@@ -18,11 +18,20 @@ class SWCData(object):
         return self.adj_list[idx]
 
 
+    def _apply_offset(self, idx):
+        return idx - self.offset_
+
+
     def get_parent(self, idx):
-        return int(self.data_block[idx - self.offset_][P])
+        return int(self.data_block[self._apply_offset(idx)][P])
 
 
-    def get_endpoints(self):
+    def get_data(self, idx):
+        new_idx = self._apply_offset(idx)
+        return self.data_block[new_idx] if new_idx > -1 else None
+
+
+    def get_end_points(self):
         ''' get the end points of the tree
 
         End points have no children so are not in the
@@ -31,5 +40,31 @@ class SWCData(object):
         return set(self.data_block[:,ID]) - set(self.adj_list.keys())
 
 
-    def get_bifurcation_points(self):
+    def get_fork_points(self):
         return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
+
+
+    def traverse_unordered(self, function):
+        '''Traverse the tree and apply a function to each node'''
+        for row in self.data_block:
+            function(row)
+
+
+    def traverse_postorder(self, function, idx=-1):
+        '''Traverse the tree post-order and apply a function to each node'''
+        if idx not in self.data_block[:,ID] and idx != -1: return
+
+        for c in self.get_children(idx):
+            self.traverse_postorder(function, c)
+
+        function(self.get_data(idx))
+
+
+    def traverse_preorder(self, function, idx=-1):
+        '''Traverse the tree pre-order and apply a function to each node'''
+        if idx not in self.data_block[:,ID] and idx != -1: return
+
+        function(self.get_data(idx))
+
+        for c in self.get_children(idx):
+            self.traverse_preorder(function, c)
