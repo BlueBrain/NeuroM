@@ -1,0 +1,1 @@
+bbp-numpy-1.8.0-system-numeric-mod==1.8.0.0

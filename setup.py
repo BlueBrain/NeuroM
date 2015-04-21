@@ -8,7 +8,7 @@ from distutils.core import setup # pylint: disable=E0611,F0401
 from pip.req import parse_requirements
 from optparse import Option
 
-from neurom import __version__
+from neurom.version import VERSION
 
 OPTIONS = Option("--workaround")
 OPTIONS.skip_requirements_regex = None
@@ -16,7 +16,7 @@ INSTALL_REQS = parse_requirements("./requirements.txt", options=OPTIONS)
 REQS = [str(ir.req) for ir in INSTALL_REQS]
 
 setup(name='neurom',
-      version=__version__,
+      version=VERSION,
       description='Neurom',
       install_requires=REQS,
       packages=['neurom', 'neurom.io', 'neurom.core'],
