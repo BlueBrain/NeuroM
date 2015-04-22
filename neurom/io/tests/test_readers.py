@@ -79,3 +79,16 @@ class TestRawDataWrapper_SingleSectionRandom(object):
             nt.ok_(p.y == i)
             nt.ok_(p.z == i)
             nt.ok_(p.r == i)
+
+    def test_iter_points(self):
+        for i, p in enumerate(self.data.iter_points()):
+            print i, p
+            nt.ok_(p == (i%8, i, i, i, i))
+
+    @nt.raises(LookupError)
+    def test_iter_points_low_id_raises(self):
+        self.data.iter_points(-1)
+
+    @nt.raises(LookupError)
+    def test_iter_points_high_id_raises(self):
+        self.data.iter_points(16)

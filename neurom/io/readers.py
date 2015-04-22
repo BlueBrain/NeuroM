@@ -1,7 +1,8 @@
-''' Simple example for reading morpholigy data files and accessing their data '''
+''' Module for morphology data loading and access'''
 import os
 from collections import defaultdict
 from collections import namedtuple
+from itertools import imap
 import numpy as np
 
 # SWC n, T, x, y, z, R, P
@@ -26,21 +27,21 @@ def unpack_data(filename):
 
 
 def load_data(filename):
-    '''Unpack filename and return a RawDataWrapper object containing the data'''
+    '''Unpack filename and return a RawDataWrapper object containing the data
+
+    Determines format from extension. Currently supported:
+
+        * SWC (case-insensitive extension ".swc")
+    '''
     return RawDataWrapper(unpack_data(filename))
 
 
 Point = namedtuple('Point', ('t', 'x', 'y', 'z', 'r'))
 
 
-def id_checker(idxs):
-    def wrapper(f):
-        def wrapped_f(idx):
-            if (not idx in idxs):
-                raise LookupError('Invalid id: {}'.format(idx))
-            f(id)
-        return wrapped_f
-    return wrapper
+def point_from_row(row):
+    '''Create a point from a data block row'''
+    return Point(*row[TYPE:P])
 
 
 class RawDataWrapper(object):
@@ -83,7 +84,7 @@ class RawDataWrapper(object):
     def get_point(self, idx):
         '''Get point data for element idx'''
         idx = self._apply_offset(idx)
-        p = Point(*self.data_block[idx][TYPE:P]) if idx > ROOT_ID else None
+        p = point_from_row(self.data_block[idx]) if idx > ROOT_ID else None
         return p
 
     def get_end_points(self):
@@ -102,3 +103,18 @@ class RawDataWrapper(object):
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
         return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
+
+    def iter_points(self, start_id=None):
+        '''Get an iterator starting at start_id
+
+        Iterator de-references to a Point object.
+        '''
+        if start_id is None:
+            start_id = self._offset
+
+        start_id = self._apply_offset(start_id)
+        if start_id < 0 or start_id >= self.data_block.shape[0]:
+            raise LookupError('Invalid id: {}'.format(start_id))
+
+        return imap(point_from_row,
+                    iter(self.data_block[start_id:]))
