@@ -1,5 +1,7 @@
 from nose import tools as nt
-from neurom.core.Tree import Tree, iter_preorder, iter_postorder
+from neurom.core.Tree import Tree
+from neurom.core.Tree import iter_preorder
+from neurom.core.Tree import iter_postorder
 
 
 REF_TREE = Tree(0)
@@ -13,6 +15,7 @@ REF_TREE.children[1].add_child(Tree(122))
 
 def test_instantiate_tree():
     t = Tree('hello')
+    nt.ok_(t.parent is None)
     nt.ok_(t.value == 'hello')
     nt.ok_(len(t.children) == 0)
 
@@ -29,6 +32,15 @@ def test_postorder_iteration():
     nt.ok_(list(iter_postorder(REF_TREE.children[1])) == [121, 122, 12])
 
 
+def test_children():
+    nt.ok_(REF_TREE.children[0].value == 11)
+    nt.ok_(REF_TREE.children[1].value == 12)
+    nt.ok_(REF_TREE.children[0].children[0].value == 111)
+    nt.ok_(REF_TREE.children[0].children[1].value == 112)
+    nt.ok_(REF_TREE.children[1].children[0].value == 121)
+    nt.ok_(REF_TREE.children[1].children[1].value == 122)
+
+
 def test_add_child():
     t = Tree(0)
     t.add_child(Tree(11))
@@ -37,3 +49,13 @@ def test_add_child():
     nt.ok_(len(t.children) == 2)
     nt.ok_([i.value for i in t.children] == [11, 22])
 
+
+def test_parent():
+    t = Tree(0)
+    for i in xrange(10):
+        t.add_child(Tree(i))
+
+    nt.ok_(len(t.children) == 10)
+
+    for c in t.children:
+        nt.ok_(c.parent is t)
