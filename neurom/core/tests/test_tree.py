@@ -2,6 +2,7 @@ from nose import tools as nt
 from neurom.core.Tree import Tree
 from neurom.core.Tree import iter_preorder
 from neurom.core.Tree import iter_postorder
+from neurom.core.Tree import iter_upstream
 
 
 REF_TREE = Tree(0)
@@ -30,6 +31,23 @@ def test_postorder_iteration():
     nt.ok_(list(iter_postorder(REF_TREE)) == [111, 112, 11, 121, 122, 12, 0])
     nt.ok_(list(iter_postorder(REF_TREE.children[0])) == [111, 112, 11])
     nt.ok_(list(iter_postorder(REF_TREE.children[1])) == [121, 122, 12])
+
+
+def test_upstream_iteration():
+
+    nt.ok_(list(iter_upstream(REF_TREE)) == [0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0])) == [11, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[0])) ==
+           [111, 11, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[1])) ==
+           [112, 11, 0])
+
+
+    nt.ok_(list(iter_upstream(REF_TREE.children[1])) == [12, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[0])) ==
+           [121, 12, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[1])) ==
+           [122, 12, 0])
 
 
 def test_children():

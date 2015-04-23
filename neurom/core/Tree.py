@@ -7,9 +7,9 @@ class Tree(object):
     Simple tree class. This is a recursive data structure, with each tree
     holding a value and a list of children trees. Every node is a tree.
     '''
-    def __init__(self, value, parent=None):
+    def __init__(self, value):
         self.value = value
-        self.parent = parent
+        self.parent = None
         self.children = list()
 
     def add_child(self, tree):
@@ -33,3 +33,10 @@ def iter_postorder(tree):
     for v in chain(*imap(iter_postorder, tree.children)):
         yield v
     yield tree.value
+
+
+def iter_upstream(tree):
+    t = tree
+    while t is not None:
+        yield t.value
+        t = t.parent
