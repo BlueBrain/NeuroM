@@ -66,3 +66,9 @@ def iter_leaf(tree):
     return imap(lambda t: t.value,
                 ifilter(lambda t: len(t.children) == 0,
                         _iter_node_preorder(tree)))
+
+
+def iter_forking_point(tree):
+    '''Iterator to forking points. Returns a tree object.'''
+    return ifilter(lambda t: len(t.children) > 1,
+                   _iter_node_preorder(tree))
