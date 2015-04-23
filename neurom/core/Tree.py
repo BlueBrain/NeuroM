@@ -50,7 +50,18 @@ def _iter_node_preorder(tree):
         yield v
 
 
-def iter_leaves(tree):
+def iter_segment(tree):
+    '''Iterate over segment values
+
+    Segments are parent-child pairs, with the child being the
+    center of the iteration
+    '''
+    return imap(lambda t: (t.parent.value, t.value),
+                ifilter(lambda t: t.parent is not None,
+                        _iter_node_preorder(tree)))
+
+
+def iter_leaf(tree):
     '''Iterator to all leaves of a tree'''
     return imap(lambda t: t.value,
                 ifilter(lambda t: len(t.children) == 0,

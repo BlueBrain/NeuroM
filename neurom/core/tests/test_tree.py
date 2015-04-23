@@ -3,7 +3,8 @@ from neurom.core.Tree import Tree
 from neurom.core.Tree import iter_preorder
 from neurom.core.Tree import iter_postorder
 from neurom.core.Tree import iter_upstream
-from neurom.core.Tree import iter_leaves
+from neurom.core.Tree import iter_segment
+from neurom.core.Tree import iter_leaf
 
 
 REF_TREE = Tree(0)
@@ -20,35 +21,6 @@ def test_instantiate_tree():
     nt.ok_(t.parent is None)
     nt.ok_(t.value == 'hello')
     nt.ok_(len(t.children) == 0)
-
-
-def test_preorder_iteration():
-    nt.ok_(list(iter_preorder(REF_TREE)) == [0, 11, 111, 112, 12, 121, 122])
-    nt.ok_(list(iter_preorder(REF_TREE.children[0])) == [11, 111, 112])
-    nt.ok_(list(iter_preorder(REF_TREE.children[1])) == [12, 121, 122])
-
-
-def test_postorder_iteration():
-    nt.ok_(list(iter_postorder(REF_TREE)) == [111, 112, 11, 121, 122, 12, 0])
-    nt.ok_(list(iter_postorder(REF_TREE.children[0])) == [111, 112, 11])
-    nt.ok_(list(iter_postorder(REF_TREE.children[1])) == [121, 122, 12])
-
-
-def test_upstream_iteration():
-
-    nt.ok_(list(iter_upstream(REF_TREE)) == [0])
-    nt.ok_(list(iter_upstream(REF_TREE.children[0])) == [11, 0])
-    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[0])) ==
-           [111, 11, 0])
-    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[1])) ==
-           [112, 11, 0])
-
-
-    nt.ok_(list(iter_upstream(REF_TREE.children[1])) == [12, 0])
-    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[0])) ==
-           [121, 12, 0])
-    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[1])) ==
-           [122, 12, 0])
 
 
 def test_children():
@@ -80,11 +52,54 @@ def test_parent():
         nt.ok_(c.parent is t)
 
 
-def test_get_leaves():
-    nt.ok_(list(iter_leaves(REF_TREE)) == [111, 112, 121, 122])
-    nt.ok_(list(iter_leaves(REF_TREE.children[0])) == [111, 112])
-    nt.ok_(list(iter_leaves(REF_TREE.children[1])) == [121, 122])
-    nt.ok_(list(iter_leaves(REF_TREE.children[0].children[0])) == [111])
-    nt.ok_(list(iter_leaves(REF_TREE.children[0].children[1])) == [112])
-    nt.ok_(list(iter_leaves(REF_TREE.children[1].children[0])) == [121])
-    nt.ok_(list(iter_leaves(REF_TREE.children[1].children[1])) == [122])
+def test_preorder_iteration():
+    nt.ok_(list(iter_preorder(REF_TREE)) == [0, 11, 111, 112, 12, 121, 122])
+    nt.ok_(list(iter_preorder(REF_TREE.children[0])) == [11, 111, 112])
+    nt.ok_(list(iter_preorder(REF_TREE.children[1])) == [12, 121, 122])
+
+
+def test_postorder_iteration():
+    nt.ok_(list(iter_postorder(REF_TREE)) == [111, 112, 11, 121, 122, 12, 0])
+    nt.ok_(list(iter_postorder(REF_TREE.children[0])) == [111, 112, 11])
+    nt.ok_(list(iter_postorder(REF_TREE.children[1])) == [121, 122, 12])
+
+
+def test_upstream_iteration():
+
+    nt.ok_(list(iter_upstream(REF_TREE)) == [0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0])) == [11, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[0])) ==
+           [111, 11, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[0].children[1])) ==
+           [112, 11, 0])
+
+
+    nt.ok_(list(iter_upstream(REF_TREE.children[1])) == [12, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[0])) ==
+           [121, 12, 0])
+    nt.ok_(list(iter_upstream(REF_TREE.children[1].children[1])) ==
+           [122, 12, 0])
+
+
+def test_segment_iteration():
+    nt.ok_(list(iter_segment(REF_TREE)),
+           [(0, 11),(11, 111),(11, 112),
+            (0, 12),(12, 121),(12, 122)])
+    nt.ok_(list(iter_segment(REF_TREE.children[0])),
+           [(0, 11), (11, 111),(11, 112)])
+    nt.ok_(list(iter_segment(REF_TREE.children[0].children[0])), [(11, 111)])
+    nt.ok_(list(iter_segment(REF_TREE.children[0].children[1])), [(11, 112)])
+    nt.ok_(list(iter_segment(REF_TREE.children[1])),
+           [(0, 12), (12, 121),(12, 122)])
+    nt.ok_(list(iter_segment(REF_TREE.children[1].children[0])), [(12, 121)])
+    nt.ok_(list(iter_segment(REF_TREE.children[1].children[1])), [(12, 122)])
+
+
+def test_leaf_iteration():
+    nt.ok_(list(iter_leaf(REF_TREE)) == [111, 112, 121, 122])
+    nt.ok_(list(iter_leaf(REF_TREE.children[0])) == [111, 112])
+    nt.ok_(list(iter_leaf(REF_TREE.children[1])) == [121, 122])
+    nt.ok_(list(iter_leaf(REF_TREE.children[0].children[0])) == [111])
+    nt.ok_(list(iter_leaf(REF_TREE.children[0].children[1])) == [112])
+    nt.ok_(list(iter_leaf(REF_TREE.children[1].children[0])) == [121])
+    nt.ok_(list(iter_leaf(REF_TREE.children[1].children[1])) == [122])
