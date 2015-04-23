@@ -3,6 +3,7 @@ from neurom.core.Tree import Tree
 from neurom.core.Tree import iter_preorder
 from neurom.core.Tree import iter_postorder
 from neurom.core.Tree import iter_upstream
+from neurom.core.Tree import iter_leaves
 
 
 REF_TREE = Tree(0)
@@ -77,3 +78,13 @@ def test_parent():
 
     for c in t.children:
         nt.ok_(c.parent is t)
+
+
+def test_get_leaves():
+    nt.ok_(list(iter_leaves(REF_TREE)) == [111, 112, 121, 122])
+    nt.ok_(list(iter_leaves(REF_TREE.children[0])) == [111, 112])
+    nt.ok_(list(iter_leaves(REF_TREE.children[1])) == [121, 122])
+    nt.ok_(list(iter_leaves(REF_TREE.children[0].children[0])) == [111])
+    nt.ok_(list(iter_leaves(REF_TREE.children[0].children[1])) == [112])
+    nt.ok_(list(iter_leaves(REF_TREE.children[1].children[0])) == [121])
+    nt.ok_(list(iter_leaves(REF_TREE.children[1].children[1])) == [122])

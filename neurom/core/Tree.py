@@ -1,5 +1,5 @@
 '''Generic tree class and iteration functions'''
-from itertools import chain, imap
+from itertools import chain, imap, ifilter
 
 
 class Tree(object):
@@ -22,21 +22,36 @@ class Tree(object):
 
 
 def iter_preorder(tree):
-    '''Depth-first pre-order iteration of tree nodes'''
+    '''Depth-first pre-order iteration of tree node values'''
     yield tree.value
     for v in chain(*imap(iter_preorder, tree.children)):
         yield v
 
 
 def iter_postorder(tree):
-    '''Depth-first post-order iteration of tree nodes'''
+    '''Depth-first post-order iteration of tree node values'''
     for v in chain(*imap(iter_postorder, tree.children)):
         yield v
     yield tree.value
 
 
 def iter_upstream(tree):
+    '''Iterate from a tree node to the root node values'''
     t = tree
     while t is not None:
         yield t.value
         t = t.parent
+
+
+def _iter_node_preorder(tree):
+    '''Depth-first pre-order iteration of tree nodes'''
+    yield tree
+    for v in chain(*imap(_iter_node_preorder, tree.children)):
+        yield v
+
+
+def iter_leaves(tree):
+    '''Iterator to all leaves of a tree'''
+    return imap(lambda t: t.value,
+                ifilter(lambda t: len(t.children) == 0,
+                        _iter_node_preorder(tree)))
