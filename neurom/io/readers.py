@@ -99,10 +99,8 @@ class RawDataWrapper(object):
         '''Get list of point ids for points with more than one child'''
         return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
 
-    def iter_points(self, start_id=None):
-        '''Get an iterator starting at start_id
-
-        Iterator de-references to a Point object.
+    def iter_row(self, start_id=None):
+        '''Get an row iterator to a starting at start_id
         '''
         if start_id is None:
             start_id = self._offset
@@ -111,5 +109,4 @@ class RawDataWrapper(object):
         if start_id < 0 or start_id >= self.data_block.shape[0]:
             raise LookupError('Invalid id: {}'.format(start_id))
 
-        return imap(point_from_row,
-                    iter(self.data_block[start_id:]))
+        return iter(self.data_block[start_id:])

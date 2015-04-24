@@ -72,7 +72,6 @@ class TestRawDataWrapper_SingleSectionRandom(object):
     def test_get_row(self):
         for i in self.data.get_ids():
             r = self.data.get_row(i)
-            print r
             nt.ok_(len(r) == 7)
             nt.ok_(r[1] >= 0 and r[1] < 8)
             nt.ok_(r[1] == i % 8)
@@ -84,7 +83,6 @@ class TestRawDataWrapper_SingleSectionRandom(object):
     def test_get_point(self):
         for i in self.data.get_ids():
             p = self.data.get_point(i)
-            print p
             nt.ok_(p)
             nt.ok_(p.t >= 0 and p.t < 8)
             nt.ok_(p.t == i % 8)
@@ -93,15 +91,14 @@ class TestRawDataWrapper_SingleSectionRandom(object):
             nt.ok_(p.z == i)
             nt.ok_(p.r == i)
 
-    def test_iter_points(self):
-        for i, p in enumerate(self.data.iter_points()):
-            print i, p
-            nt.ok_(p == (i%8, i, i, i, i))
+    def test_iter_row(self):
+        for i, p in enumerate(self.data.iter_row()):
+            nt.assert_true(np.all(p == (i, i%8, i, i, i, i, i-1)))
 
     @nt.raises(LookupError)
-    def test_iter_points_low_id_raises(self):
-        self.data.iter_points(-1)
+    def test_iter_row_low_id_raises(self):
+        self.data.iter_row(-1)
 
     @nt.raises(LookupError)
-    def test_iter_points_high_id_raises(self):
-        self.data.iter_points(16)
+    def test_iter_row_high_id_raises(self):
+        self.data.iter_row(16)
