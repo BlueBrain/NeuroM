@@ -22,32 +22,26 @@ class Tree(object):
 
 
 def iter_preorder(tree):
-    '''Depth-first pre-order iteration of tree node values'''
-    yield tree.value
+    '''Depth-first pre-order iteration of tree nodes'''
+    yield tree
     for v in chain(*imap(iter_preorder, tree.children)):
         yield v
 
 
+
 def iter_postorder(tree):
-    '''Depth-first post-order iteration of tree node values'''
+    '''Depth-first post-order iteration of tree nodes'''
     for v in chain(*imap(iter_postorder, tree.children)):
         yield v
-    yield tree.value
+    yield tree
 
 
 def iter_upstream(tree):
-    '''Iterate from a tree node to the root node values'''
+    '''Iterate from a tree node to the root nodes'''
     t = tree
     while t is not None:
-        yield t.value
+        yield t
         t = t.parent
-
-
-def _iter_node_preorder(tree):
-    '''Depth-first pre-order iteration of tree nodes'''
-    yield tree
-    for v in chain(*imap(_iter_node_preorder, tree.children)):
-        yield v
 
 
 def iter_segment(tree):
@@ -58,17 +52,21 @@ def iter_segment(tree):
     '''
     return imap(lambda t: (t.parent.value, t.value),
                 ifilter(lambda t: t.parent is not None,
-                        _iter_node_preorder(tree)))
+                        iter_preorder(tree)))
 
 
 def iter_leaf(tree):
     '''Iterator to all leaves of a tree'''
-    return imap(lambda t: t.value,
-                ifilter(lambda t: len(t.children) == 0,
-                        _iter_node_preorder(tree)))
+    return ifilter(lambda t: len(t.children) == 0, iter_preorder(tree))
 
 
 def iter_forking_point(tree):
     '''Iterator to forking points. Returns a tree object.'''
     return ifilter(lambda t: len(t.children) > 1,
-                   _iter_node_preorder(tree))
+                   iter_preorder(tree))
+
+
+def val_iter(iterator):
+    '''Iterator adaptor to iterate over Tree.value'''
+    return imap(lambda t: t.value, iterator)
+
