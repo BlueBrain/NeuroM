@@ -2,9 +2,12 @@
 Module containing the common functionality
 to be used by view-plot modules.
 """
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as _np
 import os
+
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
     """

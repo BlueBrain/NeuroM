@@ -68,6 +68,19 @@ class TestRawDataWrapper_SingleSectionRandom(object):
     def test_get_endpoints(self):
         nt.ok_(self.data.get_end_points() == [15])
 
+
+    def test_get_row(self):
+        for i in self.data.get_ids():
+            r = self.data.get_row(i)
+            print r
+            nt.ok_(len(r) == 7)
+            nt.ok_(r[1] >= 0 and r[1] < 8)
+            nt.ok_(r[1] == i % 8)
+            nt.ok_(r[2] == i)
+            nt.ok_(r[3] == i)
+            nt.ok_(r[4] == i)
+            nt.ok_(r[5] == i)
+
     def test_get_point(self):
         for i in self.data.get_ids():
             p = self.data.get_point(i)

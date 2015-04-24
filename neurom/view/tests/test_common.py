@@ -1,9 +1,9 @@
 from nose import tools as nt
+from neurom.view.common import plt
 from neurom.view.common import figure_naming
 from neurom.view.common import get_figure
 from neurom.view.common import save_plot
 from neurom.view.common import style_plot
-import matplotlib.pyplot as plt 
 import os
 
 def test_figure_naming():
@@ -20,17 +20,17 @@ def test_figure_naming():
 
 def test_get_figure():
     fig_old = plt.figure()
-    fig, ax = get_figure(new_fig=False, subplot=False)    
+    fig, ax = get_figure(new_fig=False, subplot=False)
     nt.ok_(fig == fig_old)
     nt.ok_(ax.colNum == 0)
     nt.ok_(ax.rowNum == 0)
-    fig1, ax1 = get_figure(new_fig=True, subplot=224)   
+    fig1, ax1 = get_figure(new_fig=True, subplot=224)
     nt.ok_(fig1 != fig_old)
     nt.ok_(ax1.colNum == 1)
     nt.ok_(ax1.rowNum == 1)
-    fig = get_figure(new_fig=True, no_axes=True)   
+    fig = get_figure(new_fig=True, no_axes=True)
     nt.ok_(type(fig) == plt.Figure)
-    fig2, ax2 = get_figure(new_fig=True, subplot=[1,1,1])   
+    fig2, ax2 = get_figure(new_fig=True, subplot=[1,1,1])
     nt.ok_(ax2.colNum == 0)
     nt.ok_(ax2.rowNum == 0)
     plt.close('all')

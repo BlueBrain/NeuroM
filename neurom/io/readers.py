@@ -77,6 +77,11 @@ class RawDataWrapper(object):
         p = point_from_row(self.data_block[idx]) if idx > ROOT_ID else None
         return p
 
+    def get_row(self, idx):
+        '''Get row from idx'''
+        idx = self._apply_offset(idx)
+        return self.data_block[idx] if idx > ROOT_ID else None
+
     def get_end_points(self):
         ''' get the end points of the tree
 
