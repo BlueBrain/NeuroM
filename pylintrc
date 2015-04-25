@@ -1,0 +1,63 @@
+## look at http://docutils.sourceforge.net/sandbox/py-rest-doc/utils/pylintrc
+# for some of the options that are available
+
+[MESSAGES CONTROL]
+#C0103 -  Invalid name "%s" (should match %s) - matches too many things, like variables w/ single char names
+#R0904 - Too Many public methods
+#R0903 - Too Few public methods
+#W0511 - TODO in code
+#W0232 - Class has no __init__ method
+#R0922 - Abstract class is only referenced 1 times
+#R0801 - Similar lines in %d files
+#R0921 - Abstract class not referenced
+#W0141 - Used builtin function 'map'
+#R0401 - cyclic-import
+#I0013 - Ignore the 'Ignoring entire file' warning
+#W0142 - Used * or ** magic
+disable=C0103,R0904,R0903,W0511,W0232,R0922,R0801,R0921,W0141,R0401,I0013,W0142
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=100
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=8
+# Argument names that match this expression will be ignored. Default to name
+# with leading underscore
+ignored-argument-names=_.*
+# Maximum number of locals for function / method body
+max-locals=15
+# Maximum number of return / yield for function / method body
+max-returns=6
+# Maximum number of branch for function / method body
+max-branchs=12
+# Maximum number of statements in function / method body
+max-statements=50
+# Maximum number of parents for a class (see R0901).
+max-parents=7
+# Maximum number of attributes for a class (see R0902).
+max-attributes=40
+# Minimum number of public methods for a class (see R0903).
+min-public-methods=2
+# Maximum number of public methods for a class (see R0904).
+max-public-methods=60
+# checks for similarities and duplicated code. This computation may be
+# memory / CPU intensive, so you should disable it if you experiments some
+# problems.
+# 
+
+[SIMILARITIES]
+# Minimum lines number of a similarity.
+min-similarity-lines=25
+# Ignore comments when computing similarities.
+ignore-comments=yes
+# Ignore docstrings when computing similarities.
+ignore-docstrings=yes
+
+[TYPECHECK]
+# List of classes names for which member attributes should not be checked
+# (useful for classes with attributes dynamically set).
+
+#as of numpy 1.8.0, name resolution seems to be a problem.  Ignore lookups in numpy
+ignored-classes=numpy,numpy.linalg,numpy.random,numpy.testing

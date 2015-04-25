@@ -28,7 +28,6 @@ def iter_preorder(tree):
         yield v
 
 
-
 def iter_postorder(tree):
     '''Depth-first post-order iteration of tree nodes'''
     for v in chain(*imap(iter_postorder, tree.children)):
@@ -69,4 +68,3 @@ def iter_forking_point(tree):
 def val_iter(iterator):
     '''Iterator adaptor to iterate over Tree.value'''
     return imap(lambda t: t.value, iterator)
-

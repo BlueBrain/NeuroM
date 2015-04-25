@@ -1,23 +1,23 @@
-#modules that have tests
-TEST_MODULES=neurom
-#modules that are installable (ie: ones with setup.py)
-INSTALL_MODULES=.
-#packages to cover
-COVER_PACKAGES=neurom
-# documentation to build, separated by spaces
-DOC_MODULES=doc
+test_venv:
+	virtualenv --system-site-packages test_venv
+	test_venv/bin/pip install --upgrade --force-reinstall pep8
+	test_venv/bin/pip install --upgrade --force-reinstall nose
+	test_venv/bin/pip install -e .
 
-##### DO NOT MODIFY BELOW #####################
+run_pep8: test_venv
+	test_venv/bin/pep8 --config=pep8rc `find neurom -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
 
-ifndef CI_DIR
-CI_REPO?=ssh://bbpcode.epfl.ch/platform/ContinuousIntegration.git
-CI_DIR?=ContinuousIntegration
+run_tests: test_venv
+	test_venv/bin/nosetests -v --with-coverage --cover-package neurom
 
-FETCH_CI := $(shell \
-		if [ ! -d $(CI_DIR) ]; then \
-			git clone $(CI_REPO) $(CI_DIR) > /dev/null ;\
-		fi;\
-		echo $(CI_DIR) )
-endif
+lint: run_pep8
 
-include $(CI_DIR)/python/common_makefile
+test: run_tests
+
+clean_test_venv:
+	/bin/rm -rf test_venv
+
+clean: clean_test_venv
+	/bin/rm -f pep8.txt
+
+.PHONY: run_pep8 test clean_test_venv clean

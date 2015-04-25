@@ -19,5 +19,5 @@ setup(name='neurom',
       version=VERSION,
       description='Neurom',
       install_requires=REQS,
-      packages=['neurom', 'neurom.io', 'neurom.core'],
+      packages=['neurom', 'neurom.io', 'neurom.core', 'neurom.view'],
       )

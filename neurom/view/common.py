@@ -3,10 +3,10 @@ Module containing the common functionality
 to be used by view-plot modules.
 """
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as _np
 import os
+matplotlib.use('Agg')
 
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
@@ -60,6 +60,7 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
 
     return pretitle, posttitle, prefile, postfile
 
+
 def get_figure(new_fig=True, subplot=False, params={}, no_axes=False):
     """
     Function to be used for viewing - plotting,
@@ -112,6 +113,7 @@ def get_figure(new_fig=True, subplot=False, params={}, no_axes=False):
         ax = fig.add_subplot(subplot, **params)
 
     return fig, ax
+
 
 def save_plot(fig, **kwargs):
 
@@ -175,6 +177,7 @@ def save_plot(fig, **kwargs):
     plt.savefig(output, dpi=dpi, transparent=transparent)
 
     print 'Plot Saved:', output
+
 
 def style_plot(fig, ax, **kwargs):
 
@@ -365,9 +368,3 @@ def style_plot(fig, ax, **kwargs):
         return (None, None)
 
     return fig, ax
-
-
-
-
-
-
