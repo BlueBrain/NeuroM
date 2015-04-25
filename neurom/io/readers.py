@@ -1,7 +1,6 @@
 ''' Module for morphology data loading and access'''
 import os
 from collections import defaultdict
-from itertools import imap
 import numpy as np
 from neurom.core.point import point_from_row
 from neurom.core.dataformat import Rows

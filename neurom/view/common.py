@@ -4,7 +4,6 @@ to be used by view-plot modules.
 """
 import matplotlib
 import matplotlib.pyplot as plt
-import numpy as _np
 import os
 matplotlib.use('Agg')
 
