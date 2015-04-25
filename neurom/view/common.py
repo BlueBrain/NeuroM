@@ -60,7 +60,7 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
     return pretitle, posttitle, prefile, postfile
 
 
-def get_figure(new_fig=True, subplot=False, params={}, no_axes=False):
+def get_figure(new_fig=True, subplot=False, params=None, no_axes=False):
     """
     Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
@@ -106,7 +106,10 @@ def get_figure(new_fig=True, subplot=False, params={}, no_axes=False):
     if not subplot:
         subplot = 111
 
-    if type(subplot) == tuple or type(subplot) == list:
+    if params is None:
+        params = dict()
+
+    if isinstance(subplot, (tuple, list)):
         ax = fig.add_subplot(subplot[0], subplot[1], subplot[2], **params)
     else:
         ax = fig.add_subplot(subplot, **params)
@@ -329,6 +332,7 @@ def style_plot(fig, ax, **kwargs):
     else:
         ax.xaxis.set_ticklabels(x_ticks)
         ax.xaxis.set_tick_params(labelsize=tickfontsize, **xticksarg)
+
     if no_ticks or no_yticks:
         ax.yaxis.set_ticks([])
     else:
@@ -337,6 +341,7 @@ def style_plot(fig, ax, **kwargs):
 
     if not no_limits and not no_xlim:
         ax.set_xlim(xlim)
+
     if not no_limits and not no_ylim:
         ax.set_ylim(ylim)
 
