@@ -1,4 +1,6 @@
+import numpy as np
 from neurom.io.readers import load_data
+from neurom.core.dataformat import ROOT_ID
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
 
@@ -33,6 +35,21 @@ def finite_radius_neurites(raw_data):
     return len(bad_points) == 0, bad_points
 
 
+def has_finite_length_segments(raw_data):
+    '''Check that all segments have a finite length
+
+    return: tuple of (bool, [(pid, id) for zero-length segments])
+    '''
+    bad_segments = list()
+    for row in raw_data.iter_row():
+        idx = int(row[COLS.ID])
+        pid = int(row[COLS.P])
+        if pid != ROOT_ID:
+            if np.all(row[COLS.X: COLS.R] == raw_data.get_row(pid)[COLS.X: COLS.R]):
+                bad_segments.append((pid, idx))
+    return len(bad_segments) == 0, bad_segments
+
+
 if __name__ == '__main__':
 
     files = ['test_data/swc/Neuron.swc',
@@ -41,6 +58,7 @@ if __name__ == '__main__':
              'test_data/swc/Single_basal.swc',
              'test_data/swc/Single_axon.swc',
              'test_data/swc/Neuron_zero_radius.swc',
+             'test_data/swc/sequential_trunk_off_1_16pt.swc',
              'test_data/swc/non_sequential_trunk_off_1_16pt.swc']
 
     for f in files:
@@ -55,3 +73,8 @@ if __name__ == '__main__':
         print 'Consecutive indices? %s' % ci[0]
         if not ci[0]:
             print'Non consecutive IDs detected:', ci[1]
+        else:
+            fs = has_finite_length_segments(rd)
+            print 'Finite length segments? %s' % fs[0]
+            if not fs[0]:
+                print 'Segments with zero length detected:', fs[1]
