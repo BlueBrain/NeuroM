@@ -3,14 +3,14 @@ import os
 from collections import defaultdict
 import numpy as np
 from neurom.core.point import point_from_row
-from neurom.core.dataformat import Rows
+from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
 
 
 def read_swc(filename):
     '''Read an SWC file and return a tuple of data, offset, format.'''
     data = np.loadtxt(filename)
-    offset = data[0][Rows.ID]
+    offset = data[0][COLS.ID]
     return data, offset, 'SWC'
 
 _READERS = {'swc': read_swc}
@@ -52,7 +52,7 @@ class RawDataWrapper(object):
         self.data_block, self._offset, self.fmt = raw_data
         self.adj_list = defaultdict(list)
         for row in self.data_block:
-            self.adj_list[int(row[Rows.P])].append(int(row[Rows.ID]))
+            self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
 
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
@@ -68,7 +68,7 @@ class RawDataWrapper(object):
         '''get the parent of element with id idx'''
         if idx not in self.get_ids():
             raise LookupError('Invalid id: {}'.format(idx))
-        return int(self.data_block[self._apply_offset(idx)][Rows.P])
+        return int(self.data_block[self._apply_offset(idx)][COLS.P])
 
     def get_point(self, idx):
         '''Get point data for element idx'''
@@ -81,6 +81,10 @@ class RawDataWrapper(object):
         idx = self._apply_offset(idx)
         return self.data_block[idx] if idx > ROOT_ID else None
 
+    def get_col(self, col_id):
+        '''Get column from ID'''
+        return self.data_block[:, col_id]
+
     def get_end_points(self):
         ''' get the end points of the tree
 
@@ -88,11 +92,11 @@ class RawDataWrapper(object):
         adjacency list.
         '''
         return [int(i) for i in
-                set(self.data_block[:, Rows.ID]) - set(self.adj_list.keys())]
+                set(self.get_col(COLS.ID)) - set(self.adj_list.keys())]
 
     def get_ids(self):
         '''Get the list of ids'''
-        return list(self.data_block[:, Rows.ID])
+        return list(self.data_block[:, COLS.ID])
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
