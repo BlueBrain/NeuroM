@@ -2,10 +2,10 @@
 Module containing the common functionality
 to be used by view-plot modules.
 """
-import matplotlib
-import matplotlib.pyplot as plt
 import os
-matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg') # noqa
+import matplotlib.pyplot as plt
 
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
