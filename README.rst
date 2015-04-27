@@ -7,7 +7,7 @@ TODO: write package desctiption and detailed installation instructions.
 Installation
 ============
 
-NeuroM is a ``pip``-inatallable package, so it is possible to install it system-wide or
+NeuroM is a ``pip``-installable package, so it is possible to install it system-wide or
 into a ``virtualenv`` using ``pip``:
 
     $ pip install hbp-neurom-X.Y.Z.tgz
@@ -29,7 +29,7 @@ Installation and runtime
 ------------------------
 
 * ``numpy >= 1.8.0``
-* ``matplotlib``
+* ``matplotlib >= 1.3.1``
 
 Testing
 -------
