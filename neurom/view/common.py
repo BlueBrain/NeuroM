@@ -652,16 +652,16 @@ def plot_ticks(fig, ax, **kwargs):
                 ax.set_xticks(xticks)
                 ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
             else:
-                ax.xaxis.set_ticks([])
+                ax.set_xticks([])
         if yticks is not None:
             if not no_yticks:
                 ax.set_yticks(yticks)
                 ax.yaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
             else:
-                ax.yaxis.set_ticks([])
+                ax.set_yticks([])
     else:
-        ax.xaxis.set_ticks([])
-        ax.yaxis.set_ticks([])
+        ax.set_xticks([])
+        ax.set_yticks([])
 
     return fig, ax
 

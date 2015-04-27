@@ -113,7 +113,7 @@ def test_plot_ticks():
     fig1, ax1 = plot_ticks(fig, ax, no_ticks=True)
     nt.ok_(len(ax1.get_xticks()) == 0 )
     nt.ok_(len(ax1.get_yticks()) == 0 )
-    fig1, ax1 = plot_ticks(fig, ax, no_xticks=True, no_yticks=True)
+    fig1, ax1 = plot_ticks(fig, ax, xticks=[], yticks=[], no_xticks=True, no_yticks=True)
     nt.ok_(len(ax1.get_xticks()) == 0 )
     nt.ok_(len(ax1.get_yticks()) == 0 )
     fig1, ax1 = plot_ticks(fig, ax, xticks=np.arange(3), yticks=np.arange(4))
