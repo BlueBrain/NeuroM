@@ -1,3 +1,4 @@
+'''Examples of basic data checks'''
 import numpy as np
 from neurom.io.readers import load_data
 from neurom.core.dataformat import ROOT_ID
@@ -12,7 +13,7 @@ def has_sequential_ids(raw_data):
     with their predecessor)
     '''
     ids = raw_data.get_col(COLS.ID)
-    steps = [int(j) for (i, j) in zip(ids, ids[1:]) if int(j-i) != 1]
+    steps = [int(j) for (i, j) in zip(ids, ids[1:]) if int(j - i) != 1]
     return len(steps) == 0, steps
 
 
