@@ -1,16 +1,14 @@
-.. NeuroM documentation master file, 
-   created by on Tue Apr 28 2015.
+.. NeuroM documentation master file
 
-Welcome to the Pneumatk documentation
-====================================
+Welcome to the NeuroM documentation
+===================================
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
-   
+
    readme
-   tutorial
    api
 
 Indices and tables

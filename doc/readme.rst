@@ -1,213 +1,86 @@
-.. _my-reference-quick-start-guide:
-
 NeuroM Quick Start Guide
-**************************
+************************
 
 Introduction
-=============
+============
 
-NeuroM.
-++++++++
+NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies. 
+This quick start guide contains information on how to install NeuroM and use case examples.
 
-This quick start guide contains information on how to install NeuroM and start using it. For more detailed information on NeuroM practice, see :ref:`my-reference-tutorial`. 
+Dependencies
+============
 
-Installation Manual
-===================
+The known build-time and runtime dependencies of NeuroM are:
 
-Prerequisites
--------------
+* numpy
+* scipy
+* matplotlib
 
-Operating Systems
-++++++++++++++++++
 
-**Windows:**
-	To be tested!
+Installation
+============
 
-**Linux:**
-	No specific version or model requirements are known yet. 
+It is recommended that you use pip to install into a ``virtualenv``:
 
-**Mac:**
-	No specific version or model requirements are known yet.
+.. code-block:: bash
 
-.. _my-reference-requirements:
+    $ virtualenv --system-site-packages foo   # creates a virtualenv called "foo" in foo directory
+    $ source foo/bin/activate                 # activates virtualenv
+    (foo)$                                    # now we are in the foo virtualenv
 
-Python version and module requirements
-++++++++++++++++++++++++++++++++++++++
+The prompt indicates that the ``virtualenv`` has been activated. To de-activate it,
 
-NeuroM is a Python-based toolkit. In order to use NeuroM, Python 2.7 or later is required. 
-In addition, the following Python modules are required:
+.. code-block:: bash
 
-::
+    (foo)$ deactivate
 
-    sys
-    os
-    scipy
-    numpy
-    matplotlib
+Note you do not have to work in the ``foo`` directory. This is where python packages will get installed, but you can work anywhere on your file system, as long as you have activated the ``virtualenv``.
 
-.. _my-reference-installation:
+NeuroM
+------
 
-Installation procedure
-----------------------
+Once the ``virtualenv`` is set up, you can install ``hbp-neurom`` from source. First, clone the repository
 
-Linux
-+++++
+.. code-block:: bash
 
-.. _my-reference-python-and-required-modules:
+    (foo)$ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
+    (foo)$ pip install -e ./hbp-neurom
 
-Installation of Python and required modules
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This installs ``hbp-neurom`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
+To install in read-only mode, omit the ``-e``.
 
-1. Install or upgrade Python.
 
-The first step for a successful installation of NeuroM is the installation of Python and its
-most frequently used modules. NeuroM needs at least Python 2.7, so if you have an
-earlier version you should upgrade it. If you do not have Python you can download and install 
-it from http://www.python.org/getit/.
+Running the tests
+-----------------
 
-2. Install individual Python modules.
+The tests require that you have cloned the repository, since the test code is not distributed in the package. It is recommended to use ``nosetests`` for this. Inside the virtualenv, install ``nose`` if you haven't done so already.
 
-For NeuroM to work properly, you will need some Python modules to be installed, see :ref:`my-reference-requirements`. 
+.. code-block:: bash
 
-To check if a module is already installed when Python and IPython installation is complete, 
-you can try:
+    (foo)$ pip install nose
+    (foo)$ nosetests -s -v path_to_repo/hbp-neurom/neurom/tests
 
-::
+Examples
+========
 
-    ipython
+- Load a neuron:
 
-    import wx, sys, os, shutil, h5py, scipy, numpy, matplotlib, pylab, sklearn
+.. code-block:: bash
 
-If any of these modules are not already installed, you would get an error "No module named \*".
-You have to install the missing modules, before you will be able to run NeuroM. For the 
-installation of the above modules and more details, see: http://docs.python.org/2/install/.
+    # Load a neuron
+    (foo)$
 
-Installation of NeuroM
-~~~~~~~~~~~~~~~~~~~~~~~~
+- Visualize a neuronal morphology:
 
-Once the modules listed in :ref:`my-reference-python-and-required-modules` are downloaded, installed and running, you can start the NeuroM installation procedure. 
+.. code-block:: bash
 
-1. Git get NeuroM code
+    # Visualize a neuronal morphology
+    (foo)$
 
-- Create a folder to store NeuroM code:
+- Abstract morphometrics:
 
-::
+.. code-block:: bash
 
-    mkdir -p your_git_directory/NeuroM
-    cd your_git_directory/NeuroM
-
-- Get NeuroM code out of git repository:
-
-::
-
-    git clone https://bbpteam.epfl.ch/reps/analysis/NeuroM.git
-
-For more information about git, visit: https://git.wiki.kernel.org/index.php/GitSvnCrashCourse.
-
-2. Add NeuroM path to Python path
-
-- In order to be able to run NeuroM from every directory, the NeuroM path should be added to the regular Python path:
-
-::
-
-    cd ~
-    nano .bashrc
-
-- Add the following path at the end of the file:
-
-::
-
-    # To add NeuroM to Python path:
-    export PYTHONPATH=$PYTHONPATH:~/git/NeuroM
-
-- Save the file and exit:
-
-::
-
-    Control-o
-    [return]
-    Control-x
-
-NeuroM should be ready to use. 
-
-Tests
-~~~~~
-
-In order to verify that the installation was completed successfully, 
-you should make sure that it loads correctly and that the tests designed 
-to check NeuroM are successful. 
-
-- Load NeuroM and test initialization
-
-At a new terminal you can now test NeuroM. Open a new Python session at the directory of your preference.
-
-.. warning::
-
-   You cannot run NeuroM in the directory: your_git_directory/NeuroM/neurom/. 
-   Python will crash in this directory!
-
-Load NeuroM in interactive Python:
-   
-::
-
-    ipython --pylab
-    import neurom
-
-If there are no error messages NeuroM is successfully installed and imported.
-
-- NeuroM check (The tests are not yet ready--)
-
-For validation of the installation and functioning of NeuroM, you can run the tests.
-Change to the directory where NeuroM is installed and run the following command:
-
-::
-
-    cd your_git_directory/NeuroM
-    nosetests -v --nocapture tests/tools_test.py
-
-Simple example
-===============
-
-A simple example to start using NeuroM is illustrated in the following section. 
-This example introduces a basic morphological analysis of a single neuron. The user can 
-learn how to load the morphology in IPython, view the morphology and create a small report,
-that contains the most significant measurements, acording to neuromorpho measurements.
-For more detailed information on NeuroM practice, see :ref:`my-reference-tutorial`. 
-
-- Change to your git directory:
-
-::
-
-   cd your_git_directory/
-
-- Enter a Python interactive session from the terminal:
-
-::
-
-   ipython --pylab
-
-- Import NeuroM and start using it:
-
-::
-
-   import neurom as pn
-
-   # Load a population of neurons
-   my_population = pn.io.load('/NeuroM/tests/io_test_data/bbp_h5/')
-
-   # Select a neuron from the population to analyze
-   my_neuron = my_population.neuron[0]
-
-   # Load a single neuron from the directory that contains multiple files
-   my_neuron = pn.io.load('/NeuroM/tests/io_test_data/bbp_h5/C140300B-P1.h5')
-
-- View a single neuronal morphology:
-
-::
-
-   # View the neuron in the xy plane 
-   my_neuron.view( plane = 'xy' )
-
-
+    # Abstract morphometrics
+    (foo)$
