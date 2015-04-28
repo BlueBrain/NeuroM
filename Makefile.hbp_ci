@@ -6,6 +6,8 @@ INSTALL_MODULES=.
 COVER_PACKAGES=neurom
 # documentation to build, separated by spaces
 DOC_MODULES=doc
+# optional requirements will be taken from requirements_hbp.txt
+OPTIONAL_FEATURES:='[hbp']
 
 ##### DO NOT MODIFY BELOW #####################
 

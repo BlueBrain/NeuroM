@@ -58,7 +58,7 @@ class RawDataWrapper(object):
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
         if idx != ROOT_ID and idx not in self.get_ids():
-            raise LookupError('Invalid id: {}'.format(idx))
+            raise LookupError('Invalid id: {0}'.format(idx))
         return self.adj_list[idx]
 
     def _apply_offset(self, idx):
@@ -68,7 +68,7 @@ class RawDataWrapper(object):
     def get_parent(self, idx):
         '''get the parent of element with id idx'''
         if idx not in self.get_ids():
-            raise LookupError('Invalid id: {}'.format(idx))
+            raise LookupError('Invalid id: {0}'.format(idx))
         return int(self.data_block[self._apply_offset(idx)][COLS.P])
 
     def get_point(self, idx):
@@ -112,7 +112,7 @@ class RawDataWrapper(object):
 
         start_id = self._apply_offset(start_id)
         if start_id < 0 or start_id >= self.data_block.shape[0]:
-            raise LookupError('Invalid id: {}'.format(start_id))
+            raise LookupError('Invalid id: {0}'.format(start_id))
 
         irow = iter(self.data_block[start_id:])
         return irow if pred is None else ifilter(pred, irow)
