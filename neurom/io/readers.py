@@ -1,6 +1,7 @@
 ''' Module for morphology data loading and access'''
 import os
 from collections import defaultdict
+from itertools import ifilter
 import numpy as np
 from neurom.core.point import point_from_row
 from neurom.core.dataformat import COLS
@@ -94,16 +95,17 @@ class RawDataWrapper(object):
         return [int(i) for i in
                 set(self.get_col(COLS.ID)) - set(self.adj_list.keys())]
 
-    def get_ids(self):
-        '''Get the list of ids'''
-        return list(self.data_block[:, COLS.ID])
+    def get_ids(self, pred=None):
+        '''Get the list of ids for rows satisfying an optional row predicate'''
+        return [r[COLS.ID] for r in self.iter_row(None, pred)]
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
         return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
 
-    def iter_row(self, start_id=None):
-        '''Get an row iterator to a starting at start_id
+    def iter_row(self, start_id=None, pred=None):
+        '''Get an row iterator to a starting at start_id and satisfying a
+        row predicate pred.
         '''
         if start_id is None:
             start_id = self._offset
@@ -112,4 +114,5 @@ class RawDataWrapper(object):
         if start_id < 0 or start_id >= self.data_block.shape[0]:
             raise LookupError('Invalid id: {}'.format(start_id))
 
-        return iter(self.data_block[start_id:])
+        irow = iter(self.data_block[start_id:])
+        return irow if pred is None else ifilter(pred, irow)

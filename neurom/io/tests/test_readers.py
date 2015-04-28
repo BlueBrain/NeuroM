@@ -37,6 +37,9 @@ class TestRawDataWrapper_SingleSectionRandom(object):
     def test_get_ids(self):
         nt.ok_(self.data.get_ids() == range(self.first_id, self.first_id+16))
 
+    def test_get_ids_with_pred(self):
+        nt.assert_equal(self.data.get_ids(lambda r: r[COLS.TYPE] == 2),
+                        [self.first_id+2, self.first_id+10])
 
     @nt.raises(LookupError)
     def test_get_parent_invalid_id_raises(self):
@@ -103,7 +106,10 @@ class TestRawDataWrapper_SingleSectionRandom(object):
         for i, p in enumerate(self.data.iter_row()):
             ii = i + self.first_id
             pid = -1 if i == 0 else ii - 1
-            nt.assert_true(np.all(p == (ii, i%8, i, i, i, i, pid)))
+            nt.assert_true(np.all(p == (ii, i % 8, i, i, i, i, pid)))
+
+        for p in self.data.iter_row(None, lambda r: r[COLS.TYPE] == 1):
+            nt.assert_true(p[COLS.TYPE] == 1)
 
     @nt.raises(LookupError)
     def test_iter_row_low_id_raises(self):
