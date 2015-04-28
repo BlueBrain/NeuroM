@@ -3,7 +3,7 @@ from neurom.core.point import Point
 from neurom.core.point import point_from_row
 
 def test_point_members():
-    p = Point('FOO', 1, 2, 3, 4)
+    p = Point(1, 2, 3, 4, 'FOO')
     nt.ok_(p.t == 'FOO')
     nt.ok_(p.x == 1)
     nt.ok_(p.y == 2)
