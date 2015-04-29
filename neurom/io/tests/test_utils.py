@@ -2,6 +2,7 @@
 import os
 from neurom.io.readers import load_data
 from neurom.io import utils
+from neurom.core import tree
 from nose import tools as nt
 
 
@@ -55,3 +56,21 @@ def test_get_soma_ids():
 def test_get_initial_segment_ids():
     for i, d in enumerate(RAW_DATA):
         nt.ok_(utils.get_initial_segment_ids(d) == INIT_IDS[i])
+
+
+def test_make_tree():
+    rd = RAW_DATA[0]
+    seg_ids = utils.get_initial_segment_ids(rd)
+    trees = [utils.make_tree(rd, seg_id) for seg_id in seg_ids]
+    nt.ok_(len(trees) == len(INIT_IDS[0]))
+    for t in trees:
+        nt.ok_(len(list(tree.iter_leaf(t))) == 11)
+        nt.ok_(len(list(tree.iter_forking_point(t))) == 10)
+        nt.ok_(len(list(tree.iter_preorder(t))) == 211)
+        nt.ok_(len(list(tree.iter_postorder(t))) == 211)
+        nt.ok_(len(list(tree.iter_segment(t))) == 210)
+        leaves = [l for l in tree.iter_leaf(t)]
+        # path length from each leaf to root node.
+        branch_order = [21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 111]
+        for i, l in enumerate(leaves):
+            nt.ok_(len(list(tree.iter_upstream(l))) == branch_order[i])
