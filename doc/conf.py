@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# NeuroM documentation build configuration file, 
+# NeuroM documentation build configuration file,
 # created by on Tue April 28 2015.
 #
 
@@ -8,7 +8,7 @@ import sys
 import os
 import sys, os
 import neurom
-
+from neurom.version import VERSION
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -51,9 +51,9 @@ copyright = u'HBP Algorithm Section'
 # built documents.
 #
 # The short X.Y version.
-version = 0.1
+version = VERSION
 # The full version, including alpha/beta/rc tags.
-release = 0.1
+release = VERSION
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

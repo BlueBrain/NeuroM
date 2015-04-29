@@ -10,6 +10,9 @@ from numpy.random import uniform
 import numpy as np
 
 
+np.random.seed(0)
+
+
 def test_point_dist():
     p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
     p2 = Point(4.0, 5.0, 6.0, 3.0, 1)

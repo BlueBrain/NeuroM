@@ -11,23 +11,32 @@ This quick start guide contains information on how to install NeuroM and use cas
 Dependencies
 ============
 
-The known build-time and runtime dependencies of NeuroM are:
+The build-time and runtime dependencies of NeuroM are:
 
 * numpy
 * scipy
 * matplotlib
 
+Additional dependencies needed for testing and building documentation are
+* nose
+* coverage
+* sphinx
+* GNU Make
 
 Installation
 ============
 
-It is recommended that you use pip to install into a ``virtualenv``:
+It is recommended that you use pip to install into ``NeuroM`` into a ``virtualenv``:
 
 .. code-block:: bash
 
     $ virtualenv --system-site-packages foo   # creates a virtualenv called "foo" in foo directory
     $ source foo/bin/activate                 # activates virtualenv
     (foo)$                                    # now we are in the foo virtualenv
+
+Here, the ``--system-site-packages`` option has been used. This is because dependencies such as
+``matplotlib`` aren't trivial to build in a ``virtualenv``. This setting allows python packages
+installed in the system to be used inside the ``virtualenv``.
 
 The prompt indicates that the ``virtualenv`` has been activated. To de-activate it,
 
@@ -54,12 +63,31 @@ To install in read-only mode, omit the ``-e``.
 Running the tests
 -----------------
 
-The tests require that you have cloned the repository, since the test code is not distributed in the package. It is recommended to use ``nosetests`` for this. Inside the virtualenv, install ``nose`` if you haven't done so already.
+The tests require that you have cloned the repository, since the test code is not distributed in the package. It is recommended to use ``nosetests`` for this. There are two options:
+
+Run the tests in a dedicated virtualenv:
+
+.. code-block:: bash
+
+        $ make test
+
+``make`` also has targets for running pylint and pep8:
+
+
+.. code-block:: bash
+
+        $ make lint       # runs pep8 and pylint if that succeeds
+        $ make run_pep8   # run only pep8
+        $ make run_pylint # run only pep8
+
+Alternatively, inside the virtualenv, install ``nose`` and ``coverage`` if you haven't
+done so already or these aren't installed in the system:
 
 .. code-block:: bash
 
     (foo)$ pip install nose
-    (foo)$ nosetests -s -v path_to_repo/hbp-neurom/neurom/tests
+    (foo)$ pip install coverage
+    (foo)$ nosetests -s -v --with-coverage --cover-package neurom
 
 Examples
 ========
