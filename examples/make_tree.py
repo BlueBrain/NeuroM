@@ -34,7 +34,7 @@ def get_initial_segment_ids(rdw):
 
     These are defined as non-soma points whose perent is a soma point.
     '''
-    l = list(itertools.chain(*[rd.get_children(s) for s in get_soma_ids(rdw)]))
+    l = list(itertools.chain(*[rdw.get_children(s) for s in get_soma_ids(rdw)]))
     return [i for i in l if rdw.get_row(i)[COLS.TYPE] != POINT_TYPE.SOMA]
 
 
