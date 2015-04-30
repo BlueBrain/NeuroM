@@ -21,6 +21,21 @@ class Tree(object):
         tree.parent = self
 
 
+def is_forking_point(tree):
+    '''Is this tree a forking point?'''
+    return len(tree.children) > 1
+
+
+def is_leaf(tree):
+    '''Is this tree a leaf?'''
+    return len(tree.children) == 0
+
+
+def is_root(tree):
+    '''Is this tree the root node?'''
+    return tree.parent is None
+
+
 def iter_preorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
     yield tree
@@ -68,3 +83,27 @@ def iter_forking_point(tree):
 def val_iter(iterator):
     '''Iterator adaptor to iterate over Tree.value'''
     return imap(lambda t: t.value, iterator)
+
+
+def iter_section(tree):
+    '''Iterator to sections of a tree.
+
+    Resolves to a tuple of sub-trees forming a section.
+    '''
+    def get_section(tree):
+        '''get the upstream section starting from this tree'''
+        ui = iter_upstream(tree)
+        sec = [ui.next()]
+        for i in ui:
+            sec.append(i)
+            if is_forking_point(i) or is_root(i):
+                break
+        sec.reverse()
+        return tuple(sec)
+
+    def boundary_node(n):
+        '''Is this a section boundary node?'''
+        return not is_root(n) and (is_leaf(n) or is_forking_point(n))
+
+    return imap(get_section,
+                ifilter(boundary_node, iter_preorder(tree)))

@@ -1,13 +1,17 @@
 from nose import tools as nt
 from neurom.core.tree import Tree
+from neurom.core.tree import is_root
+from neurom.core.tree import is_leaf
+from neurom.core.tree import is_forking_point
 from neurom.core.tree import iter_preorder
 from neurom.core.tree import iter_postorder
 from neurom.core.tree import iter_upstream
 from neurom.core.tree import iter_segment
 from neurom.core.tree import iter_leaf
 from neurom.core.tree import iter_forking_point
+from neurom.core.tree import iter_section
 from neurom.core.tree import val_iter
-
+from copy import deepcopy
 
 REF_TREE = Tree(0)
 REF_TREE.add_child(Tree(11))
@@ -20,6 +24,10 @@ REF_TREE.children[1].children[0].add_child(Tree(1211))
 REF_TREE.children[1].children[0].children[0].add_child(Tree(12111))
 REF_TREE.children[1].children[0].children[0].add_child(Tree(12112))
 
+REF_TREE2 = deepcopy(REF_TREE)
+REF_TREE2.children[0].children[0].add_child(Tree(1111))
+REF_TREE2.children[0].children[0].children[0].add_child(Tree(11111))
+REF_TREE2.children[0].children[0].children[0].add_child(Tree(11112))
 
 def test_instantiate_tree():
     t = Tree('hello')
@@ -55,6 +63,44 @@ def test_parent():
 
     for c in t.children:
         nt.ok_(c.parent is t)
+
+
+def test_is_root_true():
+    t = Tree(0)
+    nt.ok_(is_root(t))
+
+
+def test_is_root_false():
+    t = Tree(0)
+    t.add_child(Tree(1))
+    nt.ok_(not is_root(t.children[0]))
+
+
+def test_is_leaf():
+    nt.ok_(is_leaf(Tree(0)))
+
+
+def test_is_leaf_false():
+    t = Tree(0)
+    t.add_child(Tree(1))
+    nt.ok_(not is_leaf(t))
+
+
+def test_is_forking_point():
+    t = Tree(0)
+    t.add_child(Tree(1))
+    t.add_child(Tree(2))
+    nt.ok_(is_forking_point(t))
+    t.add_child(Tree(3))
+    nt.ok_(is_forking_point(t))
+
+
+def test_is_forking_point_false():
+    t = Tree(0)
+    nt.ok_(not is_forking_point(t))
+    t.add_child(Tree(1))
+    nt.ok_(not is_forking_point(t))
+
 
 
 def test_preorder_iteration():
@@ -135,3 +181,12 @@ def test_iter_forking_point():
 def test_valiter_forking_point():
     nt.ok_(list(val_iter(iter_forking_point(REF_TREE))) ==
            [0, 11, 12, 1211])
+
+def test_section_iteration():
+    REF_SECTIONS = ((0, 11), (11, 111, 1111), (1111, 11111), (1111, 11112),
+                    (11, 112), (0, 12), (12, 121, 1211), (1211, 12111),
+                    (1211, 12112), (12, 122))
+
+    for i, s in enumerate(iter_section(REF_TREE2)):
+        print [tt.value for tt in s]
+        nt.assert_equal(REF_SECTIONS[i], tuple(tt.value for tt in s))
