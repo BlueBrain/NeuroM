@@ -18,6 +18,7 @@ The build-time and runtime dependencies of NeuroM are:
 * matplotlib
 
 Additional dependencies needed for testing and building documentation are
+
 * nose
 * coverage
 * sphinx
@@ -88,6 +89,18 @@ done so already or these aren't installed in the system:
     (foo)$ pip install nose
     (foo)$ pip install coverage
     (foo)$ nosetests -s -v --with-coverage --cover-package neurom
+
+Building the Documentation
+--------------------------
+
+There's  a ``make`` target to build the HTML version of the documentation:
+
+.. code-block:: bash
+
+        $ make doc
+
+This builds the documentation in ``doc/build``.
+To view it, point a browser at ``doc/build/html/index.html``
 
 Examples
 ========
