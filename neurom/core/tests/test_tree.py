@@ -91,17 +91,30 @@ def test_upstream_iteration():
 
 
 def test_segment_iteration():
-    nt.ok_(list(iter_segment(REF_TREE)),
+
+    nt.assert_equal(list(iter_segment(REF_TREE)),
            [(0, 11),(11, 111),(11, 112),
-            (0, 12),(12, 121),(12, 122)])
-    nt.ok_(list(iter_segment(REF_TREE.children[0])),
+            (0, 12),(12, 121),(121,1211),
+            (1211,12111),(1211,12112),(12, 122)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[0])),
            [(0, 11), (11, 111),(11, 112)])
-    nt.ok_(list(iter_segment(REF_TREE.children[0].children[0])), [(11, 111)])
-    nt.ok_(list(iter_segment(REF_TREE.children[0].children[1])), [(11, 112)])
-    nt.ok_(list(iter_segment(REF_TREE.children[1])),
-           [(0, 12), (12, 121),(12, 122)])
-    nt.ok_(list(iter_segment(REF_TREE.children[1].children[0])), [(12, 121)])
-    nt.ok_(list(iter_segment(REF_TREE.children[1].children[1])), [(12, 122)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[0].children[0])),
+                    [(11, 111)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[0].children[1])),
+                    [(11, 112)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[1])),
+           [(0, 12), (12, 121), (121, 1211),
+            (1211, 12111), (1211, 12112), (12, 122)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[1].children[0])),
+                    [(12, 121), (121, 1211), (1211, 12111), (1211, 12112)])
+
+    nt.assert_equal(list(iter_segment(REF_TREE.children[1].children[1])),
+                    [(12, 122)])
 
 
 def test_leaf_iteration():
