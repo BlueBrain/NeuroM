@@ -6,7 +6,6 @@ forking points and end-points
 
 '''
 
-from itertools import ifilter
 from neurom.core import tree
 
 REF_TREE = tree.Tree(0)
@@ -48,13 +47,7 @@ def get_section(t):
         if is_forking_point(i) or is_root(i):
             break
     sec.reverse()
-    return sec
-
-
-def iter_leaf_or_forking(t):
-    '''Iterator to all leaves or forking points of a tree'''
-    return ifilter(lambda t: len(t.children) == 0 or len(t.children) > 1,
-                   tree.iter_preorder(t))
+    return tuple(sec)
 
 
 def get_sections(t):
@@ -62,8 +55,11 @@ def get_sections(t):
 
     This builds the sections from scratch at each call.
     '''
-    nodes = [n for n in iter_leaf_or_forking(t) if not is_root(n)]
-    return tuple(get_section(n) for n in nodes)
+    def good_node(n):
+        '''Is this a good section boundary node?'''
+        return not is_root(n) and (is_leaf(n) or is_forking_point(n))
+
+    return tuple(get_section(n) for n in tree.iter_preorder(t) if good_node(n))
 
 
 def iter_section(t):
