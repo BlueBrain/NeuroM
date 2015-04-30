@@ -2,7 +2,6 @@
 
 An example of how to build an object representing a neuron from an SWC file
 '''
-import math
 from neurom.io.readers import load_data
 from neurom.io.utils import make_tree
 from neurom.io.utils import get_soma_ids
@@ -34,11 +33,10 @@ class SOMA_TYPE(object):
 class SomaA(object):
     '''Type A soma'''
     def __init__(self, points):
-        point = point_from_row(points[0])
+        _point = point_from_row(points[0])
         self.points = points
-        self.center = point[:3]
-        self.radius = point.r
-        self.volume = 4.0 * (math.pi * self.radius ** 3) / 3.0
+        self.center = _point[:3]
+        self.radius = _point.r
 
 
 class SomaB(object):
@@ -47,7 +45,6 @@ class SomaB(object):
         self.points = points
         self.center = None
         self.radius = None
-        self.volume = None
 
 
 class SomaC(object):
@@ -56,7 +53,6 @@ class SomaC(object):
         self.points = points
         self.center = None
         self.radius = None
-        self.volume = None
 
 
 def make_soma(points):
@@ -67,11 +63,19 @@ def make_soma(points):
             SOMA_TYPE.C: SomaC}[stype](points)
 
 
-class dummy_neuron(object):
+class neuron(object):
     '''Toy neuron class for testing ideas'''
     def __init__(self, soma_points, neurite_trees):
-        self.soma_points = soma_points
+        self.soma = make_soma(soma_points)
         self.neurite_trees = neurite_trees
+
+
+def make_neuron(raw_data):
+    '''Build a neuron from a raw data block'''
+    _trees = [make_tree(raw_data, iseg)
+              for iseg in get_initial_segment_ids(raw_data)]
+    _soma_pts = [rd.get_row(s_id) for s_id in get_soma_ids(raw_data)]
+    return neuron(_soma_pts, _trees)
 
 
 if __name__ == '__main__':
@@ -92,9 +96,16 @@ if __name__ == '__main__':
 
     print 'Initial segment IDs:', init_seg_ids
 
-    nrn = dummy_neuron(soma_pts, trees)
+    nrn = neuron(soma_pts, trees)
 
-    print 'Neuron soma points', nrn.soma_points
+    print 'Neuron soma points', nrn.soma.points
     print 'Neuron tree init points, types'
     for tt in nrn.neurite_trees:
+        print tt.value[COLS.ID], tt.value[COLS.TYPE]
+
+    print 'Making neuron 2'
+    nrn2 = make_neuron(rd)
+    print 'Neuron 2 soma points', nrn2.soma.points
+    print 'Neuron 2 tree init points, types'
+    for tt in nrn2.neurite_trees:
         print tt.value[COLS.ID], tt.value[COLS.TYPE]
