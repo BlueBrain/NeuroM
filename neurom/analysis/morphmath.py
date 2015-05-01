@@ -1,5 +1,4 @@
 '''Mathematics functions used to compute morphometrics'''
-
 from math import acos
 from itertools import combinations
 import numpy as np
