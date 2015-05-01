@@ -19,6 +19,7 @@ class Tree(object):
         '''
         self.children.append(tree)
         tree.parent = self
+        return tree
 
 
 def is_forking_point(tree):

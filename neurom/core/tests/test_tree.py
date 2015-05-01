@@ -25,9 +25,9 @@ REF_TREE.children[1].children[0].children[0].add_child(Tree(12111))
 REF_TREE.children[1].children[0].children[0].add_child(Tree(12112))
 
 REF_TREE2 = deepcopy(REF_TREE)
-REF_TREE2.children[0].children[0].add_child(Tree(1111))
-REF_TREE2.children[0].children[0].children[0].add_child(Tree(11111))
-REF_TREE2.children[0].children[0].children[0].add_child(Tree(11112))
+T1111 = REF_TREE2.children[0].children[0].add_child(Tree(1111))
+T11111 = T1111.add_child(Tree(11111))
+T11112 = T1111.add_child(Tree(11112))
 
 def test_instantiate_tree():
     t = Tree('hello')
