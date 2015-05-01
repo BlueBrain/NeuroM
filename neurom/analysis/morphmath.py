@@ -55,3 +55,11 @@ def polygon_diameter(points):
     in a list of points
     '''
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))
+
+
+def average_points_dist(p0, p_list):
+    """
+    Computes the average distance between a list of points
+    and a given point p0.
+    """
+    return np.mean(list(point_dist(p0, p1) for p1 in p_list))

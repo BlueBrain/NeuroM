@@ -1,5 +1,6 @@
 '''Neuron classes and functions'''
 from neurom.core.point import point_from_row
+from neurom.analysis.morphmath import average_points_dist
 
 
 class SOMA_TYPE(object):
@@ -37,7 +38,10 @@ class BaseSoma(object):
 
 
 class SomaA(BaseSoma):
-    '''Type A soma'''
+    '''
+    Type A: 1point soma
+    Represented by a single point.
+    '''
     def __init__(self, points):
         super(SomaA, self).__init__(points)
         _point = point_from_row(points[0])
@@ -46,19 +50,39 @@ class SomaA(BaseSoma):
 
 
 class SomaB(BaseSoma):
-    '''Type B soma'''
+    '''
+    Type B: 3point soma
+    Represented by 3 points.
+    Reference: neuromorpho.org
+    The first point constitutes the center of the soma.
+    An equivalent radius (rs) is computed as the average distance
+    of the other two points.
+    '''
     def __init__(self, points):
         super(SomaB, self).__init__(points)
-        self.center = None
-        self.radius = None
+        _point = point_from_row(points[0])
+        _point1 = point_from_row(points[1])
+        _point2 = point_from_row(points[2])
+        self.center = _point[:3]
+        self.radius = average_points_dist(_point, [_point1, _point2])
 
 
 class SomaC(BaseSoma):
-    '''Type C soma'''
+    '''
+    Type C: multiple points soma
+    Represented by a contour.
+    Reference: neuromorpho.org
+    The first point constitutes the center of the soma,
+    with coordinates (xs, ys, zs) corresponding to the
+    average of all the points in the single contour.
+    An equivalent radius (rs) is computed as the average distance
+    of each point of the single contour from this center.
+    '''
     def __init__(self, points):
         super(SomaC, self).__init__(points)
-        self.center = None
-        self.radius = None
+        _point = point_from_row(points[0])
+        self.center = _point[:3]
+        self.radius = average_points_dist(_point, list(point_from_row(p) for p in points[1:]))
 
 
 def make_soma(points):

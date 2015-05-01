@@ -4,6 +4,7 @@ from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import vector
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphmath import polygon_diameter
+from neurom.analysis.morphmath import average_points_dist
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -18,6 +19,7 @@ def test_point_dist():
     p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
     dist = point_dist(p1,p2)
     nt.ok_(dist==sqrt(3))
+
 
 def test_vector():
     vec1 = (12.0, 3, 6.0)
@@ -53,8 +55,6 @@ def soma_points(radius=5,number_points=20):
     return [Point(i, j, k, 0.0, 1) for (i, j, k) in zip(x, y, z)]
 
 
-
-
 def test_polygon_diameter():
     p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
     p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
@@ -64,3 +64,11 @@ def test_polygon_diameter():
     surfpoint= soma_points()
     dia1 = polygon_diameter(surfpoint)
     nt.ok_(fabs(dia1-10.0) < 0.1)
+
+
+def test_average_points_dist():
+    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
+    p1 = Point(0.0, 0.0, 1.0, 3.0, 1)
+    p2 = Point(0.0, 0.0, 1.0, 3.0, 1)
+    av_dist = average_points_dist(p0, [p1,p1])
+    nt.ok_(av_dist == 1.0)

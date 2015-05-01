@@ -52,15 +52,15 @@ def test_make_SomaA():
 def test_make_SomaB():
     soma = neuron.make_soma(SOMA_B_PTS)
     nt.ok_(isinstance(soma, neuron.SomaB))
-    nt.ok_(soma.center is None)
-    nt.ok_(soma.radius is None)
+    nt.assert_equal(soma.center, (11, 22, 33))
+    nt.ok_(soma.radius == 0.0)
 
 
 def check_SomaC(points):
     soma = neuron.make_soma(points)
     nt.ok_(isinstance(soma, neuron.SomaC))
-    nt.ok_(soma.center is None)
-    nt.ok_(soma.radius is None)
+    nt.assert_equal(soma.center, (11, 22, 33))
+    nt.ok_(soma.radius == 0.0)
 
 
 def test_make_SomaC():
