@@ -21,7 +21,10 @@ def get_initial_segment_ids(rdw):
 
 
 def make_tree(rdw, root_id=ROOT_ID):
-    '''Return a tree obtained from a raw data block'''
+    '''Return a tree obtained from a raw data block
+
+    The tree contains rows of raw data.
+    '''
     def add_children(t):
         '''Add children to a tree'''
         for c in rdw.get_children(t.value[COLS.ID]):

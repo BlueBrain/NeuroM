@@ -1,4 +1,18 @@
-''' Module for morphology data loading and access'''
+''' Module for morphology data loading and access
+
+Data is unpacked into a 2-dimensional raw data block following the SWC format:
+
+    [ID, TYPE, X, Y, Z, R, PARENT]
+
+There is one such row per measured point.
+
+Functions to umpack the data and a higher level wrapper are provided. See
+
+* load_data
+* RawDataWrapper
+
+Currently, only the SWC format is supported.
+'''
 import os
 from collections import defaultdict
 from itertools import ifilter

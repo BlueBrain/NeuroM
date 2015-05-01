@@ -22,17 +22,17 @@ class Tree(object):
 
 
 def is_forking_point(tree):
-    '''Is this tree a forking point?'''
+    '''Is tree a forking point?'''
     return len(tree.children) > 1
 
 
 def is_leaf(tree):
-    '''Is this tree a leaf?'''
+    '''Is tree a leaf?'''
     return len(tree.children) == 0
 
 
 def is_root(tree):
-    '''Is this tree the root node?'''
+    '''Is tree the root node?'''
     return tree.parent is None
 
 
@@ -101,9 +101,9 @@ def iter_section(tree):
         sec.reverse()
         return tuple(sec)
 
-    def boundary_node(n):
-        '''Is this a section boundary node?'''
+    def seed_node(n):
+        '''Is this node a good seed for upstream section finding?'''
         return not is_root(n) and (is_leaf(n) or is_forking_point(n))
 
     return imap(get_section,
-                ifilter(boundary_node, iter_preorder(tree)))
+                ifilter(seed_node, iter_preorder(tree)))
