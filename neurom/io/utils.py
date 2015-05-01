@@ -21,10 +21,14 @@ def get_initial_segment_ids(rdw):
     return [i for i in l if rdw.get_row(i)[COLS.TYPE] != POINT_TYPE.SOMA]
 
 
-def make_tree(rdw, root_id=ROOT_ID):
+def make_tree(rdw, root_id=ROOT_ID, post_action=None):
     '''Return a tree obtained from a raw data block
 
     The tree contains rows of raw data.
+    Args:
+        rdw: a RawDataWrapper object.
+        root_id: ID of the root of the tree to be built.
+        post_action: optional function to run on the built tree.
     '''
     def add_children(t):
         '''Add children to a tree'''
@@ -35,12 +39,23 @@ def make_tree(rdw, root_id=ROOT_ID):
         return t
 
     head_node = Tree(rdw.get_row(root_id))
-    return add_children(head_node)
+    add_children(head_node)
+
+    if post_action is not None:
+        post_action(head_node)
+
+    return head_node
 
 
-def make_neuron(raw_data):
-    '''Build a neuron from a raw data block'''
-    _trees = [make_tree(raw_data, iseg)
+def make_neuron(raw_data, tree_action=None):
+    '''Build a neuron from a raw data block
+
+    The tree contains rows of raw data.
+    Args:
+        raw_data: a RawDataWrapper object.
+        tree_action: optional function to run on the built trees.
+    '''
+    _trees = [make_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_segment_ids(raw_data)]
     _soma_pts = [raw_data.get_row(s_id) for s_id in get_soma_ids(raw_data)]
     return Neuron(_soma_pts, _trees)

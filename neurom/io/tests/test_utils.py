@@ -82,8 +82,30 @@ def test_make_tree():
     _check_trees(trees)
 
 
+def test_make_tree_postaction():
+    def post_action(t):
+        t.foo = 'bar'
+
+    rd = RAW_DATA[0]
+    seg_ids = utils.get_initial_segment_ids(rd)
+    trees = [utils.make_tree(rd, root_id=seg_id, post_action=post_action)
+             for seg_id in seg_ids]
+    for t in trees:
+        nt.ok_(hasattr(t, 'foo') and t.foo == 'bar')
+
+
 def test_make_neuron():
     rd = RAW_DATA[0]
     nrn = utils.make_neuron(rd)
     nt.ok_(np.all([s[COLS.ID] for s in nrn.soma.iter()] == SOMA_IDS[0]))
     _check_trees(nrn.neurite_trees)
+
+
+def test_make_neuron_post_tree_action():
+    def post_action(t):
+        t.bar = 'foo'
+
+    rd = RAW_DATA[0]
+    nrn = utils.make_neuron(rd, post_action)
+    for t in nrn.neurite_trees:
+        nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
