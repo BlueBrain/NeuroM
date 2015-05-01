@@ -1,7 +1,9 @@
 '''Test neurom.io.utils'''
 import os
+import numpy as np
 from neurom.io.readers import load_data
 from neurom.io import utils
+from neurom.core.dataformat import COLS
 from neurom.core import tree
 from nose import tools as nt
 
@@ -58,11 +60,7 @@ def test_get_initial_segment_ids():
         nt.ok_(utils.get_initial_segment_ids(d) == INIT_IDS[i])
 
 
-def test_make_tree():
-    rd = RAW_DATA[0]
-    seg_ids = utils.get_initial_segment_ids(rd)
-    trees = [utils.make_tree(rd, seg_id) for seg_id in seg_ids]
-    nt.ok_(len(trees) == len(INIT_IDS[0]))
+def _check_trees(trees):
     for t in trees:
         nt.ok_(len(list(tree.iter_leaf(t))) == 11)
         nt.ok_(len(list(tree.iter_forking_point(t))) == 10)
@@ -74,3 +72,18 @@ def test_make_tree():
         branch_order = [21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 111]
         for i, l in enumerate(leaves):
             nt.ok_(len(list(tree.iter_upstream(l))) == branch_order[i])
+
+
+def test_make_tree():
+    rd = RAW_DATA[0]
+    seg_ids = utils.get_initial_segment_ids(rd)
+    trees = [utils.make_tree(rd, seg_id) for seg_id in seg_ids]
+    nt.ok_(len(trees) == len(INIT_IDS[0]))
+    _check_trees(trees)
+
+
+def test_make_neuron():
+    rd = RAW_DATA[0]
+    nrn = utils.make_neuron(rd)
+    nt.ok_(np.all([s[COLS.ID] for s in nrn.soma.iter()] == SOMA_IDS[0]))
+    _check_trees(nrn.neurite_trees)

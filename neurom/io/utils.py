@@ -4,6 +4,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
+from neurom.core.neuron import Neuron
 
 
 def get_soma_ids(rdw):
@@ -35,3 +36,11 @@ def make_tree(rdw, root_id=ROOT_ID):
 
     head_node = Tree(rdw.get_row(root_id))
     return add_children(head_node)
+
+
+def make_neuron(raw_data):
+    '''Build a neuron from a raw data block'''
+    _trees = [make_tree(raw_data, iseg)
+              for iseg in get_initial_segment_ids(raw_data)]
+    _soma_pts = [raw_data.get_row(s_id) for s_id in get_soma_ids(raw_data)]
+    return Neuron(_soma_pts, _trees)
