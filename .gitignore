@@ -3,3 +3,7 @@
 *.pyc
 *~
 .coverage
+*venv*
+*egg-info*
+pep8.txt
+pylint.txt
