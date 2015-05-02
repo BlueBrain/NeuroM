@@ -40,6 +40,8 @@ from neurom.analysis.morphtree import get_segment_radial_dists
 from neurom.analysis.morphtree import get_segment_path_distance
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
+from neurom.analysis.morphtree import get_section_lengths
+from neurom.analysis.morphtree import get_section_number
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
@@ -130,3 +132,16 @@ def test_get_tree_type():
         test_tree = find_tree_type(test_tree)
         # tree.type should already exists here, from previous action.
         nt.ok_(get_tree_type(test_tree) == tree_types[en_tree])
+
+def test_get_section_lengths():
+    T = form_simple_tree()
+    nt.ok_(get_section_lengths(T) == [8.0, 8.0])
+    T2 = form_neuron_tree()
+    nt.ok_(get_section_lengths(T2) == [5.0, 4.0, 4.0])
+    
+def test_get_section_number():
+    T = form_simple_tree()
+    nt.ok_(get_section_number(T) == 2)
+    T2 = form_neuron_tree()
+    nt.ok_(get_section_number(T2) == 3)
+

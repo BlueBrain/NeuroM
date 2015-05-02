@@ -30,6 +30,7 @@
 from math import acos
 from itertools import combinations
 import numpy as np
+from itertools import islice, izip
 
 
 np.seterr(all='raise')  # raise exceptions for floating point errors.
@@ -91,3 +92,10 @@ def average_points_dist(p0, p_list):
     and a given point p0.
     """
     return np.mean(list(point_dist(p0, p1) for p1 in p_list))
+
+
+def path_distance(points):
+    """
+    Compute the path distance from given set of points
+    """
+    return sum(point_dist(p[0], p[1]) for p in izip(points, islice(points, 1, None)))

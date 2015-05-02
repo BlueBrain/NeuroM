@@ -29,6 +29,7 @@
 '''Basic functions used for tree analysis'''
 from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
+from neurom.analysis.morphmath import path_distance
 from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 import numpy as np
@@ -103,3 +104,17 @@ def get_tree_type(tree):
         tree = find_tree_type(tree)
 
     return tree.type
+
+
+def get_section_lengths(tree):
+    """
+    Compute the length of section on this tree
+    """
+    return [path_distance([as_point(p.value) for p in sec]) for sec in tr.iter_section(tree)]
+
+
+def get_section_number(tree):
+    """
+    Return number of section on tree
+    """
+    return len(list(tr.iter_section(tree)))

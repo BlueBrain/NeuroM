@@ -33,6 +33,7 @@ from neurom.analysis.morphmath import vector
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphmath import polygon_diameter
 from neurom.analysis.morphmath import average_points_dist
+from neurom.analysis.morphmath import path_distance
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -100,3 +101,12 @@ def test_average_points_dist():
     p2 = Point(0.0, 0.0, 1.0, 3.0, 1)
     av_dist = average_points_dist(p0, [p1,p1])
     nt.ok_(av_dist == 1.0)
+
+def test_path_distance():
+    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
+    p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
+    p3 = Point(3.0, 6.0, 5.0, 3.0, 1)
+    p4 = Point(3.0, 7.0, 5.0, 3.0, 1)
+    p5 = Point(3.0, 8.0, 5.0, 3.0, 1)
+    dist = path_distance([p1, p2, p3, p4, p5])
+    nt.ok_(path_distance([p1, p2, p3, p4, p5]) == 4)
