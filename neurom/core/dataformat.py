@@ -30,11 +30,8 @@
 
 
 class COLS(object):
-    '''Column labels for internal data representation
-
-    These mirror the SWC data format.
-    '''
-    (ID, TYPE, X, Y, Z, R, P) = xrange(7)
+    '''Column labels for internal data representation'''
+    (X, Y, Z, R, TYPE, ID, P) = xrange(7)
 
 
 class POINT_TYPE(object):

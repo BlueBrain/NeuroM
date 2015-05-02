@@ -46,7 +46,7 @@ def check_single_section_random_swc(data, fmt, offset=0):
 
 
 def test_read_swc_basic():
-    data, offset, fmt = readers.read_swc(
+    data, offset, fmt = readers.SWC.read(
         os.path.join(SWC_PATH,
                      'random_trunk_off_0_16pt.swc'))
 
@@ -111,12 +111,12 @@ class TestRawDataWrapper_SingleSectionRandom(object):
             r = self.data.get_row(i)
             ii = i - self.first_id
             nt.ok_(len(r) == 7)
-            nt.ok_(r[1] >= 0 and r[1] < 8)
-            nt.ok_(r[1] == ii % 8)
+            nt.ok_(r[4] >= 0 and r[4] < 8)
+            nt.ok_(r[4] == ii % 8)
+            nt.ok_(r[0] == ii)
+            nt.ok_(r[1] == ii)
             nt.ok_(r[2] == ii)
             nt.ok_(r[3] == ii)
-            nt.ok_(r[4] == ii)
-            nt.ok_(r[5] == ii)
 
     def test_get_point(self):
         for i in self.data.get_ids():
@@ -134,7 +134,7 @@ class TestRawDataWrapper_SingleSectionRandom(object):
         for i, p in enumerate(self.data.iter_row()):
             ii = i + self.first_id
             pid = -1 if i == 0 else ii - 1
-            nt.assert_true(np.all(p == (ii, i % 8, i, i, i, i, pid)))
+            nt.assert_true(np.all(p == (i, i, i, i, i%8, ii, pid)))
 
         for p in self.data.iter_row(None, lambda r: r[COLS.TYPE] == 1):
             nt.assert_true(p[COLS.TYPE] == 1)

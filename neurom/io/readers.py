@@ -28,9 +28,16 @@
 
 ''' Module for morphology data loading and access
 
-Data is unpacked into a 2-dimensional raw data block following the SWC format:
+Data is unpacked into a 2-dimensional raw data block:
 
-    [ID, TYPE, X, Y, Z, R, PARENT]
+    [X, Y, Z, R, TYPE, ID, PARENT_ID]
+
+This contains the same information as the SWC format, with columns re-ordered
+so that the leading first four elements are (x, y, z, r). This makes it easier
+to interface with 3-dimensional geometrical functions.
+
+SWC format:
+    [ID, TYPE, X, Y, Z, R, PARENT_ID]
 
 There is one such row per measured point.
 
@@ -50,13 +57,23 @@ from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
 
 
-def read_swc(filename):
-    '''Read an SWC file and return a tuple of data, offset, format.'''
-    data = np.loadtxt(filename)
-    offset = data[0][COLS.ID]
-    return data, offset, 'SWC'
+class SWC(object):
+    '''Read SWC files and unpack into internal raw data block
 
-_READERS = {'swc': read_swc}
+    Input row format: [ID, TYPE, X, Y, Z, R, PARENT_ID]
+    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
+    '''
+    (ID, TYPE, X, Y, Z, R, P) = xrange(7)
+
+    @staticmethod
+    def read(filename):
+        '''Read an SWC file and return a tuple of data, offset, format.'''
+        data = np.loadtxt(filename)
+        data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
+        offset = data[0][COLS.ID]
+        return data, offset, 'SWC'
+
+_READERS = {'swc': SWC.read}
 
 
 def unpack_data(filename):
@@ -81,15 +98,15 @@ class RawDataWrapper(object):
     and giving basic access to its elements
 
     The array contains rows with
-        [ID, TYPE, X, Y, Z, R, P]
+        [X, Y, Z, R, TYPE, ID, PID]
 
     where the elements are
 
-    * ID: Identifier for a point. Non-negative, increases by one for each row.
-    * TYPE: Type of neuronal segment.
-    * X, Y, Z: X, Y, Z coorsinates of point
+    * X, Y, Z: X, Y, Z coordinates of point
     * R: Radius of node at that point
-    * P: ID of parent point
+    * TYPE: Type of neuronal segment.
+    * ID: Identifier for a point. Non-negative, increases by one for each row.
+    * PID: ID of parent point
     '''
     def __init__(self, raw_data):
         self.data_block, self._offset, self.fmt = raw_data

@@ -51,34 +51,33 @@ neuron0 = make_neuron(data)
 tree_types = ['axon', 'basal', 'basal', 'apical']
 
 def form_neuron_tree():
-    p = [1, 1, 0.0, 0.0, 0.0, 1.0, 2]
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
     T = Tree(p)
-    T1 = T.add_child(Tree([1, 1, 0.0, 1.0, 0.0, 1.0, 2]))
-    T2 = T1.add_child(Tree([1, 1, 0.0, 2.0, 0.0, 1.0, 2]))
-    T3 = T2.add_child(Tree([1, 1, 0.0, 4.0, 0.0, 2.0, 2]))
-    T4 = T3.add_child(Tree([1, 1, 0.0, 5.0, 0.0, 2.0, 2]))
-    T5 = T4.add_child(Tree([1, 1, 2.0, 5.0, 0.0, 1.0, 2]))
-    T6 = T4.add_child(Tree([1, 1, 0.0, 5.0, 2.0, 1.0, 2]))
-    T7 = T5.add_child(Tree([1, 1, 3.0, 5.0, 0.0, 0.75, 2]))
-    T8 = T7.add_child(Tree([1, 1, 4.0, 5.0, 0.0, 0.75, 2]))
-    T9 = T6.add_child(Tree([1, 1, 0.0, 5.0, 3.0, 0.75, 2]))
-    T10 = T9.add_child(Tree([1, 1, 0.0, 6.0, 3.0, 0.75,2]))
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
     return T
 
 
 def form_simple_tree():
-    p = [1, 1, 0.0, 0.0, 0.0, 1.0, 1]
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
     T = Tree(p)
-    T1 = T.add_child(Tree([1, 1, 0.0, 2.0, 0.0, 1.0, 1]))
-    T2 = T1.add_child(Tree([1, 1, 0.0, 4.0, 0.0, 1.0, 1]))
-    T3 = T2.add_child(Tree([1, 1, 0.0, 6.0, 0.0, 1.0, 1]))
-    T4 = T3.add_child(Tree([1, 1, 0.0, 8.0, 0.0, 1.0, 1]))
+    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(Tree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(Tree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
+    T4 = T3.add_child(Tree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
 
-
-    T5 = T.add_child(Tree([1, 1, 0.0, 0.0, 2.0, 1.0, 1]))
-    T6 = T5.add_child(Tree([1, 1, 0.0, 0.0, 4.0, 1.0, 1]))
-    T7 = T6.add_child(Tree([1, 1, 0.0, 0.0, 6.0, 1.0, 1]))
-    T8 = T7.add_child(Tree([1, 1, 0.0, 0.0, 8.0, 1.0, 1]))
+    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(Tree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(Tree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
+    T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
 
     return T
 
