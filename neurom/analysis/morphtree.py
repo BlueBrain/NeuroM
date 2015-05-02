@@ -1,8 +1,7 @@
 '''Basic functions used for tree analysis'''
 from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
-from neurom.core.point import point_from_row
-from neurom.core.point import Point
+from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -10,22 +9,38 @@ import numpy as np
 def get_segment_lengths(tree):
     ''' return a list of segments length inside tree
     '''
-    return [point_dist(point_from_row(s[0]), point_from_row(s[1])) for s in tr.iter_segment(tree)]
+    return [point_dist(as_point(s[0]), as_point(s[1]))
+            for s in tr.iter_segment(tree)]
 
 
 def get_segment_diameters(tree):
     ''' return a list of segments diameter inside tree
     '''
-    return [point_from_row(s[0]).r + point_from_row(s[1]).r for s in tr.iter_segment(tree)]
+    return [as_point(s[0]).r + as_point(s[1]).r for s in tr.iter_segment(tree)]
 
 
-def get_segment_radialdists(position, tree):
-    ''' return a list of radial distance of segment to given point'''
-    pos = point_from_row(position)
-    return [point_dist(pos, Point((point_from_row(s[0]).x + point_from_row(s[1]).x) / 2.0,
-                                  (point_from_row(s[0]).y + point_from_row(s[1]).y) / 2.0,
-                                  (point_from_row(s[0]).z + point_from_row(s[1]).z) / 2.0,
-                                  0.0, 0.0)) for s in tr.iter_segment(tree)]
+def get_segment_radial_dists(pos, tree):
+    '''Return a list of radial distances of tree segments to a given point
+
+    Thr radial distance is the euclidian distance between the mid-point of
+    the segment and the point in question.
+
+    Args:
+        pos: origin to which disrances are measured. It must have at lease 3
+        components. The first 3 components are (x, y, z).
+
+        tree: tree of raw data rows.
+
+    '''
+    return [point_dist(pos, np.divide(np.add(as_point(s[0]),
+                                             as_point(s[1])), 2.0))
+            for s in tr.iter_segment(tree)]
+
+
+def get_segment_path_distance(tree):
+    '''Get the path distance from a sub-tree to the root node'''
+    return np.sum(point_dist(as_point(s[0]), as_point(s[1]))
+                  for s in tr.iter_segment(tree, tr.iter_upstream))
 
 
 def find_tree_type(tree):
@@ -39,13 +54,9 @@ def find_tree_type(tree):
     Returns a tree with a tree.type defined.
     """
 
-    types = []
-
     tree_types = ['undefined', 'soma', 'axon', 'basal', 'apical']
 
-    for raw_point in tr.iter_preorder(tree):
-
-        types.append(raw_point.value[COLS.TYPE])
+    types = [node.value[COLS.TYPE] for node in tr.iter_preorder(tree)]
 
     tree.type = tree_types[int(np.median(types))]
 

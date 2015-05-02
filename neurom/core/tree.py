@@ -59,17 +59,6 @@ def iter_upstream(tree):
         t = t.parent
 
 
-def iter_segment(tree):
-    '''Iterate over segment values
-
-    Segments are parent-child pairs, with the child being the
-    center of the iteration
-    '''
-    return imap(lambda t: (t.parent.value, t.value),
-                ifilter(lambda t: t.parent is not None,
-                        iter_preorder(tree)))
-
-
 def iter_leaf(tree):
     '''Iterator to all leaves of a tree'''
     return ifilter(lambda t: len(t.children) == 0, iter_preorder(tree))
@@ -81,9 +70,29 @@ def iter_forking_point(tree):
                    iter_preorder(tree))
 
 
-def val_iter(iterator):
+def iter_segment(tree, iter_mode=iter_preorder):
+    '''Iterate over segments
+
+    Args:
+        tree: the tree over which to iterate
+        iter_mode: iteration mode. Default: iter_preorder.
+    '''
+    return segment_iter(iter_mode(tree))
+
+
+def segment_iter(tree_iterator):
+    '''Iterator adaptor to iterate over segments.
+
+    Segments are parent-child pairs, with the child being the
+    center of the iteration
+    '''
+    return imap(lambda t: (t.parent.value, t.value),
+                ifilter(lambda t: t.parent is not None, tree_iterator))
+
+
+def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
-    return imap(lambda t: t.value, iterator)
+    return imap(lambda t: t.value, tree_iterator)
 
 
 def iter_section(tree):

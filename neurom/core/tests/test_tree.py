@@ -7,6 +7,7 @@ from neurom.core.tree import iter_preorder
 from neurom.core.tree import iter_postorder
 from neurom.core.tree import iter_upstream
 from neurom.core.tree import iter_segment
+from neurom.core.tree import segment_iter
 from neurom.core.tree import iter_leaf
 from neurom.core.tree import iter_forking_point
 from neurom.core.tree import iter_section
@@ -163,6 +164,24 @@ def test_segment_iteration():
                     [(12, 122)])
 
 
+def test_segment_upstream_iteration():
+    leaves = [l for l in iter_leaf(REF_TREE2)]
+    ref_paths = [
+        [(1111, 11111), (111, 1111), (11, 111), (0, 11)],
+        [(1111, 11112), (111, 1111), (11, 111), (0, 11)],
+        [(11, 112), (0, 11)],
+        [(1211, 12111), (121, 1211), (12, 121), (0, 12)],
+        [(1211, 12112), (121, 1211), (12, 121), (0, 12)],
+        [(12, 122), (0, 12)]
+    ]
+
+    for l, ref in zip(leaves, ref_paths):
+        nt.ok_([s for s in iter_segment(l, iter_upstream)] == ref)
+
+    for l, ref in zip(leaves, ref_paths):
+        nt.ok_([s for s in segment_iter(iter_upstream(l))] == ref)
+
+
 def test_leaf_iteration():
     nt.ok_(list(val_iter(iter_leaf(REF_TREE))) == [111, 112, 12111, 12112, 122])
     nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[0]))) == [111, 112])
@@ -188,5 +207,4 @@ def test_section_iteration():
                     (1211, 12112), (12, 122))
 
     for i, s in enumerate(iter_section(REF_TREE2)):
-        print [tt.value for tt in s]
         nt.assert_equal(REF_SECTIONS[i], tuple(tt.value for tt in s))

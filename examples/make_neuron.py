@@ -11,7 +11,7 @@ from neurom.io.utils import get_initial_segment_ids
 from neurom.core import tree
 from neurom.core import neuron
 from neurom.core.dataformat import COLS
-from neurom.core.point import point_from_row
+from neurom.core.point import as_point
 
 
 def point_iter(iterator):
@@ -20,7 +20,7 @@ def point_iter(iterator):
     Args:
         iterator: tree iterator for a tree holding raw data rows.
     '''
-    return imap(point_from_row, tree.val_iter(iterator))
+    return imap(as_point, tree.val_iter(iterator))
 
 
 if __name__ == '__main__':
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     nrn = neuron.Neuron(soma_pts, trees)
 
     print 'Neuron soma raw data', [r for r in nrn.soma.iter()]
-    print 'Neuron soma points', [point_from_row(p)
+    print 'Neuron soma points', [as_point(p)
                                  for p in nrn.soma.iter()]
 
     print 'Neuron tree init points, types'
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     print 'Making neuron 2'
     nrn2 = make_neuron(rd)
     print 'Neuron 2 soma points', [r for r in nrn2.soma.iter()]
-    print 'Neuron 2 soma points', [point_from_row(p)
+    print 'Neuron 2 soma points', [as_point(p)
                                    for p in nrn2.soma.iter()]
     print 'Neuron 2 tree init points, types'
     for tt in nrn2.neurite_trees:

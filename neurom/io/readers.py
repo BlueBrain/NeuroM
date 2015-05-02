@@ -17,7 +17,7 @@ import os
 from collections import defaultdict
 from itertools import ifilter
 import numpy as np
-from neurom.core.point import point_from_row
+from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
 
@@ -88,7 +88,7 @@ class RawDataWrapper(object):
     def get_point(self, idx):
         '''Get point data for element idx'''
         idx = self._apply_offset(idx)
-        p = point_from_row(self.data_block[idx]) if idx > ROOT_ID else None
+        p = as_point(self.data_block[idx]) if idx > ROOT_ID else None
         return p
 
     def get_row(self, idx):
