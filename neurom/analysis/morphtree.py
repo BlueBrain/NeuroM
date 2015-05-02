@@ -30,7 +30,6 @@
 from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
-from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -38,14 +37,14 @@ import numpy as np
 def get_segment_lengths(tree):
     ''' return a list of segments length inside tree
     '''
-    return [point_dist(as_point(s[0]), as_point(s[1]))
+    return [point_dist(s[0], s[1])
             for s in tr.iter_segment(tree)]
 
 
 def get_segment_diameters(tree):
     ''' return a list of segments diameter inside tree
     '''
-    return [as_point(s[0]).r + as_point(s[1]).r for s in tr.iter_segment(tree)]
+    return [s[0][COLS.R] + s[1][COLS.R] for s in tr.iter_segment(tree)]
 
 
 def get_segment_radial_dists(pos, tree):
@@ -61,14 +60,13 @@ def get_segment_radial_dists(pos, tree):
         tree: tree of raw data rows.
 
     '''
-    return [point_dist(pos, np.divide(np.add(as_point(s[0]),
-                                             as_point(s[1])), 2.0))
+    return [point_dist(pos, np.divide(np.add(s[0], s[1]), 2.0))
             for s in tr.iter_segment(tree)]
 
 
 def get_segment_path_distance(tree):
     '''Get the path distance from a sub-tree to the root node'''
-    return np.sum(point_dist(as_point(s[0]), as_point(s[1]))
+    return np.sum(point_dist(s[0], s[1])
                   for s in tr.iter_segment(tree, tr.iter_upstream))
 
 
@@ -110,7 +108,7 @@ def get_section_lengths(tree):
     """
     Compute the length of section on this tree
     """
-    return [path_distance([as_point(p.value) for p in sec]) for sec in tr.iter_section(tree)]
+    return [path_distance([p.value for p in sec]) for sec in tr.iter_section(tree)]
 
 
 def get_section_number(tree):

@@ -28,12 +28,10 @@
 
 from nose import tools as nt
 import os
-from neurom.core.point import as_point
 from neurom.core.tree import Tree
 import neurom.core.tree as tr
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
-from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphtree import get_segment_lengths
 from neurom.analysis.morphtree import get_segment_diameters
 from neurom.analysis.morphtree import get_segment_radial_dists
@@ -137,7 +135,7 @@ def test_get_section_lengths():
     nt.ok_(get_section_lengths(T) == [8.0, 8.0])
     T2 = form_neuron_tree()
     nt.ok_(get_section_lengths(T2) == [5.0, 4.0, 4.0])
-    
+
 def test_get_section_number():
     T = form_simple_tree()
     nt.ok_(get_section_number(T) == 2)

@@ -28,7 +28,7 @@
 
 '''Neuron classes and functions'''
 from neurom.analysis.morphmath import average_points_dist
-from neurom.core.point import as_point
+from neurom.core.dataformat import COLS
 
 
 class SOMA_TYPE(object):
@@ -72,9 +72,8 @@ class SomaA(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaA, self).__init__(points)
-        _point = as_point(points[0])
-        self.center = _point[:3]
-        self.radius = _point.r
+        self.center = tuple(points[0][:COLS.R])
+        self.radius = points[0][COLS.R]
 
 
 class SomaB(BaseSoma):
@@ -88,11 +87,8 @@ class SomaB(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaB, self).__init__(points)
-        _point = as_point(points[0])
-        _point1 = as_point(points[1])
-        _point2 = as_point(points[2])
-        self.center = _point[:3]
-        self.radius = average_points_dist(_point, [_point1, _point2])
+        self.center = tuple(points[0][:COLS.R])
+        self.radius = average_points_dist(points[0], (points[1], points[2]))
 
 
 class SomaC(BaseSoma):
@@ -108,10 +104,8 @@ class SomaC(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaC, self).__init__(points)
-        _point = as_point(points[0])
-        self.center = _point[:3]
-        self.radius = average_points_dist(_point,
-                                          [as_point(p) for p in points[1:]])
+        self.center = tuple(points[0][:COLS.R])
+        self.radius = average_points_dist(points[0], points[1:])
 
 
 def make_soma(points):
