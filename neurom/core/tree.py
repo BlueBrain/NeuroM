@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from itertools import chain, imap, ifilter
+from itertools import chain, imap, ifilter, repeat
 
 
 class Tree(object):
@@ -116,6 +116,17 @@ def segment_iter(tree_iterator):
     '''
     return imap(lambda t: (t.parent.value, t.value),
                 ifilter(lambda t: t.parent is not None, tree_iterator))
+
+
+def iter_triplet(tree):
+    '''Iterate over triplets
+
+    Yields tuples with three consecutive sub-trees
+    '''
+    return chain(
+        *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
+              ifilter(lambda n: not is_root(n) and not is_leaf(n),
+                      iter_preorder(tree))))
 
 
 def val_iter(tree_iterator):

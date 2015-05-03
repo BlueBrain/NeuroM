@@ -37,6 +37,7 @@ from neurom.core.tree import iter_upstream
 from neurom.core.tree import iter_segment
 from neurom.core.tree import segment_iter
 from neurom.core.tree import iter_leaf
+from neurom.core.tree import iter_triplet
 from neurom.core.tree import iter_forking_point
 from neurom.core.tree import iter_section
 from neurom.core.tree import val_iter
@@ -208,6 +209,17 @@ def test_segment_upstream_iteration():
 
     for l, ref in zip(leaves, ref_paths):
         nt.ok_([s for s in segment_iter(iter_upstream(l))] == ref)
+
+
+def test_iter_triplet():
+
+    ref = [[0, 11, 111], [0, 11, 112], [11, 111, 1111], [111, 1111, 11111],
+           [111, 1111, 11112], [0, 12, 121], [0, 12, 122], [12, 121, 1211],
+           [121, 1211, 12111], [121, 1211, 12112]]
+
+    nt.assert_equal(list([n.value for n in t]
+                         for t in iter_triplet(REF_TREE2)),
+                    ref)
 
 
 def test_leaf_iteration():
