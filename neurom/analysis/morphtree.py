@@ -87,8 +87,6 @@ def find_tree_type(tree):
 
     tree.type = tree_types[int(np.median(types))]
 
-    return tree
-
 
 def get_tree_type(tree):
 
@@ -99,7 +97,7 @@ def get_tree_type(tree):
     """
 
     if not hasattr(tree, 'type'):
-        tree = find_tree_type(tree)
+        find_tree_type(tree)
 
     return tree.type
 

@@ -126,7 +126,7 @@ def test_get_tree_type():
             del test_tree.type
         # tree.type should be computed here.
         nt.ok_(get_tree_type(test_tree) == tree_types[en_tree])
-        test_tree = find_tree_type(test_tree)
+        find_tree_type(test_tree)
         # tree.type should already exists here, from previous action.
         nt.ok_(get_tree_type(test_tree) == tree_types[en_tree])
 
