@@ -40,12 +40,15 @@ from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import get_section_lengths
 from neurom.analysis.morphtree import get_section_number
+from neurom.analysis.morphtree import get_bounding_box
+import numpy as np
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
 data    = load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
+tree0   = neuron0.neurite_trees[0]
 tree_types = ['axon', 'basal', 'basal', 'apical']
 
 def form_neuron_tree():
@@ -142,3 +145,8 @@ def test_get_section_number():
     T2 = form_neuron_tree()
     nt.ok_(get_section_number(T2) == 3)
 
+def test_get_bounding_box():
+    box = np.array([[-33.25305769, -57.600172  ,   0.        ],
+                    [  0.        ,   0.        ,  49.70137991]])
+    bb = get_bounding_box(tree0)
+    nt.ok_(np.allclose(bb, box))

@@ -31,6 +31,8 @@ from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
 from neurom.core.dataformat import COLS
+from neurom.core.tree import val_iter
+from neurom.core.tree import iter_preorder
 import numpy as np
 
 
@@ -114,3 +116,21 @@ def get_section_number(tree):
     Return number of section on tree
     """
     return len(list(tr.iter_section(tree)))
+
+
+def get_bounding_box(tree):
+    """
+    Returns the boundaries of the tree
+    in three dimensions:
+    [[xmin, ymin, zmin],
+    [xmax, ymax, zmax]]
+    """
+
+    min_x = min(p[0] for p in val_iter(iter_preorder(tree)))
+    min_y = min(p[1] for p in val_iter(iter_preorder(tree)))
+    min_z = min(p[2] for p in val_iter(iter_preorder(tree)))
+    max_x = max(p[0] for p in val_iter(iter_preorder(tree)))
+    max_y = max(p[1] for p in val_iter(iter_preorder(tree)))
+    max_z = max(p[2] for p in val_iter(iter_preorder(tree)))
+
+    return np.array([[min_x, min_y, min_z], [max_x, max_y, max_z]])
