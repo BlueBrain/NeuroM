@@ -27,25 +27,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Mathematics functions used to compute morphometrics'''
-from math import acos
+import math
 from itertools import combinations
 import numpy as np
 from itertools import islice, izip
-
+from neurom.core.dataformat import COLS
 
 np.seterr(all='raise')  # raise exceptions for floating point errors.
-
-
-def point_dist(p1, p2):
-    '''compute the euclidian distance between two 3D points
-
-    Args:
-        p1, p2: indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
-    Returns:
-        The euclidian distance between the points.
-    '''
-    return np.linalg.norm(np.subtract(p1[0:3], p2[0:3]))
 
 
 def vector(p1, p2):
@@ -59,6 +47,31 @@ def vector(p1, p2):
         3-vector from p1 - p2
     '''
     return np.subtract(p1[0:3], p2[0:3])
+
+
+def point_dist2(p1, p2):
+    '''compute the square of the euclidian distance between two 3D points
+
+    Args:
+        p1, p2: indexable objects with
+        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+    Returns:
+        The square of the euclidian distance between the points.
+    '''
+    v = vector(p1, p2)
+    return np.dot(v, v)
+
+
+def point_dist(p1, p2):
+    '''compute the euclidian distance between two 3D points
+
+    Args:
+        p1, p2: indexable objects with
+        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+    Returns:
+        The euclidian distance between the points.
+    '''
+    return np.linalg.norm(vector(p1, p2))
 
 
 def angle_3points(p0, p1, p2):
@@ -75,8 +88,8 @@ def angle_3points(p0, p1, p2):
     '''
     vec1 = vector(p0, p1)
     vec2 = vector(p0, p2)
-    return acos(np.dot(vec1, vec2) /
-                (np.linalg.norm(vec1) * np.linalg.norm(vec2)))
+    return math.acos(np.dot(vec1, vec2) /
+                     (np.linalg.norm(vec1) * np.linalg.norm(vec2)))
 
 
 def polygon_diameter(points):
@@ -99,3 +112,40 @@ def path_distance(points):
     Compute the path distance from given set of points
     """
     return sum(point_dist(p[0], p[1]) for p in izip(points, islice(points, 1, None)))
+
+
+def segment_area(seg):
+    '''Compute the surface area of a segment.
+
+    Approximated as a conical frustum. Does not include the surface area
+    of the bounding circles.
+    '''
+    r0 = seg[0][COLS.R]
+    r1 = seg[1][COLS.R]
+    h2 = point_dist2(seg[0], seg[1])
+    return math.pi * (r0 + r1) * math.sqrt((r0 - r1) ** 2 + h2)
+
+
+def segment_volume(seg):
+    '''Compute the volume of a segment.
+
+    Approximated as a conical frustum.
+    '''
+    r0 = seg[0][COLS.R]
+    r1 = seg[1][COLS.R]
+    h = point_dist(seg[0], seg[1])
+    return math.pi * h * ((r0 * r0) + (r0 * r1) + (r1 * r1)) / 3.0
+
+
+def taper_rate(p0, p1):
+    '''Compute the taper rate between points p0 and p1
+
+    Args:
+        p0, p1: iterables with first 4 components containing (x, y, z, r)
+
+    Returns:
+        The taper rate, defined as the absolute value of the difference in
+        the diameters of p0 and p1 divided by the euclidian distance
+        between them.
+    '''
+    return 2 * abs(p0[COLS.R] - p1[COLS.R]) / point_dist(p0, p1)

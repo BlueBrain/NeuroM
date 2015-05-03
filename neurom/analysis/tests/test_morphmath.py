@@ -29,11 +29,15 @@
 from nose import tools as nt
 from neurom.core.point import Point
 from neurom.analysis.morphmath import point_dist
+from neurom.analysis.morphmath import point_dist2
 from neurom.analysis.morphmath import vector
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphmath import polygon_diameter
 from neurom.analysis.morphmath import average_points_dist
 from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphmath import segment_volume
+from neurom.analysis.morphmath import segment_area
+from neurom.analysis.morphmath import taper_rate
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -43,18 +47,25 @@ import numpy as np
 np.random.seed(0)
 
 
-def test_point_dist():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
-    dist = point_dist(p1,p2)
-    nt.ok_(dist==sqrt(3))
-
-
 def test_vector():
     vec1 = (12.0, 3, 6.0)
     vec2 = (14.0, 1.0, 6.0)
     vec = vector(vec1,vec2)
     nt.ok_(np.all(vec ==(-2.0, 2.0, 0.0)))
+
+
+def test_point_dist2():
+    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
+    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    dist = point_dist2(p1, p2)
+    nt.ok_(dist==3)
+
+
+def test_point_dist():
+    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
+    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    dist = point_dist(p1,p2)
+    nt.ok_(dist==sqrt(3))
 
 
 def test_angle_3points():
@@ -98,8 +109,9 @@ def test_polygon_diameter():
 def test_average_points_dist():
     p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
     p1 = Point(0.0, 0.0, 1.0, 3.0, 1)
-    p2 = Point(0.0, 0.0, 1.0, 3.0, 1)
-    av_dist = average_points_dist(p0, [p1,p1])
+    p2 = Point(0.0, 1.0, 0.0, 3.0, 1)
+    p3 = Point(1.0, 0.0, 0.0, 3.0, 1)
+    av_dist = average_points_dist(p0, [p1, p2, p3])
     nt.ok_(av_dist == 1.0)
 
 def test_path_distance():
@@ -109,4 +121,58 @@ def test_path_distance():
     p4 = Point(3.0, 7.0, 5.0, 3.0, 1)
     p5 = Point(3.0, 8.0, 5.0, 3.0, 1)
     dist = path_distance([p1, p2, p3, p4, p5])
-    nt.ok_(path_distance([p1, p2, p3, p4, p5]) == 4)
+    nt.ok_(dist == 4)
+
+
+def test_segment_area():
+    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
+    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
+    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
+    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
+    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+
+    a01 = segment_area((p0, p1))
+    a02 = segment_area((p0, p2))
+    a03 = segment_area((p0, p3))
+    a04 = segment_area((p0, p4))
+    a45 = segment_area((p4, p5))
+    a05 = segment_area((p0, p5))
+
+    nt.assert_almost_equal(a01, 37.6991118, places=6)
+    nt.assert_almost_equal(2*a01, a02)
+    nt.assert_almost_equal(a03, 141.3716694, places=6)
+    nt.assert_almost_equal(a45, a05 - a04)
+    nt.assert_almost_equal(segment_area((p0, p3)), segment_area((p3, p0)))
+
+
+def test_segment_volume():
+    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
+    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
+    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
+    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
+    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+
+    v01 = segment_volume((p0, p1))
+    v02 = segment_volume((p0, p2))
+    v03 = segment_volume((p0, p3))
+    v04 = segment_volume((p0, p4))
+    v45 = segment_volume((p4, p5))
+    v05 = segment_volume((p0, p5))
+
+    nt.assert_almost_equal(v01, 56.5486677, places=6)
+    nt.assert_almost_equal(2*v01, v02)
+    nt.assert_almost_equal(v03, 263.8937829, places=6)
+    nt.assert_almost_equal(v45, v05 - v04)
+    nt.assert_almost_equal(segment_volume((p0, p3)), segment_volume((p3, p0)))
+
+
+def test_taper_rate():
+    p0 = (0.0, 0.0, 0.0, 1.0)
+    p1 = (1.0, 0.0, 0.0, 4.0)
+    p2 = (2.0, 0.0, 0.0, 4.0)
+    p3 = (3.0, 0.0, 0.0, 4.0)
+    nt.assert_almost_equal(taper_rate(p0, p1), 6.0)
+    nt.assert_almost_equal(taper_rate(p0, p2), 3.0)
+    nt.assert_almost_equal(taper_rate(p0, p3), 2.0)
