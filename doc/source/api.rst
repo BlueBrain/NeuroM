@@ -42,3 +42,6 @@ API Documentation
    neurom.core.dataformat
    neurom.view
    neurom.view.common
+   neurom.analysis
+   neurom.analysis.morphmath
+   neurom.analysis.morphtree
