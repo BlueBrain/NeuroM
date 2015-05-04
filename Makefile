@@ -48,17 +48,18 @@ lint: run_pep8 run_pylint
 
 test: run_tests
 
-doc: 
+doc:  neurom_test_venv
 	neurom_test_venv/bin/pip install --upgrade --force-reinstall sphinx sphinxcontrib-napoleon
 	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
 
 clean_test_venv:
-	/bin/rm -rf neurom_test_venv
+	@rm -rf neurom_test_venv
 
 clean_doc:
-	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build  -C doc clean
+	@test -x $(ROOT_DIR)/neurom_test_venv/bin/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build  -C doc clean || true
 
-clean: clean_test_venv clean_doc
-	/bin/rm -f pep8.txt
+clean: clean_doc clean_test_venv
+	@rm -f pep8.txt
+	@rm -f pylint.txt
 
 .PHONY: run_pep8 test clean_test_venv clean doc
