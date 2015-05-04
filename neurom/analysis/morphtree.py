@@ -36,17 +36,53 @@ from neurom.core.tree import iter_preorder
 import numpy as np
 
 
+def segment_length(seg):
+    '''Return the length of a segment.
+
+    Returns: Euclidian distance between centres of points in seg
+    '''
+    return point_dist(seg[0], seg[1])
+
+
+def segment_diameter(seg):
+    '''Return the mean diameter of a segment
+
+    Returns: arithmetic mean of the diameters of the points in seg
+    '''
+    return seg[0][COLS.R] + seg[1][COLS.R]
+
+
+def segment_radial_dist(seg, pos):
+    '''Return the radial distance of a tree segment to a given point
+
+    The radial distance is the euclidian distance between the mid-point of
+    the segment and the point in question.
+
+    Args:
+        seg: tree segment
+
+        pos: origin to which disrances are measured. It must have at lease 3
+        components. The first 3 components are (x, y, z).
+    '''
+    return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))
+
+
+def path_length(tree):
+    '''Get the path length from a sub-tree to the root node'''
+    return np.sum(point_dist(s[0], s[1])
+                  for s in tr.iter_segment(tree, tr.iter_upstream))
+
+
 def get_segment_lengths(tree):
     ''' return a list of segments length inside tree
     '''
-    return [point_dist(s[0], s[1])
-            for s in tr.iter_segment(tree)]
+    return [segment_length(s) for s in tr.iter_segment(tree)]
 
 
 def get_segment_diameters(tree):
     ''' return a list of segments diameter inside tree
     '''
-    return [s[0][COLS.R] + s[1][COLS.R] for s in tr.iter_segment(tree)]
+    return [segment_diameter(s) for s in tr.iter_segment(tree)]
 
 
 def get_segment_radial_dists(pos, tree):
@@ -62,14 +98,8 @@ def get_segment_radial_dists(pos, tree):
         tree: tree of raw data rows.
 
     '''
-    return [point_dist(pos, np.divide(np.add(s[0], s[1]), 2.0))
+    return [segment_radial_dist(s, pos)
             for s in tr.iter_segment(tree)]
-
-
-def get_segment_path_distance(tree):
-    '''Get the path distance from a sub-tree to the root node'''
-    return np.sum(point_dist(s[0], s[1])
-                  for s in tr.iter_segment(tree, tr.iter_upstream))
 
 
 def find_tree_type(tree):

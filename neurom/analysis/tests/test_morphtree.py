@@ -32,10 +32,13 @@ from neurom.core.tree import Tree
 import neurom.core.tree as tr
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
+from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import get_segment_lengths
+from neurom.analysis.morphtree import segment_diameter
 from neurom.analysis.morphtree import get_segment_diameters
+from neurom.analysis.morphtree import segment_radial_dist
 from neurom.analysis.morphtree import get_segment_radial_dists
-from neurom.analysis.morphtree import get_segment_path_distance
+from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import get_section_lengths
@@ -83,6 +86,12 @@ def form_simple_tree():
     return T
 
 
+def test_segment_length():
+    nt.ok_(segment_length(((0,0,0), (0,0,42))) == 42)
+    nt.ok_(segment_length(((0,0,0), (0,42,0))) == 42)
+    nt.ok_(segment_length(((0,0,0), (42,0,0))) == 42)
+
+
 def test_segment_lengths():
 
     T = form_neuron_tree()
@@ -92,6 +101,10 @@ def test_segment_lengths():
     nt.assert_equal(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
 
+def test_segment_diameter():
+    nt.ok_(segment_diameter(((0,0,0,4),(0,0,0,6))) == 10)
+
+
 def test_segment_diameters():
 
     T = form_neuron_tree()
@@ -99,6 +112,12 @@ def test_segment_diameters():
     dia = get_segment_diameters(T)
 
     nt.assert_equal(dia, [2.0, 2.0, 3.0, 4.0, 3.0, 1.75, 1.5, 3.0, 1.75, 1.5])
+
+
+def test_segment_radial_dist():
+    seg = ((11,11,11), (22, 22, 22))
+    nt.ok_(segment_radial_distance(seg, (0,0,0)) ==
+                                   point_dist((0,0,0), (11,11,11)))
 
 
 def test_segment_radial_dist():
@@ -114,7 +133,7 @@ def test_segment_radial_dist():
 def test_segment_path_length():
     leaves = [l for l in tr.iter_leaf(form_neuron_tree())]
     for l in leaves:
-        nt.ok_(get_segment_path_distance(l) == 9)
+        nt.ok_(path_length(l) == 9)
 
 
 def test_find_tree_type():
