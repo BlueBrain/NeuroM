@@ -60,7 +60,7 @@ def test_tree():
     nt.ok_(c.get_linewidth()[0] == 1.2 )
     nt.ok_(np.allclose(c.get_color(), np.array([[ 0.,  0.,  0.,  1.]])) )
     fig, ax = view.tree(tree0, plane='wrong')
-    nt.ok_(ax == 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.')
+    nt.ok_(ax == 'No sunch plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
     plt.close('all')
 
 

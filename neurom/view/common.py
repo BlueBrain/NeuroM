@@ -95,7 +95,7 @@ def get_color(treecolor, tree_type):
     Axon : "blue"
     Apical dendrite: "purple"
     Soma tree: "black"
-    Undefined-Any other unrecognised type: "black"
+    Undefined-Any other unrecognised type: "green"
     Otherwise returns the treecolor.
     """
     if treecolor is None:

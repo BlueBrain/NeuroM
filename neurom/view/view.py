@@ -38,6 +38,8 @@ from neurom.core.tree import iter_segment
 from neurom.core.tree import val_iter
 from neurom.io.readers import COLS
 from neurom.analysis.morphtree import get_bounding_box
+from neurom.analysis.morphtree import get_tree_type
+from neurom.analysis.morphtree import get_segment_diameters
 
 
 def get_default(variable, **kwargs):
@@ -62,7 +64,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     Parameters
     ----------
-    tree: Tree
+    tr: Tree
         neurom.Tree object
 
     Options
@@ -130,68 +132,56 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     A 2D matplotlib figure with a tree view, at the selected plane.
 
     """
-    from neurom.analysis.morphtree import get_tree_type
-    from neurom.analysis.morphtree import get_segment_diameters
+    if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
+        return None, 'No sunch plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
+
+    # Initialization of matplotlib figure and axes.
+    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+    # Data needed for the viewer: x,y,z,r
+    bounding_box = get_bounding_box(tr)
+
+    def _seg_2d(seg):
+        '''2d coordinates needed for the plotting of a segment'''
+        horz = getattr(COLS, plane[0].capitalize())
+        vert = getattr(COLS, plane[1].capitalize())
+        parent_point = seg[0]
+        child_point = seg[1]
+        horz1 = parent_point[horz]
+        horz2 = child_point[horz]
+        vert1 = parent_point[vert]
+        vert2 = child_point[vert]
+        return ((horz1, vert1), (horz2, vert2))
+
+    segs = [_seg_2d(seg) for seg in val_iter(iter_segment(tr))]
 
     linewidth = get_default('linewidth', **kwargs)
+    # Definition of the linewidth according to diameter, if diameter is True.
+    if get_default('diameter', **kwargs):
+        linewidth = np.array(get_segment_diameters(tr)) * get_default('diameter_scale',
+                                                                      **kwargs)
 
-    def get_segments_2d(tree_structure, horz, vert):
-        """
-        Returns a list of 2d coordinates needed for the plotting of a tree.
-        """
-        segs = []
+    # Plot the collection of lines.
+    collection = LineCollection(segs,
+                                color=common.get_color(get_default('treecolor', **kwargs),
+                                                       get_tree_type(tr)),
+                                linewidth=linewidth, alpha=get_default('alpha', **kwargs))
 
-        for seg in val_iter(iter_segment(tree_structure)):
-            parent_point = seg[0]
-            child_point = seg[1]
-            horz1 = parent_point[horz]
-            horz2 = child_point[horz]
-            vert1 = parent_point[vert]
-            vert2 = child_point[vert]
-            segs.append([(horz1, vert1), (horz2, vert2)])
+    ax.add_collection(collection)
 
-        return segs
+    kwargs['title'] = kwargs.get('title', 'Tree view')
+    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][getattr(COLS, plane[0].capitalize())] -
+                                         get_default('white_space', **kwargs),
+                                         bounding_box[1][getattr(COLS, plane[0].capitalize())] +
+                                         get_default('white_space', **kwargs)])
+    kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][getattr(COLS, plane[1].capitalize())] -
+                                         get_default('white_space', **kwargs),
+                                         bounding_box[1][getattr(COLS, plane[1].capitalize())] +
+                                         get_default('white_space', **kwargs)])
 
-    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
-
-        # Initialization of matplotlib figure and axes.
-        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
-
-        # Data needed for the viewer: x,y,z,r
-        bounding_box = get_bounding_box(tr)
-
-        segs = get_segments_2d(tr, getattr(COLS, plane[0].capitalize()),
-                               getattr(COLS, plane[1].capitalize()))
-
-        # Definition of the linewidth according to diameter, if diameter is True.
-        if get_default('diameter', **kwargs):
-            diams = np.array(get_segment_diameters(tr)) * get_default('diameter_scale', **kwargs)
-            linewidth = diams
-
-        # Plot the collection of lines.
-        collection = LineCollection(segs, color=common.get_color(get_default('treecolor', **kwargs),
-                                                                 get_tree_type(tr)),
-                                    linewidth=linewidth, alpha=get_default('alpha', **kwargs))
-
-        ax.add_collection(collection)
-
-        kwargs['title'] = kwargs.get('title', 'Tree view')
-        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-        kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][getattr(COLS, plane[0].capitalize())] -
-                                             get_default('white_space', **kwargs),
-                                             bounding_box[1][getattr(COLS, plane[0].capitalize())] +
-                                             get_default('white_space', **kwargs)])
-        kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][getattr(COLS, plane[1].capitalize())] -
-                                             get_default('white_space', **kwargs),
-                                             bounding_box[1][getattr(COLS, plane[1].capitalize())] +
-                                             get_default('white_space', **kwargs)])
-
-        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
-
-        return fig, ax
-    else:
-        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
 def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
@@ -402,8 +392,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
                                              np.max(v) + get_default('white_space', **kwargs)])
 
-        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
+        return common.plot_style(fig=fig, ax=ax, **kwargs)
 
-        return fig, ax
     else:
         return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
