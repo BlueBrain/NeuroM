@@ -114,7 +114,7 @@ def segment_iter(tree_iterator):
     Segments are parent-child pairs, with the child being the
     center of the iteration
     '''
-    return imap(lambda t: (t.parent.value, t.value),
+    return imap(lambda t: (t.parent, t),
                 ifilter(lambda t: t.parent is not None, tree_iterator))
 
 
@@ -131,7 +131,12 @@ def iter_triplet(tree):
 
 def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
-    return imap(lambda t: t.value, tree_iterator)
+    def _deep_map(f, data):
+        '''Recursive map function. Maintains type of iterables'''
+        return (type(data)(_deep_map(f, x) for x in data)
+                if hasattr(data, '__iter__')
+                else f(data))
+    return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
 
 
 def iter_section(tree):

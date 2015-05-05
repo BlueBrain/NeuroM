@@ -70,36 +70,36 @@ def segment_radial_dist(seg, pos):
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
     return np.sum(point_dist(s[0], s[1])
-                  for s in tr.iter_segment(tree, tr.iter_upstream))
+                  for s in tr.val_iter(tr.iter_segment(tree, tr.iter_upstream)))
 
 
 def get_segment_lengths(tree):
-    ''' return a list of segments length inside tree
+    ''' return a list of tree segment lengths
     '''
-    return [segment_length(s) for s in tr.iter_segment(tree)]
+    return [segment_length(s) for s in tr.val_iter(tr.iter_segment(tree))]
 
 
 def get_segment_diameters(tree):
-    ''' return a list of segments diameter inside tree
+    ''' return a list of tree segment diameters
     '''
-    return [segment_diameter(s) for s in tr.iter_segment(tree)]
+    return [segment_diameter(s) for s in tr.val_iter(tr.iter_segment(tree))]
 
 
 def get_segment_radial_dists(pos, tree):
     '''Return a list of radial distances of tree segments to a given point
 
-    Thr radial distance is the euclidian distance between the mid-point of
+    The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
 
     Args:
-        pos: origin to which disrances are measured. It must have at lease 3
+        pos: origin to which disrances are measured. It must have at least 3
         components. The first 3 components are (x, y, z).
 
         tree: tree of raw data rows.
 
     '''
     return [segment_radial_dist(s, pos)
-            for s in tr.iter_segment(tree)]
+            for s in tr.val_iter(tr.iter_segment(tree))]
 
 
 def find_tree_type(tree):
@@ -136,7 +136,7 @@ def get_tree_type(tree):
 
 def get_section_lengths(tree):
     """
-    Compute the length of section on this tree
+    Return a list containing tree's section lengths
     """
     return [path_distance([p.value for p in sec]) for sec in tr.iter_section(tree)]
 

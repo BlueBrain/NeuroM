@@ -168,28 +168,28 @@ def test_upstream_iteration():
 
 def test_segment_iteration():
 
-    nt.assert_equal(list(iter_segment(REF_TREE)),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE))),
            [(0, 11),(11, 111),(11, 112),
             (0, 12),(12, 121),(121,1211),
             (1211,12111),(1211,12112),(12, 122)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[0])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0]))),
            [(0, 11), (11, 111),(11, 112)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[0].children[0])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0].children[0]))),
                     [(11, 111)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[0].children[1])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0].children[1]))),
                     [(11, 112)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[1])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1]))),
            [(0, 12), (12, 121), (121, 1211),
             (1211, 12111), (1211, 12112), (12, 122)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[1].children[0])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1].children[0]))),
                     [(12, 121), (121, 1211), (1211, 12111), (1211, 12112)])
 
-    nt.assert_equal(list(iter_segment(REF_TREE.children[1].children[1])),
+    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1].children[1]))),
                     [(12, 122)])
 
 
@@ -205,10 +205,10 @@ def test_segment_upstream_iteration():
     ]
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in iter_segment(l, iter_upstream)] == ref)
+        nt.ok_([s for s in val_iter(iter_segment(l, iter_upstream))] == ref)
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in segment_iter(iter_upstream(l))] == ref)
+        nt.ok_([s for s in val_iter(segment_iter(iter_upstream(l)))] == ref)
 
 
 def test_iter_triplet():

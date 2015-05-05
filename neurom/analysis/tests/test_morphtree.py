@@ -154,7 +154,7 @@ def test_get_tree_type():
 
 def test_get_section_lengths():
     T = form_simple_tree()
-    nt.ok_(get_section_lengths(T) == [8.0, 8.0])
+    nt.assert_equal(get_section_lengths(T), [8.0, 8.0])
     T2 = form_neuron_tree()
     nt.ok_(get_section_lengths(T2) == [5.0, 4.0, 4.0])
 

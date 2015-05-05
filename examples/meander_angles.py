@@ -48,9 +48,8 @@ if __name__ == '__main__':
 
     for tt in nrn.neurite_trees:
         print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
-        for trp in tree.iter_triplet(tt):
-            points = [n.value for n in trp]
+        for trp in tree.val_iter(tree.iter_triplet(tt)):
             try:
-                print 'Angle', angle_3points(points[1], points[0], points[2])
+                print 'Angle', angle_3points(trp[1], trp[0], trp[2])
             except ArithmeticError:
-                fail_info(points[1], points[0], points[2])
+                fail_info(trp[1], trp[0], trp[2])
