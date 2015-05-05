@@ -88,6 +88,31 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
     return pretitle, posttitle, prefile, postfile
 
 
+def get_color(treecolor, tree_type):
+    """
+    If treecolor is none returns the color depending on the type:
+    Basal dendrite: "red"
+    Axon : "blue"
+    Apical dendrite: "purple"
+    Soma tree: "black"
+    Undefined-Any other unrecognised type: "black"
+    Otherwise returns the treecolor.
+    """
+    if treecolor is None:
+        if tree_type == 'basal':
+            treecolor = "red"
+        elif tree_type == 'apical':
+            treecolor = "purple"
+        elif tree_type == 'axon':
+            treecolor = "blue"
+        elif tree_type == 'soma':
+            treecolor = "black"
+        else:
+            treecolor = "green"
+
+    return treecolor
+
+
 def get_figure(new_fig=True, subplot=False, params=None, no_axes=False):
     """
     Function to be used for viewing - plotting,

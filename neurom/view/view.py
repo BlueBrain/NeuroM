@@ -29,3 +29,381 @@
 '''
 Python module of NeuroM to visualize morphologies
 '''
+
+
+from neurom.view import common
+from matplotlib.collections import LineCollection
+import numpy as np
+from neurom.core.tree import iter_segment
+from neurom.core.tree import val_iter
+from neurom.io.readers import COLS
+from neurom.analysis.morphtree import get_bounding_box
+
+
+def get_default(variable, **kwargs):
+    """
+    Returns default variable or kwargs variable if it exists.
+    """
+    default = {'linewidth': 1.2,
+               'alpha': 0.8,
+               'treecolor': None,
+               'diameter': True,
+               'diameter_scale': 1.0,
+               'white_space': 30.}
+
+    return kwargs.get(variable, default[variable])
+
+
+def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
+
+    """
+    Generates a figure of the neuron,
+    that contains a soma and a list of trees.
+
+    Parameters
+    ----------
+    tree: Tree
+        neurom.Tree object
+
+    Options
+    -------
+    plane: str
+        Accepted values: Any pair of of xyz
+        Default value is 'xy'.treecolor
+
+    linewidth: float
+        Defines the linewidth of the tree,
+        if diameter is set to False.
+        Default value is 1.2.
+
+    alpha: float
+        Defines the transparency of the tree.
+        0.0 transparent through 1.0 opaque.
+        Default value is 0.8.
+
+    treecolor: str or None
+        Defines the color of the tree.
+        If None the default values will be used,
+        depending on the type of tree:
+        Basal dendrite: "red"
+        Axon : "blue"
+        Apical dendrite: "purple"
+        Undefined tree: "black"
+        Default value is None.
+
+    new_fig: boolean
+        Defines if the tree will be plotted
+        in the current figure (False)
+        or in a new figure (True)
+        Default value is True.
+
+    subplot: matplotlib subplot value or False
+        If False the default subplot 111 will be used.
+        For any other value a matplotlib subplot
+        will be generated.
+        Default value is False.
+
+    diameter: boolean
+        If True the diameter, scaled with diameter_scale factor,
+        will define the width of the tree lines.
+        If False use linewidth to select the width of the tree lines.
+        Default value is True.
+
+    diameter_scale: float
+        Defines the scale factor that will be multiplied
+        with the diameter to define the width of the tree line.
+        Default value is 1.
+
+    limits: list or boolean
+        List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]]
+        If False the figure will not be scaled.
+        If True the figure will be scaled according to tree limits.
+        Default value is False.
+
+    white_space: float
+        Defines the white space around
+        the boundary box of the morphology.
+        Default value is 1.
+
+    Returns
+    --------
+    A 2D matplotlib figure with a tree view, at the selected plane.
+
+    """
+    from neurom.analysis.morphtree import get_tree_type
+    from neurom.analysis.morphtree import get_segment_diameters
+
+    linewidth = get_default('linewidth', **kwargs)
+
+    def get_segments_2d(tree_structure, horz, vert):
+        """
+        Returns a list of 2d coordinates needed for the plotting of a tree.
+        """
+        segs = []
+
+        for seg in val_iter(iter_segment(tree_structure)):
+            parent_point = seg[0]
+            child_point = seg[1]
+            horz1 = parent_point[horz]
+            horz2 = child_point[horz]
+            vert1 = parent_point[vert]
+            vert2 = child_point[vert]
+            segs.append([(horz1, vert1), (horz2, vert2)])
+
+        return segs
+
+    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
+
+        # Initialization of matplotlib figure and axes.
+        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+        # Data needed for the viewer: x,y,z,r
+        bounding_box = get_bounding_box(tr)
+
+        segs = get_segments_2d(tr, getattr(COLS, plane[0].capitalize()),
+                               getattr(COLS, plane[1].capitalize()))
+
+        # Definition of the linewidth according to diameter, if diameter is True.
+        if get_default('diameter', **kwargs):
+            diams = np.array(get_segment_diameters(tr)) * get_default('diameter_scale', **kwargs)
+            linewidth = diams
+
+        # Plot the collection of lines.
+        collection = LineCollection(segs, color=common.get_color(get_default('treecolor', **kwargs),
+                                                                 get_tree_type(tr)),
+                                    linewidth=linewidth, alpha=get_default('alpha', **kwargs))
+
+        ax.add_collection(collection)
+
+        kwargs['title'] = kwargs.get('title', 'Tree view')
+        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+        kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][getattr(COLS, plane[0].capitalize())] -
+                                             get_default('white_space', **kwargs),
+                                             bounding_box[1][getattr(COLS, plane[0].capitalize())] +
+                                             get_default('white_space', **kwargs)])
+        kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][getattr(COLS, plane[1].capitalize())] -
+                                             get_default('white_space', **kwargs),
+                                             bounding_box[1][getattr(COLS, plane[1].capitalize())] +
+                                             get_default('white_space', **kwargs)])
+
+        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
+
+        return fig, ax
+    else:
+        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
+
+
+def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
+
+    """
+    Generates a figure of the soma
+
+    Parameters
+    ----------
+    soma: Soma
+        neurom.Soma object
+
+    Options
+    -------
+    plane: str
+        Accepted values: Any pair of of xyz
+        Default value is 'xy'
+
+    linewidth: float
+        Defines the linewidth of the soma.
+        Default value is 1.2
+
+    alpha: float
+        Defines the transparency of the soma.
+        0.0 transparent through 1.0 opaque.
+        Default value is 0.8.
+
+    treecolor: str or None
+        Defines the color of the soma.
+        If None the default value will be used:
+        Soma : "black".
+        Default value is None.
+
+    new_fig: boolean
+        Defines if the tree will be plotted
+        in the current figure (False)
+        or in a new figure (True)
+        Default value is True.
+
+    subplot: matplotlib subplot value or False
+        If False the default subplot 111 will be used.
+        For any other value a matplotlib subplot
+        will be generated.
+        Default value is False.
+
+    limits: list or boolean
+        List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]]
+        If False the figure will not be scaled.
+        If True the figure will be scaled according to tree limits.
+        Default value is False.
+
+    Returns
+    --------
+    A 2D matplotlib figure with a soma view, at the selected plane.
+
+    """
+
+    treecolor = kwargs.get('treecolor', None)
+    outline = kwargs.get('outline', True)
+
+    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
+
+        # Initialization of matplotlib figure and axes.
+        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+        # Data needed for the viewer //  To be revised once the soma structure is finalized:
+        # 1. if real_trace : x,y,z coordinates of soma points
+        # 2. if outline : center and diameter of the soma
+
+        # Definition of the tree color depending on the tree type.
+        treecolor = common.get_color(treecolor, tree_type='soma')
+
+        # Plot the outline of the soma as a circle, is outline is selected.
+        if not outline:
+            soma_circle = common.plt.Circle(sm.center, sm.radius, color=treecolor,
+                                            alpha=get_default('alpha', **kwargs))
+            ax.add_artist(soma_circle)
+        else:
+            horz = []
+            vert = []
+
+            for s_point in sm.iter():
+                horz.append(s_point[getattr(COLS, plane[0].capitalize())])
+                vert.append(s_point[getattr(COLS, plane[1].capitalize())])
+
+            horz.append(horz[0]) # To close the loop for a soma viewer. This might be modified!
+            vert.append(vert[0]) # To close the loop for a soma viewer. This might be modified!
+
+            common.plt.plot(horz, vert, color=treecolor,
+                            alpha=get_default('alpha', **kwargs),
+                            linewidth=get_default('linewidth', **kwargs))
+
+        kwargs['title'] = kwargs.get('title', 'Soma view')
+        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+
+        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
+
+        return fig, ax
+    else:
+        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
+
+
+def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
+
+    """
+    Generates a figure of the neuron,
+    that contains a soma and a list of trees.
+
+    Parameters
+    ----------
+    neuron: Neuron
+        neurom.Neuron object
+
+    Options
+    -------
+    plane: str
+        Accepted values: Any pair of of xyz
+        Default value is 'xy'
+
+    linewidth: float
+        Defines the linewidth of the tree and soma
+        of the neuron, if diameter is set to False.
+        Default value is 1.2.
+
+    alpha: float
+        Defines the transparency of the neuron.
+        0.0 transparent through 1.0 opaque.
+        Default value is 0.8.
+
+    treecolor: str or None
+        Defines the color of the trees.
+        If None the default values will be used,
+        depending on the type of tree:
+        Soma: "black"
+        Basal dendrite: "red"
+        Axon : "blue"
+        Apical dendrite: "purple"
+        Undefined tree: "black"
+        Default value is None.
+
+    new_fig: boolean
+        Defines if the neuron will be plotted
+        in the current figure (False)
+        or in a new figure (True)
+        Default value is True.
+
+    subplot: matplotlib subplot value or False
+        If False the default subplot 111 will be used.
+        For any other value a matplotlib subplot
+        will be generated.
+        Default value is False.
+
+    diameter: boolean
+        If True the diameter, scaled with diameter_scale factor,
+        will define the width of the tree lines.
+        If False use linewidth to select the width of the tree lines.
+        Default value is True.
+
+    diameter_scale: float
+        Defines the scale factor that will be multiplied
+        with the diameter to define the width of the tree line.
+        Default value is 1.
+
+    limits: list or boolean
+        List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]]
+        If False the figure will not be scaled.
+        If True the figure will be scaled according to tree limits.
+        Default value is False.
+
+    Returns
+    --------
+    A 2D matplotlib figure with a tree view, at the selected plane.
+
+    """
+
+    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
+
+        new_fig = kwargs.get('new_fig', True)
+        subplot = kwargs.get('subplot', False)
+
+        # Initialization of matplotlib figure and axes.
+        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+        kwargs['new_fig'] = False
+
+        soma(nrn.soma, plane=plane, **kwargs)
+
+        h = []
+        v = []
+
+        for temp_tree in nrn.neurite_trees:
+
+            bounding_box = get_bounding_box(temp_tree)
+
+            h.append([bounding_box[0][getattr(COLS, plane[0].capitalize())],
+                      bounding_box[1][getattr(COLS, plane[0].capitalize())]])
+            v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
+                      bounding_box[1][getattr(COLS, plane[1].capitalize())]])
+
+            tree(temp_tree, plane=plane, **kwargs)
+
+        kwargs['title'] = kwargs.get('title', 'Neuron view')
+        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
+                                             np.max(h) + get_default('white_space', **kwargs)])
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
+                                             np.max(v) + get_default('white_space', **kwargs)])
+
+        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
+
+        return fig, ax
+    else:
+        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'

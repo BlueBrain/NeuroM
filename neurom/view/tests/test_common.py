@@ -37,6 +37,7 @@ from neurom.view.common import plot_labels
 from neurom.view.common import plot_legend
 from neurom.view.common import plot_limits
 from neurom.view.common import plot_ticks
+from neurom.view.common import get_color
 
 import os
 import numpy as np
@@ -172,6 +173,10 @@ def test_plot_style():
     os.rmdir(fig_dir)
 
 
-
-
-
+def test_get_color():
+    nt.ok_(get_color(None, 'basal') == "red")
+    nt.ok_(get_color(None, 'axon') == "blue")
+    nt.ok_(get_color(None, 'apical') == "purple")
+    nt.ok_(get_color(None, 'soma') == "black")
+    nt.ok_(get_color(None, 'wrong') == "green")
+    nt.ok_(get_color('blue', 'wrong') == "blue")
