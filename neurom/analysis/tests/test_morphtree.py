@@ -32,17 +32,18 @@ from neurom.core.tree import Tree
 import neurom.core.tree as tr
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
+from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphtree import segment_length
-from neurom.analysis.morphtree import get_segment_lengths
+from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import segment_diameter
-from neurom.analysis.morphtree import get_segment_diameters
+from neurom.analysis.morphtree import i_segment_diameter
 from neurom.analysis.morphtree import segment_radial_dist
-from neurom.analysis.morphtree import get_segment_radial_dists
+from neurom.analysis.morphtree import i_segment_radial_dist
 from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
-from neurom.analysis.morphtree import get_section_lengths
-from neurom.analysis.morphtree import get_section_number
+from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
 import numpy as np
 
@@ -96,7 +97,7 @@ def test_segment_lengths():
 
     T = form_neuron_tree()
 
-    lg = get_segment_lengths(T)
+    lg = [l for l in i_segment_length(T)]
 
     nt.assert_equal(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
@@ -109,23 +110,23 @@ def test_segment_diameters():
 
     T = form_neuron_tree()
 
-    dia = get_segment_diameters(T)
+    dia = [d for d in i_segment_diameter(T)]
 
     nt.assert_equal(dia, [2.0, 2.0, 3.0, 4.0, 3.0, 1.75, 1.5, 3.0, 1.75, 1.5])
 
 
 def test_segment_radial_dist():
-    seg = ((11,11,11), (22, 22, 22))
-    nt.ok_(segment_radial_distance(seg, (0,0,0)) ==
-                                   point_dist((0,0,0), (11,11,11)))
+    seg = ((11,11,11), (33, 33, 33))
+    nt.assert_almost_equal(segment_radial_dist(seg, (0,0,0)),
+                           point_dist((0,0,0), (22,22,22)))
 
 
-def test_segment_radial_dist():
+def test_segment_radial_dists():
     T = form_simple_tree()
 
     p= [0.0, 0.0, 0.0]
 
-    rd = get_segment_radial_dists(p,T)
+    rd = [d for d in i_segment_radial_dist(p,T)]
 
     nt.assert_equal(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
 
@@ -152,17 +153,17 @@ def test_get_tree_type():
         # tree.type should already exists here, from previous action.
         nt.ok_(get_tree_type(test_tree) == tree_types[en_tree])
 
-def test_get_section_lengths():
+def test_i_section_length():
     T = form_simple_tree()
-    nt.assert_equal(get_section_lengths(T), [8.0, 8.0])
+    nt.assert_equal([l for l in i_section_length(T)], [8.0, 8.0])
     T2 = form_neuron_tree()
-    nt.ok_(get_section_lengths(T2) == [5.0, 4.0, 4.0])
+    nt.ok_([l for l in i_section_length(T2)] == [5.0, 4.0, 4.0])
 
-def test_get_section_number():
+def test_n_sections():
     T = form_simple_tree()
-    nt.ok_(get_section_number(T) == 2)
+    nt.ok_(n_sections(T) == 2)
     T2 = form_neuron_tree()
-    nt.ok_(get_section_number(T2) == 3)
+    nt.ok_(n_sections(T2) == 3)
 
 def test_get_bounding_box():
     box = np.array([[-33.25305769, -57.600172  ,   0.        ],

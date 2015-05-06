@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Basic functions used for tree analysis'''
+from itertools import imap
 from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
@@ -73,20 +74,20 @@ def path_length(tree):
                   for s in tr.val_iter(tr.iter_segment(tree, tr.iter_upstream)))
 
 
-def get_segment_lengths(tree):
-    ''' return a list of tree segment lengths
+def i_segment_length(tree):
+    ''' return an iterator of tree segment lengths
     '''
-    return [segment_length(s) for s in tr.val_iter(tr.iter_segment(tree))]
+    return imap(segment_length, tr.val_iter(tr.iter_segment(tree)))
 
 
-def get_segment_diameters(tree):
-    ''' return a list of tree segment diameters
+def i_segment_diameter(tree):
+    ''' return an iterator of tree segment diameters
     '''
-    return [segment_diameter(s) for s in tr.val_iter(tr.iter_segment(tree))]
+    return imap(segment_diameter, tr.val_iter(tr.iter_segment(tree)))
 
 
-def get_segment_radial_dists(pos, tree):
-    '''Return a list of radial distances of tree segments to a given point
+def i_segment_radial_dist(pos, tree):
+    '''Return an iterator of radial distances of tree segments to a given point
 
     The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
@@ -98,8 +99,8 @@ def get_segment_radial_dists(pos, tree):
         tree: tree of raw data rows.
 
     '''
-    return [segment_radial_dist(s, pos)
-            for s in tr.val_iter(tr.iter_segment(tree))]
+    return imap(lambda s: segment_radial_dist(s, pos),
+                tr.val_iter(tr.iter_segment(tree)))
 
 
 def find_tree_type(tree):
@@ -115,7 +116,7 @@ def find_tree_type(tree):
 
     tree_types = ['undefined', 'soma', 'axon', 'basal', 'apical']
 
-    types = [node.value[COLS.TYPE] for node in tr.iter_preorder(tree)]
+    types = [node[COLS.TYPE] for node in tr.val_iter(tr.iter_preorder(tree))]
 
     tree.type = tree_types[int(np.median(types))]
 
@@ -134,16 +135,16 @@ def get_tree_type(tree):
     return tree.type
 
 
-def get_section_lengths(tree):
+def i_section_length(tree):
     """
-    Return a list containing tree's section lengths
+    Return an iterator of tree section lengths
     """
-    return [path_distance([p.value for p in sec]) for sec in tr.iter_section(tree)]
+    return imap(path_distance, tr.val_iter(tr.iter_section(tree)))
 
 
-def get_section_number(tree):
+def n_sections(tree):
     """
-    Return number of section on tree
+    Return number of sections in tree
     """
     return len(list(tr.iter_section(tree)))
 

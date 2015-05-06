@@ -39,7 +39,7 @@ from neurom.core.tree import val_iter
 from neurom.io.readers import COLS
 from neurom.analysis.morphtree import get_bounding_box
 from neurom.analysis.morphtree import get_tree_type
-from neurom.analysis.morphtree import get_segment_diameters
+from neurom.analysis.morphtree import i_segment_diameter
 
 
 def get_default(variable, **kwargs):
@@ -158,8 +158,9 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     linewidth = get_default('linewidth', **kwargs)
     # Definition of the linewidth according to diameter, if diameter is True.
     if get_default('diameter', **kwargs):
-        linewidth = np.array(get_segment_diameters(tr)) * get_default('diameter_scale',
-                                                                      **kwargs)
+        scale = get_default('diameter_scale', **kwargs)
+        # TODO: This was originally a numpy array. Did it have to be one?
+        linewidth = [d * scale for d in i_segment_diameter(tr)]
 
     # Plot the collection of lines.
     collection = LineCollection(segs,
