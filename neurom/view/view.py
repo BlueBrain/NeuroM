@@ -133,7 +133,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     """
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
-        return None, 'No sunch plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
+        return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
 
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
@@ -243,47 +243,44 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
     treecolor = kwargs.get('treecolor', None)
     outline = kwargs.get('outline', True)
 
-    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
+    if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
+        return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
 
-        # Initialization of matplotlib figure and axes.
-        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    # Initialization of matplotlib figure and axes.
+    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-        # Data needed for the viewer //  To be revised once the soma structure is finalized:
-        # 1. if real_trace : x,y,z coordinates of soma points
-        # 2. if outline : center and diameter of the soma
+    # Data needed for the viewer //  To be revised once the soma structure is finalized:
+    # 1. if real_trace : x,y,z coordinates of soma points
+    # 2. if outline : center and diameter of the soma
 
-        # Definition of the tree color depending on the tree type.
-        treecolor = common.get_color(treecolor, tree_type='soma')
+    # Definition of the tree color depending on the tree type.
+    treecolor = common.get_color(treecolor, tree_type='soma')
 
-        # Plot the outline of the soma as a circle, is outline is selected.
-        if not outline:
-            soma_circle = common.plt.Circle(sm.center, sm.radius, color=treecolor,
-                                            alpha=get_default('alpha', **kwargs))
-            ax.add_artist(soma_circle)
-        else:
-            horz = []
-            vert = []
-
-            for s_point in sm.iter():
-                horz.append(s_point[getattr(COLS, plane[0].capitalize())])
-                vert.append(s_point[getattr(COLS, plane[1].capitalize())])
-
-            horz.append(horz[0]) # To close the loop for a soma viewer. This might be modified!
-            vert.append(vert[0]) # To close the loop for a soma viewer. This might be modified!
-
-            common.plt.plot(horz, vert, color=treecolor,
-                            alpha=get_default('alpha', **kwargs),
-                            linewidth=get_default('linewidth', **kwargs))
-
-        kwargs['title'] = kwargs.get('title', 'Soma view')
-        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-
-        fig, ax = common.plot_style(fig=fig, ax=ax, **kwargs)
-
-        return fig, ax
+    # Plot the outline of the soma as a circle, is outline is selected.
+    if not outline:
+        soma_circle = common.plt.Circle(sm.center, sm.radius, color=treecolor,
+                                        alpha=get_default('alpha', **kwargs))
+        ax.add_artist(soma_circle)
     else:
-        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
+        horz = []
+        vert = []
+
+        for s_point in sm.iter():
+            horz.append(s_point[getattr(COLS, plane[0].capitalize())])
+            vert.append(s_point[getattr(COLS, plane[1].capitalize())])
+
+        horz.append(horz[0]) # To close the loop for a soma viewer. This might be modified!
+        vert.append(vert[0]) # To close the loop for a soma viewer. This might be modified!
+
+        common.plt.plot(horz, vert, color=treecolor,
+                        alpha=get_default('alpha', **kwargs),
+                        linewidth=get_default('linewidth', **kwargs))
+
+    kwargs['title'] = kwargs.get('title', 'Soma view')
+    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
 def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
@@ -358,42 +355,39 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     A 2D matplotlib figure with a tree view, at the selected plane.
 
     """
+    if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
+        return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
 
-    if plane in ['xy', 'yx', 'xz', 'zx', 'yz', 'zy']:
+    new_fig = kwargs.get('new_fig', True)
+    subplot = kwargs.get('subplot', False)
 
-        new_fig = kwargs.get('new_fig', True)
-        subplot = kwargs.get('subplot', False)
+    # Initialization of matplotlib figure and axes.
+    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-        # Initialization of matplotlib figure and axes.
-        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    kwargs['new_fig'] = False
 
-        kwargs['new_fig'] = False
+    soma(nrn.soma, plane=plane, **kwargs)
 
-        soma(nrn.soma, plane=plane, **kwargs)
+    h = []
+    v = []
 
-        h = []
-        v = []
+    for temp_tree in nrn.neurite_trees:
 
-        for temp_tree in nrn.neurite_trees:
+        bounding_box = get_bounding_box(temp_tree)
 
-            bounding_box = get_bounding_box(temp_tree)
+        h.append([bounding_box[0][getattr(COLS, plane[0].capitalize())],
+                  bounding_box[1][getattr(COLS, plane[0].capitalize())]])
+        v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
+                  bounding_box[1][getattr(COLS, plane[1].capitalize())]])
 
-            h.append([bounding_box[0][getattr(COLS, plane[0].capitalize())],
-                      bounding_box[1][getattr(COLS, plane[0].capitalize())]])
-            v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
-                      bounding_box[1][getattr(COLS, plane[1].capitalize())]])
+        tree(temp_tree, plane=plane, **kwargs)
 
-            tree(temp_tree, plane=plane, **kwargs)
+    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
+                                         np.max(h) + get_default('white_space', **kwargs)])
+    kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
+                                         np.max(v) + get_default('white_space', **kwargs)])
 
-        kwargs['title'] = kwargs.get('title', 'Neuron view')
-        kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-        kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                             np.max(h) + get_default('white_space', **kwargs)])
-        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                             np.max(v) + get_default('white_space', **kwargs)])
-
-        return common.plot_style(fig=fig, ax=ax, **kwargs)
-
-    else:
-        return None, 'No sunch plane found! Please select between: xy, xz, yx, yz, zx, zy, all.'
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
