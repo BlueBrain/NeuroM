@@ -33,8 +33,6 @@ import numpy as np
 from itertools import islice, izip
 from neurom.core.dataformat import COLS
 
-np.seterr(all='raise')  # raise exceptions for floating point errors.
-
 
 def vector(p1, p2):
     '''compute vector between two 3D points
@@ -75,19 +73,20 @@ def point_dist(p1, p2):
 
 
 def angle_3points(p0, p1, p2):
-    ''' compute the angle in radians between two 3D points
+    ''' compute the angle in radians between three 3D points
 
-    Calculated as the angle between p0-p1 and p0-p2.
+    Calculated as the angle between p1-p0 and p2-p0.
 
     Args:
         p0, p1, p2:  indexable objects with
         indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
-        Angle in radians between (p0-p1) and (p0-p2)
+        Angle in radians between (p1-p0) and (p2-p0).
+        nan if p0==p1 or p0==p2.
     '''
-    vec1 = vector(p0, p1)
-    vec2 = vector(p0, p2)
+    vec1 = vector(p1, p0)
+    vec2 = vector(p2, p0)
     return math.acos(np.dot(vec1, vec2) /
                      (np.linalg.norm(vec1) * np.linalg.norm(vec2)))
 

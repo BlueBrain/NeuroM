@@ -28,11 +28,10 @@
 
 '''Calculate inter-segment angles'''
 
-from neurom.core import tree
 from neurom.core.dataformat import COLS
 from neurom.io.readers import load_data
 from neurom.io.utils import make_neuron
-from neurom.analysis.morphmath import angle_3points
+from neurom.analysis.morphtree import i_meander_angle
 
 
 def fail_info(p0, p1, p2):
@@ -48,8 +47,5 @@ if __name__ == '__main__':
 
     for tt in nrn.neurite_trees:
         print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
-        for trp in tree.val_iter(tree.itriplet(tt)):
-            try:
-                print 'Angle', angle_3points(trp[1], trp[0], trp[2])
-            except ArithmeticError:
-                fail_info(trp[1], trp[0], trp[2])
+        for a in i_meander_angle(tt):
+            print 'Angle', a

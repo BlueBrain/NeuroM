@@ -43,8 +43,10 @@ from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import i_meander_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
+import math
 import numpy as np
 
 DATA_PATH = './test_data'
@@ -159,11 +161,20 @@ def test_i_section_length():
     T2 = form_neuron_tree()
     nt.ok_([l for l in i_section_length(T2)] == [5.0, 4.0, 4.0])
 
+
+def test_i_meander_angles():
+    T = form_neuron_tree()
+    ref = [math.pi * a for a in (1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5)]
+    for i, m in enumerate(i_meander_angle(T)):
+        nt.assert_almost_equal(m, ref[i])
+
+
 def test_n_sections():
     T = form_simple_tree()
     nt.ok_(n_sections(T) == 2)
     T2 = form_neuron_tree()
     nt.ok_(n_sections(T2) == 3)
+
 
 def test_get_bounding_box():
     box = np.array([[-33.25305769, -57.600172  ,   0.        ],

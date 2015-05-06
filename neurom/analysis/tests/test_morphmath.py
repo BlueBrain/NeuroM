@@ -42,6 +42,7 @@ from math import sqrt, pi, fabs
 
 from numpy.random import uniform
 import numpy as np
+import math
 
 
 np.random.seed(0)
@@ -76,12 +77,13 @@ def test_angle_3points():
     nt.ok_(angle==pi/2.0)
 
 
-@nt.raises(ArithmeticError)
-def test_angle_3points_throws_exception():
+def test_angle_3points_equal_points_returns_nan():
     vec1 = (1.0, 0.0, 0.0)
     vec2 = (0.0, 1.0, 0.0)
     orig = (0.0,1.0,0.0)
-    angle_3points(orig,vec1,vec2)
+    a = angle_3points(orig,vec1,vec2)
+    nt.ok_(np.isnan(a))
+    nt.ok_(math.isnan(a))
 
 
 def soma_points(radius=5,number_points=20):

@@ -31,6 +31,7 @@ from itertools import imap
 from neurom.core import tree as tr
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphmath import angle_3points
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 from neurom.core.tree import ipreorder
@@ -101,6 +102,17 @@ def i_segment_radial_dist(pos, tree):
     '''
     return imap(lambda s: segment_radial_dist(s, pos),
                 tr.val_iter(tr.isegment(tree)))
+
+
+def i_meander_angle(tree):
+    '''Return an iterator to a tree meander angle
+
+    The meander angle is defined as the angle between to adjacent  segments.
+    Applies neurom.morphmath.angle_3points to triplets of
+    '''
+
+    return imap(lambda t: angle_3points(t[1], t[0], t[2]),
+                tr.val_iter(tr.itriplet(tree)))
 
 
 def find_tree_type(tree):
