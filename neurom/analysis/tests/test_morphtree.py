@@ -132,7 +132,7 @@ def test_segment_radial_dists():
 
 
 def test_segment_path_length():
-    leaves = [l for l in tr.iter_leaf(form_neuron_tree())]
+    leaves = [l for l in tr.ileaf(form_neuron_tree())]
     for l in leaves:
         nt.ok_(path_length(l) == 9)
 

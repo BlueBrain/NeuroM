@@ -64,7 +64,7 @@ if __name__ == '__main__':
     soma_pts = [rd.get_row(si) for si in get_soma_ids(rd)]
 
     for tr in trees:
-        for p in point_iter(tree.iter_preorder(tr)):
+        for p in point_iter(tree.ipreorder(tr)):
             print p
 
     print 'Initial segment IDs:', init_seg_ids
@@ -90,5 +90,5 @@ if __name__ == '__main__':
 
     print 'Print neuron leaves as points'
     for tt in nrn2.neurite_trees:
-        for p in point_iter(tree.iter_leaf(tt)):
+        for p in point_iter(tree.ileaf(tt)):
             print p

@@ -34,7 +34,7 @@ Python module of NeuroM to visualize morphologies
 from neurom.view import common
 from matplotlib.collections import LineCollection
 import numpy as np
-from neurom.core.tree import iter_segment
+from neurom.core.tree import isegment
 from neurom.core.tree import val_iter
 from neurom.io.readers import COLS
 from neurom.analysis.morphtree import get_bounding_box
@@ -153,7 +153,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
         vert2 = child_point[vert]
         return ((horz1, vert1), (horz2, vert2))
 
-    segs = [_seg_2d(seg) for seg in val_iter(iter_segment(tr))]
+    segs = [_seg_2d(seg) for seg in val_iter(isegment(tr))]
 
     linewidth = get_default('linewidth', **kwargs)
     # Definition of the linewidth according to diameter, if diameter is True.

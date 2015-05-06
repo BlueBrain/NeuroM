@@ -31,15 +31,15 @@ from neurom.core.tree import Tree
 from neurom.core.tree import is_root
 from neurom.core.tree import is_leaf
 from neurom.core.tree import is_forking_point
-from neurom.core.tree import iter_preorder
-from neurom.core.tree import iter_postorder
-from neurom.core.tree import iter_upstream
-from neurom.core.tree import iter_segment
+from neurom.core.tree import ipreorder
+from neurom.core.tree import ipostorder
+from neurom.core.tree import iupstream
+from neurom.core.tree import isegment
 from neurom.core.tree import segment_iter
-from neurom.core.tree import iter_leaf
-from neurom.core.tree import iter_triplet
-from neurom.core.tree import iter_forking_point
-from neurom.core.tree import iter_section
+from neurom.core.tree import ileaf
+from neurom.core.tree import itriplet
+from neurom.core.tree import iforking_point
+from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from copy import deepcopy
 
@@ -134,67 +134,67 @@ def test_is_forking_point_false():
 
 
 def test_preorder_iteration():
-    nt.ok_(list(val_iter(iter_preorder(REF_TREE))) ==
+    nt.ok_(list(val_iter(ipreorder(REF_TREE))) ==
            [0, 11, 111, 112, 12, 121, 1211, 12111, 12112, 122])
-    nt.ok_(list(val_iter(iter_preorder(REF_TREE.children[0]))) == [11, 111, 112])
-    nt.ok_(list(val_iter(iter_preorder(REF_TREE.children[1]))) ==
+    nt.ok_(list(val_iter(ipreorder(REF_TREE.children[0]))) == [11, 111, 112])
+    nt.ok_(list(val_iter(ipreorder(REF_TREE.children[1]))) ==
            [12, 121, 1211, 12111, 12112, 122])
 
 
 def test_postorder_iteration():
-    nt.ok_(list(val_iter(iter_postorder(REF_TREE))) ==
+    nt.ok_(list(val_iter(ipostorder(REF_TREE))) ==
            [111, 112, 11, 12111, 12112, 1211, 121, 122, 12, 0])
-    nt.ok_(list(val_iter(iter_postorder(REF_TREE.children[0]))) == [111, 112, 11])
-    nt.ok_(list(val_iter(iter_postorder(REF_TREE.children[1]))) ==
+    nt.ok_(list(val_iter(ipostorder(REF_TREE.children[0]))) == [111, 112, 11])
+    nt.ok_(list(val_iter(ipostorder(REF_TREE.children[1]))) ==
            [12111, 12112, 1211, 121, 122, 12])
 
 
 def test_upstream_iteration():
 
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE))) == [0])
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[0]))) == [11, 0])
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[0].children[0]))) ==
+    nt.ok_(list(val_iter(iupstream(REF_TREE))) == [0])
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[0]))) == [11, 0])
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[0].children[0]))) ==
            [111, 11, 0])
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[0].children[1]))) ==
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[0].children[1]))) ==
            [112, 11, 0])
 
 
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[1]))) == [12, 0])
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[1].children[0]))) ==
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[1]))) == [12, 0])
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[1].children[0]))) ==
            [121, 12, 0])
-    nt.ok_(list(val_iter(iter_upstream(REF_TREE.children[1].children[1]))) ==
+    nt.ok_(list(val_iter(iupstream(REF_TREE.children[1].children[1]))) ==
            [122, 12, 0])
 
 
 def test_segment_iteration():
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE))),
            [(0, 11),(11, 111),(11, 112),
             (0, 12),(12, 121),(121,1211),
             (1211,12111),(1211,12112),(12, 122)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[0]))),
            [(0, 11), (11, 111),(11, 112)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0].children[0]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[0].children[0]))),
                     [(11, 111)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[0].children[1]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[0].children[1]))),
                     [(11, 112)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[1]))),
            [(0, 12), (12, 121), (121, 1211),
             (1211, 12111), (1211, 12112), (12, 122)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1].children[0]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[1].children[0]))),
                     [(12, 121), (121, 1211), (1211, 12111), (1211, 12112)])
 
-    nt.assert_equal(list(val_iter(iter_segment(REF_TREE.children[1].children[1]))),
+    nt.assert_equal(list(val_iter(isegment(REF_TREE.children[1].children[1]))),
                     [(12, 122)])
 
 
 def test_segment_upstream_iteration():
-    leaves = [l for l in iter_leaf(REF_TREE2)]
+    leaves = [l for l in ileaf(REF_TREE2)]
     ref_paths = [
         [(1111, 11111), (111, 1111), (11, 111), (0, 11)],
         [(1111, 11112), (111, 1111), (11, 111), (0, 11)],
@@ -205,40 +205,40 @@ def test_segment_upstream_iteration():
     ]
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in val_iter(iter_segment(l, iter_upstream))] == ref)
+        nt.ok_([s for s in val_iter(isegment(l, iupstream))] == ref)
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in val_iter(segment_iter(iter_upstream(l)))] == ref)
+        nt.ok_([s for s in val_iter(segment_iter(iupstream(l)))] == ref)
 
 
-def test_iter_triplet():
+def test_itriplet():
 
     ref = [[0, 11, 111], [0, 11, 112], [11, 111, 1111], [111, 1111, 11111],
            [111, 1111, 11112], [0, 12, 121], [0, 12, 122], [12, 121, 1211],
            [121, 1211, 12111], [121, 1211, 12112]]
 
     nt.assert_equal(list([n.value for n in t]
-                         for t in iter_triplet(REF_TREE2)),
+                         for t in itriplet(REF_TREE2)),
                     ref)
 
 
 def test_leaf_iteration():
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE))) == [111, 112, 12111, 12112, 122])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[0]))) == [111, 112])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[1]))) == [12111, 12112, 122])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[0].children[0]))) == [111])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[0].children[1]))) == [112])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[1].children[0]))) == [12111, 12112])
-    nt.ok_(list(val_iter(iter_leaf(REF_TREE.children[1].children[1]))) == [122])
+    nt.ok_(list(val_iter(ileaf(REF_TREE))) == [111, 112, 12111, 12112, 122])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[0]))) == [111, 112])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[1]))) == [12111, 12112, 122])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[0].children[0]))) == [111])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[0].children[1]))) == [112])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[1].children[0]))) == [12111, 12112])
+    nt.ok_(list(val_iter(ileaf(REF_TREE.children[1].children[1]))) == [122])
 
 
-def test_iter_forking_point():
-    nt.ok_([n.value for n in iter_forking_point(REF_TREE)] ==
+def test_iforking_point():
+    nt.ok_([n.value for n in iforking_point(REF_TREE)] ==
            [0, 11, 12, 1211])
 
 
 def test_valiter_forking_point():
-    nt.ok_(list(val_iter(iter_forking_point(REF_TREE))) ==
+    nt.ok_(list(val_iter(iforking_point(REF_TREE))) ==
            [0, 11, 12, 1211])
 
 def test_section_iteration():
@@ -246,5 +246,5 @@ def test_section_iteration():
                     (11, 112), (0, 12), (12, 121, 1211), (1211, 12111),
                     (1211, 12112), (12, 122))
 
-    for i, s in enumerate(iter_section(REF_TREE2)):
+    for i, s in enumerate(isection(REF_TREE2)):
         nt.assert_equal(REF_SECTIONS[i], tuple(tt.value for tt in s))

@@ -33,7 +33,7 @@ from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
-from neurom.core.tree import iter_preorder
+from neurom.core.tree import ipreorder
 import numpy as np
 
 
@@ -71,19 +71,19 @@ def segment_radial_dist(seg, pos):
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
     return np.sum(point_dist(s[0], s[1])
-                  for s in tr.val_iter(tr.iter_segment(tree, tr.iter_upstream)))
+                  for s in tr.val_iter(tr.isegment(tree, tr.iupstream)))
 
 
 def i_segment_length(tree):
     ''' return an iterator of tree segment lengths
     '''
-    return imap(segment_length, tr.val_iter(tr.iter_segment(tree)))
+    return imap(segment_length, tr.val_iter(tr.isegment(tree)))
 
 
 def i_segment_diameter(tree):
     ''' return an iterator of tree segment diameters
     '''
-    return imap(segment_diameter, tr.val_iter(tr.iter_segment(tree)))
+    return imap(segment_diameter, tr.val_iter(tr.isegment(tree)))
 
 
 def i_segment_radial_dist(pos, tree):
@@ -100,7 +100,7 @@ def i_segment_radial_dist(pos, tree):
 
     '''
     return imap(lambda s: segment_radial_dist(s, pos),
-                tr.val_iter(tr.iter_segment(tree)))
+                tr.val_iter(tr.isegment(tree)))
 
 
 def find_tree_type(tree):
@@ -116,7 +116,7 @@ def find_tree_type(tree):
 
     tree_types = ['undefined', 'soma', 'axon', 'basal', 'apical']
 
-    types = [node[COLS.TYPE] for node in tr.val_iter(tr.iter_preorder(tree))]
+    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 
     tree.type = tree_types[int(np.median(types))]
 
@@ -139,14 +139,14 @@ def i_section_length(tree):
     """
     Return an iterator of tree section lengths
     """
-    return imap(path_distance, tr.val_iter(tr.iter_section(tree)))
+    return imap(path_distance, tr.val_iter(tr.isection(tree)))
 
 
 def n_sections(tree):
     """
     Return number of sections in tree
     """
-    return len(list(tr.iter_section(tree)))
+    return len(list(tr.isection(tree)))
 
 
 def get_bounding_box(tree):
@@ -157,11 +157,11 @@ def get_bounding_box(tree):
     [xmax, ymax, zmax]]
     """
 
-    min_x = min(p[0] for p in val_iter(iter_preorder(tree)))
-    min_y = min(p[1] for p in val_iter(iter_preorder(tree)))
-    min_z = min(p[2] for p in val_iter(iter_preorder(tree)))
-    max_x = max(p[0] for p in val_iter(iter_preorder(tree)))
-    max_y = max(p[1] for p in val_iter(iter_preorder(tree)))
-    max_z = max(p[2] for p in val_iter(iter_preorder(tree)))
+    min_x = min(p[0] for p in val_iter(ipreorder(tree)))
+    min_y = min(p[1] for p in val_iter(ipreorder(tree)))
+    min_z = min(p[2] for p in val_iter(ipreorder(tree)))
+    max_x = max(p[0] for p in val_iter(ipreorder(tree)))
+    max_y = max(p[1] for p in val_iter(ipreorder(tree)))
+    max_z = max(p[2] for p in val_iter(ipreorder(tree)))
 
     return np.array([[min_x, min_y, min_z], [max_x, max_y, max_z]])

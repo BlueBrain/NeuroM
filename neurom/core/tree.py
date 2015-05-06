@@ -65,21 +65,21 @@ def is_root(tree):
     return tree.parent is None
 
 
-def iter_preorder(tree):
+def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
     yield tree
-    for v in chain(*imap(iter_preorder, tree.children)):
+    for v in chain(*imap(ipreorder, tree.children)):
         yield v
 
 
-def iter_postorder(tree):
+def ipostorder(tree):
     '''Depth-first post-order iteration of tree nodes'''
-    for v in chain(*imap(iter_postorder, tree.children)):
+    for v in chain(*imap(ipostorder, tree.children)):
         yield v
     yield tree
 
 
-def iter_upstream(tree):
+def iupstream(tree):
     '''Iterate from a tree node to the root nodes'''
     t = tree
     while t is not None:
@@ -87,23 +87,23 @@ def iter_upstream(tree):
         t = t.parent
 
 
-def iter_leaf(tree):
+def ileaf(tree):
     '''Iterator to all leaves of a tree'''
-    return ifilter(lambda t: len(t.children) == 0, iter_preorder(tree))
+    return ifilter(lambda t: len(t.children) == 0, ipreorder(tree))
 
 
-def iter_forking_point(tree):
+def iforking_point(tree):
     '''Iterator to forking points. Returns a tree object.'''
     return ifilter(lambda t: len(t.children) > 1,
-                   iter_preorder(tree))
+                   ipreorder(tree))
 
 
-def iter_segment(tree, iter_mode=iter_preorder):
+def isegment(tree, iter_mode=ipreorder):
     '''Iterate over segments
 
     Args:
         tree: the tree over which to iterate
-        iter_mode: iteration mode. Default: iter_preorder.
+        iter_mode: iteration mode. Default: ipreorder.
     '''
     return segment_iter(iter_mode(tree))
 
@@ -118,7 +118,7 @@ def segment_iter(tree_iterator):
                 ifilter(lambda t: t.parent is not None, tree_iterator))
 
 
-def iter_triplet(tree):
+def itriplet(tree):
     '''Iterate over triplets
 
     Yields tuples with three consecutive sub-trees
@@ -126,7 +126,7 @@ def iter_triplet(tree):
     return chain(
         *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
               ifilter(lambda n: not is_root(n) and not is_leaf(n),
-                      iter_preorder(tree))))
+                      ipreorder(tree))))
 
 
 def val_iter(tree_iterator):
@@ -139,14 +139,14 @@ def val_iter(tree_iterator):
     return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
 
 
-def iter_section(tree):
+def isection(tree):
     '''Iterator to sections of a tree.
 
     Resolves to a tuple of sub-trees forming a section.
     '''
     def get_section(tree):
         '''get the upstream section starting from this tree'''
-        ui = iter_upstream(tree)
+        ui = iupstream(tree)
         sec = [ui.next()]
         for i in ui:
             sec.append(i)
@@ -160,4 +160,4 @@ def iter_section(tree):
         return not is_root(n) and (is_leaf(n) or is_forking_point(n))
 
     return imap(get_section,
-                ifilter(seed_node, iter_preorder(tree)))
+                ifilter(seed_node, ipreorder(tree)))

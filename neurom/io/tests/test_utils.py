@@ -90,16 +90,16 @@ def test_get_initial_segment_ids():
 
 def _check_trees(trees):
     for t in trees:
-        nt.ok_(len(list(tree.iter_leaf(t))) == 11)
-        nt.ok_(len(list(tree.iter_forking_point(t))) == 10)
-        nt.ok_(len(list(tree.iter_preorder(t))) == 211)
-        nt.ok_(len(list(tree.iter_postorder(t))) == 211)
-        nt.ok_(len(list(tree.iter_segment(t))) == 210)
-        leaves = [l for l in tree.iter_leaf(t)]
+        nt.ok_(len(list(tree.ileaf(t))) == 11)
+        nt.ok_(len(list(tree.iforking_point(t))) == 10)
+        nt.ok_(len(list(tree.ipreorder(t))) == 211)
+        nt.ok_(len(list(tree.ipostorder(t))) == 211)
+        nt.ok_(len(list(tree.isegment(t))) == 210)
+        leaves = [l for l in tree.ileaf(t)]
         # path length from each leaf to root node.
         branch_order = [21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 111]
         for i, l in enumerate(leaves):
-            nt.ok_(len(list(tree.iter_upstream(l))) == branch_order[i])
+            nt.ok_(len(list(tree.iupstream(l))) == branch_order[i])
 
 
 def test_make_tree():
