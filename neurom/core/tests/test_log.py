@@ -1,3 +1,4 @@
+
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,33 +27,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Calculate inter-segment angles'''
+from nose import tools as nt
 
-import logging
-import numpy as np
-from neurom.core.dataformat import COLS
-from neurom.io.readers import load_data
-from neurom.io.utils import make_neuron
-from neurom.analysis.morphtree import i_meander_angle
+def test_load_null_handler():
+    from neurom.core.log import NullHandler
 
 
-# root level logger. This would be a top level application logger.
-logging.basicConfig()
-LOG = logging.getLogger()
-LOG.setLevel(logging.DEBUG)
-fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-LOG.handlers[0].setFormatter(fmt)
-
-
-if __name__ == '__main__':
-
-    filename = 'test_data/swc/Neuron.swc'
-    rd = load_data(filename)
-    nrn = make_neuron(rd)
-
-    for tt in nrn.neurite_trees:
-        print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
-        for a in i_meander_angle(tt):
-            LOG.debug('Angle %f', a)
-            if np.isnan(a):
-                LOG.warn('Found NaN angle. Check for zero length segments!')
+def test_local_null_handler():
+    from neurom.core.log import _NullHandler
+    n = _NullHandler()
+    n.emit(42)

@@ -36,6 +36,9 @@ from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 from neurom.core.tree import ipreorder
 import numpy as np
+import logging
+
+LOG = logging.getLogger(__name__)
 
 
 def segment_length(seg):
