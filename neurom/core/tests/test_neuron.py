@@ -111,3 +111,6 @@ def test_neuron():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'])
     nt.assert_equal(nrn.soma.center, (11, 22, 33))
     nt.assert_equal(nrn.neurite_trees, ['foo', 'bar'])
+    nt.assert_equal(nrn.id, 'Neuron')
+    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'], 'test')
+    nt.assert_equal(nrn.id, 'test')

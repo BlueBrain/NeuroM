@@ -137,3 +137,7 @@ def test_make_neuron_post_tree_action():
     nrn = utils.make_neuron(rd, post_action)
     for t in nrn.neurite_trees:
         nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
+
+def test_load_neuron():
+    nrn = utils.load_neuron(FILES[0])
+    nt.ok_(nrn.id == FILES[0].strip('.swc'))

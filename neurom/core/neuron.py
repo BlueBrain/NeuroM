@@ -118,6 +118,7 @@ def make_soma(points):
 
 class Neuron(object):
     '''Toy neuron class for testing ideas'''
-    def __init__(self, soma_points, neurite_trees):
+    def __init__(self, soma_points, neurite_trees, name='Neuron'):
         self.soma = make_soma(soma_points)
         self.neurite_trees = neurite_trees
+        self.id = name

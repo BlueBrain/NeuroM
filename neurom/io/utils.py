@@ -33,6 +33,8 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron
+from neurom.io.readers import load_data
+import os
 
 
 def get_soma_ids(rdw):
@@ -87,3 +89,15 @@ def make_neuron(raw_data, tree_action=None):
               for iseg in get_initial_segment_ids(raw_data)]
     _soma_pts = [raw_data.get_row(s_id) for s_id in get_soma_ids(raw_data)]
     return Neuron(_soma_pts, _trees)
+
+
+def load_neuron(filename):
+    """
+    Loads a neuron keeping a record of the filename.
+    """
+
+    data = load_data(filename)
+    nrn = make_neuron(data)
+    nrn.id = nrn.id = os.path.splitext(filename)[0]
+
+    return nrn
