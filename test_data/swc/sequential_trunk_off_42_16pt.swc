@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Ecole Polytechnique Federal de Lausanne, Blue Brain Project
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
