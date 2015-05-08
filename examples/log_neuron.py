@@ -56,7 +56,7 @@ LOG.addHandler(sh)
 
 def file_handler(logfile, level=logging.WARNING, fmt=None):
     '''create file handler which logs INFO messages'''
-    fh = logging.handlers.RotatingFileHandler(logfile)
+    fh = logging.handlers.RotatingFileHandler(logfile, backupCount=8)
     fh.setLevel(level)
     if fmt is not None:
         fh.setFormatter(fmt)

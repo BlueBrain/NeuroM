@@ -98,6 +98,6 @@ def load_neuron(filename):
 
     data = load_data(filename)
     nrn = make_neuron(data)
-    nrn.id = nrn.id = os.path.splitext(filename)[0]
+    nrn.id = os.path.splitext(filename)[0]
 
     return nrn
