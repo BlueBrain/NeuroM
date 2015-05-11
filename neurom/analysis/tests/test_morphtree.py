@@ -44,6 +44,7 @@ from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_meander_angle
+from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
 import math
@@ -86,6 +87,25 @@ def form_simple_tree():
     T7 = T6.add_child(Tree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
     T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
 
+    return T
+
+
+def form_branching_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
 
@@ -167,6 +187,13 @@ def test_i_meander_angles():
     ref = [math.pi * a for a in (1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5)]
     for i, m in enumerate(i_meander_angle(T)):
         nt.assert_almost_equal(m, ref[i])
+
+
+def test_i_local_bifurcation_angles():
+    T = form_branching_tree()
+    ref = [math.pi * a for a in (0.25, 0.5, 0.25)]
+    for i, b in enumerate(i_local_bifurcation_angle(T)):
+        nt.assert_almost_equal(b, ref[i])
 
 
 def test_n_sections():

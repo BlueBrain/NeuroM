@@ -55,6 +55,11 @@ def is_forking_point(tree):
     return len(tree.children) > 1
 
 
+def is_bifurcation_point(tree):
+    '''Is tree a bifurcation point?'''
+    return len(tree.children) == 2
+
+
 def is_leaf(tree):
     '''Is tree a leaf?'''
     return len(tree.children) == 0
@@ -89,13 +94,17 @@ def iupstream(tree):
 
 def ileaf(tree):
     '''Iterator to all leaves of a tree'''
-    return ifilter(lambda t: len(t.children) == 0, ipreorder(tree))
+    return ifilter(is_leaf, ipreorder(tree))
 
 
 def iforking_point(tree):
     '''Iterator to forking points. Returns a tree object.'''
-    return ifilter(lambda t: len(t.children) > 1,
-                   ipreorder(tree))
+    return ifilter(is_forking_point, ipreorder(tree))
+
+
+def ibifurcation_point(tree):
+    '''Iterator to bifurcation points. Returns a tree object.'''
+    return ifilter(is_bifurcation_point, ipreorder(tree))
 
 
 def isegment(tree, iter_mode=ipreorder):

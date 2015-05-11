@@ -118,6 +118,16 @@ def i_meander_angle(tree):
                 tr.val_iter(tr.itriplet(tree)))
 
 
+def i_local_bifurcation_angle(tree):
+    '''Return the opening angle between two out-going segments
+    in a bifurcation point
+    '''
+    return imap(lambda t: angle_3points(t.value,
+                                        t.children[0].value,
+                                        t.children[1].value),
+                tr.ibifurcation_point(tree))
+
+
 def find_tree_type(tree):
 
     """

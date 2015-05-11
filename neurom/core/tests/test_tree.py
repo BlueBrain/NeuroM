@@ -31,6 +31,7 @@ from neurom.core.tree import Tree
 from neurom.core.tree import is_root
 from neurom.core.tree import is_leaf
 from neurom.core.tree import is_forking_point
+from neurom.core.tree import is_bifurcation_point
 from neurom.core.tree import ipreorder
 from neurom.core.tree import ipostorder
 from neurom.core.tree import iupstream
@@ -39,6 +40,7 @@ from neurom.core.tree import segment_iter
 from neurom.core.tree import ileaf
 from neurom.core.tree import itriplet
 from neurom.core.tree import iforking_point
+from neurom.core.tree import ibifurcation_point
 from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from copy import deepcopy
@@ -58,6 +60,7 @@ REF_TREE2 = deepcopy(REF_TREE)
 T1111 = REF_TREE2.children[0].children[0].add_child(Tree(1111))
 T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
+T11113 = T1111.add_child(Tree(11113))
 
 def test_instantiate_tree():
     t = Tree('hello')
@@ -132,6 +135,23 @@ def test_is_forking_point_false():
     nt.ok_(not is_forking_point(t))
 
 
+def test_is_bifurcation_point():
+    t = Tree(0)
+    t.add_child(Tree(1))
+    t.add_child(Tree(2))
+    nt.ok_(is_bifurcation_point(t))
+
+
+def test_is_bifurcation_point_false():
+    t = Tree(0)
+    nt.ok_(not is_bifurcation_point(t))
+    t.add_child(Tree(1))
+    nt.ok_(not is_bifurcation_point(t))
+    t.add_child(Tree(2))
+    t.add_child(Tree(3))
+    nt.ok_(not is_bifurcation_point(t))
+
+
 
 def test_preorder_iteration():
     nt.ok_(list(val_iter(ipreorder(REF_TREE))) ==
@@ -198,6 +218,7 @@ def test_segment_upstream_iteration():
     ref_paths = [
         [(1111, 11111), (111, 1111), (11, 111), (0, 11)],
         [(1111, 11112), (111, 1111), (11, 111), (0, 11)],
+        [(1111, 11113), (111, 1111), (11, 111), (0, 11)],
         [(11, 112), (0, 11)],
         [(1211, 12111), (121, 1211), (12, 121), (0, 12)],
         [(1211, 12112), (121, 1211), (12, 121), (0, 12)],
@@ -205,16 +226,17 @@ def test_segment_upstream_iteration():
     ]
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in val_iter(isegment(l, iupstream))] == ref)
+        nt.assert_equal([s for s in val_iter(isegment(l, iupstream))], ref)
 
     for l, ref in zip(leaves, ref_paths):
-        nt.ok_([s for s in val_iter(segment_iter(iupstream(l)))] == ref)
+        nt.assert_equal([s for s in val_iter(segment_iter(iupstream(l)))], ref)
 
 
 def test_itriplet():
 
     ref = [[0, 11, 111], [0, 11, 112], [11, 111, 1111], [111, 1111, 11111],
-           [111, 1111, 11112], [0, 12, 121], [0, 12, 122], [12, 121, 1211],
+           [111, 1111, 11112], [111, 1111, 11113],
+           [0, 12, 121], [0, 12, 122], [12, 121, 1211],
            [121, 1211, 12111], [121, 1211, 12112]]
 
     nt.assert_equal(list([n.value for n in t]
@@ -233,18 +255,29 @@ def test_leaf_iteration():
 
 
 def test_iforking_point():
-    nt.ok_([n.value for n in iforking_point(REF_TREE)] ==
-           [0, 11, 12, 1211])
+    nt.assert_equal([n.value for n in iforking_point(REF_TREE2)],
+                    [0, 11, 1111, 12, 1211])
 
 
 def test_valiter_forking_point():
-    nt.ok_(list(val_iter(iforking_point(REF_TREE))) ==
+    nt.ok_(list(val_iter(iforking_point(REF_TREE2))) ==
+           [0, 11, 1111, 12, 1211])
+
+
+def test_ibifurcation_point():
+    nt.assert_equal([n.value for n in ibifurcation_point(REF_TREE2)],
+                    [0, 11, 12, 1211])
+
+
+def test_valiter_bifurcation_point():
+    nt.ok_(list(val_iter(ibifurcation_point(REF_TREE2))) ==
            [0, 11, 12, 1211])
+
 
 def test_section_iteration():
     REF_SECTIONS = ((0, 11), (11, 111, 1111), (1111, 11111), (1111, 11112),
-                    (11, 112), (0, 12), (12, 121, 1211), (1211, 12111),
-                    (1211, 12112), (12, 122))
+                    (1111, 11113), (11, 112), (0, 12), (12, 121, 1211),
+                    (1211, 12111), (1211, 12112), (12, 122))
 
     for i, s in enumerate(isection(REF_TREE2)):
         nt.assert_equal(REF_SECTIONS[i], tuple(tt.value for tt in s))
