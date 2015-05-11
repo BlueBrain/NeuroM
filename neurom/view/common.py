@@ -34,6 +34,8 @@ import os
 import matplotlib
 matplotlib.use('Agg') # noqa
 import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D # pylint: disable=unused-import
 
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
@@ -113,7 +115,7 @@ def get_color(treecolor, tree_type):
     return treecolor
 
 
-def get_figure(new_fig=True, subplot=False, params=None, no_axes=False):
+def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=False):
     """
     Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
@@ -162,10 +164,13 @@ def get_figure(new_fig=True, subplot=False, params=None, no_axes=False):
     if params is None:
         params = dict()
 
-    if isinstance(subplot, (tuple, list)):
-        ax = fig.add_subplot(subplot[0], subplot[1], subplot[2], **params)
+    if new_axes:
+        if isinstance(subplot, (tuple, list)):
+            ax = fig.add_subplot(subplot[0], subplot[1], subplot[2], **params)
+        else:
+            ax = fig.add_subplot(subplot, **params)
     else:
-        ax = fig.add_subplot(subplot, **params)
+        ax = plt.gca()
 
     return fig, ax
 
@@ -490,13 +495,9 @@ def plot_title(fig, ax, **kwargs):
         Default value is None.
 
     title : str
-        The title for the figure
+        Set the title for the figure.
+        If "" no title will be added.
         Default value is "Figure".
-
-    no_title : boolean
-        Defines the presence of a title in the figure.
-        If True the title will be set to an empty string "".
-        Default value is False.
 
     title_fontsize : int
         Defines the size of the title's font.
@@ -517,18 +518,14 @@ def plot_title(fig, ax, **kwargs):
     pretitle = kwargs.get('pretitle', '')
     posttitle = kwargs.get('posttitle', '')
     title = kwargs.get('title', 'Figure')
-    no_title = kwargs.get('no_title', False)
     title_fontsize = kwargs.get('titlefontsize', 14)
     title_arg = kwargs.get('titlearg', None)
 
     if title_arg is None:
         title_arg = {}
 
-    if no_title:
-        ax.set_title('')
-    else:
-        ax.set_title(pretitle + title + posttitle,
-                     fontsize=title_fontsize, **title_arg)
+    ax.set_title(pretitle + title + posttitle,
+                 fontsize=title_fontsize, **title_arg)
 
     return fig, ax
 
@@ -548,27 +545,19 @@ def plot_labels(fig, ax, **kwargs):
     Options
     -------
     xlabel : str
-        The xlabel for the figure
+        The xlabel for the figure.
+        For no_xlabel set to ''.
         Default value is "X".
 
     ylabel : str
-        The xlabel for the figure
+        The xlabel for the figure.
+        For no_ylabel set to ''.
         Default value is "Y".
 
-    no_labels : boolean
-        Defines the presence of the labels in the figure.
-        If True the labels will be set to an empty string "".
-        Default value is False.
-
-    no_xlabel : boolean
-        Defines the presence of the xlabel in the figure.
-        If True the xlabel will be set to an empty string "".
-        Default value is False.
-
-    no_ylabel : boolean
-        Defines the presence of the ylabel in the figure.
-        If True the ylabel will be set to an empty string "".
-        Default value is False.
+    zlabel : str
+        The zlabel for the figure.
+        For no_zlabel set to ''.
+        Default value is "Z".
 
     label_fontsize : int
         Defines the size of the labels' font.
@@ -584,6 +573,11 @@ def plot_labels(fig, ax, **kwargs):
         into matplotlib as ylabel arguments.
         Default value is None.
 
+    zlabel_arg : dict
+        Defines the arguments that will be passsed
+        into matplotlib as zlabel arguments.
+        Default value is None.
+
     Returns
     -------
     figure_output : figure, axes
@@ -593,12 +587,11 @@ def plot_labels(fig, ax, **kwargs):
     # Definition of label options
     xlabel = kwargs.get('xlabel', 'X')
     ylabel = kwargs.get('ylabel', 'Y')
-    no_labels = kwargs.get('no_labels', False)
-    no_xlabel = kwargs.get('no_xlabel', False)
-    no_ylabel = kwargs.get('no_ylabel', False)
+    zlabel = kwargs.get('zlabel', 'Z')
     label_fontsize = kwargs.get('labelfontsize', 14)
-    xlabel_arg = kwargs.get('xlabelarg', None)
-    ylabel_arg = kwargs.get('ylabelarg', None)
+    xlabel_arg = kwargs.get('xlabel_arg', None)
+    ylabel_arg = kwargs.get('ylabel_arg', None)
+    zlabel_arg = kwargs.get('zlabel_arg', None)
 
     if xlabel_arg is None:
         xlabel_arg = {}
@@ -606,22 +599,14 @@ def plot_labels(fig, ax, **kwargs):
     if ylabel_arg is None:
         ylabel_arg = {}
 
-    if no_labels:
-        ax.set_xlabel('')
-        ax.set_ylabel('')
-    else:
-        if no_xlabel:
-            ax.set_xlabel('')
-        else:
-            ax.set_xlabel(xlabel,
-                          fontsize=label_fontsize,
-                          **xlabel_arg)
-        if no_ylabel:
-            ax.set_ylabel('')
-        else:
-            ax.set_ylabel(ylabel,
-                          fontsize=label_fontsize,
-                          **ylabel_arg)
+    if zlabel_arg is None:
+        zlabel_arg = {}
+
+    ax.set_xlabel(xlabel, fontsize=label_fontsize, **xlabel_arg)
+    ax.set_ylabel(ylabel, fontsize=label_fontsize, **ylabel_arg)
+
+    if hasattr(ax, 'zaxis'):
+        ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
     return fig, ax
 
@@ -640,27 +625,22 @@ def plot_ticks(fig, ax, **kwargs):
 
     Options
     -------
-    no_ticks : boolean
-        Defines the presence of x-y ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
-    no_xticks : boolean
-        Defines the presence of x ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
-    no_yticks : boolean
-        Defines the presence of y ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
     xticks : list of ticks
         Defines the values of x ticks in the figure.
+        If None the xticks will not be modified.
+        For no_xticks set to [].
         Default value is None.
 
     yticks : list of ticks
         Defines the values of y ticks in the figure.
+        If None the yticks will not be modified.
+        For no_yticks set to [].
+        Default value is None.
+
+    zticks : list of ticks
+        Defines the values of z ticks in the figure.
+        If None the zticks will not be modified.
+        For no_zticks set to [].
         Default value is None.
 
     tick_fontsize : int
@@ -677,6 +657,11 @@ def plot_ticks(fig, ax, **kwargs):
         into matplotlib as yticks arguments.
         Default value is None.
 
+    zticks_arg : dict
+        Defines the arguments that will be passsed
+        into matplotlib as zticks arguments.
+        Default value is None.
+
     Returns
     -------
     figure_output : figure, axes
@@ -684,14 +669,13 @@ def plot_ticks(fig, ax, **kwargs):
     """
 
     # Definition of tick options
-    no_ticks = kwargs.get('no_ticks', False)
-    no_xticks = kwargs.get('no_xticks', False)
-    no_yticks = kwargs.get('no_yticks', False)
     xticks = kwargs.get('xticks', None)
     yticks = kwargs.get('yticks', None)
+    zticks = kwargs.get('zticks', None)
     tick_fontsize = kwargs.get('tickfontsize', 12)
     xticks_arg = kwargs.get('xticksarg', None)
     yticks_arg = kwargs.get('yticksarg', None)
+    zticks_arg = kwargs.get('zticksarg', None)
 
     if xticks_arg is None:
         xticks_arg = {}
@@ -699,22 +683,20 @@ def plot_ticks(fig, ax, **kwargs):
     if yticks_arg is None:
         yticks_arg = {}
 
-    if not no_ticks:
-        if xticks is not None:
-            if not no_xticks:
-                ax.set_xticks(xticks)
-                ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
-            else:
-                ax.set_xticks([])
-        if yticks is not None:
-            if not no_yticks:
-                ax.set_yticks(yticks)
-                ax.yaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
-            else:
-                ax.set_yticks([])
-    else:
-        ax.set_xticks([])
-        ax.set_yticks([])
+    if zticks_arg is None:
+        zticks_arg = {}
+
+    if xticks is not None:
+        ax.set_xticks(xticks)
+        ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
+
+    if yticks is not None:
+        ax.set_yticks(yticks)
+        ax.yaxis.set_tick_params(labelsize=tick_fontsize, **yticks_arg)
+
+    if zticks is not None:
+        ax.set_zticks(zticks)
+        ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
     return fig, ax
 
@@ -759,17 +741,19 @@ def plot_limits(fig, ax, **kwargs):
 
     """
     # Definition of limit options
-    no_limits = kwargs.get('no_limits', False)
     no_xlim = kwargs.get('no_xlim', False)
     no_ylim = kwargs.get('no_ylim', False)
+    no_zlim = kwargs.get('no_zlim', False)
     xlim = kwargs.get('xlim', None)
     ylim = kwargs.get('ylim', None)
+    zlim = kwargs.get('zlim', None)
 
-    if not no_limits:
-        if not no_xlim:
-            ax.set_xlim(xlim)
-        if not no_ylim:
-            ax.set_ylim(ylim)
+    if not no_xlim:
+        ax.set_xlim(xlim)
+    if not no_ylim:
+        ax.set_ylim(ylim)
+    if hasattr(ax, 'zaxis') and not no_zlim:
+        ax.set_zlim(zlim)
 
     return fig, ax
 
@@ -812,5 +796,22 @@ def plot_legend(fig, ax, **kwargs):
 
     if not no_legend:
         ax.legend(**legend_arg)
+
+    return fig, ax
+
+
+def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
+    """
+    Plots a 3d sphere, given the center and the radius.
+    """
+
+    u = np.linspace(0, 2 * np.pi, 300)
+    v = np.linspace(0, np.pi, 300)
+
+    x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
+    y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
+    z = center[2] + radius * np.outer(np.ones_like(u), np.cos(v))
+
+    ax.plot_surface(x, y, z, linewidth=0.0, color=color, alpha=alpha)
 
     return fig, ax

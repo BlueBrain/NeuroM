@@ -37,6 +37,7 @@ from neurom.view.common import plot_labels
 from neurom.view.common import plot_legend
 from neurom.view.common import plot_limits
 from neurom.view.common import plot_ticks
+from neurom.view.common import plot_sphere
 from neurom.view.common import get_color
 
 import os
@@ -73,6 +74,12 @@ def test_get_figure():
     nt.ok_(ax2.colNum == 0)
     nt.ok_(ax2.rowNum == 0)
     plt.close('all')
+    fig = plt.figure()
+    ax  = fig.add_subplot(111)
+    fig2, ax2 = get_figure(new_fig=False, new_axes=False)
+    nt.ok_(fig2 == plt.gcf())
+    nt.ok_(ax2 == plt.gca())
+    plt.close('all')
 
 def test_save_plot():
     if os.path.isfile(fig_name):
@@ -97,27 +104,30 @@ ax.plot([0,0], [1,2], label='test')
 xlim = ax.get_xlim()
 ylim = ax.get_ylim()
 
+fig0 = plt.figure()
+ax0  = fig0.add_subplot((111), projection='3d')
+ax0.plot([0,0], [1,2], [2,1])
+xlim0 = ax0.get_xlim()
+ylim0 = ax0.get_ylim()
+zlim0 = ax0.get_zlim()
+
 def test_plot_title():
     fig1, ax1 = plot_title(fig, ax)
     nt.ok_(ax1.get_title() == 'Figure')
     fig1, ax1 = plot_title(fig, ax, title='Test')
     nt.ok_(ax1.get_title() == 'Test')
-    fig1, ax1 = plot_title(fig, ax, no_title=True)
-    nt.ok_(ax1.get_title() == "")
     
 def test_plot_labels():
     fig1, ax1 = plot_labels(fig, ax)
     nt.ok_(ax1.get_xlabel() == 'X')
     nt.ok_(ax1.get_ylabel() == 'Y')
-    fig1, ax1 = plot_labels(fig, ax, xlabel='T', no_ylabel=True)
+    fig1, ax1 = plot_labels(fig, ax, xlabel='T', ylabel='R')
     nt.ok_(ax1.get_xlabel() == 'T')
-    nt.ok_(ax1.get_ylabel() == "")
-    fig1, ax1 = plot_labels(fig, ax, ylabel='T', no_xlabel=True)
-    nt.ok_(ax1.get_ylabel() == 'T')
-    nt.ok_(ax1.get_xlabel() == "")
-    fig1, ax1 = plot_labels(fig, ax, no_labels=True)
-    nt.ok_(ax1.get_xlabel() == "")
-    nt.ok_(ax1.get_ylabel() == "")
+    nt.ok_(ax1.get_ylabel() == 'R')
+    fig2, ax2 = plot_labels(fig0, ax0)
+    nt.ok_(ax2.get_zlabel() == 'Z')
+    fig2, ax2 = plot_labels(fig0, ax0, zlabel='T')
+    nt.ok_(ax2.get_zlabel() == 'T')
 
 def test_plot_legend():
     fig1, ax1 = plot_legend(fig, ax)
@@ -128,26 +138,33 @@ def test_plot_legend():
     nt.ok_(legend.get_texts()[0].get_text() == 'test')
 
 def test_plot_limits():
-    fig1, ax1 = plot_limits(fig, ax, no_limits=True)
+    fig1, ax1 = plot_limits(fig, ax)
     nt.ok_(ax1.get_xlim() == xlim)
     nt.ok_(ax1.get_ylim() == ylim)
     fig1, ax1 = plot_limits(fig, ax, xlim=(0,100), ylim=(-100,0))
     nt.ok_(ax1.get_xlim() == (0,100))
     nt.ok_(ax1.get_ylim() == (-100,0))
+    fig2, ax2 = plot_limits(fig0, ax0)
+    nt.ok_(np.allclose(ax2.get_zlim(), zlim0))
+    fig2, ax2 = plot_limits(fig0, ax0, zlim=(0,100))
+    nt.ok_(np.allclose(ax2.get_zlim(), (0,100)))
 
 def test_plot_ticks():
-    fig1, ax1 = plot_ticks(fig, ax, no_ticks=False)
+    fig1, ax1 = plot_ticks(fig, ax)
     nt.ok_(len(ax1.get_xticks()) != 0 )
     nt.ok_(len(ax1.get_yticks()) != 0 )
-    fig1, ax1 = plot_ticks(fig, ax, no_ticks=True)
-    nt.ok_(len(ax1.get_xticks()) == 0 )
-    nt.ok_(len(ax1.get_yticks()) == 0 )
-    fig1, ax1 = plot_ticks(fig, ax, xticks=[], yticks=[], no_xticks=True, no_yticks=True)
+    fig1, ax1 = plot_ticks(fig, ax, xticks=[], yticks=[])
     nt.ok_(len(ax1.get_xticks()) == 0 )
     nt.ok_(len(ax1.get_yticks()) == 0 )
     fig1, ax1 = plot_ticks(fig, ax, xticks=np.arange(3), yticks=np.arange(4))
     nt.ok_(len(ax1.get_xticks()) == 3 )
     nt.ok_(len(ax1.get_yticks()) == 4 )
+    fig2, ax2 = plot_ticks(fig0, ax0)
+    nt.ok_(len(ax2.get_zticks()) != 0 )
+    fig2, ax2 = plot_ticks(fig0, ax0, zticks=[])
+    nt.ok_(len(ax2.get_zticks()) == 0 )
+    fig2, ax2 = plot_ticks(fig0, ax0, zticks=np.arange(3))
+    nt.ok_(len(ax2.get_zticks()) == 3 )
 
 def test_plot_style():
     fig1, ax1 = plot_style(fig, ax)
@@ -172,7 +189,6 @@ def test_plot_style():
     os.remove(fig_dir + fig_name)
     os.rmdir(fig_dir)
 
-
 def test_get_color():
     nt.ok_(get_color(None, 'basal') == "red")
     nt.ok_(get_color(None, 'axon') == "blue")
@@ -180,3 +196,8 @@ def test_get_color():
     nt.ok_(get_color(None, 'soma') == "black")
     nt.ok_(get_color(None, 'wrong') == "green")
     nt.ok_(get_color('blue', 'wrong') == "blue")
+
+def test_plot_sphere():
+    fig0, ax0 = get_figure(params={'projection':'3d'})
+    fig1, ax1 = plot_sphere(fig0, ax0, [0,0,0], 10., color='black', alpha=1.)
+    nt.ok_(ax1.has_data() == True)
