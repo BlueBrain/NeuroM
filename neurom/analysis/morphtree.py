@@ -171,7 +171,7 @@ def n_sections(tree):
     """
     Return number of sections in tree
     """
-    return len(list(tr.isection(tree)))
+    return sum(1 for _ in tr.isection(tree))
 
 
 def get_bounding_box(tree):
