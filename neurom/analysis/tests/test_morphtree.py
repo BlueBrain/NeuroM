@@ -35,8 +35,8 @@ from neurom.io.readers import load_data
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import i_segment_length
-from neurom.analysis.morphtree import segment_diameter
-from neurom.analysis.morphtree import i_segment_diameter
+from neurom.analysis.morphtree import segment_radius
+from neurom.analysis.morphtree import i_segment_radius
 from neurom.analysis.morphtree import segment_radial_dist
 from neurom.analysis.morphtree import i_segment_radial_dist
 from neurom.analysis.morphtree import path_length
@@ -124,17 +124,18 @@ def test_segment_lengths():
     nt.assert_equal(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
 
-def test_segment_diameter():
-    nt.ok_(segment_diameter(((0,0,0,4),(0,0,0,6))) == 10)
+def test_segment_radius():
+    nt.ok_(segment_radius(((0,0,0,4),(0,0,0,6))) == 5)
 
 
-def test_segment_diameters():
+def test_segment_radiuss():
 
     T = form_neuron_tree()
 
-    dia = [d for d in i_segment_diameter(T)]
+    rad = [r for r in i_segment_radius(T)]
 
-    nt.assert_equal(dia, [2.0, 2.0, 3.0, 4.0, 3.0, 1.75, 1.5, 3.0, 1.75, 1.5])
+    nt.assert_equal(rad,
+                    [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
 
 
 def test_segment_radial_dist():

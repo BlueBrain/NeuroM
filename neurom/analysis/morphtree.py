@@ -49,12 +49,12 @@ def segment_length(seg):
     return point_dist(seg[0], seg[1])
 
 
-def segment_diameter(seg):
-    '''Return the mean diameter of a segment
+def segment_radius(seg):
+    '''Return the mean radius of a segment
 
-    Returns: arithmetic mean of the diameters of the points in seg
+    Returns: arithmetic mean of the radii of the points in seg
     '''
-    return seg[0][COLS.R] + seg[1][COLS.R]
+    return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
 
 
 def segment_radial_dist(seg, pos):
@@ -84,10 +84,10 @@ def i_segment_length(tree):
     return imap(segment_length, tr.val_iter(tr.isegment(tree)))
 
 
-def i_segment_diameter(tree):
-    ''' return an iterator of tree segment diameters
+def i_segment_radius(tree):
+    ''' return an iterator of tree segment radii
     '''
-    return imap(segment_diameter, tr.val_iter(tr.isegment(tree)))
+    return imap(segment_radius, tr.val_iter(tr.isegment(tree)))
 
 
 def i_segment_radial_dist(pos, tree):
