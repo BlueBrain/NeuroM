@@ -43,7 +43,7 @@ from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import i_section_length
-from neurom.analysis.morphtree import i_meander_angle
+from neurom.analysis.morphtree import i_segment_meander_angle
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
@@ -183,10 +183,10 @@ def test_i_section_length():
     nt.ok_([l for l in i_section_length(T2)] == [5.0, 4.0, 4.0])
 
 
-def test_i_meander_angles():
+def test_i_segment_meander_angles():
     T = form_neuron_tree()
     ref = [math.pi * a for a in (1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5)]
-    for i, m in enumerate(i_meander_angle(T)):
+    for i, m in enumerate(i_segment_meander_angle(T)):
         nt.assert_almost_equal(m, ref[i])
 
 

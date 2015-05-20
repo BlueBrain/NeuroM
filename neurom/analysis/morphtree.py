@@ -74,7 +74,7 @@ def segment_radial_dist(seg, pos):
 
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
-    return np.sum(point_dist(s[0], s[1])
+    return np.sum(segment_length(s)
                   for s in tr.val_iter(tr.isegment(tree, tr.iupstream)))
 
 
@@ -107,7 +107,7 @@ def i_segment_radial_dist(pos, tree):
                 tr.val_iter(tr.isegment(tree)))
 
 
-def i_meander_angle(tree):
+def i_segment_meander_angle(tree):
     '''Return an iterator to a tree meander angle
 
     The meander angle is defined as the angle between to adjacent  segments.
