@@ -47,13 +47,12 @@ soma0 = neuron0.soma
 def test_tree():
     axes = []
     for tree in neuron0.neurite_trees:
-        print tree.type
         fig, ax = view.tree(tree)
         axes.append(ax)
-    nt.ok_(axes[0].get_data_ratio > 1.00 )
-    nt.ok_(axes[1].get_data_ratio > 0.80 )
-    nt.ok_(axes[2].get_data_ratio > 1.00 )
-    nt.ok_(axes[3].get_data_ratio > 0.85 )
+    nt.ok_(axes[0].get_data_ratio() > 1.00 )
+    nt.ok_(axes[1].get_data_ratio() > 0.80 )
+    nt.ok_(axes[2].get_data_ratio() > 1.00 )
+    nt.ok_(axes[3].get_data_ratio() > 0.85 )
     tree0 = neuron0.neurite_trees[0]
     fig, ax = view.tree(tree0, treecolor='black', diameter=False, alpha=1., linewidth=1.2)
     c = ax.collections[0]
@@ -83,3 +82,27 @@ def test_neuron():
     fig, ax = view.neuron(neuron0, plane='wrong')
     nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
     plt.close('all')
+
+
+def test_tree3d():
+    axes = []
+    for tree in neuron0.neurite_trees:
+        fig, ax = view.tree3d(tree)
+        axes.append(ax)
+    nt.ok_(axes[0].get_data_ratio() > 1.00 )
+    nt.ok_(axes[1].get_data_ratio() > 0.80 )
+    nt.ok_(axes[2].get_data_ratio() > 1.00 )
+    nt.ok_(axes[3].get_data_ratio() > 0.85 )
+
+
+def test_soma3d():
+    fig, ax = view.soma3d(soma0)
+    nt.ok_(np.allclose(ax.get_xlim(), (-0.2,  0.2)) )
+    nt.ok_(np.allclose(ax.get_ylim(), (-0.2,  0.2)) )
+    nt.ok_(np.allclose(ax.get_zlim(), (-0.2,  0.2)) )
+
+def test_neuron3d():
+    fig, ax = view.neuron3d(neuron0)
+    nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
+    nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
+    nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
