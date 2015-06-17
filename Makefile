@@ -44,6 +44,10 @@ run_pylint: neurom_test_venv
 run_tests: neurom_test_venv
 	neurom_test_venv/bin/nosetests -v --with-coverage --cover-package neurom
 
+run_tests_xunit: neurom_test_venv
+	@mkdir -p $(ROOT_DIR)/test-reports
+	neurom_test_venv/bin/nosetests neurom --with-coverage --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
+
 lint: run_pep8 run_pylint
 
 test: run_tests
@@ -54,6 +58,7 @@ doc:  neurom_test_venv
 
 clean_test_venv:
 	@rm -rf neurom_test_venv
+	@rm -rf $(ROOT_DIR)/test-reports
 
 clean_doc:
 	@test -x $(ROOT_DIR)/neurom_test_venv/bin/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build  -C doc clean || true
