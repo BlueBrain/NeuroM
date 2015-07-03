@@ -39,6 +39,7 @@ from nose import tools as nt
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
+H5_PATH = os.path.join(DATA_PATH, 'h5')
 
 
 def test_has_sequential_ids_good_data():
@@ -79,6 +80,8 @@ def test_has_soma_good_data():
                        'Single_basal.swc',
                        'Single_axon.swc']]
 
+    files.append(os.path.join(H5_PATH, 'Neuron_v1.h5'))
+
     for f in files:
         nt.ok_(check.has_soma(load_data(f)))
 
@@ -94,6 +97,8 @@ def test_has_finite_radius_neurites_good_data():
                        'Single_apical.swc',
                        'Single_basal.swc',
                        'Single_axon.swc']]
+
+    files.append(os.path.join(H5_PATH, 'Neuron_v1.h5'))
 
     for f in files:
         ok, ids = check.has_all_finite_radius_neurites(load_data(f))

@@ -32,48 +32,23 @@ Data is unpacked into a 2-dimensional raw data block:
 
     [X, Y, Z, R, TYPE, ID, PARENT_ID]
 
-This contains the same information as the SWC format, with columns re-ordered
-so that the leading first four elements are (x, y, z, r). This makes it easier
-to interface with 3-dimensional geometrical functions.
-
-SWC format:
-    [ID, TYPE, X, Y, Z, R, PARENT_ID]
-
 There is one such row per measured point.
 
 Functions to umpack the data and a higher level wrapper are provided. See
 
 * load_data
 * RawDataWrapper
-
-Currently, only the SWC format is supported.
 '''
 import os
 from collections import defaultdict
 from itertools import ifilter
-import numpy as np
 from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
+from neurom.io.swc import SWC
+from neurom.io.hdf5 import H5V1
 
-
-class SWC(object):
-    '''Read SWC files and unpack into internal raw data block
-
-    Input row format: [ID, TYPE, X, Y, Z, R, PARENT_ID]
-    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
-    '''
-    (ID, TYPE, X, Y, Z, R, P) = xrange(7)
-
-    @staticmethod
-    def read(filename):
-        '''Read an SWC file and return a tuple of data, offset, format.'''
-        data = np.loadtxt(filename)
-        data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
-        offset = data[0][COLS.ID]
-        return data, offset, 'SWC'
-
-_READERS = {'swc': SWC.read}
+_READERS = {'swc': SWC.read, 'h5': H5V1.read}
 
 
 def unpack_data(filename):
