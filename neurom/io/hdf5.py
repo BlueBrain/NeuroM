@@ -40,7 +40,8 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from itertools import izip
+from bisect import bisect_right
+
 import h5py
 import numpy as np
 
@@ -49,8 +50,8 @@ class H5V1(object):
     '''Read HDF5 v1 files and unpack into internal raw data block
 
     Input row format:
-        points: [X, Y, Z, D] (ID is position)
-        groups: [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
+        points: (PX, PY, PZ, PD) -> [X, Y, Z, D] (ID is position)
+        groups: (GPFIRST, GTYPE, GPID) -> [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
 
     Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
     '''
@@ -71,33 +72,30 @@ class H5V1(object):
         points = np.array(h5file['points'])
         groups = np.array(h5file['structure'])
 
+        def find_group(point_id):
+            '''Find the structure group a points id belongs to
+
+            Return: group or section point_id belongs to. Last group if
+                    point_id out of bounds.
+            '''
+            bs = bisect_right(groups[:, H5V1.GPFIRST], point_id)
+            bs = max(bs - 1, 0)
+            return groups[bs]
+
+        def find_parent_id(point_id):
+            '''Find the parent ID of a point'''
+            group = find_group(point_id)
+            if point_id != group[H5V1.GPFIRST]:
+                # point is not first point in section
+                # so parent is previous point
+                return point_id - 1
+            else:
+                # parent is last point in parent group
+                parent_group_id = group[H5V1.GPID]
+                # get last point in parent group
+                return groups[parent_group_id + 1][H5V1.GPFIRST] - 1
+
         return np.array([(p[H5V1.PX], p[H5V1.PY], p[H5V1.PZ], p[H5V1.PD] / 2.,
-                          find_group(i, groups)[H5V1.GTYPE], i,
-                          find_parent_id(i, groups))
+                          find_group(i)[H5V1.GTYPE], i,
+                          find_parent_id(i))
                          for i, p in enumerate(points)])
-
-
-def find_group(point_id, groups):
-    '''Find the structure group a points id belongs to
-
-    Return: group or section point_id belongs to. Last group if
-            point_id out of bounds.
-    '''
-    return next((start for (start, end) in izip(groups, groups[1:])
-                 if (point_id >= start[H5V1.GPFIRST] and
-                     point_id < end[H5V1.GPFIRST])),
-                groups[-1])
-
-
-def find_parent_id(point_id, groups):
-    '''Find the parent ID of a point'''
-    group = find_group(point_id, groups)
-    if point_id != group[H5V1.GPFIRST]:
-        # point is not first point in section
-        # so parent is previous point
-        return point_id - 1
-    else:
-        # parent is last point in parent group
-        parent_group_id = group[H5V1.GPID]
-        # get last point in parent group
-        return groups[parent_group_id + 1][H5V1.GPFIRST] - 1
