@@ -49,6 +49,20 @@ def test_read_h5v1_basic():
 
 
 class TestRawDataWrapper_Neuron_H5V1(object):
+
+    end_pts = [129, 272, 404, 151, 294, 41, 426, 173, 316,
+               63, 448, 195, 338, 85, 470, 217, 481, 360,
+               107, 239, 250, 382]
+
+    end_parents = [128, 271, 403, 150, 293, 40, 425, 172, 315, 62, 447,
+                   194, 337, 84, 469, 216, 480, 359, 106, 238, 249, 381]
+
+    fork_pts = [20, 30, 52, 74, 96, 118, 140, 162, 184, 206, 228,
+                261, 283, 305, 327, 349, 371, 393, 415, 437, 459]
+
+    fork_parents = [19, 29, 51, 73, 95, 117, 139, 161, 183, 205, 227,
+                    260, 282, 304, 326, 348, 370, 392, 414, 436, 458]
+
     def setup(self):
         self.data = readers.load_data(
             os.path.join(H5_PATH, 'Neuron_v1.h5'))
@@ -62,10 +76,25 @@ class TestRawDataWrapper_Neuron_H5V1(object):
         nt.ok_(self.first_id == 0)
 
     def test_fork_points(self):
-        fpts = [20, 30, 52, 74, 96, 118, 140, 162, 184, 206,
-                228, 261, 283, 305, 327, 349, 371, 393, 415, 437, 459]
         nt.assert_equal(len(self.data.get_fork_points()), 21)
-        nt.assert_equal(self.data.get_fork_points(), fpts)
+        nt.assert_equal(self.data.get_fork_points(),
+                        TestRawDataWrapper_Neuron_H5V1.fork_pts)
+
+    def test_get_endpoints(self):
+        nt.assert_equal(self.data.get_end_points(),
+                        TestRawDataWrapper_Neuron_H5V1.end_pts)
+
+    def test_end_points_have_no_children(self):
+        for p in TestRawDataWrapper_Neuron_H5V1.end_pts:
+            nt.ok_(len(self.data.get_children(p)) == 0)
+
+    def test_fork_point_parents(self):
+        fpar = [self.data.get_parent(i) for i in self.data.get_fork_points()]
+        nt.assert_equal(fpar, TestRawDataWrapper_Neuron_H5V1.fork_parents)
+
+    def test_end_point_parents(self):
+        epar = [self.data.get_parent(i) for i in self.data.get_end_points()]
+        nt.assert_equal(epar, TestRawDataWrapper_Neuron_H5V1.end_parents)
 
     @nt.raises(LookupError)
     def test_iter_row_low_id_raises(self):
