@@ -35,12 +35,12 @@ from nose import tools as nt
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
-H5_PATH = os.path.join(DATA_PATH, 'h5')
+H5_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
 
 def test_read_h5v1_basic():
     data, offset, fmt = readers.H5V1.read(
-        os.path.join(H5_PATH, 'Neuron_v1.h5'))
+        os.path.join(H5_PATH, 'Neuron_2_branch.h5'))
 
     nt.ok_(fmt == 'H5V1')
     nt.ok_(offset == 0)
@@ -65,7 +65,7 @@ class TestRawDataWrapper_Neuron_H5V1(object):
 
     def setup(self):
         self.data = readers.load_data(
-            os.path.join(H5_PATH, 'Neuron_v1.h5'))
+            os.path.join(H5_PATH, 'Neuron_2_branch.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
 

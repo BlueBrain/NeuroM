@@ -59,7 +59,7 @@ def find_parent_id(point_id, groups):
 
 if __name__ == '__main__':
 
-    FILENAME = 'test_data/h5/Neuron_v1.h5'
+    FILENAME = 'test_data/h5/v1/Neuron_2_branch.h5'
 
     _data, _, _fmt = H5V1.read(FILENAME)
 
