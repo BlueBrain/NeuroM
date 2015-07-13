@@ -29,6 +29,7 @@
 '''Basic functions used for tree analysis'''
 from itertools import imap
 from neurom.core import tree as tr
+from neurom.core.types import TreeType
 from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import path_distance
 from neurom.analysis.morphmath import angle_3points
@@ -140,7 +141,7 @@ def find_tree_type(tree):
         The type of the tree
     """
 
-    tree_types = ['undefined', 'soma', 'axon', 'basal', 'apical']
+    tree_types = tuple(TreeType)
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 

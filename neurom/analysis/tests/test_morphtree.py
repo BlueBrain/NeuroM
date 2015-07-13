@@ -30,6 +30,7 @@ from nose import tools as nt
 import os
 from neurom.core.tree import Tree
 import neurom.core.tree as tr
+from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
 from neurom.analysis.morphmath import point_dist
@@ -57,7 +58,10 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 data    = load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
 tree0   = neuron0.neurite_trees[0]
-tree_types = ['axon', 'basal', 'basal', 'apical']
+tree_types = [TreeType.axon,
+              TreeType.basal_dendrite,
+              TreeType.basal_dendrite,
+              TreeType.apical_dendrite]
 
 def form_neuron_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]

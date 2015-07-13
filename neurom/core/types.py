@@ -26,8 +26,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-bbp-numpy-1.8.0-system-numeric-mod==1.8.0.0
-bbp-h5py-2.2.1-system-mod==2.2.1.0
-bbp-scipy-0.13.3-system-numeric-mod==0.13.3.0
-bbp-matplotlib-1.3.1-system-numeric-mod==1.3.1.0
-enum34==1.0.4
+'''Type enumerations'''
+
+from enum import Enum, unique
+
+
+@unique
+class TreeType(Enum):
+    '''Enum representing valid tree types'''
+    undefined = 1
+    soma = 2
+    axon = 3
+    basal_dendrite = 4
+    apical_dendrite = 5
+    all = 32
+
+
+NEURITES = (TreeType.all,
+            TreeType.axon,
+            TreeType.basal_dendrite,
+            TreeType.apical_dendrite)
+
+
+ROOT_ID = -1

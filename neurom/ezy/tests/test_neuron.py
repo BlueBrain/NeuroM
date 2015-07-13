@@ -31,6 +31,7 @@
 import os
 import numpy as np
 from neurom import ezy
+from neurom.core.types import TreeType
 from nose import tools as nt
 from neurom.analysis.morphtree import i_section_length, i_segment_length
 
@@ -63,19 +64,98 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(seclen), 84)
         nt.assert_equal(seclen, self.seclen)
 
+        seclen = self.neuron.get_section_lengths(TreeType.all)
+        nt.assert_equal(len(seclen), 84)
+        nt.assert_equal(seclen, self.seclen)
+
+    def test_get_section_lengths_axon(self):
+        s = self.neuron.get_section_lengths(TreeType.axon)
+        nt.assert_equal(len(s), 21)
+
+    def test_get_section_lengths_basal(self):
+        s = self.neuron.get_section_lengths(TreeType.basal_dendrite)
+        nt.assert_equal(len(s), 42)
+
+    def test_get_section_lengths_apical(self):
+        s = self.neuron.get_section_lengths(TreeType.apical_dendrite)
+        nt.assert_equal(len(s), 21)
+
+    def test_get_section_lengths_invalid(self):
+        s = self.neuron.get_section_lengths(TreeType.soma)
+        nt.assert_equal(len(s), 0)
+        s = self.neuron.get_section_lengths(TreeType.undefined)
+        s = self.neuron.get_section_lengths(TreeType.soma)
+
     def test_get_segment_lengths(self):
         seglen = self.neuron.get_segment_lengths()
         nt.assert_equal(len(seglen), 840)
         nt.assert_equal(seglen, self.seglen)
+        seglen = self.neuron.get_segment_lengths(TreeType.all)
+        nt.assert_equal(len(seglen), 840)
+        nt.assert_equal(seglen, self.seglen)
+
+
+    def test_get_segment_lengths_axon(self):
+        s = self.neuron.get_segment_lengths(TreeType.axon)
+        nt.assert_equal(len(s), 210)
+
+    def test_get_segment_lengths_basal(self):
+        s = self.neuron.get_segment_lengths(TreeType.basal_dendrite)
+        nt.assert_equal(len(s), 420)
+
+    def test_get_segment_lengths_apical(self):
+        s = self.neuron.get_segment_lengths(TreeType.apical_dendrite)
+        nt.assert_equal(len(s), 210)
+
+    def test_get_segment_lengths_invalid(self):
+        s = self.neuron.get_segment_lengths(TreeType.soma)
+        nt.assert_equal(len(s), 0)
+        s = self.neuron.get_segment_lengths(TreeType.undefined)
+        nt.assert_equal(len(s), 0)
+
 
     def test_get_n_sections(self):
         nt.assert_equal(self.neuron.get_n_sections(), 84)
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.all), 84)
+
+    def test_get_n_sections_axon(self):
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.axon), 21)
+
+    def test_get_n_sections_basal(self):
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.basal_dendrite), 42)
+
+    def test_get_n_sections_apical(self):
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.apical_dendrite), 21)
+
+    def test_get_n_sections_invalid(self):
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.soma), 0)
+        nt.assert_equal(self.neuron.get_n_sections(TreeType.undefined), 0)
 
     def test_get_n_sections_per_neurite(self):
         nsecs = self.neuron.get_n_sections_per_neurite()
         nt.assert_equal(len(nsecs), 4)
-        for ns in nsecs:
-            nt.assert_equal(ns, 21)
+        nt.assert_equal(nsecs, [21, 21, 21, 21])
+
+    def test_get_n_sections_per_neurite_axon(self):
+        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.axon)
+        nt.assert_equal(len(nsecs), 1)
+        nt.assert_equal(nsecs, [21])
+
+    def test_get_n_sections_per_neurite_basal(self):
+        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.basal_dendrite)
+        nt.assert_equal(len(nsecs), 2)
+        nt.assert_equal(nsecs, [21, 21])
+
+    def test_get_n_sections_per_neurite_apical(self):
+        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.apical_dendrite)
+        nt.assert_equal(len(nsecs), 1)
+        nt.assert_equal(nsecs, [21])
 
     def test_get_n_neurites(self):
         nt.assert_equal(self.neuron.get_n_neurites(), 4)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.all), 4)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.axon), 1)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.basal_dendrite), 2)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.apical_dendrite), 1)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.soma), 0)
+        nt.assert_equal(self.neuron.get_n_neurites(TreeType.undefined), 0)

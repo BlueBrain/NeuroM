@@ -45,6 +45,7 @@ The build-time and runtime dependencies of NeuroM are:
 * h5py
 * scipy
 * matplotlib
+* enum34
 
 Additional dependencies needed for testing and building documentation are
 
