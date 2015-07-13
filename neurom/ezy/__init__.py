@@ -29,3 +29,4 @@
 ''' Quick and easy neuron morphology analysis tools '''
 
 from .neuron import Neuron
+from .neuron import TreeType

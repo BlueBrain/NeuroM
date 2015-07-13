@@ -62,11 +62,11 @@ class TestEzyNeuron(object):
     def test_get_section_lengths(self):
         seclen = self.neuron.get_section_lengths()
         nt.assert_equal(len(seclen), 84)
-        nt.assert_equal(seclen, self.seclen)
+        nt.assert_true(np.all(seclen == self.seclen))
 
         seclen = self.neuron.get_section_lengths(TreeType.all)
         nt.assert_equal(len(seclen), 84)
-        nt.assert_equal(seclen, self.seclen)
+        nt.assert_true(np.all(seclen == self.seclen))
 
     def test_get_section_lengths_axon(self):
         s = self.neuron.get_section_lengths(TreeType.axon)
@@ -89,10 +89,10 @@ class TestEzyNeuron(object):
     def test_get_segment_lengths(self):
         seglen = self.neuron.get_segment_lengths()
         nt.assert_equal(len(seglen), 840)
-        nt.assert_equal(seglen, self.seglen)
+        nt.assert_true(np.all(seglen == self.seglen))
         seglen = self.neuron.get_segment_lengths(TreeType.all)
         nt.assert_equal(len(seglen), 840)
-        nt.assert_equal(seglen, self.seglen)
+        nt.assert_true(np.all(seglen == self.seglen))
 
 
     def test_get_segment_lengths_axon(self):
@@ -134,7 +134,7 @@ class TestEzyNeuron(object):
     def test_get_n_sections_per_neurite(self):
         nsecs = self.neuron.get_n_sections_per_neurite()
         nt.assert_equal(len(nsecs), 4)
-        nt.assert_equal(nsecs, [21, 21, 21, 21])
+        nt.assert_true(np.all(nsecs == [21, 21, 21, 21]))
 
     def test_get_n_sections_per_neurite_axon(self):
         nsecs = self.neuron.get_n_sections_per_neurite(TreeType.axon)
@@ -144,12 +144,12 @@ class TestEzyNeuron(object):
     def test_get_n_sections_per_neurite_basal(self):
         nsecs = self.neuron.get_n_sections_per_neurite(TreeType.basal_dendrite)
         nt.assert_equal(len(nsecs), 2)
-        nt.assert_equal(nsecs, [21, 21])
+        nt.assert_true(np.all(nsecs == [21, 21]))
 
     def test_get_n_sections_per_neurite_apical(self):
         nsecs = self.neuron.get_n_sections_per_neurite(TreeType.apical_dendrite)
         nt.assert_equal(len(nsecs), 1)
-        nt.assert_equal(nsecs, [21])
+        nt.assert_true(np.all(nsecs == [21]))
 
     def test_get_n_neurites(self):
         nt.assert_equal(self.neuron.get_n_neurites(), 4)

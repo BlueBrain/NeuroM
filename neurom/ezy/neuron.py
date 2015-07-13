@@ -39,7 +39,22 @@ from itertools import chain
 
 
 class Neuron(object):
-    '''Class with basic analysis and plotting functionality'''
+    '''Class with basic analysis and plotting functionality
+
+    By default returns iterables as numpy.arrays and applies no filtering.
+    Example: get the segment lengths of all apical dendrites in a neuron morphology.
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some_file.swc')
+    >>> nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+
+    Example: use lists instead of numpy arrays and get section
+    lengths for the axon:
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some_file.swc', iterable_type=list)
+    >>> nrn.get_section_lengths(ezy.TreeType.axon)
+    '''
 
     def __init__(self, filename, iterable_type=np.array):
         self._iterable_type = iterable_type
@@ -49,13 +64,13 @@ class Neuron(object):
         '''Get an iterable containing the lengths of all sections of a given type'''
         neurites = self._filter_neurites(neurite_type)
         l = [[i for i in i_section_length(t)] for t in neurites]
-        return [i for i in chain(*l)]
+        return self._iterable_type([i for i in chain(*l)])
 
     def get_segment_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''
         neurites = self._filter_neurites(neurite_type)
         l = [[i for i in i_segment_length(t)] for t in neurites]
-        return [i for i in chain(*l)]
+        return self._iterable_type([i for i in chain(*l)])
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
@@ -64,7 +79,7 @@ class Neuron(object):
     def get_n_sections_per_neurite(self, neurite_type=TreeType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
         neurites = self._filter_neurites(neurite_type)
-        return [n_sections(n) for n in neurites]
+        return self._iterable_type([n_sections(n) for n in neurites])
 
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
