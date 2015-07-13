@@ -91,13 +91,17 @@ def make_neuron(raw_data, tree_action=None):
     return Neuron(_soma_pts, _trees)
 
 
-def load_neuron(filename):
+def load_neuron(filename, tree_action=None):
     """
     Loads a neuron keeping a record of the filename.
+    Args:
+        filename: the path of the file storing morphology data
+        tree_action: optional function to run on each of the neuron's
+        neurite trees.
     """
 
     data = load_data(filename)
-    nrn = make_neuron(data)
+    nrn = make_neuron(data, tree_action)
     nrn.id = os.path.splitext(filename)[0]
 
     return nrn

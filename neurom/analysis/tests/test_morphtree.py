@@ -41,6 +41,7 @@ from neurom.analysis.morphtree import segment_radial_dist
 from neurom.analysis.morphtree import i_segment_radial_dist
 from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
+from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_meander_angle
@@ -162,7 +163,12 @@ def test_segment_path_length():
 
 def test_find_tree_type():
     for en_tree, test_tree in enumerate(neuron0.neurite_trees):
-        find_tree_type(test_tree)
+        nt.ok_(find_tree_type(test_tree) == tree_types[en_tree])
+
+
+def test_set_tree_type():
+    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+        set_tree_type(test_tree)
         nt.ok_(test_tree.type == tree_types[en_tree])
 
 

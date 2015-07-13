@@ -136,26 +136,31 @@ def find_tree_type(tree):
     'undefined', 'axon', 'basal', 'apical'
     The 'mean' tree type is defined as the type
     that is shared between at least 51% of the tree's points.
-    Returns a tree with a tree.type defined.
+    Returns:
+        The type of the tree
     """
 
     tree_types = ['undefined', 'soma', 'axon', 'basal', 'apical']
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 
-    tree.type = tree_types[int(np.median(types))]
+    return tree_types[int(np.median(types))]
+
+
+def set_tree_type(tree):
+    ''' Set the type of a tree as 'type' attribute'''
+    tree.type = find_tree_type(tree)
 
 
 def get_tree_type(tree):
+    '''Return a tree's type
 
-    """
-    If tree does not have a tree type,
-    calculates the tree type and returns it.
-    If tree has a tree type returns its precomputed type.
-    """
+    If tree does not have a type, calculate it.
+    Otherwise, use its pre-computed value.
+    '''
 
     if not hasattr(tree, 'type'):
-        find_tree_type(tree)
+        set_tree_type(tree)
 
     return tree.type
 
