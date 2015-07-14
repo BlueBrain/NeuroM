@@ -46,9 +46,9 @@ from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
 from neurom.io.swc import SWC
-from neurom.io.hdf5 import H5V1
+from neurom.io.hdf5 import H5
 
-_READERS = {'swc': SWC.read, 'h5': H5V1.read}
+_READERS = {'swc': SWC.read, 'h5': H5.read}
 
 
 def unpack_data(filename):
