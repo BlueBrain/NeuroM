@@ -31,6 +31,7 @@
 # pylint: disable=R0801
 import os
 from setuptools import setup
+from setuptools import find_packages
 from pip.req import parse_requirements
 from optparse import Option
 from neurom.version import VERSION
@@ -66,7 +67,7 @@ config = {
     'version': VERSION,
     'install_requires': REQS,
     'extras_require': EXTRA_REQS,
-    'packages': ['neurom', 'neurom.io', 'neurom.core', 'neurom.view'],
+    'packages': find_packages(),
     'scripts': [],
     'name': 'neurom',
     'include_package_data': True,
