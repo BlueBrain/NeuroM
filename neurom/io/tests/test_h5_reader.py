@@ -30,7 +30,7 @@ import os
 import numpy as np
 import h5py
 from neurom.io import readers
-from neurom.io.hdf5 import get_version, H5
+from neurom.io import hdf5
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
@@ -52,7 +52,17 @@ def test_read_h5v1_basic():
     nt.assert_equal(np.shape(data), (927, 7))
 
 
-def test_read_h5v2_basic():
+def test_read_h5v2_repaired_basic():
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V2_PATH, 'Neuron_2_branch.h5'))
+
+    nt.ok_(fmt == 'H5V2')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 482)
+    nt.assert_equal(np.shape(data), (482, 7))
+
+
+def test_read_h5v2_raw_basic():
     data, offset, fmt = readers.H5.read(
         os.path.join(H5V2_PATH, 'Neuron.h5'))
 
@@ -65,8 +75,8 @@ def test_read_h5v2_basic():
 def test_get_version():
     v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'))
     v2 = h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'))
-    nt.assert_equal(get_version(v1), 'H5V1')
-    nt.assert_equal(get_version(v2), 'H5V2')
+    nt.assert_equal(hdf5.get_version(v1), 'H5V1')
+    nt.assert_equal(hdf5.get_version(v2), 'H5V2')
     v1.close()
     v2.close()
 
@@ -74,8 +84,8 @@ def test_get_version():
 def test_unpack_h2():
     v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'))
     v2 = h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'))
-    pts1, grp1 = H5.unpack_v1(v1)
-    pts2, grp2 = H5.unpack_v2(v2)
+    pts1, grp1 = hdf5._unpack_v1(v1)
+    pts2, grp2 = hdf5._unpack_v2(v2, stage='raw')
     nt.assert_true(np.all(pts1 == pts2))
     nt.assert_true(np.all(grp1 == grp2))
 
@@ -128,7 +138,6 @@ class DataWrapper_Neuron(object):
 
     def test_end_point_parents(self):
         epar = [self.data.get_parent(i) for i in self.data.get_end_points()]
-        print 'XXXX end_parents', epar
         nt.assert_equal(epar, DataWrapper_Neuron.end_parents)
 
     @nt.raises(LookupError)
@@ -143,7 +152,7 @@ class DataWrapper_Neuron(object):
 class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
     '''Test HDF5 v1 reading'''
     def setup(self):
-        self.data = readers.load_data(
+        self.data = readers.load_h5v1(
             os.path.join(H5V1_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
@@ -152,7 +161,7 @@ class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 class TestRawDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
     '''Test HDF5 v2 reading'''
     def setup(self):
-        self.data = readers.load_data(
-            os.path.join(H5V2_PATH, 'Neuron.h5'))
+        self.data = readers.load_h5v2(
+            os.path.join(H5V2_PATH, 'Neuron.h5'), stage='raw')
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)

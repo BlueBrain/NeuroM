@@ -78,20 +78,43 @@ class H5(object):
     '''
 
     @staticmethod
-    def read(filename):
+    def read_v1(filename):
         '''Read an HDF5 v1 file and return a tuple of data, offset, format.'''
-        data, version = H5.unpack_data(h5py.File(filename))
+        points, groups = _unpack_v1(h5py.File(filename))
+        data = H5.unpack_data(points, groups)
+        offset = 0  # H5 is index based, so there's no offset
+        return data, offset, 'H5V1'
+
+    @staticmethod
+    def read_v2(filename, stage='raw'):
+        '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
+        points, groups = _unpack_v2(h5py.File(filename), stage)
+        data = H5.unpack_data(points, groups)
+        offset = 0  # H5 is index based, so there's no offset
+        return data, offset, 'H5V2'
+
+    @staticmethod
+    def read(filename):
+        '''Read a file and return a tuple of data, offset, format.
+
+        * Tries to guess the format and the H5 version.
+        * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
+        '''
+        h5file = h5py.File(filename)
+        version = get_version(h5file)
+        if version == 'H5V1':
+            points, groups = _unpack_v1(h5py.File(filename))
+        elif version == 'H5V2':
+            stg = next(s for s in ('repaired', 'unraveled', 'raw')
+                       if s in h5file['neuron1'])
+            points, groups = _unpack_v2(h5py.File(filename), stage=stg)
+        data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, version
 
     @staticmethod
-    def unpack_data(h5file):
-        '''Unpack data from h5 ve file into internal format'''
-        version = get_version(h5file)
-        if version == 'H5V1':
-            points, groups = H5.unpack_v1(h5file)
-        elif version == 'H5V2':
-            points, groups = H5.unpack_v2(h5file)
+    def unpack_data(points, groups):
+        '''Unpack data from h5 data groups into internal format'''
 
         def find_group(point_id):
             '''Find the structure group a points id belongs to
@@ -119,21 +142,21 @@ class H5(object):
         return np.array([(p[H5V1.PX], p[H5V1.PY], p[H5V1.PZ], p[H5V1.PD] / 2.,
                           find_group(i)[H5V1.GTYPE], i,
                           find_parent_id(i))
-                         for i, p in enumerate(points)]), version
+                         for i, p in enumerate(points)])
 
-    @staticmethod
-    def unpack_v1(h5file):
-        '''Unpack groups from HDF5 v1 file'''
-        points = np.array(h5file['points'])
-        groups = np.array(h5file['structure'])
-        return points, groups
 
-    @staticmethod
-    def unpack_v2(h5file):
-        '''Unpack groups from HDF5 v2 file'''
-        points = np.array(h5file['neuron1/raw/points'])
-        groups = np.array(h5file['neuron1/structure/raw'])
-        stypes = np.array(h5file['neuron1/structure/sectiontype'])
-        groups = np.hstack([groups, stypes])
-        groups[:, [1, 2]] = groups[:, [2, 1]]
-        return points, groups
+def _unpack_v1(h5file):
+    '''Unpack groups from HDF5 v1 file'''
+    points = np.array(h5file['points'])
+    groups = np.array(h5file['structure'])
+    return points, groups
+
+
+def _unpack_v2(h5file, stage):
+    '''Unpack groups from HDF5 v2 file'''
+    points = np.array(h5file['neuron1/%s/points' % stage])
+    groups = np.array(h5file['neuron1/structure/%s' % stage])
+    stypes = np.array(h5file['neuron1/structure/sectiontype'])
+    groups = np.hstack([groups, stypes])
+    groups[:, [1, 2]] = groups[:, [2, 1]]
+    return points, groups

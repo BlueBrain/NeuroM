@@ -37,6 +37,9 @@ There is one such row per measured point.
 Functions to umpack the data and a higher level wrapper are provided. See
 
 * load_data
+* load_swc
+* load_h5v1
+* load_h5v2
 * RawDataWrapper
 '''
 import os
@@ -48,15 +51,6 @@ from neurom.core.dataformat import ROOT_ID
 from neurom.io.swc import SWC
 from neurom.io.hdf5 import H5
 
-_READERS = {'swc': SWC.read, 'h5': H5.read}
-
-
-def unpack_data(filename):
-    '''Read an SWC file and return a tuple of data, offset, format.
-    Forwards filename to appropriate reader depending on extension'''
-    extension = os.path.splitext(filename)[1][1:]
-    return _READERS[extension.lower()](filename)
-
 
 def load_data(filename):
     '''Unpack filename and return a RawDataWrapper object containing the data
@@ -64,8 +58,35 @@ def load_data(filename):
     Determines format from extension. Currently supported:
 
         * SWC (case-insensitive extension ".swc")
+        * H5 v1 and v2 (case-insensitive extension ".h5"). Attempts to
+          determine the version from the contents of the file.
     '''
-    return RawDataWrapper(unpack_data(filename))
+    def unpack_data():
+        '''Read an SWC file and return a tuple of data, offset, format.
+        Forwards filename to appropriate reader depending on extension'''
+        _READERS = {'swc': SWC.read, 'h5': H5.read}
+        extension = os.path.splitext(filename)[1][1:]
+        return _READERS[extension.lower()](filename)
+
+    return RawDataWrapper(unpack_data())
+
+
+def load_h5v1(filename):
+    '''Unpack HDF5 v1 file  and return a RawDataWrapper object
+    '''
+    return RawDataWrapper(H5.read_v1(filename))
+
+
+def load_h5v2(filename, stage='raw'):
+    '''Unpack HDF5 v2 file  and return a RawDataWrapper object
+    '''
+    return RawDataWrapper(H5.read_v2(filename, stage))
+
+
+def load_swc(filename):
+    '''Unpack SWC file  and return a RawDataWrapper object
+    '''
+    return RawDataWrapper(SWC.read(filename))
 
 
 class RawDataWrapper(object):
