@@ -34,6 +34,7 @@ from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import n_sections
+from neurom.view import view
 import numpy as np
 from itertools import chain
 
@@ -45,15 +46,22 @@ class Neuron(object):
     Example: get the segment lengths of all apical dendrites in a neuron morphology.
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('some_file.swc')
+    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
     >>> nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
 
     Example: use lists instead of numpy arrays and get section
-    lengths for the axon:
+    lengths for the axon. Read an HDF5 v1 file:
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('some_file.swc', iterable_type=list)
+    >>> nrn = ezy.Neuron('test_data/h5/v1/Neuron.h5', iterable_type=list)
     >>> nrn.get_section_lengths(ezy.TreeType.axon)
+
+    Example: plot the neuron and save to a file
+
+    >>> fig, ax = nrn.plot()
+    >>> fig.show()
+    >>> fig.savefig('nrn.png')
+
     '''
 
     def __init__(self, filename, iterable_type=np.array):
@@ -89,3 +97,17 @@ class Neuron(object):
         '''Filter neurites by type'''
         return self._nrn.neurite_trees if (neurite_type is TreeType.all) else(
             [t for t in self._nrn.neurite_trees if t.type is neurite_type])
+
+    def plot(self, *args, **kwargs):
+        '''Make a 2D plot of this neuron
+
+        Forwards arguments to neurom.view.view.neuron()
+        '''
+        return view.neuron(self._nrn, *args, **kwargs)
+
+    def plot3d(self, *args, **kwargs):
+        '''Make a 3D plot of this neuron
+
+        Forwards arguments to neurom.view.view.neuron3d()
+        '''
+        return view.neuron3d(self._nrn, *args, **kwargs)

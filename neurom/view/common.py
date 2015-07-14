@@ -30,12 +30,21 @@
 Module containing the common functionality
 to be used by view-plot modules.
 """
+from neurom.core.types import TreeType
 import os
 import matplotlib
 matplotlib.use('Agg') # noqa
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D # pylint: disable=unused-import
+from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
+
+
+# Map tree type to color
+TREE_COLOR = {TreeType.basal_dendrite: 'red',
+              TreeType.apical_dendrite: 'purple',
+              TreeType.axon: 'blue',
+              TreeType.soma: 'black',
+              TreeType.undefined: 'green'}
 
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
@@ -92,27 +101,18 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
 
 def get_color(treecolor, tree_type):
     """
-    If treecolor is none returns the color depending on the type:
+    If treecolor is None returns the color depending on the type:
     Basal dendrite: "red"
     Axon : "blue"
     Apical dendrite: "purple"
     Soma tree: "black"
-    Undefined-Any other unrecognised type: "green"
+    Undefined or any other type: "green"
     Otherwise returns the treecolor.
     """
-    if treecolor is None:
-        if tree_type == 'basal':
-            treecolor = "red"
-        elif tree_type == 'apical':
-            treecolor = "purple"
-        elif tree_type == 'axon':
-            treecolor = "blue"
-        elif tree_type == 'soma':
-            treecolor = "black"
-        else:
-            treecolor = "green"
-
-    return treecolor
+    if treecolor is not None:
+        return treecolor
+    else:
+        return TREE_COLOR.get(tree_type, 'green')
 
 
 def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=False):

@@ -159,3 +159,9 @@ class TestEzyNeuron(object):
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.apical_dendrite), 1)
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.soma), 0)
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.undefined), 0)
+
+    def test_plot(self):
+        # Neuron.plot simply forwards arguments to neurom.view.view.plot.
+        # So simply check that calling is OK syntactically.
+        self.neuron.plot()
+        self.neuron.plot3d()

@@ -32,6 +32,7 @@ Python module of NeuroM to visualize morphologies
 
 
 from neurom.view import common
+from neurom.core.types import TreeType
 from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.core.tree import isegment
@@ -249,7 +250,7 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     # Definition of the tree color depending on the tree type.
-    treecolor = common.get_color(treecolor, tree_type='soma')
+    treecolor = common.get_color(treecolor, tree_type=TreeType.soma)
 
     # Plot the outline of the soma as a circle, is outline is selected.
     if not outline:
@@ -556,7 +557,7 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     # Definition of the tree color depending on the tree type.
-    treecolor = common.get_color(treecolor, tree_type='soma')
+    treecolor = common.get_color(treecolor, tree_type=TreeType.soma)
 
     xs = sm.center[0]
     ys = sm.center[1]

@@ -39,6 +39,7 @@ from neurom.view.common import plot_limits
 from neurom.view.common import plot_ticks
 from neurom.view.common import plot_sphere
 from neurom.view.common import get_color
+from neurom.core.types import TreeType
 
 import os
 import numpy as np
@@ -116,7 +117,7 @@ def test_plot_title():
     nt.ok_(ax1.get_title() == 'Figure')
     fig1, ax1 = plot_title(fig, ax, title='Test')
     nt.ok_(ax1.get_title() == 'Test')
-    
+
 def test_plot_labels():
     fig1, ax1 = plot_labels(fig, ax)
     nt.ok_(ax1.get_xlabel() == 'X')
@@ -190,12 +191,14 @@ def test_plot_style():
     os.rmdir(fig_dir)
 
 def test_get_color():
-    nt.ok_(get_color(None, 'basal') == "red")
-    nt.ok_(get_color(None, 'axon') == "blue")
-    nt.ok_(get_color(None, 'apical') == "purple")
-    nt.ok_(get_color(None, 'soma') == "black")
+    nt.ok_(get_color(None, TreeType.basal_dendrite) == "red")
+    nt.ok_(get_color(None, TreeType.axon) == "blue")
+    nt.ok_(get_color(None, TreeType.apical_dendrite) == "purple")
+    nt.ok_(get_color(None, TreeType.soma) == "black")
+    nt.ok_(get_color(None, TreeType.undefined) == "green")
     nt.ok_(get_color(None, 'wrong') == "green")
     nt.ok_(get_color('blue', 'wrong') == "blue")
+    nt.ok_(get_color('yellow', TreeType.axon) == "yellow")
 
 def test_plot_sphere():
     fig0, ax0 = get_figure(params={'projection':'3d'})
