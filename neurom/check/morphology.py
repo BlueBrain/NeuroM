@@ -29,3 +29,44 @@
 '''
 Python module of NeuroM to check neurons.
 '''
+
+from neurom.core.types import TreeType
+from neurom.core.tree import ipreorder
+from neurom.core.tree import isegment
+from neurom.core.tree import val_iter
+from neurom.core.dataformat import COLS
+from neurom.analysis.morphtree import segment_length
+from neurom.analysis.morphtree import find_tree_type
+from itertools import chain
+
+
+def has_axon(neuron, treefun=find_tree_type):
+    '''Check if a neuron has an axon
+
+    Arguments:
+        neuron The neuron object to test
+        treefun Optional function to calculate the tree type of
+        neuron's neurites
+    '''
+    return TreeType.axon in [treefun(n) for n in neuron.neurite_trees]
+
+
+def has_all_finite_length_segments(neuron):
+    '''Check that neuron has no zero-length segments'''
+    l = [[s for s in val_iter(isegment(t))
+          if segment_length(s) <= 0.0]
+         for t in neuron.neurite_trees]
+    l = [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
+    return len(l) == 0, l
+
+
+def has_all_finite_radius_neurites(neuron):
+    '''Check that neuron has no zero-radius points in neurites
+
+    Return: tuple of (bool, list of IDs of zero-radius points)
+    '''
+
+    ids = [[i[COLS.ID] for i in val_iter(ipreorder(t))
+            if i[COLS.R] == 0.0] for t in neuron.neurite_trees]
+    ids = [i for i in chain(*ids)]
+    return len(ids) == 0, ids

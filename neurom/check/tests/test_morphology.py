@@ -27,12 +27,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import numpy as np
-from neurom.io.readers import load_data
-from neurom.io import check
+from neurom.io.utils import load_neuron
+from neurom.check import morphology as check
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
+from neurom.analysis.morphtree import get_tree_type
 from nose import tools as nt
 
 
@@ -42,27 +42,6 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
 
-@nt.nottest
-def test_has_soma_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Single_apical.swc',
-                       'Single_basal.swc',
-                       'Single_axon.swc']]
-
-    files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
-
-    for f in files:
-        nt.ok_(check.has_soma(load_data(f)))
-
-
-@nt.nottest
-def test_has_soma_bad_data():
-    f = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-    nt.ok_(not check.has_soma(load_data(f)))
-
-
-@nt.nottest
 def test_has_axon_good_data():
     files = [os.path.join(SWC_PATH, f)
              for f in ['Neuron.swc',
@@ -71,19 +50,19 @@ def test_has_axon_good_data():
 
     files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
-    for f in files:
-        nt.ok_(check.has_axon(load_data(f)))
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(check.has_axon(n))
 
 
-@nt.nottest
 def test_has_axon_bad_data():
     files = [os.path.join(SWC_PATH, f)
-             for f in ['Single_apical_no_soma.swc',
-                       'Single_apical.swc',
+             for f in ['Single_apical.swc',
                        'Single_basal.swc']]
 
-    for f in files:
-        nt.ok_(not check.has_axon(load_data(f)))
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(not check.has_axon(n))
 
 
 def test_has_finite_radius_neurites_good_data():
@@ -96,26 +75,25 @@ def test_has_finite_radius_neurites_good_data():
     files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
     for f in files:
-        ok, ids = check.has_all_finite_radius_neurites(load_data(f))
+        ok, ids = check.has_all_finite_radius_neurites(load_neuron(f))
         nt.ok_(ok)
         nt.ok_(len(ids) == 0)
 
 
 def test_has_finite_radius_neurites_bad_data():
     f = os.path.join(SWC_PATH, 'Neuron_zero_radius.swc')
-    ok, ids = check.has_all_finite_radius_neurites(load_data(f))
+    ok, ids = check.has_all_finite_radius_neurites(load_neuron(f))
     nt.ok_(not ok)
     nt.ok_(ids == [194, 210, 246, 304, 493])
 
 
+@nt.nottest  # TODO We need a data sample with a soma and no zero-length segments
 def test_has_finite_length_segments_good_data():
     files = [os.path.join(SWC_PATH, f)
-             for f in [
-                       'sequential_trunk_off_0_16pt.swc',
-                       'sequential_trunk_off_1_16pt.swc',
-                       'sequential_trunk_off_42_16pt.swc']]
+             for f in ['Neuron.swc']]
+
     for f in files:
-        ok, ids = check.has_all_finite_length_segments(load_data(f))
+        ok, ids = check.has_all_finite_length_segments(load_neuron(f))
         nt.ok_(ok)
         nt.ok_(len(ids) == 0)
 
@@ -134,6 +112,6 @@ def test_has_finite_length_segments_bad_data():
                 [(4, 5)]]
 
     for i, f in enumerate(files):
-        ok, ids = check.has_all_finite_length_segments(load_data(f))
+        ok, ids = check.has_all_finite_length_segments(load_neuron(f))
         nt.ok_(not ok)
         nt.assert_equal(ids, bad_segs[i])
