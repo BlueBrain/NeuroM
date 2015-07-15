@@ -33,6 +33,7 @@ neurom_test_venv:
 	neurom_test_venv/bin/pip install --upgrade --force-reinstall pep8
 	neurom_test_venv/bin/pip install --upgrade --force-reinstall pylint
 	neurom_test_venv/bin/pip install --upgrade --force-reinstall nose
+	neurom_test_venv/bin/pip install coverage
 	neurom_test_venv/bin/pip install -e .
 
 run_pep8: neurom_test_venv
