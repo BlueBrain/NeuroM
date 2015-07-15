@@ -34,8 +34,28 @@ from neurom.io import check as io_chk
 import argparse
 import os
 
+DESCRIPTION = '''
+NeuroM Raw Data Checker
+=======================
+'''
 
-EXAMPLE_TEXT = '''
+EPILOG = '''
+Description
+-----------
+
+Performs basic checks on raw data contained in morphology files.
+There is no processing performed to the data prior to checks.
+
+Note: these checks are designed to capture significant problems in data. They
+do not impose refined semantic constraints, but rather check for missing or
+inconsistent data which would render further processing unreliable or even
+impossible.
+
+Errors checked for
+------------------
+* No soma points
+* Non-consecutive point IDs
+
 Examples
 --------
 data_checks.py --help               # print this help
@@ -47,9 +67,9 @@ data_checks.py some/path/           # Process all HDF5 and SWC files found in di
 
 def parse_args():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='NeuroM Data Checker',
+    parser = argparse.ArgumentParser(description=DESCRIPTION,
                                      formatter_class=argparse.RawTextHelpFormatter,
-                                     epilog=EXAMPLE_TEXT)
+                                     epilog=EPILOG)
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
 
@@ -80,17 +100,9 @@ if __name__ == '__main__':
     for f in files:
         rd = load_data(f)
         print '\nCheck file %s...' % f
-        print 'Has soma? %s' % io_chk.has_soma(rd)
-        fr = io_chk.has_all_finite_radius_neurites(rd)
-        print 'All neurites have finite radius? %s' % fr[0]
-        if not fr[0]:
-            print 'Points with zero radius detected:', fr[1]
+        print 'Has soma points? %s' % io_chk.has_soma_points(rd)
+
         ci = io_chk.has_sequential_ids(rd)
         print 'Consecutive indices? %s' % ci[0]
         if not ci[0]:
             print'Non consecutive IDs detected:', ci[1]
-        else:
-            fs = io_chk.has_all_finite_length_segments(rd)
-            print 'Finite length segments? %s' % fs[0]
-            if not fs[0]:
-                print '\tSegments with zero length detected:', fs[1]

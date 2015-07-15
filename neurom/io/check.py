@@ -44,7 +44,7 @@ def has_sequential_ids(raw_data):
     return len(steps) == 0, steps
 
 
-def has_soma(raw_data):
+def has_soma_points(raw_data):
     '''Checks if the TYPE column of raw data block has
     an element of type soma'''
     return POINT_TYPE.SOMA in raw_data.get_col(COLS.TYPE)
@@ -55,12 +55,9 @@ def has_all_finite_radius_neurites(raw_data):
 
     return: tuple of (bool, [IDs of neurite points with zero radius])
     '''
-    bad_points = list()
-    for row in raw_data.iter_row():
-        if row[COLS.TYPE] in POINT_TYPE.NEURITES and row[COLS.R] == 0.0:
-            bad_points.append(int(row[COLS.ID]))
-
-    return len(bad_points) == 0, bad_points
+    bad_pts = [int(row[COLS.ID]) for row in raw_data.iter_row()
+               if row[COLS.TYPE] in POINT_TYPE.NEURITES and row[COLS.R] == 0.0]
+    return len(bad_pts) == 0, bad_pts
 
 
 def is_neurite_segment(segment):

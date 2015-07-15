@@ -73,7 +73,7 @@ def test_has_sequential_ids_bad_data():
     nt.ok_(ids == [6, 217, 428, 639])
 
 
-def test_has_soma_good_data():
+def test_has_soma_points_good_data():
     files = [os.path.join(SWC_PATH, f)
              for f in ['Neuron.swc',
                        'Single_apical.swc',
@@ -83,12 +83,12 @@ def test_has_soma_good_data():
     files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
     for f in files:
-        nt.ok_(check.has_soma(load_data(f)))
+        nt.ok_(check.has_soma_points(load_data(f)))
 
 
-def test_has_soma_bad_data():
+def test_has_soma_points_bad_data():
     f = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-    nt.ok_(not check.has_soma(load_data(f)))
+    nt.ok_(not check.has_soma_points(load_data(f)))
 
 
 def test_has_finite_radius_neurites_good_data():
