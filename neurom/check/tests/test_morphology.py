@@ -48,7 +48,7 @@ def test_has_axon_good_data():
                        'Neuron_small_radius.swc',
                        'Single_axon.swc']]
 
-    files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
+    files.append(os.path.join(H5V1_PATH, 'Neuron.h5'))
 
     neurons = [load_neuron(f, get_tree_type) for f in files]
     for n in neurons:
@@ -63,6 +63,53 @@ def test_has_axon_bad_data():
     neurons = [load_neuron(f, get_tree_type) for f in files]
     for n in neurons:
         nt.ok_(not check.has_axon(n))
+
+
+def test_has_apical_dendrite_good_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Neuron.swc',
+                       'Neuron_small_radius.swc',
+                       'Single_apical.swc']]
+
+    files.append(os.path.join(H5V1_PATH, 'Neuron.h5'))
+
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(check.has_apical_dendrite(n))
+
+
+def test_has_apical_dendrite_bad_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Single_axon.swc',
+                       'Single_basal.swc']]
+
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(not check.has_apical_dendrite(n))
+
+
+def test_has_basal_dendrite_good_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Neuron.swc',
+                       'Neuron_small_radius.swc',
+                       'Single_basal.swc']]
+
+    files.extend([os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'),
+                  os.path.join(H5V1_PATH, 'Neuron.h5')])
+
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(check.has_basal_dendrite(n))
+
+
+def test_has_basal_dendrite_bad_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Single_axon.swc',
+                       'Single_apical.swc']]
+
+    neurons = [load_neuron(f, get_tree_type) for f in files]
+    for n in neurons:
+        nt.ok_(not check.has_basal_dendrite(n))
 
 
 def test_has_finite_radius_neurites_good_data():
@@ -110,6 +157,32 @@ def test_has_finite_length_segments_bad_data():
                 [(4, 5)],
                 [(4, 5)],
                 [(4, 5)]]
+
+    for i, f in enumerate(files):
+        ok, ids = check.has_all_finite_length_segments(load_neuron(f))
+        nt.ok_(not ok)
+        nt.assert_equal(ids, bad_segs[i])
+
+
+def test_has_finite_length_sections_good_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Neuron.swc',
+                       'Single_apical.swc',
+                       'Single_basal.swc',
+                       'Single_axon.swc']]
+    for i, f in enumerate(files):
+        ok, ids = check.has_all_finite_length_sections(load_neuron(f))
+        nt.ok_(ok)
+        nt.ok_(len(ids) == 0)
+
+
+
+@nt.nottest  # TODO We need data sample with a soma and zero length sections
+def test_has_finite_length_sections_bad_data():
+    files = [os.path.join(SWC_PATH, f)
+             for f in []]
+
+    bad_segs = [[]]
 
     for i, f in enumerate(files):
         ok, ids = check.has_all_finite_length_segments(load_neuron(f))

@@ -33,8 +33,10 @@ Python module of NeuroM to check neurons.
 from neurom.core.types import TreeType
 from neurom.core.tree import ipreorder
 from neurom.core.tree import isegment
+from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from neurom.core.dataformat import COLS
+from neurom.analysis.morphmath import path_distance
 from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import find_tree_type
 from itertools import chain
@@ -44,19 +46,60 @@ def has_axon(neuron, treefun=find_tree_type):
     '''Check if a neuron has an axon
 
     Arguments:
-        neuron The neuron object to test
-        treefun Optional function to calculate the tree type of
+        neuron: The neuron object to test
+        treefun: Optional function to calculate the tree type of
         neuron's neurites
     '''
     return TreeType.axon in [treefun(n) for n in neuron.neurite_trees]
 
 
+def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
+    '''Check if a neuron has apical dendrites
+
+    Arguments:
+        neuron: The neuron object to test
+        min_number: minimum number of apical dendrites required
+        treefun: Optional function to calculate the tree type of neuron's
+        neurites
+    '''
+    types = [treefun(n) for n in neuron.neurite_trees]
+    return types.count(TreeType.apical_dendrite) >= min_number
+
+
+def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
+    '''Check if a neuron has basal dendrites
+
+    Arguments:
+        neuron: The neuron object to test
+        min_number: minimum number of basal dendrites required
+        treefun: Optional function to calculate the tree type of neuron's
+        neurites
+    '''
+    types = [treefun(n) for n in neuron.neurite_trees]
+    return types.count(TreeType.basal_dendrite) >= min_number
+
+
 def has_all_finite_length_segments(neuron):
-    '''Check that neuron has no zero-length segments'''
+    '''Check that neuron has no zero-length segments
+
+    Return: tuple of (bool, [(first_id, second_id)])
+    '''
     l = [[s for s in val_iter(isegment(t))
           if segment_length(s) <= 0.0]
          for t in neuron.neurite_trees]
     l = [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
+    return len(l) == 0, l
+
+
+def has_all_finite_length_sections(neuron):
+    '''Check that neuron has no zero-length sections
+
+    Return: tuple of (bool, [ids of first point in bad sections])
+    '''
+    l = [[s for s in val_iter(isection(t))
+          if path_distance(s) <= 0.0]
+         for t in neuron.neurite_trees]
+    l = [i[0][COLS.ID] for i in chain(*l)]
     return len(l) == 0, l
 
 

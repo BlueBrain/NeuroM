@@ -53,8 +53,11 @@ Errors checked for
 ------------------
 * No soma (implicit)
 * No axon
+* No apical dendrite
+* No basal dendrite
 * Zero radius points
 * Zero length segments
+* Zero length sections
 
 Examples
 --------
@@ -101,6 +104,8 @@ if __name__ == '__main__':
         nrn = load_neuron(f)
         print '\nCheck file %s...' % f
         print 'Has axon? %s' % io_chk.has_axon(nrn)
+        print 'Has apical dendrite? %s' % io_chk.has_apical_dendrite(nrn)
+        print 'Has basal dendrite? %s' % io_chk.has_basal_dendrite(nrn)
 
         fr = io_chk.has_all_finite_radius_neurites(nrn)
         print 'All neurites have finite radius? %s' % fr[0]
@@ -111,3 +116,8 @@ if __name__ == '__main__':
         print 'Finite length segments? %s' % fs[0]
         if not fs[0]:
             print '\tSegments with zero length detected:', fs[1]
+
+        fs = io_chk.has_all_finite_length_sections(nrn)
+        print 'Finite length sections? %s' % fs[0]
+        if not fs[0]:
+            print '\tSections with zero length detected:', fs[1]
