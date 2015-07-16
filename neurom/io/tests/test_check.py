@@ -115,7 +115,7 @@ def test_has_finite_radius_neurites_bad_data():
 
 def test_has_finite_length_segments_good_data():
     files = [os.path.join(SWC_PATH, f)
-             for f in [
+             for f in ['Neuron.swc',
                        'sequential_trunk_off_0_16pt.swc',
                        'sequential_trunk_off_1_16pt.swc',
                        'sequential_trunk_off_42_16pt.swc']]
@@ -127,7 +127,7 @@ def test_has_finite_length_segments_good_data():
 
 def test_has_finite_length_segments_bad_data():
     files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
+             for f in ['Neuron_zero_length_segments.swc',
                        'Single_apical.swc',
                        'Single_basal.swc',
                        'Single_axon.swc']]

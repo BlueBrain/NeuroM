@@ -90,6 +90,30 @@ def get_morph_files(directory):
             os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
 
 
+def test_file(f):
+    '''Run tests on a morphology file'''
+    print '\nCheck file %s...' % f
+    nrn = load_neuron(f)
+    print 'Has axon? %s' % io_chk.has_axon(nrn)
+    print 'Has apical dendrite? %s' % io_chk.has_apical_dendrite(nrn)
+    print 'Has basal dendrite? %s' % io_chk.has_basal_dendrite(nrn)
+
+    fr = io_chk.all_nonzero_neurite_radii(nrn)
+    print 'All neurites have finite radius? %s' % fr[0]
+    if not fr[0]:
+        print '%s points with zero radius detected: %s' % (len(fr[1]), fr[1])
+
+    fs = io_chk.all_nonzero_segment_lengths(nrn)
+    print 'Finite length segments? %s' % fs[0]
+    if not fs[0]:
+        print '\tSegments with zero length detected:', fs[1]
+
+    fs = io_chk.all_nonzero_section_lengths(nrn)
+    print 'Finite length sections? %s' % fs[0]
+    if not fs[0]:
+        print '\tSections with zero length detected:', fs[1]
+
+
 if __name__ == '__main__':
 
     args = parse_args()
@@ -100,24 +124,8 @@ if __name__ == '__main__':
         print 'Checking files in directory', data_path
         files = get_morph_files(data_path)
 
-    for f in files:
-        nrn = load_neuron(f)
-        print '\nCheck file %s...' % f
-        print 'Has axon? %s' % io_chk.has_axon(nrn)
-        print 'Has apical dendrite? %s' % io_chk.has_apical_dendrite(nrn)
-        print 'Has basal dendrite? %s' % io_chk.has_basal_dendrite(nrn)
-
-        fr = io_chk.has_all_finite_radius_neurites(nrn)
-        print 'All neurites have finite radius? %s' % fr[0]
-        if not fr[0]:
-            print '%s points with zero radius detected: %s' % (len(fr[1]), fr[1])
-
-        fs = io_chk.has_all_finite_length_segments(nrn)
-        print 'Finite length segments? %s' % fs[0]
-        if not fs[0]:
-            print '\tSegments with zero length detected:', fs[1]
-
-        fs = io_chk.has_all_finite_length_sections(nrn)
-        print 'Finite length sections? %s' % fs[0]
-        if not fs[0]:
-            print '\tSections with zero length detected:', fs[1]
+    for _f in files:
+        try:
+            test_file(_f)
+        except StandardError:
+            print 'ERROR: Could not read file %s. Run basic checks.' % _f
