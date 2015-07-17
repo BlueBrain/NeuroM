@@ -97,13 +97,13 @@ def test_make_SomaC():
     check_SomaC(SOMA_C_PTS_6)
 
 
-@nt.raises(Exception)
-def test_invalid_soma_points_0_raises():
+@nt.raises(neuron.SomaError)
+def test_invalid_soma_points_0_raises_SomaError():
     neuron.make_soma(INVALID_PTS_0)
 
 
-@nt.raises(Exception)
-def test_invalid_soma_points_2_raises():
+@nt.raises(neuron.SomaError)
+def test_invalid_soma_points_2_raises_SomaError():
     neuron.make_soma(INVALID_PTS_2)
 
 
@@ -114,3 +114,14 @@ def test_neuron():
     nt.assert_equal(nrn.id, 'Neuron')
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'], 'test')
     nt.assert_equal(nrn.id, 'test')
+
+
+
+@nt.raises(neuron.SomaError)
+def test_neuron_invalid_soma_points_0_raises_SomaError():
+    neuron.Neuron(INVALID_PTS_0, [1, 2, 3])
+
+
+@nt.raises(neuron.SomaError)
+def test_neuron_invalid_soma_points_2_raises_SomaError():
+    neuron.Neuron(INVALID_PTS_2, [1, 2, 3])

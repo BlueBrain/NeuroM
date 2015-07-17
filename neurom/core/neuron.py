@@ -108,17 +108,37 @@ class SomaC(BaseSoma):
         self.radius = average_points_dist(points[0], points[1:])
 
 
+class SomaError(StandardError):
+    '''Exception for soma construction errors'''
+    pass
+
+
 def make_soma(points):
-    '''toy soma'''
+    '''Make a soma object from a set of points
+
+    Infers the soma type (SomaA, SomaB or SomaC) from the points.
+
+    Raises: SomaError if no soma points found.
+    '''
     stype = SOMA_TYPE.get_type(points)
-    return {SOMA_TYPE.A: SomaA,
-            SOMA_TYPE.B: SomaB,
-            SOMA_TYPE.C: SomaC}[stype](points)
+    try:
+        return {SOMA_TYPE.A: SomaA,
+                SOMA_TYPE.B: SomaB,
+                SOMA_TYPE.C: SomaC}[stype](points)
+    except KeyError:
+        raise SomaError('No valid soma found in data')
 
 
 class Neuron(object):
     '''Toy neuron class for testing ideas'''
     def __init__(self, soma_points, neurite_trees, name='Neuron'):
+        '''Construct a Neuron
+        Arguments:
+            soma_points: iterable of soma points
+            neurite_trees: iterable of neurite tree structures
+            name: Optional name for this Neuron
+        Raises: SomaError if soma can't be built from soma_points.
+        '''
         self.soma = make_soma(soma_points)
         self.neurite_trees = neurite_trees
         self.id = name

@@ -33,6 +33,7 @@ from neurom.io.readers import load_data
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
+from neurom.core.neuron import SomaError
 from nose import tools as nt
 
 
@@ -50,6 +51,8 @@ FILES = [os.path.join(SWC_PATH, f)
                    'sequential_trunk_off_1_16pt.swc',
                    'sequential_trunk_off_42_16pt.swc',
                    'Neuron_no_missing_ids_no_zero_segs.swc']]
+
+NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
 SOMA_IDS = [[1, 2, 3],
             [],
@@ -77,10 +80,12 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 RAW_DATA = [load_data(f) for f in FILES]
+NO_SOMA_RAW_DATA = load_data(NO_SOMA_FILE)
 
 def test_get_soma_ids():
     for i, d in enumerate(RAW_DATA):
         nt.ok_(utils.get_soma_ids(d) == SOMA_IDS[i])
+
 
 
 def test_get_initial_segment_ids():
@@ -129,6 +134,11 @@ def test_make_neuron():
     _check_trees(nrn.neurite_trees)
 
 
+@nt.raises(SomaError)
+def test_make_neuron_no_soma_raises_SomaError():
+    utils.make_neuron(NO_SOMA_RAW_DATA)
+
+
 def test_make_neuron_post_tree_action():
     def post_action(t):
         t.bar = 'foo'
@@ -138,6 +148,12 @@ def test_make_neuron_post_tree_action():
     for t in nrn.neurite_trees:
         nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
 
+
 def test_load_neuron():
     nrn = utils.load_neuron(FILES[0])
     nt.ok_(nrn.id == FILES[0].strip('.swc'))
+
+
+@nt.raises(SomaError)
+def test_load_neuron_no_soma_raises_SomaError():
+    utils.load_neuron(NO_SOMA_FILE)

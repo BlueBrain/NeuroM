@@ -31,6 +31,7 @@
 '''Examples of basic data checks'''
 from neurom.io.utils import load_neuron
 from neurom.check import morphology as io_chk
+from neurom.core.neuron import SomaError
 import argparse
 import os
 
@@ -127,5 +128,7 @@ if __name__ == '__main__':
     for _f in files:
         try:
             test_file(_f)
+        except SomaError as se:
+            print 'ERROR in file %s: %s' % (_f, se.message)
         except StandardError:
             print 'ERROR: Could not read file %s. Run basic checks.' % _f

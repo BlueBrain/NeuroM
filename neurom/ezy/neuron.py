@@ -65,6 +65,14 @@ class Neuron(object):
     '''
 
     def __init__(self, filename, iterable_type=np.array):
+        '''Construct a Neuron
+
+        Arguments:
+            filename: path to morphology file to be loaded
+            iterable_type: type of iterable to return from methods returning
+            collections (e.g list, tuple, numpy.array)
+        Raises: neurom.core.neuron.SomaError if no soma can be build from data
+        '''
         self._iterable_type = iterable_type
         self._nrn = load_neuron(filename, set_tree_type)
 

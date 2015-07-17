@@ -33,6 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron
+from neurom.core.neuron import SomaError
 from neurom.io.readers import load_data
 import os
 
@@ -84,10 +85,13 @@ def make_neuron(raw_data, tree_action=None):
     Args:
         raw_data: a RawDataWrapper object.
         tree_action: optional function to run on the built trees.
+    Raises: SomaError if no soma points in raw_data.
     '''
     _trees = [make_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_segment_ids(raw_data)]
     _soma_pts = [raw_data.get_row(s_id) for s_id in get_soma_ids(raw_data)]
+    if not _soma_pts:
+        raise SomaError('No soma points found in data')
     return Neuron(_soma_pts, _trees)
 
 
@@ -98,6 +102,7 @@ def load_neuron(filename, tree_action=None):
         filename: the path of the file storing morphology data
         tree_action: optional function to run on each of the neuron's
         neurite trees.
+    Raises: SomaError if no soma points in data.
     """
 
     data = load_data(filename)
