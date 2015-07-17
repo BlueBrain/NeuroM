@@ -28,6 +28,7 @@
 
 from nose import tools as nt
 from neurom.core import neuron
+from neurom.exceptions import SomaError
 
 SOMA_A_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
@@ -97,12 +98,12 @@ def test_make_SomaC():
     check_SomaC(SOMA_C_PTS_6)
 
 
-@nt.raises(neuron.SomaError)
+@nt.raises(SomaError)
 def test_invalid_soma_points_0_raises_SomaError():
     neuron.make_soma(INVALID_PTS_0)
 
 
-@nt.raises(neuron.SomaError)
+@nt.raises(SomaError)
 def test_invalid_soma_points_2_raises_SomaError():
     neuron.make_soma(INVALID_PTS_2)
 
@@ -117,11 +118,11 @@ def test_neuron():
 
 
 
-@nt.raises(neuron.SomaError)
+@nt.raises(SomaError)
 def test_neuron_invalid_soma_points_0_raises_SomaError():
     neuron.Neuron(INVALID_PTS_0, [1, 2, 3])
 
 
-@nt.raises(neuron.SomaError)
+@nt.raises(SomaError)
 def test_neuron_invalid_soma_points_2_raises_SomaError():
     neuron.Neuron(INVALID_PTS_2, [1, 2, 3])

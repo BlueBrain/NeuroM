@@ -32,7 +32,7 @@ import os
 import numpy as np
 from neurom import ezy
 from neurom.core.types import TreeType
-from neurom.core.neuron import SomaError
+from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
 from neurom.analysis.morphtree import i_section_length, i_segment_length
 
@@ -50,6 +50,12 @@ def test_construct_neuron():
 @nt.raises(SomaError)
 def test_construct_neuron_no_soma_raises_SomaError():
     filename = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+    ezy.Neuron(filename)
+
+
+@nt.raises(NonConsecutiveIDsError)
+def test_construct_neuron_non_consecutive_ids_raises_NonConsecutiveIDsError():
+    filename = os.path.join(SWC_PATH, 'non_sequential_trunk_off_1_16pt.swc')
     ezy.Neuron(filename)
 
 

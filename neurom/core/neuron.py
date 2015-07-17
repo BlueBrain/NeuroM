@@ -29,6 +29,7 @@
 '''Neuron classes and functions'''
 from neurom.analysis.morphmath import average_points_dist
 from neurom.core.dataformat import COLS
+from neurom.exceptions import SomaError
 
 
 class SOMA_TYPE(object):
@@ -108,25 +109,20 @@ class SomaC(BaseSoma):
         self.radius = average_points_dist(points[0], points[1:])
 
 
-class SomaError(StandardError):
-    '''Exception for soma construction errors'''
-    pass
-
-
 def make_soma(points):
     '''Make a soma object from a set of points
 
     Infers the soma type (SomaA, SomaB or SomaC) from the points.
 
-    Raises: SomaError if no soma points found.
+    Raises: SomaError if no soma points found or points incompatible with soma.
     '''
     stype = SOMA_TYPE.get_type(points)
-    try:
-        return {SOMA_TYPE.A: SomaA,
-                SOMA_TYPE.B: SomaB,
-                SOMA_TYPE.C: SomaC}[stype](points)
-    except KeyError:
-        raise SomaError('No valid soma found in data')
+    if stype == SOMA_TYPE.INVALID:
+        raise SomaError('Invalid soma points')
+
+    return {SOMA_TYPE.A: SomaA,
+            SOMA_TYPE.B: SomaB,
+            SOMA_TYPE.C: SomaC}[stype](points)
 
 
 class Neuron(object):

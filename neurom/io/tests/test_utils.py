@@ -33,7 +33,7 @@ from neurom.io.readers import load_data
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.core.neuron import SomaError
+from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
 
 
@@ -53,6 +53,9 @@ FILES = [os.path.join(SWC_PATH, f)
                    'Neuron_no_missing_ids_no_zero_segs.swc']]
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+
+NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
+                                       'non_sequential_trunk_off_1_16pt.swc')
 
 SOMA_IDS = [[1, 2, 3],
             [],
@@ -157,3 +160,8 @@ def test_load_neuron():
 @nt.raises(SomaError)
 def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)
+
+
+@nt.raises(NonConsecutiveIDsError)
+def test_load_neuron_no_consecutive_ids_raises_NonConsecutiveIDsError():
+    utils.load_neuron(NON_CONSECUTIVE_ID_FILE);

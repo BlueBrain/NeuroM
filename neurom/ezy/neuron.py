@@ -71,7 +71,8 @@ class Neuron(object):
             filename: path to morphology file to be loaded
             iterable_type: type of iterable to return from methods returning
             collections (e.g list, tuple, numpy.array)
-        Raises: neurom.core.neuron.SomaError if no soma can be build from data
+        Raises: neurom.exceptions.SomaError if no soma can be build from data
+        Raises: neurom.exceptions.NonConsecutiveIDsError if data IDs not consecutive
         '''
         self._iterable_type = iterable_type
         self._nrn = load_neuron(filename, set_tree_type)
