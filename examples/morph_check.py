@@ -53,7 +53,7 @@ have a soma and no format errors.
 
 Errors checked for
 ------------------
-* No soma (implicit)
+* No soma
 * No axon
 * No apical dendrite
 * No basal dendrite
@@ -95,23 +95,30 @@ def get_morph_files(directory):
 def test_file(f):
     '''Run tests on a morphology file'''
     print '\nCheck file %s...' % f
-    nrn = load_neuron(f)
+    try:
+        nrn = load_neuron(f)
+        print 'Has valid soma? True'
+    except SomaError:
+        print 'Has valid soma? False'
+        print 'Cannot continue without a soma... Aborting'
+        return
+
     print 'Has axon? %s' % io_chk.has_axon(nrn)
     print 'Has apical dendrite? %s' % io_chk.has_apical_dendrite(nrn)
     print 'Has basal dendrite? %s' % io_chk.has_basal_dendrite(nrn)
 
     fr = io_chk.all_nonzero_neurite_radii(nrn)
-    print 'All neurites have finite radius? %s' % fr[0]
+    print 'All neurites have non-zero radius? %s' % fr[0]
     if not fr[0]:
         print '%s points with zero radius detected: %s' % (len(fr[1]), fr[1])
 
     fs = io_chk.all_nonzero_segment_lengths(nrn)
-    print 'Finite length segments? %s' % fs[0]
+    print 'All segments have non-zero length? %s' % fs[0]
     if not fs[0]:
         print '\tSegments with zero length detected:', fs[1]
 
     fs = io_chk.all_nonzero_section_lengths(nrn)
-    print 'Finite length sections? %s' % fs[0]
+    print 'All sections have non-zero length? %s' % fs[0]
     if not fs[0]:
         print '\tSections with zero length detected:', fs[1]
 
@@ -129,7 +136,7 @@ if __name__ == '__main__':
     for _f in files:
         try:
             test_file(_f)
-        except (SomaError, NonConsecutiveIDsError) as se:
-            print 'ERROR in file %s: %s' % (_f, se.message)
+        except NonConsecutiveIDsError as e:
+            print 'ERROR in file %s: %s' % (_f, e.message)
         except StandardError:
             print 'ERROR: Could not read file %s.' % _f
