@@ -120,52 +120,67 @@ def get_morph_files(directory):
             os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
 
 
+def log_msg(ok, msg):
+    '''Helper to log message to the right level'''
+    LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
+
+    L.log(LOG_LEVELS[ok], '%s %s', msg, 'PASS' if ok else 'FAIL')
+
+
 def test_file(f):
     '''Run tests on a morphology file'''
 
-    LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
-    L.info('=' * 32)
     L.info('Check file %s...', f)
 
     try:
         nrn = load_neuron(f)
-        L.info('Has valid soma? True')
+        L.info('Has valid soma? PASS')
     except SomaError:
-        L.error('Has valid soma? False')
+        L.error('Has valid soma? FAIL')
         L.warning('Cannot continue without a soma... Aborting')
-        return
+        return False
+
+    result = True
 
     ok = io_chk.has_axon(nrn)
-    L.log(LOG_LEVELS[ok], 'Has Axon? %s', ok)
+    result &= ok
+    log_msg(ok, 'Has Axon?')
 
     ok = io_chk.has_apical_dendrite(nrn)
-    L.log(LOG_LEVELS[ok], 'Has Apical Dendrite? %s', ok)
+    result &= ok
+    log_msg(ok, 'Has Apical Dendrite?')
 
     ok = io_chk.has_basal_dendrite(nrn)
-    L.log(LOG_LEVELS[ok], 'Has Basal Dendrite? %s', ok)
+    result &= ok
+    log_msg(ok, 'Has Basal Dendrite?')
 
-    ok, pts = io_chk.all_nonzero_neurite_radii(nrn)
-    L.log(LOG_LEVELS[ok], 'All neurites have non-zero radius? %s', ok)
-    if not ok:
+    pts = io_chk.nonzero_neurite_radii(nrn)
+    result &= not pts
+    log_msg(not pts, 'All neurites have non-zero radius?')
+    if pts:
         L.debug('%s points with zero radius detected: %s', len(pts), pts)
 
-    ok, pts = io_chk.all_nonzero_segment_lengths(nrn)
-    L.log(LOG_LEVELS[ok], 'All segments have non-zero length? %s', ok)
-    if not ok:
+    pts = io_chk.nonzero_segment_lengths(nrn)
+    result &= not pts
+    log_msg(not pts, 'All segments have non-zero length?')
+    if pts:
         L.debug('%d segments with zero length detected: %s', len(pts), pts)
 
-    ok, pts = io_chk.all_nonzero_section_lengths(nrn)
-    L.log(LOG_LEVELS[ok], 'All sections have non-zero length? %s', ok)
-    if not ok:
+    pts = io_chk.nonzero_section_lengths(nrn)
+    result &= not pts
+    log_msg(not pts, 'All sections have non-zero length?')
+    if pts:
         L.debug('%d sections with zero length detected: %s', len(pts), pts)
 
-    L.info('=' * 32)
+    return result
+
 
 if __name__ == '__main__':
 
     args = parse_args()
     _setup_logging(args.debug, args.log_file)
     data_path = args.datapath
+    SEPARATOR = '=' * 32
 
     if os.path.isfile(data_path):
         files = [data_path]
@@ -174,9 +189,13 @@ if __name__ == '__main__':
         files = get_morph_files(data_path)
 
     for _f in files:
+        L.info(SEPARATOR)
         try:
-            test_file(_f)
+            res = test_file(_f)
         except NonConsecutiveIDsError as e:
             print 'ERROR in file %s: %s' % (_f, e.message)
         except StandardError:
             print 'ERROR: Could not read file %s.' % _f
+
+    log_msg(res, 'Check result:')
+    L.info(SEPARATOR)

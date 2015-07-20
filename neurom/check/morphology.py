@@ -79,46 +79,43 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
     return types.count(TreeType.basal_dendrite) >= min_number
 
 
-def all_nonzero_segment_lengths(neuron, threshold=0.0):
-    '''Check that all neuron's segments have length above threshold
+def nonzero_segment_lengths(neuron, threshold=0.0):
+    '''Check presence of neuron segments with length not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a segment length is considered to be non-zero
-    Return: tuple of (bool, [(first_id, second_id)])
+    Return: list of (first_id, second_id) of zero length segments
     '''
     l = [[s for s in val_iter(isegment(t))
           if segment_length(s) <= threshold]
          for t in neuron.neurite_trees]
-    l = [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
-    return len(l) == 0, l
+    return [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
 
 
-def all_nonzero_section_lengths(neuron, threshold=0.0):
-    '''Check that all neuron's sections have length above threshold
+def nonzero_section_lengths(neuron, threshold=0.0):
+    '''Check presence of neuron sections with length not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a section length is considered to be non-zero
-    Return: tuple of (bool, [ids of first point in bad sections])
+    Return: list of ids of first point in bad sections
     '''
     l = [[s for s in val_iter(isection(t))
           if path_distance(s) <= threshold]
          for t in neuron.neurite_trees]
-    l = [i[0][COLS.ID] for i in chain(*l)]
-    return len(l) == 0, l
+    return [i[0][COLS.ID] for i in chain(*l)]
 
 
-def all_nonzero_neurite_radii(neuron, threshold=0.0):
-    '''Check that all neuron's neurite points have radius above threshold
+def nonzero_neurite_radii(neuron, threshold=0.0):
+    '''Check presence of neurite points with radius not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a radius is considered to be non-zero
-    Return: tuple of (bool, list of IDs of zero-radius points)
+    Return: list of IDs of zero-radius points
     '''
 
     ids = [[i[COLS.ID] for i in val_iter(ipreorder(t))
             if i[COLS.R] <= threshold] for t in neuron.neurite_trees]
-    ids = [i for i in chain(*ids)]
-    return len(ids) == 0, ids
+    return [i for i in chain(*ids)]

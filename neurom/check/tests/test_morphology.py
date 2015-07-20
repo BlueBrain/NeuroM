@@ -112,7 +112,7 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not check.has_basal_dendrite(n))
 
 
-def test_all_nonzero_neurite_radii_good_data():
+def test_nonzero_neurite_radii_good_data():
     files = [os.path.join(SWC_PATH, f)
              for f in ['Neuron.swc',
                        'Single_apical.swc',
@@ -122,40 +122,35 @@ def test_all_nonzero_neurite_radii_good_data():
     files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
     for f in files:
-        ok, ids = check.all_nonzero_neurite_radii(load_neuron(f))
-        nt.ok_(ok)
+        ids = check.nonzero_neurite_radii(load_neuron(f))
         nt.ok_(len(ids) == 0)
 
 
-def test_all_nonzero_neurite_radii_threshold():
+def test_nonzero_neurite_radii_threshold():
     mf = os.path.join(SWC_PATH, 'Neuron.swc')
     nrn = load_neuron(mf)
 
-    ok, ids = check.all_nonzero_neurite_radii(nrn)
-    nt.ok_(ok)
+    ids = check.nonzero_neurite_radii(nrn)
     nt.ok_(len(ids) == 0)
 
-    ok, ids = check.all_nonzero_neurite_radii(nrn, threshold=0.25)
-    nt.ok_(not ok)
+    ids = check.nonzero_neurite_radii(nrn, threshold=0.25)
     nt.assert_equal(len(ids), 118)
 
 
-def test_all_nonzero_neurite_radii_bad_data():
+def test_nonzero_neurite_radii_bad_data():
     f = os.path.join(SWC_PATH, 'Neuron_zero_radius.swc')
-    ok, ids = check.all_nonzero_neurite_radii(load_neuron(f))
-    nt.ok_(not ok)
+    ids = check.nonzero_neurite_radii(load_neuron(f))
     nt.ok_(ids == [194, 210, 246, 304, 493])
 
 
-def test_all_nonzero_segment_lengths_good_data():
+def test_nonzero_segment_lengths_good_data():
     f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-    ok, ids = check.all_nonzero_segment_lengths(load_neuron(f))
-    nt.ok_(ok)
+    ids = check.nonzero_segment_lengths(load_neuron(f))
     nt.ok_(len(ids) == 0)
 
 
-def test_all_nonzero_segment_lengths_bad_data():
+def test_nonzero_segment_lengths_bad_data():
     files = [os.path.join(SWC_PATH, f)
              for f in ['Neuron_zero_length_segments.swc',
                        'Single_apical.swc',
@@ -169,54 +164,47 @@ def test_all_nonzero_segment_lengths_bad_data():
                 [(4, 5)]]
 
     for i, f in enumerate(files):
-        ok, ids = check.all_nonzero_segment_lengths(load_neuron(f))
-        nt.ok_(not ok)
+        ids = check.nonzero_segment_lengths(load_neuron(f))
         nt.assert_equal(ids, bad_segs[i])
 
 
-def test_all_nonzero_segment_lengths_threshold():
+def test_nonzero_segment_lengths_threshold():
     f = os.path.join(SWC_PATH, 'Neuron.swc')
     nrn = load_neuron(f)
 
-    ok, ids = check.all_nonzero_segment_lengths(nrn)
-    nt.ok_(ok)
+    ids = check.nonzero_segment_lengths(nrn)
     nt.assert_equal(len(ids), 0)
 
-    ok, ids = check.all_nonzero_segment_lengths(nrn, threshold=0.25)
-    nt.ok_(not ok)
+    ids = check.nonzero_segment_lengths(nrn, threshold=0.25)
     nt.assert_equal(ids, [(4, 5), (215, 216), (374, 375), (426, 427),
                           (533, 534), (608, 609), (637, 638), (711, 712),
                           (773, 774)])
 
 
-def test_all_nonzero_section_lengths_good_data():
+def test_nonzero_section_lengths_good_data():
     files = [os.path.join(SWC_PATH, f)
              for f in ['Neuron.swc',
                        'Single_apical.swc',
                        'Single_basal.swc',
                        'Single_axon.swc']]
     for i, f in enumerate(files):
-        ok, ids = check.all_nonzero_section_lengths(load_neuron(f))
-        nt.ok_(ok)
+        ids = check.nonzero_section_lengths(load_neuron(f))
         nt.ok_(len(ids) == 0)
 
 
-def test_all_nonzero_section_lengths_bad_data():
+def test_nonzero_section_lengths_bad_data():
     f = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
 
-    ok, ids = check.all_nonzero_section_lengths(load_neuron(f))
-    nt.ok_(not ok)
+    ids = check.nonzero_section_lengths(load_neuron(f))
     nt.assert_equal(ids, [134])
 
 
-def test_all_nonzero_section_lengths_threshold():
+def test_nonzero_section_lengths_threshold():
     mf = os.path.join(SWC_PATH, 'Neuron.swc')
     nrn = load_neuron(mf)
 
-    ok, ids = check.all_nonzero_section_lengths(nrn)
-    nt.ok_(ok)
+    ids = check.nonzero_section_lengths(nrn)
     nt.ok_(len(ids) == 0)
 
-    ok, ids = check.all_nonzero_section_lengths(nrn, threshold=15.)
-    nt.ok_(not ok)
+    ids = check.nonzero_section_lengths(nrn, threshold=15.)
     nt.assert_equal(len(ids), 84)
