@@ -201,18 +201,12 @@ def test_all_nonzero_section_lengths_good_data():
         nt.ok_(len(ids) == 0)
 
 
-
-@nt.nottest  # TODO We need data sample with a soma and zero length sections
 def test_all_nonzero_section_lengths_bad_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in []]
+    f = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
 
-    bad_segs = [[]]
-
-    for i, f in enumerate(files):
-        ok, ids = check.all_nonzero_section_lengths(load_neuron(f))
-        nt.ok_(not ok)
-        nt.assert_equal(ids, bad_segs[i])
+    ok, ids = check.all_nonzero_section_lengths(load_neuron(f))
+    nt.ok_(not ok)
+    nt.assert_equal(ids, [134])
 
 
 def test_all_nonzero_section_lengths_threshold():
