@@ -26,27 +26,19 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+NeuroM morphology definitions
+=============================
 
-Welcome to the NeuroM documentation
-***********************************
+These are ``NeuroM`` specific working definitions of various components of
+neuron morpholigies.
 
-Contents
-========
+This is to be based on `Basic Definitions to be used in NeuroM <https://bbpteam.epfl.ch/project/spaces/display/BBPSUBSIM/Basic+Definitions+to+be+used+in+NeuroM>`_
 
-.. toctree::
-   :maxdepth: 2
+Soma
+----
 
-   readme
-   quick
-   tour
-   definitions
-   api
+Neurite tree
+------------
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+Neuron
+------

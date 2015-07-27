@@ -26,27 +26,11 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Quick and easy analysis
+=======================
 
-Welcome to the NeuroM documentation
-***********************************
+The ``neurom.ezy`` module
+-------------------------
 
-Contents
-========
-
-.. toctree::
-   :maxdepth: 2
-
-   readme
-   quick
-   tour
-   definitions
-   api
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+Data checking applications
+--------------------------
