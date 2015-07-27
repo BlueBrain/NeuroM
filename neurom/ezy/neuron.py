@@ -43,20 +43,33 @@ class Neuron(object):
     '''Class with basic analysis and plotting functionality
 
     By default returns iterables as numpy.arrays and applies no filtering.
-    Example: get the segment lengths of all apical dendrites in a neuron morphology.
+
+    Arguments:
+        filename: path to morphology file to be loaded.
+        iterable_type: type of iterable to return from methods returning \
+            collections (e.g list, tuple, numpy.array).
+
+    Raises:
+        neurom.exceptions.SomaError if no soma can be built from the data
+        neurom.exceptions.NonConsecutiveIDsError if data IDs not consecutive
+
+    Example:
+        get the segment lengths of all apical dendrites in a neuron morphology.
 
     >>> from neurom import ezy
     >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
     >>> nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
 
-    Example: use lists instead of numpy arrays and get section
+    Example:
+        use lists instead of numpy arrays and get section \
     lengths for the axon. Read an HDF5 v1 file:
 
     >>> from neurom import ezy
     >>> nrn = ezy.Neuron('test_data/h5/v1/Neuron.h5', iterable_type=list)
     >>> nrn.get_section_lengths(ezy.TreeType.axon)
 
-    Example: plot the neuron and save to a file
+    Example:
+        plot the neuron and save to a file
 
     >>> fig, ax = nrn.plot()
     >>> fig.show()
@@ -65,15 +78,6 @@ class Neuron(object):
     '''
 
     def __init__(self, filename, iterable_type=np.array):
-        '''Construct a Neuron
-
-        Arguments:
-            filename: path to morphology file to be loaded
-            iterable_type: type of iterable to return from methods returning
-            collections (e.g list, tuple, numpy.array)
-        Raises: neurom.exceptions.SomaError if no soma can be build from data
-        Raises: neurom.exceptions.NonConsecutiveIDsError if data IDs not consecutive
-        '''
         self._iterable_type = iterable_type
         self._nrn = load_neuron(filename, set_tree_type)
 

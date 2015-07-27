@@ -35,16 +35,16 @@ from neurom.exceptions import SomaError
 class SOMA_TYPE(object):
     '''Enumeration holding soma types
 
-    Type A: single point at centre
-    Type B: Three points on circumference of sphere
-    Type C: More than three points
-    INVALID: Not satisfying any of the above
+    * Type A: single point at centre
+    * Type B: Three points on circumference of sphere
+    * Type C: More than three points
+    * INVALID: Not satisfying any of the above
     '''
     INVALID, A, B, C = xrange(4)
 
     @staticmethod
     def get_type(points):
-        '''gues what this does?'''
+        '''get the type of the soma'''
         npoints = len(points)
         return {0: SOMA_TYPE.INVALID,
                 1: SOMA_TYPE.A,
@@ -114,7 +114,8 @@ def make_soma(points):
 
     Infers the soma type (SomaA, SomaB or SomaC) from the points.
 
-    Raises: SomaError if no soma points found or points incompatible with soma.
+    Raises:
+        SomaError if no soma points found or points incompatible with soma.
     '''
     stype = SOMA_TYPE.get_type(points)
     if stype == SOMA_TYPE.INVALID:
@@ -129,11 +130,14 @@ class Neuron(object):
     '''Toy neuron class for testing ideas'''
     def __init__(self, soma_points, neurite_trees, name='Neuron'):
         '''Construct a Neuron
+
         Arguments:
-            soma_points: iterable of soma points
-            neurite_trees: iterable of neurite tree structures
-            name: Optional name for this Neuron
-        Raises: SomaError if soma can't be built from soma_points.
+            soma_points: iterable of soma points.
+            neurite_trees: iterable of neurite tree structures.
+            name: Optional name for this Neuron.
+
+        Raises:
+            SomaError if soma can't be built from soma_points.
         '''
         self.soma = make_soma(soma_points)
         self.neurite_trees = neurite_trees

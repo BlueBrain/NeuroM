@@ -37,8 +37,68 @@ This is to be based on `Basic Definitions to be used in NeuroM <https://bbpteam.
 Soma
 ----
 
+A soma can be represented by one, three or more points. The soma is classified based on
+the number of points it contains thus:
+
+* Type A: 1 point defining the center and radius.
+* Type B: 3 points. Only the centers of the points are considered.
+  The first point defines the center. The radius is extimated from
+  the mean distance between the center and the two remaining points.
+* Type C: More than three points. Only the centers of the points are considered.
+  The first point defines the center. The radius is
+  estimated from the mean distance between the center and the remaining points.
+
+.. todo::
+    Expand list if and when specifications require new types of soma.
+
+The soma interface exports a center and radius. These can be calculated in different
+ways, but the default is to use the center and radius for type A and the mean center
+and radius for types B and C.
+
+.. todo::
+    In the future, type B may be interpreted as 3 points on an ellipse.
+    In this case, the points would have to be non-collinear.
+    Currently there is no such restriction.
+
+See also
+
+.. seealso:: :py:class:`neurom.core.neuron.SOMA_TYPE`
+
 Neurite tree
 ------------
 
+A neurite consists of a tree structure with a set of points (x, y, z, r, t ) in each
+vertex or node. The tree structure implies the following:
+
+* A node can only have one parent.
+* A node can have an arbitrary number of children.
+* No loops are present in the structure.
+
+.. todo::
+    Should neurite trees be restricted to being binary trees? If so, no more
+    than two children per node would be allowed.
+
+Different type of points are allowed in the same tree as long as same conventions
+are followed
+
+.. todo::
+    The conventions governing the types of points in a neurite
+    tree need to be well defined
+
+In ``NeuroM`` neurite trees are implemented as a recursive structure. See
+
+.. seealso:: :py:class:`neurom.core.tree.Tree`
+
 Neuron
 ------
+
+A neuron structure consists of a single soma and a collection of trees.
+
+The trees that are expected to be present depend on the type of cell:
+
+* Interneuron (IN): basal dendrite, axon
+* Pyramidal cell (PC): basal dendrite, apical dendrite, axon
+
+.. seealso::
+    :py:class:`neurom.core.neuron.Neuron`
+    :py:class:`neurom.ezy.Neuron`

@@ -30,6 +30,7 @@ API Documentation
 =================
 
 .. autosummary::
+   :toctree: neurom
 
    neurom.ezy
    neurom.ezy.neuron
@@ -39,6 +40,7 @@ API Documentation
    neurom.io.check
    neurom.core
    neurom.core.tree
+   neurom.core.neuron
    neurom.core.point
    neurom.core.dataformat
    neurom.exceptions
