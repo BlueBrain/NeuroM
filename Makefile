@@ -54,7 +54,7 @@ lint: run_pep8 run_pylint
 test: run_tests
 
 doc:  neurom_test_venv
-	neurom_test_venv/bin/pip install --upgrade sphinx sphinxcontrib-napoleon
+	neurom_test_venv/bin/pip install --upgrade sphinx sphinxcontrib-napoleon sphinx_rtd_theme
 	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
 
 clean_test_venv:

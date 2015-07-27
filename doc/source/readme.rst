@@ -135,19 +135,23 @@ To view it, point a browser at ``doc/build/html/index.html``
 Examples
 ========
 
-- Load a neuron:
+- Load a neuron and obtain some information from it:
 
-.. code-block:: bash
+.. code-block:: python
 
-    # Load a neuron
-    (foo)$
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+
 
 - Visualize a neuronal morphology:
 
-.. code-block:: bash
+.. code-block:: python
 
-    # Visualize a neuronal morphology
-    (foo)$
+    >>> # Initialize nrn as above
+    >>> fig, ax = nrn.plot()
+    >>> fig.show()
 
 - Abstract morphometrics:
 
