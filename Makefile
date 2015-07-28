@@ -30,10 +30,7 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 neurom_test_venv:
 	virtualenv --system-site-packages neurom_test_venv
-	neurom_test_venv/bin/pip install --upgrade --force-reinstall pep8
-	neurom_test_venv/bin/pip install --upgrade --force-reinstall pylint
-	neurom_test_venv/bin/pip install --upgrade --force-reinstall nose
-	neurom_test_venv/bin/pip install coverage
+	neurom_test_venv/bin/pip install --upgrade -r requirements_dev.txt
 	neurom_test_venv/bin/pip install -e .
 
 run_pep8: neurom_test_venv
@@ -54,7 +51,6 @@ lint: run_pep8 run_pylint
 test: run_tests
 
 doc:  neurom_test_venv
-	neurom_test_venv/bin/pip install --upgrade sphinx sphinxcontrib-napoleon sphinx_rtd_theme
 	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
 
 clean_test_venv:

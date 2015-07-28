@@ -28,8 +28,8 @@
 
 .. NeuroM documentation master file
 
-Welcome to the NeuroM documentation
-***********************************
+NeuroM Documentation
+********************
 
 Contents
 ========
