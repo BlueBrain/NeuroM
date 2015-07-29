@@ -34,10 +34,40 @@ neuron morpholigies.
 
 This is to be based on `Basic Definitions to be used in NeuroM <https://bbpteam.epfl.ch/project/spaces/display/BBPSUBSIM/Basic+Definitions+to+be+used+in+NeuroM>`_
 
+.. _point-label:
+
+Point
+-----
+
+A point is a vector of numbers **[X, Y, Z, R, TYPE, ID, PID]** where the components are
+
+* X, Y, Z: Cartesian coordinates of position
+* R: Radius
+* TYPE: One of the :py:class:`NeuroM valid point types<neurom.core.dataformat.POINT_TYPE>`
+* ID: Unique identifier of the point.
+* PID: ID of the parent of the point.
+
+Typically only the first four or five components are of interest to morphology analysis.
+The rest are used to construct the soma and hierarchical tree structures of the neuron,
+and to check its semantic validity. 
+
+.. note::
+    For most of what follows, it suffices to consider a
+    **point** as a vector of **[X, Y, Z, R, TYPE]**. The remaining
+    components **ID** and **PID** can be considered book-keeping.
+
+.. todo::
+    Point types may need to be restricted to align SWC with H5. This is dependent on
+    future H5 specs.
+
+
+.. _soma-label:
+
 Soma
 ----
 
-A soma can be represented by one, three or more points. The soma is classified based on
+A soma can be represented by one, three or more :ref:`points<point-label>`. 
+The soma is classified based on
 the number of points it contains thus:
 
 * Type A: 1 point defining the center and radius.
@@ -64,10 +94,13 @@ See also
 
 .. seealso:: :py:class:`neurom.core.neuron.SOMA_TYPE`
 
+
+.. _tree-label:
+
 Neurite tree
 ------------
 
-A neurite consists of a tree structure with a set of points (x, y, z, r, t ) in each
+A neurite consists of a tree structure with a set of :ref:`points<point-label>` in each
 vertex or node. The tree structure implies the following:
 
 * A node can only have one parent.
@@ -85,14 +118,15 @@ are followed
     The conventions governing the types of points in a neurite
     tree need to be well defined
 
-In ``NeuroM`` neurite trees are implemented as a recursive structure. See
-
-.. seealso:: :py:class:`neurom.core.tree.Tree`
+In ``NeuroM`` neurite trees are implemented using the recursive structure 
+:py:class:`neurom.core.tree.Tree`, with each node holding a reference to a
+:ref:`morphology point<point-label>`.
 
 Neuron
 ------
 
-A neuron structure consists of a single soma and a collection of trees.
+A neuron structure consists of a single :ref:`soma<soma-label>` and a collection of 
+:ref:`trees<tree-label>`.
 
 The trees that are expected to be present depend on the type of cell:
 

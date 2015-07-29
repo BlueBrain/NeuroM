@@ -29,8 +29,39 @@
 Quick and easy analysis
 =======================
 
-The ``neurom.ezy`` module
--------------------------
 
-Data checking applications
+
+The :py:mod:`neurom.ezy` module
+-------------------------------
+
+The :py:mod:`neurom.ezy` module contains a :py:class:`Neuron<neurom.ezy.neuron.Neuron>` class that allows to easily
+load neuron morphology from a file into ``neurom`` data structures. It provides convenient
+methods to query various properties of the neuron. The functionality is limited, but it
+is hoped that it will suffice for most analyses. 
+
+The following properties can be obtained for a single neurite type or for all
+neurites regardless of type:
+
+* Segment lengths
+* Section lengths
+* Number of sections
+* Number of sections per neurite
+* Number of neurites
+
+There are also methods for plotting a neuron in 2 and 3 dimensions.
+
+See :py:class:`neurom.ezy.neuron.Neuron` for more details and examples.
+
+Date checking applications
 --------------------------
+
+There are two user-friendly data checking applications. One checks for basic consistency
+of raw data, and the other applies some further semantic checks to the data in order to
+determine whether it is suitable to construct a neuron structure and whether certain
+defects within the structure are detected.
+
+.. todo::
+    Make ``examples/basic_checks.py`` and ``examples/morph_checks.py`` into installable
+    executables.
+    Add more details once that is done.
+
