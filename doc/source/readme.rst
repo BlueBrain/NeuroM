@@ -80,7 +80,22 @@ Note you do not have to work in the ``foo`` directory. This is where python pack
 NeuroM
 ------
 
-Once the ``virtualenv`` is set up, you can install ``hbp-neurom`` from source. First, clone the repository
+Once the ``virtualenv`` is set up, you can install ``hbp-neurom`` from a the git repository
+or from source. To install from git,
+
+Install the latest version:
+
+.. code-block:: bash
+
+    (foo)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git
+
+Install a particular release:
+
+.. code-block:: bash
+
+    (foo)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git@neurom-v0.0.1
+
+To install from source, clone the repository and install it:
 
 .. code-block:: bash
 
@@ -123,7 +138,8 @@ done so already or these aren't installed in the system:
 Building the Documentation
 --------------------------
 
-There's  a ``make`` target to build the HTML version of the documentation:
+The documentation requires that you clone the repository. Once you have done that,
+there's a ``make`` target to build the HTML version of the documentation:
 
 .. code-block:: bash
 
