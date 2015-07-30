@@ -52,16 +52,43 @@ There are also methods for plotting a neuron in 2 and 3 dimensions.
 
 See :py:class:`neurom.ezy.neuron.Neuron` for more details and examples.
 
-Date checking applications
+Data checking applications
 --------------------------
 
-There are two user-friendly data checking applications. One checks for basic consistency
-of raw data, and the other applies some further semantic checks to the data in order to
+There are two user-friendly data checking applications. ``raw_data_check`` checks for basic 
+consistency
+of raw data, and ``morph_check`` applies some further semantic checks to the data in order to
 determine whether it is suitable to construct a neuron structure and whether certain
-defects within the structure are detected.
+defects within the structure are detected. Both can be invoked from the command line, and
+take as main argument the path to either a single file or a directory of morphology files.
 
-.. todo::
-    Make ``examples/basic_checks.py`` and ``examples/morph_checks.py`` into installable
-    executables.
-    Add more details once that is done.
+For example,
+
+.. code-block:: bash
+
+    $ morph_check test_data/swc/Neuron.swc # single file
+    INFO: ================================
+    INFO: Check file test_data/swc/Neuron.swc...
+    INFO: Has valid soma? PASS
+    INFO: Has Apical Dendrite? PASS
+    INFO: Has Basal Dendrite? PASS
+    INFO: All neurites have non-zero radius? PASS
+    INFO: All segments have non-zero length? PASS
+    INFO: All sections have non-zero length? PASS
+    INFO: Check result: PASS
+    INFO: ================================
+
+
+    $ morph_check test_data/swc # all files in directory
+    # loops over all morphology files found in test_data/swc
+
+For more information, use the help option:
+
+ .. code-block:: bash
+
+    $ morph_check --help
+    ....
+
+    $ raw_data_check --help
+    ....
 

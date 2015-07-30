@@ -73,14 +73,14 @@ for file_name in os.listdir(BASEDIR):
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
-    'author': 'HBP Algorithm Development Team',
+    'author': 'BBP Algorithm Development Team',
     'url': 'http://www.example.com',
     'author_email': 'juan.palacios@epfl.ch, lida.kanari@epfl.ch',
     'version': VERSION,
     'install_requires': REQS,
     'extras_require': EXTRA_REQS,
     'packages': find_packages(),
-    'scripts': [],
+    'scripts': ['apps/raw_data_check', 'apps/morph_check'],
     'name': 'neurom',
     'include_package_data': True,
 }

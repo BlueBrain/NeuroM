@@ -30,14 +30,14 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 neurom_test_venv:
 	virtualenv --system-site-packages neurom_test_venv
-	neurom_test_venv/bin/pip install --upgrade -r requirements_dev.txt
+	neurom_test_venv/bin/pip install --ignore-installed -r requirements_dev.txt
 	neurom_test_venv/bin/pip install -e .
 
 run_pep8: neurom_test_venv
-	neurom_test_venv/bin/pep8 --config=pep8rc `find neurom examples -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
+	neurom_test_venv/bin/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
 
 run_pylint: neurom_test_venv
-	neurom_test_venv/bin/pylint --rcfile=pylintrc `find neurom examples -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
+	neurom_test_venv/bin/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
 
 run_tests: neurom_test_venv
 	neurom_test_venv/bin/nosetests -v --with-coverage --cover-package neurom

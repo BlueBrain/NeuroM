@@ -64,14 +64,13 @@ Errors checked for
 
 Examples
 --------
-morph_check.py --help               # print this help
-morph_check.py some/path/neuron.h5  # Process an HDF5 file
-morph_check.py some/path/neuron.swc # Process an SWC file
-morph_check.py some/path/           # Process all HDF5 and SWC files found in directory
+morph_check --help               # print this help
+morph_check some/path/neuron.h5  # Process an HDF5 file
+morph_check some/path/neuron.swc # Process an SWC file
+morph_check some/path/           # Process all HDF5 and SWC files found in directory
 '''
 
 L = logging.getLogger(__name__)
-
 
 def _setup_logging(debug, log_file):
     """ Set up logger """

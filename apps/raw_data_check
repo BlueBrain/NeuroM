@@ -58,10 +58,10 @@ Errors checked for
 
 Examples
 --------
-data_checks.py --help               # print this help
-data_checks.py some/path/neuron.h5  # Process an HDF5 file
-data_checks.py some/path/neuron.swc # Process an SWC file
-data_checks.py some/path/           # Process all HDF5 and SWC files found in directory
+raw_data_check --help               # print this help
+raw_data_check some/path/neuron.h5  # Process an HDF5 file
+raw_data_check some/path/neuron.swc # Process an SWC file
+raw_data_check some/path/           # Process all HDF5 and SWC files found in directory
 '''
 
 

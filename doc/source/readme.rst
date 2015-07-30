@@ -135,6 +135,28 @@ To view it, point a browser at ``doc/build/html/index.html``
 Examples
 ========
 
+- Perform checks on neuron morphology files:
+
+.. code-block:: bash
+
+    $ morph_check test_data/swc/Neuron.swc # single file
+    INFO: ================================
+    INFO: Check file test_data/swc/Neuron.swc...
+    INFO: Has valid soma? PASS
+    INFO: Has Apical Dendrite? PASS
+    INFO: Has Basal Dendrite? PASS
+    INFO: All neurites have non-zero radius? PASS
+    INFO: All segments have non-zero length? PASS
+    INFO: All sections have non-zero length? PASS
+    INFO: Check result: PASS
+    INFO: ================================
+
+
+    $ morph_check test_data/swc # all files in directory
+    ....
+
+
+
 - Load a neuron and obtain some information from it:
 
 .. code-block:: python
