@@ -84,7 +84,7 @@ For example,
 
 For more information, use the help option:
 
- .. code-block:: bash
+.. code-block:: bash
 
     $ morph_check --help
     ....
