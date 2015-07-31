@@ -57,13 +57,17 @@ Additional dependencies needed for testing and building documentation are
 Installation
 ============
 
-It is recommended that you use pip to install into ``NeuroM`` into a ``virtualenv``:
+It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
+``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_:
+
+Virtualenv setup
+----------------
 
 .. code-block:: bash
 
-    $ virtualenv --system-site-packages foo   # creates a virtualenv called "foo" in foo directory
-    $ source foo/bin/activate                 # activates virtualenv
-    (foo)$                                    # now we are in the foo virtualenv
+    $ virtualenv --system-site-packages nrm   # creates a virtualenv called "nrm" in nrm directory
+    $ source nrm/bin/activate                 # activates virtualenv
+    (nrm)$                                    # now we are in the nrm virtualenv
 
 Here, the ``--system-site-packages`` option has been used. This is because dependencies such as
 ``matplotlib`` aren't trivial to build in a ``virtualenv``. This setting allows python packages
@@ -73,52 +77,94 @@ The prompt indicates that the ``virtualenv`` has been activated. To de-activate 
 
 .. code-block:: bash
 
-    (foo)$ deactivate
+    (nrm)$ deactivate
 
-Note you do not have to work in the ``foo`` directory. This is where python packages will get installed, but you can work anywhere on your file system, as long as you have activated the ``virtualenv``.
+Note you do not have to work in the ``nrm`` directory. This is where python packages will get installed, but you can work anywhere on your file system, as long as you have activated the ``virtualenv``.
 
-NeuroM
-------
+.. note::
 
-Once the ``virtualenv`` is set up, you can install ``hbp-neurom`` from a the git repository
-or from source. To install from git,
+    In following code samples, the prompts ``(nrm)$`` and ``$`` are used to indicate
+    that the user virtualenv is *activated* or *deactivated* respectively.
+
+.. note::
+
+    In following code samples, the prompt ``>>>`` indicates a python interpreter session
+    started *with the virtualenv activated*. That gives access to the ``neurom``
+    installation.
+
+NeuroM installation
+-------------------
+
+Once the ``virtualenv`` is set up, there are three ways to install ``hbp-neurom``
+
+#. From the internal BBP PyPI server (restricted access)
+#. From the git repository
+#. From source (for NeuroM developers)
+
+Install from the BBP PyPI server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install the latest release:
+
+.. code-block:: bash
+
+    (nrm)$ pip install -i http://bbpgb019.epfl.ch:9090/simple neurom
+
+Install a specific version:
+
+.. code-block:: bash
+
+    (nrm)$ pip install -i http://bbpgb019.epfl.ch:9090/simple neurom==1.2.3
+
+.. warning::
+
+    If your version of pip 7.0 or higher, you need to add the option
+    ``--trusted-host bbpgb019.epfl.ch``.
+
+Install from git
+^^^^^^^^^^^^^^^^
 
 Install the latest version:
 
 .. code-block:: bash
 
-    (foo)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git
+    (nrm)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git
 
 Install a particular release:
 
 .. code-block:: bash
 
-    (foo)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git@neurom-v0.0.1
+    (nrm)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git@neurom-v0.0.1
 
-To install from source, clone the repository and install it:
+Install from source
+^^^^^^^^^^^^^^^^^^^
+
+Clone the repository and install it:
 
 .. code-block:: bash
 
-    (foo)$ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
-    (foo)$ pip install -e ./hbp-neurom
+    (nrm)$ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
+    (nrm)$ pip install -e ./hbp-neurom
 
 This installs ``hbp-neurom`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
 To install in read-only mode, omit the ``-e``.
 
-
 Running the tests
 -----------------
 
-The tests require that you have cloned the repository, since the test code is not distributed in the package. It is recommended to use ``nosetests`` for this. There are two options:
+The tests require that you have cloned the repository, since the test code is
+not distributed in the package. It is recommended to use ``nosetests`` for
+this. There are two options:
 
-Run the tests in a dedicated virtualenv:
+Use the provided ``Makefile`` to run the tests using ``make``:
 
 .. code-block:: bash
 
-        $ make test
+    $ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
+    $ cd hbp-neurom
+    $ make test
 
-``make`` also has targets for running pylint and pep8:
-
+The ``Makefile`` also has targets for running pylint and pep8:
 
 .. code-block:: bash
 
@@ -126,14 +172,18 @@ Run the tests in a dedicated virtualenv:
         $ make run_pep8   # run only pep8
         $ make run_pylint # run only pep8
 
-Alternatively, inside the virtualenv, install ``nose`` and ``coverage`` if you haven't
+This creates its own virtualenv ``neurom_test_venv`` and runs all the tests inside of
+it.
+
+Alternatively, inside the your own virtualenv, install ``nose`` and ``coverage``
+if you haven't
 done so already or these aren't installed in the system:
 
 .. code-block:: bash
 
-    (foo)$ pip install nose
-    (foo)$ pip install coverage
-    (foo)$ nosetests -s -v --with-coverage --cover-package neurom
+    (nrm)$ pip install nose
+    (nrm)$ pip install coverage
+    (nrm)$ nosetests -s -v --with-coverage --cover-package neurom
 
 Building the Documentation
 --------------------------
@@ -143,7 +193,8 @@ there's a ``make`` target to build the HTML version of the documentation:
 
 .. code-block:: bash
 
-        $ make doc
+    $ cd hbp-neurom # repository location
+    $ make doc
 
 This builds the documentation in ``doc/build``.
 To view it, point a browser at ``doc/build/html/index.html``
@@ -155,9 +206,9 @@ Examples
 
 .. code-block:: bash
 
-    $ morph_check test_data/swc/Neuron.swc # single file
+    (nrm)$ morph_check some/data/path/morph_file.swc # single file
     INFO: ================================
-    INFO: Check file test_data/swc/Neuron.swc...
+    INFO: Check file some/data/path/morph_file.swc...
     INFO: Has valid soma? PASS
     INFO: Has Apical Dendrite? PASS
     INFO: Has Basal Dendrite? PASS
@@ -168,7 +219,7 @@ Examples
     INFO: ================================
 
 
-    $ morph_check test_data/swc # all files in directory
+    (nrm)$ morph_check some/data/path # all files in directory
     ....
 
 
@@ -178,7 +229,7 @@ Examples
 .. code-block:: python
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
     >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
     >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
 
@@ -193,7 +244,5 @@ Examples
 
 - Abstract morphometrics:
 
-.. code-block:: bash
-
-    # Abstract morphometrics
-    (foo)$
+.. todo::
+    Figure out what this means and add examples
