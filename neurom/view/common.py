@@ -33,7 +33,12 @@ to be used by view-plot modules.
 from neurom.core.types import TreeType
 import os
 import matplotlib
-matplotlib.use('Agg') # noqa
+
+#  Awful hack to use non-GUI backend when no display
+#  is available. For unixy systems.
+if 'DISPLAY' not in os.environ: # noqa
+    matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
