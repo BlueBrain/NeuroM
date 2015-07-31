@@ -33,6 +33,7 @@ from neurom.io.readers import load_data
 from neurom.io import check as io_chk
 import argparse
 import os
+import sys
 
 DESCRIPTION = '''
 NeuroM Raw Data Checker
@@ -96,6 +97,8 @@ if __name__ == '__main__':
     elif os.path.isdir(data_path):
         print 'Checking files in directory', data_path
         files = get_morph_files(data_path)
+    else:
+        sys.exit('ERROR: Invalid data path %s' % data_path)
 
     for f in files:
         rd = load_data(f)
