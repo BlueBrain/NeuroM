@@ -164,6 +164,10 @@ def test_segment_path_length():
     for l in leaves:
         nt.ok_(path_length(l) == 9)
 
+    leaves = [l for l in tr.ileaf(form_simple_tree())]
+    for l in leaves:
+        nt.ok_(path_length(l) == 8)
+
 
 def test_find_tree_type():
     for en_tree, test_tree in enumerate(neuron0.neurite_trees):

@@ -33,6 +33,7 @@ from neurom.core.types import TreeType
 from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
+from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
 import numpy as np
@@ -83,15 +84,19 @@ class Neuron(object):
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
-        neurites = self._filter_neurites(neurite_type)
-        l = [[i for i in i_section_length(t)] for t in neurites]
-        return self._iterable_type([i for i in chain(*l)])
+        return self._neurite_loop(neurite_type, i_section_length)
 
     def get_segment_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''
-        neurites = self._filter_neurites(neurite_type)
-        l = [[i for i in i_segment_length(t)] for t in neurites]
-        return self._iterable_type([i for i in chain(*l)])
+        return self._neurite_loop(neurite_type, i_segment_length)
+
+    def get_local_bifurcation_angles(self, neurite_type=TreeType.all):
+        '''Get an iterable containing the local bifircation angles of all segments of a given type
+
+        The local bifurcation angle is defined as the angle between
+        the first segments of the bifurcation branches.
+        '''
+        return self._neurite_loop(neurite_type, i_local_bifurcation_angle)
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
@@ -105,6 +110,13 @@ class Neuron(object):
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
         return len(self._filter_neurites(neurite_type))
+
+    def _neurite_loop(self, neurite_type, iterator_type):
+        '''Iterate over collection of neurites applying iterator_type
+        '''
+        neurites = self._filter_neurites(neurite_type)
+        l = [[i for i in iterator_type(t)] for t in neurites]
+        return self._iterable_type([i for i in chain(*l)])
 
     def _filter_neurites(self, neurite_type):
         '''Filter neurites by type'''

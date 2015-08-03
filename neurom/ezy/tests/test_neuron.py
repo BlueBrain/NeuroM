@@ -34,7 +34,10 @@ from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
-from neurom.analysis.morphtree import i_section_length, i_segment_length
+from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import i_segment_length
+from neurom.analysis.morphtree import i_segment_length
+from neurom.analysis.morphtree import i_local_bifurcation_angle
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -72,6 +75,10 @@ class TestEzyNeuron(object):
         for t in self.neuron._nrn.neurite_trees:
             self.seglen.extend(ll for ll in i_segment_length(t))
 
+        self.local_bifangles = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.local_bifangles.extend(a for a in i_local_bifurcation_angle(t))
+
     def test_get_section_lengths(self):
         seclen = self.neuron.get_section_lengths()
         nt.assert_equal(len(seclen), 84)
@@ -107,7 +114,6 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == self.seglen))
 
-
     def test_get_segment_lengths_axon(self):
         s = self.neuron.get_segment_lengths(TreeType.axon)
         nt.assert_equal(len(s), 210)
@@ -125,6 +131,33 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(s), 0)
         s = self.neuron.get_segment_lengths(TreeType.undefined)
         nt.assert_equal(len(s), 0)
+
+    def test_get_local_bifurcation_angles(self):
+        local_bifangles = self.neuron.get_local_bifurcation_angles()
+        nt.assert_equal(len(local_bifangles), 40)
+        nt.assert_true(np.all(local_bifangles == self.local_bifangles))
+        local_bifangles = self.neuron.get_local_bifurcation_angles(TreeType.all)
+        nt.assert_equal(len(local_bifangles), 40)
+        nt.assert_true(np.all(local_bifangles == self.local_bifangles))
+
+    def test_get_local_bifurcation_angles_axon(self):
+        s = self.neuron.get_local_bifurcation_angles(TreeType.axon)
+        nt.assert_equal(len(s), 10)
+
+    def test_get_local_bifurcation_angles_basal(self):
+        s = self.neuron.get_local_bifurcation_angles(TreeType.basal_dendrite)
+        nt.assert_equal(len(s), 20)
+
+    def test_get_local_bifurcation_angles_apical(self):
+        s = self.neuron.get_local_bifurcation_angles(TreeType.apical_dendrite)
+        nt.assert_equal(len(s), 10)
+
+    def test_get_local_bifurcation_angles_invalid(self):
+        s = self.neuron.get_local_bifurcation_angles(TreeType.soma)
+        nt.assert_equal(len(s), 0)
+        s = self.neuron.get_local_bifurcation_angles(TreeType.undefined)
+        nt.assert_equal(len(s), 0)
+
 
 
     def test_get_n_sections(self):
