@@ -36,7 +36,6 @@ from neurom.core.tree import ipreorder
 from neurom.core.tree import ipostorder
 from neurom.core.tree import iupstream
 from neurom.core.tree import isegment
-from neurom.core.tree import segment_iter
 from neurom.core.tree import ileaf
 from neurom.core.tree import itriplet
 from neurom.core.tree import iforking_point
@@ -228,9 +227,6 @@ def test_segment_upstream_iteration():
     for l, ref in zip(leaves, ref_paths):
         nt.assert_equal([s for s in val_iter(isegment(l, iupstream))], ref)
 
-    for l, ref in zip(leaves, ref_paths):
-        nt.assert_equal([s for s in val_iter(segment_iter(iupstream(l)))], ref)
-
 
 def test_itriplet():
 
@@ -259,6 +255,22 @@ def test_iforking_point():
                     [0, 11, 1111, 12, 1211])
 
 
+def test_iforking_point_preorder():
+    nt.assert_equal([n.value for n in iforking_point(REF_TREE2, ipostorder)],
+                    [1111, 11, 1211, 12, 0])
+
+
+def test_iforking_point_upstream():
+    leaves = [l for l in ileaf(REF_TREE2)]
+    ref_paths = [
+        [1111, 11, 0], [1111, 11, 0], [1111, 11, 0], [11, 0],
+        [1211, 12, 0], [1211, 12, 0], [12, 0]
+    ]
+
+    for l, ref in zip(leaves, ref_paths):
+        nt.assert_equal([s for s in val_iter(iforking_point(l, iupstream))], ref)
+
+
 def test_valiter_forking_point():
     nt.ok_(list(val_iter(iforking_point(REF_TREE2))) ==
            [0, 11, 1111, 12, 1211])
@@ -267,6 +279,22 @@ def test_valiter_forking_point():
 def test_ibifurcation_point():
     nt.assert_equal([n.value for n in ibifurcation_point(REF_TREE2)],
                     [0, 11, 12, 1211])
+
+
+def test_ibifurcation_point_postorder():
+    nt.assert_equal([n.value for n in ibifurcation_point(REF_TREE2, ipostorder)],
+                    [11, 1211, 12, 0])
+
+
+def test_ibifurcation_point_upstream():
+    leaves = [l for l in ileaf(REF_TREE2)]
+    ref_paths = [
+        [11, 0], [11, 0], [11, 0], [11, 0],
+        [1211, 12, 0], [1211, 12, 0], [12, 0]
+    ]
+
+    for l, ref in zip(leaves, ref_paths):
+        nt.assert_equal([s for s in val_iter(ibifurcation_point(l, iupstream))], ref)
 
 
 def test_valiter_bifurcation_point():

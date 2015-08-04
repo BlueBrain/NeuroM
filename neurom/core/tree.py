@@ -97,55 +97,38 @@ def ileaf(tree):
     return ifilter(is_leaf, ipreorder(tree))
 
 
-def iforking_point(tree):
-    '''Iterator to forking points. Returns a tree object.'''
-    return ifilter(is_forking_point, ipreorder(tree))
-
-
-def ibifurcation_point(tree):
-    '''Iterator to bifurcation points. Returns a tree object.'''
-    return ifilter(is_bifurcation_point, ipreorder(tree))
-
-
-def isegment(tree, iter_mode=ipreorder):
-    '''Iterate over segments
+def iforking_point(tree, iter_mode=ipreorder):
+    '''Iterator to forking points. Returns a tree object.
 
     Parameters:
         tree: the tree over which to iterate
         iter_mode: iteration mode. Default: ipreorder.
     '''
-    return segment_iter(iter_mode(tree))
+    return ifilter(is_forking_point, iter_mode(tree))
 
 
-def segment_iter(tree_iterator):
-    '''Iterator adaptor to iterate over segments.
+def ibifurcation_point(tree, iter_mode=ipreorder):
+    '''Iterator to bifurcation points. Returns a tree object.
+
+    Parameters:
+        tree: the tree over which to iterate
+        iter_mode: iteration mode. Default: ipreorder.
+    '''
+    return ifilter(is_bifurcation_point, iter_mode(tree))
+
+
+def isegment(tree, iter_mode=ipreorder):
+    '''Iterate over segments
 
     Segments are parent-child pairs, with the child being the
     center of the iteration
+
+    Parameters:
+        tree: the tree over which to iterate
+        iter_mode: iteration mode. Default: ipreorder.
     '''
     return imap(lambda t: (t.parent, t),
-                ifilter(lambda t: t.parent is not None, tree_iterator))
-
-
-def itriplet(tree):
-    '''Iterate over triplets
-
-    Yields tuples with three consecutive sub-trees
-    '''
-    return chain(
-        *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
-              ifilter(lambda n: not is_root(n) and not is_leaf(n),
-                      ipreorder(tree))))
-
-
-def val_iter(tree_iterator):
-    '''Iterator adaptor to iterate over Tree.value'''
-    def _deep_map(f, data):
-        '''Recursive map function. Maintains type of iterables'''
-        return (type(data)(_deep_map(f, x) for x in data)
-                if hasattr(data, '__iter__')
-                else f(data))
-    return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
+                ifilter(lambda t: t.parent is not None, iter_mode(tree)))
 
 
 def isection(tree, iter_mode=ipreorder):
@@ -174,3 +157,24 @@ def isection(tree, iter_mode=ipreorder):
 
     return imap(get_section,
                 ifilter(seed_node, iter_mode(tree)))
+
+
+def itriplet(tree):
+    '''Iterate over triplets
+
+    Post-order iteration yielding tuples with three consecutive sub-trees
+    '''
+    return chain(
+        *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
+              ifilter(lambda n: not is_root(n) and not is_leaf(n),
+                      ipreorder(tree))))
+
+
+def val_iter(tree_iterator):
+    '''Iterator adaptor to iterate over Tree.value'''
+    def _deep_map(f, data):
+        '''Recursive map function. Maintains type of iterables'''
+        return (type(data)(_deep_map(f, x) for x in data)
+                if hasattr(data, '__iter__')
+                else f(data))
+    return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
