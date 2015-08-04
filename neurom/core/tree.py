@@ -110,7 +110,7 @@ def ibifurcation_point(tree):
 def isegment(tree, iter_mode=ipreorder):
     '''Iterate over segments
 
-    Args:
+    Parameters:
         tree: the tree over which to iterate
         iter_mode: iteration mode. Default: ipreorder.
     '''
@@ -148,10 +148,14 @@ def val_iter(tree_iterator):
     return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
 
 
-def isection(tree):
+def isection(tree, iter_mode=ipreorder):
     '''Iterator to sections of a tree.
 
     Resolves to a tuple of sub-trees forming a section.
+
+    Parameters:
+        tree: the tree over which to iterate
+        iter_mode: iteration mode. Default: ipreorder.
     '''
     def get_section(tree):
         '''get the upstream section starting from this tree'''
@@ -169,4 +173,4 @@ def isection(tree):
         return not is_root(n) and (is_leaf(n) or is_forking_point(n))
 
     return imap(get_section,
-                ifilter(seed_node, ipreorder(tree)))
+                ifilter(seed_node, iter_mode(tree)))

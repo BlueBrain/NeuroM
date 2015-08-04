@@ -281,3 +281,18 @@ def test_section_iteration():
 
     for i, s in enumerate(isection(REF_TREE2)):
         nt.assert_equal(REF_SECTIONS[i], tuple(tt.value for tt in s))
+
+
+def test_section_upstream_iteration():
+    leaves = [l for l in ileaf(REF_TREE2)]
+    ref_paths = [
+        [(1111, 11111), (11, 111, 1111), (0, 11)],
+        [(1111, 11112), (11, 111, 1111), (0, 11)],
+        [(1111, 11113), (11, 111, 1111), (0, 11)],
+        [(11, 112), (0, 11)],
+        [(1211, 12111), (12, 121, 1211), (0, 12)],
+        [(1211, 12112), (12, 121, 1211), (0, 12)],
+        [(12, 122), (0, 12)]]
+
+    for l, ref in zip(leaves, ref_paths):
+        nt.assert_equal([s for s in val_iter(isection(l, iupstream))], ref)
