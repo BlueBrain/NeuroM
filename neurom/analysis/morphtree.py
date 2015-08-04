@@ -137,7 +137,7 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
 
     Parameters:
         tree: tree object
-        pos: origin to which disrances are measured. It must have at least 3\
+        pos: origin to which distances are measured. It must have at least 3\
             components. The first 3 components are (x, y, z).\
             (default tree origin)
 
@@ -146,9 +146,24 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
 
     '''
     pos = tree.value if pos is None else pos
-    seg_idx = 0 if use_start_point else -1
-    return imap(lambda s: point_dist(s[seg_idx], pos),
+    sec_idx = 0 if use_start_point else -1
+    return imap(lambda s: point_dist(s[sec_idx], pos),
                 tr.val_iter(tr.isection(tree)))
+
+
+def i_section_path_length(tree, use_start_point=False):
+    '''Return an iterator of path lengths of tree sections
+
+    Path lengths are measured to the tree's root.
+
+    Parameters:
+        tree: tree object
+        use_start_point: If true, calculate path length from section start point,\
+            else from end-point (default, False)
+
+    '''
+    sec_idx = 0 if use_start_point else -1
+    return imap(lambda s: path_length(s[sec_idx]), tr.isection(tree))
 
 
 def find_tree_type(tree):

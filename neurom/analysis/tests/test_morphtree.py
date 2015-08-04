@@ -40,13 +40,14 @@ from neurom.analysis.morphtree import segment_radius
 from neurom.analysis.morphtree import i_segment_radius
 from neurom.analysis.morphtree import segment_radial_dist
 from neurom.analysis.morphtree import i_segment_radial_dist
-from neurom.analysis.morphtree import i_section_radial_dist
+from neurom.analysis.morphtree import i_segment_meander_angle
 from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import get_tree_type
 from neurom.analysis.morphtree import i_section_length
-from neurom.analysis.morphtree import i_segment_meander_angle
+from neurom.analysis.morphtree import i_section_path_length
+from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
@@ -226,6 +227,22 @@ def test_i_section_radial_dists():
                     [0.0, 5.0, 5.0])
 
     nt.assert_equal([d for d in i_section_radial_dist(T2, p0, use_start_point=True)],
+                    [0.0, 5.0, 5.0])
+
+
+def test_i_section_path_length():
+    T1 = form_simple_tree()
+    T2 = form_neuron_tree()
+
+    nt.assert_equal([d for d in i_section_path_length(T1)],
+                    [8.0, 8.0])
+
+    nt.assert_equal([d for d in i_section_path_length(T1, use_start_point=True)],
+                    [0.0, 0.0])
+
+    nt.assert_equal([d for d in i_section_path_length(T2)], [5.0, 9.0, 9.0])
+
+    nt.assert_equal([d for d in i_section_path_length(T2, use_start_point=True)],
                     [0.0, 5.0, 5.0])
 
 
