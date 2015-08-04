@@ -64,7 +64,7 @@ def segment_radial_dist(seg, pos):
     The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
 
-    Args:
+    Parameters:
         seg: tree segment
 
         pos: origin to which disrances are measured. It must have at lease 3
@@ -97,7 +97,7 @@ def i_segment_radial_dist(pos, tree):
     The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
 
-    Args:
+    Parameters:
         pos: origin to which disrances are measured. It must have at least 3
         components. The first 3 components are (x, y, z).
 
@@ -127,6 +127,28 @@ def i_local_bifurcation_angle(tree):
                                         t.children[0].value,
                                         t.children[1].value),
                 tr.ibifurcation_point(tree))
+
+
+def i_section_radial_dist(tree, pos=None, use_start_point=False):
+    '''Return an iterator of radial distances of tree sections to a given point
+
+    The radial distance is the euclidian distance between the either the
+    end-point or rhe start point of the section and the point in question.
+
+    Parameters:
+        tree: tree object
+        pos: origin to which disrances are measured. It must have at least 3\
+            components. The first 3 components are (x, y, z).\
+            (default tree origin)
+
+        use_start_point: If true, calculate distance from section start point,\
+            else from end-point (default, False)
+
+    '''
+    pos = tree.value if pos is None else pos
+    seg_idx = 0 if use_start_point else -1
+    return imap(lambda s: point_dist(s[seg_idx], pos),
+                tr.val_iter(tr.isection(tree)))
 
 
 def find_tree_type(tree):

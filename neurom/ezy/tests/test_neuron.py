@@ -38,6 +38,7 @@ from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
+from neurom.analysis.morphtree import i_section_radial_dist
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -74,6 +75,16 @@ class TestEzyNeuron(object):
         self.seglen = []
         for t in self.neuron._nrn.neurite_trees:
             self.seglen.extend(ll for ll in i_segment_length(t))
+
+        self.sec_rad_dist = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.sec_rad_dist.extend(ll for ll in i_section_radial_dist(t))
+
+        self.sec_rad_dist_start = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.sec_rad_dist_start.extend(
+                ll for ll in i_section_radial_dist(t, use_start_point=True))
+
 
         self.local_bifangles = []
         for t in self.neuron._nrn.neurite_trees:
@@ -159,6 +170,20 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(s), 0)
 
 
+    def test_get_section_radial_distances_endpoint(self):
+        rad_dists = self.neuron.get_section_radial_distances()
+        nt.assert_true(self.sec_rad_dist != self.sec_rad_dist_start)
+        nt.assert_equal(len(rad_dists), 84)
+        nt.assert_true(np.all(rad_dists == self.sec_rad_dist))
+
+    def test_get_section_radial_distances_start_point(self):
+        rad_dists = self.neuron.get_section_radial_distances(use_start_point=True)
+        nt.assert_equal(len(rad_dists), 84)
+        nt.assert_true(np.all(rad_dists == self.sec_rad_dist_start))
+
+    def test_get_section_radial_axon(self):
+        rad_dists = self.neuron.get_section_radial_distances(neurite_type=TreeType.axon)
+        nt.assert_equal(len(rad_dists), 21)
 
     def test_get_n_sections(self):
         nt.assert_equal(self.neuron.get_n_sections(), 84)

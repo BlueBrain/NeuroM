@@ -1,6 +1,7 @@
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
+
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,6 +35,7 @@ from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
+from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
 import numpy as np
@@ -97,6 +99,22 @@ class Neuron(object):
         the first segments of the bifurcation branches.
         '''
         return self._neurite_loop(neurite_type, i_local_bifurcation_angle)
+
+    def get_section_radial_distances(self, origin=None, use_start_point=False,
+                                     neurite_type=TreeType.all):
+        '''Get an iterable containing section radial distances to origin of\
+           all neurites of a given type
+
+        Parameters:
+            origin: Point wrt which radial dirtance is calulated\
+                    (default tree root)
+            use_start_point: if true, use the section's first point,\
+                             otherwise use the end-point (default False)
+            neurite_type: Type of neurites to be considered (default all)
+        '''
+        return self._neurite_loop(neurite_type,
+                                  lambda t: i_section_radial_dist(t, origin,
+                                                                  use_start_point))
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
