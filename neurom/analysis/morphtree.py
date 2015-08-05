@@ -36,6 +36,7 @@ from neurom.analysis.morphmath import angle_3points
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 from neurom.core.tree import ipreorder
+from neurom.core.tree import i_branch_end_points
 import numpy as np
 import logging
 
@@ -127,6 +128,18 @@ def i_local_bifurcation_angle(tree):
                                         t.children[0].value,
                                         t.children[1].value),
                 tr.ibifurcation_point(tree))
+
+
+def i_remote_bifurcation_angle(tree):
+    '''Return the opening angle between the last segments of two out-going
+    sections of a bifurcation point
+    '''
+    def _remangle(t):
+        '''Helper to calculate the remote angle'''
+        end_points = tuple(p for p in i_branch_end_points(t))
+        return angle_3points(t.value, end_points[0].value, end_points[1].value)
+
+    return imap(_remangle, tr.ibifurcation_point(tree))
 
 
 def i_section_radial_dist(tree, pos=None, use_start_point=False):

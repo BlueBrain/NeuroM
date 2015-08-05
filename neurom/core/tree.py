@@ -170,6 +170,35 @@ def itriplet(tree):
                       ipreorder(tree))))
 
 
+def i_branch_end_points(fork_point):
+    '''Iterate over the furthest points in forking sections
+
+    Parameters:
+        fork_point: A tree object which is a forking point
+
+    Returns:
+        An iterator with end-points of the sections forking out\
+            of fork_point
+    '''
+
+    def next_end_point(tree):
+        '''Get the next node of a tree which is a section end-point
+        '''
+        i = ipreorder(tree)
+        while True:
+            n = i.next()
+            if is_section_end_point(n):
+                break
+        return n
+
+    def is_section_end_point(tree):
+        '''Is this tree a section end point???
+        '''
+        return (not is_root(tree)) and (is_forking_point(tree) or is_leaf(tree))
+
+    return imap(next_end_point, fork_point.children)
+
+
 def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
     def _deep_map(f, data):

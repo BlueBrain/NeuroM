@@ -42,6 +42,7 @@ from neurom.core.tree import iforking_point
 from neurom.core.tree import ibifurcation_point
 from neurom.core.tree import isection
 from neurom.core.tree import val_iter
+from neurom.core.tree import i_branch_end_points
 from copy import deepcopy
 
 REF_TREE = Tree(0)
@@ -324,3 +325,24 @@ def test_section_upstream_iteration():
 
     for l, ref in zip(leaves, ref_paths):
         nt.assert_equal([s for s in val_iter(isection(l, iupstream))], ref)
+
+
+
+def test_branch_end_points():
+
+    def _build_tuple(tree):
+        return tuple(p for p in val_iter(i_branch_end_points(tree)))
+
+    nt.assert_equal(_build_tuple(REF_TREE2), (11, 12))
+    nt.assert_equal(_build_tuple(REF_TREE2), (11, 12))
+    nt.assert_equal(_build_tuple(REF_TREE2.children[0]), (1111, 112))
+    nt.assert_equal(_build_tuple(REF_TREE2.children[1]), (1211, 122))
+
+    nt.assert_equal(_build_tuple(REF_TREE2.children[0].children[0]), (1111,))
+    nt.assert_equal(len(_build_tuple(REF_TREE2.children[0].children[1])), 0)
+
+    nt.assert_equal(_build_tuple(REF_TREE2.children[1].children[0]), (1211,))
+    nt.assert_equal(len(_build_tuple(REF_TREE2.children[1].children[1])), 0)
+
+    nt.assert_equal(_build_tuple(REF_TREE2.children[0].children[0].children[0]),
+                    (11111, 11112, 11113))

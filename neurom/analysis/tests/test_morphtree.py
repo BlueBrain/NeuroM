@@ -34,6 +34,7 @@ from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
 from neurom.analysis.morphmath import point_dist
+from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import segment_radius
@@ -49,6 +50,7 @@ from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_local_bifurcation_angle
+from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
 import math
@@ -255,9 +257,29 @@ def test_i_segment_meander_angles():
 
 def test_i_local_bifurcation_angles():
     T = form_branching_tree()
-    ref = [math.pi * a for a in (0.25, 0.5, 0.25)]
+    ref = (0.25, 0.5, 0.25)  # ref angles in pi radians
     for i, b in enumerate(i_local_bifurcation_angle(T)):
+        nt.assert_almost_equal(b / math.pi, ref[i])
+
+
+def test_i_remote_bifurcation_angles():
+    T = form_branching_tree()
+
+    # (fork point, end point, end point) tuples calculated by hand
+    # from form_branching_tree
+    refs = (((0, 4, 0), (0, 5, 0), (15, 15, 0)),
+            ((0, 5, 0), (4, 5, 0), (0, 5, 3)),
+            ((0, 5, 3), (0, 6, 3), (0, 6, 4)))
+
+    ref_angles = tuple(angle_3points(p[0], p[1], p[2]) / math.pi for p in refs)
+    ref = (0.2985898, 0.5, 0.25)  # ref angles in pi radians
+    # sanity check
+    for i, b in enumerate(ref_angles):
         nt.assert_almost_equal(b, ref[i])
+
+    for i, b in enumerate(i_remote_bifurcation_angle(T)):
+        nt.assert_almost_equal(b / math.pi, ref_angles[i])
+        nt.assert_almost_equal(b / math.pi, ref[i])
 
 
 def test_n_sections():
