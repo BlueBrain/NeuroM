@@ -35,6 +35,7 @@ from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
+from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
@@ -93,12 +94,27 @@ class Neuron(object):
         return self._neurite_loop(neurite_type, i_segment_length)
 
     def get_local_bifurcation_angles(self, neurite_type=TreeType.all):
-        '''Get an iterable containing the local bifircation angles of all segments of a given type
+        '''Get local bifircation angles of all segments of a given type
 
         The local bifurcation angle is defined as the angle between
         the first segments of the bifurcation branches.
+
+        Returns:
+            Iterable containing bifurcation angles in radians
         '''
         return self._neurite_loop(neurite_type, i_local_bifurcation_angle)
+
+    def get_remote_bifurcation_angles(self, neurite_type=TreeType.all):
+        '''Get remote bifircation angles of all segments of a given type
+
+        The remote bifurcation angle is defined as the angle between
+        the lines joining the bifurcation point to the last points
+        of the bifurcated sections.
+
+        Returns:
+            Iterable containing bifurcation angles in radians
+        '''
+        return self._neurite_loop(neurite_type, i_remote_bifurcation_angle)
 
     def get_section_radial_distances(self, origin=None, use_start_point=False,
                                      neurite_type=TreeType.all):

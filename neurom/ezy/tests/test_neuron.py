@@ -38,6 +38,7 @@ from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
+from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -85,10 +86,13 @@ class TestEzyNeuron(object):
             self.sec_rad_dist_start.extend(
                 ll for ll in i_section_radial_dist(t, use_start_point=True))
 
-
         self.local_bifangles = []
         for t in self.neuron._nrn.neurite_trees:
             self.local_bifangles.extend(a for a in i_local_bifurcation_angle(t))
+
+        self.remote_bifangles = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.remote_bifangles.extend(a for a in i_remote_bifurcation_angle(t))
 
     def test_get_section_lengths(self):
         seclen = self.neuron.get_section_lengths()
@@ -167,6 +171,32 @@ class TestEzyNeuron(object):
         s = self.neuron.get_local_bifurcation_angles(TreeType.soma)
         nt.assert_equal(len(s), 0)
         s = self.neuron.get_local_bifurcation_angles(TreeType.undefined)
+        nt.assert_equal(len(s), 0)
+
+    def test_get_remote_bifurcation_angles(self):
+        remote_bifangles = self.neuron.get_remote_bifurcation_angles()
+        nt.assert_equal(len(remote_bifangles), 40)
+        nt.assert_true(np.all(remote_bifangles == self.remote_bifangles))
+        remote_bifangles = self.neuron.get_remote_bifurcation_angles(TreeType.all)
+        nt.assert_equal(len(remote_bifangles), 40)
+        nt.assert_true(np.all(remote_bifangles == self.remote_bifangles))
+
+    def test_get_remote_bifurcation_angles_axon(self):
+        s = self.neuron.get_remote_bifurcation_angles(TreeType.axon)
+        nt.assert_equal(len(s), 10)
+
+    def test_get_remote_bifurcation_angles_basal(self):
+        s = self.neuron.get_remote_bifurcation_angles(TreeType.basal_dendrite)
+        nt.assert_equal(len(s), 20)
+
+    def test_get_remote_bifurcation_angles_apical(self):
+        s = self.neuron.get_remote_bifurcation_angles(TreeType.apical_dendrite)
+        nt.assert_equal(len(s), 10)
+
+    def test_get_remote_bifurcation_angles_invalid(self):
+        s = self.neuron.get_remote_bifurcation_angles(TreeType.soma)
+        nt.assert_equal(len(s), 0)
+        s = self.neuron.get_remote_bifurcation_angles(TreeType.undefined)
         nt.assert_equal(len(s), 0)
 
 
