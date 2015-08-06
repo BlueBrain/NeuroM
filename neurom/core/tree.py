@@ -207,3 +207,9 @@ def val_iter(tree_iterator):
                 if hasattr(data, '__iter__')
                 else f(data))
     return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
+
+
+def imap_val(f, tree_iterator):
+    '''Map function f to value of tree_iterator's target
+    '''
+    return imap(f, val_iter(tree_iterator))

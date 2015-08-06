@@ -35,8 +35,6 @@ from neurom.analysis.morphmath import path_distance
 from neurom.analysis.morphmath import angle_3points
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
-from neurom.core.tree import ipreorder
-from neurom.core.tree import i_branch_end_points
 import numpy as np
 import logging
 
@@ -76,20 +74,20 @@ def segment_radial_dist(seg, pos):
 
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
-    return np.sum(segment_length(s)
-                  for s in tr.val_iter(tr.isegment(tree, tr.iupstream)))
+    return np.sum(s for s in
+                  tr.imap_val(segment_length, tr.isegment(tree, tr.iupstream)))
 
 
 def i_segment_length(tree):
     ''' return an iterator of tree segment lengths
     '''
-    return imap(segment_length, tr.val_iter(tr.isegment(tree)))
+    return tr.imap_val(segment_length, tr.isegment(tree))
 
 
 def i_segment_radius(tree):
     ''' return an iterator of tree segment radii
     '''
-    return imap(segment_radius, tr.val_iter(tr.isegment(tree)))
+    return tr.imap_val(segment_radius, tr.isegment(tree))
 
 
 def i_segment_radial_dist(pos, tree):
@@ -105,8 +103,7 @@ def i_segment_radial_dist(pos, tree):
         tree: tree of raw data rows.
 
     '''
-    return imap(lambda s: segment_radial_dist(s, pos),
-                tr.val_iter(tr.isegment(tree)))
+    return tr.imap_val(lambda s: segment_radial_dist(s, pos), tr.isegment(tree))
 
 
 def i_segment_meander_angle(tree):
@@ -116,8 +113,7 @@ def i_segment_meander_angle(tree):
     Applies neurom.morphmath.angle_3points to triplets of
     '''
 
-    return imap(lambda t: angle_3points(t[1], t[0], t[2]),
-                tr.val_iter(tr.itriplet(tree)))
+    return tr.imap_val(lambda t: angle_3points(t[1], t[0], t[2]), tr.itriplet(tree))
 
 
 def i_local_bifurcation_angle(tree):
@@ -136,7 +132,7 @@ def i_remote_bifurcation_angle(tree):
     '''
     def _remangle(t):
         '''Helper to calculate the remote angle'''
-        end_points = tuple(p for p in i_branch_end_points(t))
+        end_points = tuple(p for p in tr.i_branch_end_points(t))
         return angle_3points(t.value, end_points[0].value, end_points[1].value)
 
     return imap(_remangle, tr.ibifurcation_point(tree))
@@ -160,8 +156,7 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''
     pos = tree.value if pos is None else pos
     sec_idx = 0 if use_start_point else -1
-    return imap(lambda s: point_dist(s[sec_idx], pos),
-                tr.val_iter(tr.isection(tree)))
+    return tr.imap_val(lambda s: point_dist(s[sec_idx], pos), tr.isection(tree))
 
 
 def i_section_path_length(tree, use_start_point=False):
@@ -194,6 +189,7 @@ def find_tree_type(tree):
     tree_types = tuple(TreeType)
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
+    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 
     return tree_types[int(np.median(types))]
 
@@ -220,7 +216,7 @@ def i_section_length(tree):
     """
     Return an iterator of tree section lengths
     """
-    return imap(path_distance, tr.val_iter(tr.isection(tree)))
+    return tr.imap_val(path_distance, tr.isection(tree))
 
 
 def n_sections(tree):
@@ -238,11 +234,11 @@ def get_bounding_box(tree):
     [xmax, ymax, zmax]]
     """
 
-    min_x = min(p[0] for p in val_iter(ipreorder(tree)))
-    min_y = min(p[1] for p in val_iter(ipreorder(tree)))
-    min_z = min(p[2] for p in val_iter(ipreorder(tree)))
-    max_x = max(p[0] for p in val_iter(ipreorder(tree)))
-    max_y = max(p[1] for p in val_iter(ipreorder(tree)))
-    max_z = max(p[2] for p in val_iter(ipreorder(tree)))
+    min_x = min(p[0] for p in val_iter(tr.ipreorder(tree)))
+    min_y = min(p[1] for p in val_iter(tr.ipreorder(tree)))
+    min_z = min(p[2] for p in val_iter(tr.ipreorder(tree)))
+    max_x = max(p[0] for p in val_iter(tr.ipreorder(tree)))
+    max_y = max(p[1] for p in val_iter(tr.ipreorder(tree)))
+    max_z = max(p[2] for p in val_iter(tr.ipreorder(tree)))
 
     return np.array([[min_x, min_y, min_z], [max_x, max_y, max_z]])
