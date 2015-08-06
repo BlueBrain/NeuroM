@@ -37,6 +37,7 @@ from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
+from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
 import numpy as np
@@ -131,6 +132,23 @@ class Neuron(object):
         return self._neurite_loop(neurite_type,
                                   lambda t: i_section_radial_dist(t, origin,
                                                                   use_start_point))
+
+    def get_section_path_lengths(self, use_start_point=False,
+                                 neurite_type=TreeType.all):
+        '''Get section path lengths of all neurites of a given type
+
+        The section path length is measured to the neurite's root.
+
+        Parameters:
+            use_start_point: if true, use the section's first point,\
+                             otherwise use the end-point (default False)
+            neurite_type: Type of neurites to be considered (default all)
+
+        Returns:
+            Iterable containing the section path lengths.
+        '''
+        return self._neurite_loop(neurite_type,
+                                  lambda t: i_section_path_length(t, use_start_point))
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''

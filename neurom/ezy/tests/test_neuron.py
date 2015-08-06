@@ -36,10 +36,10 @@ from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
-from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
+from neurom.analysis.morphtree import i_section_path_length
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -85,6 +85,15 @@ class TestEzyNeuron(object):
         for t in self.neuron._nrn.neurite_trees:
             self.sec_rad_dist_start.extend(
                 ll for ll in i_section_radial_dist(t, use_start_point=True))
+
+        self.sec_path_len = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.sec_path_len.extend(ll for ll in i_section_path_length(t))
+
+        self.sec_path_len_start = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.sec_path_len_start.extend(
+                ll for ll in i_section_path_length(t, use_start_point=True))
 
         self.local_bifangles = []
         for t in self.neuron._nrn.neurite_trees:
@@ -214,6 +223,22 @@ class TestEzyNeuron(object):
     def test_get_section_radial_axon(self):
         rad_dists = self.neuron.get_section_radial_distances(neurite_type=TreeType.axon)
         nt.assert_equal(len(rad_dists), 21)
+
+    def test_get_section_path_lengths_endpoint(self):
+        path_lengths = self.neuron.get_section_path_lengths()
+        nt.assert_true(self.sec_path_len != self.sec_path_len_start)
+        nt.assert_equal(len(path_lengths), 84)
+        nt.assert_true(np.all(path_lengths == self.sec_path_len))
+
+    def test_get_section_path_lengths_start_point(self):
+        path_lengths = self.neuron.get_section_path_lengths(use_start_point=True)
+        nt.assert_equal(len(path_lengths), 84)
+        nt.assert_true(np.all(path_lengths == self.sec_path_len_start))
+
+    def test_get_section_path_length_axon(self):
+        path_lengths = self.neuron.get_section_path_lengths(neurite_type=TreeType.axon)
+        nt.assert_equal(len(path_lengths), 21)
+
 
     def test_get_n_sections(self):
         nt.assert_equal(self.neuron.get_n_sections(), 84)
