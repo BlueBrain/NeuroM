@@ -224,19 +224,19 @@ class TestEzyNeuron(object):
         rad_dists = self.neuron.get_section_radial_distances(neurite_type=TreeType.axon)
         nt.assert_equal(len(rad_dists), 21)
 
-    def test_get_section_path_lengths_endpoint(self):
-        path_lengths = self.neuron.get_section_path_lengths()
+    def test_get_section_path_distances_endpoint(self):
+        path_lengths = self.neuron.get_section_path_distances()
         nt.assert_true(self.sec_path_len != self.sec_path_len_start)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == self.sec_path_len))
 
-    def test_get_section_path_lengths_start_point(self):
-        path_lengths = self.neuron.get_section_path_lengths(use_start_point=True)
+    def test_get_section_path_distances_start_point(self):
+        path_lengths = self.neuron.get_section_path_distances(use_start_point=True)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == self.sec_path_len_start))
 
-    def test_get_section_path_length_axon(self):
-        path_lengths = self.neuron.get_section_path_lengths(neurite_type=TreeType.axon)
+    def test_get_section_path_distances_axon(self):
+        path_lengths = self.neuron.get_section_path_distances(neurite_type=TreeType.axon)
         nt.assert_equal(len(path_lengths), 21)
 
 
