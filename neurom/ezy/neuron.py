@@ -175,16 +175,16 @@ class Neuron(object):
         return self._nrn.neurite_trees if (neurite_type is TreeType.all) else(
             [t for t in self._nrn.neurite_trees if t.type is neurite_type])
 
-    def plot(self, *args, **kwargs):
-        '''Make a 2D plot of this neuron
-
+    def view(self, *args, **kwargs):
+        '''
+        Generates a 2D viewer of the neuron
         Forwards arguments to neurom.view.view.neuron()
         '''
         return view.neuron(self._nrn, *args, **kwargs)
 
-    def plot3d(self, *args, **kwargs):
-        '''Make a 3D plot of this neuron
-
+    def view3d(self, *args, **kwargs):
+        '''
+        Generates a 3D viewer of the neuron
         Forwards arguments to neurom.view.view.neuron3d()
         '''
         return view.neuron3d(self._nrn, *args, **kwargs)
