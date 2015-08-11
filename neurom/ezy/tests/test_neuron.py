@@ -138,6 +138,9 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == self.seglen))
 
+    def test_get_soma_radius(self):
+        nt.ok_(np.allclose(self.neuron.get_soma_radius(), 0.17071))
+
     def test_get_segment_lengths_axon(self):
         s = self.neuron.get_segment_lengths(TreeType.axon)
         nt.assert_equal(len(s), 210)

@@ -94,6 +94,10 @@ class Neuron(object):
         '''Get an iterable containing the lengths of all segments of a given type'''
         return self._neurite_loop(neurite_type, i_segment_length)
 
+    def get_soma_radius(self):
+        '''Get the radius of the soma'''
+        return self._nrn.soma.radius
+
     def get_local_bifurcation_angles(self, neurite_type=TreeType.all):
         '''Get local bifircation angles of all segments of a given type
 
