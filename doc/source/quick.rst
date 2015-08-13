@@ -39,7 +39,7 @@ load neuron morphology from a file into ``neurom`` data structures. It provides 
 methods to query various properties of the neuron. The functionality is limited, but it
 is hoped that it will suffice for most analyses. 
 
-The following properties can be obtained for a single neurite type or for all
+These are some of the properties can be obtained for a single neurite type or for all
 neurites regardless of type:
 
 * Segment lengths
@@ -47,8 +47,12 @@ neurites regardless of type:
 * Number of sections
 * Number of sections per neurite
 * Number of neurites
+* Local and remote bifurcation angles
+* Section path distances
+* Section radial distances
 
-There are also methods for plotting a neuron in 2 and 3 dimensions.
+There are also methods for obtaining the soma radius and for plotting a neuron
+in 2 and 3 dimensions.
 
 See :py:class:`neurom.ezy.neuron.Neuron` for more details and examples.
 
