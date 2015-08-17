@@ -95,7 +95,7 @@ Note you do not have to work in the ``nrm`` directory. This is where python pack
 NeuroM installation
 -------------------
 
-Once the ``virtualenv`` is set up, there are three ways to install ``hbp-neurom``
+Once the ``virtualenv`` is set up, there are three ways to install ``NeuroM``
 
 #. From the internal BBP PyPI server (restricted access)
 #. From the git repository
@@ -128,13 +128,13 @@ Install the latest version:
 
 .. code-block:: bash
 
-    (nrm)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
 
 Install a particular release:
 
 .. code-block:: bash
 
-    (nrm)$ pip install git+https://bbpcode.epfl.ch/code/p/algorithms/hbp-neurom.git@neurom-v0.0.1
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@neurom-v0.0.1
 
 Install from source
 ^^^^^^^^^^^^^^^^^^^
@@ -143,10 +143,10 @@ Clone the repository and install it:
 
 .. code-block:: bash
 
-    (nrm)$ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
-    (nrm)$ pip install -e ./hbp-neurom
+    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
+    (nrm)$ pip install -e ./NeuroM
 
-This installs ``hbp-neurom`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
+This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
 To install in read-only mode, omit the ``-e``.
 
 Running the tests
@@ -160,8 +160,8 @@ Use the provided ``Makefile`` to run the tests using ``make``:
 
 .. code-block:: bash
 
-    $ git clone ssh://bbpcode.epfl.ch/algorithms/hbp-neurom
-    $ cd hbp-neurom
+    $ git clone https://github.com/BlueBrain/NeuroM.git
+    $ cd NeuroM
     $ make test
 
 The ``Makefile`` also has targets for running pylint and pep8:
@@ -193,7 +193,7 @@ there's a ``make`` target to build the HTML version of the documentation:
 
 .. code-block:: bash
 
-    $ cd hbp-neurom # repository location
+    $ cd NeuroM # repository location
     $ make doc
 
 This builds the documentation in ``doc/build``.
