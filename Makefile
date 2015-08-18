@@ -48,7 +48,7 @@ run_tests_xunit: neurom_test_venv
 
 lint: run_pep8 run_pylint
 
-test: run_tests
+test: lint run_tests
 
 doc:  neurom_test_venv
 	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
