@@ -167,7 +167,9 @@ Use the provided ``Makefile`` to run the tests using ``make``:
     $ cd NeuroM
     $ make test
 
-The ``Makefile`` also has targets for running pylint and pep8:
+This runs ``pep8``, ``pylint`` and the unit tests in sequence.
+
+The ``Makefile`` also has targets for running only pylint and pep8 individually:
 
 .. code-block:: bash
 

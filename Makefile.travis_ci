@@ -26,42 +26,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+# This makefile is intended for use with travis CI. It assumes NeuroM and dependencies
+# have already been installed.
+# DO NOT USE OUTSIDE OF TRAVIS CI
 
-neurom_test_venv:
-	virtualenv --system-site-packages neurom_test_venv
-	neurom_test_venv/bin/pip install --ignore-installed -r requirements_dev.txt
-	neurom_test_venv/bin/pip install -e .
+# Test coverage pass threshold (percent)
+MIN_COV ?= 100
 
-run_pep8: neurom_test_venv
-	neurom_test_venv/bin/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
+run_pep8:
+	pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
 
-run_pylint: neurom_test_venv
-	neurom_test_venv/bin/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
+run_pylint:
+	pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
 
-run_tests: neurom_test_venv
-	neurom_test_venv/bin/nosetests -v --with-coverage --cover-package neurom
-
-run_tests_xunit: neurom_test_venv
-	@mkdir -p $(ROOT_DIR)/test-reports
-	neurom_test_venv/bin/nosetests neurom --with-coverage --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
+run_tests:
+	nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
 
 lint: run_pep8 run_pylint
 
 test: lint run_tests
 
-doc:  neurom_test_venv
-	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
-
-clean_test_venv:
-	@rm -rf neurom_test_venv
-	@rm -rf $(ROOT_DIR)/test-reports
+doc:
+	make -C doc html
 
 clean_doc:
-	@test -x $(ROOT_DIR)/neurom_test_venv/bin/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build  -C doc clean || true
+	make -C doc clean
 
-clean: clean_doc clean_test_venv
+clean: clean_doc
 	@rm -f pep8.txt
 	@rm -f pylint.txt
 
-.PHONY: run_pep8 test clean_test_venv clean doc
+.PHONY: run_pep8 test clean doc
