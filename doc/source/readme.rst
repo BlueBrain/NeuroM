@@ -29,7 +29,8 @@
 NeuroM
 ******
 
-[![Build Status](https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master)](https://travis-ci.org/BlueBrain/NeuroM)
+.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
+    :target: https://travis-ci.org/BlueBrain/NeuroM
 
 Introduction
 ============
