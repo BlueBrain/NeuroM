@@ -12,5 +12,6 @@ install:
   - pip install --ignore-installed -r requirements_dev.txt
   - pip install matplotlib==1.3.1
   - pip install .
+cache: pip
 script:
   - make -f Makefile.travis_ci test
