@@ -7,5 +7,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install python-numpy
   - sudo apt-get install python-h5py
+install:
+  - pip install --ignore-installed -r requirements_dev.txt
+  - pip install .
 script:
-  - make lint && make test
+  - make -f Makefile.travis_ci test
