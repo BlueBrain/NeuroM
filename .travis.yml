@@ -8,7 +8,9 @@ before_install:
   - sudo apt-get install python-numpy
   - sudo apt-get install python-h5py
 install:
+  - pip install --upgrade pip
   - pip install --ignore-installed -r requirements_dev.txt
+  - pip install matplotlib==1.3.1
   - pip install .
 script:
   - make -f Makefile.travis_ci test

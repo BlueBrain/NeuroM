@@ -39,6 +39,7 @@ API Documentation
    neurom.io.readers
    neurom.io.check
    neurom.core
+   neurom.core.types
    neurom.core.tree
    neurom.core.neuron
    neurom.core.point
