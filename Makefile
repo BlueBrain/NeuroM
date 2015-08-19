@@ -28,40 +28,52 @@
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-neurom_test_venv:
-	virtualenv --system-site-packages neurom_test_venv
-	neurom_test_venv/bin/pip install --ignore-installed -r requirements_dev.txt
-	neurom_test_venv/bin/pip install -e .
+VENV := neurom_test_venv
+VENV_BIN := $(VENV)/bin
 
-run_pep8: neurom_test_venv
-	neurom_test_venv/bin/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
+# simulate running in headless mode
+unexport DISPLAY
 
-run_pylint: neurom_test_venv
-	neurom_test_venv/bin/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
+# Test coverage pass threshold (percent)
+MIN_COV ?= 100
 
-run_tests: neurom_test_venv
-	neurom_test_venv/bin/nosetests -v --with-coverage --cover-package neurom
+$(VENV):
+	virtualenv --system-site-packages $(VENV)
+	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
+	$(VENV_BIN)/pip install -e .
 
-run_tests_xunit: neurom_test_venv
+run_pep8: $(VENV)
+	$(VENV_BIN)/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
+
+run_pylint: $(VENV)
+	$(VENV_BIN)/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
+
+run_tests: $(VENV)
+	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
+
+run_tests_xunit: $(VENV)
 	@mkdir -p $(ROOT_DIR)/test-reports
-	neurom_test_venv/bin/nosetests neurom --with-coverage --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
+	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
 
 lint: run_pep8 run_pylint
 
 test: lint run_tests
 
-doc:  neurom_test_venv
-	make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build -C doc html
+doc: $(VENV)
+	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc html
 
 clean_test_venv:
-	@rm -rf neurom_test_venv
+	@rm -rf $(VENV)
 	@rm -rf $(ROOT_DIR)/test-reports
 
 clean_doc:
-	@test -x $(ROOT_DIR)/neurom_test_venv/bin/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/neurom_test_venv/bin/sphinx-build  -C doc clean || true
+	@test -x $(ROOT_DIR)/$(VENV_BIN)/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build  -C doc clean || true
 
 clean: clean_doc clean_test_venv
 	@rm -f pep8.txt
 	@rm -f pylint.txt
+	@rm -rf neurom.egg-info
+	@rm -f .coverage
+	@rm -rf test-reports
 
 .PHONY: run_pep8 test clean_test_venv clean doc
