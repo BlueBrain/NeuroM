@@ -246,8 +246,3 @@ Examples
     >>> # Initialize nrn as above
     >>> fig, ax = nrn.plot()
     >>> fig.show()
-
-- Abstract morphometrics:
-
-.. todo::
-    Figure out what this means and add examples
