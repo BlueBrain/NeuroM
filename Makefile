@@ -62,6 +62,9 @@ test: lint run_tests
 doc: $(VENV)
 	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc html
 
+doc_pdf: $(VENV)
+	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc latexpdf
+
 clean_test_venv:
 	@rm -rf $(VENV)
 	@rm -rf $(ROOT_DIR)/test-reports
