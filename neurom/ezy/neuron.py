@@ -31,9 +31,12 @@
 
 from neurom.io.utils import load_neuron
 from neurom.core.types import TreeType
+from neurom.core.types import checkTreeType
+from neurom.core.tree import isection
+from neurom.core.tree import isegment
+from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import set_tree_type
-from neurom.analysis.morphtree import i_section_length
-from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
@@ -41,7 +44,6 @@ from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
 import numpy as np
-from itertools import chain
 
 
 class Neuron(object):
@@ -88,11 +90,11 @@ class Neuron(object):
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
-        return self._neurite_loop(neurite_type, i_section_length)
+        return self._neurite_loop(neurite_type, isection, path_distance)
 
     def get_segment_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''
-        return self._neurite_loop(neurite_type, i_segment_length)
+        return self._neurite_loop(neurite_type, isegment, segment_length)
 
     def get_soma_radius(self):
         '''Get the radius of the soma'''
@@ -161,28 +163,29 @@ class Neuron(object):
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
-        return sum([n_sections(t) for t in self._filter_neurites(neurite_type)])
+        return sum(n_sections(t) for t in self._nrn.neurite_trees
+                   if checkTreeType(neurite_type, t.type))
 
     def get_n_sections_per_neurite(self, neurite_type=TreeType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
-        neurites = self._filter_neurites(neurite_type)
-        return self._iterable_type([n_sections(n) for n in neurites])
+        return self._iterable_type(
+            [n_sections(n) for n in self._nrn.neurite_trees
+             if checkTreeType(neurite_type, n.type)]
+        )
 
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
-        return len(self._filter_neurites(neurite_type))
+        return sum(1 for n in self._nrn.neurite_trees
+                   if checkTreeType(neurite_type, n.type))
 
-    def _neurite_loop(self, neurite_type, iterator_type):
+    def _neurite_loop(self, neurite_type, iterator_type, mapping=None):
         '''Iterate over collection of neurites applying iterator_type
         '''
-        neurites = self._filter_neurites(neurite_type)
-        l = [[i for i in iterator_type(t)] for t in neurites]
-        return self._iterable_type([i for i in chain(*l)])
-
-    def _filter_neurites(self, neurite_type):
-        '''Filter neurites by type'''
-        return self._nrn.neurite_trees if (neurite_type is TreeType.all) else(
-            [t for t in self._nrn.neurite_trees if t.type is neurite_type])
+        it = self._nrn.i_neurite(iterator_type,
+                                 mapping,
+                                 tree_filter=lambda t: checkTreeType(neurite_type,
+                                                                     t.type))
+        return self._iterable_type([i for i in it])
 
     def view(self, *args, **kwargs):
         '''

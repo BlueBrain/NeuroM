@@ -80,6 +80,15 @@ def path_length(tree):
                   tr.imap_val(segment_length, tr.isegment(tree, tr.iupstream)))
 
 
+def local_bifurcation_angle(bifurcation_point):
+    '''Return the opening angle between two out-going segments
+    in a bifurcation point
+    '''
+    return angle_3points(bifurcation_point.value,
+                         bifurcation_point.children[0].value,
+                         bifurcation_point.children[1].value)
+
+
 def i_segment_length(tree):
     ''' return an iterator of tree segment lengths
     '''
@@ -134,9 +143,7 @@ def i_local_bifurcation_angle(tree):
     '''Return the opening angle between two out-going segments
     in a bifurcation point
     '''
-    return imap(lambda t: angle_3points(t.value,
-                                        t.children[0].value,
-                                        t.children[1].value),
+    return imap(local_bifurcation_angle,
                 tr.ibifurcation_point(tree))
 
 
