@@ -35,8 +35,11 @@ from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphmath import polygon_diameter
 from neurom.analysis.morphmath import average_points_dist
 from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphmath import segment_length
+from neurom.analysis.morphmath import segment_radius
 from neurom.analysis.morphmath import segment_volume
 from neurom.analysis.morphmath import segment_area
+from neurom.analysis.morphmath import segment_radial_dist
 from neurom.analysis.morphmath import taper_rate
 from math import sqrt, pi, fabs
 
@@ -168,6 +171,22 @@ def test_segment_volume():
     nt.assert_almost_equal(v03, 263.8937829, places=6)
     nt.assert_almost_equal(v45, v05 - v04)
     nt.assert_almost_equal(segment_volume((p0, p3)), segment_volume((p3, p0)))
+
+
+def test_segment_length():
+    nt.ok_(segment_length(((0,0,0), (0,0,42))) == 42)
+    nt.ok_(segment_length(((0,0,0), (0,42,0))) == 42)
+    nt.ok_(segment_length(((0,0,0), (42,0,0))) == 42)
+
+
+def test_segment_radius():
+    nt.ok_(segment_radius(((0,0,0,4),(0,0,0,6))) == 5)
+
+
+def test_segment_radial_dist():
+    seg = ((11,11,11), (33, 33, 33))
+    nt.assert_almost_equal(segment_radial_dist(seg, (0,0,0)),
+                           point_dist((0,0,0), (22,22,22)))
 
 
 def test_taper_rate():

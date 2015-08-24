@@ -35,7 +35,7 @@ from neurom.core.types import checkTreeType
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
 from neurom.analysis.morphmath import path_distance
-from neurom.analysis.morphtree import segment_length
+from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle

@@ -26,15 +26,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions used for tree analysis'''
+'''Basic functions used for tree analysis
+
+These functions all depend on the internal structure of the tree or its
+different iteration modes.
+'''
 from itertools import imap
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
-from neurom.analysis.morphmath import point_dist
-from neurom.analysis.morphmath import segment_volume
-from neurom.analysis.morphmath import segment_area
-from neurom.analysis.morphmath import path_distance
-from neurom.analysis.morphmath import angle_3points
+import neurom.analysis.morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 import numpy as np
@@ -43,74 +43,43 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def segment_length(seg):
-    '''Return the length of a segment.
-
-    Returns: Euclidian distance between centres of points in seg
-    '''
-    return point_dist(seg[0], seg[1])
-
-
-def segment_radius(seg):
-    '''Return the mean radius of a segment
-
-    Returns: arithmetic mean of the radii of the points in seg
-    '''
-    return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
-
-
-def segment_radial_dist(seg, pos):
-    '''Return the radial distance of a tree segment to a given point
-
-    The radial distance is the euclidian distance between the mid-point of
-    the segment and the point in question.
-
-    Parameters:
-        seg: tree segment
-
-        pos: origin to which disrances are measured. It must have at lease 3
-        components. The first 3 components are (x, y, z).
-    '''
-    return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))
-
-
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
     return np.sum(s for s in
-                  tr.imap_val(segment_length, tr.isegment(tree, tr.iupstream)))
+                  tr.imap_val(mm.segment_length, tr.isegment(tree, tr.iupstream)))
 
 
 def local_bifurcation_angle(bifurcation_point):
     '''Return the opening angle between two out-going segments
     in a bifurcation point
     '''
-    return angle_3points(bifurcation_point.value,
-                         bifurcation_point.children[0].value,
-                         bifurcation_point.children[1].value)
+    return mm.angle_3points(bifurcation_point.value,
+                            bifurcation_point.children[0].value,
+                            bifurcation_point.children[1].value)
 
 
 def i_segment_length(tree):
     ''' return an iterator of tree segment lengths
     '''
-    return tr.imap_val(segment_length, tr.isegment(tree))
+    return tr.imap_val(mm.segment_length, tr.isegment(tree))
 
 
 def i_segment_radius(tree):
     ''' return an iterator of tree segment radii
     '''
-    return tr.imap_val(segment_radius, tr.isegment(tree))
+    return tr.imap_val(mm.segment_radius, tr.isegment(tree))
 
 
 def i_segment_volume(tree):
     ''' return an iterator of tree segment volumes
     '''
-    return tr.imap_val(segment_volume, tr.isegment(tree))
+    return tr.imap_val(mm.segment_volume, tr.isegment(tree))
 
 
 def i_segment_area(tree):
     ''' return an iterator of tree segment areas
     '''
-    return tr.imap_val(segment_area, tr.isegment(tree))
+    return tr.imap_val(mm.segment_area, tr.isegment(tree))
 
 
 def i_segment_radial_dist(pos, tree):
@@ -126,7 +95,7 @@ def i_segment_radial_dist(pos, tree):
         tree: tree of raw data rows.
 
     '''
-    return tr.imap_val(lambda s: segment_radial_dist(s, pos), tr.isegment(tree))
+    return tr.imap_val(lambda s: mm.segment_radial_dist(s, pos), tr.isegment(tree))
 
 
 def i_segment_meander_angle(tree):
@@ -136,7 +105,7 @@ def i_segment_meander_angle(tree):
     Applies neurom.morphmath.angle_3points to triplets of
     '''
 
-    return tr.imap_val(lambda t: angle_3points(t[1], t[0], t[2]), tr.itriplet(tree))
+    return tr.imap_val(lambda t: mm.angle_3points(t[1], t[0], t[2]), tr.itriplet(tree))
 
 
 def i_local_bifurcation_angle(tree):
@@ -154,7 +123,7 @@ def i_remote_bifurcation_angle(tree):
     def _remangle(t):
         '''Helper to calculate the remote angle'''
         end_points = tuple(p for p in tr.i_branch_end_points(t))
-        return angle_3points(t.value, end_points[0].value, end_points[1].value)
+        return mm.angle_3points(t.value, end_points[0].value, end_points[1].value)
 
     return imap(_remangle, tr.ibifurcation_point(tree))
 
@@ -177,7 +146,7 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''
     pos = tree.value if pos is None else pos
     sec_idx = 0 if use_start_point else -1
-    return tr.imap_val(lambda s: point_dist(s[sec_idx], pos), tr.isection(tree))
+    return tr.imap_val(lambda s: mm.point_dist(s[sec_idx], pos), tr.isection(tree))
 
 
 def i_section_path_length(tree, use_start_point=False):
@@ -237,7 +206,7 @@ def i_section_length(tree):
     """
     Return an iterator of tree section lengths
     """
-    return tr.imap_val(path_distance, tr.isection(tree))
+    return tr.imap_val(mm.path_distance, tr.isection(tree))
 
 
 def n_sections(tree):

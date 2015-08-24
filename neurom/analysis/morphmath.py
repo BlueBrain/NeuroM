@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Mathematics functions used to compute morphometrics'''
+'''Mathematical and geometrical functions used to compute morphometrics'''
 import math
 from itertools import combinations
 import numpy as np
@@ -111,6 +111,37 @@ def path_distance(points):
     Compute the path distance from given set of points
     """
     return sum(point_dist(p[0], p[1]) for p in izip(points, islice(points, 1, None)))
+
+
+def segment_length(seg):
+    '''Return the length of a segment.
+
+    Returns: Euclidian distance between centres of points in seg
+    '''
+    return point_dist(seg[0], seg[1])
+
+
+def segment_radius(seg):
+    '''Return the mean radius of a segment
+
+    Returns: arithmetic mean of the radii of the points in seg
+    '''
+    return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
+
+
+def segment_radial_dist(seg, pos):
+    '''Return the radial distance of a tree segment to a given point
+
+    The radial distance is the euclidian distance between the mid-point of
+    the segment and the point in question.
+
+    Parameters:
+        seg: tree segment
+
+        pos: origin to which disrances are measured. It must have at lease 3
+        components. The first 3 components are (x, y, z).
+    '''
+    return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))
 
 
 def segment_area(seg):
