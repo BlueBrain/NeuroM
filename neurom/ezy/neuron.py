@@ -90,11 +90,11 @@ class Neuron(object):
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
-        return self.neurite_loop(neurite_type, isection, path_distance)
+        return self.neurite_loop(isection, path_distance, neurite_type)
 
     def get_segment_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''
-        return self.neurite_loop(neurite_type, isegment, segment_length)
+        return self.neurite_loop(isegment, segment_length, neurite_type)
 
     def get_soma_radius(self):
         '''Get the radius of the soma'''
@@ -109,7 +109,8 @@ class Neuron(object):
         Returns:
             Iterable containing bifurcation angles in radians
         '''
-        return self.neurite_loop(neurite_type, i_local_bifurcation_angle)
+        return self.neurite_loop(i_local_bifurcation_angle,
+                                 neurite_type=neurite_type)
 
     def get_remote_bifurcation_angles(self, neurite_type=TreeType.all):
         '''Get remote bifircation angles of all segments of a given type
@@ -121,7 +122,8 @@ class Neuron(object):
         Returns:
             Iterable containing bifurcation angles in radians
         '''
-        return self.neurite_loop(neurite_type, i_remote_bifurcation_angle)
+        return self.neurite_loop(i_remote_bifurcation_angle,
+                                 neurite_type=neurite_type)
 
     def get_section_radial_distances(self, origin=None, use_start_point=False,
                                      neurite_type=TreeType.all):
@@ -135,9 +137,9 @@ class Neuron(object):
                              otherwise use the end-point (default False)
             neurite_type: Type of neurites to be considered (default all)
         '''
-        return self.neurite_loop(neurite_type,
-                                 lambda t: i_section_radial_dist(t, origin,
-                                                                 use_start_point))
+        return self.neurite_loop(lambda t: i_section_radial_dist(t, origin,
+                                                                 use_start_point),
+                                 neurite_type=neurite_type)
 
     def get_section_path_distances(self, use_start_point=False,
                                    neurite_type=TreeType.all):
@@ -158,8 +160,8 @@ class Neuron(object):
         ---------
             Iterable containing the section path distances.
         '''
-        return self.neurite_loop(neurite_type,
-                                 lambda t: i_section_path_length(t, use_start_point))
+        return self.neurite_loop(lambda t: i_section_path_length(t, use_start_point),
+                                 neurite_type=neurite_type)
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
@@ -178,41 +180,50 @@ class Neuron(object):
         return sum(1 for n in self._nrn.neurite_trees
                    if checkTreeType(neurite_type, n.type))
 
-    def neurite_iter(self, neurite_type, iterator_type, mapping=None):
+    def neurite_iter(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
 
         Parameters:
-            neurite_type: TreeType object. Neurites of incompatible type are
-            filtered out.
             iterator_type: Type of iterator with which to perform the iteration.
             (e.g. isegment, isection, i_section_path_length)
             mapping: mapping function to be applied to the target of iteration.
             (e.g. segment_length). Must be compatible with the iterator_type.
+            neurite_type: TreeType object. Neurites of incompatible type are
+            filtered out.
 
         Returns:
             Iterator of mapped iteration targets.
+
+        Example:
+            Get the total volume of all neurites in the cell:
+
+        >>> from neurom import ezy
+        >>> from neurom.analysis import morphmath as mm
+        >>> from neurom.core import tree as tr
+        >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+        >>> vol = sum(v for v in nrn.neurite_iter(tr.isegment, mm.segment_volume)
         '''
         return self._nrn.i_neurite(iterator_type,
                                    mapping,
                                    tree_filter=lambda t: checkTreeType(neurite_type,
                                                                        t.type))
 
-    def neurite_loop(self, neurite_type, iterator_type, mapping=None):
+    def neurite_loop(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
 
         Parameters:
-            neurite_type: TreeType object. Neurites of incompatible type are
-            filtered out.
             iterator_type: Type of iterator with which to perform the iteration.
             (e.g. isegment, isection, i_section_path_length)
             mapping: mapping function to be applied to the target of iteration.
             (e.g. segment_length). Must be compatible with the iterator_type.
+            neurite_type: TreeType object. Neurites of incompatible type are
+            filtered out.
 
         Returns:
             Iterable containing the iteration targets after mapping.
         '''
         return self._iterable_type(
-            [i for i in self.neurite_iter(neurite_type, iterator_type, mapping)]
+            [i for i in self.neurite_iter(iterator_type, mapping, neurite_type)]
         )
 
     def view(self, *args, **kwargs):
