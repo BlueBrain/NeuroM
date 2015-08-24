@@ -37,6 +37,8 @@ from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphtree import segment_length
 from neurom.analysis.morphtree import i_segment_length
+from neurom.analysis.morphtree import i_segment_volume
+from neurom.analysis.morphtree import i_segment_area
 from neurom.analysis.morphtree import segment_radius
 from neurom.analysis.morphtree import i_segment_radius
 from neurom.analysis.morphtree import segment_radial_dist
@@ -55,6 +57,7 @@ from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
+from itertools import izip
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
@@ -67,7 +70,7 @@ tree_types = [TreeType.axon,
               TreeType.basal_dendrite,
               TreeType.apical_dendrite]
 
-def form_neuron_tree():
+def _form_neuron_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
     T = Tree(p)
     T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
@@ -83,7 +86,7 @@ def form_neuron_tree():
     return T
 
 
-def form_simple_tree():
+def _form_simple_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
     T = Tree(p)
     T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
@@ -97,6 +100,10 @@ def form_simple_tree():
     T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
 
     return T
+
+
+NEURON_TREE = _form_neuron_tree()
+SIMPLE_TREE = _form_simple_tree()
 
 
 def form_branching_tree():
@@ -126,11 +133,37 @@ def test_segment_length():
 
 def test_segment_lengths():
 
-    T = form_neuron_tree()
+    T = NEURON_TREE
 
     lg = [l for l in i_segment_length(T)]
 
     nt.assert_equal(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
+
+
+def test_segment_volumes():
+
+    T = NEURON_TREE
+
+    sv = (l/math.pi for l in i_segment_volume(T))
+
+    ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
+           0.5625, 4.6666667, 0.7708333, 0.5625)
+
+    for a, b in izip(sv, ref):
+        nt.assert_almost_equal(a, b)
+
+
+def test_segment_areas():
+
+    T = NEURON_TREE
+
+    sa = (l/math.pi for l in i_segment_area(T))
+
+    ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
+           1.5, 6.7082039, 1.8038587, 1.5)
+
+    for a, b in izip(sa, ref):
+        nt.assert_almost_equal(a, b)
 
 
 def test_segment_radius():
@@ -139,7 +172,7 @@ def test_segment_radius():
 
 def test_segment_radiuss():
 
-    T = form_neuron_tree()
+    T = NEURON_TREE
 
     rad = [r for r in i_segment_radius(T)]
 
@@ -154,7 +187,7 @@ def test_segment_radial_dist():
 
 
 def test_segment_radial_dists():
-    T = form_simple_tree()
+    T = SIMPLE_TREE
 
     p= [0.0, 0.0, 0.0]
 
@@ -164,11 +197,11 @@ def test_segment_radial_dists():
 
 
 def test_segment_path_length():
-    leaves = [l for l in tr.ileaf(form_neuron_tree())]
+    leaves = [l for l in tr.ileaf(NEURON_TREE)]
     for l in leaves:
         nt.ok_(path_length(l) == 9)
 
-    leaves = [l for l in tr.ileaf(form_simple_tree())]
+    leaves = [l for l in tr.ileaf(SIMPLE_TREE)]
     for l in leaves:
         nt.ok_(path_length(l) == 8)
 
@@ -195,15 +228,15 @@ def test_get_tree_type():
         nt.ok_(get_tree_type(test_tree) == tree_types[en_tree])
 
 def test_i_section_length():
-    T = form_simple_tree()
+    T = SIMPLE_TREE
     nt.assert_equal([l for l in i_section_length(T)], [8.0, 8.0])
-    T2 = form_neuron_tree()
+    T2 = NEURON_TREE
     nt.ok_([l for l in i_section_length(T2)] == [5.0, 4.0, 4.0])
 
 
 def test_i_section_radial_dists():
-    T1 = form_simple_tree()
-    T2 = form_neuron_tree()
+    T1 = SIMPLE_TREE
+    T2 = NEURON_TREE
 
     p0 = [0.0, 0.0, 0.0]
 
@@ -233,8 +266,8 @@ def test_i_section_radial_dists():
 
 
 def test_i_section_path_length():
-    T1 = form_simple_tree()
-    T2 = form_neuron_tree()
+    T1 = SIMPLE_TREE
+    T2 = NEURON_TREE
 
     nt.assert_equal([d for d in i_section_path_length(T1)],
                     [8.0, 8.0])
@@ -249,7 +282,7 @@ def test_i_section_path_length():
 
 
 def test_i_segment_meander_angles():
-    T = form_neuron_tree()
+    T = NEURON_TREE
     ref = [math.pi * a for a in (1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5)]
     for i, m in enumerate(i_segment_meander_angle(T)):
         nt.assert_almost_equal(m, ref[i])
@@ -283,9 +316,9 @@ def test_i_remote_bifurcation_angles():
 
 
 def test_n_sections():
-    T = form_simple_tree()
+    T = SIMPLE_TREE
     nt.ok_(n_sections(T) == 2)
-    T2 = form_neuron_tree()
+    T2 = NEURON_TREE
     nt.ok_(n_sections(T2) == 3)
 
 

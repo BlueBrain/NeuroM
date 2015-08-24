@@ -31,6 +31,8 @@ from itertools import imap
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
 from neurom.analysis.morphmath import point_dist
+from neurom.analysis.morphmath import segment_volume
+from neurom.analysis.morphmath import segment_area
 from neurom.analysis.morphmath import path_distance
 from neurom.analysis.morphmath import angle_3points
 from neurom.core.dataformat import COLS
@@ -88,6 +90,18 @@ def i_segment_radius(tree):
     ''' return an iterator of tree segment radii
     '''
     return tr.imap_val(segment_radius, tr.isegment(tree))
+
+
+def i_segment_volume(tree):
+    ''' return an iterator of tree segment volumes
+    '''
+    return tr.imap_val(segment_volume, tr.isegment(tree))
+
+
+def i_segment_area(tree):
+    ''' return an iterator of tree segment areas
+    '''
+    return tr.imap_val(segment_area, tr.isegment(tree))
 
 
 def i_segment_radial_dist(pos, tree):
