@@ -29,6 +29,7 @@
 from nose import tools as nt
 from neurom.core import neuron
 from neurom.exceptions import SomaError
+from itertools import izip
 
 SOMA_A_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
@@ -116,6 +117,21 @@ def test_neuron():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'], 'test')
     nt.assert_equal(nrn.id, 'test')
 
+
+def test_i_neurite_chains():
+    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
+    s = 'foobarbaz'
+    for i, j in izip(s, nrn.i_neurite(iter)):
+        nt.assert_equal(i, j)
+
+
+def test_i_neurite_filter():
+    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
+    ref = 'barbaz'
+    for i, j in izip(ref,
+                     nrn.i_neurite(iter,
+                                   tree_filter=lambda s: s.startswith('b'))):
+        nt.assert_equal(i, j)
 
 
 @nt.raises(SomaError)

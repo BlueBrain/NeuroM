@@ -33,18 +33,14 @@ import neurom.core.tree as tr
 from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
-from neurom.analysis.morphmath import point_dist
 from neurom.analysis.morphmath import angle_3points
-from neurom.analysis.morphtree import segment_length
+from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_segment_volume
 from neurom.analysis.morphtree import i_segment_area
-from neurom.analysis.morphtree import segment_radius
 from neurom.analysis.morphtree import i_segment_radius
-from neurom.analysis.morphtree import segment_radial_dist
 from neurom.analysis.morphtree import i_segment_radial_dist
 from neurom.analysis.morphtree import i_segment_meander_angle
-from neurom.analysis.morphtree import path_length
 from neurom.analysis.morphtree import find_tree_type
 from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import get_tree_type
@@ -125,12 +121,6 @@ def form_branching_tree():
     return T
 
 
-def test_segment_length():
-    nt.ok_(segment_length(((0,0,0), (0,0,42))) == 42)
-    nt.ok_(segment_length(((0,0,0), (0,42,0))) == 42)
-    nt.ok_(segment_length(((0,0,0), (42,0,0))) == 42)
-
-
 def test_segment_lengths():
 
     T = NEURON_TREE
@@ -166,9 +156,6 @@ def test_segment_areas():
         nt.assert_almost_equal(a, b)
 
 
-def test_segment_radius():
-    nt.ok_(segment_radius(((0,0,0,4),(0,0,0,6))) == 5)
-
 
 def test_segment_radiuss():
 
@@ -178,12 +165,6 @@ def test_segment_radiuss():
 
     nt.assert_equal(rad,
                     [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
-
-
-def test_segment_radial_dist():
-    seg = ((11,11,11), (33, 33, 33))
-    nt.assert_almost_equal(segment_radial_dist(seg, (0,0,0)),
-                           point_dist((0,0,0), (22,22,22)))
 
 
 def test_segment_radial_dists():

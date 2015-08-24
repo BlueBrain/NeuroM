@@ -37,7 +37,7 @@ from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import path_distance
-from neurom.analysis.morphtree import segment_length
+from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import find_tree_type
 from itertools import chain
 
