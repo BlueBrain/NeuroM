@@ -244,5 +244,5 @@ Examples
 .. code-block:: python
 
     >>> # Initialize nrn as above
-    >>> fig, ax = nrn.plot()
+    >>> fig, ax = nrn.view()
     >>> fig.show()
