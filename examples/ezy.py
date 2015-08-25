@@ -12,7 +12,6 @@ from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.core.types import NEURITES
 from neurom.core.dataformat import COLS
-from neurom.core import tree as tr
 from neurom.analysis import morphmath as mm
 import numpy as np
 
@@ -124,44 +123,34 @@ if __name__ == '__main__':
     # The iterations give us a lot of flexibility: we can map
     # any function that takes a segment or section.
 
-    # Get length of all neurites in cell (from sections)
-    # This is the most generic way:
-    #   we specify type of iteration (tr.isection),
-    #   and mapping function. Optionally, we can specify tree type as before.
-    print('Total neurite length (sections):',
-          sum(l for l in nrn.neurite_iter(tr.isection, mm.path_distance)))
+    # Get length of all neurites in cell by iterating over sections,
+    # and summing the section lengths
+    print('Total neurite length:',
+          sum(seclen for seclen in nrn.iter_sections(mm.path_distance)))
 
-    # Get length of all neurites in cell (from iter_sections)
-    # Same as above, but using a more convenient section iteration
-    # function instead of passing iteration mode as argument.
-    print('Total neurite length (iter_sections):',
-          sum(l for l in nrn.iter_sections(mm.path_distance)))
+    # Get length of all neurites in cell by iterating over segments,
+    # and summing the segment lengths.
+    # This should yield the same result as iterating over sections.
+    print('Total neurite length:',
+          sum(seglen for seglen in nrn.iter_segments(mm.segment_length)))
 
-    # Get length of all neurites in cell
-    # The long way, for illustration.
-    # The length as calculated from segments should be the same
-    # as that calculated from sections
-    print('Total neurite length (segments):',
-          sum(l for l in nrn.neurite_iter(tr.isegment, mm.segment_length)))
-
-    # Get length of all neurites in cell (iter_segments)
-    # Equivalent to the above, using convenience segment iteration method.
-    print('Total neurite length (iter_segments):',
-          sum(l for l in nrn.iter_segments(mm.segment_length)))
-
-    # get volume of all neurites in cell
+    # get volume of all neurites in cell by summing over segment
+    # volumes
     print('Total neurite volume:',
-          sum(l for l in nrn.iter_segments(mm.segment_volume)))
+          sum(vol for vol in nrn.iter_segments(mm.segment_volume)))
 
-    # get area of all neurites in cell
+    # get area of all neurites in cell by summing over segment
+    # areas
     print('Total neurite surface area:',
-          sum(l for l in nrn.iter_segments(mm.segment_area)))
+          sum(area for area in nrn.iter_segments(mm.segment_area)))
 
-    # get total number of points in cell
+    # get total number of points in cell.
+    # iter_points needs a mapping function, so we pass the identity.
     print('Total number of points:',
           sum(1 for _ in nrn.iter_points(lambda p: p)))
 
-    # get mean radius of points in cell
+    # get mean radius of points in cell.
+    # p[COLS.R] yields the radius for point p.
     print('Mean radius of points:',
           np.mean([r for r in nrn.iter_points(lambda p: p[COLS.R])]))
 
