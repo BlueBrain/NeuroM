@@ -69,6 +69,26 @@ class Neuron(object):
     >>> nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
 
     Example:
+        iterate over the segment surface areas of all axons in a neuron\
+            morphology.
+
+    >>> from neurom import ezy
+    >>> from neurom.analysis import morphmath as mm
+    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> for a in nrn.iter_segments(mm.segment_area, ezy.TreeType.axon):
+          print (a)
+
+    Example:
+        calculate the mean volume of all neurite segments on a neuron\
+            morphology
+
+    >>> from neurom import ezy
+    >>> from neurom.analysis import morphmath as mm
+    >>> import numpy as np
+    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> mv = np.mean([v for v in nrn.iter_segments(mm.segment_volume)])
+
+    Example:
         use lists instead of numpy arrays and get section \
     lengths for the axon. Read an HDF5 v1 file:
 
