@@ -12,7 +12,6 @@ from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.core.types import NEURITES
 from neurom.core.dataformat import COLS
-from neurom.core import tree as tr
 from neurom.analysis import morphmath as mm
 import numpy as np
 
