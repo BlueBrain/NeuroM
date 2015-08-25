@@ -193,13 +193,15 @@ class Neuron(object):
             Iterator of mapped iteration targets.
 
         Example:
-            Get the total volume of all neurites in the cell
+            Get the total volume of all neurites in the cell and the total\
+                length or neurites from their segments.
 
         >>> from neurom import ezy
         >>> from neurom.analysis import morphmath as mm
         >>> from neurom.core import tree as tr
         >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
         >>> v = sum(i for i in nrn.neurite_iter(tr.isegment, mm.segment_volume))
+        >>> tl = sum(l for l in nrn.neurite_iter(tr.isegment, mm.segment_length)))
 
         '''
         return self._nrn.i_neurite(iterator_type,
