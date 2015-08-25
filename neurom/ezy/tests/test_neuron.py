@@ -34,6 +34,8 @@ from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
+from neurom.core.dataformat import COLS
+from neurom.core.tree import ipreorder, val_iter
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
@@ -102,6 +104,10 @@ class TestEzyNeuron(object):
         self.remote_bifangles = []
         for t in self.neuron._nrn.neurite_trees:
             self.remote_bifangles.extend(a for a in i_remote_bifurcation_angle(t))
+
+        self.point_radii = []
+        for t in self.neuron._nrn.neurite_trees:
+            self.point_radii.extend(p[COLS.R] for p in val_iter(ipreorder(t)))
 
     def test_get_section_lengths(self):
         seclen = self.neuron.get_section_lengths()
@@ -288,6 +294,10 @@ class TestEzyNeuron(object):
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.apical_dendrite), 1)
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.soma), 0)
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.undefined), 0)
+
+    def test_iter_points(self):
+        rads = [r for r in self.neuron.iter_points(lambda p: p[COLS.R])]
+        nt.assert_true(np.all(self.point_radii == rads))
 
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view

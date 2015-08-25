@@ -32,6 +32,7 @@
 from neurom.io.utils import load_neuron
 from neurom.core.types import TreeType
 from neurom.core.types import checkTreeType
+from neurom.core.tree import ipreorder
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
 from neurom.analysis.morphmath import path_distance
@@ -213,7 +214,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to points.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(lambda i: i, mapfun, neurite_type)
+        return self.neurite_iter(ipreorder, mapfun, neurite_type)
 
     def iter_segments(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite segments with mapping
