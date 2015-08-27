@@ -43,6 +43,12 @@ if __name__ == '__main__':
     #  load a neuron from an SWC file
     nrn = ezy.Neuron(filename)
 
+    # Get some soma information
+    # Soma radius and surface area
+    print("Soma radius", nrn.get_soma_radius())
+    print("Soma surface area", nrn.get_soma_surface_area())
+
+    # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
     # The allowed types are members of the TreeType enumeration.
     # NEURITES is a list of valid neurite types.
