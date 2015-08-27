@@ -32,7 +32,6 @@ from neurom.core.tree import is_root
 from neurom.core.tree import is_leaf
 from neurom.core.tree import is_forking_point
 from neurom.core.tree import is_bifurcation_point
-from neurom.core.tree import section_branch_order
 from neurom.core.tree import ipreorder
 from neurom.core.tree import ipostorder
 from neurom.core.tree import iupstream
