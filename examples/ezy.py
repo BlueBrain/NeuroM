@@ -11,6 +11,7 @@ from pprint import pprint
 from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.core.types import NEURITES
+from neurom.core.tree import ibifurcation_point
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
 import numpy as np
@@ -163,3 +164,15 @@ if __name__ == '__main__':
     # get mean radius of segments
     print('Mean radius of segments:',
           np.mean([r for r in nrn.iter_segments(mm.segment_radius)]))
+
+    # Number of bifurcation points.
+    # This uses the more generic iter_neurites method, in which
+    # we can decide the type of iteration. Here we iterate over
+    # bifurcation points.
+    print('Number of bifurcation points:',
+          sum(1 for _ in nrn.iter_neurites(ibifurcation_point)))
+
+    # Number of bifurcation points for apical dendrites
+    print('Number of bifurcation points (apical dendrites):',
+          sum(1 for _ in nrn.iter_neurites(ibifurcation_point,
+                                           neurite_type=TreeType.apical_dendrite)))

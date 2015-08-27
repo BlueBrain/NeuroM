@@ -207,7 +207,7 @@ class Neuron(object):
         return sum(1 for n in self._nrn.neurite_trees
                    if checkTreeType(neurite_type, n.type))
 
-    def neurite_iter(self, iterator_type, mapping=None, neurite_type=TreeType.all):
+    def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
 
         Parameters:
@@ -229,8 +229,8 @@ class Neuron(object):
         >>> from neurom.analysis import morphmath as mm
         >>> from neurom.core import tree as tr
         >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
-        >>> v = sum(i for i in nrn.neurite_iter(tr.isegment, mm.segment_volume))
-        >>> tl = sum(l for l in nrn.neurite_iter(tr.isegment, mm.segment_length)))
+        >>> v = sum(i for i in nrn.iter_neurites(tr.isegment, mm.segment_volume))
+        >>> tl = sum(l for l in nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
         return self._nrn.i_neurite(iterator_type,
@@ -245,7 +245,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to points.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(ipreorder, mapfun, neurite_type)
+        return self.iter_neurites(ipreorder, mapfun, neurite_type)
 
     def iter_segments(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite segments with mapping
@@ -254,7 +254,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to segments.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(isegment, mapfun, neurite_type)
+        return self.iter_neurites(isegment, mapfun, neurite_type)
 
     def iter_sections(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite sections with mapping
@@ -263,7 +263,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to sections.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(isection, mapfun, neurite_type)
+        return self.iter_neurites(isection, mapfun, neurite_type)
 
     def neurite_loop(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
@@ -279,7 +279,7 @@ class Neuron(object):
         Returns:
             Iterable containing the iteration targets after mapping.
         '''
-        return self._pkg(self.neurite_iter(iterator_type, mapping, neurite_type))
+        return self._pkg(self.iter_neurites(iterator_type, mapping, neurite_type))
 
     def _pkg(self, iterator):
         '''Create an iterable from an iterator'''
