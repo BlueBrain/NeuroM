@@ -70,6 +70,19 @@ def is_root(tree):
     return tree.parent is None
 
 
+def section_branch_order(tree_section):
+    '''Branching order of a tree section
+
+    The branching order is defined as the depth of the tree section.
+
+    Note:
+        The first level has branch order 0.
+    '''
+    node = tree_section[-1]
+    bo = sum(1 for _ in iforking_point(node, iupstream))
+    return bo - 2 if is_forking_point(node) else bo - 1
+
+
 def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
     yield tree
