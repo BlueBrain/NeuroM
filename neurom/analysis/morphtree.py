@@ -58,6 +58,19 @@ def local_bifurcation_angle(bifurcation_point):
                             bifurcation_point.children[1].value)
 
 
+def branch_order(tree_section):
+    '''Branching order of a tree section
+
+    The branching order is defined as the depth of the tree section.
+
+    Note:
+        The first level has branch order 0.
+    '''
+    node = tree_section[-1]
+    bo = sum(1 for _ in tr.iforking_point(node, tr.iupstream))
+    return bo - 2 if tr.is_forking_point(node) else bo - 1
+
+
 def i_segment_length(tree):
     ''' return an iterator of tree segment lengths
     '''
