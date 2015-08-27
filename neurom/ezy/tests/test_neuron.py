@@ -29,6 +29,7 @@
 '''Test neurom.ezy.Neuron'''
 
 import os
+import math
 import numpy as np
 from neurom import ezy
 from neurom.core.types import TreeType
@@ -145,7 +146,11 @@ class TestEzyNeuron(object):
         nt.assert_true(np.all(seglen == self.seglen))
 
     def test_get_soma_radius(self):
-        nt.ok_(np.allclose(self.neuron.get_soma_radius(), 0.17071))
+        nt.assert_almost_equal(self.neuron.get_soma_radius(), 0.170710678)
+
+    def test_get_soma_surface_area(self):
+        area = 4 * math.pi * (self.neuron.get_soma_radius() ** 2)
+        nt.assert_almost_equal(self.neuron.get_soma_surface_area(), area)
 
     def test_get_segment_lengths_axon(self):
         s = self.neuron.get_segment_lengths(TreeType.axon)

@@ -44,6 +44,7 @@ from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
 from neurom.view import view
+import math
 import numpy as np
 
 
@@ -120,6 +121,14 @@ class Neuron(object):
     def get_soma_radius(self):
         '''Get the radius of the soma'''
         return self._nrn.soma.radius
+
+    def get_soma_surface_area(self):
+        '''Get the surface area of the soma.
+
+        Note:
+            The surface area is calculated by assuming the soma is spherical.
+        '''
+        return 4 * math.pi * self.get_soma_radius() ** 2
 
     def get_local_bifurcation_angles(self, neurite_type=TreeType.all):
         '''Get local bifircation angles of all segments of a given type
