@@ -307,5 +307,5 @@ class TestEzyNeuron(object):
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view
         # So simply check that calling is OK syntactically.
-        self.neuron.view()
-        self.neuron.view3d()
+        ezy.view(self.neuron)
+        ezy.view3d(self.neuron)
