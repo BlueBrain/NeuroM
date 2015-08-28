@@ -244,5 +244,5 @@ Examples
 .. code-block:: python
 
     >>> # Initialize nrn as above
-    >>> fig, ax = nrn.view()
+    >>> fig, ax = ezy.view(nrn)
     >>> fig.show()

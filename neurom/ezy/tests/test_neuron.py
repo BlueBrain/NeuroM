@@ -73,41 +73,41 @@ class TestEzyNeuron(object):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
         self.neuron = ezy.Neuron(self.filename)
         self.seclen = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.seclen.extend(ll for ll in i_section_length(t))
 
         self.seglen = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.seglen.extend(ll for ll in i_segment_length(t))
 
         self.sec_rad_dist = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.sec_rad_dist.extend(ll for ll in i_section_radial_dist(t))
 
         self.sec_rad_dist_start = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.sec_rad_dist_start.extend(
                 ll for ll in i_section_radial_dist(t, use_start_point=True))
 
         self.sec_path_len = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.sec_path_len.extend(ll for ll in i_section_path_length(t))
 
         self.sec_path_len_start = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.sec_path_len_start.extend(
                 ll for ll in i_section_path_length(t, use_start_point=True))
 
         self.local_bifangles = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.local_bifangles.extend(a for a in i_local_bifurcation_angle(t))
 
         self.remote_bifangles = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.remote_bifangles.extend(a for a in i_remote_bifurcation_angle(t))
 
         self.point_radii = []
-        for t in self.neuron._nrn.neurite_trees:
+        for t in self.neuron._nrn.neurites:
             self.point_radii.extend(p[COLS.R] for p in val_iter(ipreorder(t)))
 
     def test_get_section_lengths(self):
@@ -307,5 +307,5 @@ class TestEzyNeuron(object):
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view
         # So simply check that calling is OK syntactically.
-        self.neuron.view()
-        self.neuron.view3d()
+        ezy.view(self.neuron)
+        ezy.view3d(self.neuron)

@@ -50,7 +50,7 @@ def has_axon(neuron, treefun=find_tree_type):
         treefun: Optional function to calculate the tree type of
         neuron's neurites
     '''
-    return TreeType.axon in [treefun(n) for n in neuron.neurite_trees]
+    return TreeType.axon in [treefun(n) for n in neuron.neurites]
 
 
 def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
@@ -62,7 +62,7 @@ def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
         treefun: Optional function to calculate the tree type of neuron's
         neurites
     '''
-    types = [treefun(n) for n in neuron.neurite_trees]
+    types = [treefun(n) for n in neuron.neurites]
     return types.count(TreeType.apical_dendrite) >= min_number
 
 
@@ -75,7 +75,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
         treefun: Optional function to calculate the tree type of neuron's
         neurites
     '''
-    types = [treefun(n) for n in neuron.neurite_trees]
+    types = [treefun(n) for n in neuron.neurites]
     return types.count(TreeType.basal_dendrite) >= min_number
 
 
@@ -89,7 +89,7 @@ def nonzero_segment_lengths(neuron, threshold=0.0):
     '''
     l = [[s for s in val_iter(isegment(t))
           if segment_length(s) <= threshold]
-         for t in neuron.neurite_trees]
+         for t in neuron.neurites]
     return [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
 
 
@@ -103,7 +103,7 @@ def nonzero_section_lengths(neuron, threshold=0.0):
     '''
     l = [[s for s in val_iter(isection(t))
           if path_distance(s) <= threshold]
-         for t in neuron.neurite_trees]
+         for t in neuron.neurites]
     return [i[0][COLS.ID] for i in chain(*l)]
 
 
@@ -117,5 +117,5 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
     '''
 
     ids = [[i[COLS.ID] for i in val_iter(ipreorder(t))
-            if i[COLS.R] <= threshold] for t in neuron.neurite_trees]
+            if i[COLS.R] <= threshold] for t in neuron.neurites]
     return [i for i in chain(*ids)]

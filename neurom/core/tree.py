@@ -213,3 +213,22 @@ def imap_val(f, tree_iterator):
     '''Map function f to value of tree_iterator's target
     '''
     return imap(f, val_iter(tree_iterator))
+
+
+def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
+    '''Returns a mapped iterator to a collection of trees
+
+    Provides access to all the elements of all the trees
+    in one iteration sequence.
+
+    Parameters:
+        trees: iterator or iterable of tree objects
+        iterator_type: type of the iteration (segment, section, triplet...)
+        mapping: optional function to apply to the iterator's target.
+        tree_filter: optional top level filter on properties of tree objects.
+    '''
+    nrt = (trees if tree_filter is None
+           else filter(tree_filter, trees))
+
+    chain_it = chain(*imap(iterator_type, nrt))
+    return chain_it if mapping is None else imap_val(mapping, chain_it)
