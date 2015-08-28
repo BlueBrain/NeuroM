@@ -237,11 +237,11 @@ def get_bounding_box(tree):
     [xmax, ymax, zmax]]
     """
 
-    min_x = min(p[0] for p in val_iter(tr.ipreorder(tree)))
-    min_y = min(p[1] for p in val_iter(tr.ipreorder(tree)))
-    min_z = min(p[2] for p in val_iter(tr.ipreorder(tree)))
-    max_x = max(p[0] for p in val_iter(tr.ipreorder(tree)))
-    max_y = max(p[1] for p in val_iter(tr.ipreorder(tree)))
-    max_z = max(p[2] for p in val_iter(tr.ipreorder(tree)))
+    min_x = min(p[COLS.X] for p in val_iter(tr.ipreorder(tree)))
+    min_y = min(p[COLS.Y] for p in val_iter(tr.ipreorder(tree)))
+    min_z = min(p[COLS.Z] for p in val_iter(tr.ipreorder(tree)))
+    max_x = max(p[COLS.X] for p in val_iter(tr.ipreorder(tree)))
+    max_y = max(p[COLS.Y] for p in val_iter(tr.ipreorder(tree)))
+    max_z = max(p[COLS.Z] for p in val_iter(tr.ipreorder(tree)))
 
     return np.array([[min_x, min_y, min_z], [max_x, max_y, max_z]])

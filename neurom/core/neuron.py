@@ -31,6 +31,7 @@ from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
+from itertools import izip
 
 
 class SOMA_TYPE(object):
@@ -156,3 +157,38 @@ class Neuron(object):
             tree_filter: optional top level filter on properties of neurite tree objects.
         '''
         return tr.i_chain(self.neurites, iterator_type, mapping, tree_filter)
+
+
+def bounding_box(nrn):
+    '''Return 3D bounding box of a neuron
+
+    Returns:
+        tuple of ((min_x, min_y, min_z), (max_x, max_y, max_z))
+    '''
+
+    # Get the bounding coordinates of the neurites
+    nmin_xyz = (min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.X])),
+                min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.Y])),
+                min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.Z])))
+
+    nmax_xyz = (max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.X])),
+                max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.Y])),
+                max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
+                                          lambda p: p[COLS.Z])))
+
+    # Get the bounding coordinates of the soma
+    smin_xyz = (nrn.soma.center[COLS.X] - nrn.soma.radius,
+                nrn.soma.center[COLS.Y] - nrn.soma.radius,
+                nrn.soma.center[COLS.Z] - nrn.soma.radius)
+
+    smax_xyz = (nrn.soma.center[COLS.X] + nrn.soma.radius,
+                nrn.soma.center[COLS.Y] + nrn.soma.radius,
+                nrn.soma.center[COLS.Z] + nrn.soma.radius)
+
+    return (tuple(min(i) for i in izip(nmin_xyz, smin_xyz)),
+            tuple(max(i) for i in izip(nmax_xyz, smax_xyz)))
