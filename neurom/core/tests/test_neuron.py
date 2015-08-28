@@ -118,19 +118,19 @@ def test_neuron():
     nt.assert_equal(nrn.id, 'test')
 
 
-def test_i_neurite_chains():
+def test_i_neurites_chains():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
     s = 'foobarbaz'
-    for i, j in izip(s, nrn.i_neurite(iter)):
+    for i, j in izip(s, nrn.i_neurites(iter)):
         nt.assert_equal(i, j)
 
 
-def test_i_neurite_filter():
+def test_i_neurites_filter():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
     ref = 'barbaz'
     for i, j in izip(ref,
-                     nrn.i_neurite(iter,
-                                   tree_filter=lambda s: s.startswith('b'))):
+                     nrn.i_neurites(iter,
+                                    tree_filter=lambda s: s.startswith('b'))):
         nt.assert_equal(i, j)
 
 

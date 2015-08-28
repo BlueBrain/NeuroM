@@ -31,7 +31,6 @@ from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-from itertools import chain, imap
 
 
 class SOMA_TYPE(object):
@@ -145,7 +144,7 @@ class Neuron(object):
         self.neurite_trees = neurite_trees
         self.id = name
 
-    def i_neurite(self, iterator_type, mapping=None, tree_filter=None):
+    def i_neurites(self, iterator_type, mapping=None, tree_filter=None):
         '''Returns a mapped iterator to all the neuron's neurites
 
         Provides access to all the elements of all the neurites
@@ -156,8 +155,4 @@ class Neuron(object):
             mapping: optional function to apply to the iterator's target.
             tree_filter: optional top level filter on properties of neurite tree objects.
         '''
-        nrt = (self.neurite_trees if tree_filter is None
-               else filter(tree_filter, self.neurite_trees))
-
-        chain_it = chain(*imap(iterator_type, nrt))
-        return chain_it if mapping is None else tr.imap_val(mapping, chain_it)
+        return tr.i_chain(self.neurite_trees, iterator_type, mapping, tree_filter)
