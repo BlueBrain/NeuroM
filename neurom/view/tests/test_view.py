@@ -46,14 +46,14 @@ soma0 = neuron0.soma
 
 def test_tree():
     axes = []
-    for tree in neuron0.neurite_trees:
+    for tree in neuron0.neurites:
         fig, ax = view.tree(tree)
         axes.append(ax)
     nt.ok_(axes[0].get_data_ratio() > 1.00 )
     nt.ok_(axes[1].get_data_ratio() > 0.80 )
     nt.ok_(axes[2].get_data_ratio() > 1.00 )
     nt.ok_(axes[3].get_data_ratio() > 0.85 )
-    tree0 = neuron0.neurite_trees[0]
+    tree0 = neuron0.neurites[0]
     fig, ax = view.tree(tree0, treecolor='black', diameter=False, alpha=1., linewidth=1.2)
     c = ax.collections[0]
     nt.ok_(c.get_linewidth()[0] == 1.2 )
@@ -86,7 +86,7 @@ def test_neuron():
 
 def test_tree3d():
     axes = []
-    for tree in neuron0.neurite_trees:
+    for tree in neuron0.neurites:
         fig, ax = view.tree3d(tree)
         axes.append(ax)
     nt.ok_(axes[0].get_data_ratio() > 1.00 )

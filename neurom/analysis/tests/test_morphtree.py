@@ -61,7 +61,7 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
 data    = load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
-tree0   = neuron0.neurite_trees[0]
+tree0   = neuron0.neurites[0]
 tree_types = [TreeType.axon,
               TreeType.basal_dendrite,
               TreeType.basal_dendrite,
@@ -209,18 +209,18 @@ def test_segment_path_length():
 
 
 def test_find_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         nt.ok_(find_tree_type(test_tree) == tree_types[en_tree])
 
 
 def test_set_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         set_tree_type(test_tree)
         nt.ok_(test_tree.type == tree_types[en_tree])
 
 
 def test_get_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         if hasattr(test_tree, 'type'):
             del test_tree.type
         # tree.type should be computed here.

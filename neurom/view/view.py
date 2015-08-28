@@ -367,7 +367,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     h = []
     v = []
 
-    for temp_tree in nrn.neurite_trees:
+    for temp_tree in nrn.neurites:
 
         bounding_box = get_bounding_box(temp_tree)
 
@@ -653,7 +653,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     v = []
     d = []
 
-    for temp_tree in nrn.neurite_trees:
+    for temp_tree in nrn.neurites:
 
         bounding_box = get_bounding_box(temp_tree)
 

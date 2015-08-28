@@ -76,7 +76,7 @@ if __name__ == '__main__':
                                  for p in nrn.soma.iter()]
 
     print 'Neuron tree init points, types'
-    for tt in nrn.neurite_trees:
+    for tt in nrn.neurites:
         print tt.value[COLS.ID], tt.value[COLS.TYPE]
 
     print 'Making neuron 2'
@@ -85,10 +85,10 @@ if __name__ == '__main__':
     print 'Neuron 2 soma points', [as_point(p)
                                    for p in nrn2.soma.iter()]
     print 'Neuron 2 tree init points, types'
-    for tt in nrn2.neurite_trees:
+    for tt in nrn2.neurites:
         print tt.value[COLS.ID], tt.value[COLS.TYPE]
 
     print 'Print neuron leaves as points'
-    for tt in nrn2.neurite_trees:
+    for tt in nrn2.neurites:
         for p in point_iter(tree.ileaf(tt)):
             print p

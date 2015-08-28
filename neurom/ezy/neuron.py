@@ -44,7 +44,6 @@ from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
-from neurom.view import view
 import math
 import numpy as np
 
@@ -110,6 +109,8 @@ class Neuron(object):
     def __init__(self, filename, iterable_type=np.array):
         self._iterable_type = iterable_type
         self._nrn = load_neuron(filename, set_tree_type)
+        self.soma = self._nrn.soma
+        self.neurites = self._nrn.neurites
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
@@ -193,19 +194,19 @@ class Neuron(object):
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
-        return sum(n_sections(t) for t in self._nrn.neurite_trees
+        return sum(n_sections(t) for t in self._nrn.neurites
                    if checkTreeType(neurite_type, t.type))
 
     def get_n_sections_per_neurite(self, neurite_type=TreeType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
         return self._iterable_type(
-            [n_sections(n) for n in self._nrn.neurite_trees
+            [n_sections(n) for n in self._nrn.neurites
              if checkTreeType(neurite_type, n.type)]
         )
 
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
-        return sum(1 for n in self._nrn.neurite_trees
+        return sum(1 for n in self._nrn.neurites
                    if checkTreeType(neurite_type, n.type))
 
     def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
@@ -234,7 +235,7 @@ class Neuron(object):
         >>> tl = sum(l for l in nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
-        return i_neurites(self._nrn.neurite_trees,
+        return i_neurites(self._nrn.neurites,
                           iterator_type,
                           mapping,
                           tree_filter=lambda t: checkTreeType(neurite_type,
@@ -286,17 +287,3 @@ class Neuron(object):
     def _pkg(self, iterator):
         '''Create an iterable from an iterator'''
         return self._iterable_type([i for i in iterator])
-
-    def view(self, *args, **kwargs):
-        '''
-        Generates a 2D viewer of the neuron
-        Forwards arguments to neurom.view.view.neuron()
-        '''
-        return view.neuron(self._nrn, *args, **kwargs)
-
-    def view3d(self, *args, **kwargs):
-        '''
-        Generates a 3D viewer of the neuron
-        Forwards arguments to neurom.view.view.neuron3d()
-        '''
-        return view.neuron3d(self._nrn, *args, **kwargs)

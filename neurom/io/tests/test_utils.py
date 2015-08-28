@@ -134,7 +134,7 @@ def test_make_neuron():
     rd = RAW_DATA[0]
     nrn = utils.make_neuron(rd)
     nt.ok_(np.all([s[COLS.ID] for s in nrn.soma.iter()] == SOMA_IDS[0]))
-    _check_trees(nrn.neurite_trees)
+    _check_trees(nrn.neurites)
 
 
 @nt.raises(SomaError)
@@ -148,7 +148,7 @@ def test_make_neuron_post_tree_action():
 
     rd = RAW_DATA[0]
     nrn = utils.make_neuron(rd, post_action)
-    for t in nrn.neurite_trees:
+    for t in nrn.neurites:
         nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
 
 
