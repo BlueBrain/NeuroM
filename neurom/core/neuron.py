@@ -31,7 +31,6 @@ from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-from itertools import chain, imap
 
 
 class SOMA_TYPE(object):
@@ -130,22 +129,22 @@ def make_soma(points):
 
 class Neuron(object):
     '''Toy neuron class for testing ideas'''
-    def __init__(self, soma_points, neurite_trees, name='Neuron'):
+    def __init__(self, soma_points, neurites, name='Neuron'):
         '''Construct a Neuron
 
         Arguments:
             soma_points: iterable of soma points.
-            neurite_trees: iterable of neurite tree structures.
+            neurites: iterable of neurite tree structures.
             name: Optional name for this Neuron.
 
         Raises:
             SomaError if soma can't be built from soma_points.
         '''
         self.soma = make_soma(soma_points)
-        self.neurite_trees = neurite_trees
+        self.neurites = neurites
         self.id = name
 
-    def i_neurite(self, iterator_type, mapping=None, tree_filter=None):
+    def i_neurites(self, iterator_type, mapping=None, tree_filter=None):
         '''Returns a mapped iterator to all the neuron's neurites
 
         Provides access to all the elements of all the neurites
@@ -156,8 +155,4 @@ class Neuron(object):
             mapping: optional function to apply to the iterator's target.
             tree_filter: optional top level filter on properties of neurite tree objects.
         '''
-        nrt = (self.neurite_trees if tree_filter is None
-               else filter(tree_filter, self.neurite_trees))
-
-        chain_it = chain(*imap(iterator_type, nrt))
-        return chain_it if mapping is None else tr.imap_val(mapping, chain_it)
+        return tr.i_chain(self.neurites, iterator_type, mapping, tree_filter)

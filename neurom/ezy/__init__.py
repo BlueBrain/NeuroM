@@ -26,7 +26,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools '''
+''' Quick and easy neuron morphology analysis tools
+
+Example:
+    Load a neuron, get some morphometrics and plot it.
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+    >>> fig, ax = ezy.view(nrn)
+    >>> fig.show()
+
+'''
 
 from .neuron import Neuron
 from .neuron import TreeType
+from ..view.view import neuron as view
+from ..view.view import neuron3d as view3d
