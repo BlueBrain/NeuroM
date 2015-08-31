@@ -28,19 +28,29 @@
 
 ''' Quick and easy neuron morphology analysis tools
 
-Example:
-    Load a neuron, get some morphometrics and plot it.
+Examples:
+
+    Load a neuron
 
     >>> from neurom import ezy
     >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+
+    Obtain some morphometrics
+
     >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
     >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
-    >>> fig, ax = ezy.view(nrn)
-    >>> fig.show()
+
+    View it in 2D and 3D
+
+    >>> fig2d, ax2d = ezy.view(nrn)
+    >>> fig2d.show()
+    >>> fig3d, ax3d = ezy.view3d(nrn)
+    >>> fig3d.show()
 
 '''
 
 from .neuron import Neuron
 from .neuron import TreeType
+from ..core.neuron import bounding_box
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d

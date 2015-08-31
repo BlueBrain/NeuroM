@@ -231,17 +231,17 @@ def n_sections(tree):
 
 def get_bounding_box(tree):
     """
-    Returns the boundaries of the tree
-    in three dimensions:
-    [[xmin, ymin, zmin],
-    [xmax, ymax, zmax]]
+    Returns:
+        The boundaries of the tree in three dimensions:
+            [[xmin, ymin, zmin],
+            [xmax, ymax, zmax]]
     """
 
-    min_x = min(p[0] for p in val_iter(tr.ipreorder(tree)))
-    min_y = min(p[1] for p in val_iter(tr.ipreorder(tree)))
-    min_z = min(p[2] for p in val_iter(tr.ipreorder(tree)))
-    max_x = max(p[0] for p in val_iter(tr.ipreorder(tree)))
-    max_y = max(p[1] for p in val_iter(tr.ipreorder(tree)))
-    max_z = max(p[2] for p in val_iter(tr.ipreorder(tree)))
+    min_xyz, max_xyz = (np.array([np.inf, np.inf, np.inf]),
+                        np.array([np.NINF, np.NINF, np.NINF]))
 
-    return np.array([[min_x, min_y, min_z], [max_x, max_y, max_z]])
+    for p in val_iter(tr.ipreorder(tree)):
+        min_xyz = np.minimum(p[:COLS.R], min_xyz)
+        max_xyz = np.maximum(p[:COLS.R], max_xyz)
+
+    return np.array([min_xyz, max_xyz])

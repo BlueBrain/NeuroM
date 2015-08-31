@@ -309,3 +309,8 @@ class TestEzyNeuron(object):
         # So simply check that calling is OK syntactically.
         ezy.view(self.neuron)
         ezy.view3d(self.neuron)
+
+    def test_bounding_box(self):
+        bbox = ((-40.328535157399998, -57.6001719972, -0.17071067811865476),
+                (64.7472627179, 48.516262252300002, 54.204087967500001))
+        nt.ok_(np.allclose(bbox, ezy.bounding_box(self.neuron)))

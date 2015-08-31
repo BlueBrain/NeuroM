@@ -190,3 +190,7 @@ if __name__ == '__main__':
     print('Maximum branch order:',
           np.max([bo for bo in nrn.iter_neurites(
               lambda t: imap(mt.branch_order, isection(t)))]))
+
+    # Neuron's bounding box
+    print('Bounding box ((min x, y, z), (max x, y, z))',
+          ezy.bounding_box(nrn))

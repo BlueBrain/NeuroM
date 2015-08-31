@@ -31,6 +31,7 @@ from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
+import numpy as np
 
 
 class SOMA_TYPE(object):
@@ -156,3 +157,27 @@ class Neuron(object):
             tree_filter: optional top level filter on properties of neurite tree objects.
         '''
         return tr.i_chain(self.neurites, iterator_type, mapping, tree_filter)
+
+
+def bounding_box(nrn):
+    '''Return 3D bounding box of a neuron
+
+    Returns:
+        2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
+    '''
+
+    # Get the bounding coordinates of the neurites
+    nmin_xyz, nmax_xyz = (np.array([np.inf, np.inf, np.inf]),
+                          np.array([np.NINF, np.NINF, np.NINF]))
+
+    for p in tr.i_chain(nrn.neurites, tr.ipreorder, lambda p: p):
+        nmin_xyz = np.minimum(p[:COLS.R], nmin_xyz)
+        nmax_xyz = np.maximum(p[:COLS.R], nmax_xyz)
+
+    # Get the bounding coordinates of the soma
+    smin_xyz = np.array(nrn.soma.center) - nrn.soma.radius
+
+    smax_xyz = np.array(nrn.soma.center) + nrn.soma.radius
+
+    return np.array([np.minimum(smin_xyz, nmin_xyz),
+                     np.maximum(smax_xyz, nmax_xyz)])
