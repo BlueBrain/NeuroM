@@ -313,4 +313,4 @@ class TestEzyNeuron(object):
     def test_bounding_box(self):
         bbox = ((-40.328535157399998, -57.6001719972, -0.17071067811865476),
                 (64.7472627179, 48.516262252300002, 54.204087967500001))
-        nt.assert_equal(bbox, ezy.bounding_box(self.neuron))
+        nt.ok_(np.allclose(bbox, ezy.bounding_box(self.neuron)))

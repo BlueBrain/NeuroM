@@ -31,7 +31,7 @@ from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-from itertools import izip
+import numpy as np
 
 
 class SOMA_TYPE(object):
@@ -163,32 +163,21 @@ def bounding_box(nrn):
     '''Return 3D bounding box of a neuron
 
     Returns:
-        tuple of ((min_x, min_y, min_z), (max_x, max_y, max_z))
+        2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
     '''
 
     # Get the bounding coordinates of the neurites
-    nmin_xyz = (min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.X])),
-                min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.Y])),
-                min(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.Z])))
+    nmin_xyz, nmax_xyz = (np.array([np.inf, np.inf, np.inf]),
+                          np.array([np.NINF, np.NINF, np.NINF]))
 
-    nmax_xyz = (max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.X])),
-                max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.Y])),
-                max(c for c in tr.i_chain(nrn.neurites, tr.ipreorder,
-                                          lambda p: p[COLS.Z])))
+    for p in tr.i_chain(nrn.neurites, tr.ipreorder, lambda p: p):
+        nmin_xyz = np.minimum(p[:COLS.R], nmin_xyz)
+        nmax_xyz = np.maximum(p[:COLS.R], nmax_xyz)
 
     # Get the bounding coordinates of the soma
-    smin_xyz = (nrn.soma.center[COLS.X] - nrn.soma.radius,
-                nrn.soma.center[COLS.Y] - nrn.soma.radius,
-                nrn.soma.center[COLS.Z] - nrn.soma.radius)
+    smin_xyz = np.array(nrn.soma.center) - nrn.soma.radius
 
-    smax_xyz = (nrn.soma.center[COLS.X] + nrn.soma.radius,
-                nrn.soma.center[COLS.Y] + nrn.soma.radius,
-                nrn.soma.center[COLS.Z] + nrn.soma.radius)
+    smax_xyz = np.array(nrn.soma.center) + nrn.soma.radius
 
-    return (tuple(min(i) for i in izip(nmin_xyz, smin_xyz)),
-            tuple(max(i) for i in izip(nmax_xyz, smax_xyz)))
+    return np.array([np.minimum(smin_xyz, nmin_xyz),
+                     np.maximum(smax_xyz, nmax_xyz)])
