@@ -157,6 +157,16 @@ def test_load_neuron():
     nt.ok_(nrn.id == FILES[0].strip('.swc'))
 
 
+def test_get_morph_files():
+    ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5',
+               'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
+
+    FILE_PATH = os.path.abspath(os.path.join(DATA_PATH, 'valid_set'))
+    files = set(os.path.basename(f) for f in utils.get_morph_files(FILE_PATH))
+
+    nt.assert_equal(ref, files)
+
+
 @nt.raises(SomaError)
 def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)

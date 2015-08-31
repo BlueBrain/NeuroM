@@ -117,3 +117,15 @@ def load_neuron(filename, tree_action=None):
     nrn.id = os.path.splitext(filename)[0]
 
     return nrn
+
+
+def get_morph_files(directory):
+    '''Get a list of all morphology files in a directory
+
+    Returns:
+        list with all files with extensions '.swc' or '.h5' (case insensitive)
+    '''
+    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
+    return [m for m in lsdir
+            if os.path.isfile(m) and
+            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
