@@ -53,7 +53,7 @@ Examples:
     >>> import numpy as np  # For mean value calculation
     >>> nrns = ezy.load_neurons('some/data/directory')
     >>> for nrn in nrns:
-            print 'mean section length', np.mean([l for l in nrn.get_section_lengths()])
+            print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
 
 '''
 
