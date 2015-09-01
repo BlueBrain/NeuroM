@@ -28,7 +28,7 @@
 
 .. NeuroM documentation master file
 
-NeuroM Documentation
+NeuroM |version|
 ********************
 
 Contents
