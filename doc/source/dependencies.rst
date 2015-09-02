@@ -26,20 +26,22 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM
-******
+Dependencies
+============
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+The build-time and runtime dependencies of NeuroM are:
 
-.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
-    :target: https://travis-ci.org/BlueBrain/NeuroM
+* numpy
+* h5py
+* scipy
+* matplotlib
+* enum34
 
-The official documentation can be found `here<https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
+Additional dependencies needed for testing and building documentation are:
 
-.. include:: doc/source/dependencies.rst
+* nose
+* coverage
+* sphinx
+* GNU Make
 
-.. include:: doc/source/install.rst
 
-.. include:: doc/source/examples.rst
-
-.. include:: doc/source/developer.rst

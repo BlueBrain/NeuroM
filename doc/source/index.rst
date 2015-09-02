@@ -31,17 +31,26 @@
 NeuroM |version|
 ********************
 
+.. include:: about.rst
+    :start-after: ============
+
+.. include:: build_status.rst
+
+----
+
 Contents
 ========
 
 .. toctree::
    :maxdepth: 2
 
-   readme
-   quick
+   quickstart
    tour
    definitions
    api
+   developer
+
+----
 
 Indices and tables
 ==================

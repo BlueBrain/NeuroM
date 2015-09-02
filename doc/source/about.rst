@@ -26,20 +26,9 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM
-******
+
+Introduction
+============
 
 NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
 
-.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
-    :target: https://travis-ci.org/BlueBrain/NeuroM
-
-The official documentation can be found `here<https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
-
-.. include:: doc/source/dependencies.rst
-
-.. include:: doc/source/install.rst
-
-.. include:: doc/source/examples.rst
-
-.. include:: doc/source/developer.rst

@@ -26,20 +26,46 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM
-******
+Examples
+========
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+- Perform checks on neuron morphology files:
 
-.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
-    :target: https://travis-ci.org/BlueBrain/NeuroM
+.. code-block:: bash
 
-The official documentation can be found `here<https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
+    (nrm)$ morph_check some/data/path/morph_file.swc # single file
+    INFO: ================================
+    INFO: Check file some/data/path/morph_file.swc...
+    INFO: Has valid soma? PASS
+    INFO: Has Apical Dendrite? PASS
+    INFO: Has Basal Dendrite? PASS
+    INFO: All neurites have non-zero radius? PASS
+    INFO: All segments have non-zero length? PASS
+    INFO: All sections have non-zero length? PASS
+    INFO: Check result: PASS
+    INFO: ================================
 
-.. include:: doc/source/dependencies.rst
 
-.. include:: doc/source/install.rst
+    (nrm)$ morph_check some/data/path # all files in directory
+    ....
 
-.. include:: doc/source/examples.rst
 
-.. include:: doc/source/developer.rst
+
+- Load a neuron and obtain some information from it:
+
+.. code-block:: python
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+
+
+- Visualize a neuronal morphology:
+
+.. code-block:: python
+
+    >>> # Initialize nrn as above
+    >>> fig, ax = ezy.view(nrn)
+    >>> fig.show()
+

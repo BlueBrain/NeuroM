@@ -26,20 +26,17 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM
-******
+Building the Documentation
+--------------------------
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+The documentation requires that you clone the repository. Once you have done that,
+there's a ``make`` target to build the HTML version of the documentation:
 
-.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
-    :target: https://travis-ci.org/BlueBrain/NeuroM
+.. code-block:: bash
 
-The official documentation can be found `here<https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
+    $ cd NeuroM # repository location
+    $ make doc
 
-.. include:: doc/source/dependencies.rst
+This builds the documentation in ``doc/build``.
+To view it, point a browser at ``doc/build/html/index.html``
 
-.. include:: doc/source/install.rst
-
-.. include:: doc/source/examples.rst
-
-.. include:: doc/source/developer.rst
