@@ -71,6 +71,7 @@ clean_test_venv:
 
 clean_doc:
 	@test -x $(ROOT_DIR)/$(VENV_BIN)/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build  -C doc clean || true
+	@rm -rf $(ROOT_DIR)/doc/source/_build
 
 clean: clean_doc clean_test_venv
 	@rm -f pep8.txt
