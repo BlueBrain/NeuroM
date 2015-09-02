@@ -36,10 +36,100 @@ NeuroM is a Python-based toolkit for the analysis and processing of neuron morph
 
 The official documentation can be found `here <https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
 
-.. include:: doc/source/dependencies.rst
 
-.. include:: doc/source/install.rst
+Dependencies
+============
 
-.. include:: doc/source/examples.rst
+The build-time and runtime dependencies of NeuroM are:
 
-.. include:: doc/source/developer.rst
+* numpy
+* h5py
+* scipy
+* matplotlib
+* enum34
+
+Installation
+============
+
+It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
+``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_:
+
+NeuroM installation
+-------------------
+
+The following assumes ``virtualenv`` named ``nrm`` with access to the dependencies has been set up
+and activated.
+We will see two ways to install ``NeuroM``
+
+#. From the git repository
+#. From source (for NeuroM developers)
+
+Install package from git
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install the latest version:
+
+.. code-block:: bash
+
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
+
+Install a particular release:
+
+.. code-block:: bash
+
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@neurom-v0.0.1
+
+Install from source
+^^^^^^^^^^^^^^^^^^^
+
+Clone the repository and install it:
+
+.. code-block:: bash
+
+    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
+    (nrm)$ pip install -e ./NeuroM
+
+This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
+To install in read-only mode, omit the ``-e``.
+
+Examples
+========
+
+- Perform checks on neuron morphology files:
+
+.. code-block:: bash
+
+    (nrm)$ morph_check some/data/path/morph_file.swc # single file
+    INFO: ================================
+    INFO: Check file some/data/path/morph_file.swc...
+    INFO: Has valid soma? PASS
+    INFO: Has Apical Dendrite? PASS
+    INFO: Has Basal Dendrite? PASS
+    INFO: All neurites have non-zero radius? PASS
+    INFO: All segments have non-zero length? PASS
+    INFO: All sections have non-zero length? PASS
+    INFO: Check result: PASS
+    INFO: ================================
+
+
+    (nrm)$ morph_check some/data/path # all files in directory
+    ....
+
+- Load a neuron and obtain some information from it:
+
+.. code-block:: python
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+
+
+- Visualize a neuronal morphology:
+
+.. code-block:: python
+
+    >>> # Initialize nrn as above
+    >>> fig, ax = ezy.view(nrn)
+    >>> fig.show()
+
