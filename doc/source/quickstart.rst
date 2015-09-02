@@ -26,36 +26,14 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
-
-NeuroM |version|
-********************
-
-.. include:: about.rst
-    :start-after: ============
-
-.. include:: build_status.rst
-
-----
-
-Contents
-========
+NeuroM Quick-Start Tutorial
+***************************
 
 .. toctree::
    :maxdepth: 2
 
-   quickstart
-   tour
-   definitions
-   api
-   developer
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   dependencies
+   install
+   quick
+   examples
 

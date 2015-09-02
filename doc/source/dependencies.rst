@@ -26,36 +26,22 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Dependencies
+============
 
-NeuroM |version|
-********************
+The build-time and runtime dependencies of NeuroM are:
 
-.. include:: about.rst
-    :start-after: ============
+* numpy
+* h5py
+* scipy
+* matplotlib
+* enum34
 
-.. include:: build_status.rst
+Additional dependencies needed for testing and building documentation are:
 
-----
+* nose
+* coverage
+* sphinx
+* GNU Make
 
-Contents
-========
-
-.. toctree::
-   :maxdepth: 2
-
-   quickstart
-   tour
-   definitions
-   api
-   developer
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 

@@ -26,36 +26,57 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Developer Documentation
+=======================
 
-NeuroM |version|
-********************
+Development Workflow
+--------------------
 
-.. include:: about.rst
-    :start-after: ============
+* Fork from github
+* Develop on your fork
+* Make a pull request
 
-.. include:: build_status.rst
+Before making a pull request, make sure that your fork is up to data and that all the
+tests pass locally. This will make it less likely that your pull request will get
+rejected by making braking chages or by failing the rest requirements.
 
-----
+Running the tests
+-----------------
 
-Contents
-========
+The tests require that you have cloned the repository, since the test code is
+not distributed in the package. It is recommended to use ``nosetests`` for
+this. There are two options:
 
-.. toctree::
-   :maxdepth: 2
+Use the provided ``Makefile`` to run the tests using ``make``:
 
-   quickstart
-   tour
-   definitions
-   api
-   developer
+.. code-block:: bash
 
-----
+    $ git clone https://github.com/BlueBrain/NeuroM.git
+    $ cd NeuroM
+    $ make test
 
-Indices and tables
-==================
+This runs ``pep8``, ``pylint`` and the unit tests in sequence.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+The ``Makefile`` also has targets for running only pylint and pep8 individually:
 
+.. code-block:: bash
+
+        $ make lint       # runs pep8 and pylint if that succeeds
+        $ make run_pep8   # run only pep8
+        $ make run_pylint # run only pep8
+
+This creates its own virtualenv ``neurom_test_venv`` and runs all the tests inside of
+it.
+
+Alternatively, inside the your own virtualenv, install ``nose`` and ``coverage``
+if you haven't
+done so already or these aren't installed in the system:
+
+.. code-block:: bash
+
+    (nrm)$ pip install nose
+    (nrm)$ pip install coverage
+    (nrm)$ nosetests -s -v --with-coverage --cover-package neurom
+
+
+.. include:: documentation.rst

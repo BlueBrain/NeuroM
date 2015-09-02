@@ -34,9 +34,10 @@ Quick and easy analysis
 The :py:mod:`neurom.ezy` module
 -------------------------------
 
-The :py:mod:`neurom.ezy` module contains a :py:class:`Neuron<neurom.ezy.neuron.Neuron>` class that allows to easily
-load neuron morphology from a file into ``neurom`` data structures. It provides convenient
-methods to query various properties of the neuron. The functionality is limited, but it
+The :py:mod:`neurom.ezy` module contains a :py:class:`Neuron<neurom.ezy.neuron.Neuron>` class 
+and helper functions that allow to easily
+load neuron morphologies from files into ``neurom`` data structures. It provides convenient
+methods to query various properties of the neurons. The functionality is limited, but it
 is hoped that it will suffice for most analyses. 
 
 These are some of the properties can be obtained for a single neurite type or for all
@@ -54,7 +55,8 @@ neurites regardless of type:
 There are also methods for obtaining the soma radius and for plotting a neuron
 in 2 and 3 dimensions.
 
-See :py:class:`neurom.ezy.neuron.Neuron` for more details and examples.
+.. seealso::
+    The :py:mod:`neurom.ezy` and :py:class:`neurom.ezy.Neuron` documentation for more details and examples.
 
 Data checking applications
 --------------------------
