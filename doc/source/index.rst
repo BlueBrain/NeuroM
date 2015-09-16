@@ -34,8 +34,6 @@ NeuroM |version|
 .. include:: about.rst
     :start-after: ============
 
-.. include:: build_status.rst
-
 ----
 
 Contents
