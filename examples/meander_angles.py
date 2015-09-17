@@ -50,7 +50,7 @@ if __name__ == '__main__':
     rd = load_data(filename)
     nrn = make_neuron(rd)
 
-    for tt in nrn.neurite_trees:
+    for tt in nrn.neurites:
         print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
         for a in i_segment_meander_angle(tt):
             LOG.debug('Angle %f', a)

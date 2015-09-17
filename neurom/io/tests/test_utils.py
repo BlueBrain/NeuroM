@@ -134,7 +134,7 @@ def test_make_neuron():
     rd = RAW_DATA[0]
     nrn = utils.make_neuron(rd)
     nt.ok_(np.all([s[COLS.ID] for s in nrn.soma.iter()] == SOMA_IDS[0]))
-    _check_trees(nrn.neurite_trees)
+    _check_trees(nrn.neurites)
 
 
 @nt.raises(SomaError)
@@ -148,13 +148,23 @@ def test_make_neuron_post_tree_action():
 
     rd = RAW_DATA[0]
     nrn = utils.make_neuron(rd, post_action)
-    for t in nrn.neurite_trees:
+    for t in nrn.neurites:
         nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
 
 
 def test_load_neuron():
     nrn = utils.load_neuron(FILES[0])
     nt.ok_(nrn.id == FILES[0].strip('.swc'))
+
+
+def test_get_morph_files():
+    ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5',
+               'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
+
+    FILE_PATH = os.path.abspath(os.path.join(DATA_PATH, 'valid_set'))
+    files = set(os.path.basename(f) for f in utils.get_morph_files(FILE_PATH))
+
+    nt.assert_equal(ref, files)
 
 
 @nt.raises(SomaError)

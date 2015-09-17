@@ -26,7 +26,45 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools '''
+''' Quick and easy neuron morphology analysis tools
+
+Examples:
+
+    Load a neuron
+
+    >>> from neurom import ezy
+    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+
+    Obtain some morphometrics
+
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+
+    View it in 2D and 3D
+
+    >>> fig2d, ax2d = ezy.view(nrn)
+    >>> fig2d.show()
+    >>> fig3d, ax3d = ezy.view3d(nrn)
+    >>> fig3d.show()
+
+    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
+    and returns a list of neurons
+
+    >>> import numpy as np  # For mean value calculation
+    >>> nrns = ezy.load_neurons('some/data/directory')
+    >>> for nrn in nrns:
+    ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
+
+'''
 
 from .neuron import Neuron
 from .neuron import TreeType
+from ..core.neuron import bounding_box
+from ..view.view import neuron as view
+from ..view.view import neuron3d as view3d
+from ..io.utils import get_morph_files
+
+
+def load_neurons(directory):
+    '''Create a list of Neuron objects from each morphology file in directory'''
+    return [Neuron(m) for m in get_morph_files(directory)]

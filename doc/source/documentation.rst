@@ -26,35 +26,17 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Building the Documentation
+--------------------------
 
-NeuroM |version|
-********************
+The documentation requires that you clone the repository. Once you have done that,
+there's a ``make`` target to build the HTML version of the documentation:
 
-.. include:: about.rst
-    :start-after: ============
+.. code-block:: bash
 
-----
+    $ cd NeuroM # repository location
+    $ make doc
 
-Contents
-========
-
-.. toctree::
-   :maxdepth: 2
-
-   quickstart
-   tour
-   definitions
-   api
-   developer
-   license
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+This builds the documentation in ``doc/build``.
+To view it, point a browser at ``doc/build/html/index.html``
 

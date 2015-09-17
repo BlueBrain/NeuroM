@@ -35,6 +35,7 @@ from neurom.core.types import checkTreeType
 from neurom.core.tree import ipreorder
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
+from neurom.core.tree import i_chain as i_neurites
 from neurom.analysis.morphmath import path_distance
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import set_tree_type
@@ -43,7 +44,7 @@ from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
-from neurom.view import view
+import math
 import numpy as np
 
 
@@ -108,6 +109,8 @@ class Neuron(object):
     def __init__(self, filename, iterable_type=np.array):
         self._iterable_type = iterable_type
         self._nrn = load_neuron(filename, set_tree_type)
+        self.soma = self._nrn.soma
+        self.neurites = self._nrn.neurites
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
@@ -120,6 +123,14 @@ class Neuron(object):
     def get_soma_radius(self):
         '''Get the radius of the soma'''
         return self._nrn.soma.radius
+
+    def get_soma_surface_area(self):
+        '''Get the surface area of the soma.
+
+        Note:
+            The surface area is calculated by assuming the soma is spherical.
+        '''
+        return 4 * math.pi * self.get_soma_radius() ** 2
 
     def get_local_bifurcation_angles(self, neurite_type=TreeType.all):
         '''Get local bifircation angles of all segments of a given type
@@ -183,22 +194,22 @@ class Neuron(object):
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
-        return sum(n_sections(t) for t in self._nrn.neurite_trees
+        return sum(n_sections(t) for t in self._nrn.neurites
                    if checkTreeType(neurite_type, t.type))
 
     def get_n_sections_per_neurite(self, neurite_type=TreeType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
         return self._iterable_type(
-            [n_sections(n) for n in self._nrn.neurite_trees
+            [n_sections(n) for n in self._nrn.neurites
              if checkTreeType(neurite_type, n.type)]
         )
 
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
-        return sum(1 for n in self._nrn.neurite_trees
+        return sum(1 for n in self._nrn.neurites
                    if checkTreeType(neurite_type, n.type))
 
-    def neurite_iter(self, iterator_type, mapping=None, neurite_type=TreeType.all):
+    def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
 
         Parameters:
@@ -220,14 +231,15 @@ class Neuron(object):
         >>> from neurom.analysis import morphmath as mm
         >>> from neurom.core import tree as tr
         >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
-        >>> v = sum(i for i in nrn.neurite_iter(tr.isegment, mm.segment_volume))
-        >>> tl = sum(l for l in nrn.neurite_iter(tr.isegment, mm.segment_length)))
+        >>> v = sum(i for i in nrn.iter_neurites(tr.isegment, mm.segment_volume))
+        >>> tl = sum(l for l in nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
-        return self._nrn.i_neurite(iterator_type,
-                                   mapping,
-                                   tree_filter=lambda t: checkTreeType(neurite_type,
-                                                                       t.type))
+        return i_neurites(self._nrn.neurites,
+                          iterator_type,
+                          mapping,
+                          tree_filter=lambda t: checkTreeType(neurite_type,
+                                                              t.type))
 
     def iter_points(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite points with mapping
@@ -236,7 +248,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to points.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(ipreorder, mapfun, neurite_type)
+        return self.iter_neurites(ipreorder, mapfun, neurite_type)
 
     def iter_segments(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite segments with mapping
@@ -245,7 +257,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to segments.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(isegment, mapfun, neurite_type)
+        return self.iter_neurites(isegment, mapfun, neurite_type)
 
     def iter_sections(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite sections with mapping
@@ -254,7 +266,7 @@ class Neuron(object):
             mapfun: mapping function to be applied to sections.
             neurite_type: type of neurites to iterate over.
         '''
-        return self.neurite_iter(isection, mapfun, neurite_type)
+        return self.iter_neurites(isection, mapfun, neurite_type)
 
     def neurite_loop(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type
@@ -270,22 +282,8 @@ class Neuron(object):
         Returns:
             Iterable containing the iteration targets after mapping.
         '''
-        return self._pkg(self.neurite_iter(iterator_type, mapping, neurite_type))
+        return self._pkg(self.iter_neurites(iterator_type, mapping, neurite_type))
 
     def _pkg(self, iterator):
         '''Create an iterable from an iterator'''
         return self._iterable_type([i for i in iterator])
-
-    def view(self, *args, **kwargs):
-        '''
-        Generates a 2D viewer of the neuron
-        Forwards arguments to neurom.view.view.neuron()
-        '''
-        return view.neuron(self._nrn, *args, **kwargs)
-
-    def view3d(self, *args, **kwargs):
-        '''
-        Generates a 3D viewer of the neuron
-        Forwards arguments to neurom.view.view.neuron3d()
-        '''
-        return view.neuron3d(self._nrn, *args, **kwargs)

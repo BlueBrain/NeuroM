@@ -26,72 +26,6 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM
-******
-
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
-
-.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
-    :target: https://travis-ci.org/BlueBrain/NeuroM
-
-The official documentation can be found `here <https://developer.humanbrainproject.eu/docs/neurom/latest/>`_.
-
-
-Dependencies
-============
-
-The build-time and runtime dependencies of NeuroM are:
-
-* numpy
-* h5py
-* scipy
-* matplotlib
-* enum34
-
-Installation
-============
-
-It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
-``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_:
-
-NeuroM installation
--------------------
-
-The following assumes ``virtualenv`` named ``nrm`` with access to the dependencies has been set up
-and activated.
-We will see two ways to install ``NeuroM``
-
-#. From the git repository
-#. From source (for NeuroM developers)
-
-Install package from git
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install the latest version:
-
-.. code-block:: bash
-
-    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
-
-Install a particular release:
-
-.. code-block:: bash
-
-    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@neurom-v0.0.1
-
-Install from source
-^^^^^^^^^^^^^^^^^^^
-
-Clone the repository and install it:
-
-.. code-block:: bash
-
-    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
-    (nrm)$ pip install -e ./NeuroM
-
-This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
-To install in read-only mode, omit the ``-e``.
-
 Examples
 ========
 
@@ -114,6 +48,8 @@ Examples
 
     (nrm)$ morph_check some/data/path # all files in directory
     ....
+
+
 
 - Load a neuron and obtain some information from it:
 

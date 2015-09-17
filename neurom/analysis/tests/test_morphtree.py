@@ -35,6 +35,7 @@ from neurom.io.utils import make_neuron
 from neurom.io.readers import load_data
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphtree import path_length
+from neurom.analysis.morphtree import branch_order
 from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_segment_volume
 from neurom.analysis.morphtree import i_segment_area
@@ -60,11 +61,29 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
 data    = load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
-tree0   = neuron0.neurite_trees[0]
+tree0   = neuron0.neurites[0]
 tree_types = [TreeType.axon,
               TreeType.basal_dendrite,
               TreeType.basal_dendrite,
               TreeType.apical_dendrite]
+
+
+# Mock tree holding integers, not points
+MOCK_TREE = Tree(0)
+MOCK_TREE.add_child(Tree(11))
+MOCK_TREE.add_child(Tree(12))
+MOCK_TREE.children[0].add_child(Tree(111))
+MOCK_TREE.children[0].add_child(Tree(112))
+MOCK_TREE.children[1].add_child(Tree(121))
+MOCK_TREE.children[1].add_child(Tree(122))
+MOCK_TREE.children[1].children[0].add_child(Tree(1211))
+MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12111))
+MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12112))
+T1111 = MOCK_TREE.children[0].children[0].add_child(Tree(1111))
+T11111 = T1111.add_child(Tree(11111))
+T11112 = T1111.add_child(Tree(11112))
+T11113 = T1111.add_child(Tree(11113))
+
 
 def _form_neuron_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
@@ -102,7 +121,7 @@ NEURON_TREE = _form_neuron_tree()
 SIMPLE_TREE = _form_simple_tree()
 
 
-def form_branching_tree():
+def _form_branching_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
     T = Tree(p)
     T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
@@ -119,6 +138,8 @@ def form_branching_tree():
     T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
     T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
+
+BRANCHING_TREE = _form_branching_tree()
 
 
 def test_segment_lengths():
@@ -188,18 +209,18 @@ def test_segment_path_length():
 
 
 def test_find_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         nt.ok_(find_tree_type(test_tree) == tree_types[en_tree])
 
 
 def test_set_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         set_tree_type(test_tree)
         nt.ok_(test_tree.type == tree_types[en_tree])
 
 
 def test_get_tree_type():
-    for en_tree, test_tree in enumerate(neuron0.neurite_trees):
+    for en_tree, test_tree in enumerate(neuron0.neurites):
         if hasattr(test_tree, 'type'):
             del test_tree.type
         # tree.type should be computed here.
@@ -270,17 +291,17 @@ def test_i_segment_meander_angles():
 
 
 def test_i_local_bifurcation_angles():
-    T = form_branching_tree()
+    T = BRANCHING_TREE
     ref = (0.25, 0.5, 0.25)  # ref angles in pi radians
     for i, b in enumerate(i_local_bifurcation_angle(T)):
         nt.assert_almost_equal(b / math.pi, ref[i])
 
 
 def test_i_remote_bifurcation_angles():
-    T = form_branching_tree()
+    T = BRANCHING_TREE
 
     # (fork point, end point, end point) tuples calculated by hand
-    # from form_branching_tree
+    # from BRANCHING_TREE
     refs = (((0, 4, 0), (0, 5, 0), (15, 15, 0)),
             ((0, 5, 0), (4, 5, 0), (0, 5, 3)),
             ((0, 5, 3), (0, 6, 3), (0, 6, 4)))
@@ -308,3 +329,23 @@ def test_get_bounding_box():
                     [  0.        ,   0.        ,  49.70137991]])
     bb = get_bounding_box(tree0)
     nt.ok_(np.allclose(bb, box))
+
+
+def test_branch_order():
+
+    branch_order_map = {
+        (0, 11): 0,
+        (11, 111, 1111): 1,
+        (1111, 11111): 2,
+        (1111, 11112): 2,
+        (1111, 11113): 2,
+        (11, 112): 1,
+        (0, 12): 0,
+        (12, 121, 1211): 1,
+        (1211, 12111): 2,
+        (1211, 12112): 2,
+        (12, 122): 1
+    }
+    for sec in tr.isection(MOCK_TREE):
+        nt.assert_equal(branch_order(sec),
+                        branch_order_map[tuple(p for p in tr.val_iter(sec))])

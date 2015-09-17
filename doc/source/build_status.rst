@@ -26,35 +26,8 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
 
-NeuroM |version|
-********************
+.. image:: https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master
+    :target: https://travis-ci.org/BlueBrain/NeuroM
 
-.. include:: about.rst
-    :start-after: ============
-
-----
-
-Contents
-========
-
-.. toctree::
-   :maxdepth: 2
-
-   quickstart
-   tour
-   definitions
-   api
-   developer
-   license
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 

@@ -9,4 +9,4 @@ test-reports
 pep8.txt
 pylint.txt
 doc/build
-doc/source/neurom
+doc/source/_build

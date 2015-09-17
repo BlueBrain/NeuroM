@@ -26,58 +26,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+'''Test neurom.ezy module'''
 
-VENV := neurom_test_venv
-VENV_BIN := $(VENV)/bin
+from nose import tools as nt
+import os
+from neurom import ezy
 
-# simulate running in headless mode
-unexport DISPLAY
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
 
-# Test coverage pass threshold (percent)
-MIN_COV ?= 100
 
-$(VENV):
-	virtualenv --system-site-packages $(VENV)
-	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
-	$(VENV_BIN)/pip install -e .
+def test_load_neurons():
 
-run_pep8: $(VENV)
-	$(VENV_BIN)/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
-
-run_pylint: $(VENV)
-	$(VENV_BIN)/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
-
-run_tests: $(VENV)
-	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
-
-run_tests_xunit: $(VENV)
-	@mkdir -p $(ROOT_DIR)/test-reports
-	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
-
-lint: run_pep8 run_pylint
-
-test: lint run_tests
-
-doc: $(VENV)
-	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc html
-
-doc_pdf: $(VENV)
-	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc latexpdf
-
-clean_test_venv:
-	@rm -rf $(VENV)
-	@rm -rf $(ROOT_DIR)/test-reports
-
-clean_doc:
-	@test -x $(ROOT_DIR)/$(VENV_BIN)/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build  -C doc clean || true
-	@rm -rf $(ROOT_DIR)/doc/source/_build
-
-clean: clean_doc clean_test_venv
-	@rm -f pep8.txt
-	@rm -f pylint.txt
-	@rm -rf neurom.egg-info
-	@rm -f .coverage
-	@rm -rf test-reports
-
-.PHONY: run_pep8 test clean_test_venv clean doc
+    nrns = ezy.load_neurons(DATA_PATH)
+    nt.assert_equal(len(nrns), 5)

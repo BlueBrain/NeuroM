@@ -8,11 +8,15 @@ morphometrics functionality.
 
 from __future__ import print_function
 from pprint import pprint
+from itertools import imap
 from neurom import ezy
 from neurom.core.types import TreeType
 from neurom.core.types import NEURITES
+from neurom.core.tree import isection
+from neurom.core.tree import ibifurcation_point
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
+from neurom.analysis import morphtree as mt
 import numpy as np
 
 
@@ -43,6 +47,12 @@ if __name__ == '__main__':
     #  load a neuron from an SWC file
     nrn = ezy.Neuron(filename)
 
+    # Get some soma information
+    # Soma radius and surface area
+    print("Soma radius", nrn.get_soma_radius())
+    print("Soma surface area", nrn.get_soma_surface_area())
+
+    # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
     # The allowed types are members of the TreeType enumeration.
     # NEURITES is a list of valid neurite types.
@@ -157,3 +167,30 @@ if __name__ == '__main__':
     # get mean radius of segments
     print('Mean radius of segments:',
           np.mean([r for r in nrn.iter_segments(mm.segment_radius)]))
+
+    # Number of bifurcation points.
+    # This uses the more generic iter_neurites method, in which
+    # we can decide the type of iteration. Here we iterate over
+    # bifurcation points.
+    print('Number of bifurcation points:',
+          sum(1 for _ in nrn.iter_neurites(ibifurcation_point)))
+
+    # Number of bifurcation points for apical dendrites
+    print('Number of bifurcation points (apical dendrites):',
+          sum(1 for _ in nrn.iter_neurites(ibifurcation_point,
+                                           neurite_type=TreeType.apical_dendrite)))
+
+    # Maximum branch order
+    # This is complicated and will be factored into a helper function.
+    # We iterate over sections, calcumating the branch order for each one.
+    # The reason we cannot simply call nen.iter_sections(mt.branch_order) is
+    # that mt.branch_order requires sections of tree nodes for navigation, but
+    # nrn.iter_sections iterates over the sections of points.
+    # TODO: This whole tree data business has to be refactored and simplified.
+    print('Maximum branch order:',
+          np.max([bo for bo in nrn.iter_neurites(
+              lambda t: imap(mt.branch_order, isection(t)))]))
+
+    # Neuron's bounding box
+    print('Bounding box ((min x, y, z), (max x, y, z))',
+          ezy.bounding_box(nrn))

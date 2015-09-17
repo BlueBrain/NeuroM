@@ -28,8 +28,10 @@
 
 from nose import tools as nt
 from neurom.core import neuron
+from neurom.core.tree import Tree
 from neurom.exceptions import SomaError
 from itertools import izip
+import numpy as np
 
 SOMA_A_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
@@ -73,6 +75,18 @@ INVALID_PTS_2 = [
     [11, 22, 33, 44, 2, 1, 1]
 ]
 
+TREE = Tree([0.0, 0.0, 0.0, 1.0, 1, 1, 2] )
+T1 = TREE.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+
 def test_make_SomaA():
     soma = neuron.make_soma(SOMA_A_PTS)
     nt.ok_(isinstance(soma, neuron.SomaA))
@@ -112,26 +126,42 @@ def test_invalid_soma_points_2_raises_SomaError():
 def test_neuron():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'])
     nt.assert_equal(nrn.soma.center, (11, 22, 33))
-    nt.assert_equal(nrn.neurite_trees, ['foo', 'bar'])
+    nt.assert_equal(nrn.neurites, ['foo', 'bar'])
     nt.assert_equal(nrn.id, 'Neuron')
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'], 'test')
     nt.assert_equal(nrn.id, 'test')
 
 
-def test_i_neurite_chains():
+def test_i_neurites_chains():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
     s = 'foobarbaz'
-    for i, j in izip(s, nrn.i_neurite(iter)):
+    for i, j in izip(s, nrn.i_neurites(iter)):
         nt.assert_equal(i, j)
 
 
-def test_i_neurite_filter():
+def test_i_neurites_filter():
     nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
     ref = 'barbaz'
     for i, j in izip(ref,
-                     nrn.i_neurite(iter,
-                                   tree_filter=lambda s: s.startswith('b'))):
+                     nrn.i_neurites(iter,
+                                    tree_filter=lambda s: s.startswith('b'))):
         nt.assert_equal(i, j)
+
+
+def test_bounding_box():
+
+    soma_pts = [[0, 0, 0, 1, 1, 1, -1]]
+    nrn = neuron.Neuron(soma_pts, [TREE])
+    ref1 = ((-1, -1, -1), (4.0, 6.0, 3.0))
+
+    for a, b in izip(neuron.bounding_box(nrn), ref1):
+        nt.assert_true(np.allclose(a, b))
+
+    nrn = neuron.Neuron(SOMA_A_PTS, [TREE])
+    ref2 = ((-33, -22, -11), (55, 66, 77))
+
+    for a, b in izip(neuron.bounding_box(nrn), ref2):
+        nt.assert_true(np.allclose(a, b))
 
 
 @nt.raises(SomaError)
