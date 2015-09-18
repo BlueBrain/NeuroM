@@ -136,23 +136,23 @@ if __name__ == '__main__':
     # Get length of all neurites in cell by iterating over sections,
     # and summing the section lengths
     print('Total neurite length:',
-          sum(seclen for seclen in nrn.iter_sections(mm.path_distance)))
+          sum(nrn.iter_sections(mm.path_distance)))
 
     # Get length of all neurites in cell by iterating over segments,
     # and summing the segment lengths.
     # This should yield the same result as iterating over sections.
     print('Total neurite length:',
-          sum(seglen for seglen in nrn.iter_segments(mm.segment_length)))
+          sum(nrn.iter_segments(mm.segment_length)))
 
     # get volume of all neurites in cell by summing over segment
     # volumes
     print('Total neurite volume:',
-          sum(vol for vol in nrn.iter_segments(mm.segment_volume)))
+          sum(nrn.iter_segments(mm.segment_volume)))
 
     # get area of all neurites in cell by summing over segment
     # areas
     print('Total neurite surface area:',
-          sum(area for area in nrn.iter_segments(mm.segment_area)))
+          sum(nrn.iter_segments(mm.segment_area)))
 
     # get total number of points in cell.
     # iter_points needs a mapping function, so we pass the identity.

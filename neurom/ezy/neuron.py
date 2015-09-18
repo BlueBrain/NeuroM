@@ -231,8 +231,8 @@ class Neuron(object):
         >>> from neurom.analysis import morphmath as mm
         >>> from neurom.core import tree as tr
         >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
-        >>> v = sum(i for i in nrn.iter_neurites(tr.isegment, mm.segment_volume))
-        >>> tl = sum(l for l in nrn.iter_neurites(tr.isegment, mm.segment_length)))
+        >>> v = sum(nrn.iter_neurites(tr.isegment, mm.segment_volume))
+        >>> tl = sum(nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
         return i_neurites(self._nrn.neurites,
