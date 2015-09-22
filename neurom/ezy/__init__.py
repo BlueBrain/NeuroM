@@ -59,6 +59,7 @@ Examples:
 
 from .neuron import Neuron
 from .neuron import TreeType
+from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.neuron import bounding_box
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d

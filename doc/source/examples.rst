@@ -29,7 +29,8 @@
 Examples
 ========
 
-- Perform checks on neuron morphology files:
+Morphology file data consistency checks
+***************************************
 
 .. code-block:: bash
 
@@ -50,6 +51,8 @@ Examples
     ....
 
 
+Basic ``eyz.Neuron`` usage
+**************************
 
 - Load a neuron and obtain some information from it:
 
@@ -69,3 +72,34 @@ Examples
     >>> fig, ax = ezy.view(nrn)
     >>> fig.show()
 
+
+Basic ``ezy`` examples script
+*****************************
+
+These basic examples illustrate the type of morphometrics that can be easily obtained
+from the ``ezy`` module, without the need for any other ``neurom`` modules or tools.
+
+The idea here is to pre-package the most common analyses so that users can obtain the
+morphometrics with a very minimal knowledge of ``python`` and ``neurom``.
+
+.. literalinclude:: ../../examples/ezy.py
+    :lines: 30-
+
+
+Advanced ``ezy`` examples script
+********************************
+
+These slightly more complex examples illustrate what can be done with the ``ezy``
+module in combination with various generic iterators and simple morphometric functions.
+
+The idea here is that there is a great deal of flexibility to build new analyses based
+on some limited number of orthogonal iterator and morphometric components that can
+be combined in many ways. Users with some knowledge of ``python`` and ``neurom`` can easily
+implement code to obtain new morphometrics.
+
+All of the examples in the previous sections can be implemented
+in a similar way to those presented here.
+
+
+.. literalinclude:: ../../examples/ezy_advanced.py
+    :lines: 30-
