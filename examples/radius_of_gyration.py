@@ -88,7 +88,8 @@ if __name__ == '__main__':
     nrn = ezy.Neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
-    print [(sum(1 for _ in tree.isegment(n)), radius_of_gyration(n), n.type) for n in nrn.neurites]
+    print([(sum(1 for _ in tree.isegment(nrte)),
+            radius_of_gyration(nrte), nrte.type) for nrte in nrn.neurites])
 
     # print mean radius of gyration per neurite type
     print('Mean radius of gyration for axons: ',
