@@ -34,6 +34,7 @@ from neurom.core import tree
 from neurom.core.dataformat import COLS
 import numpy as np
 
+
 def segment_centre_of_mass(seg):
     '''Calculate and return centre of mass of a segment.
 
@@ -41,10 +42,11 @@ def segment_centre_of_mass(seg):
     h = morphmath.segment_length(seg)
     r0 = seg[0][COLS.R]
     r1 = seg[1][COLS.R]
-    num = r0*r0 + 2*r0*r1 + 3*r1*r1
-    denom = 4 * (r0*r0 + r0*r1 + r1*r1)
-    centre_of_mass_z_loc = num/denom
-    return seg[0][0:3] + centre_of_mass_z_loc/h*(seg[1][0:3] - seg[0][0:3])
+    num = r0 * r0 + 2 * r0 * r1 + 3 * r1 * r1
+    denom = 4 * (r0 * r0 + r0 * r1 + r1 * r1)
+    centre_of_mass_z_loc = num / denom
+    return seg[0][0:3] + (centre_of_mass_z_loc / h) * (seg[1][0:3] - seg[0][0:3])
+
 
 def neurite_centre_of_mass(neurite):
     '''Calculate and return centre of mass of a neurite.'''
@@ -52,15 +54,17 @@ def neurite_centre_of_mass(neurite):
     total_volume = 0
     for segment in tree.val_iter(tree.isegment(neurite)):
         seg_volume = morphmath.segment_volume(segment)
-        centre_of_mass = centre_of_mass + seg_volume*segment_centre_of_mass(segment)
+        centre_of_mass = centre_of_mass + seg_volume * segment_centre_of_mass(segment)
         total_volume += seg_volume
-    return centre_of_mass/total_volume
+    return centre_of_mass / total_volume
+
 
 def distance_sqr(point, seg):
     '''Calculate and return square Euclidian distance from given point to
     centre of mass of given segment.'''
     centre_of_mass = segment_centre_of_mass(seg)
     return sum(pow(np.subtract(point, centre_of_mass), 2))
+
 
 def radius_of_gyration(neurite):
     '''Calculate and return radius of gyration of a given neurite.'''
@@ -70,11 +74,13 @@ def radius_of_gyration(neurite):
     for segment in tree.val_iter(tree.isegment(neurite)):
         sum_sqr_distance = sum_sqr_distance + distance_sqr(centre_mass, segment)
         N += 1
-    return np.sqrt(sum_sqr_distance/N)
+    return np.sqrt(sum_sqr_distance / N)
 
-def mean_radius_of_gyration(neurites):
+
+def mean_rad_of_gyration(neurites):
     '''Calculate mean radius of gyration for set of neurites.'''
     return np.mean([radius_of_gyration(n) for n in neurites])
+
 
 if __name__ == '__main__':
     #  load a neuron from an SWC file
@@ -85,6 +91,9 @@ if __name__ == '__main__':
     print [(sum(1 for _ in tree.isegment(n)), radius_of_gyration(n), n.type) for n in nrn.neurites]
 
     # print mean radius of gyration per neurite type
-    print 'Mean radius of gyration for axons: ', mean_radius_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.axon)
-    print 'Mean radius of gyration for basal dendrites: ', mean_radius_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.basal_dendrite)
-    print 'Mean radius of gyration for apical dendrites: ', mean_radius_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.apical_dendrite)
+    print('Mean radius of gyration for axons: ',
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.axon))
+    print('Mean radius of gyration for basal dendrites: ',
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.basal_dendrite))
+    print('Mean radius of gyration for apical dendrites: ',
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == ezy.TreeType.apical_dendrite))
