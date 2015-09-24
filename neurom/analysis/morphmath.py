@@ -179,3 +179,14 @@ def taper_rate(p0, p1):
         between them.
     '''
     return 2 * abs(p0[COLS.R] - p1[COLS.R]) / point_dist(p0, p1)
+
+
+def segment_taper_rate(seg):
+    '''Compute the taper rate of a segment
+
+    Returns:
+        The taper rate, defined as the absolute value of the difference in
+        the diameters of the segment's two points divided by the euclidian
+        distance between them.
+    '''
+    return taper_rate(seg[0], seg[1])
