@@ -34,11 +34,12 @@ Development Workflow
 
 * Fork from github
 * Develop on your fork
+* Test locally
 * Make a pull request
 
-Before making a pull request, make sure that your fork is up to data and that all the
+Before making a pull request, make sure that your fork is up to date and that all the
 tests pass locally. This will make it less likely that your pull request will get
-rejected by making braking chages or by failing the rest requirements.
+rejected by making breaking chages or by failing the test requirements.
 
 Running the tests
 -----------------
@@ -71,14 +72,14 @@ The ``Makefile`` also has targets for running only pylint and pep8 individually:
         $ make run_pylint # run only pep8
 
 
-Alternatively, inside the your own virtualenv, you can install the "developer packages", 
-if you haven't done so already or these aren't installed in the system:
+Note that you can also install the test dependencies and run the tests inside of your 
+own virtualenv:
 
 .. code-block:: bash
 
     (nrm)$ pip install -r requirements_dev.txt
 
-This installs the following packages into the ``virtualenv``
+This installs the following packages into your ``virtualenv``
 unless they are already installed:
 
 .. literalinclude:: ../../requirements_dev.txt
@@ -89,5 +90,12 @@ Then, run the tests manually in the ``virtualenv``. For example,
 .. code-block:: bash
 
     (nrm)$ nosetests -v --with-coverage --cover-min-percentage=100 --cover-package neurom
+
+.. warning::
+
+    To ensure that the test requirements are the same as those run in continuous
+    integration, you should run the tests using the ``make test`` command. This is the
+    same command used in continuous integration. Failure to pass means will result in
+    a pull request being rejected.
 
 .. include:: documentation.rst
