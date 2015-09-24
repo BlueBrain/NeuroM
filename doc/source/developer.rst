@@ -34,11 +34,12 @@ Development Workflow
 
 * Fork from github
 * Develop on your fork
+* Test locally
 * Make a pull request
 
-Before making a pull request, make sure that your fork is up to data and that all the
+Before making a pull request, make sure that your fork is up to date and that all the
 tests pass locally. This will make it less likely that your pull request will get
-rejected by making braking chages or by failing the rest requirements.
+rejected by making breaking chages or by failing the test requirements.
 
 Running the tests
 -----------------
@@ -57,6 +58,11 @@ Use the provided ``Makefile`` to run the tests using ``make``:
 
 This runs ``pep8``, ``pylint`` and the unit tests in sequence.
 
+This method takes care of
+installing all extra dependencies needed for running the tests, diagnosing the results,
+performing linting on the source code. These dependencies are installed into a
+``virtuanelv`` named ``neurom_test_venv``:
+
 The ``Makefile`` also has targets for running only pylint and pep8 individually:
 
 .. code-block:: bash
@@ -65,18 +71,31 @@ The ``Makefile`` also has targets for running only pylint and pep8 individually:
         $ make run_pep8   # run only pep8
         $ make run_pylint # run only pep8
 
-This creates its own virtualenv ``neurom_test_venv`` and runs all the tests inside of
-it.
 
-Alternatively, inside the your own virtualenv, install ``nose`` and ``coverage``
-if you haven't
-done so already or these aren't installed in the system:
+Note that you can also install the test dependencies and run the tests inside of your 
+own virtualenv:
 
 .. code-block:: bash
 
-    (nrm)$ pip install nose
-    (nrm)$ pip install coverage
-    (nrm)$ nosetests -s -v --with-coverage --cover-package neurom
+    (nrm)$ pip install -r requirements_dev.txt
 
+This installs the following packages into your ``virtualenv``
+unless they are already installed:
+
+.. literalinclude:: ../../requirements_dev.txt
+    :lines: 29-36
+
+Then, run the tests manually in the ``virtualenv``. For example,
+
+.. code-block:: bash
+
+    (nrm)$ nosetests -v --with-coverage --cover-min-percentage=100 --cover-package neurom
+
+.. warning::
+
+    To ensure that the test requirements are the same as those run in continuous
+    integration, you should run the tests using the ``make test`` command. This is the
+    same command used in continuous integration. Failure to pass means will result in
+    a pull request being rejected.
 
 .. include:: documentation.rst
