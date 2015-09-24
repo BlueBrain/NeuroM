@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Calculate and illustrate end-to-end distance of neurites.'''
+'''Calculate and plot end-to-end distance of neurites.'''
 
 from neurom.analysis import morphmath
 from neurom import ezy
