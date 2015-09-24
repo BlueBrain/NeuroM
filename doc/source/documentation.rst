@@ -34,6 +34,8 @@ there's a ``make`` target to build the HTML version of the documentation:
 
 .. code-block:: bash
 
+    $ git clone https://github.com/BlueBrain/NeuroM.git
+    ....
     $ cd NeuroM # repository location
     $ make doc
 
