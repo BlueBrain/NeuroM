@@ -29,19 +29,32 @@
 Dependencies
 ============
 
-The build-time and runtime dependencies of NeuroM are:
+Build-time and runtime
+^^^^^^^^^^^^^^^^^^^^^^
 
-* numpy
-* h5py
-* scipy
-* matplotlib
-* enum34
+* `numpy <http://www.numpy.org/>`_
+* `h5py <http://www.h5py.org/>`_
+* `scipy <http://www.scipy.org/>`_
+* `matplotlib <http://www.matplotlib.org/>`_
+* `enum34 <https://pypi.python.org/pypi/enum34/>`_
 
-Additional dependencies needed for testing and building documentation are:
+It is highly recommended that all except ``enum34`` be installed into your system
+before attempting to install ``NeuroM``. The ``NeuroM`` package installation
+takes care of installing ``enum34``.
 
-* nose
-* coverage
-* sphinx
-* GNU Make
+Installing and building
+^^^^^^^^^^^^^^^^^^^^^^^
 
+* `pip <https://pip.pypa.io/en/stable/>`_
+* `virtualenv <https://virtualenv.pypa.io/en/stable/>`_
+* `GNU Make <https://www.gnu.org/software/make/>`_
 
+Testing and documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These dependencies are not needed for installing and running ``NeuroM``,
+but are useful for those who want to contribute to its development.
+
+* `nose <https://nose.readthedocs.org/en/latest/>`_
+* `coverage <https://coverage.readthedocs.org/en/latest/>`_
+* `sphinx <http://sphinx-doc.org/>`_
