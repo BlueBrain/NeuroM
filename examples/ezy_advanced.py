@@ -35,7 +35,6 @@ morphometrics functionality.
 '''
 
 from __future__ import print_function
-from pprint import pprint
 from itertools import imap
 from neurom import ezy
 from neurom.core.tree import isection
@@ -44,26 +43,6 @@ from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
 from neurom.analysis import morphtree as mt
 import numpy as np
-
-
-def stats(data):
-    '''Dictionary with summary stats for data
-
-    Returns:
-        dicitonary with length, mean, sum, standard deviation,\
-            min and max of data
-    '''
-    return {'len': len(data),
-            'mean': np.mean(data),
-            'sum': np.sum(data),
-            'std': np.std(data),
-            'min': np.min(data),
-            'max': np.max(data)}
-
-
-def pprint_stats(data):
-    '''Pretty print summary stats for data'''
-    pprint(stats(data))
 
 
 if __name__ == '__main__':
@@ -112,6 +91,16 @@ if __name__ == '__main__':
     # get mean radius of segments
     print('Mean radius of segments:',
           np.mean([r for r in nrn.iter_segments(mm.segment_radius)]))
+
+    # get stats for the segment taper rate, for different types of neurite
+    for ttype in ezy.NEURITE_TYPES:
+        seg_taper_rate = list(nrn.iter_segments(mm.segment_taper_rate, ttype))
+        print('Segment taper rate (', ttype,
+              '):\n  mean=', np.mean(seg_taper_rate),
+              ', std=', np.std(seg_taper_rate),
+              ', min=', np.min(seg_taper_rate),
+              ', max=', np.max(seg_taper_rate),
+              sep='')
 
     # Number of bifurcation points.
     # This uses the more generic iter_neurites method, in which

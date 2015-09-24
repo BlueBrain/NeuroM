@@ -41,6 +41,7 @@ from neurom.analysis.morphmath import segment_volume
 from neurom.analysis.morphmath import segment_area
 from neurom.analysis.morphmath import segment_radial_dist
 from neurom.analysis.morphmath import taper_rate
+from neurom.analysis.morphmath import segment_taper_rate
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -197,3 +198,13 @@ def test_taper_rate():
     nt.assert_almost_equal(taper_rate(p0, p1), 6.0)
     nt.assert_almost_equal(taper_rate(p0, p2), 3.0)
     nt.assert_almost_equal(taper_rate(p0, p3), 2.0)
+
+
+def test_segment_taper_rate():
+    p0 = (0.0, 0.0, 0.0, 1.0)
+    p1 = (1.0, 0.0, 0.0, 4.0)
+    p2 = (2.0, 0.0, 0.0, 4.0)
+    p3 = (3.0, 0.0, 0.0, 4.0)
+    nt.assert_almost_equal(segment_taper_rate((p0, p1)), 6.0)
+    nt.assert_almost_equal(segment_taper_rate((p0, p2)), 3.0)
+    nt.assert_almost_equal(segment_taper_rate((p0, p3)), 2.0)
