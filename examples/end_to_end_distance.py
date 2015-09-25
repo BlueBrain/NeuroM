@@ -35,20 +35,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def furthest_leaf(neurite):
-    '''Find and return the neurite point that is the furthest away from the
-    neurite trunk.'''
-    trunk = neurite.value[0:3]
-    furthest = trunk
-    max_distance = 0
-    for leaf in tree.val_iter(tree.ileaf(neurite)):
-        new_distance = morphmath.point_dist(leaf[0:3], trunk)
-        if new_distance > max_distance:
-            max_distance = new_distance
-            furthest = leaf[0:3]
-    return furthest
-
-
 def segment_vector(seg):
     '''Calculate and return segment vector.'''
     return np.subtract(seg[1][0:3], seg[0][0:3])
@@ -56,7 +42,8 @@ def segment_vector(seg):
 
 def neurite_end_to_end_distance(neurite):
     '''Calculate and return end-to-end-distance of a given neurite.'''
-    return morphmath.point_dist(furthest_leaf(neurite), neurite.value[0:3])
+    trunk = neurite.value
+    return max(morphmath.point_dist(l, trunk) for l in tree.val_iter(tree.ileaf(neurite)))
 
 
 def mean_end_to_end_dist(neurites):
@@ -82,9 +69,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
     index = 0
     max_so_far = 0
     for segment in tree.val_iter(tree.isegment(neurite)):
-        new_distance = morphmath.point_dist(segment[1][0:3], neurite.value[0:3])
-        if new_distance > max_so_far:
-            max_so_far = new_distance
+        max_so_far = max(max_so_far, morphmath.point_dist(segment[1], neurite.value))
         end_to_end_distance[index] = max_so_far
         index += 1
     make_end_to_end_distance_plot(np.arange(n) + 1, end_to_end_distance, neurite.type)
