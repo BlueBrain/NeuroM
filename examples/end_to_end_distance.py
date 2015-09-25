@@ -35,20 +35,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def segment_vector(seg):
-    '''Calculate and return segment vector.'''
-    return np.subtract(seg[1][0:3], seg[0][0:3])
-
-
-def neurite_end_to_end_distance(neurite):
-    '''Calculate and return end-to-end-distance of a given neurite.'''
-    trunk = neurite.value
-    return max(morphmath.point_dist(l, trunk) for l in tree.val_iter(tree.ileaf(neurite)))
+def path_end_to_end_distance(path):
+    '''Calculate and return end-to-end-distance of a given path.'''
+    trunk = path.value
+    return max(morphmath.point_dist(l, trunk) for l in tree.val_iter(tree.ileaf(path)))
 
 
 def mean_end_to_end_dist(neurites):
     '''Calculate mean end to end distance for set of neurites.'''
-    return np.mean([neurite_end_to_end_distance(n) for n in neurites])
+    return np.mean([path_end_to_end_distance(n) for n in neurites])
 
 
 def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type):
@@ -61,23 +56,21 @@ def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type
     plt.show()
 
 
-def calculate_and_plot_end_to_end_distance(neurite):
+def calculate_and_plot_end_to_end_distance(path):
     '''Calculate and plot the end-to-end distance vs the number of segments for
-    an increasingly larger part of a given neurite.'''
-    n = sum(1 for _ in tree.isegment(neurite))
+    an increasingly larger part of a given path.
+
+    Note that the plots are not very meaningful for bifurcating trees.'''
+    n = sum(1 for _ in tree.isegment(path))
     end_to_end_distance = np.zeros(n)
-    index = 0
-    max_so_far = 0
-    for segment in tree.val_iter(tree.isegment(neurite)):
-        max_so_far = max(max_so_far, morphmath.point_dist(segment[1], neurite.value))
-        end_to_end_distance[index] = max_so_far
-        index += 1
-    make_end_to_end_distance_plot(np.arange(n) + 1, end_to_end_distance, neurite.type)
+    for index, segment in enumerate(tree.val_iter(tree.isegment(path))):
+        end_to_end_distance[index] = morphmath.point_dist(segment[1], path.value)
+    make_end_to_end_distance_plot(np.arange(n) + 1, end_to_end_distance, path.type)
 
 
 if __name__ == '__main__':
     #  load a neuron from an SWC file
-    filename = 'test_data/swc/Neuron.swc'
+    filename = 'test_data/swc/Neuron_3_random_walker_branches.swc'
     nrn = ezy.Neuron(filename)
 
     # print mean end-to-end distance per neurite type
@@ -94,4 +87,4 @@ if __name__ == '__main__':
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)
         print(sum(1 for _ in tree.isegment(nrte)),
-              neurite_end_to_end_distance(nrte), nrte.type)
+              path_end_to_end_distance(nrte), nrte.type)
