@@ -36,7 +36,7 @@ from neurom.core.tree import ipreorder
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
 from neurom.core.tree import i_chain as i_neurites
-from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_local_bifurcation_angle
@@ -114,7 +114,7 @@ class Neuron(object):
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
-        return self._pkg(self.iter_sections(path_distance, neurite_type))
+        return self._pkg(self.iter_sections(section_length, neurite_type))
 
     def get_segment_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''

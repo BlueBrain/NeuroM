@@ -219,7 +219,7 @@ def i_section_length(tree):
     """
     Return an iterator of tree section lengths
     """
-    return tr.imap_val(mm.path_distance, tr.isection(tree))
+    return tr.imap_val(mm.section_length, tr.isection(tree))
 
 
 def n_sections(tree):

@@ -36,7 +36,7 @@ from neurom.core.tree import isegment
 from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from neurom.core.dataformat import COLS
-from neurom.analysis.morphmath import path_distance
+from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import find_tree_type
 from itertools import chain
@@ -102,7 +102,7 @@ def nonzero_section_lengths(neuron, threshold=0.0):
     Return: list of ids of first point in bad sections
     '''
     l = [[s for s in val_iter(isection(t))
-          if path_distance(s) <= threshold]
+          if section_length(s) <= threshold]
          for t in neuron.neurites]
     return [i[0][COLS.ID] for i in chain(*l)]
 
