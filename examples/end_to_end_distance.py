@@ -61,11 +61,10 @@ def calculate_and_plot_end_to_end_distance(path):
     an increasingly larger part of a given path.
 
     Note that the plots are not very meaningful for bifurcating trees.'''
-    n = sum(1 for _ in tree.isegment(path))
-    end_to_end_distance = np.zeros(n)
-    for index, segment in enumerate(tree.val_iter(tree.isegment(path))):
-        end_to_end_distance[index] = morphmath.point_dist(segment[1], path.value)
-    make_end_to_end_distance_plot(np.arange(n) + 1, end_to_end_distance, path.type)
+    end_to_end_distance = [morphmath.point_dist(segment[1], path.value)
+                           for segment in tree.val_iter(tree.isegment(path))]
+    make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1, end_to_end_distance,
+                                  path.type)
 
 
 if __name__ == '__main__':
