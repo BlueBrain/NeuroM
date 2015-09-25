@@ -190,3 +190,7 @@ def segment_taper_rate(seg):
         distance between them.
     '''
     return taper_rate(seg[0], seg[1])
+
+
+# Useful alias for path_distance
+section_length = path_distance
