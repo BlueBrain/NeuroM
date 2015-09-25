@@ -134,7 +134,7 @@ is to load a morphology file into a neuron object.
 
     from neurom.io.utils import load_neuron
     nrn = load_neuron('test_data/swc/Neuron.swc')
-    trees = nrn.neurite_trees
+    trees = nrn.neurites
 
 We will assume ``trees`` has been obtained in a similar way in the following examples.
 
@@ -148,7 +148,7 @@ lengths together:
 .. code:: python
 
     from neurom.core.tree import isegment, val_iter
-    from neurom.analysis.morphtree import segment_length
+    from neurom.analysis.morpmath import segment_length
     tree = trees[0]
     tree_length = sum(segment_length(s) for s in val_iter(isegment(tree)))
 
@@ -162,12 +162,12 @@ along:
 .. code:: python
 
     from neurom.core.tree import isegment, ileaf, iupstream, val_iter
-    from neurom.analysis.morphtree import segment_length
+    from neurom.analysis.morphmath import segment_length
     # for demonstration purposes, get the first leaf we find:
     tree = tree[0]
     first_leaf = ileaf(tree).next()
     # now iterate segment-wise, upstream, and sum the lengths
-    path_len = sum(segment_length(s) for s in val_iter(isegment(tree, iupstream)))
+    path_len = sum(segment_length(s) for s in val_iter(isegment(first_leaf, iupstream)))
 
 
 This example is conceptually the same as the previous one, except for one
@@ -180,6 +180,21 @@ root. This is the reason for the extra complexity:
 * We iterate in segments using isegment, but we tell it
   to iterate upstream. That is what the second parameter to isegment does: it
   transforms the order of iteration.
+
+A variant of the last example is to use the helper function
+``neurom.core.tree.imap_val``. This is an iterator mapping function that transforms
+the target of the iteration from a tree object to the data stored in the tree. In other
+words, it applies ``val_iter`` internally:
+
+.. code:: python
+
+    from neurom.core.tree import isegment, ileaf, iupstream, imap_val
+    from neurom.analysis.morphmath import segment_length
+
+    first_leaf = ... # get a leaf of the tree (see previous example)
+
+    path_len = sum(imap_val(segment_length, isegment(first_leaf, iupstream)))
+
 
 If this all seems too complicated, remember that it is a general approach that
 will allow you to do many more things other than getting the path length to the
