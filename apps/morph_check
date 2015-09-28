@@ -106,6 +106,9 @@ def parse_args():
     parser.add_argument('-l', '--log', dest='log_file',
                         default="", help="File to log to")
 
+    parser.add_argument('-c', '--color', action='store_true',
+                        help='Colorize the output')
+
     return parser.parse_args()
 
 
@@ -120,11 +123,17 @@ def get_morph_files(directory):
             os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
 
 
-def log_msg(ok, msg):
+def log_msg(ok, msg, color=False):
     '''Helper to log message to the right level'''
+    if color:
+        CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
+    else:
+        CGREEN = CRED = CEND = ''
+
     LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
 
-    L.log(LOG_LEVELS[ok], '%s %s', msg, 'PASS' if ok else 'FAIL')
+    L.log(LOG_LEVELS[ok],
+          '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
 
 def test_file(f):
@@ -134,9 +143,9 @@ def test_file(f):
 
     try:
         nrn = load_neuron(f)
-        L.info('Has valid soma? PASS')
+        log_msg(True, 'Has valid soma?')
     except SomaError:
-        L.error('Has valid soma? FAIL')
+        log_msg(False, 'Has valid soma?')
         L.warning('Cannot continue without a soma... Aborting')
         return False
 
@@ -180,7 +189,11 @@ if __name__ == '__main__':
     args = parse_args()
     _setup_logging(args.debug, args.log_file)
     data_path = args.datapath
-    SEPARATOR = '=' * 32
+    SEPARATOR = '=' * 40
+
+    if args.color:
+        import functools
+        log_msg = functools.partial(log_msg, color=True)
 
     if os.path.isfile(data_path):
         files = [data_path]
