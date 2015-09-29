@@ -46,6 +46,7 @@ API Documentation
    neurom.core.dataformat
    neurom.exceptions
    neurom.view
+   neurom.view.view
    neurom.view.common
    neurom.analysis
    neurom.analysis.morphmath
