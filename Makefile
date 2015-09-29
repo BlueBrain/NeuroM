@@ -37,16 +37,18 @@ unexport DISPLAY
 # Test coverage pass threshold (percent)
 MIN_COV ?= 100
 
+FIND_LINT_PY=`find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"`
+
 $(VENV):
 	virtualenv --system-site-packages $(VENV)
 	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
 	$(VENV_BIN)/pip install -e .
 
 run_pep8: $(VENV)
-	$(VENV_BIN)/pep8 --config=pep8rc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pep8.txt
+	$(VENV_BIN)/pep8 --config=pep8rc  $(FIND_LINT_PY) > pep8.txt
 
 run_pylint: $(VENV)
-	$(VENV_BIN)/pylint --rcfile=pylintrc `find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"` > pylint.txt
+	$(VENV_BIN)/pylint --rcfile=pylintrc  $(FIND_LINT_PY) > pylint.txt
 
 run_tests: $(VENV)
 	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
