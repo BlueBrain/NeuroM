@@ -81,5 +81,6 @@ clean: clean_doc clean_test_venv
 	@rm -rf neurom.egg-info
 	@rm -f .coverage
 	@rm -rf test-reports
+	@rm -rf dist
 
 .PHONY: run_pep8 test clean_test_venv clean doc
