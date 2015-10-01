@@ -20,3 +20,11 @@ script:
   - make -f Makefile.travis_ci test
 after_success:
   - codecov
+deploy:
+  provider: pypi
+  user: juanchopanza
+  password:
+    secure: fLcTXIjrPUhYsmXFshtzfO/V/QWQprxJ68KA9fxayzmpLHoqX6C0sl7PAmPosXempMCBqntjJ4k7IDGyOdaBx+igmHcylqFcmiFSgeFYjOTqcMCLsBEaqFIutqoMTPT+/OiM6YDJFxNTwuO41uI5i4lE1pKV9XZqKh/pmJYluNQ=
+  on:
+    tags: true
+    branch: master
