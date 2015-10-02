@@ -364,6 +364,10 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     soma(nrn.soma, plane=plane, **kwargs)
 
+    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
+    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+
     h = []
     v = []
 
@@ -378,13 +382,12 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
         tree(temp_tree, plane=plane, **kwargs)
 
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-    kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                         np.max(h) + get_default('white_space', **kwargs)])
-    kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                         np.max(v) + get_default('white_space', **kwargs)])
+    if h:
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
+                                             np.max(h) + get_default('white_space', **kwargs)])
+    if v:
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
+                                             np.max(v) + get_default('white_space', **kwargs)])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -646,6 +649,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
     kwargs['new_fig'] = False
     kwargs['new_axes'] = False
+    kwargs['title'] = kwargs.get('title', 'Neuron view')
 
     soma3d(nrn.soma, **kwargs)
 
@@ -666,13 +670,14 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
         tree3d(temp_tree, **kwargs)
 
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
-
-    kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                         np.max(h) + get_default('white_space', **kwargs)])
-    kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                         np.max(v) + get_default('white_space', **kwargs)])
-    kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
-                                         np.max(d) + get_default('white_space', **kwargs)])
+    if h:
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
+                                             np.max(h) + get_default('white_space', **kwargs)])
+    if v:
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
+                                             np.max(v) + get_default('white_space', **kwargs)])
+    if d:
+        kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
+                                             np.max(d) + get_default('white_space', **kwargs)])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
