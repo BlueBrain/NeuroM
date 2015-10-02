@@ -52,6 +52,19 @@ def test_read_swc_basic():
 
     check_single_section_random_swc(data, fmt, offset)
 
+
+def test_point_soma_swc():
+
+    data, offset, fmt = readers.SWC.read(
+        os.path.join(SWC_PATH,
+                     'point_soma.swc'))
+
+    nt.ok_(fmt == 'SWC')
+    nt.ok_(offset == 1)
+    nt.ok_(len(data) == 1)
+    nt.ok_(np.shape(data) == (1, 7))
+
+
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
         self.data = readers.load_swc(
