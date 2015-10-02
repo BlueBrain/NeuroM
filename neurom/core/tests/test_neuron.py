@@ -89,12 +89,14 @@ T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
 
 def test_make_SomaA():
     soma = neuron.make_soma(SOMA_A_PTS)
+    nt.ok_('SomaA' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaA))
     nt.assert_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 44)
 
 def test_make_SomaB():
     soma = neuron.make_soma(SOMA_B_PTS)
+    nt.ok_('SomaB' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaB))
     nt.assert_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 0.0)
@@ -102,6 +104,7 @@ def test_make_SomaB():
 
 def check_SomaC(points):
     soma = neuron.make_soma(points)
+    nt.ok_('SomaC' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaC))
     nt.assert_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 0.0)

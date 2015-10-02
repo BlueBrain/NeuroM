@@ -78,6 +78,10 @@ class SomaA(BaseSoma):
         self.center = tuple(points[0][:COLS.R])
         self.radius = points[0][COLS.R]
 
+    def __str__(self):
+        return 'SomaA(%s) <center: %s, radius: %s>' % \
+             (repr(self._points), self.center, self.radius)
+
 
 class SomaB(BaseSoma):
     '''
@@ -92,6 +96,10 @@ class SomaB(BaseSoma):
         super(SomaB, self).__init__(points)
         self.center = tuple(points[0][:COLS.R])
         self.radius = average_points_dist(points[0], (points[1], points[2]))
+
+    def __str__(self):
+        return 'SomaB(%s) <center: %s, radius: %s>' % \
+             (repr(self._points), self.center, self.radius)
 
 
 class SomaC(BaseSoma):
@@ -109,6 +117,10 @@ class SomaC(BaseSoma):
         super(SomaC, self).__init__(points)
         self.center = tuple(points[0][:COLS.R])
         self.radius = average_points_dist(points[0], points[1:])
+
+    def __str__(self):
+        return 'SomaC(%s) <center: %s, radius: %s>' % \
+             (repr(self._points), self.center, self.radius)
 
 
 def make_soma(points):

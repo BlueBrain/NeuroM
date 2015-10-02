@@ -52,8 +52,8 @@ NEURITE_STATS = ['get_section_lengths',
                  ]
 
 SCALAR_STATS = ['get_soma_radius',
-                 'get_soma_surface_area',
-                 ]
+                'get_soma_surface_area',
+                ]
 
 
 def parse_args():

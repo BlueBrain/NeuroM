@@ -38,9 +38,6 @@ import neurom.analysis.morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 import numpy as np
-import logging
-
-LOG = logging.getLogger(__name__)
 
 
 def path_length(tree):
