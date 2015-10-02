@@ -41,7 +41,7 @@ class Tree(object):
         self.children = list()
 
     def __str__(self):
-        return 'Tree(value=%s) <parent: %s, nchildren: %d' % \
+        return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
             (self.value, self.parent, len(self.children))
 
     def add_child(self, tree):
