@@ -40,6 +40,10 @@ class Tree(object):
         self.parent = None
         self.children = list()
 
+    def __str__(self):
+        return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
+            (self.value, self.parent, len(self.children))
+
     def add_child(self, tree):
         '''Add a child to the list of this tree's children
 

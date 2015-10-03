@@ -62,6 +62,12 @@ T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
 T11113 = T1111.add_child(Tree(11113))
 
+
+def test_str():
+    t = Tree('hello')
+    nt.ok_(str(t))
+
+
 def test_instantiate_tree():
     t = Tree('hello')
     nt.ok_(t.parent is None)

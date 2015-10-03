@@ -81,7 +81,10 @@ config = {
     'extras_require': EXTRA_REQS,
     'packages': find_packages(),
     'license': 'BSD',
-    'scripts': ['apps/raw_data_check', 'apps/morph_check'],
+    'scripts': ['apps/raw_data_check',
+                'apps/morph_check',
+                'apps/morph_stats',
+                ],
     'name': 'neurom',
     'include_package_data': True,
 }
