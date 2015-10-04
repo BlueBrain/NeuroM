@@ -85,10 +85,10 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 RAW_DATA = [load_data(f) for f in FILES]
 NO_SOMA_RAW_DATA = load_data(NO_SOMA_FILE)
 
+
 def test_get_soma_ids():
     for i, d in enumerate(RAW_DATA):
         nt.ok_(utils.get_soma_ids(d) == SOMA_IDS[i])
-
 
 
 def test_get_initial_segment_ids():
@@ -155,6 +155,14 @@ def test_make_neuron_post_tree_action():
 def test_load_neuron():
     nrn = utils.load_neuron(FILES[0])
     nt.ok_(nrn.id == FILES[0].strip('.swc'))
+
+
+def test_load_neuron_deep_neuron():
+    '''make sure that neurons with deep (ie: larger than the python 
+       recursion limit can be loaded)
+    '''
+    deep_neuron = os.path.join(DATA_PATH, 'h5/v1/deep_neuron.h5')
+    nrn = utils.load_neuron(deep_neuron)
 
 
 def test_get_morph_files():

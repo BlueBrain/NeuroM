@@ -76,9 +76,11 @@ def is_root(tree):
 
 def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
-    yield tree
-    for v in chain(*imap(ipreorder, tree.children)):
-        yield v
+    children = [tree, ]
+    while children:
+        cur_node = children.pop()
+        children.extend(reversed(cur_node.children))
+        yield cur_node
 
 
 def ipostorder(tree):
