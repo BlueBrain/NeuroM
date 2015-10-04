@@ -78,10 +78,10 @@ def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
     children = [tree, ]
     while children:
-      cur_node = children.pop()
-      children.extend(reversed(cur_node.children))
-      yield cur_node
-    
+        cur_node = children.pop()
+        children.extend(reversed(cur_node.children))
+        yield cur_node
+
 
 def ipostorder(tree):
     '''Depth-first post-order iteration of tree nodes'''
