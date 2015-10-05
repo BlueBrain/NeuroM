@@ -63,16 +63,15 @@ def make_tree(rdw, root_id=ROOT_ID, post_action=None):
         root_id: ID of the root of the tree to be built.
         post_action: optional function to run on the built tree.
     '''
-    def add_children(t):
-        '''Add children to a tree'''
-        for c in rdw.get_children(t.value[COLS.ID]):
-            child = Tree(rdw.get_row(c))
-            t.add_child(child)
-            add_children(child)
-        return t
-
     head_node = Tree(rdw.get_row(root_id))
-    add_children(head_node)
+    children = [head_node, ]
+    while children:
+        cur_node = children.pop()
+        for c in rdw.get_children(cur_node.value[COLS.ID]):
+            row = rdw.get_row(c)
+            child = Tree(row)
+            cur_node.add_child(child)
+            children.append(child)
 
     if post_action is not None:
         post_action(head_node)
