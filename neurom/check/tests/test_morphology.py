@@ -32,7 +32,6 @@ from neurom.check import morphology as check
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
-from neurom.analysis.morphtree import get_tree_type
 from nose import tools as nt
 
 
@@ -41,94 +40,104 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
+def _load_neuron(name):
+    if name.endswith('.swc'):
+        path = os.path.join(SWC_PATH, name)
+    elif name.endswith('.h5'):
+        path = os.path.join(H5V1_PATH, name)
+    return name, load_neuron(path)
+
+NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
+                                          'Neuron_2_branch.h5',
+                                          'Neuron.swc',
+                                          'Neuron_small_radius.swc',
+                                          'Neuron_zero_length_sections.swc',
+                                          'Neuron_zero_length_segments.swc',
+                                          'Neuron_zero_radius.swc',
+                                          'Single_apical.swc',
+                                          'Single_axon.swc',
+                                          'Single_basal.swc',
+                                          ]])
+
+def _pick(files):
+    return [NEURONS[f] for f in files]
+
 
 def test_has_axon_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Neuron_small_radius.swc',
-                       'Single_axon.swc']]
-
-    files.append(os.path.join(H5V1_PATH, 'Neuron.h5'))
-
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    files = ['Neuron.swc',
+             'Neuron_small_radius.swc',
+             'Single_axon.swc',
+             'Neuron.h5',
+             ]
+    for n in _pick(files):
         nt.ok_(check.has_axon(n))
 
 
 def test_has_axon_bad_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Single_apical.swc',
-                       'Single_basal.swc']]
+    files = ['Single_apical.swc',
+             'Single_basal.swc',
+             ]
 
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    for n in _pick(files):
         nt.ok_(not check.has_axon(n))
 
 
 def test_has_apical_dendrite_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Neuron_small_radius.swc',
-                       'Single_apical.swc']]
+    files = ['Neuron.swc',
+             'Neuron_small_radius.swc',
+             'Single_apical.swc',
+             'Neuron.h5',
+             ]
 
-    files.append(os.path.join(H5V1_PATH, 'Neuron.h5'))
-
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    for n in _pick(files):
         nt.ok_(check.has_apical_dendrite(n))
 
 
 def test_has_apical_dendrite_bad_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Single_axon.swc',
-                       'Single_basal.swc']]
+    files = ['Single_axon.swc',
+             'Single_basal.swc',
+             ]
 
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    for n in _pick(files):
         nt.ok_(not check.has_apical_dendrite(n))
 
 
 def test_has_basal_dendrite_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Neuron_small_radius.swc',
-                       'Single_basal.swc']]
+    files = ['Neuron.swc',
+             'Neuron_small_radius.swc',
+             'Single_basal.swc',
+             'Neuron_2_branch.h5',
+             'Neuron.h5',
+             ]
 
-    files.extend([os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'),
-                  os.path.join(H5V1_PATH, 'Neuron.h5')])
-
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    for n in _pick(files):
         nt.ok_(check.has_basal_dendrite(n))
 
 
 def test_has_basal_dendrite_bad_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Single_axon.swc',
-                       'Single_apical.swc']]
+    files = ['Single_axon.swc',
+             'Single_apical.swc',
+             ]
 
-    neurons = [load_neuron(f, get_tree_type) for f in files]
-    for n in neurons:
+    for n in _pick(files):
         nt.ok_(not check.has_basal_dendrite(n))
 
 
 def test_nonzero_neurite_radii_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Single_apical.swc',
-                       'Single_basal.swc',
-                       'Single_axon.swc']]
+    files = ['Neuron.swc',
+             'Single_apical.swc',
+             'Single_basal.swc',
+             'Single_axon.swc',
+             'Neuron_2_branch.h5',
+             ]
 
-    files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
-
-    for f in files:
-        ids = check.nonzero_neurite_radii(load_neuron(f))
+    for n in _pick(files):
+        ids = check.nonzero_neurite_radii(n)
         nt.ok_(len(ids) == 0)
 
 
 def test_nonzero_neurite_radii_threshold():
-    mf = os.path.join(SWC_PATH, 'Neuron.swc')
-    nrn = load_neuron(mf)
+    nrn = NEURONS['Neuron.swc']
 
     ids = check.nonzero_neurite_radii(nrn)
     nt.ok_(len(ids) == 0)
@@ -138,24 +147,23 @@ def test_nonzero_neurite_radii_threshold():
 
 
 def test_nonzero_neurite_radii_bad_data():
-    f = os.path.join(SWC_PATH, 'Neuron_zero_radius.swc')
-    ids = check.nonzero_neurite_radii(load_neuron(f))
+    nrn = NEURONS['Neuron_zero_radius.swc']
+    ids = check.nonzero_neurite_radii(nrn)
     nt.ok_(ids == [194, 210, 246, 304, 493])
 
 
 def test_nonzero_segment_lengths_good_data():
-    f = os.path.join(SWC_PATH, 'Neuron.swc')
-
-    ids = check.nonzero_segment_lengths(load_neuron(f))
+    nrn = NEURONS['Neuron.swc']
+    ids = check.nonzero_segment_lengths(nrn)
     nt.ok_(len(ids) == 0)
 
 
 def test_nonzero_segment_lengths_bad_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron_zero_length_segments.swc',
-                       'Single_apical.swc',
-                       'Single_basal.swc',
-                       'Single_axon.swc']]
+    files = ['Neuron_zero_length_segments.swc',
+             'Single_apical.swc',
+             'Single_basal.swc',
+             'Single_axon.swc',
+             ]
 
     bad_segs = [[(4, 5), (215, 216),
                  (426, 427), (637, 638)],
@@ -163,14 +171,13 @@ def test_nonzero_segment_lengths_bad_data():
                 [(4, 5)],
                 [(4, 5)]]
 
-    for i, f in enumerate(files):
-        ids = check.nonzero_segment_lengths(load_neuron(f))
+    for i, nrn in enumerate(_pick(files)):
+        ids = check.nonzero_segment_lengths(nrn)
         nt.assert_equal(ids, bad_segs[i])
 
 
 def test_nonzero_segment_lengths_threshold():
-    f = os.path.join(SWC_PATH, 'Neuron.swc')
-    nrn = load_neuron(f)
+    nrn = NEURONS['Neuron.swc']
 
     ids = check.nonzero_segment_lengths(nrn)
     nt.assert_equal(len(ids), 0)
@@ -182,26 +189,26 @@ def test_nonzero_segment_lengths_threshold():
 
 
 def test_nonzero_section_lengths_good_data():
-    files = [os.path.join(SWC_PATH, f)
-             for f in ['Neuron.swc',
-                       'Single_apical.swc',
-                       'Single_basal.swc',
-                       'Single_axon.swc']]
-    for i, f in enumerate(files):
-        ids = check.nonzero_section_lengths(load_neuron(f))
+    files = ['Neuron.swc',
+             'Single_apical.swc',
+             'Single_basal.swc',
+             'Single_axon.swc',
+             ]
+
+    for i, nrn in enumerate(_pick(files)):
+        ids = check.nonzero_section_lengths(nrn)
         nt.ok_(len(ids) == 0)
 
 
 def test_nonzero_section_lengths_bad_data():
-    f = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
+    nrn = NEURONS['Neuron_zero_length_sections.swc']
 
-    ids = check.nonzero_section_lengths(load_neuron(f))
+    ids = check.nonzero_section_lengths(nrn)
     nt.assert_equal(ids, [134])
 
 
 def test_nonzero_section_lengths_threshold():
-    mf = os.path.join(SWC_PATH, 'Neuron.swc')
-    nrn = load_neuron(mf)
+    nrn = NEURONS['Neuron.swc']
 
     ids = check.nonzero_section_lengths(nrn)
     nt.ok_(len(ids) == 0)
