@@ -41,6 +41,7 @@ There is one such row per measured point.
 
 '''
 from bisect import bisect_right
+from neurom.utils import memoize
 
 import h5py
 import numpy as np
@@ -116,6 +117,7 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        @memoize
         def find_group(point_id):
             '''Find the structure group a points id belongs to
 
