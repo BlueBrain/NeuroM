@@ -27,13 +27,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Simple Histogram function for multiple neurons
+''' Box Plot function for multiple neurons
 '''
 
 from neurom.view import common
 
 
-def histogram(neurons, feature, new_fig=True, subplot=False, **kwargs):
+def boxplot(neurons, feature, new_fig=True, subplot=False):
     '''
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -50,44 +50,18 @@ def histogram(neurons, feature, new_fig=True, subplot=False, **kwargs):
 
     Options
     -------
-    bins : int
-    Number of bins for the histogram.
-
-    cumulative : bool
-    Sets cumulative histogram on.
 
     subplot : bool
         Default is False, which returns a matplotlib figure object. If True,
         returns a matplotlib axis object, for use as a subplot.
 
-    Returns
-    -------
-    figure_output : list
-        [fig|ax, figdata, figtext]
-        The first item is either a figure object (if subplot is False) or an
-        axis object. The second item is an object containing the data used to
-        generate the figure. The final item is text used in report generation
-        as a figure legend. This text needs to be manually entered in each
-        figure file.
     '''
-
-    bins = kwargs.get('bins', 100)
-    cumulative = kwargs.get('cumulative', False)
-
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
-
-    kwargs['xlabel'] = kwargs.get('xlabel', feature)
-
-    kwargs['ylabel'] = kwargs.get('ylabel', feature + ' fraction')
-
-    kwargs['title'] = kwargs.get('title', feature + ' histogram')
-
     feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
 
-    neu_labels = ['neuron_id' for neu in neurons]
+    _, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-    ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels)
+    ax.boxplot(feature_values)
 
-    kwargs['no_legend'] = len(neu_labels) == 1
+    x_labels = ['neuron_id' for _ in neurons]
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    ax.set_xticklabels(x_labels)
