@@ -28,10 +28,15 @@
 
 '''Load and view multiple somas'''
 
+import os
 from neurom import ezy
-from neurom.view.common import plot_sphere
+import neurom.view.common as common
 import matplotlib.pyplot as plt
 import numpy as np
+
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../test_data')
+SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
 def random_color():
@@ -47,33 +52,25 @@ def load_neurons(file_names):
     return neurons
 
 
-def extract_somas(neurons):
-    '''Extract and return somas from set of neurons'''
-    somas = []
-    for neuron in neurons:
-        somas.append(neuron.soma)
-    return somas
-
-
 def plot_somas(neurons):
     '''Plot set of somas on same figure as spheres, each with different color'''
-    somas = extract_somas(neurons)
+    somas = list(neuron.soma for neuron in neurons)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d', aspect='equal')
+    fig, ax = common.get_figure(new_fig=True, subplot=111,
+                                params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
         center = s.center
         radius = s.radius
-        plot_sphere(fig, ax, center, radius, color=random_color(), alpha=1)
+        common.plot_sphere(fig, ax, center, radius, color=random_color(), alpha=1)
     plt.show()
 
 
 if __name__ == '__main__':
     #  define set of files containing relevant neurons
     file_nms = []
-    file_nms.append('test_data/swc/Soma_origin.swc')
-    file_nms.append('test_data/swc/Soma_translated_1.swc')
-    file_nms.append('test_data/swc/Soma_translated_2.swc')
+    file_nms.append(os.path.join(SWC_PATH, 'Soma_origin.swc'))
+    file_nms.append(os.path.join(SWC_PATH, 'Soma_translated_1.swc'))
+    file_nms.append(os.path.join(SWC_PATH, 'Soma_translated_2.swc'))
 
     # load from file and plot
     plot_somas(load_neurons(file_nms))
