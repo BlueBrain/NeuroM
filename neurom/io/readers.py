@@ -45,6 +45,9 @@ Functions to umpack the data and a higher level wrapper are provided. See
 import os
 from collections import defaultdict
 from itertools import ifilter
+
+import numpy as np
+
 from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
@@ -112,7 +115,7 @@ class RawDataWrapper(object):
 
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
-        if idx != ROOT_ID and idx not in self.get_ids():
+        if idx != ROOT_ID and idx not in set(self.get_ids()):
             raise LookupError('Invalid id: {0}'.format(idx))
         return self.adj_list[idx]
 
@@ -122,7 +125,7 @@ class RawDataWrapper(object):
 
     def get_parent(self, idx):
         '''get the parent of element with id idx'''
-        if idx not in self.get_ids():
+        if idx not in set(self.get_ids()):
             raise LookupError('Invalid id: {0}'.format(idx))
         return int(self.data_block[self._apply_offset(idx)][COLS.P])
 
@@ -152,7 +155,10 @@ class RawDataWrapper(object):
 
     def get_ids(self, pred=None):
         '''Get the list of ids for rows satisfying an optional row predicate'''
-        return [r[COLS.ID] for r in self.iter_row(None, pred)]
+        if pred is None:
+            return np.array(self.data_block[:, COLS.ID], dtype=np.int32).tolist()
+        else:
+            return [r[COLS.ID] for r in self.iter_row(None, pred)]
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
