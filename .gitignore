@@ -10,3 +10,4 @@ pep8.txt
 pylint.txt
 doc/build
 doc/source/_build
+dist/*

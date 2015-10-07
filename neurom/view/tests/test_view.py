@@ -28,6 +28,7 @@
 
 from nose import tools as nt
 from neurom.io.utils import make_neuron
+from neurom.io.utils import load_neuron
 from neurom.io.readers import load_data
 from neurom.view import view
 from neurom.analysis.morphtree import find_tree_type
@@ -101,8 +102,19 @@ def test_soma3d():
     nt.ok_(np.allclose(ax.get_ylim(), (-0.2,  0.2)) )
     nt.ok_(np.allclose(ax.get_zlim(), (-0.2,  0.2)) )
 
+
 def test_neuron3d():
     fig, ax = view.neuron3d(neuron0)
     nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
     nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
     nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
+
+
+def test_neuron_no_neurites():
+    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+    f, a = view.neuron(load_neuron(filename))
+
+
+def test_neuron3d_no_neurites():
+    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+    f, a = view.neuron3d(load_neuron(filename))

@@ -1,0 +1,127 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+'''Examples of extracting basic statistics'''
+import argparse
+import json
+import logging
+import os
+import sys
+
+import numpy as np
+
+from neurom.core.types import NEURITES
+from neurom.ezy import Neuron
+
+L = logging.getLogger(__name__)
+
+NEURITE_STATS = ['get_section_lengths',
+                 'get_segment_lengths',
+                 'get_local_bifurcation_angles',
+                 'get_remote_bifurcation_angles',
+                 'get_n_sections',
+                 'get_n_neurites',
+                 'get_n_sections_per_neurite',
+                 ]
+
+SCALAR_STATS = ['get_soma_radius',
+                'get_soma_surface_area',
+                ]
+
+
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(description='Morphology statistics extractor',
+                                     epilog='Note: Outputs json')
+
+    parser.add_argument('datapath',
+                        help='Path to morphology data file or directory')
+
+    parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
+                        help='-v for INFO, -vv for DEBUG')
+
+    return parser.parse_args()
+
+
+def get_morph_files(directory):
+    '''Get a list of all morphology files in directory dir
+
+    Returns files with extensions '.swc' or '.h5' (case insensitive)
+    '''
+    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
+    return [m for m in lsdir
+            if os.path.isfile(m) and
+            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
+
+
+def extract_stats(files):
+    '''Extract stats from files'''
+    results = {}
+    for _f in files:
+        nrn = Neuron(_f)
+        stats = results[_f] = {}
+        for ns in NEURITE_STATS:
+            stat_name = ns[4:]
+            stats[stat_name] = {}
+            for n in NEURITES:
+                value = getattr(nrn, ns)(n)
+                L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
+                if isinstance(value, np.ndarray):
+                    value = {'mean': np.mean(value),
+                             'std': np.std(value),
+                             'min': np.min(value),
+                             'max': np.max(value),
+                             }
+                stats[stat_name][n.name] = value
+
+        for ns in SCALAR_STATS:
+            stats[ns[4:]] = getattr(nrn, ns)()
+
+    return results
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    logging.basicConfig(level=(logging.WARNING,
+                               logging.INFO,
+                               logging.DEBUG)[min(args.verbose, 2)])
+
+    data_path = args.datapath
+
+    if os.path.isfile(data_path):
+        _files = [data_path]
+    elif os.path.isdir(data_path):
+        _files = get_morph_files(data_path)
+    else:
+        L.error('Invalid data path %s', data_path)
+        sys.exit(1)
+
+    _stats = extract_stats(_files)
+    print json.dumps(_stats, indent=2, separators=(',', ':'))

@@ -26,6 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
+
 from nose import tools as nt
 from neurom.core.tree import Tree
 from neurom.core.tree import is_root
@@ -61,6 +63,12 @@ T1111 = REF_TREE2.children[0].children[0].add_child(Tree(1111))
 T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
 T11113 = T1111.add_child(Tree(11113))
+
+
+def test_str():
+    t = Tree('hello')
+    nt.ok_(str(t))
+
 
 def test_instantiate_tree():
     t = Tree('hello')
@@ -151,6 +159,16 @@ def test_is_bifurcation_point_false():
     t.add_child(Tree(3))
     nt.ok_(not is_bifurcation_point(t))
 
+
+def test_deep_iteration():
+    root = t = Tree(0)
+    for i in range(1, sys.getrecursionlimit() + 2):
+        child = Tree(i)
+        t.add_child(child)
+        t = child
+    list(ipreorder(root))
+    list(ipostorder(root))
+    list(iupstream(t))
 
 
 def test_preorder_iteration():

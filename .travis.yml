@@ -11,9 +11,20 @@ install:
   - pip install --upgrade pip
   - pip install --ignore-installed -r requirements_dev.txt
   - pip install matplotlib==1.3.1
+  - pip install codecov
   - pip install .
 cache:
   directories:
     - $HOME/.cache/pip
 script:
   - make -f Makefile.travis_ci test
+after_success:
+  - codecov
+deploy:
+  provider: pypi
+  user: juanchopanza
+  password:
+    secure: fLcTXIjrPUhYsmXFshtzfO/V/QWQprxJ68KA9fxayzmpLHoqX6C0sl7PAmPosXempMCBqntjJ4k7IDGyOdaBx+igmHcylqFcmiFSgeFYjOTqcMCLsBEaqFIutqoMTPT+/OiM6YDJFxNTwuO41uI5i4lE1pKV9XZqKh/pmJYluNQ=
+  on:
+    tags: true
+    branch: master

@@ -71,9 +71,24 @@ NeuroM installation
 
 Once the ``virtualenv`` is set up, there are three ways to install ``NeuroM``
 
-#. From the internal BBP PyPI server (restricted access)
+#. From the official Python Package Index server (PyPI)
 #. From the git repository
 #. From source (for NeuroM developers)
+
+Install from the official PyPI server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install the latest release:
+
+.. code-block:: bash
+
+    (nrm)$ pip install neurom
+
+Install a specific version:
+
+.. code-block:: bash
+
+    (nrm)$ pip install neurom==1.2.3
 
 Install from git
 ^^^^^^^^^^^^^^^^
@@ -104,24 +119,3 @@ Clone the repository and install it:
 This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means
 that changes made to the source code after the installation procedure are seen by the
 installed package. To install in read-only mode, omit the ``-e``.
-
-Install from the BBP PyPI server (restricted access)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install the latest release:
-
-.. code-block:: bash
-
-    (nrm)$ pip install -i http://bbpgb019.epfl.ch:9090/simple neurom
-
-Install a specific version:
-
-.. code-block:: bash
-
-    (nrm)$ pip install -i http://bbpgb019.epfl.ch:9090/simple neurom==1.2.3
-
-.. warning::
-
-    If your version of pip 7.0 or higher, you need to add the option
-    ``--trusted-host bbpgb019.epfl.ch``.
-
