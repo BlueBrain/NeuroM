@@ -112,10 +112,13 @@ class RawDataWrapper(object):
         self.adj_list = defaultdict(list)
         for row in self.data_block:
             self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
+        self._ids = np.array(self.data_block[:, COLS.ID],
+                             dtype=np.int32).tolist()
+        self._id_set = set(self._ids)
 
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
-        if idx != ROOT_ID and idx not in set(self.get_ids()):
+        if idx != ROOT_ID and idx not in self._id_set:
             raise LookupError('Invalid id: {0}'.format(idx))
         return self.adj_list[idx]
 
@@ -125,7 +128,7 @@ class RawDataWrapper(object):
 
     def get_parent(self, idx):
         '''get the parent of element with id idx'''
-        if idx not in set(self.get_ids()):
+        if idx not in self._id_set:
             raise LookupError('Invalid id: {0}'.format(idx))
         return int(self.data_block[self._apply_offset(idx)][COLS.P])
 
@@ -156,9 +159,9 @@ class RawDataWrapper(object):
     def get_ids(self, pred=None):
         '''Get the list of ids for rows satisfying an optional row predicate'''
         if pred is None:
-            return np.array(self.data_block[:, COLS.ID], dtype=np.int32).tolist()
+            return list(self._ids)
         else:
-            return [r[COLS.ID] for r in self.iter_row(None, pred)]
+            return list(r[COLS.ID] for r in self.iter_row(None, pred))
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
