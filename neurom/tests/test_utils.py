@@ -59,4 +59,4 @@ def test_memoize_does_not_cache_kwargs():
         return ctr
 
     for i in xrange(100):
-        nt.assert_equal(dummy(42, y=i), i + 1)
+        nt.assert_equal(dummy(42, y=43), i + 1)
