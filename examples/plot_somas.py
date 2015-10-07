@@ -39,17 +39,26 @@ def random_color():
     return np.random.rand(3, 1)
 
 
-def load_somas(file_names):
-    '''Load neurons from file and return list of somas'''
-    somas = []
+def load_neurons(file_names):
+    '''Load neurons from list of file names'''
+    neurons = []
     for file_name in file_names:
-        nrn = ezy.Neuron(file_name)
-        somas.append(nrn.soma)
+        neurons.append(ezy.Neuron(file_name))
+    return neurons
+
+
+def extract_somas(neurons):
+    '''Extract and return somas from set of neurons'''
+    somas = []
+    for neuron in neurons:
+        somas.append(neuron.soma)
     return somas
 
 
-def plot_somas(somas):
+def plot_somas(neurons):
     '''Plot set of somas on same figure as spheres, each with different color'''
+    somas = extract_somas(neurons)
+
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d', aspect='equal')
     for s in somas:
@@ -67,4 +76,4 @@ if __name__ == '__main__':
     file_nms.append('test_data/swc/Soma_translated_2.swc')
 
     # load from file and plot
-    plot_somas(load_somas(file_nms))
+    plot_somas(load_neurons(file_nms))
