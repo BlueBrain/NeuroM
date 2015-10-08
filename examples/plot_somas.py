@@ -44,18 +44,8 @@ def random_color():
     return np.random.rand(3, 1)
 
 
-def load_neurons(file_names):
-    '''Load neurons from list of file names'''
-    neurons = []
-    for file_name in file_names:
-        neurons.append(ezy.Neuron(file_name))
-    return neurons
-
-
-def plot_somas(neurons):
+def plot_somas(somas):
     '''Plot set of somas on same figure as spheres, each with different color'''
-    somas = list(neuron.soma for neuron in neurons)
-
     fig, ax = common.get_figure(new_fig=True, subplot=111,
                                 params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
@@ -67,10 +57,10 @@ def plot_somas(neurons):
 
 if __name__ == '__main__':
     #  define set of files containing relevant neurons
-    file_nms = []
-    file_nms.append(os.path.join(SWC_PATH, 'Soma_origin.swc'))
-    file_nms.append(os.path.join(SWC_PATH, 'Soma_translated_1.swc'))
-    file_nms.append(os.path.join(SWC_PATH, 'Soma_translated_2.swc'))
+    file_nms = [os.path.join(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
+                                                                'Soma_translated_1.swc',
+                                                                'Soma_translated_2.swc']]
+    sms = [ezy.Neuron(file_nm).soma for file_nm in file_nms]
 
     # load from file and plot
-    plot_somas(load_neurons(file_nms))
+    plot_somas(sms)
