@@ -60,7 +60,7 @@ if __name__ == '__main__':
     file_nms = [os.path.join(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
                                                                 'Soma_translated_1.swc',
                                                                 'Soma_translated_2.swc']]
-    sms = [ezy.Neuron(file_nm).soma for file_nm in file_nms]
 
     # load from file and plot
+    sms = [ezy.Neuron(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)
