@@ -154,7 +154,7 @@ def test_make_neuron_post_tree_action():
 
 def test_load_neuron():
     nrn = utils.load_neuron(FILES[0])
-    nt.ok_(nrn.id == FILES[0].strip('.swc'))
+    nt.ok_(nrn.id == FILES[0].strip('.swc').split('/')[-1])
 
 
 def test_load_neuron_deep_neuron():
