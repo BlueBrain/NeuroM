@@ -37,14 +37,17 @@ from neurom.exceptions import SomaError
 from neurom.exceptions import NonConsecutiveIDsError
 from neurom.io.readers import load_data
 from neurom.io.check import has_sequential_ids
+from neurom.utils import memoize
 import os
 
 
+@memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
     return rdw.get_ids(lambda r: r[COLS.TYPE] == POINT_TYPE.SOMA)
 
 
+@memoize
 def get_initial_segment_ids(rdw):
     '''Returns a list of IDs of initial tree segments
 

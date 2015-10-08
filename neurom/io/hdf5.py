@@ -40,7 +40,7 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from bisect import bisect_right
+from neurom.utils import memoize
 
 import h5py
 import numpy as np
@@ -116,13 +116,14 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        @memoize
         def find_group(point_id):
             '''Find the structure group a points id belongs to
 
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = bisect_right(groups[:, H5V1.GPFIRST], point_id)
+            bs = np.searchsorted(groups[:, H5V1.GPFIRST], point_id, side='right')
             bs = max(bs - 1, 0)
             return groups[bs]
 
