@@ -26,6 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+'''Neuron Population Classes and Functions
+'''
+
 
 class Population(object):
     '''Neuron Population Class'''
@@ -37,9 +40,6 @@ class Population(object):
             name: Optional name for this Population.
         '''
         self.neurons = neurons
-        self.neurites = 
+        self.somata = [neu.soma for neu in neurons]
+        self.neurites = [nrt for nrt in neu.neurites for neu in neurons]
         self.id = name
-
-    def _flatten(self):
-        for neu in self.neurons:
-            yield 
