@@ -28,13 +28,13 @@
 
 from nose import tools as nt
 from neurom.core.population import Population
-from neurom.ezy import Neuron
+from neurom.ezy import Neuron, load_neuron
 from neurom.analysis.morphtree import i_section_length
 from neurom.analysis.morphtree import i_segment_length
 
-NRN1 = Neuron('test_data/swc/Neuron.swc')
-NRN2 = Neuron('test_data/swc/Single_basal.swc')
-NRN3 = Neuron('test_data/swc/Neuron_small_radius.swc')
+NRN1 = load_neuron('test_data/swc/Neuron.swc')
+NRN2 = load_neuron('test_data/swc/Single_basal.swc')
+NRN3 = load_neuron('test_data/swc/Neuron_small_radius.swc')
 
 NEURONS = [NRN1, NRN2, NRN3]
 TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
@@ -46,7 +46,7 @@ def test_population():
 	nt.ok_(pop.neurons[0].name, 'Neuron')
 	nt.ok_(pop.neurons[1].name, 'Single_basal')
 	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
-	
+
 	nt.assert_equal(len(pop.somata), 3)
 
 	nt.assert_equal(len(pop.neurites),TOT_NEURITES)

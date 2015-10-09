@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     trees = [make_tree(rd, sg) for sg in init_seg_ids]
 
-    soma_pts = [rd.get_row(si) for si in get_soma_ids(rd)]
+    soma = neuron.make_soma([rd.get_row(si) for si in get_soma_ids(rd)])
 
     for tr in trees:
         for p in point_iter(tree.ipreorder(tr)):
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     LOG.info('Initial segment IDs: %s', init_seg_ids)
 
-    nrn = neuron.Neuron(soma_pts, trees)
+    nrn = neuron.Neuron(soma, trees)
 
     LOG.info('Neuron soma raw data % s', [r for r in nrn.soma.iter()])
     LOG.info('Neuron soma points %s', [as_point(p)

@@ -142,20 +142,17 @@ def make_soma(points):
 
 class Neuron(object):
     '''Toy neuron class for testing ideas'''
-    def __init__(self, soma_points, neurites, name='Neuron'):
+    def __init__(self, soma, neurites, name='Neuron'):
         '''Construct a Neuron
 
         Arguments:
-            soma_points: iterable of soma points.
+            soma: soma object
             neurites: iterable of neurite tree structures.
             name: Optional name for this Neuron.
-
-        Raises:
-            SomaError if soma can't be built from soma_points.
         '''
-        self.soma = make_soma(soma_points)
+        self.soma = soma
         self.neurites = neurites
-        self.id = name
+        self.name = name
 
     def i_neurites(self, iterator_type, mapping=None, tree_filter=None):
         '''Returns a mapped iterator to all the neuron's neurites
@@ -170,26 +167,25 @@ class Neuron(object):
         '''
         return tr.i_chain(self.neurites, iterator_type, mapping, tree_filter)
 
+    def bounding_box(self):
+        '''Return 3D bounding box of a neuron
 
-def bounding_box(nrn):
-    '''Return 3D bounding box of a neuron
+        Returns:
+            2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
+        '''
 
-    Returns:
-        2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
-    '''
+        # Get the bounding coordinates of the neurites
+        nmin_xyz, nmax_xyz = (np.array([np.inf, np.inf, np.inf]),
+                              np.array([np.NINF, np.NINF, np.NINF]))
 
-    # Get the bounding coordinates of the neurites
-    nmin_xyz, nmax_xyz = (np.array([np.inf, np.inf, np.inf]),
-                          np.array([np.NINF, np.NINF, np.NINF]))
+        for p in tr.i_chain(self.neurites, tr.ipreorder, lambda p: p):
+            nmin_xyz = np.minimum(p[:COLS.R], nmin_xyz)
+            nmax_xyz = np.maximum(p[:COLS.R], nmax_xyz)
 
-    for p in tr.i_chain(nrn.neurites, tr.ipreorder, lambda p: p):
-        nmin_xyz = np.minimum(p[:COLS.R], nmin_xyz)
-        nmax_xyz = np.maximum(p[:COLS.R], nmax_xyz)
+        # Get the bounding coordinates of the soma
+        smin_xyz = np.array(self.soma.center) - self.soma.radius
 
-    # Get the bounding coordinates of the soma
-    smin_xyz = np.array(nrn.soma.center) - nrn.soma.radius
+        smax_xyz = np.array(self.soma.center) + self.soma.radius
 
-    smax_xyz = np.array(nrn.soma.center) + nrn.soma.radius
-
-    return np.array([np.minimum(smin_xyz, nmin_xyz),
-                     np.maximum(smax_xyz, nmax_xyz)])
+        return np.array([np.minimum(smin_xyz, nmin_xyz),
+                         np.maximum(smax_xyz, nmax_xyz)])

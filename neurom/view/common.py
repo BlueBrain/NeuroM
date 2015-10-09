@@ -54,31 +54,20 @@ TREE_COLOR = {TreeType.basal_dendrite: 'red',
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
     """
-    Helping function to define the strings that handle pre-post conventions
+    Helper function to define the strings that handle pre-post conventions
     for viewing - plotting title and saving options.
 
-    Options
-    ----------
-    pretitle : str
-        String to include before the general title of the figure.
-        Default is None.
-
-    posttitle : str
-        String to include after the general title of the figure.
-        Default is None.
-
-    prefile : str
-        String to include before the general filename of the figure.
-        Default is None.
-
-    postfile : str
-        String to include after the general filename of the figure.
-        Default is None.
-
-    Returns
-    -------
-    string_output : string
-        String to include in the figure name and title, in a suitable form.
+    Parameters:
+        pretitle (Optional[str]): String to include before the\
+            general title of the figure.
+        posttitle (Optional[str[): String to include after the\
+            general title of the figure.
+        prefile (Optional[str]): String to include before the\
+            general filename of the figure.
+        postfile (Optional[str]): String to include after the\
+            general filename of the figure.
+    Returns:
+        str: String to include in the figure name and title, in a suitable form.
 
     """
     if not pretitle:
@@ -125,35 +114,24 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
     Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
 
-    Options
-    ----------
-    new_fig : boolean
-        Defines if a new figure will be created.
-        If False the current figure is returned.
+    Parameters:
+        new_fig (Optional[bool]):\
+        Defines if a new figure will be created.\
+        If False the current figure is returned.\
         Default is True.
-
-    subplot : subplot or False
-        Defines if a subplot will be generated.
-        If False the subplot is the standard 111.
+        subplot (Optional[bool]): Defines if a subplot will be generated.\
+        If False the subplot is the standard 111.\
         Default is False.
+        params (Optional[dict]): If empty dictonary no supplementary parameters\
+            will be used.If dict not None the parameters will be passed\
+            to the initialization of the axes. Defaults to None.
+        no_axes (Optional[bool]): Defines the output of the function:\
+            If False the axes is returned.\
+            If True the figure is returned.\
+            Default value is False.
 
-    params: dict
-        If empty dictonary no supplementary parameters will be used.
-        If dict not empty the parameters will be passed to the initialization of the axes.
-        Default value is {}
-
-    no_axes: boolean
-        Defines the output of the function:
-        If False the axes is returned.
-        If True the figure is returned.
-        Default value is False.
-
-    Returns
-    -------
-    figure or axes
-        Returns a figure if no_axes is True,
-        or axes if no_axes is False.
-
+    Returns:
+        figure is no_axes is True, otherwise axes.
     """
     if new_fig:
         fig = plt.figure()
@@ -181,49 +159,38 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
 
 
 def save_plot(fig, **kwargs):
-
     """
     Function to be used for viewing - plotting
     to save a matplotlib figure.
 
-    Input
-    -------
-    fig: matplotlib figure
-
-    Options
-    ----------
-    prefile : str
-        String to include before the general filename of the figure.
-        Default is None.
-
-    postfile : str
-        String to include after the general filename of the figure.
-        Default is None.
-
-    output_path : str
-        String to define the path to the output directory.
-        Default value is './'
-
-    output_name : str
-        String to define the name of the output figure.
-        Default value is 'Figure'
-
-    output_format : str
-        String to define the format of the output figure.
-        Default value is 'png'
-
-    dpi: int
-        Define the DPI (Dots per Inch) of the figure.
-        Default value is 300.
-
-    transparent: boolean
-        If True the saved figure will have a transparent background.
-        Default value is False.
-
-    Returns
-    -------
     Generates a figure file in the selected directory.
 
+    Parameters:
+        fig: matplotlib figure
+        prefile (Optional[str]):\
+            String to include before the general filename of the figure.\
+            Default is None.
+        postfile (Optional[str]):\
+            String to include after the general filename of the figure.\
+            Default is None.
+        output_path (str):\
+            String to define the path to the output directory.\
+            Default value is './'
+        output_name (str):\
+            String to define the name of the output figure.\
+            Default value is 'Figure'
+        output_format (Optional[str]):\
+            String to define the format of the output figure.\
+            Default value is 'png'
+        dpi (Optional[int]):\
+            Define the DPI (Dots per Inch) of the figure.\
+            Default value is 300.
+        transparent (Optional(bool):\
+            If True the saved figure will have a transparent background.\
+            Default value is False.
+
+    Returns:
+       input matplotlib figure
     """
 
     prefile = kwargs.get('prefile', '')
@@ -245,192 +212,148 @@ def save_plot(fig, **kwargs):
 
 
 def plot_style(fig, ax, **kwargs):
-
     """
     Function to set the basic options of a matplotlib figure,
     to be used by viewing - plotting functions.
 
-    Parameters
-    ----------
-    ax: matplotlib axes
-
-    Options
-    -------
-    pretitle : str
-        String to include before the general title of the figure.
-        Default value is None.
-
-    posttitle : str
-        String to include after the general title of the figure.
-        Default value is None.
-
-    title : str
-        The title for the figure
-        Default value is "Figure".
-
-    no_title : boolean
-        Defines the presence of a title in the figure.
-        If True the title will be set to an empty string "".
-        Default value is False.
-
-    title_fontsize : int
-        Defines the size of the title's font.
-        Default value is 14.
-
-    title_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as title arguments.
-        Default value is None.
-
-    xlabel : str
-        The xlabel for the figure
-        Default value is "X".
-
-    ylabel : str
-        The xlabel for the figure
-        Default value is "Y".
-
-    no_labels : boolean
-        Defines the presence of the labels in the figure.
-        If True the labels will be set to an empty string "".
-        Default value is False.
-
-    no_xlabel : boolean
-        Defines the presence of the xlabel in the figure.
-        If True the xlabel will be set to an empty string "".
-        Default value is False.
-
-    no_ylabel : boolean
-        Defines the presence of the ylabel in the figure.
-        If True the ylabel will be set to an empty string "".
-        Default value is False.
-
-    label_fontsize : int
-        Defines the size of the labels' font.
-        Default value is 14.
-
-    xlabel_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as xlabel arguments.
-        Default value is None.
-
-    ylabel_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as ylabel arguments.
-        Default value is None.
-
-    no_ticks : boolean
-        Defines the presence of x-y ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
-    no_xticks : boolean
-        Defines the presence of x ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
-    no_yticks : boolean
-        Defines the presence of y ticks in the figure.
-        If True the ticks will be empty.
-        Default value is False.
-
-    xticks : list of ticks
-        Defines the values of x ticks in the figure.
-        Default value is None.
-
-    yticks : list of ticks
-        Defines the values of y ticks in the figure.
-        Default value is None.
-
-    tick_fontsize : int
-        Defines the size of the ticks' font.
-        Default value is 12.
-
-    xticks_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as xticks arguments.
-        Default value is None.
-
-    yticks_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as yticks arguments.
-        Default value is None.
-
-    no_limits : boolean
-        Defines the presence of plot limits in the figure.
-        Default value is False.
-
-    no_xlim : boolean
-        Defines the presence of plot x-limits in the figure.
-        Default value is False.
-
-    no_ylim : boolean
-        Defines the presence of plot y-limits in the figure.
-        Default value is False.
-
-    xlim: list of two floats
-        Defines the min and the max values in x-axis.
-        Default in None
-
-    ylim: list of two floats
-        Defines the min and the max values in y-axis.
-        Default in None
-
-    no_legend : boolean
-        Defines the presence of a legend in the figure.
-        If True the legend will not be included in the Figure.
-        Default value is True.
-
-    legend_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as legend arguments.
-        Default value is None.
-
-    prefile : str
-        String to include before the general filename of the figure.
+    Parameters:
+        fig: matplotlib figure
+        ax: matplotlib axes
+        pretitle (str): hello\
+            String to include before the general title of the figure.\
+            Default value is None.
+        posttitle (str):\
+            String to include after the general title of the figure.\
+            Default value is None.
+        title (str):\
+            The title for the figure\
+            Default value is "Figure".
+        no_title (bool):\
+            Defines the presence of a title in the figure.\
+            If True the title will be set to an empty string "".\
+            Default value is False.
+        title_fontsize (int):\
+            Defines the size of the title's font.\
+            Default value is 14.
+        title_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as title arguments.\
+            Default value is None.
+        xlabel (str):\
+            The xlabel for the figure\
+            Default value is "X".
+        ylabel (str):\
+            The ylabel for the figure\
+            Default value is "Y".
+        no_labels (bool):\
+            Defines the presence of the labels in the figure.\
+            If True the labels will be set to an empty string "".\
+            Default value is False.
+        no_xlabel (bool):\
+            Defines the presence of the xlabel in the figure.\
+            If True the xlabel will be set to an empty string "".\
+            Default value is False.
+        no_ylabel (bool):\
+            Defines the presence of the ylabel in the figure.\
+            If True the ylabel will be set to an empty string "".\
+            Default value is False.
+        label_fontsize (int):\
+            Defines the size of the labels' font.\
+            Default value is 14.
+        xlabel_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as xlabel arguments.\
+            Default value is None.
+        ylabel_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as ylabel arguments.\
+            Default value is None.
+        no_ticks (bool):\
+            Defines the presence of x-y ticks in the figure.\
+            If True the ticks will be empty.\
+            Default value is False.
+        no_xticks (bool):\
+            Defines the presence of x ticks in the figure.\
+            If True the ticks will be empty.\
+            Default value is False.
+        no_yticks (bool):\
+            Defines the presence of y ticks in the figure.\
+            If True the ticks will be empty.\
+            Default value is False.
+        xticks: list of ticks\
+            Defines the values of x ticks in the figure.\
+            Default value is None.
+        yticks : list of ticks\
+            Defines the values of y ticks in the figure.\
+            Default value is None.
+        tick_fontsize (int):\
+            Defines the size of the ticks' font.\
+            Default value is 12.
+        xticks_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as xticks arguments.\
+            Default value is None.
+        yticks_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as yticks arguments.\
+            Default value is None.
+        no_limits (bool):\
+            Defines the presence of plot limits in the figure.\
+            Default value is False.
+        no_xlim (bool):\
+            Defines the presence of plot x-limits in the figure.\
+            Default value is False.
+        no_ylim (bool):\
+            Defines the presence of plot y-limits in the figure.\
+            Default value is False.
+        xlim: list of two floats\
+            Defines the min and the max values in x-axis.\
+            Default in None
+        ylim: list of two floats\
+            Defines the min and the max values in y-axis.\
+            Default in None
+        no_legend (bool):\
+            Defines the presence of a legend in the figure.\
+            If True the legend will not be included in the Figure.\
+            Default value is True.
+        legend_arg (dict):\
+            Defines the arguments that will be passsed\
+            into matplotlib as legend arguments.\
+            Default value is None.
+        prefile (str):\
+            String to include before the general filename of the figure.\
         Default is None.
+        postfile (str):\
+            String to include after the general filename of the figure.\
+            Default is None.
+        output_path (str):\
+            String to define the path to the output directory.\
+            Default value is './'
+        output_name (str):\
+            String to define the name of the output figure.\
+            Default value is 'Figure'
+        output_format (str):\
+            String to define the format of the output figure.\
+            Default value is 'png'
+        dpi (int):\
+            Define the DPI (Dots per Inch) of the figure.\
+            Default value is 300.
+        transparent (bool):\
+            If True the saved figure will have a transparent background.\
+            Default value is False.
+        show_plot (bool):\
+            If True the figure is displayed.\
+            Default value is True.
+        no_axes (bool):\
+            If True the labels and the frame will be set off.\
+            Default value is False.
+        tight (bool):\
+            If True the set layout of matplotlib will be activated.\
+            Default value is False.
 
-    postfile : str
-        String to include after the general filename of the figure.
-        Default is None.
-
-    output_path : str
-        String to define the path to the output directory.
-        Default value is './'
-
-    output_name : str
-        String to define the name of the output figure.
-        Default value is 'Figure'
-
-    output_format : str
-        String to define the format of the output figure.
-        Default value is 'png'
-
-    dpi: int
-        Define the DPI (Dots per Inch) of the figure.
-        Default value is 300.
-
-    transparent: boolean
-        If True the saved figure will have a transparent background.
-        Default value is False.
-
-    show_plot : boolean
-        If True the figure is displayed.
-        Default value is True.
-
-    no_axes: boolean
-        If True the labels and the frame will be set off.
-        Default value is False.
-
-    tight: boolean
-        If True the set layout of matplotlib will be activated.
-        Default value is False.
-
-    Returns
-    -------
-    figure_output : figure, axes
-
-    """
+    Returns:
+        figure, axes
+        """
     # Definition of title/file naming variables
     prefile = kwargs.get('prefile', '')
     postfile = kwargs.get('postfile', '')

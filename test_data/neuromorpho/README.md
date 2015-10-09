@@ -26,52 +26,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools
+test_data
+==========
 
-Examples:
+This directory contains links for the download of a population of neurons from neuromorpho.org in swc format.
+This dataset is useful for testing purposes of the neurom code.
 
-    Load a neuron
+Here are links for downloading 8 cells of Rat, Neocortex, Somatosensory, Layer 5, Pyramidal cells from 
+Henry Markram's lab, from the online database of neurons: neuromorpho.org
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
-
-    Obtain some morphometrics
-
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
-
-    View it in 2D and 3D
-
-    >>> fig2d, ax2d = ezy.view(nrn)
-    >>> fig2d.show()
-    >>> fig3d, ax3d = ezy.view3d(nrn)
-    >>> fig3d.show()
-
-    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
-    and returns a list of neurons
-
-    >>> import numpy as np  # For mean value calculation
-    >>> nrns = ezy.load_neurons('some/data/directory')
-    >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
-
-'''
-
-from .neuron import Neuron
-from .neuron import TreeType
-from ..core.types import NEURITES as NEURITE_TYPES
-from ..view.view import neuron as view
-from ..view.view import neuron3d as view3d
-from ..io.utils import get_morph_files
-from ..io.utils import load_neuron as _load
-from ..analysis.morphtree import set_tree_type as _set_tt
-
-
-def load_neuron(filename):
-    '''Load a Neuron from a file'''
-    return Neuron(_load(filename, _set_tt))
-
-
-def load_neurons(directory):
-    '''Create a list of Neuron objects from each morphology file in directory'''
-    return [load_neuron(m) for m in get_morph_files(directory)]
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C261296A-P2.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C261296A-P1.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C231296A-P3.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C220197A-P2.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C080418A-1-SR.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C040896A-P3.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C040896A-P2.CNG.swc
+http://neuromorpho.org/neuroMorpho/dableFiles/markram/CNG%20version/C030796A-P1.CNG.swc

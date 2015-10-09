@@ -62,5 +62,5 @@ if __name__ == '__main__':
                                                                 'Soma_translated_2.swc']]
 
     # load from file and plot
-    sms = [ezy.Neuron(file_nm).soma for file_nm in file_nms]
+    sms = [ezy.load_neuron(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)
