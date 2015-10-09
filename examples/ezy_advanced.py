@@ -50,7 +50,7 @@ if __name__ == '__main__':
     filename = 'test_data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
-    nrn = ezy.Neuron(filename)
+    nrn = ezy.load_neuron(filename)
 
     # Some examples of what can be done using iteration
     # instead of pre-packaged functions that return lists.
@@ -127,4 +127,4 @@ if __name__ == '__main__':
 
     # Neuron's bounding box
     print('Bounding box ((min x, y, z), (max x, y, z))',
-          ezy.bounding_box(nrn))
+          nrn.bounding_box())

@@ -29,16 +29,15 @@
 
 ''' Neuron class with basic analysis and plotting capabilities. '''
 
-from neurom.io.utils import load_neuron
 from neurom.core.types import TreeType
 from neurom.core.types import checkTreeType
 from neurom.core.tree import ipreorder
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
 from neurom.core.tree import i_chain as i_neurites
+from neurom.core.neuron import Neuron as CoreNeuron
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
-from neurom.analysis.morphtree import set_tree_type
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
@@ -48,13 +47,13 @@ import math
 import numpy as np
 
 
-class Neuron(object):
+class Neuron(CoreNeuron):
     '''Class with basic analysis and plotting functionality
 
     By default returns iterables as numpy.arrays and applies no filtering.
 
     Arguments:
-        filename: path to morphology file to be loaded.
+        neuron: neuron-like object
         iterable_type: type of iterable to return from methods returning \
             collections (e.g list, tuple, numpy.array).
 
@@ -66,7 +65,7 @@ class Neuron(object):
         get the segment lengths of all apical dendrites in a neuron morphology.
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> nrn = ezy.load_neuron('test_data/swc/Neuron.swc')
     >>> nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
 
     Example:
@@ -75,7 +74,7 @@ class Neuron(object):
 
     >>> from neurom import ezy
     >>> from neurom.analysis import morphmath as mm
-    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> nrn = ezy.load_neuron('test_data/swc/Neuron.swc')
     >>> for a in nrn.iter_segments(mm.segment_area, ezy.TreeType.axon):
           print (a)
 
@@ -86,7 +85,7 @@ class Neuron(object):
     >>> from neurom import ezy
     >>> from neurom.analysis import morphmath as mm
     >>> import numpy as np
-    >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+    >>> nrn = ezy.load_neuron('test_data/swc/Neuron.swc')
     >>> mv = np.mean([v for v in nrn.iter_segments(mm.segment_volume)])
 
     Example:
@@ -94,7 +93,7 @@ class Neuron(object):
     lengths for the axon. Read an HDF5 v1 file:
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('test_data/h5/v1/Neuron.h5', iterable_type=list)
+    >>> nrn = ezy.load_neuron('test_data/h5/v1/Neuron.h5', iterable_type=list)
     >>> nrn.get_section_lengths(ezy.TreeType.axon)
 
     Example:
@@ -106,12 +105,9 @@ class Neuron(object):
 
     '''
 
-    def __init__(self, filename, iterable_type=np.array):
+    def __init__(self, neuron, iterable_type=np.array):
+        super(Neuron, self).__init__(neuron.soma, neuron.neurites, neuron.name)
         self._iterable_type = iterable_type
-        _nrn = load_neuron(filename, set_tree_type)
-        self.soma = _nrn.soma
-        self.neurites = _nrn.neurites
-        self.name = _nrn.id
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
@@ -231,7 +227,7 @@ class Neuron(object):
         >>> from neurom import ezy
         >>> from neurom.analysis import morphmath as mm
         >>> from neurom.core import tree as tr
-        >>> nrn = ezy.Neuron('test_data/swc/Neuron.swc')
+        >>> nrn = ezy.load_neuron('test_data/swc/Neuron.swc')
         >>> v = sum(nrn.iter_neurites(tr.isegment, mm.segment_volume))
         >>> tl = sum(nrn.iter_neurites(tr.isegment, mm.segment_length)))
 

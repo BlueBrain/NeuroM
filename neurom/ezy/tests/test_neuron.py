@@ -50,26 +50,26 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 def test_construct_neuron():
     filename = os.path.join(SWC_PATH, 'Neuron.swc')
-    ezy.Neuron(filename)
+    ezy.load_neuron(filename)
 
 
 @nt.raises(SomaError)
 def test_construct_neuron_no_soma_raises_SomaError():
     filename = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-    ezy.Neuron(filename)
+    ezy.load_neuron(filename)
 
 
 @nt.raises(NonConsecutiveIDsError)
 def test_construct_neuron_non_consecutive_ids_raises_NonConsecutiveIDsError():
     filename = os.path.join(SWC_PATH, 'non_sequential_trunk_off_1_16pt.swc')
-    ezy.Neuron(filename)
+    ezy.load_neuron(filename)
 
 
 class TestEzyNeuron(object):
 
     def setUp(self):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
-        self.neuron = ezy.Neuron(self.filename)
+        self.neuron = ezy.load_neuron(self.filename)
 
     def test_name(self):
         nt.assert_true(self.neuron.name == 'Neuron')
@@ -326,4 +326,4 @@ class TestEzyNeuron(object):
     def test_bounding_box(self):
         bbox = ((-40.328535157399998, -57.6001719972, -0.17071067811865476),
                 (64.7472627179, 48.516262252300002, 54.204087967500001))
-        nt.ok_(np.allclose(bbox, ezy.bounding_box(self.neuron)))
+        nt.ok_(np.allclose(bbox, self.neuron.bounding_box()))
