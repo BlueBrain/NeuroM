@@ -34,7 +34,6 @@ from neurom.core.types import checkTreeType
 from neurom.core.tree import ipreorder
 from neurom.core.tree import isection
 from neurom.core.tree import isegment
-from neurom.core.tree import i_chain as i_neurites
 from neurom.core.neuron import Neuron as CoreNeuron
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
@@ -232,11 +231,10 @@ class Neuron(CoreNeuron):
         >>> tl = sum(nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
-        return i_neurites(self.neurites,
-                          iterator_type,
-                          mapping,
-                          tree_filter=lambda t: checkTreeType(neurite_type,
-                                                              t.type))
+        return self.i_neurites(iterator_type,
+                               mapping,
+                               tree_filter=lambda t: checkTreeType(neurite_type,
+                                                                   t.type))
 
     def iter_points(self, mapfun, neurite_type=TreeType.all):
         '''Iterator to neurite points with mapping
