@@ -116,7 +116,7 @@ def load_neuron(filename, tree_action=None):
         raise NonConsecutiveIDsError('Non consecutive IDs found in raw data')
 
     nrn = make_neuron(data, tree_action)
-    nrn.id = os.path.splitext(filename)[0]
+    nrn.id = os.path.splitext(os.path.basename(filename))[0]
 
     return nrn
 

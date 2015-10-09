@@ -111,6 +111,7 @@ class Neuron(object):
         self._nrn = load_neuron(filename, set_tree_type)
         self.soma = self._nrn.soma
         self.neurites = self._nrn.neurites
+        self.name = self._nrn.id
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
