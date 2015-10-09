@@ -33,7 +33,7 @@ Examples:
     Load a neuron
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
 
     Obtain some morphometrics
 
@@ -60,12 +60,18 @@ Examples:
 from .neuron import Neuron
 from .neuron import TreeType
 from ..core.types import NEURITES as NEURITE_TYPES
-from ..core.neuron import bounding_box
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d
 from ..io.utils import get_morph_files
+from ..io.utils import load_neuron as _load
+from ..analysis.morphtree import set_tree_type as _set_tt
+
+
+def load_neuron(filename):
+    '''Load a Neuron from a file'''
+    return Neuron(_load(filename, _set_tt))
 
 
 def load_neurons(directory):
     '''Create a list of Neuron objects from each morphology file in directory'''
-    return [Neuron(m) for m in get_morph_files(directory)]
+    return [load_neuron(m) for m in get_morph_files(directory)]
