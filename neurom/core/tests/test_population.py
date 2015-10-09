@@ -26,22 +26,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Neuron Population Classes and Functions
-'''
+from nose import tools as nt
+from neurom.core.population import Population
+from neurom.ezy import Neuron
+from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import i_segment_length
 
-from itertools import chain
+NRN1 = Neuron('test_data/swc/Neuron.swc')
+NRN2 = Neuron('test_data/swc/Single_basal.swc')
+NRN3 = Neuron('test_data/swc/Neuron_small_radius.swc')
 
+NEURONS = [NRN1, NRN2, NRN3]
+TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
 
-class Population(object):
-    '''Neuron Population Class'''
-    def __init__(self, neurons, name='Population'):
-        '''Construct a Neuron
+def test_population():
+	pop = Population(NEURONS, name='foo')
 
-        Arguments:
-            neurons: iterable of ezy neuron objects.
-            name: Optional name for this Population.
-        '''
-        self.neurons = neurons
-        self.somata = [neu.soma for neu in neurons]
-        self.neurites = list(chain(*(neu.neurites for neu in neurons)))
-        self.name = name
+	nt.assert_equal(len(pop.neurons), 3)
+	nt.ok_(pop.neurons[0].name, 'Neuron')
+	nt.ok_(pop.neurons[1].name, 'Single_basal')
+	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
+	
+	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
+
+	nt.assert_equal(pop.name, 'foo')
