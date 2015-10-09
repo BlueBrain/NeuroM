@@ -39,8 +39,8 @@ import os
 
 def parse_args():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='Morphology statistics extractor',
-                                     epilog='Note: Outputs json')
+    parser = argparse.ArgumentParser(description='Morphology fit distribution extractor',
+                                     epilog='Note: Prints the optimal distribution and corresponding parameters.')
 
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
@@ -65,12 +65,17 @@ def distribution_fit(data, distribution='norm'):
 
 
 def distribution_error(data, distribution='norm'):
-    '''Calculates and returns the distance of a fitted distribution from the initial data'''
+    '''Calculates and returns the distance of a fitted distribution 
+       from the initial data.
+    '''
     params = distribution_fit(data, distribution=distribution)
     return getattr(stats, distribution).fit(data)[0]
 
 
 def test_multiple_distr(filepath):
+    '''Runs the distribution fit for multiple distributions and returns
+       the optimal distribution along with the corresponding parameters.
+    '''
     #  load a neuron from an SWC file
     population = ezy.load_neurons(filepath)
 
