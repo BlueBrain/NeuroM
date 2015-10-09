@@ -26,52 +26,29 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools
+from nose import tools as nt
+from neurom.core.population import Population
+from neurom.ezy import Neuron, load_neuron
+from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import i_segment_length
 
-Examples:
+NRN1 = load_neuron('test_data/swc/Neuron.swc')
+NRN2 = load_neuron('test_data/swc/Single_basal.swc')
+NRN3 = load_neuron('test_data/swc/Neuron_small_radius.swc')
 
-    Load a neuron
+NEURONS = [NRN1, NRN2, NRN3]
+TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
+def test_population():
+	pop = Population(NEURONS, name='foo')
 
-    Obtain some morphometrics
+	nt.assert_equal(len(pop.neurons), 3)
+	nt.ok_(pop.neurons[0].name, 'Neuron')
+	nt.ok_(pop.neurons[1].name, 'Single_basal')
+	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
 
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+	nt.assert_equal(len(pop.somata), 3)
 
-    View it in 2D and 3D
+	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
 
-    >>> fig2d, ax2d = ezy.view(nrn)
-    >>> fig2d.show()
-    >>> fig3d, ax3d = ezy.view3d(nrn)
-    >>> fig3d.show()
-
-    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
-    and returns a list of neurons
-
-    >>> import numpy as np  # For mean value calculation
-    >>> nrns = ezy.load_neurons('some/data/directory')
-    >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
-
-'''
-
-from .neuron import Neuron
-from .neuron import TreeType
-from ..core.types import NEURITES as NEURITE_TYPES
-from ..view.view import neuron as view
-from ..view.view import neuron3d as view3d
-from ..io.utils import get_morph_files
-from ..io.utils import load_neuron as _load
-from ..analysis.morphtree import set_tree_type as _set_tt
-
-
-def load_neuron(filename):
-    '''Load a Neuron from a file'''
-    return Neuron(_load(filename, _set_tt))
-
-
-def load_neurons(directory):
-    '''Create a list of Neuron objects from each morphology file in directory'''
-    return [load_neuron(m) for m in get_morph_files(directory)]
+	nt.assert_equal(pop.name, 'foo')

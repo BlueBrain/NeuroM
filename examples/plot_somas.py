@@ -26,52 +26,41 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools
+'''Load and view multiple somas'''
 
-Examples:
+import os
+from neurom import ezy
+import neurom.view.common as common
+import matplotlib.pyplot as plt
+import numpy as np
 
-    Load a neuron
-
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
-
-    Obtain some morphometrics
-
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
-
-    View it in 2D and 3D
-
-    >>> fig2d, ax2d = ezy.view(nrn)
-    >>> fig2d.show()
-    >>> fig3d, ax3d = ezy.view3d(nrn)
-    >>> fig3d.show()
-
-    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
-    and returns a list of neurons
-
-    >>> import numpy as np  # For mean value calculation
-    >>> nrns = ezy.load_neurons('some/data/directory')
-    >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
-
-'''
-
-from .neuron import Neuron
-from .neuron import TreeType
-from ..core.types import NEURITES as NEURITE_TYPES
-from ..view.view import neuron as view
-from ..view.view import neuron3d as view3d
-from ..io.utils import get_morph_files
-from ..io.utils import load_neuron as _load
-from ..analysis.morphtree import set_tree_type as _set_tt
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../test_data')
+SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
-def load_neuron(filename):
-    '''Load a Neuron from a file'''
-    return Neuron(_load(filename, _set_tt))
+def random_color():
+    '''Random color generation'''
+    return np.random.rand(3, 1)
 
 
-def load_neurons(directory):
-    '''Create a list of Neuron objects from each morphology file in directory'''
-    return [load_neuron(m) for m in get_morph_files(directory)]
+def plot_somas(somas):
+    '''Plot set of somas on same figure as spheres, each with different color'''
+    fig, ax = common.get_figure(new_fig=True, subplot=111,
+                                params={'projection': '3d', 'aspect': 'equal'})
+    for s in somas:
+        center = s.center
+        radius = s.radius
+        common.plot_sphere(fig, ax, center, radius, color=random_color(), alpha=1)
+    plt.show()
+
+
+if __name__ == '__main__':
+    #  define set of files containing relevant neurons
+    file_nms = [os.path.join(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
+                                                                'Soma_translated_1.swc',
+                                                                'Soma_translated_2.swc']]
+
+    # load from file and plot
+    sms = [ezy.load_neuron(file_nm).soma for file_nm in file_nms]
+    plot_somas(sms)

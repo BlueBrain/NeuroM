@@ -127,23 +127,26 @@ def test_invalid_soma_points_2_raises_SomaError():
 
 
 def test_neuron():
-    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'])
+    soma = neuron.make_soma(SOMA_A_PTS)
+    nrn = neuron.Neuron(soma, ['foo', 'bar'])
     nt.assert_equal(nrn.soma.center, (11, 22, 33))
     nt.assert_equal(nrn.neurites, ['foo', 'bar'])
-    nt.assert_equal(nrn.id, 'Neuron')
-    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar'], 'test')
-    nt.assert_equal(nrn.id, 'test')
+    nt.assert_equal(nrn.name, 'Neuron')
+    nrn = neuron.Neuron(soma, ['foo', 'bar'], 'test')
+    nt.assert_equal(nrn.name, 'test')
 
 
 def test_i_neurites_chains():
-    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
+    soma = neuron.make_soma(SOMA_A_PTS)
+    nrn = neuron.Neuron(soma, ['foo', 'bar', 'baz'])
     s = 'foobarbaz'
     for i, j in izip(s, nrn.i_neurites(iter)):
         nt.assert_equal(i, j)
 
 
 def test_i_neurites_filter():
-    nrn = neuron.Neuron(SOMA_A_PTS, ['foo', 'bar', 'baz'])
+    soma = neuron.make_soma(SOMA_A_PTS)
+    nrn = neuron.Neuron(soma, ['foo', 'bar', 'baz'])
     ref = 'barbaz'
     for i, j in izip(ref,
                      nrn.i_neurites(iter,
@@ -153,25 +156,16 @@ def test_i_neurites_filter():
 
 def test_bounding_box():
 
-    soma_pts = [[0, 0, 0, 1, 1, 1, -1]]
-    nrn = neuron.Neuron(soma_pts, [TREE])
+    soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])
+    nrn = neuron.Neuron(soma, [TREE])
     ref1 = ((-1, -1, -1), (4.0, 6.0, 3.0))
 
-    for a, b in izip(neuron.bounding_box(nrn), ref1):
+    for a, b in izip(nrn.bounding_box(), ref1):
         nt.assert_true(np.allclose(a, b))
 
-    nrn = neuron.Neuron(SOMA_A_PTS, [TREE])
+    soma = neuron.make_soma(SOMA_A_PTS)
+    nrn = neuron.Neuron(soma, [TREE])
     ref2 = ((-33, -22, -11), (55, 66, 77))
 
-    for a, b in izip(neuron.bounding_box(nrn), ref2):
+    for a, b in izip(nrn.bounding_box(), ref2):
         nt.assert_true(np.allclose(a, b))
-
-
-@nt.raises(SomaError)
-def test_neuron_invalid_soma_points_0_raises_SomaError():
-    neuron.Neuron(INVALID_PTS_0, [1, 2, 3])
-
-
-@nt.raises(SomaError)
-def test_neuron_invalid_soma_points_2_raises_SomaError():
-    neuron.Neuron(INVALID_PTS_2, [1, 2, 3])

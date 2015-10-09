@@ -85,7 +85,7 @@ def mean_rad_of_gyration(neurites):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron.swc'
-    nrn = ezy.Neuron(filename)
+    nrn = ezy.load_neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
     print([(sum(1 for _ in tree.isegment(nrte)),
