@@ -47,6 +47,8 @@ def test_population():
 	nt.ok_(pop.neurons[1].name, 'Single_basal')
 	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
 	
+	nt.assert_equal(pop.somata, 3)
+
 	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
 
 	nt.assert_equal(pop.name, 'foo')
