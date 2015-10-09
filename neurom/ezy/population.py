@@ -32,7 +32,6 @@
 from neurom.ezy import load_neurons
 from neurom.core.types import TreeType
 from neurom.core.population import Population as CorePopulation
-from itertools import chain
 
 
 class Population(CorePopulation):
@@ -63,7 +62,7 @@ class Population(CorePopulation):
             Returns:
                 Iterator of neurite tree iterators
         '''
-        return chain(self.neurites)
+        return iter(self.neurites)
 
     def iter_neurons(self):
         '''
