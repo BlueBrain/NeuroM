@@ -35,7 +35,7 @@ from itertools import chain
 class Population(object):
     '''Neuron Population Class'''
     def __init__(self, neurons, name='Population'):
-        '''Construct a Neuron
+        '''Construct a Population
 
         Arguments:
             neurons: iterable of ezy neuron objects.
