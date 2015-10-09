@@ -108,10 +108,10 @@ class Neuron(object):
 
     def __init__(self, filename, iterable_type=np.array):
         self._iterable_type = iterable_type
-        self._nrn = load_neuron(filename, set_tree_type)
-        self.soma = self._nrn.soma
-        self.neurites = self._nrn.neurites
-        self.name = self._nrn.id
+        _nrn = load_neuron(filename, set_tree_type)
+        self.soma = _nrn.soma
+        self.neurites = _nrn.neurites
+        self.name = _nrn.id
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
@@ -123,7 +123,7 @@ class Neuron(object):
 
     def get_soma_radius(self):
         '''Get the radius of the soma'''
-        return self._nrn.soma.radius
+        return self.soma.radius
 
     def get_soma_surface_area(self):
         '''Get the surface area of the soma.
@@ -195,19 +195,19 @@ class Neuron(object):
 
     def get_n_sections(self, neurite_type=TreeType.all):
         '''Get the number of sections of a given type'''
-        return sum(n_sections(t) for t in self._nrn.neurites
+        return sum(n_sections(t) for t in self.neurites
                    if checkTreeType(neurite_type, t.type))
 
     def get_n_sections_per_neurite(self, neurite_type=TreeType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
         return self._iterable_type(
-            [n_sections(n) for n in self._nrn.neurites
+            [n_sections(n) for n in self.neurites
              if checkTreeType(neurite_type, n.type)]
         )
 
     def get_n_neurites(self, neurite_type=TreeType.all):
         '''Get the number of neurites of a given type in a neuron'''
-        return sum(1 for n in self._nrn.neurites
+        return sum(1 for n in self.neurites
                    if checkTreeType(neurite_type, n.type))
 
     def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
@@ -236,7 +236,7 @@ class Neuron(object):
         >>> tl = sum(nrn.iter_neurites(tr.isegment, mm.segment_length)))
 
         '''
-        return i_neurites(self._nrn.neurites,
+        return i_neurites(self.neurites,
                           iterator_type,
                           mapping,
                           tree_filter=lambda t: checkTreeType(neurite_type,
