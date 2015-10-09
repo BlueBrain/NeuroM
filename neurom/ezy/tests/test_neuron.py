@@ -73,6 +73,9 @@ class TestEzyNeuron(object):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
         self.neuron = ezy.Neuron(self.filename)
 
+    def test_name(self):
+        nt.assert_true(self.neuron.name == 'Neuron')
+
     def test_get_section_lengths(self):
         ref_seclen = []
         for t in self.neuron._nrn.neurites:
