@@ -29,7 +29,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.io.utils import load_neuron
+from neurom.io.utils import load_neuron, get_morph_files
 from neurom.check import morphology as io_chk
 from neurom.exceptions import SomaError
 from neurom.exceptions import NonConsecutiveIDsError
@@ -110,17 +110,6 @@ def parse_args():
                         help='Colorize the output')
 
     return parser.parse_args()
-
-
-def get_morph_files(directory):
-    '''Get a list of all morphology files in directory dir
-
-    Returns files with extensions '.swc' or '.h5' (case insensitive)
-    '''
-    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
-    return [m for m in lsdir
-            if os.path.isfile(m) and
-            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
 
 
 def log_msg(ok, msg, color=False):
