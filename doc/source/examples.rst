@@ -59,7 +59,7 @@ Basic ``eyz.Neuron`` usage
 .. code-block:: python
 
     >>> from neurom import ezy
-    >>> nrn = ezy.Neuron('some/data/path/morph_file.swc')
+    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
     >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
     >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
 
