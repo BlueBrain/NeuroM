@@ -35,7 +35,11 @@ from neurom.io.utils import get_morph_files
 from scipy import stats
 import numpy as np
 import argparse
+import logging
 import os
+import sys
+
+L = logging.getLogger(__name__)
 
 
 def parse_args():
