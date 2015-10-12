@@ -42,18 +42,20 @@ from neurom.ezy import Neuron
 
 L = logging.getLogger(__name__)
 
-NEURITE_STATS = ['get_section_lengths',
-                 'get_segment_lengths',
-                 'get_local_bifurcation_angles',
-                 'get_remote_bifurcation_angles',
-                 'get_n_sections',
-                 'get_n_neurites',
-                 'get_n_sections_per_neurite',
-                 ]
+NEURITE_STATS = [
+    'get_section_lengths',
+    'get_segment_lengths',
+    'get_local_bifurcation_angles',
+    'get_remote_bifurcation_angles',
+    'get_n_sections',
+    'get_n_neurites',
+    'get_n_sections_per_neurite'
+]
 
-SCALAR_STATS = ['get_soma_radius',
-                'get_soma_surface_area',
-                ]
+SCALAR_STATS = [
+    'get_soma_radius',
+    'get_soma_surface_area',
+]
 
 
 def parse_args():
@@ -94,11 +96,12 @@ def extract_stats(files):
                 value = getattr(nrn, ns)(n)
                 L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
                 if isinstance(value, np.ndarray):
-                    value = {'mean': np.mean(value),
-                             'std': np.std(value),
-                             'min': np.min(value),
-                             'max': np.max(value),
-                             }
+                    value = {
+                        'mean': np.mean(value),
+                        'std': np.std(value),
+                        'min': np.min(value),
+                        'max': np.max(value),
+                    }
                 stats[stat_name][n.name] = value
 
         for ns in SCALAR_STATS:

@@ -31,32 +31,27 @@
 '''Extract a distribution for the soma radii of the population (list) of neurons.'''
 
 from neurom import ezy
+from neurom.io.utils import get_morph_files
 from scipy import stats
 import numpy as np
 import argparse
+import logging
 import os
+import sys
+
+L = logging.getLogger(__name__)
 
 
 def parse_args():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='Morphology fit distribution extractor',
-                                     epilog='Note: Prints the optimal distribution and corresponding parameters.')
+    parser = argparse.ArgumentParser(
+        description='Morphology fit distribution extractor',
+        epilog='Note: Prints the optimal distribution and corresponding parameters.')
 
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
 
     return parser.parse_args()
-
-
-def get_morph_files(directory):
-    '''Get a list of all morphology files in directory dir
-
-    Returns files with extensions '.swc' or '.h5' (case insensitive)
-    '''
-    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
-    return [m for m in lsdir
-            if os.path.isfile(m) and
-            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
 
 
 def distribution_fit(data, distribution='norm'):
@@ -65,7 +60,7 @@ def distribution_fit(data, distribution='norm'):
 
 
 def distribution_error(data, distribution='norm'):
-    '''Calculates and returns the distance of a fitted distribution 
+    '''Calculates and returns the distance of a fitted distribution
        from the initial data.
     '''
     params = distribution_fit(data, distribution=distribution)
@@ -86,10 +81,10 @@ def test_multiple_distr(filepath):
     soma_size = [n.get_soma_radius() for n in population]
 
     # Fit the section lengths of the neuron with a distribution.
-    fit_data = {d: distribution_fit(soma_size,d) for d in distr_to_check}
+    fit_data = {d: distribution_fit(soma_size, d) for d in distr_to_check}
 
     # Get the error for the fitted data with each distribution.
-    fit_error = {distribution_error(soma_size,d) : d for d in distr_to_check}
+    fit_error = {distribution_error(soma_size, d): d for d in distr_to_check}
 
     # Select the distribution with the minimum ks distance from data
     optimal = fit_error.values()[np.argmax(fit_error.iterkeys())]
@@ -108,5 +103,5 @@ if __name__ == '__main__':
         sys.exit(1)
 
     result = test_multiple_distr(data_path)
-    print "Optimal distribution fit for soma radius is: ", result[0], " with parameters: ", result[1]
-
+    print "Optimal distribution fit for soma radius is: %s with parameters %s"\
+        % (result[0], result[1])
