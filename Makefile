@@ -37,7 +37,9 @@ unexport DISPLAY
 # Test coverage pass threshold (percent)
 MIN_COV ?= 100
 
-FIND_LINT_PY=`find neurom examples apps -name "*.py" -not -path "./*venv*/*" -not -path "*/*test*"`
+FIND_LINT_PY=`find neurom examples apps -name "*.py" -not -path "*/*test*"`
+FIND_LINT_APP=`find apps -type f -not -path "*/*\.*" -not -path "*/\.*" -not -path "*/.*~"`
+LINT_PYFILES := $(shell find $(FIND_LINT_PY)) $(shell find $(FIND_LINT_APP))
 
 $(VENV):
 	virtualenv --system-site-packages $(VENV)
@@ -45,10 +47,10 @@ $(VENV):
 	$(VENV_BIN)/pip install -e .
 
 run_pep8: $(VENV)
-	$(VENV_BIN)/pep8 --config=pep8rc  $(FIND_LINT_PY) > pep8.txt
+	$(VENV_BIN)/pep8 --config=pep8rc $(LINT_PYFILES) > pep8.txt
 
 run_pylint: $(VENV)
-	$(VENV_BIN)/pylint --rcfile=pylintrc  $(FIND_LINT_PY) > pylint.txt
+	$(VENV_BIN)/pylint --rcfile=pylintrc $(LINT_PYFILES) > pylint.txt
 
 run_tests: $(VENV)
 	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
@@ -73,7 +75,7 @@ clean_test_venv:
 
 clean_doc:
 	@test -x $(ROOT_DIR)/$(VENV_BIN)/sphinx-build && make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build  -C doc clean || true
-	@rm -rf $(ROOT_DIR)/doc/source/_build
+	@rm -rf $(ROOT_DIR)/doc/source/_neurom_build
 
 clean: clean_doc clean_test_venv
 	@rm -f pep8.txt

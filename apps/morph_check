@@ -73,6 +73,7 @@ morph_check some/path/           # Process all HDF5 and SWC files found in direc
 
 L = logging.getLogger(__name__)
 
+
 def _setup_logging(debug, log_file):
     """ Set up logger """
 
@@ -192,7 +193,6 @@ if __name__ == '__main__':
     else:
         L.error('Invalid data path %s', data_path)
         sys.exit(1)
-
 
     for _f in files:
         L.info(SEPARATOR)
