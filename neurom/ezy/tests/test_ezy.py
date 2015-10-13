@@ -40,3 +40,9 @@ def test_load_neurons():
 
     nrns = ezy.load_neurons(DATA_PATH)
     nt.assert_equal(len(nrns), 5)
+
+def test_load_population():
+
+    pop = ezy.load_population(DATA_PATH)
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(pop.name, 'valid_set')
