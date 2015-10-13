@@ -48,9 +48,6 @@ def parse_args():
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
 
-    parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
-                        help='-v for INFO, -vv for DEBUG')
-
     return parser.parse_args()
 
 
