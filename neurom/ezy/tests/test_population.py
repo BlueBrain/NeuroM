@@ -31,6 +31,7 @@
 import os
 from nose import tools as nt
 from itertools import izip
+from neurom.ezy import load_population
 from neurom.ezy.population import Population
 from neurom.core.types import TreeType
 
@@ -39,7 +40,7 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 VALID_DIR = os.path.join(DATA_PATH, 'valid_set')
 
 def test_construct_population():
-    pop = Population(VALID_DIR)
+    pop = load_population(VALID_DIR)
     nt.ok_(pop is not None)
 
 
@@ -47,7 +48,7 @@ class TestEzyPopulation(object):
 
     def setUp(self):
         self.directory = VALID_DIR
-        self.pop = Population(VALID_DIR)
+        self.pop = load_population(VALID_DIR)
         self.n_somata = len(self.pop.somata)
 
     def test_iter_somata(self):
