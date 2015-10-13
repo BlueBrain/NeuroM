@@ -32,22 +32,23 @@ API Documentation
 .. autosummary::
    :toctree: _neurom_build
 
-   neurom.ezy
-   neurom.ezy.neuron
-   neurom.io
-   neurom.io.utils
-   neurom.io.readers
-   neurom.io.check
+   neurom.exceptions
    neurom.core
    neurom.core.types
    neurom.core.tree
    neurom.core.neuron
    neurom.core.point
    neurom.core.dataformat
-   neurom.exceptions
+   neurom.io
+   neurom.io.readers
+   neurom.io.check
+   neurom.io.utils
    neurom.view
-   neurom.view.view
    neurom.view.common
+   neurom.view.view
    neurom.analysis
    neurom.analysis.morphmath
    neurom.analysis.morphtree
+   neurom.ezy
+   neurom.ezy.neuron
+   neurom.ezy.population
