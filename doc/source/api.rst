@@ -30,7 +30,7 @@ API Documentation
 =================
 
 .. autosummary::
-   :toctree: _build
+   :toctree: _neurom_build
 
    neurom.ezy
    neurom.ezy.neuron
