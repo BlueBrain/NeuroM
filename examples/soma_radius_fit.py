@@ -31,15 +31,9 @@
 '''Extract a distribution for the soma radii of the population (list) of neurons.'''
 
 from neurom import ezy
-from neurom.io.utils import get_morph_files
 from scipy import stats
 import numpy as np
 import argparse
-import logging
-import os
-import sys
-
-L = logging.getLogger(__name__)
 
 
 def parse_args():
@@ -64,7 +58,7 @@ def distribution_error(data, distribution='norm'):
        from the initial data.
     '''
     params = distribution_fit(data, distribution=distribution)
-    return getattr(stats, distribution).fit(data)[0]
+    return stats.kstest(data, distribution, params)[0]
 
 
 def test_multiple_distr(filepath):
@@ -94,13 +88,8 @@ def test_multiple_distr(filepath):
 
 if __name__ == '__main__':
     args = parse_args()
-    data_path = args.datapath
 
-    if os.path.isdir(data_path):
-        _files = get_morph_files(data_path)
-    else:
-        L.error('Invalid data path %s', data_path)
-        sys.exit(1)
+    data_path = args.datapath
 
     result = test_multiple_distr(data_path)
     print "Optimal distribution fit for soma radius is: %s with parameters %s"\
