@@ -56,8 +56,9 @@ Examples:
     ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
 
 '''
-
+import os
 from .neuron import Neuron
+from .population import Population
 from .neuron import TreeType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..view.view import neuron as view
@@ -75,3 +76,10 @@ def load_neuron(filename):
 def load_neurons(directory):
     '''Create a list of Neuron objects from each morphology file in directory'''
     return [load_neuron(m) for m in get_morph_files(directory)]
+
+
+def load_population(directory):
+    '''Create a population object from all morphologies in a directory'''
+    pop = Population(load_neurons(directory))
+    pop.name = os.path.basename(directory)
+    return pop

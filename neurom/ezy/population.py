@@ -29,18 +29,19 @@
 
 '''Population Class with basic analysis and plotting capabilities'''
 
-from neurom.ezy import load_neurons
 from neurom.core.types import TreeType
 from neurom.core.population import Population as CorePopulation
 
 
 class Population(CorePopulation):
-    '''docstring
+    '''Population Class
+
+    Arguments:
+        neurons: list of neurons (core or ezy)
     '''
 
-    def __init__(self, directory):
-        nrns = load_neurons(directory)
-        super(Population, self).__init__(nrns)
+    def __init__(self, neurons):
+        super(Population, self).__init__(neurons)
 
     def iter_somata(self):
         '''
