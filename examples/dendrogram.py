@@ -31,7 +31,7 @@
 
 from neurom.view import common
 from neurom.analysis.morphmath import segment_length
-from neurom.core.tree import isegment
+from neurom.core.tree import isegment, val_iter
 from matplotlib.collections import LineCollection
 
 
@@ -53,7 +53,7 @@ def get_transformed_position(segment, segments_dict, y_length):
     (x0, y0), line_type = segments_dict[start_node_id]
 
     # increase horizontal dendrogram length by segment length
-    x1 = x0 + segment_length(segment)
+    x1 = x0 + segment_length(list(val_iter(segment)))
 
     # if the parent node is visited for the first time
     # the dendrogram segment is drawn from below. If it
