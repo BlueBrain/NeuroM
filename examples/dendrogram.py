@@ -112,7 +112,7 @@ def affine2D_transfrom(pos, a, b, c, d):
     '''
 
     for i, elements in enumerate(pos):
-        for j in len(elements):
+        for j, _ in enumerate(elements):
 
             x = pos[i][j][0]
             y = pos[i][j][1]
@@ -162,13 +162,9 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 
         angle = pi
 
-        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
-
     elif rotation == 'up':
 
         angle = pi / 2.
-
-        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
 
         xlabel, ylabel = ylabel, xlabel
 
@@ -176,9 +172,13 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 
         angle = - pi / 2.
 
-        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
-
         xlabel, ylabel = ylabel, xlabel
+
+    else:
+
+        angle = 0.
+
+    affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
 
     collection = LineCollection(positions, color='k', linewidth=linewidths)
 
