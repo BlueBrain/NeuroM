@@ -30,20 +30,9 @@
 '''Moprhology Dendrogram Functions Example'''
 
 from neurom.view import common
+from neurom.analysis.morphmath import segment_length
 from neurom.core.tree import isegment
 from matplotlib.collections import LineCollection
-from numpy import sqrt
-
-
-def get_length(segment):
-    '''Calculate Segment Length
-    '''
-
-    p0, p1 = segment[0].value, segment[1].value
-
-    # length calculated from the distance of the starting and
-    # ending point in space
-    return sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2 + (p0[2] - p1[2])**2)
 
 
 def get_transformed_position(segment, segments_dict, y_length):
@@ -64,7 +53,7 @@ def get_transformed_position(segment, segments_dict, y_length):
     (x0, y0), line_type = segments_dict[start_node_id]
 
     # increase horizontal dendrogram length by segment length
-    x1 = x0 + get_length(segment)
+    x1 = x0 + segment_length(segment)
 
     # if the parent node is visited for the first time
     # the dendrogram segment is drawn from below. If it
@@ -107,6 +96,7 @@ def dendro_transform(tree_object):
 
         tr_pos = get_transformed_position(seg, segments_dict, y_length)
 
+        # mean segment diameter
         seg_diam = seg[0].value[3] + seg[1].value[3]
 
         positions.extend(tr_pos)
@@ -143,10 +133,7 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True, subplot=False, *
     # get line segment positions and respective diameters
     positions, linewidths = dendro_transform(tree_object)
 
-    linewidths = linewidths / min(linewidths)
-
-    if not show_diameters:
-        linewidths = 1.
+    linewidths = linewidths / min(linewidths) if show_diameters else 1
 
     collection = LineCollection(positions, color='k', linewidth=linewidths)
 
