@@ -41,7 +41,7 @@ run_pep8:
 	pep8 --config=pep8rc $(LINT_PYFILES)
 
 run_pylint:
-	pylint --rcfile=pylintrc $(LINT_PYFILES)
+	pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES)
 
 run_tests:
 	nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
