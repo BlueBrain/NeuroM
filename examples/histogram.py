@@ -34,7 +34,7 @@ from neurom.view import common
 from itertools import chain
 
 
-def histogram(neurons, feature, new_fig=True, subplot=False, **kwargs):
+def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
     '''
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -72,7 +72,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, **kwargs):
         figure file.
     '''
 
-    bins = kwargs.get('bins', 100)
+    bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
 
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
@@ -85,16 +85,35 @@ def histogram(neurons, feature, new_fig=True, subplot=False, **kwargs):
 
     feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
 
-    neu_labels = ['neuron_id' for neu in neurons]
+    neu_labels = [neu.name for neu in neurons]
 
-    ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels)
+    ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels, normed=normed)
 
     kwargs['no_legend'] = len(neu_labels) == 1
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
-def population_histogram( pops, feature, new_fig=True, normed=False, subplot=False, **kwargs):
+def population_feature_values(pops, feature):
+    '''Extracts feature values per population
+    '''
+    pops_feature_values = []
+
+    for pop in pops:
+
+        feature_values = [getattr(neu, 'get_' + feature)() for neu in pop.neurons]
+
+        # ugly hack to chain in case of list of lists
+        if any([isinstance(p, (list, np.ndarray)) for p in feature_values]):
+
+            feature_values = list(chain(*feature_values))
+
+        pops_feature_values.append(feature_values)
+
+    return pops_feature_values
+
+
+def population_histogram(pops, feature, new_fig=True, normed=False, subplot=False, **kwargs):
     '''
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -142,27 +161,11 @@ def population_histogram( pops, feature, new_fig=True, normed=False, subplot=Fal
 
     kwargs['title'] = kwargs.get('title', feature + ' histogram')
 
-    multiple_feature_values = []
-
-    for pop in pops:
-
-        feature_values = [getattr(neu, 'get_' + feature)() for neu in pop.neurons]
-
-        # ugly hack to chain in case of list of lists
-        if any([isinstance(p, (list, np.ndarray)) for p in feature_values]):
-
-            feature_values = list(chain(*feature_values))
-
-
-        if normed:
-
-            feature_vals /=
-
-        multiple_feature_values.append(feature_values)
+    pops_feature_values = population_feature_values(pops, feature)
 
     pops_labels = [pop.name for pop in pops]
 
-    ax.hist(multiple_feature_values, bins=bins, cumulative=cumulative, label=pops_labels)
+    ax.hist(pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, normed=normed)
 
     kwargs['no_legend'] = len(pops_labels) == 1
 
