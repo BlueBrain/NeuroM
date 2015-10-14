@@ -33,6 +33,7 @@ from neurom.view import common
 from neurom.analysis.morphmath import segment_length
 from neurom.core.tree import isegment, val_iter
 from matplotlib.collections import LineCollection
+from numpy import sin, cos, pi
 
 
 def get_transformed_position(segment, segments_dict, y_length):
@@ -64,11 +65,11 @@ def get_transformed_position(segment, segments_dict, y_length):
     y_length[end_node_id] = y_length[start_node_id] * (1. - 0.5 * abs(line_type))
 
     # horizontal segment
-    segments = [((x0, y1), (x1, y1))]
+    segments = [[(x0, y1), (x1, y1)]]
 
     # vertical segment
     if line_type != 0:
-        segments.extend([((x0, y0), (x0, y1))])
+        segments.extend([[(x0, y0), (x0, y1)]])
 
     # If the segment has children, the first child will be drawn
     # from below. If no children the child will be a straight segment
@@ -106,7 +107,24 @@ def dendro_transform(tree_object):
     return positions, diameters
 
 
-def dendrogram(tree_object, show_diameters=False, new_fig=True, subplot=False, **kwargs):
+def affine2D_transfrom(pos, a, b, c, d):
+    '''Affine 2D transformation for the positions of the line collection
+    '''
+
+    for i, elements in enumerate(pos):
+        for j in len(elements):
+
+            x = pos[i][j][0]
+            y = pos[i][j][1]
+
+            x_prime = a * x + b * y
+            y_prime = c * x + d * y
+
+            pos[i][j] = (x_prime, y_prime)
+
+
+def dendrogram(tree_object, show_diameters=False, new_fig=True,
+               subplot=False, rotation='right', **kwargs):
     '''Generates the deondrogram of the input neurite
 
     Arguments:
@@ -119,6 +137,8 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True, subplot=False, *
 
         subplot : Default is False, which returns a matplotlib figure object. If True,
         returns a matplotlib axis object, for use as a subplot.
+
+        rotation : angle in degrees of rotation of the dendrogram.
 
     Returns:
 
@@ -135,6 +155,31 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True, subplot=False, *
 
     linewidths = linewidths / min(linewidths) if show_diameters else 1
 
+    xlabel = 'Length (um)'
+    ylabel = ''
+
+    if rotation == 'left':
+
+        angle = pi
+
+        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
+
+    elif rotation == 'up':
+
+        angle = pi / 2.
+
+        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
+
+        xlabel, ylabel = ylabel, xlabel
+
+    elif rotation == 'down':
+
+        angle = - pi / 2.
+
+        affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
+
+        xlabel, ylabel = ylabel, xlabel
+
     collection = LineCollection(positions, color='k', linewidth=linewidths)
 
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
@@ -144,7 +189,9 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True, subplot=False, *
     ax.autoscale(enable=True, tight=None)
 
     kwargs['title'] = 'Morphology Dendrogram'
-    kwargs['xlabel'] = 'Length (uM)'
-    kwargs['ylabel'] = ''
+
+    kwargs['xlabel'] = xlabel
+
+    kwargs['ylabel'] = ylabel
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
