@@ -56,32 +56,28 @@ def parse_args():
     return parser.parse_args()
 
 
-def distribution_fit(data, distribution='norm'):
-    '''Calculates and returns the parameters of a distribution'''
-    return getattr(stats, distribution).fit(data)
-
-
-def distribution_error(data, distribution='norm'):
-    '''Calculates and returns the distance of a fitted distribution
-       from the initial data.
+def distribution_fit_error(data, distribution='norm'):
+    '''Calculates and returns the parameters and the ks-distance
+        of a fitted distribution from the initial data.
     '''
-    params = distribution_fit(data, distribution=distribution)
-    return stats.kstest(data, distribution, params)[0]
+    params = getattr(stats, distribution).fit(data)
+    return params, stats.kstest(data, distribution, params)[0]
 
 
 def test_multiple_distr(data):
     '''Runs the distribution fit for multiple distributions and returns
        the optimal distribution along with the corresponding parameters.
+       Fit normal returns (mean, std).
+       Fit exponential returns (loc, scale=1/lambda).
+       Fit uniform returns (mean, std).
     '''
     distr_to_check = ['norm', 'expon', 'uniform']
 
-    fit_data = {d: distribution_fit(data, d) for d in distr_to_check}
+    fit_all = {d: distribution_fit_error(data, d) for d in distr_to_check}
 
-    fit_error = {distribution_error(data, d): d for d in distr_to_check}
+    optimal = fit_all.keys()[np.argmin([error[1] for error in fit_all.values()])]
 
-    optimal = fit_error.values()[np.argmax(fit_error.iterkeys())]
-
-    return optimal, fit_data[optimal]
+    return optimal, fit_all[optimal][0]
 
 
 def extract_data(data_path, feature):
@@ -124,14 +120,13 @@ def transform_distribution(data):
 
     elif data["type"] == 'expon':
         data_dict.update({"type": "exponential"})
-        data_dict.update({"lambda": data["params"][1]})
+        data_dict.update({"lambda": 1. / data["params"][1]})
 
     elif data["type"] == 'uniform':
         data_dict.update({"type": "uniform"})
 
     data_dict.update({"min": data["min"]})
     data_dict.update({"max": data["max"]})
-    data_dict.update({"description": "Random text"})
 
     return data_dict
 
