@@ -41,35 +41,33 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
 
     More information about the plot and how it works.
 
-    Parameters
-    ----------
-    neurons : list
-        List of Neurons. Single neurons must be encapsulated in a list.
+    Parameters :
 
-    feature : str
-    The feature of interest.
+        neurons : list
+            List of Neurons. Single neurons must be encapsulated in a list.
 
-    Options
-    -------
-    bins : int
-    Number of bins for the histogram.
+        feature : str
+            The feature of interest.
 
-    cumulative : bool
-    Sets cumulative histogram on.
+        bins : int
+            Number of bins for the histogram.
 
-    subplot : bool
-        Default is False, which returns a matplotlib figure object. If True,
-        returns a matplotlib axis object, for use as a subplot.
+        cumulative : bool
+            Sets cumulative histogram on.
 
-    Returns
-    -------
-    figure_output : list
-        [fig|ax, figdata, figtext]
-        The first item is either a figure object (if subplot is False) or an
-        axis object. The second item is an object containing the data used to
-        generate the figure. The final item is text used in report generation
-        as a figure legend. This text needs to be manually entered in each
-        figure file.
+        subplot : bool
+            Default is False, which returns a matplotlib figure object. If True,
+            returns a matplotlib axis object, for use as a subplot.
+
+    Returns :
+
+        figure_output : list
+            [fig|ax, figdata, figtext]
+            The first item is either a figure object (if subplot is False) or an
+            axis object. The second item is an object containing the data used to
+            generate the figure. The final item is text used in report generation
+            as a figure legend. This text needs to be manually entered in each
+            figure file.
     '''
 
     bins = kwargs.get('bins', 25)
@@ -120,14 +118,12 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
 
     More information about the plot and how it works.
 
-    Parameters
+    Parameters :
 
         populations : populations list
 
         feature : str
         The feature of interest.
-
-    Options
 
         bins : int
         Number of bins for the histogram.
@@ -139,7 +135,7 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
             Default is False, which returns a matplotlib figure object. If True,
             returns a matplotlib axis object, for use as a subplot.
 
-    Returns
+    Returns :
 
         figure_output : list
             [fig|ax, figdata, figtext]
