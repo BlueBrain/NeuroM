@@ -33,7 +33,7 @@
    '''
 
 from neurom import ezy
-from scipy import stats
+from neurom import stats
 import numpy as np
 import argparse
 import json
@@ -56,30 +56,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def distribution_fit_error(data, distribution='norm'):
-    '''Calculates and returns the parameters and the ks-distance
-        of a fitted distribution from the initial data.
-    '''
-    params = getattr(stats, distribution).fit(data)
-    return params, stats.kstest(data, distribution, params)[0]
-
-
-def test_multiple_distr(data):
-    '''Runs the distribution fit for multiple distributions and returns
-       the optimal distribution along with the corresponding parameters.
-       Fit normal returns (mean, std).
-       Fit exponential returns (loc, scale=1/lambda).
-       Fit uniform returns (mean, std).
-    '''
-    distr_to_check = ['norm', 'expon', 'uniform']
-
-    fit_all = {d: distribution_fit_error(data, d) for d in distr_to_check}
-
-    optimal = fit_all.keys()[np.argmin([error[1] for error in fit_all.values()])]
-
-    return optimal, fit_all[optimal][0]
-
-
 def extract_data(data_path, feature):
     '''Loads a list of neurons, extracts feature
        and transforms the fitted distribution in the correct format.
@@ -93,14 +69,14 @@ def extract_data(data_path, feature):
     results = {}
 
     try:
-        opt_fit = test_multiple_distr(feature_data)
+        opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
         from itertools import chain
         feature_data = list(chain(*feature_data))
-        opt_fit = test_multiple_distr(feature_data)
+        opt_fit = stats.optimal_distribution(feature_data)
 
     results["type"] = opt_fit[0]
-    results["params"] = opt_fit[1]
+    results["params"] = opt_fit[1][0]
     results["min"] = np.min(feature_data)
     results["max"] = np.max(feature_data)
 
