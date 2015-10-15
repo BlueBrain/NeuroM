@@ -133,9 +133,9 @@ def transform_package(data_path, components, feature_list):
     '''
     data_dict = transform_header(os.path.basename(data_path), components)
 
-    for feature, name, comp, fmin, fmax in feature_list:
+    for feature, name, comp, fmin, fmax, fparam in feature_list:
 
-        result = transform_distribution(extract_data(data_path, feature), fmin, fmax)
+        result = transform_distribution(extract_data(data_path, feature, fparam), fmin, fmax)
         data_dict["components"][comp] = {name: result}
 
     return data_dict
@@ -146,7 +146,12 @@ if __name__ == '__main__':
 
     d_path = args.datapath
 
-    flist = [["soma_radius","radius","soma",None,None]]
+    flist = [["soma_radius", "radius", "soma", None, None, None],
+             ["n_neurites", "number", "basal_dendrite", 1, None,
+              {"neurite_type": ezy.TreeType.basal_dendrite}],
+             ["n_neurites", "number", "axon", 1, None,
+              {"neurite_type": ezy.TreeType.axon}]]
+
     comps = ["soma"]
 
     _result = transform_package(d_path, comps, flist)
