@@ -63,3 +63,9 @@ def test_fit_default_is_normal():
     p1, e1 = st.fit(NORMAL, 'norm')
     nt.assert_items_equal(p0, p1)
     nt.assert_items_equal(e0, e1)
+
+def test_optimal_distribution():
+    optimal, params = st.optimal_distribution(NORMAL)
+    nt.ok_(optimal=='norm')
+    nt.assert_almost_equal(params[0], NORMAL_MU, 1)
+    nt.assert_almost_equal(params[1], NORMAL_SIGMA, 1)
