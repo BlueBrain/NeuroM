@@ -81,13 +81,11 @@ def extract_data(data_path, feature, params=None):
 
     results["type"] = opt_fit[0]
     results["params"] = opt_fit[1][0]
-    results["min"] = np.min(feature_data)
-    results["max"] = np.max(feature_data)
 
     return results
 
 
-def transform_distribution(data):
+def transform_distribution(data, datamin=None, datamax=None):
     '''Transform optimal distribution data into correct format
        based on the distribution type.
     '''
@@ -105,8 +103,10 @@ def transform_distribution(data):
     elif data["type"] == 'uniform':
         data_dict.update({"type": "uniform"})
 
-    data_dict.update({"min": data["min"]})
-    data_dict.update({"max": data["max"]})
+    if datamin is not None:
+        data_dict.update({"min": datamin})
+    if datamax is not None:
+        data_dict.update({"max": datamax})
 
     return data_dict
 
@@ -131,7 +131,7 @@ def transform_package(data_path, feature_list, feature_names, component):
 
         data_dict["components"].setdefault(comp)
 
-    for feature, comp, name in zip(feature_list, component, feature_names):
+    for feature, name, comp in zip(feature_list, component, feature_names):
 
         result = transform_distribution(extract_data(data_path, feature))
         data_dict["components"][comp] = {name: result}
