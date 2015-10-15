@@ -43,6 +43,12 @@ NORMAL_MU = 10.
 NORMAL_SIGMA = 1.0
 NORMAL = np.random.normal(NORMAL_MU, NORMAL_SIGMA, 1000)
 
+EXPON_LAMBDA = 10.
+EXPON = np.random.exponential(EXPON_LAMBDA, 1000)
+
+UNIFORM_MIN = -1.
+UNIFORM_MAX = 1.
+UNIFORM = np.random.uniform(UNIFORM_MIN, UNIFORM_MAX, 1000)
 
 def test_fit_normal_params():
     params, errs = st.fit(NORMAL, 'norm')
@@ -64,8 +70,17 @@ def test_fit_default_is_normal():
     nt.assert_items_equal(p0, p1)
     nt.assert_items_equal(e0, e1)
 
-def test_optimal_distribution():
+
+def test_optimal_distribution_normal():
     optimal, params = st.optimal_distribution(NORMAL)
     nt.ok_(optimal=='norm')
-    nt.assert_almost_equal(params[0], NORMAL_MU, 1)
-    nt.assert_almost_equal(params[1], NORMAL_SIGMA, 1)
+
+
+def test_optimal_distribution_exponential():
+    optimal, params = st.optimal_distribution(EXPON)
+    nt.ok_(optimal=='expon')
+
+
+def test_optimal_distribution_uniform():
+    optimal, params = st.optimal_distribution(UNIFORM)
+    nt.ok_(optimal=='uniform')
