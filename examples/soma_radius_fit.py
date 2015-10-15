@@ -33,8 +33,7 @@
    '''
 
 from neurom import ezy
-from scipy import stats
-import numpy as np
+from neurom import stats as st
 import argparse
 
 
@@ -50,19 +49,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def distribution_fit(data, distribution='norm'):
-    '''Calculates and returns the parameters of a distribution'''
-    return getattr(stats, distribution).fit(data)
-
-
-def distribution_error(data, distribution='norm'):
-    '''Calculates and returns the distance of a fitted distribution
-       from the initial data.
-    '''
-    params = distribution_fit(data, distribution=distribution)
-    return stats.kstest(data, distribution, params)[0]
-
-
 def test_multiple_distr(filepath):
     '''Runs the distribution fit for multiple distributions and returns
        the optimal distribution along with the corresponding parameters.
@@ -71,21 +57,15 @@ def test_multiple_distr(filepath):
     population = ezy.load_neurons(filepath)
 
     # Create a list of basic distributions
-    distr_to_check = ['norm', 'expon', 'uniform']
+    distr_to_check = ('norm', 'expon', 'uniform')
 
     # Get the soma radius of a lis of neurons
     soma_size = [n.get_soma_radius() for n in population]
 
-    # Fit the section lengths of the neuron with a distribution.
-    fit_data = {d: distribution_fit(soma_size, d) for d in distr_to_check}
+    # Find the best fit distribution
+    optimal, fit_results = st.optimal_distribution(soma_size, distr_to_check)
 
-    # Get the error for the fitted data with each distribution.
-    fit_error = {distribution_error(soma_size, d): d for d in distr_to_check}
-
-    # Select the distribution with the minimum ks distance from data
-    optimal = fit_error.values()[np.argmax(fit_error.iterkeys())]
-
-    return optimal, fit_data[optimal]
+    return optimal, fit_results[0]
 
 
 if __name__ == '__main__':

@@ -33,8 +33,7 @@
    '''
 
 from neurom import ezy
-from scipy import stats
-import numpy as np
+from neurom import stats as st
 import argparse
 
 
@@ -53,39 +52,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def distribution_fit(data, distribution='norm'):
-    '''Calculates and returns the parameters of a distribution'''
-    return getattr(stats, distribution).fit(data)
-
-
-def distribution_error(data, distribution='norm'):
-    '''Calculates and returns the distance of a fitted distribution
-       from the initial data.
-    '''
-    params = distribution_fit(data, distribution=distribution)
-    return stats.kstest(data, distribution, params)[0]
-
-
-def test_multiple_distr(data):
-    '''Runs the distribution fit for multiple distributions and returns
-       the optimal distribution along with the corresponding parameters.
-    '''
-    # Create a list of basic distributions
-    distr_to_check = ['norm', 'expon', 'uniform']
-
-    # Fit the section lengths of the neuron with a distribution.
-    fit_data = {d: distribution_fit(data, d) for d in distr_to_check}
-
-    # Get the error for the fitted data with each distribution.
-    fit_error = {distribution_error(data, d): d for d in distr_to_check}
-
-    # Select the distribution with the minimum ks distance from data
-    optimal = fit_error.values()[np.argmax(fit_error.iterkeys())]
-
-    return optimal, fit_data[optimal]
-
-
 if __name__ == '__main__':
+
     args = parse_args()
 
     data_path = args.datapath
@@ -97,11 +65,11 @@ if __name__ == '__main__':
     feature_data = [getattr(n, 'get_' + feature)() for n in population]
 
     try:
-        result = test_multiple_distr(feature_data)
+        result = st.optimal_distribution(feature_data)
     except ValueError:
         from itertools import chain
         feature_data = list(chain(*feature_data))
-        result = test_multiple_distr(feature_data)
+        result = st.optimal_distribution(feature_data)
 
     print "Optimal distribution fit for %s is: %s with parameters %s"\
-        % (feature, result[0], result[1])
+        % (feature, result[0], result[1][0])
