@@ -31,6 +31,7 @@
 Nothing fancy. Just commonly used functions using scipy functionality.'''
 
 from scipy import stats as _st
+import numpy as _np
 
 
 def fit(data, distribution='norm'):
@@ -38,6 +39,8 @@ def fit(data, distribution='norm'):
 
     Parameters:
         data: array of data points to be fitted
+
+    Options:
         distribution (str): type of distribution to fit. Default 'norm'.
 
     Returns:
@@ -48,3 +51,26 @@ def fit(data, distribution='norm'):
     '''
     params = getattr(_st, distribution).fit(data)
     return params, _st.kstest(data, distribution, params)
+
+
+def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
+    '''Calculate the parameters of a fit of different distributions to a data set
+       and returns the distribution of the minimal ks-distance.
+
+    Parameters:
+        data: array of data points to be fitted
+
+    Options:
+        distr_to_check: tuple of distributions to be checked
+
+    Returns:
+        tuple (optimal, (parameters, (distance, p-value))) of data to fitted distribution
+
+    Note:
+        Uses Kolmogorov-Smirnov test to estimate distance and p-value.
+    '''
+    fit_d = {d: fit(data, d) for d in distr_to_check}
+
+    optimal = fit_d.keys()[_np.argmin([results[1][0] for results in fit_d.values()])]
+
+    return optimal, fit_d[optimal]
