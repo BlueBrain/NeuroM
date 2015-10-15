@@ -111,7 +111,7 @@ def transform_distribution(data, datamin=None, datamax=None):
     return data_dict
 
 
-def transform_header(mtype_name):
+def transform_header(mtype_name, components):
     '''Add header to json output to wrap around distribution data.
     '''
     head_dict = OrderedDict()
@@ -119,34 +119,36 @@ def transform_header(mtype_name):
     head_dict.update({"m-type": mtype_name})
     head_dict.update({"components": {}})
 
+    for comp in np.unique(components):
+
+        head_dict["components"].setdefault(comp)
+
     return head_dict
 
 
-def transform_package(data_path, feature_list, feature_names, component):
+def transform_package(data_path, components, feature_list):
     '''Put together header and list of data into one json output.
+       feature_list contains all the information about the data to be extracted:
+       features, feature_names, feature_components, feature_min, feature_max
     '''
-    data_dict = transform_header(os.path.basename(data_path))
+    data_dict = transform_header(os.path.basename(data_path), components)
 
-    for comp in np.unique(component):
+    for feature, name, comp, fmin, fmax in feature_list:
 
-        data_dict["components"].setdefault(comp)
-
-    for feature, name, comp in zip(feature_list, component, feature_names):
-
-        result = transform_distribution(extract_data(data_path, feature))
+        result = transform_distribution(extract_data(data_path, feature), fmin, fmax)
         data_dict["components"][comp] = {name: result}
 
     return data_dict
+
 
 if __name__ == '__main__':
     args = parse_args()
 
     d_path = args.datapath
 
-    flist = ["soma_radius"]
-    fnames = ["radius"]
+    flist = [["soma_radius","radius","soma",None,None]]
     comps = ["soma"]
 
-    _result = transform_package(d_path, flist, fnames, comps)
+    _result = transform_package(d_path, comps, flist)
 
     print json.dumps(_result, indent=2, separators=(', \n', ': '))
