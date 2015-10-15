@@ -51,6 +51,21 @@ def checkTreeType(ref, target):
     return ref is TreeType.all or target is ref
 
 
+@unique
+class Feature(Enum):
+    '''Enum representing valid features'''
+    soma_radius = 1
+    soma_surface_area = 2
+    segment_lengths = 3
+    section_lengths = 4
+    local_bifurcation_angles = 5
+    remote_bifurcation_angles = 6
+    section_path_distances = 7
+    section_radial_distances = 8
+    n_neurites = 9
+    n_sections = 10
+    n_sections_per_neurite = 11
+
 NEURITES = (TreeType.all,
             TreeType.axon,
             TreeType.basal_dendrite,
