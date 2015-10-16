@@ -68,7 +68,7 @@ def extract_data(data_path, feature, params=None):
     if params is None:
         params = {}
 
-    feature_data = [getattr(n, 'get_' + feature)(*params) for n in population]
+    feature_data = [getattr(n, 'get_' + feature)(**params) for n in population]
 
     results = {}
 
@@ -98,7 +98,10 @@ def transform_distribution(data, datamin=None, datamax=None):
 
     elif data["type"] == 'expon':
         data_dict.update({"type": "exponential"})
-        data_dict.update({"lambda": 1. / data["params"][1]})
+        if data["params"][1] != 0:
+            data_dict.update({"lambda": 1. / data["params"][1]})
+        else:
+            data_dict.update({"scale": 0.})
 
     elif data["type"] == 'uniform':
         data_dict.update({"type": "uniform"})
@@ -150,9 +153,7 @@ if __name__ == '__main__':
 
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
-              {"neurite_type": ezy.TreeType.basal_dendrite}],
-             ["n_neurites", "number", "axon", 1, None,
-              {"neurite_type": ezy.TreeType.axon}]]
+              {"neurite_type": ezy.TreeType.basal_dendrite}]]
 
     comps = ["soma"]
 
