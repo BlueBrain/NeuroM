@@ -93,8 +93,8 @@ def transform_distribution(data, datamin=None, datamax=None):
 
     if data["type"] == 'uniform':
         data_dict["type"] = "uniform"
-        data_dict["min"] = np.min(data["params"])
-        data_dict["max"] = np.max(data["params"])
+        data_dict["min"] = data["params"][0]
+        data_dict["max"] = np.sum(data["params"])
         return data_dict
 
     elif data["type"] == 'norm':
