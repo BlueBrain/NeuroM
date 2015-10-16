@@ -92,18 +92,18 @@ def transform_distribution(data, datamin=None, datamax=None):
     data_dict = OrderedDict()
 
     if data["type"] == 'uniform':
-        data_dict.update({"type": "uniform",
-                          "min": np.min(data["params"]),
-                          "max": np.max(data["params"])})
+        data_dict["type"] = "uniform"
+        data_dict["min"] = np.min(data["params"])
+        data_dict["max"] = np.max(data["params"])
         return data_dict
 
     elif data["type"] == 'norm':
-        data_dict.update({"type": "normal",
-                          "mu": data["params"][0],
-                          "sigma": data["params"][1]})
+        data_dict["type"] = "normal"
+        data_dict["mu"] = data["params"][0]
+        data_dict["sigma"] = data["params"][1]
 
     elif data["type"] == 'expon':
-        data_dict.update({"type": "exponential"})
+        data_dict["type"] = "exponential"
         if data["params"][1] != 0:
             data_dict["lambda"] = 1. / data["params"][1]
         else:
@@ -122,10 +122,10 @@ def transform_header(mtype_name, components):
     '''
     head_dict = OrderedDict()
 
-    head_dict.update({"m-type": mtype_name, "components": {}})
+    head_dict["m-type"] = mtype_name
+    head_dict["components"] = {}
 
     for comp in np.unique(components):
-
         head_dict["components"].setdefault(comp)
 
     return head_dict
