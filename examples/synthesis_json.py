@@ -91,27 +91,28 @@ def transform_distribution(data, datamin=None, datamax=None):
     '''
     data_dict = OrderedDict()
 
-    if data["type"] == 'norm':
-        data_dict.update({"type": "normal"})
-        data_dict.update({"mu": data["params"][0]})
-        data_dict.update({"sigma": data["params"][1]})
+    if data["type"] == 'uniform':
+        data_dict.update({"type": "uniform",
+                          "min": np.min(data["params"]),
+                          "max": np.max(data["params"])})
+        return data_dict
+
+    elif data["type"] == 'norm':
+        data_dict.update({"type": "normal",
+                          "mu": data["params"][0],
+                          "sigma": data["params"][1]})
 
     elif data["type"] == 'expon':
         data_dict.update({"type": "exponential"})
         if data["params"][1] != 0:
-            data_dict.update({"lambda": 1. / data["params"][1]})
+            data_dict["lambda"] = 1. / data["params"][1]
         else:
-            data_dict.update({"scale": 0.})
+            data_dict["scale"] = 0.
 
     if datamin is not None:
-        data_dict.update({"min": datamin})
+        data_dict["min"] = datamin
     if datamax is not None:
-        data_dict.update({"max": datamax})
-
-    elif data["type"] == 'uniform':
-        data_dict.update({"type": "uniform"})
-        data_dict.update({"min": data["params"][0]})
-        data_dict.update({"max": data["params"][1]})
+        data_dict["max"] = datamax
 
     return data_dict
 
@@ -121,8 +122,7 @@ def transform_header(mtype_name, components):
     '''
     head_dict = OrderedDict()
 
-    head_dict.update({"m-type": mtype_name})
-    head_dict.update({"components": {}})
+    head_dict.update({"m-type": mtype_name, "components": {}})
 
     for comp in np.unique(components):
 
