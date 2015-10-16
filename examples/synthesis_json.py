@@ -110,8 +110,8 @@ def transform_distribution(data, datamin=None, datamax=None):
 
     elif data["type"] == 'uniform':
         data_dict.update({"type": "uniform"})
-        data_dict.update({"min": data["params"][0]})
-        data_dict.update({"max": data["params"][1]})
+        data_dict.update({"min": np.min(data["params"])})
+        data_dict.update({"max": np.max(data["params"])})
 
     return data_dict
 

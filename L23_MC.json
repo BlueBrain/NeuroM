@@ -1,0 +1,27 @@
+{
+  "m-type": "", 
+
+  "components": {
+    "soma": {
+      "radius": {
+        "type": "uniform", 
+
+        "min": 6.5197347977645759, 
+
+        "max": 9.2194377943838361
+      }
+    }, 
+
+    "basal_dendrite": {
+      "number": {
+        "type": "normal", 
+
+        "mu": 3.5, 
+
+        "sigma": 1.3693063937629153, 
+
+        "min": 1
+      }
+    }
+  }
+}
