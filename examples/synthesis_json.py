@@ -95,6 +95,10 @@ def transform_distribution(data, datamin=None, datamax=None):
         data_dict.update({"type": "normal"})
         data_dict.update({"mu": data["params"][0]})
         data_dict.update({"sigma": data["params"][1]})
+        if datamin is not None:
+            data_dict.update({"min": datamin})
+        if datamax is not None:
+            data_dict.update({"max": datamax})
 
     elif data["type"] == 'expon':
         data_dict.update({"type": "exponential"})
@@ -102,16 +106,15 @@ def transform_distribution(data, datamin=None, datamax=None):
             data_dict.update({"lambda": 1. / data["params"][1]})
         else:
             data_dict.update({"scale": 0.})
-
-    if datamin is not None:
-        data_dict.update({"min": datamin})
-    if datamax is not None:
-        data_dict.update({"max": datamax})
+        if datamin is not None:
+            data_dict.update({"min": datamin})
+        if datamax is not None:
+            data_dict.update({"max": datamax})
 
     elif data["type"] == 'uniform':
         data_dict.update({"type": "uniform"})
-        data_dict.update({"min": data["params"][0]})
-        data_dict.update({"max": data["params"][1]})
+        data_dict.update({"min": np.min(data["params"])})
+        data_dict.update({"max": np.max(data["params"])})
 
     return data_dict
 
