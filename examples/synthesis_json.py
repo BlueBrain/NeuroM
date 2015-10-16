@@ -103,15 +103,15 @@ def transform_distribution(data, datamin=None, datamax=None):
         else:
             data_dict.update({"scale": 0.})
 
-    elif data["type"] == 'uniform':
-        data_dict.update({"type": "uniform"})
-        data_dict.update({"lower_bound": data["params"][0]})
-        data_dict.update({"upper_bound": data["params"][1]})
-
     if datamin is not None:
         data_dict.update({"min": datamin})
     if datamax is not None:
         data_dict.update({"max": datamax})
+
+    elif data["type"] == 'uniform':
+        data_dict.update({"type": "uniform"})
+        data_dict.update({"min": data["params"][0]})
+        data_dict.update({"max": data["params"][1]})
 
     return data_dict
 
