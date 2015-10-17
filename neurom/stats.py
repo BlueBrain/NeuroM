@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -28,48 +26,51 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Extract a distribution for the selected feature of the population of neurons among
-   the exponential, normal and uniform distribution, according to the minimum ks distance.
-   '''
+'''Statistical analysis helper functions
 
-from neurom import ezy
-from neurom import stats as st
-import argparse
+Nothing fancy. Just commonly used functions using scipy functionality.'''
 
-
-def parse_args():
-    '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(
-        description='Morphology fit distribution extractor',
-        epilog='Note: Prints the optimal distribution and corresponding parameters.')
-
-    parser.add_argument('datapath',
-                        help='Path to morphology data file or directory')
-
-    parser.add_argument('feature',
-                        help='Feature available for the ezy.neuron')
-
-    return parser.parse_args()
+from scipy import stats as _st
+import numpy as _np
 
 
-if __name__ == '__main__':
+def fit(data, distribution='norm'):
+    '''Calculate the parameters of a fit of a distribution to a data set
 
-    args = parse_args()
+    Parameters:
+        data: array of data points to be fitted
 
-    data_path = args.datapath
+    Options:
+        distribution (str): type of distribution to fit. Default 'norm'.
 
-    feature = args.feature
+    Returns:
+        tuple (parameters, (distance, p-value)) of data to fitted distribution
 
-    population = ezy.load_neurons(data_path)
+    Note:
+        Uses Kolmogorov-Smirnov test to estimate distance and p-value.
+    '''
+    params = getattr(_st, distribution).fit(data)
+    return params, _st.kstest(data, distribution, params)
 
-    feature_data = [getattr(n, 'get_' + feature)() for n in population]
 
-    try:
-        result = st.optimal_distribution(feature_data)
-    except ValueError:
-        from itertools import chain
-        feature_data = list(chain(*feature_data))
-        result = st.optimal_distribution(feature_data)
+def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
+    '''Calculate the parameters of a fit of different distributions to a data set
+       and returns the distribution of the minimal ks-distance.
 
-    print "Optimal distribution fit for %s is: %s with parameters %s"\
-        % (feature, result[0], result[1][0])
+    Parameters:
+        data: array of data points to be fitted
+
+    Options:
+        distr_to_check: tuple of distributions to be checked
+
+    Returns:
+        tuple (optimal, (parameters, (distance, p-value))) of data to fitted distribution
+
+    Note:
+        Uses Kolmogorov-Smirnov test to estimate distance and p-value.
+    '''
+    fit_d = {d: fit(data, d) for d in distr_to_check}
+
+    optimal = fit_d.keys()[_np.argmin([results[1][0] for results in fit_d.values()])]
+
+    return optimal, fit_d[optimal]

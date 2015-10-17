@@ -80,7 +80,7 @@ class H5(object):
     @staticmethod
     def read_v1(filename):
         '''Read an HDF5 v1 file and return a tuple of data, offset, format.'''
-        points, groups = _unpack_v1(h5py.File(filename))
+        points, groups = _unpack_v1(h5py.File(filename, mode='r'))
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V1'
@@ -88,7 +88,7 @@ class H5(object):
     @staticmethod
     def read_v2(filename, stage='raw'):
         '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
-        points, groups = _unpack_v2(h5py.File(filename), stage)
+        points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V2'
@@ -100,14 +100,15 @@ class H5(object):
         * Tries to guess the format and the H5 version.
         * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
         '''
-        h5file = h5py.File(filename)
+        h5file = h5py.File(filename, mode='r')
         version = get_version(h5file)
         if version == 'H5V1':
-            points, groups = _unpack_v1(h5py.File(filename))
+            points, groups = _unpack_v1(h5py.File(filename, mode='r'))
         elif version == 'H5V2':
             stg = next(s for s in ('repaired', 'unraveled', 'raw')
                        if s in h5file['neuron1'])
-            points, groups = _unpack_v2(h5py.File(filename), stage=stg)
+            points, groups = _unpack_v2(h5py.File(filename, mode='r'),
+                                        stage=stg)
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, version

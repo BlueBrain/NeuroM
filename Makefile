@@ -50,7 +50,7 @@ run_pep8: $(VENV)
 	$(VENV_BIN)/pep8 --config=pep8rc $(LINT_PYFILES) > pep8.txt
 
 run_pylint: $(VENV)
-	$(VENV_BIN)/pylint --rcfile=pylintrc $(LINT_PYFILES) > pylint.txt
+	$(VENV_BIN)/pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES) > pylint.txt
 
 run_tests: $(VENV)
 	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom

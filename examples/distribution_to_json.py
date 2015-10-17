@@ -33,15 +33,19 @@
    '''
 
 from neurom import ezy
-from neurom import stats as st
+from neurom import stats
+import numpy as np
 import argparse
+import json
+from collections import OrderedDict
 
 
 def parse_args():
     '''Parse command line arguments'''
     parser = argparse.ArgumentParser(
         description='Morphology fit distribution extractor',
-        epilog='Note: Prints the optimal distribution and corresponding parameters.')
+        epilog='Note: Outputs json of the optimal distribution \
+                and corresponding parameters.')
 
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
@@ -52,24 +56,64 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-
-    args = parse_args()
-
-    data_path = args.datapath
-
-    feature = args.feature
-
+def extract_data(data_path, feature):
+    '''Loads a list of neurons, extracts feature
+       and transforms the fitted distribution in the correct format.
+       Returns the optimal distribution, corresponding parameters,
+       minimun and maximum values.
+    '''
     population = ezy.load_neurons(data_path)
 
     feature_data = [getattr(n, 'get_' + feature)() for n in population]
 
+    results = {}
+
     try:
-        result = st.optimal_distribution(feature_data)
+        opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
         from itertools import chain
         feature_data = list(chain(*feature_data))
-        result = st.optimal_distribution(feature_data)
+        opt_fit = stats.optimal_distribution(feature_data)
 
-    print "Optimal distribution fit for %s is: %s with parameters %s"\
-        % (feature, result[0], result[1][0])
+    results["type"] = opt_fit[0]
+    results["params"] = opt_fit[1][0]
+    results["min"] = np.min(feature_data)
+    results["max"] = np.max(feature_data)
+
+    return results
+
+
+def transform_distribution(data):
+    '''Transform optimal distribution data into correct format
+       based on the distribution type.
+    '''
+    data_dict = OrderedDict()
+
+    if data["type"] == 'norm':
+        data_dict.update({"type": "normal"})
+        data_dict.update({"mu": data["params"][0]})
+        data_dict.update({"sigma": data["params"][1]})
+
+    elif data["type"] == 'expon':
+        data_dict.update({"type": "exponential"})
+        data_dict.update({"lambda": 1. / data["params"][1]})
+
+    elif data["type"] == 'uniform':
+        data_dict.update({"type": "uniform"})
+
+    data_dict.update({"min": data["min"]})
+    data_dict.update({"max": data["max"]})
+
+    return data_dict
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    d_path = args.datapath
+
+    feat = args.feature
+
+    _result = transform_distribution(extract_data(d_path, feat))
+
+    print json.dumps(_result, indent=2, separators=(',', ': '))

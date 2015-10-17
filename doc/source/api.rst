@@ -32,7 +32,6 @@ API Documentation
 .. autosummary::
    :toctree: _neurom_build
 
-   neurom.exceptions
    neurom.core
    neurom.core.types
    neurom.core.tree
@@ -52,3 +51,5 @@ API Documentation
    neurom.ezy
    neurom.ezy.neuron
    neurom.ezy.population
+   neurom.exceptions
+   neurom.stats
