@@ -31,8 +31,6 @@
 '''Extract the optimal distributions for the following features of the population of neurons:
    soma: radius
    basal dendrites: n_neurites
-   apical dendrites: n_neurites
-   axons: n_neurites
    '''
 
 from neurom import ezy
@@ -60,8 +58,10 @@ def parse_args():
 def extract_data(data_path, feature, params=None):
     '''Loads a list of neurons, extracts feature
        and transforms the fitted distribution in the correct format.
-       Returns the optimal distribution, corresponding parameters,
-       minimun and maximum values.
+       Returns the optimal distribution and corresponding parameters.
+       Normal distribution params (mean, std)
+       Exponential distribution params (loc, scale)
+       Uniform distribution params (min, range)
     '''
     population = ezy.load_neurons(data_path)
 
@@ -93,8 +93,8 @@ def transform_distribution(data, datamin=None, datamax=None):
 
     if data["type"] == 'uniform':
         data_dict["type"] = "uniform"
-        data_dict["min"] = np.min(data["params"])
-        data_dict["max"] = np.max(data["params"])
+        data_dict["min"] = data["params"][0]
+        data_dict["max"] = np.sum(data["params"])
         return data_dict
 
     elif data["type"] == 'norm':
