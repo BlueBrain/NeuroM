@@ -226,6 +226,20 @@ def n_sections(tree):
     return sum(1 for _ in tr.isection(tree))
 
 
+def n_bifurcations(tree):
+    """
+    Return number of bifurcations in tree
+    """
+    return sum(1 for _ in tr.ibifurcation_point(tree))
+
+
+def n_terminations(tree):
+    """
+    Return number of terminations in tree
+    """
+    return sum(1 for _ in tr.ibifurcation_point(tree))
+
+
 def get_bounding_box(tree):
     """
     Returns:
