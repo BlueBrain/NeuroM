@@ -72,4 +72,4 @@ if __name__ == '__main__':
         result = st.optimal_distribution(feature_data)
 
     print "Optimal distribution fit for %s is: %s with parameters %s"\
-        % (feature, result[0], result[1][0])
+        % (feature, result.type, result.params)

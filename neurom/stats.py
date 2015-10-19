@@ -30,8 +30,45 @@
 
 Nothing fancy. Just commonly used functions using scipy functionality.'''
 
+from collections import namedtuple
 from scipy import stats as _st
-import numpy as _np
+
+
+FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
+
+
+def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
+    '''Create a JSON-comparible dict from a FitResults object
+
+    Parameters:
+        fit_results (FitResults): object containing fit parameters,\
+            errors and type
+        min_bound: optional min value to add to dictionary if min isn't\
+            a fit parameter.
+        max_bound: optional max value to add to dictionary if max isn't\
+            a fit parameter.
+
+    Returns:
+        JSON-compatible dictionary with fit results
+
+    Note:
+        Supported fit types: 'norm', 'expon', 'uniform'
+    '''
+
+    type_map = {'norm': 'normal', 'expon': 'exponential', 'uniform': 'uniform'}
+    param_map = {'uniform': lambda p: {'min': p[0], 'max': p[0] + p[1]},
+                 'norm': lambda p: {'mu': p[0], 'sigma': p[1]},
+                 'expon': lambda p: {'lambda': 1.0 / p[1]}}
+
+    d = {'type': type_map[fit_results.type]}
+    d.update(param_map[fit_results.type](fit_results.params))
+
+    if min_bound is not None and 'min' not in d:
+        d['min'] = min_bound
+    if max_bound is not None and 'max' not in d:
+        d['max'] = max_bound
+
+    return d
 
 
 def fit(data, distribution='norm'):
@@ -44,13 +81,13 @@ def fit(data, distribution='norm'):
         distribution (str): type of distribution to fit. Default 'norm'.
 
     Returns:
-        tuple (parameters, (distance, p-value)) of data to fitted distribution
+        FitResults object with fitted parameters, errors and distrubution type
 
     Note:
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
     '''
     params = getattr(_st, distribution).fit(data)
-    return params, _st.kstest(data, distribution, params)
+    return FitResults(params, _st.kstest(data, distribution, params), distribution)
 
 
 def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
@@ -64,13 +101,11 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
         distr_to_check: tuple of distributions to be checked
 
     Returns:
-        tuple (optimal, (parameters, (distance, p-value))) of data to fitted distribution
+        FitResults object with fitted parameters, errors and distrubution type\
+            of the fit with the smallest fit distance
 
     Note:
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
     '''
-    fit_d = {d: fit(data, d) for d in distr_to_check}
-
-    optimal = fit_d.keys()[_np.argmin([results[1][0] for results in fit_d.values()])]
-
-    return optimal, fit_d[optimal]
+    fit_results = [fit(data, d) for d in distr_to_check]
+    return min(fit_results, key=lambda fit: fit.errs[0])
