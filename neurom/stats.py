@@ -31,6 +31,7 @@
 Nothing fancy. Just commonly used functions using scipy functionality.'''
 
 from collections import namedtuple
+from collections import OrderedDict
 from scipy import stats as _st
 
 
@@ -56,11 +57,11 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
     '''
 
     type_map = {'norm': 'normal', 'expon': 'exponential', 'uniform': 'uniform'}
-    param_map = {'uniform': lambda p: {'min': p[0], 'max': p[0] + p[1]},
-                 'norm': lambda p: {'mu': p[0], 'sigma': p[1]},
-                 'expon': lambda p: {'lambda': 1.0 / p[1]}}
+    param_map = {'uniform': lambda p: [('min', p[0]), ('max', p[0] + p[1])],
+                 'norm': lambda p: [('mu', p[0]), ('sigma', p[1])],
+                 'expon': lambda p: [('lambda', 1.0 / p[1])]}
 
-    d = {'type': type_map[fit_results.type]}
+    d = OrderedDict({'type': type_map[fit_results.type]})
     d.update(param_map[fit_results.type](fit_results.params))
 
     if min_bound is not None and 'min' not in d:

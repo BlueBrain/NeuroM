@@ -130,8 +130,6 @@ if __name__ == '__main__':
     for f in get_morph_files(d_path):
         mtype_files[get_mtype(f)].append(f)
 
-    print 'mtype_files: %s' % mtype_files
-
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
               {"neurite_type": ezy.TreeType.basal_dendrite}]]
