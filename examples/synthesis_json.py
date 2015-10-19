@@ -72,8 +72,6 @@ def extract_data(files, feature, params=None):
 
     feature_data = [getattr(n, 'get_' + feature)(**params) for n in population]
 
-    results = {}
-
     try:
         opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
@@ -81,42 +79,7 @@ def extract_data(files, feature, params=None):
         feature_data = list(chain(*feature_data))
         opt_fit = stats.optimal_distribution(feature_data)
 
-    results["type"] = opt_fit[0]
-    results["params"] = opt_fit[1][0]
-
-    return results
-
-
-def transform_distribution(data, datamin=None, datamax=None):
-    '''Transform optimal distribution data into correct format
-       based on the distribution type.
-    '''
-    data_dict = OrderedDict()
-
-    if data["type"] == 'uniform':
-        data_dict["type"] = "uniform"
-        data_dict["min"] = data["params"][0]
-        data_dict["max"] = np.sum(data["params"])
-        return data_dict
-
-    elif data["type"] == 'norm':
-        data_dict["type"] = "normal"
-        data_dict["mu"] = data["params"][0]
-        data_dict["sigma"] = data["params"][1]
-
-    elif data["type"] == 'expon':
-        data_dict["type"] = "exponential"
-        if data["params"][1] != 0:
-            data_dict["lambda"] = 1. / data["params"][1]
-        else:
-            data_dict["scale"] = 0.
-
-    if datamin is not None:
-        data_dict["min"] = datamin
-    if datamax is not None:
-        data_dict["max"] = datamax
-
-    return data_dict
+    return opt_fit
 
 
 def transform_header(mtype_name, components):
@@ -142,7 +105,9 @@ def transform_package(mtype, files, components, feature_list):
 
     for feature, name, comp, fmin, fmax, fparam in feature_list:
 
-        result = transform_distribution(extract_data(files, feature, fparam), fmin, fmax)
+        result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
+                                           fmin, fmax)
+
         data_dict["components"][comp] = {name: result}
 
     return data_dict
