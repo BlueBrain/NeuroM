@@ -35,10 +35,12 @@
 
 from neurom import ezy
 from neurom import stats
+from neurom.io.utils import get_morph_files
 import numpy as np
 import argparse
 import json
 from collections import OrderedDict
+from collections import defaultdict
 import os
 
 
@@ -55,7 +57,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def extract_data(data_path, feature, params=None):
+def extract_data(files, feature, params=None):
     '''Loads a list of neurons, extracts feature
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution and corresponding parameters.
@@ -63,7 +65,7 @@ def extract_data(data_path, feature, params=None):
        Exponential distribution params (loc, scale)
        Uniform distribution params (min, range)
     '''
-    population = ezy.load_neurons(data_path)
+    population = ezy.load_neurons(files)
 
     if params is None:
         params = {}
@@ -131,25 +133,39 @@ def transform_header(mtype_name, components):
     return head_dict
 
 
-def transform_package(data_path, components, feature_list):
+def transform_package(mtype, files, components, feature_list):
     '''Put together header and list of data into one json output.
        feature_list contains all the information about the data to be extracted:
        features, feature_names, feature_components, feature_min, feature_max
     '''
-    data_dict = transform_header(os.path.basename(data_path), components)
+    data_dict = transform_header(mtype, components)
 
     for feature, name, comp, fmin, fmax, fparam in feature_list:
 
-        result = transform_distribution(extract_data(data_path, feature, fparam), fmin, fmax)
+        result = transform_distribution(extract_data(files, feature, fparam), fmin, fmax)
         data_dict["components"][comp] = {name: result}
 
     return data_dict
 
 
+def get_mtype(filename, sep='_'):
+    '''Get mtype of a morphology file from file name
+
+    Assumes file name has structure 'a/b/c/d/mtype_xyx.abc'
+    '''
+    return os.path.basename(filename).split(sep)[0]
+
 if __name__ == '__main__':
     args = parse_args()
 
     d_path = args.datapath
+
+    mtype_files = defaultdict(list)
+
+    for f in get_morph_files(d_path):
+        mtype_files[get_mtype(f)].append(f)
+
+    print 'mtype_files: %s' % mtype_files
 
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
@@ -157,6 +173,8 @@ if __name__ == '__main__':
 
     comps = ["soma"]
 
-    _result = transform_package(d_path, comps, flist)
+    _results = [transform_package(mtype_, files_, comps, flist)
+                for mtype_, files_ in mtype_files.iteritems()]
 
-    print json.dumps(_result, indent=2, separators=(', \n', ': '))
+    for res in _results:
+        print json.dumps(res, indent=2, separators=(', \n', ': ')), '\n'
