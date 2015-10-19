@@ -28,130 +28,147 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Moprhology Dendrogram Functions Example'''
-
+import numpy as np
 from neurom.view import common, view
 from neurom.analysis.morphmath import segment_length
-from neurom.core.tree import isegment, val_iter
+from neurom.analysis.morphtree import n_segments, n_bifurcations
+from neurom.core.tree import isegment, val_iter, iforking_point as ifork, Tree, is_bifurcation_point, ipreorder, ileaf
 from matplotlib.collections import PolyCollection
 from numpy import sin, cos, pi
+from copy import deepcopy
 import pylab as pl
+from itertools import izip
 
-def segment_shape(start, end, diameter, line_type, horizontal=True):
+def n_leaves(tree):
 
-    x0, y0 = start
-    x1, y1 = end
+    children = tree.children
 
-    r = diameter / 2.
+    return sum(1. for _ in ileaf(tree))
 
-    if horizontal:
+def vertical_line(offsets, new_offsets, spacing, radii):
 
-        vertex1 = ((x0, y0 + r), (x1, y1 + r))
-        vertex2 = (vertex1[1], (x1, y1 - r))
-        vertex3 = (vertex2[1], (x0, y0 - r))
-        vertex4 = (vertex3[1], vertex1[0])
+    v = np.zeros((4,2))
+    vertex1 = ((new_offsets[0] - radii[0], offsets[1] + spacing[1]), (new_offsets[0] - radii[1], new_offsets[1]))
+    vertex2 = (vertex1[1], (new_offsets[0] + radii[1], new_offsets[1]))
+    vertex3 = (vertex2[1], (new_offsets[0] + radii[0], offsets[1] + spacing[1]))
+    vertex4 = (vertex3[1], vertex1[0])
 
-    else:
+    # x,y of vertices
+    v[0] = np.array((new_offsets[0] - radii[0], offsets[1] + spacing[1]))
+    v[1] = np.array((new_offsets[0] - radii[1], new_offsets[1]))
+    v[2] = np.array((new_offsets[0] + radii[1], new_offsets[1]))
+    v[3] = np.array((new_offsets[0] + radii[0], offsets[1] + spacing[1]))
 
-        vertex1 = ((x0 - r, y0), (x1 - r, y1 ))
-        vertex2 = (vertex1[1], (x1 + r, y1))
-        vertex3 = (vertex2[1], (x0 + r, y0))
-        vertex4 = (vertex3[1], vertex1[0])
+    return v
+
+def horizontal_line(offsets, new_offsets, spacing, diameter):
+
+    vertex1 = ((offsets[0], offsets[1] + spacing[1]), (new_offsets[0], offsets[1] + spacing[1]))
+
+    v = np.zeros((4,2))
+    # x coordinates
+    v[0] = np.array((offsets[0], offsets[1] + spacing[1]))
+    v[1] = np.array((new_offsets[0], offsets[1] + spacing[1]))
+    v[2] = np.array((new_offsets[0], offsets[1] + spacing[1] - diameter))
+    v[3] = np.array((offsets[0], offsets[1] + spacing[1] - diameter))
+
+    return v
+    #return np.array(vertex1, vertex1, vertex1, vertex1)
 
 
-    return (vertex1, vertex2, vertex3, vertex4)
+def _generate_dendro(current_node, lines, n, max_dims, spacing, off_x, off_y, show_diameters=True):
 
-def get_segment_shapes(segment, segments_dict, y_length, with_diameters=False):
-    '''Calculate Dendrogram Line Position. The structure of
-    this drawing algorithm does not take into account directly
-    the vertical segments because it stores only the ids of the
-    horizontal segments which map to the ids of the nodes of the tree.
-    Thus, it applies the corrections for the vertical segment dimensions
-    in the horizontal one by saving virtually longer segments that
-    accomodate for the diameters of the vertical segments
+    '''
+        if swc_tree.is_root(cNode) :
+            print 'i am expanding the root'
+            cNode.children.remove(swc_tree.get_node_with_index(2))
+            cNode.children.remove(swc_tree.get_node_with_index(3))
+        
+
+            plt.vlines(new_off_x,off_y+V_SPACE,new_off_y,linewidth=r,colors=C)
+            if((off_y+(V_SPACE*2)+l) > max_height) :
+                max_height = off_y+(V_SPACE*2)+l
+
+            _expand_dendrogram(cChild,swc_tree,new_off_x,new_off_y,radius=radius,transform=transform)
+
+            start_x = start_x + (cChild_degree*place_holder_h)
+            plt.hlines(off_y+V_SPACE,off_x,new_off_x,colors=C)
     '''
 
-    start, end = segment
+    max_terminations = n_leaves(current_node)
 
-    start_node_id, end_node_id = start.value[-2], end.value[-2]
+    # determine the spacing of the current node depending on the number
+    # of the leaves of the tree
+    x_spacing = max_terminations * spacing[0]
 
-    # mean diameter
-    d = start.value[3] + end.value[3] if with_diameters else 0.0
+    start_x = off_x - x_spacing / 2.
 
-    segments = []
+    if (x_spacing > max_dims[0]): max_dims[0] = x_spacing
 
-    # The parent node is connected with the child
-    # line type:
-    # 0 straight segment
-    # 1 upward segment
-    # -1 downward segment
-    (x0, y0), pre_d, line_type = segments_dict[start_node_id]
+    # store the parent radius in order to construct polygonal segments
+    # isntead of simple line segments
+    r_parent = current_node.value[3] if show_diameters else 0.
 
-    # increase horizontal dendrogram length by segment length
-    x1 = x0 + segment_length(list(val_iter(segment)))
+    for child in current_node.children:
 
-    # if the parent node is visited for the first time
-    # the dendrogram segment is drawn from below. If it
-    # is visited twice it is drawn from above
-    y1 = y0 + y_length[start_node_id] * line_type
+        # segment length
+        length = segment_length(list(val_iter((current_node, child))))
 
-    # reduce the vertical y for subsequent children
-    y_length[end_node_id] = y_length[start_node_id] * (1. - 0.6 * abs(line_type))
+        # extract the radius of the child node. Need both radius for
+        # realistic segment representation
+        r_child = child.value[3] if show_diameters else 0.
 
-    #x0 += abs(line_type) * mean_diameter /2. 
-    #x1 += abs(line_type) * mean_diameter /2. 
-    #v0 = x0
-    # horizontal segment
-    segments.extend(segment_shape((x0, y1), (x1, y1), d, line_type, horizontal=True))
+        # number of leaves in child
+        terminations = n_leaves(child)
 
-    # vertical segment
-    if line_type != 0:
+        # horizontal spacing with respect to the number of 
+        new_off_x = start_x + spacing[0] * terminations / 2.
+        new_off_y = off_y + spacing[1] * 2. + length 
 
-        #v0  = x0 + abs(line_type) * mean_diameter / 2.
+        # vertical segment
+        lines[n] = vertical_line((off_x, off_y), (new_off_x, new_off_y), spacing, (r_parent, r_child))
 
-        #x1 += abs(line_type) * mean_diameter
+        if off_y + spacing[1] * 2 + length > max_dims[1]:
+            max_dims[1] = off_y + spacing[1] * 2. + length
 
-        segments.extend(segment_shape((x0, y0), (x0, y1), 0.0, line_type, horizontal=False))
+        # recursive call to self. n must be outputed in order to be maintain
+        # its actual value
+        n = _generate_dendro(child, lines, n + 1, max_dims, spacing, new_off_x, new_off_y, show_diameters=show_diameters)
 
-    # If the segment has children, the first child will be drawn
-    # from below. If no children the child will be a straight segment
-    # send the first segment that starts from the ending node
-    # of the current segment upwards
-    # if not two children the next segment that links
-    # to the current ending node will continue straight
-    line_type = 1 if len(end.children) == 2 else 0
+        start_x += terminations * spacing[0]
 
+        # horizontal segment
+        lines[n] = horizontal_line((off_x, off_y), (new_off_x, new_off_y), spacing, 2. * r_parent)
 
+        n += 1
+        print n
 
-    # store the ending node id along with the data that are needed
-    # for the next segment
-    segments_dict[end_node_id] = [(x1, y1), d, line_type]
-
-    # upon revisiting the starting node for the second branch
-     # the direction will be opposite
-    segments_dict[start_node_id][-1] = -1
-
-    return segments
+    return n
 
 
-def dendro_transform(tree_object):
-    '''Extract Dendrogram Lines and Diameters from tree structure
-    '''
-    root_id = tree_object.value[-2]
+def _dendrogram(neurites, show_diameters=True, transform=None):
 
-    y_length = {root_id: 500.}
+    # total number of lines equal to the total number of segments
+    # plus the number of horizontal lines (2) per bifurcation
+    total_lines = sum( n_segments(neu) + 2 * n_bifurcations(neu) for neu in neurites) + 1000.
 
-    # id : [(x, y), diameter, line_type]
-    segments_dict = {root_id: [(0., 0.), 0., 0.]}
+    max_dims = [0., 0.]
 
-    positions = []
+    spacing = (20., 0.)
 
-    for seg in isegment(tree_object):
+    lines = np.zeros((total_lines, 4, 2))
 
-        tr_pos = get_segment_shapes(seg, segments_dict, y_length, with_diameters=True)
+    for neurite in neurites:
 
-        positions.extend(tr_pos)
+        _generate_dendro(neurite, lines, 0, max_dims, spacing, 0., 0., show_diameters=show_diameters)
 
-    return positions
+    return lines
+
+
+    
+
+
+"""
 
 
 def affine2D_transfrom(pos, a, b, c, d):
@@ -168,7 +185,7 @@ def affine2D_transfrom(pos, a, b, c, d):
             y_prime = c * x + d * y
 
             pos[i][j] = (x_prime, y_prime)
-
+"""
 
 def dendrogram(tree_object, show_diameters=False, new_fig=True,
                subplot=False, rotation='right', **kwargs):
@@ -198,10 +215,9 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
             figure file.
     '''
     # get line segment positions and respective diameters
-    positions = dendro_transform(tree_object)
+    #positions = dendro_transform(tree_object)
     #min_l = 1.0
     #max_l = 100.0
-
     #linewidths = [ (w - min_l) * (max_l - min_l) for w in linewidths ] if show_diameters else 1.0
 
     xlabel = kwargs.get('xlabel', 'Length (um)')
@@ -227,9 +243,11 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 
         angle = 0.
 
+    positions = _dendrogram(tree_object, show_diameters=show_diameters)
+
     #affine2D_transfrom(positions, cos(angle), -sin(angle), sin(angle), cos(angle))
 
-    collection = PolyCollection(positions, closed=True, antialiaseds=True, edgecolors='k')
+    collection = PolyCollection(positions, closed=False, antialiaseds=True, edgecolors='k', facecolors='k')
 
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
@@ -246,7 +264,7 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 
     kwargs['ylabel'] = ylabel
 
-    return collection#common.plot_style(fig=fig, ax=ax, **kwargs)
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 def neurites_figure(neurites, suptitle='Neuron Morphology', **kwargs):
 
