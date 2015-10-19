@@ -237,7 +237,7 @@ def n_terminations(tree):
     """
     Return number of terminations in tree
     """
-    return sum(1 for _ in tr.ibifurcation_point(tree))
+    return sum(1 for _ in tr.ileaf(tree))
 
 
 def get_bounding_box(tree):
