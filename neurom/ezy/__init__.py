@@ -73,13 +73,41 @@ def load_neuron(filename):
     return Neuron(_load(filename, _set_tt))
 
 
-def load_neurons(directory):
-    '''Create a list of Neuron objects from each morphology file in directory'''
-    return [load_neuron(m) for m in get_morph_files(directory)]
+def load_neurons(neurons):
+    '''Create a list of Neuron objects from each morphology file in directory\
+        or from a list or tuple of file names
+
+    Parameters:
+        neurons: directory path or list of neuron file paths
+
+    Returns:
+        list of Neuron objects
+    '''
+    if isinstance(neurons, list) or isinstance(neurons, tuple):
+        return [load_neuron(f) for f in neurons]
+    elif isinstance(neurons, str):
+        return [load_neuron(f) for f in get_morph_files(neurons)]
 
 
-def load_population(directory):
-    '''Create a population object from all morphologies in a directory'''
-    pop = Population(load_neurons(directory))
-    pop.name = os.path.basename(directory)
+def load_population(neurons, name=None):
+    '''Create a population object from all morphologies in a directory\
+        of from morphologies in a list of file names
+
+    Parameters:
+        neurons: directory path or list of neuron file paths
+        name (str): optional name of population. By default 'Population' or\
+            filepath basename depending on whether neurons is list or\
+            directory path respectively.
+
+    Returns:
+        neuron Population object
+
+    '''
+    pop = Population(load_neurons(neurons))
+    if isinstance(neurons, list) or isinstance(neurons, tuple):
+        name = name if name is not None else 'Population'
+    elif isinstance(neurons, str):
+        name = name if name is not None else os.path.basename(neurons)
+
+    pop.name = name
     return pop
