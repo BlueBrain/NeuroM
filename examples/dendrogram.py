@@ -48,10 +48,10 @@ def n_leaves(tree):
 def vertical_line(offsets, new_offsets, spacing, radii):
 
     v = np.zeros((4,2))
-    vertex1 = ((new_offsets[0] - radii[0], offsets[1] + spacing[1]), (new_offsets[0] - radii[1], new_offsets[1]))
-    vertex2 = (vertex1[1], (new_offsets[0] + radii[1], new_offsets[1]))
-    vertex3 = (vertex2[1], (new_offsets[0] + radii[0], offsets[1] + spacing[1]))
-    vertex4 = (vertex3[1], vertex1[0])
+    #vertex1 = ((new_offsets[0] - radii[0], offsets[1] + spacing[1]), (new_offsets[0] - radii[1], new_offsets[1]))
+    #vertex2 = (vertex1[1], (new_offsets[0] + radii[1], new_offsets[1]))
+    #vertex3 = (vertex2[1], (new_offsets[0] + radii[0], offsets[1] + spacing[1]))
+    #vertex4 = (vertex3[1], vertex1[0])
 
     # x,y of vertices
     v[0] = np.array((new_offsets[0] - radii[0], offsets[1] + spacing[1]))
@@ -63,7 +63,7 @@ def vertical_line(offsets, new_offsets, spacing, radii):
 
 def horizontal_line(offsets, new_offsets, spacing, diameter):
 
-    vertex1 = ((offsets[0], offsets[1] + spacing[1]), (new_offsets[0], offsets[1] + spacing[1]))
+    #vertex1 = ((offsets[0], offsets[1] + spacing[1]), (new_offsets[0], offsets[1] + spacing[1]))
 
     v = np.zeros((4,2))
     # x coordinates
@@ -77,23 +77,6 @@ def horizontal_line(offsets, new_offsets, spacing, diameter):
 
 
 def _generate_dendro(current_node, lines, n, max_dims, spacing, off_x, off_y, show_diameters=True):
-
-    '''
-        if swc_tree.is_root(cNode) :
-            print 'i am expanding the root'
-            cNode.children.remove(swc_tree.get_node_with_index(2))
-            cNode.children.remove(swc_tree.get_node_with_index(3))
-        
-
-            plt.vlines(new_off_x,off_y+V_SPACE,new_off_y,linewidth=r,colors=C)
-            if((off_y+(V_SPACE*2)+l) > max_height) :
-                max_height = off_y+(V_SPACE*2)+l
-
-            _expand_dendrogram(cChild,swc_tree,new_off_x,new_off_y,radius=radius,transform=transform)
-
-            start_x = start_x + (cChild_degree*place_holder_h)
-            plt.hlines(off_y+V_SPACE,off_x,new_off_x,colors=C)
-    '''
 
     max_terminations = n_leaves(current_node)
 
@@ -133,26 +116,31 @@ def _generate_dendro(current_node, lines, n, max_dims, spacing, off_x, off_y, sh
 
         # recursive call to self. n must be outputed in order to be maintain
         # its actual value
-        n = _generate_dendro(child, lines, n + 1, max_dims, spacing, new_off_x, new_off_y, show_diameters=show_diameters)
+        n,_ = _generate_dendro(child, lines, n + 1, max_dims, spacing, new_off_x, new_off_y, show_diameters=show_diameters)
 
+        # update the starting position for the next child
         start_x += terminations * spacing[0]
 
-        # horizontal segment
-        lines[n] = horizontal_line((off_x, off_y), (new_off_x, new_off_y), spacing, 2. * r_parent)
+        # write the horizontal lines only for bifurcations, where the are actual horizontal lines
+        # and not zero ones
+        if off_x != new_off_x and off_y != new_off_y:
 
-        n += 1
-        print n
+            # horizontal segment
+            lines[n] = horizontal_line((off_x, off_y), (new_off_x, new_off_y), spacing, 2. * r_parent)
 
-    return n
+            n += 1
+
+    return n, spacing
 
 
 def _dendrogram(neurites, show_diameters=True, transform=None):
 
     # total number of lines equal to the total number of segments
     # plus the number of horizontal lines (2) per bifurcation
-    total_lines = sum( n_segments(neu) + 2 * n_bifurcations(neu) for neu in neurites) + 1000.
+    total_lines = sum( n_segments(neu) + n_bifurcations(neu) * 2 for neu in neurites)
 
-    max_dims = [0., 0.]
+    print total_lines
+    
 
     spacing = (20., 0.)
 
@@ -160,7 +148,8 @@ def _dendrogram(neurites, show_diameters=True, transform=None):
 
     for neurite in neurites:
 
-        _generate_dendro(neurite, lines, 0, max_dims, spacing, 0., 0., show_diameters=show_diameters)
+        max_dims = [0., 0.]
+        n, spacing = _generate_dendro(neurite, lines, 0, max_dims, spacing, 0., 0., show_diameters=show_diameters)
 
     return lines
 
