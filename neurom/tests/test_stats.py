@@ -51,36 +51,92 @@ UNIFORM_MAX = 1.
 UNIFORM = np.random.uniform(UNIFORM_MIN, UNIFORM_MAX, 1000)
 
 def test_fit_normal_params():
-    params, errs = st.fit(NORMAL, 'norm')
-    nt.assert_almost_equal(params[0], NORMAL_MU, 1)
-    nt.assert_almost_equal(params[1], NORMAL_SIGMA, 1)
+    fit_ = st.fit(NORMAL, 'norm')
+    nt.assert_almost_equal(fit_.params[0], NORMAL_MU, 1)
+    nt.assert_almost_equal(fit_.params[1], NORMAL_SIGMA, 1)
 
+def test_fit_normal_dict():
+    fit_ = st.fit(NORMAL, 'norm')
+    d = st.fit_results_to_dict(fit_, min_bound=-123, max_bound=123)
+    nt.assert_almost_equal(d['mu'], NORMAL_MU, 1)
+    nt.assert_almost_equal(d['sigma'], NORMAL_SIGMA, 1)
+    nt.assert_almost_equal(d['min'], -123, 1)
+    nt.assert_almost_equal(d['max'], 123, 1)
 
 def test_fit_normal_regression():
-    params, errs = st.fit(NORMAL, 'norm')
-    nt.assert_almost_equal(params[0], 10.019332055822, 12)
-    nt.assert_almost_equal(params[1], 0.978726207747, 12)
-    nt.assert_almost_equal(errs[0], 0.021479979161, 12)
-    nt.assert_almost_equal(errs[1], 0.745431659944, 12)
+    fit_ = st.fit(NORMAL, 'norm')
+    nt.assert_almost_equal(fit_.params[0], 10.019332055822, 12)
+    nt.assert_almost_equal(fit_.params[1], 0.978726207747, 12)
+    nt.assert_almost_equal(fit_.errs[0], 0.021479979161, 12)
+    nt.assert_almost_equal(fit_.errs[1], 0.745431659944, 12)
 
 
 def test_fit_default_is_normal():
-    p0, e0 = st.fit(NORMAL)
-    p1, e1 = st.fit(NORMAL, 'norm')
-    nt.assert_items_equal(p0, p1)
-    nt.assert_items_equal(e0, e1)
+    fit0_ = st.fit(NORMAL)
+    fit1_ = st.fit(NORMAL, 'norm')
+    nt.assert_items_equal(fit0_.params, fit1_.params)
+    nt.assert_items_equal(fit0_.errs, fit1_.errs)
 
 
 def test_optimal_distribution_normal():
-    optimal, params = st.optimal_distribution(NORMAL)
-    nt.ok_(optimal=='norm')
+    optimal = st.optimal_distribution(NORMAL)
+    nt.ok_(optimal.type == 'norm')
 
 
 def test_optimal_distribution_exponential():
-    optimal, params = st.optimal_distribution(EXPON)
-    nt.ok_(optimal=='expon')
+    optimal = st.optimal_distribution(EXPON)
+    nt.ok_(optimal.type == 'expon')
 
 
 def test_optimal_distribution_uniform():
-    optimal, params = st.optimal_distribution(UNIFORM)
-    nt.ok_(optimal=='uniform')
+    optimal = st.optimal_distribution(UNIFORM)
+    nt.ok_(optimal.type == 'uniform')
+
+
+def test_fit_results_dict_uniform():
+    a = st.FitResults(params=[1, 2], errs=[3,4], type='uniform')
+    d = st.fit_results_to_dict(a)
+    nt.assert_equal(d['min'], 1)
+    nt.assert_equal(d['max'], 3)
+    nt.assert_equal(d['type'], 'uniform')
+
+def test_fit_results_dict_uniform_min_max():
+    a = st.FitResults(params=[1, 2], errs=[3,4], type='uniform')
+    d = st.fit_results_to_dict(a, min_bound=-100, max_bound=100)
+    nt.assert_equal(d['min'], 1)
+    nt.assert_equal(d['max'], 3)
+    nt.assert_equal(d['type'], 'uniform')
+
+
+def test_fit_results_dict_normal():
+    a = st.FitResults(params=[1, 2], errs=[3,4], type='norm')
+    d = st.fit_results_to_dict(a)
+    nt.assert_equal(d['mu'], 1)
+    nt.assert_equal(d['sigma'], 2)
+    nt.assert_equal(d['type'], 'normal')
+
+
+def test_fit_results_dict_normal_min_max():
+    a = st.FitResults(params=[1, 2], errs=[3,4], type='norm')
+    d = st.fit_results_to_dict(a, min_bound=-100, max_bound=100)
+    nt.assert_equal(d['mu'], 1)
+    nt.assert_equal(d['sigma'], 2)
+    nt.assert_equal(d['min'], -100)
+    nt.assert_equal(d['max'], 100)
+    nt.assert_equal(d['type'], 'normal')
+
+
+def test_fit_results_dict_exponential():
+    a = st.FitResults(params=[2, 2], errs=[3,4], type='expon')
+    d = st.fit_results_to_dict(a)
+    nt.assert_equal(d['lambda'], 1./2)
+    nt.assert_equal(d['type'], 'exponential')
+
+
+def test_fit_results_dict_exponential_min_max():
+    a = st.FitResults(params=[2, 2], errs=[3,4], type='expon')
+    d = st.fit_results_to_dict(a, min_bound=-100, max_bound=100)
+    nt.assert_equal(d['lambda'], 1./2)
+    nt.assert_equal(d['min'], -100)
+    nt.assert_equal(d['max'], 100)
+    nt.assert_equal(d['type'], 'exponential')

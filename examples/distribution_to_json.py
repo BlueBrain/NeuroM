@@ -34,10 +34,8 @@
 
 from neurom import ezy
 from neurom import stats
-import numpy as np
 import argparse
 import json
-from collections import OrderedDict
 
 
 def parse_args():
@@ -66,8 +64,6 @@ def extract_data(data_path, feature):
 
     feature_data = [getattr(n, 'get_' + feature)() for n in population]
 
-    results = {}
-
     try:
         opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
@@ -75,37 +71,7 @@ def extract_data(data_path, feature):
         feature_data = list(chain(*feature_data))
         opt_fit = stats.optimal_distribution(feature_data)
 
-    results["type"] = opt_fit[0]
-    results["params"] = opt_fit[1][0]
-    results["min"] = np.min(feature_data)
-    results["max"] = np.max(feature_data)
-
-    return results
-
-
-def transform_distribution(data):
-    '''Transform optimal distribution data into correct format
-       based on the distribution type.
-    '''
-    data_dict = OrderedDict()
-
-    if data["type"] == 'norm':
-        data_dict.update({"type": "normal"})
-        data_dict.update({"mu": data["params"][0]})
-        data_dict.update({"sigma": data["params"][1]})
-
-    elif data["type"] == 'expon':
-        data_dict.update({"type": "exponential"})
-        data_dict.update({"lambda": 1. / data["params"][1]})
-
-    elif data["type"] == 'uniform':
-        data_dict.update({"type": "uniform"})
-
-    data_dict.update({"min": data["min"]})
-    data_dict.update({"max": data["max"]})
-
-    return data_dict
-
+    return opt_fit
 
 if __name__ == '__main__':
     args = parse_args()
@@ -114,6 +80,6 @@ if __name__ == '__main__':
 
     feat = args.feature
 
-    _result = transform_distribution(extract_data(d_path, feat))
+    _result = stats.fit_results_to_dict(extract_data(d_path, feat))
 
     print json.dumps(_result, indent=2, separators=(',', ': '))

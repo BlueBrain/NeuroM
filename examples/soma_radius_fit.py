@@ -63,9 +63,7 @@ def test_multiple_distr(filepath):
     soma_size = [n.get_soma_radius() for n in population]
 
     # Find the best fit distribution
-    optimal, fit_results = st.optimal_distribution(soma_size, distr_to_check)
-
-    return optimal, fit_results[0]
+    return st.optimal_distribution(soma_size, distr_to_check)
 
 
 if __name__ == '__main__':
@@ -75,4 +73,4 @@ if __name__ == '__main__':
 
     result = test_multiple_distr(data_path)
     print "Optimal distribution fit for soma radius is: %s with parameters %s"\
-        % (result[0], result[1])
+        % (result.type, result.params)
