@@ -58,17 +58,15 @@ def _horizontal_segment(offsets, new_offsets, spacing, diameter):
 
 
 def _generate_dendro(current_node, lines, colors, n, max_dims,
-                     spacing, off_x, off_y, show_diameters=True):
+                     spacing, offsets, show_diameters=True):
     '''Recursive function for dendrogram line computations
     '''
-    max_terminations = n_terminations(current_node)
-
     # determine the spacing of the current node depending on the number
     # of the leaves of the tree
-    x_spacing = max_terminations * spacing[0]
+    x_spacing = n_terminations(current_node) * spacing[0]
 
     # initial positioning with respect to the current spacing
-    start_x = off_x - x_spacing / 2.
+    start_x = offsets[0] - x_spacing / 2.
 
     if x_spacing > max_dims[0]:
         max_dims[0] = x_spacing
@@ -76,6 +74,8 @@ def _generate_dendro(current_node, lines, colors, n, max_dims,
     # store the parent radius in order to construct polygonal segments
     # isntead of simple line segments
     r_parent = current_node.value[3] if show_diameters else 0.
+
+    new_offsets = [0., 0.]
 
     for child in current_node.children:
 
@@ -91,34 +91,35 @@ def _generate_dendro(current_node, lines, colors, n, max_dims,
 
         # horizontal spacing with respect to the number of
         # terminations
-        new_off_x = start_x + spacing[0] * terminations / 2.
-        new_off_y = off_y + spacing[1] * 2. + length
+        new_offsets[0] = start_x + spacing[0] * terminations / 2.
+        new_offsets[1] = offsets[1] + spacing[1] * 2. + length
 
         # vertical segment
-        lines[n[0]] = _vertical_segment((off_x, off_y),
-                                        (new_off_x, new_off_y),
+        lines[n[0]] = _vertical_segment(offsets,
+                                        new_offsets,
                                         spacing,
                                         (r_parent, r_child))
+
+        # assign segment id to color array
         colors[n[0]] = child.value[4]
         n[0] += 1
 
-        if off_y + spacing[1] * 2 + length > max_dims[1]:
-            max_dims[1] = off_y + spacing[1] * 2. + length
+        if offsets[1] + spacing[1] * 2 + length > max_dims[1]:
+            max_dims[1] = offsets[1] + spacing[1] * 2. + length
 
-        # recursive call to self. n must be outputed in order to be maintain
-        # its actual value
+        # recursive call to self.
         _generate_dendro(child, lines, colors, n, max_dims,
-                         spacing, new_off_x, new_off_y, show_diameters=show_diameters)
+                         spacing, new_offsets, show_diameters=show_diameters)
 
         # update the starting position for the next child
         start_x += terminations * spacing[0]
 
         # write the horizontal lines only for bifurcations, where the are actual horizontal lines
         # and not zero ones
-        if off_x != new_off_x:
+        if offsets[0] != new_offsets[0]:
 
             # horizontal segment
-            lines[n[0]] = _horizontal_segment((off_x, off_y), (new_off_x, new_off_y), spacing, 0.)
+            lines[n[0]] = _horizontal_segment(offsets, new_offsets, spacing, 0.)
             colors[n[0]] = current_node.value[4]
             n[0] += 1
 
@@ -128,7 +129,7 @@ def _dendrogram(neuron_, show_diameters=True):
     '''
     from copy import deepcopy
     import sys
-    sys.setrecursionlimit(1500)
+    sys.setrecursionlimit(3000)
     # neuron is copied because otherwise the tree modifications that follow
     # will be applied to our original object
     neuron = deepcopy(neuron_)
@@ -136,9 +137,6 @@ def _dendrogram(neuron_, show_diameters=True):
     # total number of lines equal to the total number of segments
     # plus the number of horizontal lines (2) per bifurcation
     n_lines = sum(n_segments(neu) + n_bifurcations(neu) * 2 for neu in neuron.neurites)
-
-    max_dims = [0., 0.]
-    spacing = (40., 0.)
 
     # soma segment to represent the soma as a square of radius equal to the soma one
     soma_radius = neuron.get_soma_radius()
@@ -162,8 +160,8 @@ def _dendrogram(neuron_, show_diameters=True):
     # n is used as a list in order to be static
     n = [0]
 
-    _generate_dendro(soma_node0, lines, colors, n, max_dims,
-                     spacing, 0., 0., show_diameters=show_diameters)
+    _generate_dendro(soma_node0, lines, colors, n, [0., 0.],
+                     (40., 0.), (0., 0.), show_diameters=show_diameters)
 
     assert n[0] == n_lines - 1
 
