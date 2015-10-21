@@ -51,6 +51,7 @@ from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import n_sections
+from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
 from neurom.analysis.morphtree import get_bounding_box
@@ -324,6 +325,10 @@ def test_n_sections():
     nt.ok_(n_sections(T) == 2)
     T2 = NEURON_TREE
     nt.ok_(n_sections(T2) == 3)
+
+
+def test_n_segments():
+    nt.ok_(n_segments(tree0) == 210)
 
 
 def test_n_bifurcations():
