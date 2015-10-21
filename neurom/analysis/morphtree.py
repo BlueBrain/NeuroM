@@ -226,6 +226,13 @@ def n_sections(tree):
     return sum(1 for _ in tr.isection(tree))
 
 
+def n_segments(tree):
+    """
+    Return number of segments in tree
+    """
+    return sum(1 for _ in tr.isegment(tree))
+
+
 def n_bifurcations(tree):
     """
     Return number of bifurcations in tree
