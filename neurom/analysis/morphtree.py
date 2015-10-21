@@ -219,12 +219,6 @@ def i_section_length(tree):
     return tr.imap_val(mm.section_length, tr.isection(tree))
 
 
-def n_segments(tree):
-    '''Return number of segments in tree
-    '''
-    return sum(1 for _ in tr.isegment(tree))
-
-
 def n_sections(tree):
     """
     Return number of sections in tree
