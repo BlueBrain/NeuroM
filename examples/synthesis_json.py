@@ -146,8 +146,6 @@ if __name__ == '__main__':
 
     mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
-    print 'M-type: ', mtype_getter
-
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
               {"neurite_type": ezy.TreeType.basal_dendrite}],
