@@ -127,8 +127,6 @@ if __name__ == '__main__':
 
     data_dirs = args.datapaths
 
-    mtype_files = defaultdict(list)
-
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
               {"neurite_type": ezy.TreeType.basal_dendrite}],
@@ -140,6 +138,7 @@ if __name__ == '__main__':
     comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
 
     for d in data_dirs:
+        mtype_files = defaultdict(list)
         for f in get_morph_files(d):
             mtype_files[get_mtype_from_filename(f)].append(f)
 
