@@ -354,9 +354,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
         return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
 
-    new_fig = kwargs.get('new_fig', True)
-    subplot = kwargs.get('subplot', False)
-
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
@@ -640,9 +637,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     A 3D matplotlib figure with a neuron view.
 
     """
-    new_fig = kwargs.get('new_fig', True)
-    subplot = kwargs.get('subplot', False)
-
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
                                 subplot=subplot, params={'projection': '3d'})
