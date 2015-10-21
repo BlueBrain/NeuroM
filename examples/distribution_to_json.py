@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,12 +28,58 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''Extract a distribution for the selected feature of the population of neurons among
+   the exponential, normal and uniform distribution, according to the minimum ks distance.
+   '''
+
+from neurom import ezy
+from neurom import stats
+import argparse
+import json
+
+
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(
+        description='Morphology fit distribution extractor',
+        epilog='Note: Outputs json of the optimal distribution \
+                and corresponding parameters.')
+
+    parser.add_argument('datapath',
+                        help='Path to morphology data file or directory')
+
+    parser.add_argument('feature',
+                        help='Feature available for the ezy.neuron')
+
+    return parser.parse_args()
+
+
+def extract_data(data_path, feature):
+    '''Loads a list of neurons, extracts feature
+       and transforms the fitted distribution in the correct format.
+       Returns the optimal distribution, corresponding parameters,
+       minimun and maximum values.
+    '''
+    population = ezy.load_neurons(data_path)
+
+    feature_data = [getattr(n, 'get_' + feature)() for n in population]
+
+    try:
+        opt_fit = stats.optimal_distribution(feature_data)
+    except ValueError:
+        from itertools import chain
+        feature_data = list(chain(*feature_data))
+        opt_fit = stats.optimal_distribution(feature_data)
+
+    return opt_fit
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    d_path = args.datapath
+
+    feat = args.feature
+
+    _result = stats.fit_results_to_dict(extract_data(d_path, feat))
+
+    print json.dumps(_result, indent=2, separators=(',', ': '))

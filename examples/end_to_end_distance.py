@@ -70,7 +70,7 @@ def calculate_and_plot_end_to_end_distance(path):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron_3_random_walker_branches.swc'
-    nrn = ezy.Neuron(filename)
+    nrn = ezy.load_neuron(filename)
 
     # print mean end-to-end distance per neurite type
     print('Mean end-to-end distance for axons: ',

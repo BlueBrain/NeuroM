@@ -1,6 +1,7 @@
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
+
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,12 +27,49 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''Population Class with basic analysis and plotting capabilities'''
+
+from neurom.core.types import TreeType
+from neurom.core.population import Population as CorePopulation
+
+
+class Population(CorePopulation):
+    '''Population Class
+
+    Arguments:
+        neurons: list of neurons (core or ezy)
+    '''
+
+    def __init__(self, neurons):
+        super(Population, self).__init__(neurons)
+
+    def iter_somata(self):
+        '''
+        Iterate over the neuron somata
+
+            Returns:
+                Iterator of neuron somata
+        '''
+        return iter(self.somata)
+
+    def get_n_neurites(self, neurite_type=TreeType.all):
+        '''Get the number of neurites of a given type in a population'''
+        return sum(nrn.get_n_neurites(neurite_type=neurite_type) for nrn in self.iter_neurons())
+
+    def iter_neurites(self):
+        '''
+        Iterate over the neurites
+
+            Returns:
+                Iterator of neurite tree iterators
+        '''
+        return iter(self.neurites)
+
+    def iter_neurons(self):
+        '''
+        Iterate over the neurons in the population
+
+            Returns:
+                Iterator of neurons
+        '''
+        return iter(self.neurons)

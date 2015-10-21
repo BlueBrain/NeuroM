@@ -40,7 +40,7 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from bisect import bisect_right
+from neurom.utils import memoize
 
 import h5py
 import numpy as np
@@ -80,7 +80,7 @@ class H5(object):
     @staticmethod
     def read_v1(filename):
         '''Read an HDF5 v1 file and return a tuple of data, offset, format.'''
-        points, groups = _unpack_v1(h5py.File(filename))
+        points, groups = _unpack_v1(h5py.File(filename, mode='r'))
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V1'
@@ -88,7 +88,7 @@ class H5(object):
     @staticmethod
     def read_v2(filename, stage='raw'):
         '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
-        points, groups = _unpack_v2(h5py.File(filename), stage)
+        points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V2'
@@ -100,14 +100,15 @@ class H5(object):
         * Tries to guess the format and the H5 version.
         * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
         '''
-        h5file = h5py.File(filename)
+        h5file = h5py.File(filename, mode='r')
         version = get_version(h5file)
         if version == 'H5V1':
-            points, groups = _unpack_v1(h5py.File(filename))
+            points, groups = _unpack_v1(h5py.File(filename, mode='r'))
         elif version == 'H5V2':
             stg = next(s for s in ('repaired', 'unraveled', 'raw')
                        if s in h5file['neuron1'])
-            points, groups = _unpack_v2(h5py.File(filename), stage=stg)
+            points, groups = _unpack_v2(h5py.File(filename, mode='r'),
+                                        stage=stg)
         data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, version
@@ -116,13 +117,14 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        @memoize
         def find_group(point_id):
             '''Find the structure group a points id belongs to
 
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = bisect_right(groups[:, H5V1.GPFIRST], point_id)
+            bs = np.searchsorted(groups[:, H5V1.GPFIRST], point_id, side='right')
             bs = max(bs - 1, 0)
             return groups[bs]
 

@@ -38,22 +38,26 @@ import sys
 import numpy as np
 
 from neurom.core.types import NEURITES
-from neurom.ezy import Neuron
+from neurom.ezy import load_neuron
+from neurom.io.utils import get_morph_files
 
 L = logging.getLogger(__name__)
 
-NEURITE_STATS = ['get_section_lengths',
-                 'get_segment_lengths',
-                 'get_local_bifurcation_angles',
-                 'get_remote_bifurcation_angles',
-                 'get_n_sections',
-                 'get_n_neurites',
-                 'get_n_sections_per_neurite',
-                 ]
+NEURITE_STATS = [
+    'get_section_lengths',
+    'get_segment_lengths',
+    'get_local_bifurcation_angles',
+    'get_remote_bifurcation_angles',
+    'get_n_sections',
+    'get_n_neurites',
+    'get_n_sections_per_neurite'
+]
 
-SCALAR_STATS = ['get_soma_radius',
-                'get_soma_surface_area',
-                ]
+
+SCALAR_STATS = [
+    'get_soma_radius',
+    'get_soma_surface_area',
+]
 
 
 def parse_args():
@@ -70,22 +74,11 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_morph_files(directory):
-    '''Get a list of all morphology files in directory dir
-
-    Returns files with extensions '.swc' or '.h5' (case insensitive)
-    '''
-    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
-    return [m for m in lsdir
-            if os.path.isfile(m) and
-            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
-
-
 def extract_stats(files):
     '''Extract stats from files'''
     results = {}
     for _f in files:
-        nrn = Neuron(_f)
+        nrn = load_neuron(_f)
         stats = results[_f] = {}
         for ns in NEURITE_STATS:
             stat_name = ns[4:]
@@ -94,11 +87,12 @@ def extract_stats(files):
                 value = getattr(nrn, ns)(n)
                 L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
                 if isinstance(value, np.ndarray):
-                    value = {'mean': np.mean(value),
-                             'std': np.std(value),
-                             'min': np.min(value),
-                             'max': np.max(value),
-                             }
+                    value = {
+                        'mean': np.mean(value),
+                        'std': np.std(value),
+                        'min': np.min(value),
+                        'max': np.max(value),
+                    }
                 stats[stat_name][n.name] = value
 
         for ns in SCALAR_STATS:

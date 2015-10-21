@@ -50,32 +50,33 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 def test_construct_neuron():
     filename = os.path.join(SWC_PATH, 'Neuron.swc')
-    nrn = ezy.Neuron(filename)
-
-    nt.ok_(nrn._nrn is not None)
+    ezy.load_neuron(filename)
 
 
 @nt.raises(SomaError)
 def test_construct_neuron_no_soma_raises_SomaError():
     filename = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-    ezy.Neuron(filename)
+    ezy.load_neuron(filename)
 
 
 @nt.raises(NonConsecutiveIDsError)
 def test_construct_neuron_non_consecutive_ids_raises_NonConsecutiveIDsError():
     filename = os.path.join(SWC_PATH, 'non_sequential_trunk_off_1_16pt.swc')
-    ezy.Neuron(filename)
+    ezy.load_neuron(filename)
 
 
 class TestEzyNeuron(object):
 
     def setUp(self):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
-        self.neuron = ezy.Neuron(self.filename)
+        self.neuron = ezy.load_neuron(self.filename)
+
+    def test_name(self):
+        nt.assert_true(self.neuron.name == 'Neuron')
 
     def test_get_section_lengths(self):
         ref_seclen = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_seclen.extend(ll for ll in i_section_length(t))
 
         seclen = self.neuron.get_section_lengths()
@@ -106,7 +107,7 @@ class TestEzyNeuron(object):
 
     def test_get_segment_lengths(self):
         ref_seglen = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_seglen.extend(ll for ll in i_segment_length(t))
 
         seglen = self.neuron.get_segment_lengths()
@@ -144,7 +145,7 @@ class TestEzyNeuron(object):
 
     def test_get_local_bifurcation_angles(self):
         ref_local_bifangles = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_local_bifangles.extend(a for a in i_local_bifurcation_angle(t))
 
         local_bifangles = self.neuron.get_local_bifurcation_angles()
@@ -174,7 +175,7 @@ class TestEzyNeuron(object):
 
     def test_get_remote_bifurcation_angles(self):
         ref_remote_bifangles = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_remote_bifangles.extend(a for a in i_remote_bifurcation_angle(t))
 
         remote_bifangles = self.neuron.get_remote_bifurcation_angles()
@@ -205,12 +206,12 @@ class TestEzyNeuron(object):
 
     def test_get_section_radial_distances_endpoint(self):
         ref_sec_rad_dist_start = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_rad_dist_start.extend(
                 ll for ll in i_section_radial_dist(t, use_start_point=True))
 
         ref_sec_rad_dist = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_rad_dist.extend(ll for ll in i_section_radial_dist(t))
 
         rad_dists = self.neuron.get_section_radial_distances()
@@ -220,10 +221,10 @@ class TestEzyNeuron(object):
 
     def test_get_section_radial_distances_start_point(self):
         ref_sec_rad_dist_start = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_rad_dist_start.extend(
                 ll for ll in i_section_radial_dist(t, use_start_point=True))
-      
+
         rad_dists = self.neuron.get_section_radial_distances(use_start_point=True)
         nt.assert_equal(len(rad_dists), 84)
         nt.assert_true(np.all(rad_dists == ref_sec_rad_dist_start))
@@ -234,12 +235,12 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_endpoint(self):
         ref_sec_path_len_start = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_path_len_start.extend(
                 ll for ll in i_section_path_length(t, use_start_point=True))
 
         ref_sec_path_len = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_path_len.extend(ll for ll in i_section_path_length(t))
 
         path_lengths = self.neuron.get_section_path_distances()
@@ -249,7 +250,7 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_start_point(self):
         ref_sec_path_len_start = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_sec_path_len_start.extend(
                 ll for ll in i_section_path_length(t, use_start_point=True))
 
@@ -310,7 +311,7 @@ class TestEzyNeuron(object):
 
     def test_iter_points(self):
         ref_point_radii = []
-        for t in self.neuron._nrn.neurites:
+        for t in self.neuron.neurites:
             ref_point_radii.extend(p[COLS.R] for p in val_iter(ipreorder(t)))
 
         rads = [r for r in self.neuron.iter_points(lambda p: p[COLS.R])]
@@ -325,4 +326,4 @@ class TestEzyNeuron(object):
     def test_bounding_box(self):
         bbox = ((-40.328535157399998, -57.6001719972, -0.17071067811865476),
                 (64.7472627179, 48.516262252300002, 54.204087967500001))
-        nt.ok_(np.allclose(bbox, ezy.bounding_box(self.neuron)))
+        nt.ok_(np.allclose(bbox, self.neuron.bounding_box()))

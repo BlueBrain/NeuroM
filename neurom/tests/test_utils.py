@@ -26,12 +26,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''Test neurom.utils'''
+
+from neurom import utils as nu
+from nose import tools as nt
+import random
+
+
+def test_memoize_caches_args():
+
+    @nu.memoize
+    def dummy(x, y=42):
+        return random.random()
+
+    ref1 = dummy(42)
+    ref2 = dummy(42, 43)
+
+    for _ in xrange(100):
+        nt.assert_equal(dummy(42), ref1)
+        nt.assert_equal(dummy(42, 43), ref2)
+
+
+def test_memoize_does_not_cache_kwargs():
+
+    global ctr
+    ctr = 0
+
+    @nu.memoize
+    def dummy(x, y=42):
+        global ctr
+        ctr += 1
+        return ctr
+
+    for i in xrange(100):
+        nt.assert_equal(dummy(42, y=43), i + 1)

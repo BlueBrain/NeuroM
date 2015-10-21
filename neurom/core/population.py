@@ -26,12 +26,22 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''Neuron Population Classes and Functions
+'''
+
+from itertools import chain
+
+
+class Population(object):
+    '''Neuron Population Class'''
+    def __init__(self, neurons, name='Population'):
+        '''Construct a Population
+
+        Arguments:
+            neurons: iterable of neuron objects (core or ezy) .
+            name: Optional name for this Population.
+        '''
+        self.neurons = neurons
+        self.somata = [neu.soma for neu in neurons]
+        self.neurites = list(chain(*(neu.neurites for neu in neurons)))
+        self.name = name

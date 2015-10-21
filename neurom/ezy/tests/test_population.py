@@ -26,12 +26,48 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''Test neurom.ezy.Population'''
+
+import os
+from nose import tools as nt
+from itertools import izip
+from neurom.ezy import load_population
+from neurom.ezy.population import Population
+from neurom.core.types import TreeType
+
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+VALID_DIR = os.path.join(DATA_PATH, 'valid_set')
+
+def test_construct_population():
+    pop = load_population(VALID_DIR)
+    nt.ok_(pop is not None)
+
+
+class TestEzyPopulation(object):
+
+    def setUp(self):
+        self.directory = VALID_DIR
+        self.pop = load_population(VALID_DIR)
+        self.n_somata = len(self.pop.somata)
+
+    def test_iter_somata(self):
+        sm_it = self.pop.iter_somata()
+        for soma in self.pop.somata:
+            nt.assert_almost_equal(sm_it.next().radius, soma.radius)
+
+    def test_get_n_neurites(self):
+        nrts_all = sum(len(neuron.neurites) for neuron in self.pop.neurons)
+        nt.assert_equal(nrts_all, self.pop.get_n_neurites())
+
+        nrts_axons = sum(nrn.get_n_neurites(neurite_type=TreeType.axon) for nrn in self.pop.neurons)
+        nt.assert_equal(nrts_axons, self.pop.get_n_neurites(neurite_type=TreeType.axon))
+
+
+    def test_iter_neurites(self):
+        nrts_it = self.pop.iter_neurites()
+        nt.assert_equal(len(self.pop.neurites), len(list(nrts_it)))
+
+    def test_iter_neurons(self):
+        nrns_it = self.pop.iter_neurons()
+        nt.assert_equal(len(self.pop.neurons), len(list(nrns_it)))

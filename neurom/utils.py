@@ -26,12 +26,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+'''NeuroM helper utilities'''
+import functools
+
+
+def memoize(fun):
+    '''Memoize a function
+
+    Caches return values based on function arguments.
+
+    Note:
+        Does not cache calls with keyword arguments.
+    '''
+    _cache = {}
+
+    @functools.wraps(fun)
+    def memoizer(*args, **kwargs):
+        '''Return cahced value
+
+        Calculate and store if args not in cache.
+        '''
+        if args not in _cache or kwargs:
+            _cache[args] = fun(*args, **kwargs)
+        return _cache[args]
+    return memoizer

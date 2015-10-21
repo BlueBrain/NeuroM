@@ -32,19 +32,21 @@ from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
-from neurom.core.neuron import Neuron
-from neurom.exceptions import SomaError
+from neurom.core.neuron import Neuron, make_soma
 from neurom.exceptions import NonConsecutiveIDsError
 from neurom.io.readers import load_data
 from neurom.io.check import has_sequential_ids
+from neurom.utils import memoize
 import os
 
 
+@memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
     return rdw.get_ids(lambda r: r[COLS.TYPE] == POINT_TYPE.SOMA)
 
 
+@memoize
 def get_initial_segment_ids(rdw):
     '''Returns a list of IDs of initial tree segments
 
@@ -83,17 +85,18 @@ def make_neuron(raw_data, tree_action=None):
     '''Build a neuron from a raw data block
 
     The tree contains rows of raw data.
-    Args:
+    Parameters:
         raw_data: a RawDataWrapper object.
         tree_action: optional function to run on the built trees.
-    Raises: SomaError if no soma points in raw_data.
+    Raises:
+        SomaError if no soma points in raw_data or points incompatible with soma.
     '''
+    _soma = make_soma([raw_data.get_row(s_id)
+                       for s_id in get_soma_ids(raw_data)])
     _trees = [make_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_segment_ids(raw_data)]
-    _soma_pts = [raw_data.get_row(s_id) for s_id in get_soma_ids(raw_data)]
-    if not _soma_pts:
-        raise SomaError('No soma points found in data')
-    return Neuron(_soma_pts, _trees)
+
+    return Neuron(_soma, _trees)
 
 
 def load_neuron(filename, tree_action=None):
@@ -113,7 +116,7 @@ def load_neuron(filename, tree_action=None):
         raise NonConsecutiveIDsError('Non consecutive IDs found in raw data')
 
     nrn = make_neuron(data, tree_action)
-    nrn.id = os.path.splitext(filename)[0]
+    nrn.name = os.path.splitext(os.path.basename(filename))[0]
 
     return nrn
 

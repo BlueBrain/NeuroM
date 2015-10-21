@@ -26,12 +26,29 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+from nose import tools as nt
+from neurom.core.population import Population
+from neurom.ezy import Neuron, load_neuron
+from neurom.analysis.morphtree import i_section_length
+from neurom.analysis.morphtree import i_segment_length
+
+NRN1 = load_neuron('test_data/swc/Neuron.swc')
+NRN2 = load_neuron('test_data/swc/Single_basal.swc')
+NRN3 = load_neuron('test_data/swc/Neuron_small_radius.swc')
+
+NEURONS = [NRN1, NRN2, NRN3]
+TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
+
+def test_population():
+	pop = Population(NEURONS, name='foo')
+
+	nt.assert_equal(len(pop.neurons), 3)
+	nt.ok_(pop.neurons[0].name, 'Neuron')
+	nt.ok_(pop.neurons[1].name, 'Single_basal')
+	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
+
+	nt.assert_equal(len(pop.somata), 3)
+
+	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
+
+	nt.assert_equal(pop.name, 'foo')

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,12 +27,41 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pep8>=1.6.0
-pylint>=1.4.0
-nose>=1.3.0
-coverage==3.7
-nosexcover>=1.0.8
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
+''' Box Plot function for multiple neurons
+'''
+
+from neurom.view import common
+
+
+def boxplot(neurons, feature, new_fig=True, subplot=False):
+    '''
+    Plot a histogram of the selected feature for the population of neurons.
+    Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
+
+    More information about the plot and how it works.
+
+    Parameters
+    ----------
+    neurons : list
+        List of Neurons. Single neurons must be encapsulated in a list.
+
+    feature : str
+    The feature of interest.
+
+    Options
+    -------
+
+    subplot : bool
+        Default is False, which returns a matplotlib figure object. If True,
+        returns a matplotlib axis object, for use as a subplot.
+
+    '''
+    feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
+
+    _, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+    ax.boxplot(feature_values)
+
+    x_labels = ['neuron_id' for _ in neurons]
+
+    ax.set_xticklabels(x_labels)

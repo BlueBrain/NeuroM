@@ -118,9 +118,10 @@ class RawDataWrapper(object):
 
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
-        if idx != ROOT_ID and idx not in self._id_set:
-            raise LookupError('Invalid id: {0}'.format(idx))
-        return self.adj_list[idx]
+        if idx in self._id_set or idx == ROOT_ID:
+            return self.adj_list[idx]
+
+        raise LookupError('Invalid id: {0}'.format(idx))
 
     def _apply_offset(self, idx):
         ''' Apply global offset to an id'''
