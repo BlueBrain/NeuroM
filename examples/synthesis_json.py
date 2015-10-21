@@ -137,7 +137,7 @@ if __name__ == '__main__':
              ["n_neurites", "number", "axon", 1, None,
               {"neurite_type": ezy.TreeType.axon}]]
 
-    comps = ["soma"]
+    comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
 
     for d in data_dirs:
         for f in get_morph_files(d):
