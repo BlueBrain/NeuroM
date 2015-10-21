@@ -51,8 +51,9 @@ def parse_args():
         epilog='Note: Outputs json of the optimal distribution \
                 and corresponding parameters.')
 
-    parser.add_argument('datapath',
-                        help='Path to morphology data file or directory')
+    parser.add_argument('datapaths',
+                        nargs='+',
+                        help='Morphology data directory paths')
 
     return parser.parse_args()
 
@@ -113,31 +114,37 @@ def transform_package(mtype, files, components, feature_list):
     return data_dict
 
 
-def get_mtype(filename, sep='_'):
+def get_mtype_from_filename(filename, sep='_'):
     '''Get mtype of a morphology file from file name
 
     Assumes file name has structure 'a/b/c/d/mtype_xyx.abc'
     '''
     return os.path.basename(filename).split(sep)[0]
 
+
 if __name__ == '__main__':
     args = parse_args()
 
-    d_path = args.datapath
+    data_dirs = args.datapaths
 
     mtype_files = defaultdict(list)
 
-    for f in get_morph_files(d_path):
-        mtype_files[get_mtype(f)].append(f)
-
     flist = [["soma_radius", "radius", "soma", None, None, None],
              ["n_neurites", "number", "basal_dendrite", 1, None,
-              {"neurite_type": ezy.TreeType.basal_dendrite}]]
+              {"neurite_type": ezy.TreeType.basal_dendrite}],
+             ["n_neurites", "number", "apical_dendrite", 0, None,
+              {"neurite_type": ezy.TreeType.apical_dendrite}],
+             ["n_neurites", "number", "axon", 1, None,
+              {"neurite_type": ezy.TreeType.axon}]]
 
-    comps = ["soma"]
+    comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
 
-    _results = [transform_package(mtype_, files_, comps, flist)
-                for mtype_, files_ in mtype_files.iteritems()]
+    for d in data_dirs:
+        for f in get_morph_files(d):
+            mtype_files[get_mtype_from_filename(f)].append(f)
 
-    for res in _results:
-        print json.dumps(res, indent=2, separators=(', \n', ': ')), '\n'
+        _results = [transform_package(mtype_, files_, comps, flist)
+                    for mtype_, files_ in mtype_files.iteritems()]
+
+        for res in _results:
+            print json.dumps(res, indent=2, separators=(', \n', ': ')), '\n'
