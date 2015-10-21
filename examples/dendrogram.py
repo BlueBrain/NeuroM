@@ -30,12 +30,12 @@
 '''Moprhology Dendrogram Functions Example'''
 
 import numpy as np
-from neurom.view import common, view
+from neurom.core.tree import val_iter, Tree
 from neurom.core.types import TreeType
-from neurom.view.common import TREE_COLOR
+from neurom.view import common
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
-from neurom.core.tree import val_iter, Tree
+
 from matplotlib.collections import PolyCollection
 
 
@@ -57,25 +57,29 @@ def _horizontal_segment(offsets, new_offsets, spacing, diameter):
                      (offsets[0], offsets[1] + spacing[1] - diameter)))
 
 
-def _generate_dendro(current_node, lines, colors, n, max_dims,
-                     spacing, offsets, show_diameters=True):
-    '''Recursive function for dendrogram line computations
+def _spacingx(current_node, max_dims, offsets, spacing):
+    '''Determine the spacing of the current node depending on the number
+       of the leaves of the tree
     '''
-    # determine the spacing of the current node depending on the number
-    # of the leaves of the tree
     x_spacing = n_terminations(current_node) * spacing[0]
-
-    # initial positioning with respect to the current spacing
-    start_x = offsets[0] - x_spacing / 2.
 
     if x_spacing > max_dims[0]:
         max_dims[0] = x_spacing
 
+    return offsets[0] - x_spacing / 2.
+
+
+def _generate_dendro(current_node, lines, colors, n, max_dims,
+                     spacing, offsets, show_diameters=True):
+    '''Recursive function for dendrogram line computations
+    '''
+
+    start_x = _spacingx(current_node, max_dims, offsets, spacing)
+
+    radii = [0., 0.]
     # store the parent radius in order to construct polygonal segments
     # isntead of simple line segments
-    r_parent = current_node.value[3] if show_diameters else 0.
-
-    new_offsets = [0., 0.]
+    radii[0] = current_node.value[3] if show_diameters else 0.
 
     for child in current_node.children:
 
@@ -84,21 +88,18 @@ def _generate_dendro(current_node, lines, colors, n, max_dims,
 
         # extract the radius of the child node. Need both radius for
         # realistic segment representation
-        r_child = child.value[3] if show_diameters else 0.
+        radii[1] = child.value[3] if show_diameters else 0.
 
         # number of leaves in child
         terminations = n_terminations(child)
 
         # horizontal spacing with respect to the number of
         # terminations
-        new_offsets[0] = start_x + spacing[0] * terminations / 2.
-        new_offsets[1] = offsets[1] + spacing[1] * 2. + length
+        new_offsets = (start_x + spacing[0] * terminations / 2.,
+                       offsets[1] + spacing[1] * 2. + length)
 
         # vertical segment
-        lines[n[0]] = _vertical_segment(offsets,
-                                        new_offsets,
-                                        spacing,
-                                        (r_parent, r_child))
+        lines[n[0]] = _vertical_segment(offsets, new_offsets, spacing, radii)
 
         # assign segment id to color array
         colors[n[0]] = child.value[4]
@@ -124,6 +125,20 @@ def _generate_dendro(current_node, lines, colors, n, max_dims,
             n[0] += 1
 
 
+def _create_root_soma_tree(neuron):
+    ''' soma segment to represent the soma as a square of radius equal to the soma one
+    '''
+    soma_radius = neuron.get_soma_radius()
+
+    soma_node0 = Tree((0., 0., 0., soma_radius, 1.))
+
+    soma_node1 = Tree((soma_radius, 0., 0., soma_radius, 1.))
+
+    soma_node0.add_child(soma_node1)
+
+    return soma_node0
+
+
 def _dendrogram(neuron_, show_diameters=True):
     '''Main dendrogram function
     '''
@@ -138,18 +153,14 @@ def _dendrogram(neuron_, show_diameters=True):
     # plus the number of horizontal lines (2) per bifurcation
     n_lines = sum(n_segments(neu) + n_bifurcations(neu) * 2 for neu in neuron.neurites)
 
-    # soma segment to represent the soma as a square of radius equal to the soma one
-    soma_radius = neuron.get_soma_radius()
-    soma_node0 = Tree((0., 0., 0., soma_radius, 1.))
-    soma_node1 = Tree((soma_radius, 0., 0., soma_radius, 1.))
+    soma_tree = _create_root_soma_tree(neuron)
 
-    soma_node0.add_child(soma_node1)
     n_lines += 2
 
     # add all the neurites to the soma treen
     for neurite in neuron.neurites:
 
-        soma_node1.add_child(neurite)
+        soma_tree.children[0].add_child(neurite)
         n_lines += 2
 
     # initialize the lines matrix that is required for the PolyCollection
@@ -160,12 +171,39 @@ def _dendrogram(neuron_, show_diameters=True):
     # n is used as a list in order to be static
     n = [0]
 
-    _generate_dendro(soma_node0, lines, colors, n, [0., 0.],
+    _generate_dendro(soma_tree, lines, colors, n, [0., 0.],
                      (40., 0.), (0., 0.), show_diameters=show_diameters)
 
     assert n[0] == n_lines - 1
 
     return lines, colors
+
+
+def _generate_segment_collection(tree, show_diameters):
+    '''Creates quadrilateral segment collection for the input tree
+    '''
+    # generate positions matrix of size (n, 4, 2) for the line segments
+    # and colors array for each quadrilateral shape
+    positions, colors = _dendrogram(tree, show_diameters=show_diameters)
+
+    linked_colors = []
+    string_colors = []
+
+    for val in colors:
+
+        color_string = common.TREE_COLOR[tuple(TreeType)[int(val)]]
+
+        type_string = str(tuple(TreeType)[int(val)]).split('.')[-1]
+
+        linked_colors.append((color_string, type_string))
+
+        string_colors.append(color_string)
+
+    # generate polycollection with all the segments for the plot
+    collection = PolyCollection(positions, closed=False, antialiaseds=True,
+                                edgecolors=string_colors, facecolors=string_colors)
+
+    return collection, linked_colors
 
 
 def dendrogram(tree_object, show_diameters=False, new_fig=True,
@@ -178,7 +216,7 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 
     Options:
 
-        show_diameters : bool for showing mean segment diameters
+        show_diameters : bool for showing segment diameters
 
         subplot : Default is False, which returns a matplotlib figure object. If True,
         returns a matplotlib axis object, for use as a subplot.
@@ -193,27 +231,8 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
             as a figure legend. This text needs to be manually entered in each
             figure file.
     '''
-    xlabel = kwargs.get('xlabel', 'Length (um)')
-    ylabel = kwargs.get('ylabel', '')
 
-    positions, colors = _dendrogram(tree_object, show_diameters=show_diameters)
-
-    linked_colors = []
-    string_colors = []
-
-    for val in colors:
-
-        color_string = TREE_COLOR[tuple(TreeType)[int(val)]]
-
-        type_string = str(tuple(TreeType)[int(val)]).split('.')[-1]
-
-        linked_colors.append((color_string, type_string))
-
-        string_colors.append(color_string)
-
-    # generate polycollection with all the segments for the plot
-    collection = PolyCollection(positions, closed=False, antialiaseds=True,
-                                edgecolors=string_colors, facecolors=string_colors)
+    collection, linked_colors = _generate_segment_collection(tree_object, show_diameters)
 
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
@@ -224,9 +243,11 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
     for color, label in set(linked_colors):
         ax.plot((0., 0.), (0., 0.), c=color, label=label)
 
+    # customization settings
     kwargs['xticks'] = []
     kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
-    kwargs['xlabel'], kwargs['ylabel'] = xlabel, ylabel
+    kwargs['xlabel'] = kwargs.get('xlabel', '')
+    kwargs['ylabel'] = kwargs.get('ylabel', '')
     kwargs['no_legend'] = False
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
@@ -235,6 +256,7 @@ def dendrogram(tree_object, show_diameters=False, new_fig=True,
 def neuron_morphology_dendrogram(neuron, suptitle='Neuron Morphology'):
     '''Figure of dendrogram and morphology view
     '''
+    from neurom.view import view
     import pylab as pl
 
     dendrogram(neuron, show_diameters=True, new_fig=True, subplot=121, rotation='right', title='')
