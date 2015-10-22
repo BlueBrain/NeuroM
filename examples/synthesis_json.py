@@ -95,6 +95,11 @@ def transform_package(mtype, files, components, feature_list):
         result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
                                            fmin, fmax)
 
+        # When the distribution is normal with sigma = 0 it will be replaced with constant
+        if result['type'] == 'normal' and result['sigma'] == 0.0:
+            replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
+            result = replace_result
+
         data_dict["components"][comp] = {name: result}
 
     return data_dict
@@ -147,11 +152,11 @@ if __name__ == '__main__':
     mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
     flist = [["soma_radius", "radius", "soma", None, None, None],
-             ["n_neurites", "number", "basal_dendrite", 1, None,
+             ["n_neurites", "number", "basal_dendrite", 0, None,
               {"neurite_type": ezy.TreeType.basal_dendrite}],
              ["n_neurites", "number", "apical_dendrite", 0, None,
               {"neurite_type": ezy.TreeType.apical_dendrite}],
-             ["n_neurites", "number", "axon", 1, None,
+             ["n_neurites", "number", "axon", 0, None,
               {"neurite_type": ezy.TreeType.axon}]]
 
     comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
