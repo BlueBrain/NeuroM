@@ -95,6 +95,13 @@ def transform_package(mtype, files, components, feature_list):
         result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
                                            fmin, fmax)
 
+        # When the distribution is normal with sigma = 0 it will be replaced with constant
+        if result['type'] == 'normal' and result['sigma']==0.0:
+            replace_result = OrderedDict()
+            replace_result['type'] = 'constant'
+            replace_result['val'] = result['mu']
+            result = replace_result
+
         data_dict["components"][comp] = {name: result}
 
     return data_dict
