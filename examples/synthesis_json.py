@@ -96,10 +96,8 @@ def transform_package(mtype, files, components, feature_list):
                                            fmin, fmax)
 
         # When the distribution is normal with sigma = 0 it will be replaced with constant
-        if result['type'] == 'normal' and result['sigma']==0.0:
-            replace_result = OrderedDict()
-            replace_result['type'] = 'constant'
-            replace_result['val'] = result['mu']
+        if result['type'] == 'normal' and result['sigma'] == 0.0:
+            replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
             result = replace_result
 
         data_dict["components"][comp] = {name: result}
