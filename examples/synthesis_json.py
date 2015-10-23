@@ -198,4 +198,4 @@ if __name__ == '__main__':
                     for mtype_, files_ in mtype_files.iteritems()]
 
         for res in _results:
-            print json.dumps(res, indent=2, separators=(', \n', ': ')), '\n'
+            print json.dumps(res, indent=2), '\n'
