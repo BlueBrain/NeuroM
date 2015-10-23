@@ -209,13 +209,17 @@ class Neuron(CoreNeuron):
 
     def get_trunk_radii(self, neurite_type=TreeType.all):
         '''Get the trunk radii of a given type in a neuron'''
-        return [trunk_radius(t) for t in self.neurites
-                if checkTreeType(neurite_type, t.type)]
+        return self._iterable_type(
+            [trunk_radius(t) for t in self.neurites
+             if checkTreeType(neurite_type, t.type)]
+        )
 
     def get_trunk_lengths(self, neurite_type=TreeType.all):
         '''Get the trunk lengths of a given type in a neuron'''
-        return [trunk_length(t) for t in self.neurites
-                if checkTreeType(neurite_type, t.type)]
+        return self._iterable_type(
+            [trunk_length(t) for t in self.neurites
+             if checkTreeType(neurite_type, t.type)]
+        )
 
     def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type

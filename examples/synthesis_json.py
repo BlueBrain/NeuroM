@@ -42,12 +42,15 @@ import argparse
 import json
 from collections import OrderedDict
 from collections import defaultdict
+from itertools import chain
 import os
+
 
 FEATURE_MAP = {
     'soma_radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
     'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
+    'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
 }
 
 
@@ -69,7 +72,6 @@ def extract_data(files, feature, params=None):
     try:
         opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
-        from itertools import chain
         feature_data = list(chain(*feature_data))
         opt_fit = stats.optimal_distribution(feature_data)
 
@@ -168,6 +170,12 @@ if __name__ == '__main__':
         ["segment_length", "segment_length", "apical_dendrite", 0, None,
          {"neurite_type": ezy.TreeType.apical_dendrite}],
         ["segment_length", "segment_length", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["trunk_radius", "initial_radius", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["trunk_radius", "initial_radius", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["trunk_radius", "initial_radius", "axon", 0, None,
          {"neurite_type": ezy.TreeType.axon}],
     ]
 
