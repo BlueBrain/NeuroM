@@ -247,8 +247,8 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
-def trunk_diameter(tree):
-    '''Return the initial diameter of the tree segments'''
+def trunk_radius(tree):
+    '''Return the initial radius of the tree segments'''
     return i_segment_radius(tree).next()
 
 
