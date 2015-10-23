@@ -171,6 +171,12 @@ if __name__ == '__main__':
          {"neurite_type": ezy.TreeType.apical_dendrite}],
         ["segment_length", "segment_length", "axon", 0, None,
          {"neurite_type": ezy.TreeType.axon}],
+        ["trunk_radius", "trunk_radius", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["trunk_radius", "trunk_radius", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["trunk_radius", "trunk_radius", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
     ]
 
     for d in data_dirs:
