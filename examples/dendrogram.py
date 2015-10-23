@@ -130,9 +130,11 @@ def _create_root_soma_tree(neuron):
     '''
     soma_radius = neuron.get_soma_radius()
 
-    soma_node0 = Tree((0., 0., 0., soma_radius, 1.))
+    soma_center = neuron.soma.center
 
-    soma_node1 = Tree((soma_radius, 0., 0., soma_radius, 1.))
+    soma_node0 = Tree((soma_center[0] - soma_radius, soma_center[1] ,soma_center[2], soma_radius, 1.))
+
+    soma_node1 = Tree((soma_center[0], soma_center[1] ,soma_center[2], soma_radius, 1.))
 
     soma_node0.add_child(soma_node1)
 
@@ -259,8 +261,9 @@ def neuron_morphology_dendrogram(neuron, suptitle='Neuron Morphology'):
     from neurom.view import view
     import pylab as pl
 
-    dendrogram(neuron, show_diameters=True, new_fig=True, subplot=121, rotation='right', title='')
-    view.neuron(neuron, new_fig=False, plane='xz', subplot=122,
+    view.neuron(neuron, new_fig=True, plane='xz', subplot=121,
                 title='', xlabel='', ylabel='', xticks=[], yticks=[])
+    dendrogram(neuron, show_diameters=True, new_fig=False, subplot=122, rotation='right', title='')
+
 
     pl.suptitle(suptitle)
