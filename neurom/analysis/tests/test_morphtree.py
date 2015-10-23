@@ -346,7 +346,7 @@ def test_trunk_radius():
 
 
 def test_trunk_length():
-    nt.assert_almost_equal(trunk_length(tree0), 0.1)
+    nt.assert_almost_equal(trunk_length(tree0), 9.579117366740002)
 
 
 def test_get_bounding_box():

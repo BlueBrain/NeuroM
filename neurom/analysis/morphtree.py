@@ -253,8 +253,8 @@ def trunk_radius(tree):
 
 
 def trunk_length(tree):
-    '''Return the initial length of the tree segments'''
-    return i_segment_length(tree).next()
+    '''Return the length of the initial tree section'''
+    return i_section_length(tree).next()
 
 
 def get_bounding_box(tree):

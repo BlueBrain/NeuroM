@@ -311,19 +311,22 @@ class TestEzyNeuron(object):
 
     def test_get_trunk_radii(self):
         nt.assert_equal(self.neuron.get_trunk_radii(), [0.79103407271899995,
-                                                            0.37307018103449996,
-                                                            0.42678149696750001,
-                                                            0.23151233611099997])
+                                                        0.37307018103449996,
+                                                        0.42678149696750001,
+                                                        0.23151233611099997])
         nt.assert_equal(self.neuron.get_trunk_radii(TreeType.apical_dendrite), [0.23151233611099997])
         nt.assert_equal(self.neuron.get_trunk_radii(TreeType.basal_dendrite), [0.37307018103449996,
                                                                                    0.42678149696750001])
         nt.assert_equal(self.neuron.get_trunk_radii(TreeType.axon), [0.79103407271899995])
 
     def test_get_trunk_lengths(self):
-        nt.assert_equal(self.neuron.get_trunk_lengths(), [0.1, 0.1, 0.1, 0.1])
-        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.apical_dendrite), [0.1])
-        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.basal_dendrite), [0.1, 0.1])
-        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.axon), [0.1])
+        nt.assert_equal(self.neuron.get_trunk_lengths(), [9.579117366740002,
+                                                          7.972322416776259,
+                                                          8.2245287740603779,
+                                                          9.212707985134525])
+        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.apical_dendrite), [9.212707985134525])
+        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.basal_dendrite), [7.972322416776259, 8.2245287740603779])
+        nt.assert_equal(self.neuron.get_trunk_lengths(TreeType.axon), [9.579117366740002])
 
     def test_iter_points(self):
         ref_point_radii = []
