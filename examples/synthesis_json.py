@@ -31,17 +31,110 @@
 '''Extract the optimal distributions for the following features of the population of neurons:
    soma: radius
    basal dendrites: n_neurites
-   '''
+   apical dendrites: n_neurites
+   axons: n_neurites
+'''
 
 from neurom import ezy
 from neurom import stats
+from neurom.analysis import morphmath as mm
 from neurom.io.utils import get_morph_files
-import numpy as np
 import argparse
 import json
 from collections import OrderedDict
 from collections import defaultdict
+from itertools import chain
 import os
+import numpy as np
+
+
+FEATURE_MAP = {
+    'soma_radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
+    'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
+    'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
+    'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
+    'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
+                                                                  **kwargs))),
+}
+
+
+def extract_data(files, feature, params=None):
+    '''Loads a list of neurons, extracts feature
+       and transforms the fitted distribution in the correct format.
+       Returns the optimal distribution and corresponding parameters.
+       Normal distribution params (mean, std)
+       Exponential distribution params (loc, scale)
+       Uniform distribution params (min, range)
+    '''
+    neurons = ezy.load_neurons(files)
+
+    if params is None:
+        params = {}
+
+    feature_data = [FEATURE_MAP[feature](n, params) for n in neurons]
+
+    try:
+        opt_fit = stats.optimal_distribution(feature_data)
+    except ValueError:
+        feature_data = list(chain(*feature_data))
+        opt_fit = stats.optimal_distribution(feature_data)
+
+    return opt_fit
+
+
+def transform_header(mtype_name):
+    '''Add header to json output to wrap around distribution data.
+    '''
+    head_dict = OrderedDict()
+
+    head_dict["m-type"] = mtype_name
+    head_dict["components"] = defaultdict(OrderedDict)
+
+    return head_dict
+
+
+def transform_package(mtype, files, feature_list):
+    '''Put together header and list of data into one json output.
+       feature_list contains all the information about the data to be extracted:
+       features, feature_names, feature_components, feature_min, feature_max
+    '''
+    data_dict = transform_header(mtype)
+
+    for feature, name, comp, fmin, fmax, fparam in feature_list:
+
+        result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
+                                           fmin, fmax)
+
+        # When the distribution is normal with sigma = 0 it will be replaced with constant
+        if result['type'] == 'normal' and result['sigma'] == 0.0:
+            replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
+            result = replace_result
+
+        data_dict["components"][comp].update({name: result})
+
+    return data_dict
+
+
+def get_mtype_from_filename(filename, sep='_'):
+    '''Get mtype of a morphology file from file name
+
+    Assumes file name has structure 'a/b/c/d/mtype_xyx.abc'
+    '''
+    return os.path.basename(filename).split(sep)[0]
+
+
+def get_mtype_from_directory(filename):
+    '''Get mtype of a morphology file from file's parent directory name
+
+    Assumes file name has structure 'a/b/c/mtype/xyx.abc'
+    '''
+    return os.path.split(os.path.dirname(filename))[-1]
+
+
+MTYPE_GETTERS = {
+    'filename': get_mtype_from_filename,
+    'directory': get_mtype_from_directory
+}
 
 
 def parse_args():
@@ -55,71 +148,10 @@ def parse_args():
                         nargs='+',
                         help='Morphology data directory paths')
 
+    parser.add_argument('--mtype', choices=MTYPE_GETTERS.keys(),
+                        help='Get mtype from filename or parent directory')
+
     return parser.parse_args()
-
-
-def extract_data(files, feature, params=None):
-    '''Loads a list of neurons, extracts feature
-       and transforms the fitted distribution in the correct format.
-       Returns the optimal distribution and corresponding parameters.
-       Normal distribution params (mean, std)
-       Exponential distribution params (loc, scale)
-       Uniform distribution params (min, range)
-    '''
-    population = ezy.load_neurons(files)
-
-    if params is None:
-        params = {}
-
-    feature_data = [getattr(n, 'get_' + feature)(**params) for n in population]
-
-    try:
-        opt_fit = stats.optimal_distribution(feature_data)
-    except ValueError:
-        from itertools import chain
-        feature_data = list(chain(*feature_data))
-        opt_fit = stats.optimal_distribution(feature_data)
-
-    return opt_fit
-
-
-def transform_header(mtype_name, components):
-    '''Add header to json output to wrap around distribution data.
-    '''
-    head_dict = OrderedDict()
-
-    head_dict["m-type"] = mtype_name
-    head_dict["components"] = {}
-
-    for comp in np.unique(components):
-        head_dict["components"].setdefault(comp)
-
-    return head_dict
-
-
-def transform_package(mtype, files, components, feature_list):
-    '''Put together header and list of data into one json output.
-       feature_list contains all the information about the data to be extracted:
-       features, feature_names, feature_components, feature_min, feature_max
-    '''
-    data_dict = transform_header(mtype, components)
-
-    for feature, name, comp, fmin, fmax, fparam in feature_list:
-
-        result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
-                                           fmin, fmax)
-
-        data_dict["components"][comp] = {name: result}
-
-    return data_dict
-
-
-def get_mtype_from_filename(filename, sep='_'):
-    '''Get mtype of a morphology file from file name
-
-    Assumes file name has structure 'a/b/c/d/mtype_xyx.abc'
-    '''
-    return os.path.basename(filename).split(sep)[0]
 
 
 if __name__ == '__main__':
@@ -127,22 +159,42 @@ if __name__ == '__main__':
 
     data_dirs = args.datapaths
 
-    flist = [["soma_radius", "radius", "soma", None, None, None],
-             ["n_neurites", "number", "basal_dendrite", 1, None,
-              {"neurite_type": ezy.TreeType.basal_dendrite}],
-             ["n_neurites", "number", "apical_dendrite", 0, None,
-              {"neurite_type": ezy.TreeType.apical_dendrite}],
-             ["n_neurites", "number", "axon", 1, None,
-              {"neurite_type": ezy.TreeType.axon}]]
+    mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
-    comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
+    flist = [
+        ["soma_radius", "radius", "soma", None, None, None],
+        ["n_neurites", "number", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["n_neurites", "number", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["n_neurites", "number", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["segment_length", "segment_length", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["segment_length", "segment_length", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["segment_length", "segment_length", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["trunk_radius", "initial_radius", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["trunk_radius", "initial_radius", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["trunk_radius", "initial_radius", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["taper_rate", "taper_rate", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["taper_rate", "taper_rate", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["taper_rate", "taper_rate", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+    ]
 
     for d in data_dirs:
         mtype_files = defaultdict(list)
         for f in get_morph_files(d):
-            mtype_files[get_mtype_from_filename(f)].append(f)
+            mtype_files[mtype_getter(f)].append(f)
 
-        _results = [transform_package(mtype_, files_, comps, flist)
+        _results = [transform_package(mtype_, files_, flist)
                     for mtype_, files_ in mtype_files.iteritems()]
 
         for res in _results:

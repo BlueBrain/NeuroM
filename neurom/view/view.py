@@ -314,6 +314,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     kwargs['new_fig'] = False
+    kwargs['subplot'] = subplot
 
     soma(nrn.soma, plane=plane, **kwargs)
 
@@ -561,6 +562,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     kwargs['new_fig'] = False
+    kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
     kwargs['title'] = kwargs.get('title', 'Neuron view')
 

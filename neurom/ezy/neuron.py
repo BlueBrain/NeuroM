@@ -42,6 +42,8 @@ from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
+from neurom.analysis.morphtree import trunk_radius
+from neurom.analysis.morphtree import trunk_length
 import math
 import numpy as np
 
@@ -204,6 +206,20 @@ class Neuron(CoreNeuron):
         '''Get the number of neurites of a given type in a neuron'''
         return sum(1 for n in self.neurites
                    if checkTreeType(neurite_type, n.type))
+
+    def get_trunk_radii(self, neurite_type=TreeType.all):
+        '''Get the trunk radii of a given type in a neuron'''
+        return self._iterable_type(
+            [trunk_radius(t) for t in self.neurites
+             if checkTreeType(neurite_type, t.type)]
+        )
+
+    def get_trunk_lengths(self, neurite_type=TreeType.all):
+        '''Get the trunk lengths of a given type in a neuron'''
+        return self._iterable_type(
+            [trunk_length(t) for t in self.neurites
+             if checkTreeType(neurite_type, t.type)]
+        )
 
     def iter_neurites(self, iterator_type, mapping=None, neurite_type=TreeType.all):
         '''Iterate over collection of neurites applying iterator_type

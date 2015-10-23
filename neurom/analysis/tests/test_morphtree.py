@@ -54,6 +54,8 @@ from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
+from neurom.analysis.morphtree import trunk_radius
+from neurom.analysis.morphtree import trunk_length
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -337,6 +339,24 @@ def test_n_bifurcations():
 
 def test_n_terminations():
     nt.ok_(n_terminations(tree0) == 11)
+
+
+def test_trunk_radius():
+    t = Tree((0, 0, 0, 42))
+    t.add_child(Tree((1, 0, 0, 4)))
+    nt.assert_equal(trunk_radius(t), 42.0)
+
+
+def test_trunk_length():
+    t = Tree((0, 0, 0, 42))
+    tt = t.add_child(Tree((10, 0, 0, 4)))
+    tt.add_child(Tree((10, 15, 0, 4)))
+    nt.assert_almost_equal(trunk_length(t), 25.0)
+
+
+def test_trunk_radius_length_point_tree():
+    t = Tree((0, 0, 0, 42))
+    nt.assert_equal(trunk_length(t), 0.0)
 
 
 def test_get_bounding_box():

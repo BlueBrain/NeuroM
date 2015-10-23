@@ -247,6 +247,23 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
+def trunk_radius(tree):
+    '''Radius of the first point of a tree'''
+    return tree.value[COLS.R]
+
+
+def trunk_length(tree):
+    '''Length of the initial tree section
+
+    Returns:
+        Length of first section of tree or 0 if single point tree
+    '''
+    try:
+        return i_section_length(tree).next()
+    except StopIteration:
+        return 0.0
+
+
 def get_bounding_box(tree):
     """
     Returns:
