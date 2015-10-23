@@ -38,12 +38,17 @@
 from neurom import ezy
 from neurom import stats
 from neurom.io.utils import get_morph_files
-import numpy as np
 import argparse
 import json
 from collections import OrderedDict
 from collections import defaultdict
 import os
+
+FEATURE_MAP = {
+    'soma_radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
+    'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
+    'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
+}
 
 
 def extract_data(files, feature, params=None):
@@ -54,12 +59,12 @@ def extract_data(files, feature, params=None):
        Exponential distribution params (loc, scale)
        Uniform distribution params (min, range)
     '''
-    population = ezy.load_neurons(files)
+    neurons = ezy.load_neurons(files)
 
     if params is None:
         params = {}
 
-    feature_data = [getattr(n, 'get_' + feature)(**params) for n in population]
+    feature_data = [FEATURE_MAP[feature](n, params) for n in neurons]
 
     try:
         opt_fit = stats.optimal_distribution(feature_data)
@@ -71,26 +76,23 @@ def extract_data(files, feature, params=None):
     return opt_fit
 
 
-def transform_header(mtype_name, components):
+def transform_header(mtype_name):
     '''Add header to json output to wrap around distribution data.
     '''
     head_dict = OrderedDict()
 
     head_dict["m-type"] = mtype_name
-    head_dict["components"] = {}
-
-    for comp in np.unique(components):
-        head_dict["components"].setdefault(comp)
+    head_dict["components"] = defaultdict(OrderedDict)
 
     return head_dict
 
 
-def transform_package(mtype, files, components, feature_list):
+def transform_package(mtype, files, feature_list):
     '''Put together header and list of data into one json output.
        feature_list contains all the information about the data to be extracted:
        features, feature_names, feature_components, feature_min, feature_max
     '''
-    data_dict = transform_header(mtype, components)
+    data_dict = transform_header(mtype)
 
     for feature, name, comp, fmin, fmax, fparam in feature_list:
 
@@ -102,7 +104,7 @@ def transform_package(mtype, files, components, feature_list):
             replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
             result = replace_result
 
-        data_dict["components"][comp] = {name: result}
+        data_dict["components"][comp].update({name: result})
 
     return data_dict
 
@@ -153,22 +155,28 @@ if __name__ == '__main__':
 
     mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
-    flist = [["soma_radius", "radius", "soma", None, None, None],
-             ["n_neurites", "number", "basal_dendrite", 0, None,
-              {"neurite_type": ezy.TreeType.basal_dendrite}],
-             ["n_neurites", "number", "apical_dendrite", 0, None,
-              {"neurite_type": ezy.TreeType.apical_dendrite}],
-             ["n_neurites", "number", "axon", 0, None,
-              {"neurite_type": ezy.TreeType.axon}]]
-
-    comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
+    flist = [
+        ["soma_radius", "radius", "soma", None, None, None],
+        ["n_neurites", "number", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["n_neurites", "number", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["n_neurites", "number", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["segment_length", "segment_length", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["segment_length", "segment_length", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["segment_length", "segment_length", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+    ]
 
     for d in data_dirs:
         mtype_files = defaultdict(list)
         for f in get_morph_files(d):
             mtype_files[mtype_getter(f)].append(f)
 
-        _results = [transform_package(mtype_, files_, comps, flist)
+        _results = [transform_package(mtype_, files_, flist)
                     for mtype_, files_ in mtype_files.iteritems()]
 
         for res in _results:
