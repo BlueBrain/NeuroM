@@ -37,6 +37,7 @@
 
 from neurom import ezy
 from neurom import stats
+from neurom.analysis import morphmath as mm
 from neurom.io.utils import get_morph_files
 import argparse
 import json
@@ -44,6 +45,7 @@ from collections import OrderedDict
 from collections import defaultdict
 from itertools import chain
 import os
+import numpy as np
 
 
 FEATURE_MAP = {
@@ -51,6 +53,8 @@ FEATURE_MAP = {
     'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
     'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
+    'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
+                                                                  **kwargs))),
 }
 
 
@@ -176,6 +180,12 @@ if __name__ == '__main__':
         ["trunk_radius", "initial_radius", "apical_dendrite", 0, None,
          {"neurite_type": ezy.TreeType.apical_dendrite}],
         ["trunk_radius", "initial_radius", "axon", 0, None,
+         {"neurite_type": ezy.TreeType.axon}],
+        ["taper_rate", "taper_rate", "basal_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.basal_dendrite}],
+        ["taper_rate", "taper_rate", "apical_dendrite", 0, None,
+         {"neurite_type": ezy.TreeType.apical_dendrite}],
+        ["taper_rate", "taper_rate", "axon", 0, None,
          {"neurite_type": ezy.TreeType.axon}],
     ]
 
