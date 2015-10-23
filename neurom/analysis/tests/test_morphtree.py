@@ -349,8 +349,9 @@ def test_trunk_radius():
 
 def test_trunk_length():
     t = Tree((0, 0, 0, 42))
-    t.add_child(Tree((10, 0, 0, 4)))
-    nt.assert_almost_equal(trunk_length(t), 10.0)
+    tt = t.add_child(Tree((10, 0, 0, 4)))
+    tt.add_child(Tree((10, 15, 0, 4)))
+    nt.assert_almost_equal(trunk_length(t), 25.0)
 
 
 def test_trunk_radius_length_point_tree():
