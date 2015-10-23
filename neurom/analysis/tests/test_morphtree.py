@@ -54,6 +54,7 @@ from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
+from neurom.analysis.morphtree import trunk_diameter
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -337,6 +338,10 @@ def test_n_bifurcations():
 
 def test_n_terminations():
     nt.ok_(n_terminations(tree0) == 11)
+
+
+def test_trunk_diameter():
+    nt.assert_almost_equal(trunk_diameter(tree0), 0.79103407271899995)
 
 
 def test_get_bounding_box():
