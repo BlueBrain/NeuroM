@@ -31,7 +31,9 @@
 '''Extract the optimal distributions for the following features of the population of neurons:
    soma: radius
    basal dendrites: n_neurites
-   '''
+   apical dendrites: n_neurites
+   axons: n_neurites
+'''
 
 from neurom import ezy
 from neurom import stats
