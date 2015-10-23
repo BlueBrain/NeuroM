@@ -54,7 +54,7 @@ FEATURE_MAP = {
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
     'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
     'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
-                                                    **kwargs))),
+                                                                  **kwargs))),
 }
 
 
