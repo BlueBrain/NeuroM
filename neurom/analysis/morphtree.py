@@ -248,8 +248,13 @@ def n_terminations(tree):
 
 
 def trunk_diameter(tree):
-    '''Return the initial diameter of the tree'''
+    '''Return the initial diameter of the tree segments'''
     return i_segment_radius(tree).next()
+
+
+def trunk_length(tree):
+    '''Return the initial length of the tree segments'''
+    return i_segment_length(tree).next()
 
 
 def get_bounding_box(tree):
