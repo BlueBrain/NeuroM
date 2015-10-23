@@ -44,20 +44,6 @@ from collections import defaultdict
 import os
 
 
-def parse_args():
-    '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(
-        description='Morphology fit distribution extractor',
-        epilog='Note: Outputs json of the optimal distribution \
-                and corresponding parameters.')
-
-    parser.add_argument('datapaths',
-                        nargs='+',
-                        help='Morphology data directory paths')
-
-    return parser.parse_args()
-
-
 def extract_data(files, feature, params=None):
     '''Loads a list of neurons, extracts feature
        and transforms the fitted distribution in the correct format.
@@ -109,6 +95,11 @@ def transform_package(mtype, files, components, feature_list):
         result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
                                            fmin, fmax)
 
+        # When the distribution is normal with sigma = 0 it will be replaced with constant
+        if result['type'] == 'normal' and result['sigma'] == 0.0:
+            replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
+            result = replace_result
+
         data_dict["components"][comp] = {name: result}
 
     return data_dict
@@ -122,17 +113,50 @@ def get_mtype_from_filename(filename, sep='_'):
     return os.path.basename(filename).split(sep)[0]
 
 
+def get_mtype_from_directory(filename):
+    '''Get mtype of a morphology file from file's parent directory name
+
+    Assumes file name has structure 'a/b/c/mtype/xyx.abc'
+    '''
+    return os.path.split(os.path.dirname(filename))[-1]
+
+
+MTYPE_GETTERS = {
+    'filename': get_mtype_from_filename,
+    'directory': get_mtype_from_directory
+}
+
+
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(
+        description='Morphology fit distribution extractor',
+        epilog='Note: Outputs json of the optimal distribution \
+                and corresponding parameters.')
+
+    parser.add_argument('datapaths',
+                        nargs='+',
+                        help='Morphology data directory paths')
+
+    parser.add_argument('--mtype', choices=MTYPE_GETTERS.keys(),
+                        help='Get mtype from filename or parent directory')
+
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
     args = parse_args()
 
     data_dirs = args.datapaths
 
+    mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
+
     flist = [["soma_radius", "radius", "soma", None, None, None],
-             ["n_neurites", "number", "basal_dendrite", 1, None,
+             ["n_neurites", "number", "basal_dendrite", 0, None,
               {"neurite_type": ezy.TreeType.basal_dendrite}],
              ["n_neurites", "number", "apical_dendrite", 0, None,
               {"neurite_type": ezy.TreeType.apical_dendrite}],
-             ["n_neurites", "number", "axon", 1, None,
+             ["n_neurites", "number", "axon", 0, None,
               {"neurite_type": ezy.TreeType.axon}]]
 
     comps = ["soma", "basal_dendrite", "apical_dendrite", "axon"]
@@ -140,7 +164,7 @@ if __name__ == '__main__':
     for d in data_dirs:
         mtype_files = defaultdict(list)
         for f in get_morph_files(d):
-            mtype_files[get_mtype_from_filename(f)].append(f)
+            mtype_files[mtype_getter(f)].append(f)
 
         _results = [transform_package(mtype_, files_, comps, flist)
                     for mtype_, files_ in mtype_files.iteritems()]
