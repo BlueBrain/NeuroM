@@ -247,6 +247,16 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
+def trunk_radius(tree):
+    '''Return the initial radius of the tree segments'''
+    return i_segment_radius(tree).next()
+
+
+def trunk_length(tree):
+    '''Return the length of the initial tree section'''
+    return i_section_length(tree).next()
+
+
 def get_bounding_box(tree):
     """
     Returns:
