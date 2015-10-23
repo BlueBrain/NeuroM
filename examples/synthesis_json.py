@@ -42,12 +42,15 @@ import argparse
 import json
 from collections import OrderedDict
 from collections import defaultdict
+from itertools import chain
 import os
+
 
 FEATURE_MAP = {
     'soma_radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
     'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
+    'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
 }
 
 
@@ -69,7 +72,6 @@ def extract_data(files, feature, params=None):
     try:
         opt_fit = stats.optimal_distribution(feature_data)
     except ValueError:
-        from itertools import chain
         feature_data = list(chain(*feature_data))
         opt_fit = stats.optimal_distribution(feature_data)
 

@@ -342,11 +342,20 @@ def test_n_terminations():
 
 
 def test_trunk_radius():
-    nt.assert_almost_equal(trunk_radius(tree0), 0.79103407271899995)
+    t = Tree((0, 0, 0, 42))
+    t.add_child(Tree((1, 0, 0, 4)))
+    nt.assert_equal(trunk_radius(t), 42.0)
 
 
 def test_trunk_length():
-    nt.assert_almost_equal(trunk_length(tree0), 9.579117366740002)
+    t = Tree((0, 0, 0, 42))
+    t.add_child(Tree((10, 0, 0, 4)))
+    nt.assert_almost_equal(trunk_length(t), 10.0)
+
+
+def test_trunk_radius_length_point_tree():
+    t = Tree((0, 0, 0, 42))
+    nt.assert_equal(trunk_length(t), 0.0)
 
 
 def test_get_bounding_box():
