@@ -67,8 +67,8 @@ def test_point_soma_swc():
 
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
-        self.data = readers.load_swc(
-            os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
+        self.data = readers.RawDataWrapper(readers.SWC.read(
+            os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc')))
         self.first_id = int(self.data.data_block[0][COLS.ID])
 
     def test_data_structure(self):
