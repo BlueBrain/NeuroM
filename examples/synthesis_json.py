@@ -48,18 +48,12 @@ from itertools import chain
 import os
 import numpy as np
 
-
+Limits = namedtuple('Limits', 'min, max')
 Feature = namedtuple('Feature', 'name, limits')
 Component = namedtuple('Component', 'name, features')
 
 
-class Limits(object):
-    '''min-max pair class'''
-    def __init__(self, min=None, max=None):
-        self.min = min
-        self.max = max
-
-
+# Map feature names to data getter functions
 FEATURE_MAP = {
     'radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
     'number': lambda n, kwargs: n.get_n_neurites(**kwargs),
@@ -69,6 +63,7 @@ FEATURE_MAP = {
                                                                   **kwargs))),
 }
 
+# Map component name to filtering parameters where applicable
 PARAM_MAP = {
     'basal_dendrite': {'neurite_type': ezy.TreeType.basal_dendrite},
     'apical_dendrite': {'neurite_type': ezy.TreeType.apical_dendrite},
@@ -178,6 +173,30 @@ def parse_args():
     return parser.parse_args()
 
 
+# Note: new features require a data getter function in
+# FEATURE_MAP
+# TODO: Set this config from a JSON or YAML file
+COMPONENTS = [
+    Component('soma',
+              [Feature('radius', Limits(None, None))]),
+    Component('basal_dendrite',
+              [Feature('number', Limits(0, None)),
+               Feature('segment_length', Limits(0, None)),
+               Feature('initial_radius', Limits(0, None)),
+               Feature('taper_rate', Limits(0, None))]),
+    Component('apical_dendrite',
+              [Feature('number', Limits(0, None)),
+               Feature('segment_length', Limits(0, None)),
+               Feature('initial_radius', Limits(0, None)),
+               Feature('taper_rate', Limits(0, None))]),
+    Component('axon',
+              [Feature('number', Limits(0, None)),
+               Feature('segment_length', Limits(0, None)),
+               Feature('initial_radius', Limits(0, None)),
+               Feature('taper_rate', Limits(0, None))]),
+]
+
+
 if __name__ == '__main__':
     args = parse_args()
 
@@ -185,33 +204,12 @@ if __name__ == '__main__':
 
     mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
-
-    components = [
-        Component('soma',
-                  [Feature('radius', Limits(None, None))]),
-        Component('basal_dendrite',
-                  [Feature('number', Limits(0, None)),
-                   Feature('segment_length', Limits(0, None)),
-                   Feature('initial_radius', Limits(0, None)),
-                   Feature('taper_rate', Limits(0, None))]),
-        Component('apical_dendrite',
-                  [Feature('number', Limits(0, None)),
-                   Feature('segment_length', Limits(0, None)),
-                   Feature('initial_radius', Limits(0, None)),
-                   Feature('taper_rate', Limits(0, None))]),
-        Component('axon',
-                  [Feature('number', Limits(0, None)),
-                   Feature('segment_length', Limits(0, None)),
-                   Feature('initial_radius', Limits(0, None)),
-                   Feature('taper_rate', Limits(0, None))]),
-    ]
-
     for d in data_dirs:
         mtype_files = defaultdict(list)
         for f in get_morph_files(d):
             mtype_files[mtype_getter(f)].append(f)
 
-        _results = [transform_package(mtype_, files_, components)
+        _results = [transform_package(mtype_, files_, COMPONENTS)
                     for mtype_, files_ in mtype_files.iteritems()]
 
         for res in _results:
