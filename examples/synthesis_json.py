@@ -43,18 +43,37 @@ import argparse
 import json
 from collections import OrderedDict
 from collections import defaultdict
+from collections import namedtuple
 from itertools import chain
 import os
 import numpy as np
 
 
+Feature = namedtuple('Feature', 'name, limits')
+Component = namedtuple('Component', 'name, features')
+
+
+class Limits(object):
+    '''min-max pair class'''
+    def __init__(self, min=None, max=None):
+        self.min = min
+        self.max = max
+
+
 FEATURE_MAP = {
-    'soma_radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
-    'n_neurites': lambda n, kwargs: n.get_n_neurites(**kwargs),
+    'radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
+    'number': lambda n, kwargs: n.get_n_neurites(**kwargs),
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
-    'trunk_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
+    'initial_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
     'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
                                                                   **kwargs))),
+}
+
+PARAM_MAP = {
+    'basal_dendrite': {'neurite_type': ezy.TreeType.basal_dendrite},
+    'apical_dendrite': {'neurite_type': ezy.TreeType.apical_dendrite},
+    'axon': {'neurite_type': ezy.TreeType.axon},
+    'soma': None
 }
 
 
@@ -93,24 +112,29 @@ def transform_header(mtype_name):
     return head_dict
 
 
-def transform_package(mtype, files, feature_list):
+def transform_package(mtype, files, components):
     '''Put together header and list of data into one json output.
        feature_list contains all the information about the data to be extracted:
        features, feature_names, feature_components, feature_min, feature_max
     '''
     data_dict = transform_header(mtype)
 
-    for feature, name, comp, fmin, fmax, fparam in feature_list:
+    for comp in components:
+        params = PARAM_MAP[comp.name]
+        for feature in comp.features:
+            result = stats.fit_results_to_dict(
+                extract_data(files, feature.name, params),
+                feature.limits.min, feature.limits.max
+            )
 
-        result = stats.fit_results_to_dict(extract_data(files, feature, fparam),
-                                           fmin, fmax)
+            # When the distribution is normal with sigma = 0
+            # it will be replaced with constant
+            if result['type'] == 'normal' and result['sigma'] == 0.0:
+                replace_result = OrderedDict((('type', 'constant'),
+                                              ('val', result['mu'])))
+                result = replace_result
 
-        # When the distribution is normal with sigma = 0 it will be replaced with constant
-        if result['type'] == 'normal' and result['sigma'] == 0.0:
-            replace_result = OrderedDict((('type', 'constant'), ('val', result['mu'])))
-            result = replace_result
-
-        data_dict["components"][comp].update({name: result})
+            data_dict["components"][comp.name].update({feature.name: result})
 
     return data_dict
 
@@ -161,32 +185,25 @@ if __name__ == '__main__':
 
     mtype_getter = MTYPE_GETTERS.get(args.mtype, lambda f: 'UNKNOWN')
 
-    flist = [
-        ["soma_radius", "radius", "soma", None, None, None],
-        ["n_neurites", "number", "basal_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.basal_dendrite}],
-        ["n_neurites", "number", "apical_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.apical_dendrite}],
-        ["n_neurites", "number", "axon", 0, None,
-         {"neurite_type": ezy.TreeType.axon}],
-        ["segment_length", "segment_length", "basal_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.basal_dendrite}],
-        ["segment_length", "segment_length", "apical_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.apical_dendrite}],
-        ["segment_length", "segment_length", "axon", 0, None,
-         {"neurite_type": ezy.TreeType.axon}],
-        ["trunk_radius", "initial_radius", "basal_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.basal_dendrite}],
-        ["trunk_radius", "initial_radius", "apical_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.apical_dendrite}],
-        ["trunk_radius", "initial_radius", "axon", 0, None,
-         {"neurite_type": ezy.TreeType.axon}],
-        ["taper_rate", "taper_rate", "basal_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.basal_dendrite}],
-        ["taper_rate", "taper_rate", "apical_dendrite", 0, None,
-         {"neurite_type": ezy.TreeType.apical_dendrite}],
-        ["taper_rate", "taper_rate", "axon", 0, None,
-         {"neurite_type": ezy.TreeType.axon}],
+
+    components = [
+        Component('soma',
+                  [Feature('radius', Limits(None, None))]),
+        Component('basal_dendrite',
+                  [Feature('number', Limits(0, None)),
+                   Feature('segment_length', Limits(0, None)),
+                   Feature('initial_radius', Limits(0, None)),
+                   Feature('taper_rate', Limits(0, None))]),
+        Component('apical_dendrite',
+                  [Feature('number', Limits(0, None)),
+                   Feature('segment_length', Limits(0, None)),
+                   Feature('initial_radius', Limits(0, None)),
+                   Feature('taper_rate', Limits(0, None))]),
+        Component('axon',
+                  [Feature('number', Limits(0, None)),
+                   Feature('segment_length', Limits(0, None)),
+                   Feature('initial_radius', Limits(0, None)),
+                   Feature('taper_rate', Limits(0, None))]),
     ]
 
     for d in data_dirs:
@@ -194,7 +211,7 @@ if __name__ == '__main__':
         for f in get_morph_files(d):
             mtype_files[mtype_getter(f)].append(f)
 
-        _results = [transform_package(mtype_, files_, flist)
+        _results = [transform_package(mtype_, files_, components)
                     for mtype_, files_ in mtype_files.iteritems()]
 
         for res in _results:
