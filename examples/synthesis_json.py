@@ -40,13 +40,16 @@ from neurom import stats
 from neurom.analysis import morphmath as mm
 from neurom.io.utils import get_morph_files
 import argparse
-import json
 from collections import OrderedDict
 from collections import defaultdict
 from collections import namedtuple
 from itertools import chain
 import os
 import numpy as np
+import json
+from json import encoder
+
+encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
 Limits = namedtuple('Limits', 'min, max')
 Feature = namedtuple('Feature', 'name, limits')
