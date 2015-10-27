@@ -273,7 +273,10 @@ def trunk_vector(tree, soma):
 
 def trunk_elevation(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
-       on the x-y plane.
+       on the x-y half-plane.
+
+       Returns:
+           Angle in radiants between -pi/2 and pi/2
     '''
     vector = trunk_vector(tree, soma)
 
@@ -286,6 +289,9 @@ def trunk_elevation(tree, soma):
 def trunk_azimuth(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-z plane.
+
+       Returns:
+           Angle in radiants between -pi and pi
     '''
     vector = trunk_vector(tree, soma)
 
