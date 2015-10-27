@@ -32,6 +32,7 @@ from neurom.core.tree import Tree
 import neurom.core.tree as tr
 from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
+from neurom.core.neuron import make_soma
 from neurom.io.readers import load_data
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphtree import path_length
@@ -56,6 +57,7 @@ from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
 from neurom.analysis.morphtree import trunk_radius
 from neurom.analysis.morphtree import trunk_length
+from neurom.analysis.morphtree import trunk_vector
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -352,6 +354,12 @@ def test_trunk_length():
     tt = t.add_child(Tree((10, 0, 0, 4)))
     tt.add_child(Tree((10, 15, 0, 4)))
     nt.assert_almost_equal(trunk_length(t), 25.0)
+
+
+def test_trunk_vector():
+    t = Tree((1, 0, 0, 2))
+    s = make_soma([[0, 0, 0, 4]])
+    nt.ok_(np.allclose(trunk_vector(t, s), np.array([1, 0, 0])))
 
 
 def test_trunk_radius_length_point_tree():

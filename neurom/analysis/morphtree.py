@@ -252,6 +252,13 @@ def trunk_radius(tree):
     return tree.value[COLS.R]
 
 
+def trunk_vector(tree, soma):
+    '''Vector of trunk defined as (soma center - initial point)
+       of the tree.
+    '''
+    return mm.vector(tree.value, soma.center)
+
+
 def trunk_length(tree):
     '''Length of the initial tree section
 
