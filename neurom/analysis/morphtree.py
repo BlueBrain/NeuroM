@@ -265,19 +265,22 @@ def trunk_length(tree):
 
 
 def trunk_vector(tree, soma):
-    '''Vector of trunk defined as (soma center - initial point)
+    '''Vector of trunk defined as (initial tree point - soma center)
        of the tree.
     '''
     return mm.vector(tree.value, soma.center)
 
 
 def trunk_elevation(tree, soma):
-    '''Angle between x-axis and vector defined by (soma center - initial point)
+    '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-y plane.
     '''
     vector = trunk_vector(tree, soma)
 
-    return np.arcsin(vector[COLS.Y] / np.linalg.norm(vector))
+    if np.linalg.norm(vector) != 0:
+        return np.arcsin(vector[COLS.Y] / np.linalg.norm(vector))
+    else:
+        raise ValueError("Vector between soma center and tree is [0, 0, 0]")
 
 
 def get_bounding_box(tree):

@@ -374,6 +374,12 @@ def test_trunk_elevation():
     nt.assert_equal(trunk_elevation(t, s), 0.0)
     t = Tree((0, 1, 0, 2))
     nt.assert_equal(trunk_elevation(t, s),  np.pi/2)
+    t = Tree((0, 0, 0, 2))
+    try:
+        trunk_elevation(t, s)
+        nt.ok_(False)
+    except ValueError:
+        nt.ok_(True)
 
 
 def test_get_bounding_box():
