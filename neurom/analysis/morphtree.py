@@ -252,13 +252,6 @@ def trunk_radius(tree):
     return tree.value[COLS.R]
 
 
-def trunk_vector(tree, soma):
-    '''Vector of trunk defined as (soma center - initial point)
-       of the tree.
-    '''
-    return mm.vector(tree.value, soma.center)
-
-
 def trunk_length(tree):
     '''Length of the initial tree section
 
@@ -269,6 +262,22 @@ def trunk_length(tree):
         return i_section_length(tree).next()
     except StopIteration:
         return 0.0
+
+
+def trunk_vector(tree, soma):
+    '''Vector of trunk defined as (soma center - initial point)
+       of the tree.
+    '''
+    return mm.vector(tree.value, soma.center)
+
+
+def trunk_elevation(tree, soma):
+    '''Angle between x-axis and vector defined by (soma center - initial point)
+       on the x-y plane.
+    '''
+    vector = trunk_vector(tree, soma)
+
+    return np.arcsin(vector[COLS.Y] / np.linalg.norm(vector))
 
 
 def get_bounding_box(tree):
