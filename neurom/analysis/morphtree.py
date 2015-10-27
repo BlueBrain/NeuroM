@@ -289,10 +289,7 @@ def trunk_azimuth(tree, soma):
     '''
     vector = trunk_vector(tree, soma)
 
-    if vector[COLS.X] != 0.0:
-        return np.arctan(vector[COLS.Z] / vector[COLS.X])
-    else:
-        return np.pi / 2
+    return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
 
 def get_bounding_box(tree):
