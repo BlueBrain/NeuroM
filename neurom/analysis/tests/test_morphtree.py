@@ -59,6 +59,7 @@ from neurom.analysis.morphtree import trunk_radius
 from neurom.analysis.morphtree import trunk_length
 from neurom.analysis.morphtree import trunk_vector
 from neurom.analysis.morphtree import trunk_elevation
+from neurom.analysis.morphtree import trunk_azimuth
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -380,6 +381,14 @@ def test_trunk_elevation():
         nt.ok_(False)
     except ValueError:
         nt.ok_(True)
+
+
+def test_trunk_azimuth():
+    t = Tree((1, 0, 0, 2))
+    s = make_soma([[0, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    t = Tree((0, 1, 0, 2))
+    nt.assert_equal(trunk_azimuth(t, s), np.pi/2)
 
 
 def test_get_bounding_box():

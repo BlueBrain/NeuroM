@@ -283,6 +283,18 @@ def trunk_elevation(tree, soma):
         raise ValueError("Vector between soma center and tree is [0, 0, 0]")
 
 
+def trunk_azimuth(tree, soma):
+    '''Angle between x-axis and vector defined by (initial tree point - soma center)
+       on the x-z plane.
+    '''
+    vector = trunk_vector(tree, soma)
+
+    if vector[COLS.X] != 0.0:
+        return np.arctan(vector[COLS.Z] / vector[COLS.X])
+    else:
+        return np.pi / 2
+
+
 def get_bounding_box(tree):
     """
     Returns:
