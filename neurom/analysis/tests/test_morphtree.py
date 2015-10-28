@@ -375,6 +375,8 @@ def test_trunk_elevation():
     nt.assert_equal(trunk_elevation(t, s), 0.0)
     t = Tree((0, 1, 0, 2))
     nt.assert_equal(trunk_elevation(t, s),  np.pi/2)
+    t = Tree((0, -1, 0, 2))
+    nt.assert_equal(trunk_elevation(t, s),  -np.pi/2)
     t = Tree((0, 0, 0, 2))
     try:
         trunk_elevation(t, s)
@@ -393,6 +395,11 @@ def test_trunk_azimuth():
     nt.assert_equal(trunk_azimuth(t, s), 0.0)
     s = make_soma([[-1, 0, -1, 4]])
     nt.assert_equal(trunk_azimuth(t, s), np.pi/4)
+    s = make_soma([[-1, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    s = make_soma([[1, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), np.pi)
+
 
 
 def test_get_bounding_box():
