@@ -280,10 +280,12 @@ def trunk_elevation(tree, soma):
     '''
     vector = trunk_direction(tree, soma)
 
-    if np.linalg.norm(vector) != 0:
-        return np.arcsin(vector[COLS.Y] / np.linalg.norm(vector))
+    norm_vector = np.linalg.norm(vector)
+
+    if norm_vector >= np.finfo(type(norm_vector)).eps:
+        return np.arcsin(vector[COLS.Y] / norm_vector)
     else:
-        raise ValueError("Vector between soma center and tree is [0, 0, 0]")
+        raise ValueError("Norm of vector between soma center and tree is almost zero.")
 
 
 def trunk_azimuth(tree, soma):
