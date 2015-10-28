@@ -57,7 +57,7 @@ from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
 from neurom.analysis.morphtree import trunk_radius
 from neurom.analysis.morphtree import trunk_length
-from neurom.analysis.morphtree import trunk_vector
+from neurom.analysis.morphtree import trunk_direction
 from neurom.analysis.morphtree import trunk_elevation
 from neurom.analysis.morphtree import trunk_azimuth
 from neurom.analysis.morphtree import get_bounding_box
@@ -363,10 +363,10 @@ def test_trunk_radius_length_point_tree():
     nt.assert_equal(trunk_length(t), 0.0)
 
 
-def test_trunk_vector():
+def test_trunk_direction():
     t = Tree((1, 0, 0, 2))
     s = make_soma([[0, 0, 0, 4]])
-    nt.ok_(np.allclose(trunk_vector(t, s), np.array([1, 0, 0])))
+    nt.ok_(np.allclose(trunk_direction(t, s), np.array([1, 0, 0])))
 
 
 def test_trunk_elevation():

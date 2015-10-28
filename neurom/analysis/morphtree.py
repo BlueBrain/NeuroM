@@ -264,9 +264,9 @@ def trunk_length(tree):
         return 0.0
 
 
-def trunk_vector(tree, soma):
-    '''Vector of trunk defined as (initial tree point - soma center)
-       of the tree.
+def trunk_direction(tree, soma):
+    '''Vector of trunk direction defined as
+       (initial tree point - soma center) of the tree.
     '''
     return mm.vector(tree.value, soma.center)
 
@@ -276,9 +276,9 @@ def trunk_elevation(tree, soma):
        on the x-y half-plane.
 
        Returns:
-           Angle in radiants between -pi/2 and pi/2
+           Angle in radians between -pi/2 and pi/2
     '''
-    vector = trunk_vector(tree, soma)
+    vector = trunk_direction(tree, soma)
 
     if np.linalg.norm(vector) != 0:
         return np.arcsin(vector[COLS.Y] / np.linalg.norm(vector))
@@ -291,9 +291,9 @@ def trunk_azimuth(tree, soma):
        on the x-z plane.
 
        Returns:
-           Angle in radiants between -pi and pi
+           Angle in radians between -pi and pi
     '''
-    vector = trunk_vector(tree, soma)
+    vector = trunk_direction(tree, soma)
 
     return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
