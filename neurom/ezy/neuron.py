@@ -108,6 +108,14 @@ class Neuron(CoreNeuron):
         super(Neuron, self).__init__(neuron.soma, neuron.neurites, neuron.name)
         self._iterable_type = iterable_type
 
+    def __eq__(self, other):
+        return False if type(self) != type(other) else \
+               all(self._compare_neurites(other, ttype) for ttype in
+                    [TreeType.axon,
+                     TreeType.basal_dendrite,
+                     TreeType.apical_dendrite,
+                     TreeType.undefined])
+
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
         return self._pkg(self.iter_sections(section_length, neurite_type))
@@ -282,3 +290,37 @@ class Neuron(CoreNeuron):
     def _pkg(self, iterator):
         '''Create an iterable from an iterator'''
         return self._iterable_type([i for i in iterator])
+
+    def _compare_neurites(self, other, neurite_type):
+        '''
+        Find the identical pair of neurites of determined type if existent.
+
+        Returns:
+            False if pair does not exist or not identical. True otherwise.
+        '''
+        from itertools import product
+
+        neurites1 = [neu for neu in self.neurites if neu.type == neurite_type]
+
+        neurites2 = [neu for neu in other.neurites if neu.type == neurite_type]
+
+        if len(neurites1) != len(neurites2):
+
+            return False
+
+        elif len(neurites1) == 0 and len(neurites2) == 0:
+
+            return True
+
+        else:
+
+            nneurites = len(neurites1)
+
+            for neu1, neu2 in product(neurites1, neurites2):
+
+                if neu1 == neu2:
+                    nneurites -= 1
+                else:
+                    continue
+
+        return nneurites == 0
