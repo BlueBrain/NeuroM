@@ -309,6 +309,31 @@ class TestEzyNeuron(object):
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.soma), 0)
         nt.assert_equal(self.neuron.get_n_neurites(TreeType.undefined), 0)
 
+    def test_get_trunk_radii(self):
+        nt.assert_items_equal(self.neuron.get_trunk_radii(),
+                              [0.85351288499400002,
+                               0.18391483031299999,
+                               0.66943255462899998,
+                               0.14656092843999999])
+
+        nt.assert_items_equal(self.neuron.get_trunk_radii(TreeType.apical_dendrite),
+                              [0.14656092843999999])
+        nt.assert_items_equal(self.neuron.get_trunk_radii(TreeType.basal_dendrite),
+                              [0.18391483031299999,
+                               0.66943255462899998])
+        nt.assert_items_equal(self.neuron.get_trunk_radii(TreeType.axon),
+                              [0.85351288499400002])
+
+    def test_get_trunk_lengths(self):
+        nt.assert_items_equal(self.neuron.get_trunk_lengths(), [9.579117366740002,
+                                                                7.972322416776259,
+                                                                8.2245287740603779,
+                                                                9.212707985134525])
+        nt.assert_items_equal(self.neuron.get_trunk_lengths(TreeType.apical_dendrite), [9.212707985134525])
+        nt.assert_items_equal(self.neuron.get_trunk_lengths(TreeType.basal_dendrite),
+                              [7.972322416776259, 8.2245287740603779])
+        nt.assert_items_equal(self.neuron.get_trunk_lengths(TreeType.axon), [9.579117366740002])
+
     def test_iter_points(self):
         ref_point_radii = []
         for t in self.neuron.neurites:

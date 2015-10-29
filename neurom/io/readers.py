@@ -37,9 +37,6 @@ There is one such row per measured point.
 Functions to umpack the data and a higher level wrapper are provided. See
 
 * load_data
-* load_swc
-* load_h5v1
-* load_h5v2
 * RawDataWrapper
 '''
 import os
@@ -72,24 +69,6 @@ def load_data(filename):
         return _READERS[extension.lower()](filename)
 
     return RawDataWrapper(unpack_data())
-
-
-def load_h5v1(filename):
-    '''Unpack HDF5 v1 file  and return a RawDataWrapper object
-    '''
-    return RawDataWrapper(H5.read_v1(filename))
-
-
-def load_h5v2(filename, stage='raw'):
-    '''Unpack HDF5 v2 file  and return a RawDataWrapper object
-    '''
-    return RawDataWrapper(H5.read_v2(filename, stage))
-
-
-def load_swc(filename):
-    '''Unpack SWC file  and return a RawDataWrapper object
-    '''
-    return RawDataWrapper(SWC.read(filename))
 
 
 class RawDataWrapper(object):

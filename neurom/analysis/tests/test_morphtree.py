@@ -32,6 +32,7 @@ from neurom.core.tree import Tree
 import neurom.core.tree as tr
 from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
+from neurom.core.neuron import make_soma
 from neurom.io.readers import load_data
 from neurom.analysis.morphmath import angle_3points
 from neurom.analysis.morphtree import path_length
@@ -54,6 +55,11 @@ from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
+from neurom.analysis.morphtree import trunk_radius
+from neurom.analysis.morphtree import trunk_length
+from neurom.analysis.morphtree import trunk_direction
+from neurom.analysis.morphtree import trunk_elevation
+from neurom.analysis.morphtree import trunk_azimuth
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -337,6 +343,63 @@ def test_n_bifurcations():
 
 def test_n_terminations():
     nt.ok_(n_terminations(tree0) == 11)
+
+
+def test_trunk_radius():
+    t = Tree((0, 0, 0, 42))
+    t.add_child(Tree((1, 0, 0, 4)))
+    nt.assert_equal(trunk_radius(t), 42.0)
+
+
+def test_trunk_length():
+    t = Tree((0, 0, 0, 42))
+    tt = t.add_child(Tree((10, 0, 0, 4)))
+    tt.add_child(Tree((10, 15, 0, 4)))
+    nt.assert_almost_equal(trunk_length(t), 25.0)
+
+
+def test_trunk_radius_length_point_tree():
+    t = Tree((0, 0, 0, 42))
+    nt.assert_equal(trunk_length(t), 0.0)
+
+
+def test_trunk_direction():
+    t = Tree((1, 0, 0, 2))
+    s = make_soma([[0, 0, 0, 4]])
+    nt.ok_(np.allclose(trunk_direction(t, s), np.array([1, 0, 0])))
+
+
+def test_trunk_elevation():
+    t = Tree((1, 0, 0, 2))
+    s = make_soma([[0, 0, 0, 4]])
+    nt.assert_equal(trunk_elevation(t, s), 0.0)
+    t = Tree((0, 1, 0, 2))
+    nt.assert_equal(trunk_elevation(t, s),  np.pi/2)
+    t = Tree((0, -1, 0, 2))
+    nt.assert_equal(trunk_elevation(t, s),  -np.pi/2)
+    t = Tree((0, 0, 0, 2))
+    try:
+        trunk_elevation(t, s)
+        nt.ok_(False)
+    except ValueError:
+        nt.ok_(True)
+
+
+def test_trunk_azimuth():
+    t = Tree((0, 0, 0, 2))
+    s = make_soma([[0, 0, 1, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), -np.pi/2)
+    s = make_soma([[0, 0, -1, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), np.pi/2)
+    s = make_soma([[0, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    s = make_soma([[-1, 0, -1, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), np.pi/4)
+    s = make_soma([[-1, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    s = make_soma([[1, 0, 0, 4]])
+    nt.assert_equal(trunk_azimuth(t, s), np.pi)
+
 
 
 def test_get_bounding_box():
