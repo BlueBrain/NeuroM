@@ -69,6 +69,9 @@ def test_str():
     t = Tree('hello')
     nt.ok_(str(t))
 
+def test_eq():
+    nt.ok_(REF_TREE == REF_TREE)
+    nt.ok_(not REF_TREE == REF_TREE2)
 
 def test_instantiate_tree():
     t = Tree('hello')
