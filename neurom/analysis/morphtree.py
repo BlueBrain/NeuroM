@@ -247,6 +247,59 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
+def trunk_radius(tree):
+    '''Radius of the first point of a tree'''
+    return tree.value[COLS.R]
+
+
+def trunk_length(tree):
+    '''Length of the initial tree section
+
+    Returns:
+        Length of first section of tree or 0 if single point tree
+    '''
+    try:
+        return i_section_length(tree).next()
+    except StopIteration:
+        return 0.0
+
+
+def trunk_direction(tree, soma):
+    '''Vector of trunk direction defined as
+       (initial tree point - soma center) of the tree.
+    '''
+    return mm.vector(tree.value, soma.center)
+
+
+def trunk_elevation(tree, soma):
+    '''Angle between x-axis and vector defined by (initial tree point - soma center)
+       on the x-y half-plane.
+
+       Returns:
+           Angle in radians between -pi/2 and pi/2
+    '''
+    vector = trunk_direction(tree, soma)
+
+    norm_vector = np.linalg.norm(vector)
+
+    if norm_vector >= np.finfo(type(norm_vector)).eps:
+        return np.arcsin(vector[COLS.Y] / norm_vector)
+    else:
+        raise ValueError("Norm of vector between soma center and tree is almost zero.")
+
+
+def trunk_azimuth(tree, soma):
+    '''Angle between x-axis and vector defined by (initial tree point - soma center)
+       on the x-z plane.
+
+       Returns:
+           Angle in radians between -pi and pi
+    '''
+    vector = trunk_direction(tree, soma)
+
+    return np.arctan2(vector[COLS.Z], vector[COLS.X])
+
+
 def get_bounding_box(tree):
     """
     Returns:

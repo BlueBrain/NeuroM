@@ -152,8 +152,8 @@ class DataWrapper_Neuron(object):
 class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
     '''Test HDF5 v1 reading'''
     def setup(self):
-        self.data = readers.load_h5v1(
-            os.path.join(H5V1_PATH, 'Neuron.h5'))
+        self.data = readers.RawDataWrapper(readers.H5.read_v1(
+            os.path.join(H5V1_PATH, 'Neuron.h5')))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
 
@@ -161,7 +161,7 @@ class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 class TestRawDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
     '''Test HDF5 v2 reading'''
     def setup(self):
-        self.data = readers.load_h5v2(
-            os.path.join(H5V2_PATH, 'Neuron.h5'), stage='raw')
+        self.data = readers.RawDataWrapper(readers.H5.read_v2(
+            os.path.join(H5V2_PATH, 'Neuron.h5'), stage='raw'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
