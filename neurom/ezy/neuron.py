@@ -318,17 +318,11 @@ class Neuron(CoreNeuron):
 
         neurites2 = [neu for neu in other.neurites if neu.type == neurite_type]
 
-        if len(neurites1) != len(neurites2):
+        if len(neurites1) == len(neurites2):
 
-            return False
-
-        elif len(neurites1) == 0 and len(neurites2) == 0:
-
-            return True
-
+            return True if len(neurites1) == 0 and len(neurites2) == 0 else \
+                   len(neurites1) - sum(1 for neu1, neu2 in
+                                        product(neurites1, neurites2) if neu1 == neu2) == 0
         else:
 
-            nneurites = len(neurites1) -\
-                        sum(1 for neu1, neu2 in product(neurites1, neurites2) if neu1 == neu2)
-
-        return nneurites == 0
+            return False
