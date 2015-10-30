@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from itertools import chain, imap, ifilter, repeat
+from itertools import chain, imap, ifilter, repeat, izip, product
 
 
 class Tree(object):
@@ -43,6 +43,12 @@ class Tree(object):
     def __str__(self):
         return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
             (self.value, self.parent, len(self.children))
+
+    def __eq__(self, other):
+        '''
+            Comparison operator between two trees
+        '''
+        return compare_trees(self, other)
 
     def add_child(self, tree):
         '''Add a child to the list of this tree's children
@@ -245,3 +251,40 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
 
     chain_it = chain(*imap(iterator_type, nrt))
     return chain_it if mapping is None else imap_val(mapping, chain_it)
+
+
+def compare_trees(tree1, tree2):
+    '''
+    Comparison between all the nodes and their respective radii between two trees.
+    Ids are do not have to be identical between the trees, and swapping is allowed
+
+    Returns:
+
+        False if the trees are not identical. True otherwise.
+    '''
+    leaves1 = list(ileaf(tree1))
+    leaves2 = list(ileaf(tree2))
+
+    if len(leaves1) != len(leaves2):
+
+        return False
+
+    else:
+
+        nleaves = len(leaves1)
+
+        for leaf1, leaf2 in product(leaves1, leaves2):
+
+            is_equal = True
+
+            for node1, node2 in izip(val_iter(iupstream(leaf1)), val_iter(iupstream(leaf2))):
+
+                if any(node1[0:5] != node2[0:5]):
+
+                    is_equal = False
+                    continue
+
+            if is_equal:
+                nleaves -= 1
+
+    return nleaves == 0
