@@ -111,12 +111,10 @@ class Neuron(CoreNeuron):
         self._iterable_type = iterable_type
 
     def __eq__(self, other):
-        return False if type(self) != type(other) else \
+        return False if not isinstance(self, type(other)) else \
                all(self._compare_neurites(other, ttype) for ttype in
-                    [TreeType.axon,
-                     TreeType.basal_dendrite,
-                     TreeType.apical_dendrite,
-                     TreeType.undefined])
+                   [TreeType.axon, TreeType.basal_dendrite,
+                    TreeType.apical_dendrite, TreeType.undefined])
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
