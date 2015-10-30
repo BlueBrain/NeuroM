@@ -334,7 +334,5 @@ class Neuron(CoreNeuron):
 
                 if neu1 == neu2:
                     nneurites -= 1
-                else:
-                    continue
 
         return nneurites == 0
