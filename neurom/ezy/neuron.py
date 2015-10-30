@@ -29,6 +29,8 @@
 
 ''' Neuron class with basic analysis and plotting capabilities. '''
 
+
+from itertools import product
 from neurom.core.types import TreeType
 from neurom.core.types import checkTreeType
 from neurom.core.tree import ipreorder
@@ -312,8 +314,6 @@ class Neuron(CoreNeuron):
         Returns:
             False if pair does not exist or not identical. True otherwise.
         '''
-        from itertools import product
-
         neurites1 = [neu for neu in self.neurites if neu.type == neurite_type]
 
         neurites2 = [neu for neu in other.neurites if neu.type == neurite_type]
@@ -328,11 +328,7 @@ class Neuron(CoreNeuron):
 
         else:
 
-            nneurites = len(neurites1)
-
-            for neu1, neu2 in product(neurites1, neurites2):
-
-                if neu1 == neu2:
-                    nneurites -= 1
+            nneurites = len(neurites1) -\
+                        sum(1 for neu1, neu2 in product(neurites1, neurites2) if neu1 == neu2)
 
         return nneurites == 0
