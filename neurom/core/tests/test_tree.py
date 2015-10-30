@@ -58,12 +58,25 @@ REF_TREE.children[1].children[0].add_child(Tree(1211))
 REF_TREE.children[1].children[0].children[0].add_child(Tree(12111))
 REF_TREE.children[1].children[0].children[0].add_child(Tree(12112))
 
+REF_TREE1 = Tree(0)
+REF_TREE1.add_child(Tree(11))
+REF_TREE1.add_child(Tree(12))
+REF_TREE1.children[0].add_child(Tree(111))
+REF_TREE1.children[0].add_child(Tree(112))
+REF_TREE1.children[1].add_child(Tree(121))
+REF_TREE1.children[1].add_child(Tree(122))
+REF_TREE1.children[1].children[0].add_child(Tree(1211))
+REF_TREE1.children[1].children[0].children[0].add_child(Tree(12112))
+REF_TREE1.children[1].children[0].children[0].add_child(Tree(12111))
+
+
 REF_TREE2 = deepcopy(REF_TREE)
 T1111 = REF_TREE2.children[0].children[0].add_child(Tree(1111))
 T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
 T11113 = T1111.add_child(Tree(11113))
 
+T11113 = T1111.add_child(Tree(11113))
 
 def test_str():
     t = Tree('hello')
@@ -71,6 +84,7 @@ def test_str():
 
 def test_eq():
     nt.ok_(REF_TREE == REF_TREE)
+    nt.ok_(REF_TREE == REF_TREE1)
     nt.ok_(not REF_TREE == REF_TREE2)
 
 def test_instantiate_tree():

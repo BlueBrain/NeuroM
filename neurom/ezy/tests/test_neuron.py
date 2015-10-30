@@ -69,7 +69,12 @@ class TestEzyNeuron(object):
 
     def setUp(self):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
+        #self.filename2 = os.path.join(SWC_PATH, '')
         self.neuron = ezy.load_neuron(self.filename)
+
+    def test_eq(self):
+        other = ezy.load_neuron(self.filename)
+        nt.assert_true(self.neuron == other)
 
     def test_name(self):
         nt.assert_true(self.neuron.name == 'Neuron')
