@@ -33,6 +33,7 @@ from neurom import ezy
 from neurom.analysis import morphtree as mt
 from neurom.view import common as view_utils
 from collections import defaultdict
+from collections import namedtuple
 import json
 import numpy as np
 
@@ -71,11 +72,15 @@ for nrn in nrns:
 
 # load histograms, distribution parameter sets and figures into arrays.
 # To plot figures, do
-# plots[i].show()
+# plots[i].fig.show()
+# To modify an axis, do
+# plots[i].ax.something()
 
 histos = []
 dists = []
 plots = []
+
+Plot = namedtuple('Plot', 'fig, ax')
 
 for feat, d in stuff.iteritems():
     for typ, data in d.iteritems():
@@ -89,7 +94,7 @@ for feat, d in stuff.iteritems():
         # print 'HEIGHT', histo[0]
         # print 'BINS', histo[1]
         histos.append(histo)
-        fig, ax = view_utils.get_figure(new_fig=True, subplot=111)
-        ax.hist(histo[0], bins=histo[1])
-        ax.set_title('%s (%s)' % (feat, typ))
-        plots.append(fig)
+        plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
+        plot.ax.hist(histo[0], bins=histo[1])
+        plot.ax.set_title('%s (%s)' % (feat, typ))
+        plots.append(plot)
