@@ -34,6 +34,7 @@ from neurom.analysis import morphtree as mt
 from collections import defaultdict
 import json
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 nrns = ezy.load_neurons('../Synthesizer/build/L23MC/')
@@ -68,19 +69,28 @@ for nrn in nrns:
                 GET_FEATURE[feat](nrn, t)
             )
 
-# Then access the arrays of azimuths with tr_azimuth[key]
-# where the keys are string representations of the tree types.
+# load histograms, distribution parameter sets and figures into arrays.
+# To plot figures, do
+# plots[i].show()
 
 histos = []
 dists = []
+plots = []
 
 for feat, d in stuff.iteritems():
     for typ, data in d.iteritems():
         dist = sim_params['components'][typ][feat]
         dists.append(dist)
-        print typ, feat
-        print 'Distribution:', dist
+        print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
+        # print 'DATA', data
 
         num_bins = 100
         histo = np.histogram(data, num_bins, normed=True)
+        # print 'HEIGHT', histo[0]
+        # print 'BINS', histo[1]
         histos.append(histo)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.hist(histo[0], bins=histo[1])
+        ax.set_title('%s (%s)' % (feat, typ))
+        plots.append(fig)
