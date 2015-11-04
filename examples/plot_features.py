@@ -33,16 +33,20 @@ from neurom import ezy
 from neurom.analysis import morphtree as mt
 from collections import defaultdict
 import json
-import matplotlib.pyplot as plt
-
-nrns = ezy.load_neurons('../morphsyn/Synthesizer/build/L23MC/')
-sim_params = json.load(open('../morphsyn/Synthesizer/data/L23MC.json'))
+import numpy as np
 
 
+nrns = ezy.load_neurons('../Synthesizer/build/L23MC/')
+sim_params = json.load(open('../Synthesizer/data/L23MC.json'))
+
+
+# Neurite types of interest
 NEURITES_ = (ezy.TreeType.axon,
              ezy.TreeType.apical_dendrite,
              ezy.TreeType.basal_dendrite)
 
+# map feature names to functors that get us arrays of that
+# feature, for a given tree type
 GET_FEATURE = {
     'trunk_azimuth': lambda nrn, typ: [mt.trunk_azimuth(n, nrn.soma)
                                        for n in nrn.neurites if n.type == typ],
@@ -50,8 +54,10 @@ GET_FEATURE = {
                                          for n in nrn.neurites if n.type == typ]
 }
 
+# For now we use all the features in the map
 FEATURES = GET_FEATURE.keys()
 
+# data structure to store results
 stuff = defaultdict(lambda: defaultdict(list))
 
 # unpack data into arrays
@@ -65,11 +71,16 @@ for nrn in nrns:
 # Then access the arrays of azimuths with tr_azimuth[key]
 # where the keys are string representations of the tree types.
 
+histos = []
+dists = []
+
 for feat, d in stuff.iteritems():
     for typ, data in d.iteritems():
+        dist = sim_params['components'][typ][feat]
+        dists.append(dist)
         print typ, feat
-        print 'Params:', sim_params['components'][typ][feat]
+        print 'Distribution:', dist
 
         num_bins = 100
-        n, bins, patches = plt.hist(data, num_bins, normed=1, facecolor='green', alpha=0.5)
-        plt.show()
+        histo = np.histogram(data, num_bins, normed=True)
+        histos.append(histo)
