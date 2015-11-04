@@ -301,11 +301,13 @@ def trunk_azimuth(tree, soma):
 
 
 def partition(tree):
-    '''Ratio of maximum number of sections 
-       over minimum number of sections at 
-       each bifurcation.
+    '''Ratio of maximum number of sections
+       over minimum number of sections at
+       each bifurcation point.
     '''
-    [np.max(n_sections(i.children)) / np.min(n_sections(i.children)) for i in tr.ibifurcation_point(tree)]
+    return [np.max([n_sections(i.children[0]), n_sections(i.children[1])]) /
+            np.min([n_sections(i.children[0]), n_sections(i.children[1])])
+            for i in tr.ibifurcation_point(tree)]
 
 
 def get_bounding_box(tree):

@@ -60,6 +60,7 @@ from neurom.analysis.morphtree import trunk_length
 from neurom.analysis.morphtree import trunk_direction
 from neurom.analysis.morphtree import trunk_elevation
 from neurom.analysis.morphtree import trunk_azimuth
+from neurom.analysis.morphtree import partition
 from neurom.analysis.morphtree import get_bounding_box
 import math
 import numpy as np
@@ -401,6 +402,8 @@ def test_trunk_azimuth():
     nt.assert_equal(trunk_azimuth(t, s), np.pi)
 
 
+def test_partition():
+    nt.ok_(np.allclose(partition(tree0), [19, 17, 15, 13, 11, 9, 7, 5, 3, 1]))
 
 def test_get_bounding_box():
     box = np.array([[-33.25305769, -57.600172  ,   0.        ],
