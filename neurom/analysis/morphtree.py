@@ -301,12 +301,21 @@ def trunk_azimuth(tree, soma):
 
 
 def partition(tree):
-    '''Ratio of maximum number of sections
-       over minimum number of sections at
-       each bifurcation point.
+    '''Measures the distribution of sections
+       to the children subtrees at each bifurcation point.
+       Partition is defined as the max/min number of sections
+       between the children subtrees of a bifurcation point.
+
+       Returns:
+           List of partition for each bifurcation point.
     '''
-    return [np.max([n_sections(i.children[0]), n_sections(i.children[1])]) /
-            np.min([n_sections(i.children[0]), n_sections(i.children[1])])
+    def partition_at_point(bif_point):
+        '''Partition at each bif point.'''
+        n = n_sections(bif_point.children[0])
+        m = n_sections(bif_point.children[1])
+        return max(n, m) / min(n, m)
+
+    return [partition_at_point(i)
             for i in tr.ibifurcation_point(tree)]
 
 
