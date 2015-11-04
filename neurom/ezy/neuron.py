@@ -29,6 +29,8 @@
 
 ''' Neuron class with basic analysis and plotting capabilities. '''
 
+
+from itertools import product
 from neurom.core.types import TreeType
 from neurom.core.types import checkTreeType
 from neurom.core.tree import ipreorder
@@ -109,6 +111,12 @@ class Neuron(CoreNeuron):
     def __init__(self, neuron, iterable_type=np.array):
         super(Neuron, self).__init__(neuron.soma, neuron.neurites, neuron.name)
         self._iterable_type = iterable_type
+
+    def __eq__(self, other):
+        return False if not isinstance(self, type(other)) else \
+               all(self._compare_neurites(other, ttype) for ttype in
+                   [TreeType.axon, TreeType.basal_dendrite,
+                    TreeType.apical_dendrite, TreeType.undefined])
 
     def get_section_lengths(self, neurite_type=TreeType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
@@ -298,3 +306,23 @@ class Neuron(CoreNeuron):
     def _pkg(self, iterator):
         '''Create an iterable from an iterator'''
         return self._iterable_type([i for i in iterator])
+
+    def _compare_neurites(self, other, neurite_type):
+        '''
+        Find the identical pair of neurites of determined type if existent.
+
+        Returns:
+            False if pair does not exist or not identical. True otherwise.
+        '''
+        neurites1 = [neu for neu in self.neurites if neu.type == neurite_type]
+
+        neurites2 = [neu for neu in other.neurites if neu.type == neurite_type]
+
+        if len(neurites1) == len(neurites2):
+
+            return True if len(neurites1) == 0 and len(neurites2) == 0 else \
+                   len(neurites1) - sum(1 for neu1, neu2 in
+                                        product(neurites1, neurites2) if neu1 == neu2) == 0
+        else:
+
+            return False

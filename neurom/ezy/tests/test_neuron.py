@@ -31,7 +31,9 @@
 import os
 import math
 import numpy as np
+from copy import deepcopy
 from neurom import ezy
+from collections import namedtuple
 from neurom.core.types import TreeType
 from neurom.exceptions import SomaError, NonConsecutiveIDsError
 from nose import tools as nt
@@ -69,7 +71,12 @@ class TestEzyNeuron(object):
 
     def setUp(self):
         self.filename = os.path.join(SWC_PATH, 'Neuron.swc')
+        #self.filename2 = os.path.join(SWC_PATH, '')
         self.neuron = ezy.load_neuron(self.filename)
+
+    def test_eq(self):
+        other = ezy.load_neuron(self.filename)
+        nt.assert_true(self.neuron == other)
 
     def test_name(self):
         nt.assert_true(self.neuron.name == 'Neuron')
@@ -352,3 +359,22 @@ class TestEzyNeuron(object):
         bbox = ((-40.328535157399998, -57.6001719972, -0.17071067811865476),
                 (64.7472627179, 48.516262252300002, 54.204087967500001))
         nt.ok_(np.allclose(bbox, self.neuron.bounding_box()))
+
+    def test_compare_neurites(self):
+
+        fake_neuron = namedtuple('Neuron', 'neurites')        
+        fake_neuron.neurites = []
+        nt.assert_false(self.neuron._compare_neurites(fake_neuron, TreeType.axon))
+        nt.assert_true(fake_neuron, fake_neuron)
+
+        neuron2 = deepcopy(self.neuron)
+        
+        n_types = set([n.type for n in self.neuron.neurites])
+        
+        for n_type in n_types:
+            nt.assert_true(self.neuron._compare_neurites(neuron2, n_type))
+
+        neuron2.neurites[1].children[0].value[1] += 0.01
+
+        nt.assert_false(self.neuron._compare_neurites(neuron2, neuron2.neurites[1].type))
+
