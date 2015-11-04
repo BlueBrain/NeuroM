@@ -300,6 +300,14 @@ def trunk_azimuth(tree, soma):
     return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
 
+def partition(tree):
+    '''Ratio of maximum number of sections 
+       over minimum number of sections at 
+       each bifurcation.
+    '''
+    [np.max(n_sections(i.children)) / np.min(n_sections(i.children)) for i in tr.ibifurcation_point(tree)]
+
+
 def get_bounding_box(tree):
     """
     Returns:
