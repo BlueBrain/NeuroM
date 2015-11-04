@@ -31,11 +31,29 @@
 
 from neurom import ezy
 from neurom.analysis import morphtree as mt
+from neurom.analysis import morphmath as mm
 from neurom.view import common as view_utils
 from collections import defaultdict
 from collections import namedtuple
 import json
 import numpy as np
+import scipy.stats as _st
+
+
+DISTS = {
+    'normal': lambda p, bins: _st.norm.pdf(bins, p['mu'], p['sigma']),
+    'uniform': lambda p, bins: _st.uniform.pdf(bins, p['min'], p['max'] - p['min']),
+    'constant': lambda p, bins: None
+}
+
+
+def dist_points(d, bin_edges):
+    """Return an array ov values according to a distribution
+
+    Points are calculated at the center of each bin
+    """
+    bin_centers = (bin_edges[1:] - bin_edges[:-1]) / 2.0
+    return DISTS[dist['type']](d, bin_centers), bin_centers
 
 
 nrns = ezy.load_neurons('../Synthesizer/build/L23MC/')
@@ -53,7 +71,8 @@ GET_FEATURE = {
     'trunk_azimuth': lambda nrn, typ: [mt.trunk_azimuth(n, nrn.soma)
                                        for n in nrn.neurites if n.type == typ],
     'trunk_elevation': lambda nrn, typ: [mt.trunk_elevation(n, nrn.soma)
-                                         for n in nrn.neurites if n.type == typ]
+                                         for n in nrn.neurites if n.type == typ],
+    'segment_length': lambda n, typ: n.get_segment_lengths(typ),
 }
 
 # For now we use all the features in the map
@@ -96,5 +115,10 @@ for feat, d in stuff.iteritems():
         histos.append(histo)
         plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
         plot.ax.hist(histo[0], bins=histo[1])
+        dp, bc = dist_points(dist, histo[1])
+        if dp is not None:
+            print 'DIST POINTS:', dp, len(dp)
+            print 'BIN CENTERS:', bc, len(bc)
+            plot.ax.plot(bc, dp, '+')
         plot.ax.set_title('%s (%s)' % (feat, typ))
         plots.append(plot)
