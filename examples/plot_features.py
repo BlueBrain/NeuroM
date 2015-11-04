@@ -31,10 +31,10 @@
 
 from neurom import ezy
 from neurom.analysis import morphtree as mt
+from neurom.view import common as view_utils
 from collections import defaultdict
 import json
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 nrns = ezy.load_neurons('../Synthesizer/build/L23MC/')
@@ -89,8 +89,7 @@ for feat, d in stuff.iteritems():
         # print 'HEIGHT', histo[0]
         # print 'BINS', histo[1]
         histos.append(histo)
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        fig, ax = view_utils.get_figure(new_fig=True, subplot=111)
         ax.hist(histo[0], bins=histo[1])
         ax.set_title('%s (%s)' % (feat, typ))
         plots.append(fig)
