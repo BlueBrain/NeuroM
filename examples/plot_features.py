@@ -144,18 +144,20 @@ def main(): # pylint: disable=too-many-locals
             print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
             # print 'DATA', data
 
-            num_bins = 100
+            num_bins = 10 if dist['type'] == 'constant' else 100
             limits = calc_limits(data, dist)
             bin_edges = np.linspace(limits[0], limits[1], num_bins + 1)
             histo = np.histogram(data, bin_edges, normed=True)
-            # print 'HEIGHT', histo[0]
-            # print 'BINS', histo[1]
+            print 'PLOT LIMITS:', limits
+            # print 'DATA:', data
+            # print 'BIN HEIGHT', histo[0]
             plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
-            plot.ax.hist(histo[0], bins=histo[1])
+            view_utils.plot_limits(plot.fig, plot.ax, xlim=limits, no_ylim=True)
+            plot.ax.bar(histo[1][:-1], histo[0], width=histo[1][1] - histo[1][0])
             dp, bc = dist_points(dist, histo[1])
+            # print 'BIN CENTERS:', bc, len(bc)
             if dp is not None:
-                print 'DIST POINTS:', dp, len(dp)
-                print 'BIN CENTERS:', bc, len(bc)
+                # print 'DIST POINTS:', dp, len(dp)
                 plot.ax.plot(bc, dp, 'r*')
             plot.ax.set_title('%s (%s)' % (feat, typ))
             _plots.append(plot)
