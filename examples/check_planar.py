@@ -42,7 +42,7 @@ def pca(points):
 	return np.linalg.eig(cov)
 
 
-def check_planar(tree, tol=0.1):
+def extend_of_tree(tree, tol=10):
 
 	# extract the x,y,z coordinates of all the points in the tree
 	points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
@@ -63,10 +63,19 @@ def check_planar(tree, tol=0.1):
 
 	# the maximum extend on the line
 	extend = np.linalg.norm(projections[0] - projections[-1])
-	#sc = 2.*np.sqrt(6.251 * eigs) # 90%
 
 	return  extend
 
+def check_flat_neuron(neuron, tol=10):
 
+	print '\nChecking for flat neurites. Tolerance : {0} microns \n'.format(tol)
+	print 'Neurite Type \t\t\t Extend \t Flat'
+	print '-'*60
+
+	for neurite in neuron.neurites:
+
+		extend = extend_of_tree(neurite)
+
+		print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extend, extend < float(tol))
 
 
