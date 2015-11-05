@@ -33,6 +33,15 @@
 import numpy as np
 from neurom.core.tree import val_iter, ipreorder
 
+def pca(points):
+
+	# calculate the covariance of the points
+	cov = np.cov(points)
+
+	# find the principal components
+	return np.linalg.eig(cov)
+
+
 def check_planar(tree, tol=0.1):
 
 	# extract the x,y,z coordinates of all the points in the tree
@@ -41,11 +50,7 @@ def check_planar(tree, tol=0.1):
 	# center the points around 0.0
 	points -= np.mean(points, axis=0)
 
-	# calculate the covariance of the points
-	cov = np.cov(points.transpose())
-
-	# find the principal components
-	eigs, eigv = np.linalg.eig(cov)
+	eigs, eigv = pca(points.transpose())
 
 	# smallest component size
 	min_eigv = eigs[np.argmin(eigs)]
