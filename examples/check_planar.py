@@ -34,6 +34,15 @@ import numpy as np
 from neurom.core.tree import val_iter, ipreorder
 
 def pca(points):
+	'''
+	Estimate the principal components of the given point cloud
+
+	Input
+		A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
+
+	Ouptut
+		Eigenvalues and respective eigenvectors
+	'''
 
 	# calculate the covariance of the points
 	cov = np.cov(points)
@@ -43,13 +52,24 @@ def pca(points):
 
 
 def extend_of_tree(tree, tol=10):
+'''Calculate the extend of a tree, which is defined as the maximum distance
+	on the direction of minimum variance.
 
+	Input 
+		tree : a tree object
+
+		tol : tolerance in microns
+
+	Returns
+		extend : int
+'''
 	# extract the x,y,z coordinates of all the points in the tree
 	points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
 
 	# center the points around 0.0
 	points -= np.mean(points, axis=0)
 
+	# principal components
 	eigs, eigv = pca(points.transpose())
 
 	# smallest component size
@@ -61,15 +81,24 @@ def extend_of_tree(tree, tol=10):
 	# sorting with respect to the distance from the center
 	sorted(projections, key=np.linalg.norm)
 
-	# the maximum extend on the line
-	extend = np.linalg.norm(projections[0] - projections[-1])
+	# the max distance mong the points on that direction
+	return  np.linalg.norm(projections[0] - projections[-1])
 
-	return  extend
 
 def check_flat_neuron(neuron, tol=10):
+'''Iterate over neurites and check for flatness given the tolerance. default tol = 10
+
+	Input
+
+		neuron : neuron object
+
+		tol : tolerance in microns
+'''
 
 	print '\nChecking for flat neurites. Tolerance : {0} microns \n'.format(tol)
+
 	print 'Neurite Type \t\t\t Extend \t Flat'
+
 	print '-'*60
 
 	for neurite in neuron.neurites:
@@ -77,5 +106,3 @@ def check_flat_neuron(neuron, tol=10):
 		extend = extend_of_tree(neurite)
 
 		print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extend, extend < float(tol))
-
-
