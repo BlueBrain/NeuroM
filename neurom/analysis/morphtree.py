@@ -300,6 +300,25 @@ def trunk_azimuth(tree, soma):
     return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
 
+def partition(tree):
+    '''Measures the distribution of sections
+       to the children subtrees at each bifurcation point.
+       Partition is defined as the max/min number of sections
+       between the children subtrees of a bifurcation point.
+
+       Returns:
+           List of partition for each bifurcation point.
+    '''
+    def partition_at_point(bif_point):
+        '''Partition at each bif point.'''
+        n = n_sections(bif_point.children[0])
+        m = n_sections(bif_point.children[1])
+        return max(n, m) / min(n, m)
+
+    return [partition_at_point(i)
+            for i in tr.ibifurcation_point(tree)]
+
+
 def get_bounding_box(tree):
     """
     Returns:
