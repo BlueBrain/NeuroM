@@ -46,13 +46,32 @@ DISTS = {
 }
 
 
+def bin_centers(bin_edges):
+    """Return array of bin centers given an array of bin edges"""
+    return (bin_edges[1:] + bin_edges[:-1]) / 2.0
+
+
+def bin_widths(bin_edges):
+    """Return array of bin widths given an array of bin edges"""
+    return bin_edges[1:] - bin_edges[:-1]
+
+
+def histo_entries(histo):
+    """Calculate the number of entries in a histogram
+
+    This is the sum of bin height * bin width
+    """
+    bw = bin_widths(histo[1])
+    return np.sum(histo[0] * bw)
+
+
 def dist_points(d, bin_edges):
     """Return an array ov values according to a distribution
 
     Points are calculated at the center of each bin
     """
-    bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2.0
-    return DISTS[d['type']](d, bin_centers), bin_centers
+    bc = bin_centers(bin_edges)
+    return DISTS[d['type']](d, bc), bc
 
 
 def calc_limits(data, dist):
@@ -116,7 +135,7 @@ def main(): # pylint: disable=too-many-locals
     # plots[i].ax.something()
 
     dists = []
-    plots = []
+    _plots = []
 
     for feat, d in stuff.iteritems():
         for typ, data in d.iteritems():
@@ -135,13 +154,13 @@ def main(): # pylint: disable=too-many-locals
             plot.ax.hist(histo[0], bins=histo[1])
             dp, bc = dist_points(dist, histo[1])
             if dp is not None:
-                # print 'DIST POINTS:', dp, len(dp)
-                # print 'BIN CENTERS:', bc, len(bc)
-                plot.ax.plot(bc, dp, '+')
+                print 'DIST POINTS:', dp, len(dp)
+                print 'BIN CENTERS:', bc, len(bc)
+                plot.ax.plot(bc, dp, 'r*')
             plot.ax.set_title('%s (%s)' % (feat, typ))
-            plots.append(plot)
+            _plots.append(plot)
 
-    return plots
+    return _plots
 
 if __name__ == '__main__':
     plots = main()
