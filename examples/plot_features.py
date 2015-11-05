@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -31,10 +30,10 @@
 
 from neurom import ezy
 from neurom.analysis import morphtree as mt
-from neurom.analysis import morphmath as mm
 from neurom.view import common as view_utils
 from collections import defaultdict
 from collections import namedtuple
+import sys
 import json
 import numpy as np
 import scipy.stats as _st
@@ -52,12 +51,21 @@ def dist_points(d, bin_edges):
 
     Points are calculated at the center of each bin
     """
-    bin_centers = (bin_edges[1:] - bin_edges[:-1]) / 2.0
-    return DISTS[dist['type']](d, bin_centers), bin_centers
+    bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2.0
+    return DISTS[d['type']](d, bin_centers), bin_centers
 
 
-nrns = ezy.load_neurons('../Synthesizer/build/L23MC/')
-sim_params = json.load(open('../Synthesizer/data/L23MC.json'))
+def calc_limits(data, dist):
+    """Calculate a suitable range for a histogram
+
+    Returns:
+        tuple of (min, max)
+    """
+    _min = min(min(data), dist.get('min', sys.float_info.max))
+    _max = max(max(data), dist.get('max', sys.float_info.min))
+
+    padding = 0.25 * (_max - _min)
+    return _min - padding, _max + padding
 
 
 # Neurite types of interest
@@ -78,47 +86,62 @@ GET_FEATURE = {
 # For now we use all the features in the map
 FEATURES = GET_FEATURE.keys()
 
-# data structure to store results
-stuff = defaultdict(lambda: defaultdict(list))
 
-# unpack data into arrays
-for nrn in nrns:
-    for t in NEURITES_:
-        for feat in FEATURES:
-            stuff[feat][str(t).split('.')[1]].extend(
-                GET_FEATURE[feat](nrn, t)
-            )
-
-# load histograms, distribution parameter sets and figures into arrays.
-# To plot figures, do
-# plots[i].fig.show()
-# To modify an axis, do
-# plots[i].ax.something()
-
-histos = []
-dists = []
-plots = []
+def load_neuron_features(filepath):
+    '''Unpack relevant data into megadict'''
+    stuff = defaultdict(lambda: defaultdict(list))
+    nrns = ezy.load_neurons(filepath)
+    # unpack data into arrays
+    for nrn in nrns:
+        for t in NEURITES_:
+            for feat in FEATURES:
+                stuff[feat][str(t).split('.')[1]].extend(
+                    GET_FEATURE[feat](nrn, t)
+                )
+    return stuff
 
 Plot = namedtuple('Plot', 'fig, ax')
 
-for feat, d in stuff.iteritems():
-    for typ, data in d.iteritems():
-        dist = sim_params['components'][typ][feat]
-        dists.append(dist)
-        print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
-        # print 'DATA', data
 
-        num_bins = 100
-        histo = np.histogram(data, num_bins, normed=True)
-        # print 'HEIGHT', histo[0]
-        # print 'BINS', histo[1]
-        histos.append(histo)
-        plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
-        plot.ax.hist(histo[0], bins=histo[1])
-        dp, bc = dist_points(dist, histo[1])
-        if dp is not None:
-            print 'DIST POINTS:', dp, len(dp)
-            print 'BIN CENTERS:', bc, len(bc)
-            plot.ax.plot(bc, dp, '+')
-        plot.ax.set_title('%s (%s)' % (feat, typ))
-        plots.append(plot)
+def main(): # pylint: disable=too-many-locals
+    '''Run the stuff'''
+    # data structure to store results
+    stuff = load_neuron_features('../morphsyn/Synthesizer/build/L23MC/')
+    sim_params = json.load(open('../morphsyn/Synthesizer/data/L23MC.json'))
+
+    # load histograms, distribution parameter sets and figures into arrays.
+    # To plot figures, do
+    # plots[i].fig.show()
+    # To modify an axis, do
+    # plots[i].ax.something()
+
+    dists = []
+    plots = []
+
+    for feat, d in stuff.iteritems():
+        for typ, data in d.iteritems():
+            dist = sim_params['components'][typ][feat]
+            dists.append(dist)
+            print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
+            # print 'DATA', data
+
+            num_bins = 100
+            limits = calc_limits(data, dist)
+            bin_edges = np.linspace(limits[0], limits[1], num_bins + 1)
+            histo = np.histogram(data, bin_edges, normed=True)
+            # print 'HEIGHT', histo[0]
+            # print 'BINS', histo[1]
+            plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
+            plot.ax.hist(histo[0], bins=histo[1])
+            dp, bc = dist_points(dist, histo[1])
+            if dp is not None:
+                # print 'DIST POINTS:', dp, len(dp)
+                # print 'BIN CENTERS:', bc, len(bc)
+                plot.ax.plot(bc, dp, '+')
+            plot.ax.set_title('%s (%s)' % (feat, typ))
+            plots.append(plot)
+
+    return plots
+
+if __name__ == '__main__':
+    plots = main()
