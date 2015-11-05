@@ -38,7 +38,8 @@ def check_planar(tree, tol=0.1):
 	# extract the x,y,z coordinates of all the points in the tree
 	points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
 
-	points -= 
+	# center the points around 0.0
+	points -= np.mean(points, axis=0)
 
 	# calculate the covariance of the points
 	cov = np.cov(points.transpose())
@@ -47,12 +48,19 @@ def check_planar(tree, tol=0.1):
 	eigs, eigv = np.linalg.eig(cov)
 
 	# smallest component size
-
 	min_eigv = eigs[np.argmin(eigs)]
 
+	# projections onto the smallest component direction
+	projections = np.dot(min_eigv, points)
+
+	# sorting with respect to the distance from the center
+	sorted(projections, key=np.linalg.norm)
+
+	# the maximum extend on the line
+	extend = np.linalg.norm(projections[0] - projections[-1])
 	#sc = 2.*np.sqrt(6.251 * eigs) # 90%
 
-	return  min_eigv
+	return  extend
 
 
 
