@@ -33,76 +33,77 @@
 import numpy as np
 from neurom.core.tree import val_iter, ipreorder
 
+
 def pca(points):
-	'''
-	Estimate the principal components of the given point cloud
+    '''
+    Estimate the principal components of the given point cloud
 
-	Input
-		A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
+    Input
+        A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
 
-	Ouptut
-		Eigenvalues and respective eigenvectors
-	'''
+    Ouptut
+        Eigenvalues and respective eigenvectors
+    '''
 
-	# calculate the covariance of the points
-	cov = np.cov(points)
+    # calculate the covariance of the points
+    cov = np.cov(points)
 
-	# find the principal components
-	return np.linalg.eig(cov)
+    # find the principal components
+    return np.linalg.eig(cov)
 
 
 def extend_of_tree(tree, tol=10):
-'''Calculate the extend of a tree, which is defined as the maximum distance
-	on the direction of minimum variance.
+    '''Calculate the extend of a tree, which is defined as the maximum distance
+        on the direction of minimum variance.
 
-	Input 
-		tree : a tree object
+        Input
+            tree : a tree object
 
-		tol : tolerance in microns
+            tol : tolerance in microns
 
-	Returns
-		extend : int
-'''
-	# extract the x,y,z coordinates of all the points in the tree
-	points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
+        Returns
+            extend : int
+    '''
+    # extract the x,y,z coordinates of all the points in the tree
+    points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
 
-	# center the points around 0.0
-	points -= np.mean(points, axis=0)
+    # center the points around 0.0
+    points -= np.mean(points, axis=0)
 
-	# principal components
-	eigs, eigv = pca(points.transpose())
+    # principal components
+    eigs, eigv = pca(points.transpose())
 
-	# smallest component size
-	min_eigv = eigs[np.argmin(eigs)]
+    # smallest component size
+    min_eigv = eigs[np.argmin(eigs)]
 
-	# projections onto the smallest component direction
-	projections = np.dot(min_eigv, points)
+    # projections onto the smallest component direction
+    projections = np.dot(min_eigv, points)
 
-	# sorting with respect to the distance from the center
-	sorted(projections, key=np.linalg.norm)
+    # sorting with respect to the distance from the center
+    sorted(projections, key=np.linalg.norm)
 
-	# the max distance mong the points on that direction
-	return  np.linalg.norm(projections[0] - projections[-1])
+    # the max distance mong the points on that direction
+    return np.linalg.norm(projections[0] - projections[-1])
 
 
 def check_flat_neuron(neuron, tol=10):
-'''Iterate over neurites and check for flatness given the tolerance. default tol = 10
+    '''Iterate over neurites and check for flatness given the tolerance. default tol = 10
 
-	Input
+        Input
 
-		neuron : neuron object
+            neuron : neuron object
 
-		tol : tolerance in microns
-'''
+            tol : tolerance in microns
+    '''
 
-	print '\nChecking for flat neurites. Tolerance : {0} microns \n'.format(tol)
+    print '\nChecking for flat neurites. Tolerance : {0} microns \n'.format(tol)
 
-	print 'Neurite Type \t\t\t Extend \t Flat'
+    print 'Neurite Type \t\t\t Extend \t Flat'
 
-	print '-'*60
+    print '-' * 60
 
-	for neurite in neuron.neurites:
+    for neurite in neuron.neurites:
 
-		extend = extend_of_tree(neurite)
+        extend = extend_of_tree(neurite)
 
-		print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extend, extend < float(tol))
+        print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extend, extend < float(tol))
