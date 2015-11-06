@@ -32,6 +32,7 @@
 
 import numpy as np
 from neurom.core.tree import val_iter, ipreorder
+from neurom.core.dataformat import COLS
 
 
 def pca(points):
@@ -52,7 +53,7 @@ def pca(points):
     return np.linalg.eig(cov)
 
 
-def extend_of_tree(tree):
+def extent_of_tree(tree):
     '''Calculate the extend of a tree, which is defined as the maximum distance
         on the direction of minimum variance.
 
@@ -65,7 +66,7 @@ def extend_of_tree(tree):
             extend : int
     '''
     # extract the x,y,z coordinates of all the points in the tree
-    points = np.array([value[0:3] for value in val_iter(ipreorder(tree))])
+    points = np.array([value[COLS.X: COLS.R]for value in val_iter(ipreorder(tree))])
 
     # center the points around 0.0
     points -= np.mean(points, axis=0)
@@ -79,13 +80,13 @@ def extend_of_tree(tree):
     # orthogonal projection onto the direction of the smallest component
     scalar_projs = np.sort(np.array([np.dot(p, min_eigv) for p in points]))
 
-    extend = scalar_projs[-1]
+    extent = scalar_projs[-1]
 
     if scalar_projs[0] < 0.:
-        extend -= scalar_projs[0]
+        extent -= scalar_projs[0]
 
     # the max distance mong the points on that direction
-    return extend
+    return extent
 
 
 def check_flat_neuron(neuron, tol=10):
@@ -106,6 +107,6 @@ def check_flat_neuron(neuron, tol=10):
 
     for neurite in neuron.neurites:
 
-        extend = extend_of_tree(neurite)
+        extent = extent_of_tree(neurite)
 
-        print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extend, extend < float(tol))
+        print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extent, extent < float(tol))
