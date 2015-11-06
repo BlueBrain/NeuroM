@@ -52,7 +52,7 @@ def pca(points):
     return np.linalg.eig(cov)
 
 
-def extend_of_tree(tree, tol=10):
+def extend_of_tree(tree):
     '''Calculate the extend of a tree, which is defined as the maximum distance
         on the direction of minimum variance.
 
@@ -74,16 +74,18 @@ def extend_of_tree(tree, tol=10):
     eigs, eigv = pca(points.transpose())
 
     # smallest component size
-    min_eigv = eigs[np.argmin(eigs)]
+    min_eigv = eigv[:, np.argmin(eigs)]
 
-    # projections onto the smallest component direction
-    projections = np.dot(min_eigv, points)
+    # orthogonal projection onto the direction of the smallest component
+    scalar_projs = np.sort(np.array([np.dot(p, min_eigv) for p in points]))
 
-    # sorting with respect to the distance from the center
-    sorted(projections, key=np.linalg.norm)
+    extend = scalar_projs[-1]
+
+    if scalar_projs[0] < 0.:
+        extend -= scalar_projs[0]
 
     # the max distance mong the points on that direction
-    return np.linalg.norm(projections[0] - projections[-1])
+    return extend
 
 
 def check_flat_neuron(neuron, tol=10):
