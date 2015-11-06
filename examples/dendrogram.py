@@ -37,6 +37,8 @@ from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
 
 from matplotlib.collections import PolyCollection
+import sys
+sys.setrecursionlimit(10000)
 
 
 def _vertical_segment(offsets, new_offsets, spacing, radii):
@@ -146,8 +148,7 @@ def _dendrogram(neuron_, show_diameters=True):
     '''Main dendrogram function
     '''
     from copy import deepcopy
-    import sys
-    sys.setrecursionlimit(3000)
+
     # neuron is copied because otherwise the tree modifications that follow
     # will be applied to our original object
     neuron = deepcopy(neuron_)
