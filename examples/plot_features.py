@@ -66,23 +66,29 @@ def histo_entries(histo):
     return np.sum(histo[0] * bw)
 
 
-def dist_points(d, bin_edges):
+def dist_points(bin_edges, d):
     """Return an array of values according to a distribution
 
     Points are calculated at the center of each bin
     """
     bc = bin_centers(bin_edges)
-    return DISTS[d['type']](d, bc), bc
+    if d is not None:
+        d = DISTS[d['type']](d, bc)
+    return d, bc
 
 
-def calc_limits(data, dist, padding=0.25):
+def calc_limits(data, dist=None, padding=0.25):
     """Calculate a suitable range for a histogram
 
     Returns:
         tuple of (min, max)
     """
-    _min = min(min(data), dist.get('min', sys.float_info.max))
-    _max = max(max(data), dist.get('max', sys.float_info.min))
+    dmin = sys.float_info.max if dist is None else dist.get('min',
+                                                            sys.float_info.max)
+    dmax = sys.float_info.min if dist is None else dist.get('max',
+                                                            sys.float_info.min)
+    _min = min(min(data), dmin)
+    _max = max(max(data), dmax)
 
     padding = padding * (_max - _min)
     return _min - padding, _max + padding
@@ -152,13 +158,11 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
     # To modify an axis, do
     # plots[i].ax.something()
 
-    dists = []
     _plots = []
 
     for feat, d in stuff.iteritems():
         for typ, data in d.iteritems():
-            dist = sim_params['components'][typ][feat]
-            dists.append(dist)
+            dist = sim_params['components'][typ].get(feat, None)
             print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
             # print 'DATA', data
             num_bins = 100
@@ -171,7 +175,7 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
             plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
             view_utils.plot_limits(plot.fig, plot.ax, xlim=limits, no_ylim=True)
             plot.ax.bar(histo[1][:-1], histo[0], width=bin_widths(histo[1]))
-            dp, bc = dist_points(dist, histo[1])
+            dp, bc = dist_points(histo[1], dist)
             # print 'BIN CENTERS:', bc, len(bc)
             if dp is not None:
                 # print 'DIST POINTS:', dp, len(dp)
@@ -183,4 +187,5 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     args = parse_args()
+    print 'MTYPE FILE:', args.mtypeconfig
     plots = main(args.datapath, args.mtypeconfig)
