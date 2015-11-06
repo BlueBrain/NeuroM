@@ -38,6 +38,7 @@ import json
 import argparse
 import numpy as np
 import scipy.stats as _st
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 DISTS = {
@@ -135,14 +136,19 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Morphology feature plotter',
         epilog='Note: Makes plots of various features and superimposes\
-        input distributions')
+        input distributions. Plots are saved to PDF file.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('datapath',
                         help='Morphology data directory path')
 
     parser.add_argument('--mtypeconfig',
+                        required=True,
                         help='Get mtype JSON configuration file')
 
+    parser.add_argument('--output',
+                        default='plots.pdf',
+                        help='Output PDF file name')
     return parser.parse_args()
 
 
@@ -189,3 +195,8 @@ if __name__ == '__main__':
     args = parse_args()
     print 'MTYPE FILE:', args.mtypeconfig
     plots = main(args.datapath, args.mtypeconfig)
+
+    pp = PdfPages(args.output)
+    for p in plots:
+        pp.savefig(p.fig)
+    pp.close()
