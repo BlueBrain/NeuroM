@@ -35,6 +35,7 @@ from collections import defaultdict
 from collections import namedtuple
 import sys
 import json
+import argparse
 import numpy as np
 import scipy.stats as _st
 
@@ -66,7 +67,7 @@ def histo_entries(histo):
 
 
 def dist_points(d, bin_edges):
-    """Return an array ov values according to a distribution
+    """Return an array of values according to a distribution
 
     Points are calculated at the center of each bin
     """
@@ -74,7 +75,7 @@ def dist_points(d, bin_edges):
     return DISTS[d['type']](d, bc), bc
 
 
-def calc_limits(data, dist):
+def calc_limits(data, dist, padding=0.25):
     """Calculate a suitable range for a histogram
 
     Returns:
@@ -83,7 +84,7 @@ def calc_limits(data, dist):
     _min = min(min(data), dist.get('min', sys.float_info.max))
     _max = max(max(data), dist.get('max', sys.float_info.min))
 
-    padding = 0.25 * (_max - _min)
+    padding = padding * (_max - _min)
     return _min - padding, _max + padding
 
 
@@ -94,19 +95,20 @@ NEURITES_ = (ezy.TreeType.axon,
 
 # map feature names to functors that get us arrays of that
 # feature, for a given tree type
-GET_FEATURE = {
+GET_NEURITE_FEATURE = {
     'trunk_azimuth': lambda nrn, typ: [mt.trunk_azimuth(n, nrn.soma)
                                        for n in nrn.neurites if n.type == typ],
     'trunk_elevation': lambda nrn, typ: [mt.trunk_elevation(n, nrn.soma)
                                          for n in nrn.neurites if n.type == typ],
     'segment_length': lambda n, typ: n.get_segment_lengths(typ),
+    'section_length': lambda n, typ: n.get_section_lengths(typ),
 }
 
 # For now we use all the features in the map
-FEATURES = GET_FEATURE.keys()
+FEATURES = GET_NEURITE_FEATURE.keys()
 
 
-def load_neuron_features(filepath):
+def load_neurite_features(filepath):
     '''Unpack relevant data into megadict'''
     stuff = defaultdict(lambda: defaultdict(list))
     nrns = ezy.load_neurons(filepath)
@@ -115,18 +117,34 @@ def load_neuron_features(filepath):
         for t in NEURITES_:
             for feat in FEATURES:
                 stuff[feat][str(t).split('.')[1]].extend(
-                    GET_FEATURE[feat](nrn, t)
+                    GET_NEURITE_FEATURE[feat](nrn, t)
                 )
     return stuff
 
 Plot = namedtuple('Plot', 'fig, ax')
 
 
-def main(): # pylint: disable=too-many-locals
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(
+        description='Morphology feature plotter',
+        epilog='Note: Makes plots of various features and superimposes\
+        input distributions')
+
+    parser.add_argument('datapath',
+                        help='Morphology data directory path')
+
+    parser.add_argument('--mtypeconfig',
+                        help='Get mtype JSON configuration file')
+
+    return parser.parse_args()
+
+
+def main(data_dir, mtype_file): # pylint: disable=too-many-locals
     '''Run the stuff'''
     # data structure to store results
-    stuff = load_neuron_features('../morphsyn/Synthesizer/build/L23MC/')
-    sim_params = json.load(open('../morphsyn/Synthesizer/data/L23MC.json'))
+    stuff = load_neurite_features(data_dir)
+    sim_params = json.load(open(mtype_file))
 
     # load histograms, distribution parameter sets and figures into arrays.
     # To plot figures, do
@@ -164,4 +182,5 @@ def main(): # pylint: disable=too-many-locals
     return _plots
 
 if __name__ == '__main__':
-    plots = main()
+    args = parse_args()
+    plots = main(args.datapath, args.mtypeconfig)
