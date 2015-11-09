@@ -62,6 +62,7 @@ from neurom.analysis.morphtree import trunk_elevation
 from neurom.analysis.morphtree import trunk_azimuth
 from neurom.analysis.morphtree import partition
 from neurom.analysis.morphtree import get_bounding_box
+from neurom.analysis.morphtree import principal_direction_extent
 import math
 import numpy as np
 from itertools import izip
@@ -430,3 +431,7 @@ def test_branch_order():
     for sec in tr.isection(MOCK_TREE):
         nt.assert_equal(branch_order(sec),
                         branch_order_map[tuple(p for p in tr.val_iter(sec))])
+
+
+def test_principal_direction_extent(): pass
+
