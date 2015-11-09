@@ -252,7 +252,7 @@ def trunk_origin_radius(tree):
     return tree.value[COLS.R]
 
 
-def trunk_length(tree):
+def trunk_section_length(tree):
     '''Length of the initial tree section
 
     Returns:

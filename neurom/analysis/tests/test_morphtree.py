@@ -56,7 +56,7 @@ from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
 from neurom.analysis.morphtree import trunk_origin_radius
-from neurom.analysis.morphtree import trunk_length
+from neurom.analysis.morphtree import trunk_section_length
 from neurom.analysis.morphtree import trunk_direction
 from neurom.analysis.morphtree import trunk_elevation
 from neurom.analysis.morphtree import trunk_azimuth
@@ -352,16 +352,16 @@ def test_trunk_origin_radius():
     nt.assert_equal(trunk_origin_radius(t), 42.0)
 
 
-def test_trunk_length():
+def test_trunk_section_length():
     t = Tree((0, 0, 0, 42))
     tt = t.add_child(Tree((10, 0, 0, 4)))
     tt.add_child(Tree((10, 15, 0, 4)))
-    nt.assert_almost_equal(trunk_length(t), 25.0)
+    nt.assert_almost_equal(trunk_section_length(t), 25.0)
 
 
 def test_trunk_radius_length_point_tree():
     t = Tree((0, 0, 0, 42))
-    nt.assert_equal(trunk_length(t), 0.0)
+    nt.assert_equal(trunk_section_length(t), 0.0)
 
 
 def test_trunk_direction():
