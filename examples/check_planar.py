@@ -53,17 +53,19 @@ def pca(points):
     return np.linalg.eig(cov)
 
 
-def extent_of_tree(tree):
-    '''Calculate the extend of a tree, which is defined as the maximum distance
-        on the direction of minimum variance.
+def extent(tree):
+    '''Calculate the extent of a tree, that is the maximum distance between
+        the projections on the principal directions of the covariance matrix
+        of the x,y,z points of the nodes of the tree.
 
         Input
             tree : a tree object
 
-            tol : tolerance in microns
-
         Returns
-            extend : int
+
+            extents : the extents for each of the eigenvectors of the cov matrix
+            eigs : eigenvalues of the covariance matrix
+            eigv : respective eigenvectors of the covariance matrix
     '''
     # extract the x,y,z coordinates of all the points in the tree
     points = np.array([value[COLS.X: COLS.R]for value in val_iter(ipreorder(tree))])
@@ -74,39 +76,52 @@ def extent_of_tree(tree):
     # principal components
     eigs, eigv = pca(points.transpose())
 
-    # smallest component size
-    min_eigv = eigv[:, np.argmin(eigs)]
+    extent = np.zeros(3)
 
-    # orthogonal projection onto the direction of the smallest component
-    scalar_projs = np.sort(np.array([np.dot(p, min_eigv) for p in points]))
+    for i, v in enumerate(eigv):
 
-    extent = scalar_projs[-1]
+        # orthogonal projection onto the direction of the v component
+        scalar_projs = np.sort(np.array([np.dot(p, v) for p in points]))
 
-    if scalar_projs[0] < 0.:
-        extent -= scalar_projs[0]
+        extent[i] = scalar_projs[-1]
 
-    # the max distance mong the points on that direction
-    return extent
+        if scalar_projs[0] < 0.:
+            extent -= scalar_projs[0]
+
+    return extent, eigs, eigv
 
 
-def check_flat_neuron(neuron, tol=10):
-    '''Iterate over neurites and check for flatness given the tolerance. default tol = 10
+def is_flat(tree, tol, method='tolerance'):
+    '''Check if neurite is flat using the given method
 
         Input
 
-            neuron : neuron object
+            tree : the tree object
 
-            tol : tolerance in microns
+            tol : the tolerance
+
+            method : the method of flatness estimation.
+            'tolerance' returns true if any extent of the tree
+            is smaller than the given tolerance
+            'ratio' returns true if the ratio of the smallest directions
+            is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
+
+        Returns
+
+            True if it is flat
+
     '''
 
-    print '\nChecking for flat neurites. Tolerance : {0} microns \n'.format(tol)
+    ext, _, _ = extent(tree)
 
-    print 'Neurite Type \t\t\t Extend \t Flat'
+    # check if the ratio between the two smaller directions
+    # is smaller than the tol ratio
+    if method == 'ratio':
 
-    print '-' * 60
+        sorted_ext = np.sort(ext)
+        return sorted_ext[0] / sorted_ext[1] < float(tol)
 
-    for neurite in neuron.neurites:
+    # check if any of the extents is smaller than the tolerance
+    else:
 
-        extent = extent_of_tree(neurite)
-
-        print '{0:30}   {1:.02f} \t\t {2}'.format(neurite.type, extent, extent < float(tol))
+        return any(ext < float(tol))
