@@ -42,6 +42,7 @@ from neurom.analysis.morphmath import segment_area
 from neurom.analysis.morphmath import segment_radial_dist
 from neurom.analysis.morphmath import taper_rate
 from neurom.analysis.morphmath import segment_taper_rate
+from neurom.analysis.morphmath import pca
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -208,3 +209,27 @@ def test_segment_taper_rate():
     nt.assert_almost_equal(segment_taper_rate((p0, p1)), 6.0)
     nt.assert_almost_equal(segment_taper_rate((p0, p2)), 3.0)
     nt.assert_almost_equal(segment_taper_rate((p0, p3)), 2.0)
+
+def test_pca():
+
+    p = np.array([[4., 2., 0.6],
+                 [4.2, 2.1, 0.59],
+                 [3.9, 2.0, 0.58],
+                 [4.3, 2.1, 0.62], 
+                 [4.1, 2.2, 0.63]])
+
+    RES_COV = np.array([[0.025, 0.0075, 0.00175], 
+                        [0.0075, 0.0070, 0.00135], 
+                        [0.00175, 0.00135, 0.00043]])
+    
+    RES_EIGV = np.array([[ 0.93676841,  0.34958469, -0.0159843 ],
+                        [ 0.34148069, -0.92313136, -0.1766902 ],
+                        [ 0.0765238 , -0.16005947,  0.98413672]])
+
+    RES_EIGS = np.array([0.0278769, 0.00439387, 0.0001592])
+    eigs, eigv = pca(p)
+
+    nt.assert_true(np.allclose(eigs, RES_EIGS))
+    nt.assert_true(np.allclose(eigv[:,0], RES_EIGV[:,0]) or np.allclose(eigv[:, 0], -1. * RES_EIGV[:, 0]))
+    nt.assert_true(np.allclose(eigv[:,1], RES_EIGV[:,1]) or np.allclose(eigv[:, 1], -1. * RES_EIGV[:, 1]))
+    nt.assert_true(np.allclose(eigv[:,2], RES_EIGV[:,2]) or np.allclose(eigv[:, 2], -1. * RES_EIGV[:, 2]))

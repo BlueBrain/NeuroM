@@ -192,5 +192,17 @@ def segment_taper_rate(seg):
     return taper_rate(seg[0], seg[1])
 
 
+def pca(points):
+    '''
+    Estimate the principal components of the covariance on the given point cloud
+
+    Input
+        A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
+
+    Ouptut
+        Eigenvalues and respective eigenvectors
+    '''
+    return np.linalg.eig(np.cov(points.transpose()))
+
 # Useful alias for path_distance
 section_length = path_distance
