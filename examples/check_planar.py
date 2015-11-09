@@ -53,7 +53,7 @@ def pca(points):
     return np.linalg.eig(cov)
 
 
-def extent(tree):
+def get_extent(tree):
     '''Calculate the extent of a tree, that is the maximum distance between
         the projections on the principal directions of the covariance matrix
         of the x,y,z points of the nodes of the tree.
@@ -112,7 +112,7 @@ def is_flat(tree, tol, method='tolerance'):
 
     '''
 
-    ext, _, _ = extent(tree)
+    ext, _, _ = get_extent(tree)
 
     # check if the ratio between the two smaller directions
     # is smaller than the tol ratio
