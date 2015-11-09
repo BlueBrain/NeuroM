@@ -55,18 +55,3 @@ def is_monotonic(tree, tol):
                 return False
 
     return True
-
-
-def check_monotonicity(neuron, tol=1e-6):
-    '''Check if neuron's dendrites have monotonic diameters
-
-        Input
-            neuron : neuron object
-
-        tol
-            numerical precision
-    '''
-
-    for i, neurite in enumerate(neuron.neurites):
-
-        print '{0} {1:30} {2}'.format(i, neurite.type, is_monotonic(neurite, tol))
