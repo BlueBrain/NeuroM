@@ -59,7 +59,7 @@ from neurom.analysis.morphtree import trunk_origin_radius
 from neurom.analysis.morphtree import trunk_section_length
 from neurom.analysis.morphtree import trunk_origin_direction
 from neurom.analysis.morphtree import trunk_origin_elevation
-from neurom.analysis.morphtree import trunk_azimuth
+from neurom.analysis.morphtree import trunk_origin_azimuth
 from neurom.analysis.morphtree import partition
 from neurom.analysis.morphtree import get_bounding_box
 import math
@@ -386,20 +386,20 @@ def test_trunk_origin_elevation():
         nt.ok_(True)
 
 
-def test_trunk_azimuth():
+def test_trunk_origin_azimuth():
     t = Tree((0, 0, 0, 2))
     s = make_soma([[0, 0, 1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), -np.pi/2)
+    nt.assert_equal(trunk_origin_azimuth(t, s), -np.pi/2)
     s = make_soma([[0, 0, -1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi/2)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi/2)
     s = make_soma([[0, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    nt.assert_equal(trunk_origin_azimuth(t, s), 0.0)
     s = make_soma([[-1, 0, -1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi/4)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi/4)
     s = make_soma([[-1, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    nt.assert_equal(trunk_origin_azimuth(t, s), 0.0)
     s = make_soma([[1, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi)
 
 
 def test_partition():

@@ -288,7 +288,7 @@ def trunk_origin_elevation(tree, soma):
         raise ValueError("Norm of vector between soma center and tree is almost zero.")
 
 
-def trunk_azimuth(tree, soma):
+def trunk_origin_azimuth(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-z plane.
 
