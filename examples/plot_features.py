@@ -104,9 +104,9 @@ NEURITES_ = (ezy.TreeType.axon,
 # feature, for a given tree type
 GET_NEURITE_FEATURE = {
     'trunk_origin_azimuth': lambda nrn, typ: [mt.trunk_origin_azimuth(n, nrn.soma)
-                                       for n in nrn.neurites if n.type == typ],
+                                              for n in nrn.neurites if n.type == typ],
     'trunk_origin_elevation': lambda nrn, typ: [mt.trunk_origin_elevation(n, nrn.soma)
-                                         for n in nrn.neurites if n.type == typ],
+                                                for n in nrn.neurites if n.type == typ],
     'segment_length': lambda n, typ: n.get_segment_lengths(typ),
     'section_length': lambda n, typ: n.get_section_lengths(typ),
 }
