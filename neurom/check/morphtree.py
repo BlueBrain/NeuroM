@@ -29,3 +29,27 @@
 '''
 Python module of NeuroM to check neuronal trees.
 '''
+
+
+from neurom.core.tree import ipreorder
+from neurom.core.dataformat import COLS
+
+
+def is_monotonic(tree, tol):
+    '''Check if tree is monotonic, i.e. if each child has smaller or
+        equal diameters from its parent
+
+        Arguments:
+            tree : tree object
+            tol: numerical precision
+    '''
+
+    for node in ipreorder(tree):
+
+        if node.parent is not None:
+
+            if node.value[COLS.R] > node.parent.value[COLS.R] + tol:
+
+                return False
+
+    return True
