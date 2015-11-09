@@ -247,7 +247,7 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
-def trunk_radius(tree):
+def trunk_origin_radius(tree):
     '''Radius of the first point of a tree'''
     return tree.value[COLS.R]
 
