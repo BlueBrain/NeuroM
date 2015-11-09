@@ -71,3 +71,4 @@ def test_is_monotonic():
 	nt.assert_true(is_monotonic(equl_diams, 1e-6))
 	nt.assert_false(is_monotonic(incr_diams, 1e-6))
 
+def test_is_flat(): pass
