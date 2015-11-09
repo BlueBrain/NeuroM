@@ -271,7 +271,7 @@ def trunk_origin_direction(tree, soma):
     return mm.vector(tree.value, soma.center)
 
 
-def trunk_elevation(tree, soma):
+def trunk_origin_elevation(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-y half-plane.
 
