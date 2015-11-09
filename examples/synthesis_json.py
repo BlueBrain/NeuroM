@@ -61,7 +61,7 @@ FEATURE_MAP = {
     'radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
     'number': lambda n, kwargs: n.get_n_neurites(**kwargs),
     'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
-    'initial_radius': lambda n, kwargs: n.get_trunk_radii(**kwargs),
+    'initial_radius': lambda n, kwargs: n.get_trunk_origin_radii(**kwargs),
     'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
                                                                   **kwargs))),
 }
