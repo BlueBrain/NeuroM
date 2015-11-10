@@ -55,6 +55,12 @@ def _make_monotonic(neuron):
             if node.parent is not None:
                 node.value[COLS.R] = node.parent.value[COLS.R] / 2.
 
+def _make_flat(neuron):
+    for neurite in neuron.neurites:
+        for node in ipreorder(neurite):
+            if node.parent is not None:
+                node.value[COLS.Z] = 0.
+
 NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
                                           'Neuron_2_branch.h5',
                                           'Neuron.swc',
@@ -131,7 +137,17 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not check.has_basal_dendrite(n))
 
 
-def test_has_flat_neurites():pass
+def test_has_flat_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+
+    nt.assert_false(any(check.has_flat_neurites(n, 1e-6, method='tolerance')))
+    nt.assert_false(any(check.has_flat_neurites(n, 0.1, method='ratio')))
+
+    _make_flat(n)
+
+    nt.assert_true(all(check.has_flat_neurites(n, 1e-6, method='tolerance')))
+    nt.assert_true(all(check.has_flat_neurites(n, 0.1, method='ratio')))
 
 
 
