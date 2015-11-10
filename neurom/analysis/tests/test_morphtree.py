@@ -433,5 +433,23 @@ def test_branch_order():
                         branch_order_map[tuple(p for p in tr.val_iter(sec))])
 
 
-def test_principal_direction_extent(): pass
+def test_principal_direction_extent():
+
+    points = np.array([[-10., 0., 0.], 
+                        [-9., 0., 0.],
+                        [9., 0., 0.],
+                        [10., 0., 0.]])
+
+    tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
+    tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
+
+    extent = principal_direction_extent(tree)
+
+    nt.assert_true(np.allclose(extent, [20., 0., 0.]))
+
+
+
+
 
