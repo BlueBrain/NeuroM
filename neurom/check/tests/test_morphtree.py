@@ -27,4 +27,63 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neurom.check import morphtree
+from neurom.ezy import load_neuron
+from neurom.check.morphtree import is_monotonic
+from neurom.check.morphtree import is_flat
+from neurom.core.dataformat import COLS
+from neurom.core.tree import Tree
 from nose import tools as nt
+import numpy as np
+import os
+
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+SWC_PATH = os.path.join(DATA_PATH, 'swc')
+
+def _generate_tree(mode):
+
+	def fake_tree(prev_radius, mode):
+
+		if mode == 0:
+			radius = prev_radius/2.
+		elif mode == 1:
+			radius = prev_radius
+		else:
+			radius = prev_radius * 2.
+
+		return Tree(np.array([0., 0., 0., radius, 0., 0.]))
+
+	radius = 1.
+
+	tree = fake_tree(radius, mode)
+	tree.add_child(fake_tree(tree.value[COLS.R], mode))
+	tree.add_child(fake_tree(tree.value[COLS.R], mode))
+	tree.children[0].add_child(fake_tree(tree.children[0].value[COLS.R], mode))
+	tree.children[1].add_child(fake_tree(tree.children[1].value[COLS.R], mode))
+
+	return tree
+
+
+def test_is_monotonic():
+
+	# tree with decreasing radii
+	decr_diams = _generate_tree(0)
+
+	# tree with equal radii
+	equl_diams = _generate_tree(1)
+
+	# tree with increasing radii
+	incr_diams = _generate_tree(2)
+
+	nt.assert_true(is_monotonic(decr_diams, 1e-6))
+	nt.assert_true(is_monotonic(equl_diams, 1e-6))
+	nt.assert_false(is_monotonic(incr_diams, 1e-6))
+
+def test_is_flat():
+
+	neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
+
+	nt.assert_false(is_flat(neu_tree, 1e-6, method='tolerance'))
+	nt.assert_false(is_flat(neu_tree, 0.1, method='ratio'))
+
+

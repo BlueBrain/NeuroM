@@ -34,7 +34,9 @@ different iteration modes.
 from itertools import imap
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
+from neurom.core.tree import ipreorder
 import neurom.analysis.morphmath as mm
+from neurom.analysis.morphmath import pca
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 import numpy as np
@@ -335,3 +337,41 @@ def get_bounding_box(tree):
         max_xyz = np.maximum(p[:COLS.R], max_xyz)
 
     return np.array([min_xyz, max_xyz])
+
+
+def principal_direction_extent(tree):
+    '''Calculate the extent of a tree, that is the maximum distance between
+        the projections on the principal directions of the covariance matrix
+        of the x,y,z points of the nodes of the tree.
+
+        Input
+            tree : a tree object
+
+        Returns
+
+            extents : the extents for each of the eigenvectors of the cov matrix
+            eigs : eigenvalues of the covariance matrix
+            eigv : respective eigenvectors of the covariance matrix
+    '''
+    # extract the x,y,z coordinates of all the points in the tree
+    points = np.array([value[COLS.X: COLS.R]for value in val_iter(ipreorder(tree))])
+
+    # center the points around 0.0
+    points -= np.mean(points, axis=0)
+
+    # principal components
+    _, eigv = pca(points)
+
+    extent = np.zeros(3)
+
+    for i in range(eigv.shape[1]):
+
+        # orthogonal projection onto the direction of the v component
+        scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
+
+        extent[i] = scalar_projs[-1]
+
+        if scalar_projs[0] < 0.:
+            extent -= scalar_projs[0]
+
+    return extent

@@ -29,3 +29,61 @@
 '''
 Python module of NeuroM to check neuronal trees.
 '''
+
+import numpy as np
+from neurom.core.tree import ipreorder
+from neurom.core.dataformat import COLS
+from neurom.analysis.morphtree import principal_direction_extent
+
+
+def is_monotonic(tree, tol):
+    '''Check if tree is monotonic, i.e. if each child has smaller or
+        equal diameters from its parent
+
+        Arguments:
+            tree : tree object
+            tol: numerical precision
+    '''
+
+    for node in ipreorder(tree):
+
+        if node.parent is not None:
+
+            if node.value[COLS.R] > node.parent.value[COLS.R] + tol:
+
+                return False
+
+    return True
+
+
+def is_flat(tree, tol, method='tolerance'):
+    '''Check if neurite is flat using the given method
+
+        Input
+
+            tree : the tree object
+
+            tol : tolerance
+
+            method : the method of flatness estimation.
+            'tolerance' returns true if any extent of the tree
+            is smaller than the given tolerance
+            'ratio' returns true if the ratio of the smallest directions
+            is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
+
+        Returns
+
+            True if it is flat
+
+    '''
+
+    ext = principal_direction_extent(tree)
+
+    if method == 'ratio':
+
+        sorted_ext = np.sort(ext)
+        return sorted_ext[0] / sorted_ext[1] < float(tol)
+
+    else:
+
+        return any(ext < float(tol))
