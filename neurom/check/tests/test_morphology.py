@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from neurom.core.tree import ipreorder
 from neurom.io.utils import load_neuron
 from neurom.check import morphology as check
 from neurom.core.dataformat import ROOT_ID
@@ -46,6 +47,19 @@ def _load_neuron(name):
     elif name.endswith('.h5'):
         path = os.path.join(H5V1_PATH, name)
     return name, load_neuron(path)
+
+def _make_monotonic(neuron):
+    for neurite in neuron.neurites:
+        radius = 1.
+        for node in ipreorder(neurite):
+            if node.parent is not None:
+                node.value[COLS.R] = node.parent.value[COLS.R] / 2.
+
+def _make_flat(neuron):
+    for neurite in neuron.neurites:
+        for node in ipreorder(neurite):
+            if node.parent is not None:
+                node.value[COLS.Z] = 0.
 
 NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
                                           'Neuron_2_branch.h5',
@@ -121,6 +135,31 @@ def test_has_basal_dendrite_bad_data():
 
     for n in _pick(files):
         nt.ok_(not check.has_basal_dendrite(n))
+
+
+def test_has_flat_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+
+    nt.assert_false(any(check.has_flat_neurites(n, 1e-6, method='tolerance')))
+    nt.assert_false(any(check.has_flat_neurites(n, 0.1, method='ratio')))
+
+    _make_flat(n)
+
+    nt.assert_true(all(check.has_flat_neurites(n, 1e-6, method='tolerance')))
+    nt.assert_true(all(check.has_flat_neurites(n, 0.1, method='ratio')))
+
+
+
+def test_has_monotonic_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+
+    nt.assert_false(any(check.has_monotonic_neurites(n)))
+
+    _make_monotonic(n)
+
+    nt.assert_true(all(check.has_monotonic_neurites(n)))
 
 
 def test_nonzero_neurite_radii_good_data():
