@@ -35,6 +35,7 @@ from neurom.exceptions import SomaError
 from neurom.exceptions import NonConsecutiveIDsError
 import argparse
 import logging
+import yaml
 import os
 import sys
 
@@ -107,8 +108,7 @@ def parse_args():
     parser.add_argument('-l', '--log', dest='log_file',
                         default="", help="File to log to")
 
-    parser.add_argument('-c', '--color', action='store_true',
-                        help='Colorize the output')
+    parser.add_argument('-C', '--config', help='Configuration File')
 
     return parser.parse_args()
 
@@ -126,7 +126,7 @@ def log_msg(ok, msg, color=False):
           '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
 
-def test_file(f):
+def test_file(f, options):
     '''Run tests on a morphology file'''
 
     L.info('Check file %s...', f)
@@ -141,35 +141,35 @@ def test_file(f):
 
     result = True
 
-    ok = io_chk.has_axon(nrn)
-    result &= ok
-    log_msg(ok, 'Has Axon?')
+    for check in options['neuron_checks']:
 
-    ok = io_chk.has_apical_dendrite(nrn)
-    result &= ok
-    log_msg(ok, 'Has Apical Dendrite?')
+        out = getattr(io_chk, check)(nrn)
 
-    ok = io_chk.has_basal_dendrite(nrn)
-    result &= ok
-    log_msg(ok, 'Has Basal Dendrite?')
+        if check in ['nonzero_section_lengths',
+                     'nonzero_segment_lengths',
+                     'nonzero_neurite_radii']:
 
-    pts = io_chk.nonzero_neurite_radii(nrn)
-    result &= not pts
-    log_msg(not pts, 'All neurites have non-zero radius?')
-    if pts:
-        L.debug('%s points with zero radius detected: %s', len(pts), pts)
+            ok = not out
+            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
 
-    pts = io_chk.nonzero_segment_lengths(nrn)
-    result &= not pts
-    log_msg(not pts, 'All segments have non-zero length?')
-    if pts:
-        L.debug('%d segments with zero length detected: %s', len(pts), pts)
+            if out:
+                L.debug('%d sections with zero length detected: %s', len(out), out)
 
-    pts = io_chk.nonzero_section_lengths(nrn)
-    result &= not pts
-    log_msg(not pts, 'All sections have non-zero length?')
-    if pts:
-        L.debug('%d sections with zero length detected: %s', len(pts), pts)
+        elif check in ['has_monotonic_neurites', 'has_flat_neurites']:
+
+            ok = all(out)
+
+            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
+
+            if not all(out):
+                L.debug('%d out of %d neurites', sum(out), len(out))
+
+        else:
+
+            ok = out
+            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
+
+        result &= ok
 
     return result
 
@@ -179,11 +179,24 @@ if __name__ == '__main__':
     args = parse_args()
     _setup_logging(args.debug, args.log_file)
     data_path = args.datapath
+    yaml_path = args.config
     SEPARATOR = '=' * 40
 
-    if args.color:
+    config = {}
+
+    try:
+        with open(yaml_path, 'r') as stream:
+
+            config = yaml.load(stream)
+
+    except yaml.scanner.ScannerError as e:
+
+        L.error('Invalid yaml file : \n %s', str(e))
+        sys.exit(1)
+
+    if 'color' in config:
         import functools
-        log_msg = functools.partial(log_msg, color=True)
+        log_msg = functools.partial(log_msg, color=config['color'])
 
     if os.path.isfile(data_path):
         files = [data_path]
@@ -197,7 +210,7 @@ if __name__ == '__main__':
     for _f in files:
         L.info(SEPARATOR)
         try:
-            res = test_file(_f)
+            res = test_file(_f, config)
         except NonConsecutiveIDsError as e:
             print 'ERROR in file %s: %s' % (_f, e.message)
         except StandardError:
