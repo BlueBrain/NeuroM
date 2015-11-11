@@ -80,7 +80,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
     return types.count(TreeType.basal_dendrite) >= min_number
 
 
-def has_flat_neurites(neuron, tol, method='tolerance'):
+def has_flat_neurites(neuron, tol=0.1, method='tolerance'):
     '''Check if a neuron has neurites that are flat within a tolerance
 
     Argument:
