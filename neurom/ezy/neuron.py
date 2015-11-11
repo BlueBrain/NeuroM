@@ -44,8 +44,8 @@ from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
-from neurom.analysis.morphtree import trunk_radius
-from neurom.analysis.morphtree import trunk_length
+from neurom.analysis.morphtree import trunk_origin_radius
+from neurom.analysis.morphtree import trunk_section_length
 import math
 import numpy as np
 
@@ -215,17 +215,17 @@ class Neuron(CoreNeuron):
         return sum(1 for n in self.neurites
                    if checkTreeType(neurite_type, n.type))
 
-    def get_trunk_radii(self, neurite_type=TreeType.all):
-        '''Get the trunk radii of a given type in a neuron'''
+    def get_trunk_origin_radii(self, neurite_type=TreeType.all):
+        '''Get the trunk origin radii of a given type in a neuron'''
         return self._iterable_type(
-            [trunk_radius(t) for t in self.neurites
+            [trunk_origin_radius(t) for t in self.neurites
              if checkTreeType(neurite_type, t.type)]
         )
 
-    def get_trunk_lengths(self, neurite_type=TreeType.all):
-        '''Get the trunk lengths of a given type in a neuron'''
+    def get_trunk_section_lengths(self, neurite_type=TreeType.all):
+        '''Get the trunk section lengths of a given type in a neuron'''
         return self._iterable_type(
-            [trunk_length(t) for t in self.neurites
+            [trunk_section_length(t) for t in self.neurites
              if checkTreeType(neurite_type, t.type)]
         )
 
