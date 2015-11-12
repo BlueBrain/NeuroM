@@ -62,8 +62,5 @@ options :
     nonzero_segment_lengths : 0.007
     nonzero_section_lengths : 0.007
 
-    # tolerance
-    has_monotonic_neurites  : 1e-6
-
     # tolerance/ratio, method
     has_flat_neurites       : [0.1, 'ratio']
