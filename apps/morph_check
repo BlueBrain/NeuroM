@@ -126,7 +126,7 @@ def log_msg(ok, msg, color=False):
           '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
 
-def test_file(f, config):
+def test_file(f):
     '''Run tests on a morphology file'''
 
     L.info('Check file %s...', f)
@@ -145,11 +145,12 @@ def test_file(f, config):
 
         if check in config['options']:
 
-            args = config['options'][check]
-            if isinstance(args, list):
-                out = getattr(io_chk, check)(nrn, *args)
+            fargs = config['options'][check]
+
+            if isinstance(fargs, list):
+                out = getattr(io_chk, check)(nrn, *fargs)
             else:
-                out = getattr(io_chk, check)(nrn, args)
+                out = getattr(io_chk, check)(nrn, fargs)
 
         else:
 
@@ -220,9 +221,8 @@ if __name__ == '__main__':
 
     for _f in files:
         L.info(SEPARATOR)
-        res = test_file(_f, config)
-        try:pass
-            
+        try:
+            res = test_file(_f)
         except NonConsecutiveIDsError as e:
             print 'ERROR in file %s: %s' % (_f, e.message)
         except StandardError:
