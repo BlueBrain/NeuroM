@@ -55,11 +55,11 @@ from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import n_segments
 from neurom.analysis.morphtree import n_bifurcations
 from neurom.analysis.morphtree import n_terminations
-from neurom.analysis.morphtree import trunk_radius
-from neurom.analysis.morphtree import trunk_length
-from neurom.analysis.morphtree import trunk_direction
-from neurom.analysis.morphtree import trunk_elevation
-from neurom.analysis.morphtree import trunk_azimuth
+from neurom.analysis.morphtree import trunk_origin_radius
+from neurom.analysis.morphtree import trunk_section_length
+from neurom.analysis.morphtree import trunk_origin_direction
+from neurom.analysis.morphtree import trunk_origin_elevation
+from neurom.analysis.morphtree import trunk_origin_azimuth
 from neurom.analysis.morphtree import partition
 from neurom.analysis.morphtree import get_bounding_box
 from neurom.analysis.morphtree import principal_direction_extent
@@ -347,60 +347,60 @@ def test_n_terminations():
     nt.ok_(n_terminations(tree0) == 11)
 
 
-def test_trunk_radius():
+def test_trunk_origin_radius():
     t = Tree((0, 0, 0, 42))
     t.add_child(Tree((1, 0, 0, 4)))
-    nt.assert_equal(trunk_radius(t), 42.0)
+    nt.assert_equal(trunk_origin_radius(t), 42.0)
 
 
-def test_trunk_length():
+def test_trunk_section_length():
     t = Tree((0, 0, 0, 42))
     tt = t.add_child(Tree((10, 0, 0, 4)))
     tt.add_child(Tree((10, 15, 0, 4)))
-    nt.assert_almost_equal(trunk_length(t), 25.0)
+    nt.assert_almost_equal(trunk_section_length(t), 25.0)
 
 
 def test_trunk_radius_length_point_tree():
     t = Tree((0, 0, 0, 42))
-    nt.assert_equal(trunk_length(t), 0.0)
+    nt.assert_equal(trunk_section_length(t), 0.0)
 
 
-def test_trunk_direction():
+def test_trunk_origin_direction():
     t = Tree((1, 0, 0, 2))
     s = make_soma([[0, 0, 0, 4]])
-    nt.ok_(np.allclose(trunk_direction(t, s), np.array([1, 0, 0])))
+    nt.ok_(np.allclose(trunk_origin_direction(t, s), np.array([1, 0, 0])))
 
 
-def test_trunk_elevation():
+def test_trunk_origin_elevation():
     t = Tree((1, 0, 0, 2))
     s = make_soma([[0, 0, 0, 4]])
-    nt.assert_equal(trunk_elevation(t, s), 0.0)
+    nt.assert_equal(trunk_origin_elevation(t, s), 0.0)
     t = Tree((0, 1, 0, 2))
-    nt.assert_equal(trunk_elevation(t, s),  np.pi/2)
+    nt.assert_equal(trunk_origin_elevation(t, s),  np.pi/2)
     t = Tree((0, -1, 0, 2))
-    nt.assert_equal(trunk_elevation(t, s),  -np.pi/2)
+    nt.assert_equal(trunk_origin_elevation(t, s),  -np.pi/2)
     t = Tree((0, 0, 0, 2))
     try:
-        trunk_elevation(t, s)
+        trunk_origin_elevation(t, s)
         nt.ok_(False)
     except ValueError:
         nt.ok_(True)
 
 
-def test_trunk_azimuth():
+def test_trunk_origin_azimuth():
     t = Tree((0, 0, 0, 2))
     s = make_soma([[0, 0, 1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), -np.pi/2)
+    nt.assert_equal(trunk_origin_azimuth(t, s), -np.pi/2)
     s = make_soma([[0, 0, -1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi/2)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi/2)
     s = make_soma([[0, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    nt.assert_equal(trunk_origin_azimuth(t, s), 0.0)
     s = make_soma([[-1, 0, -1, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi/4)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi/4)
     s = make_soma([[-1, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), 0.0)
+    nt.assert_equal(trunk_origin_azimuth(t, s), 0.0)
     s = make_soma([[1, 0, 0, 4]])
-    nt.assert_equal(trunk_azimuth(t, s), np.pi)
+    nt.assert_equal(trunk_origin_azimuth(t, s), np.pi)
 
 
 def test_partition():
