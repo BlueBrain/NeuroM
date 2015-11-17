@@ -90,6 +90,14 @@ def test_unpack_h2():
     nt.assert_true(np.all(grp1 == grp2))
 
 
+def test_consistency_between_v1_v2():
+    v1_data = readers.RawDataWrapper(readers.H5.read_v1(
+            os.path.join(H5V1_PATH, 'Neuron.h5')))
+    v2_data = readers.RawDataWrapper(readers.H5.read_v2(
+            os.path.join(H5V2_PATH, 'Neuron.h5')))
+    nt.ok_(np.allclose(v1_data.data_block, v1_data.data_block))
+    nt.ok_(v1_data.adj_list == v2_data.adj_list)
+
 class DataWrapper_Neuron(object):
     '''Base class for H5 tests'''
 
