@@ -89,7 +89,7 @@ class H5(object):
     def read_v2(filename, stage='raw'):
         '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
         points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
-        data = H5.unpack_data(points, groups)
+        data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V2'
 
@@ -145,6 +145,42 @@ class H5(object):
                           find_group(i)[H5V1.GTYPE], i,
                           find_parent_id(i))
                          for i, p in enumerate(points)])
+
+    @staticmethod
+    def remove_duplicate_points(points, groups):
+        ''' Removes the duplicate points
+            from the beginning of a section,
+            if they are present in points-groups representation.
+            Returns points, groups with unique points.
+        '''
+        def _find_last_point(group_id, groups, points):
+            ''' Identifies and returns the id of the last point of a group'''
+            group_initial_ids = np.sort(np.transpose(groups)[0])
+
+            if group_id != len(group_initial_ids) - 1:
+                return group_initial_ids[np.where(group_initial_ids ==
+                                                  groups[group_id][0])[0][0] + 1] - 1
+            else:
+                return len(points) - 1
+
+        to_be_reduced = np.zeros(len(groups))
+        to_be_removed = []
+
+        for ig, g in enumerate(groups):
+            if g[2] != -1 and np.allclose(points[g[0]],
+                                          points[_find_last_point(g[2], groups, points)]):
+                # Remove duplicate from list of points
+                to_be_removed.append(g[0])
+                # Reduce the id of the following sections
+                # in groups structure by one
+                for igg in range(ig + 1, len(groups)):
+                    to_be_reduced[igg] = to_be_reduced[igg] + 1
+
+        groups = np.array([np.subtract(i, [j, 0, 0])
+                           for i, j in zip(groups, to_be_reduced)])
+        points = np.delete(points, to_be_removed, axis=0)
+
+        return points, groups
 
 
 def _unpack_v1(h5file):
