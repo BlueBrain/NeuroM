@@ -29,7 +29,7 @@
 
 ''' Copy function for trees
 '''
-
+from copy import copy
 from neurom.core.tree import Tree
 
 
@@ -41,7 +41,7 @@ def make_copy(tree):
 
     Returns : copied tree object
     '''
-    copy_head = Tree(tree.value)
+    copy_head = Tree(copy(tree.value))
 
     orig_children = [tree, ]
     copy_children = [copy_head, ]
@@ -53,7 +53,7 @@ def make_copy(tree):
 
         for c in orig_current_node.children:
 
-            copy_child = Tree(c.value)
+            copy_child = Tree(copy(c.value))
 
             copy_current_node.add_child(copy_child)
 
