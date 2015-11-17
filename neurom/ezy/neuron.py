@@ -308,7 +308,7 @@ class Neuron(CoreNeuron):
         '''Create an iterable from an iterator'''
         return self._iterable_type([i for i in iterator])
 
-    def _compare_neurites(self, other, neurite_type):
+    def _compare_neurites(self, other, neurite_type, comp_function=compare_trees):
         '''
         Find the identical pair of neurites of determined type if existent.
 
@@ -324,7 +324,7 @@ class Neuron(CoreNeuron):
             return True if len(neurites1) == 0 and len(neurites2) == 0 else \
                    len(neurites1) - sum(1 for neu1, neu2 in
                                         product(neurites1, neurites2)
-                                        if compare_trees(neu1, neu2)) == 0
+                                        if comp_function(neu1, neu2)) == 0
         else:
 
             return False
