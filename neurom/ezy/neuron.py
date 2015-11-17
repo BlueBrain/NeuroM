@@ -46,6 +46,7 @@ from neurom.analysis.morphtree import i_section_path_length
 from neurom.analysis.morphtree import n_sections
 from neurom.analysis.morphtree import trunk_origin_radius
 from neurom.analysis.morphtree import trunk_section_length
+from neurom.analysis.morphtree import compare_trees
 import math
 import numpy as np
 
@@ -322,7 +323,8 @@ class Neuron(CoreNeuron):
 
             return True if len(neurites1) == 0 and len(neurites2) == 0 else \
                    len(neurites1) - sum(1 for neu1, neu2 in
-                                        product(neurites1, neurites2) if neu1 == neu2) == 0
+                                        product(neurites1, neurites2)
+                                        if compare_trees(neu1, neu2)) == 0
         else:
 
             return False

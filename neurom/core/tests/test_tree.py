@@ -65,39 +65,10 @@ T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
 T11113 = T1111.add_child(Tree(11113))
 
-REF_TREE3 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
-REF_TREE3.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
-REF_TREE3.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
-REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
-REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
-REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
-REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
-
-REF_TREE4 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
-REF_TREE4.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
-REF_TREE4.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.]))) # swapped child addition
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
-
-REF_TREE5 = deepcopy(REF_TREE3)
-REF_TREE5.add_child(Tree('222222'))
-
 def test_str():
     t = Tree('hello')
     nt.ok_(str(t))
 
-def test_eq():
-    nt.assert_true(REF_TREE3 == REF_TREE3)
-    nt.assert_true(REF_TREE3 == REF_TREE4)
-    nt.assert_false(REF_TREE3 == REF_TREE5)
 
 def test_instantiate_tree():
     t = Tree('hello')
