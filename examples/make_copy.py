@@ -61,3 +61,33 @@ def make_copy(tree):
             copy_children.append(copy_child)
 
     return copy_head
+
+if __name__ == "__main__":
+
+    import nose.tools as nt
+    from neurom.ezy import load_neuron
+    from neurom.analysis.morphtree import compare_trees
+
+    def test_make_copy():
+
+        n = load_neuron('test_data/valid_set/Neuron.swc').neurites[0]
+
+        m = make_copy(n)
+
+        # first check if they are identical
+
+        nt.assert_true(compare_trees(n, m))
+
+        # check if they refer to the same value
+
+        n.children[0].value[1] = - 5000.
+
+        nt.assert_false(compare_trees(n, m))
+
+        n.value[0] = -10000.
+
+        nt.assert_false(n.value[0] == m.value[0])
+
+    print "Running Test"
+    test_make_copy()
+    print "Finished"
