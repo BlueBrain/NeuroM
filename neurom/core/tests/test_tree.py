@@ -393,7 +393,20 @@ def test_make_copy():
 
         nt.assert_true(all(val1 == val2))
 
-    # assert that the tree values doe not have the same identity
+    # assert that the tree values do not have the same identity
     for val1, val2 in izip(val_iter(ipreorder(tree_copy)), val_iter(ipreorder(REF_TREE3))):
 
         nt.assert_false(val1 is val2)
+
+    # create a deepcopy of the original tree for validation
+    validation_tree = deepcopy(REF_TREE3)
+
+    # modify copied tree
+    tree_copy.value[0:3] = np.array([1000.,1000.,-1000.])
+    tree_copy.children[0].add_child(Tree(np.array([0., 0., 0., 1., 1., 1., 1.])))
+
+    # check if anything changed in REF_TREE3 with respect to the validation deepcopy
+    nt.assert_true(len(list(ipreorder(validation_tree))) == len(list(ipreorder(REF_TREE3))))
+    for val1, val2 in izip(val_iter(ipreorder(REF_TREE3)), val_iter(ipreorder(validation_tree))):
+
+        nt.assert_true(all(val1 == val2))
