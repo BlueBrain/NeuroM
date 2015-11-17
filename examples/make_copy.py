@@ -69,6 +69,8 @@ if __name__ == "__main__":
     from neurom.analysis.morphtree import compare_trees
 
     def test_make_copy():
+        '''test make_copy
+        '''
 
         n = load_neuron('test_data/valid_set/Neuron.swc').neurites[0]
 
