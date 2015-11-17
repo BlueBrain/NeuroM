@@ -250,7 +250,8 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
 
 def make_copy(tree):
     '''
-    Copy a tree structure
+    Copies a tree structure. A new tree is generated with the copied values
+    and node structure as the input one and is returned.
 
     Input : tree object
 
