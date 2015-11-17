@@ -28,6 +28,7 @@
 
 '''Generic tree class and iteration functions'''
 from itertools import chain, imap, ifilter, repeat
+from copy import copy
 
 
 class Tree(object):
@@ -245,3 +246,33 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
 
     chain_it = chain(*imap(iterator_type, nrt))
     return chain_it if mapping is None else imap_val(mapping, chain_it)
+
+
+def make_copy(tree):
+    '''
+    Copy a tree structure
+
+    Input : tree object
+
+    Returns : copied tree object
+    '''
+    copy_head = Tree(copy(tree.value))
+
+    orig_children = [tree, ]
+    copy_children = [copy_head, ]
+
+    while orig_children:
+
+        orig_current_node = orig_children.pop()
+        copy_current_node = copy_children.pop()
+
+        for c in orig_current_node.children:
+
+            copy_child = Tree(copy(c.value))
+
+            copy_current_node.add_child(copy_child)
+
+            orig_children.append(c)
+            copy_children.append(copy_child)
+
+    return copy_head

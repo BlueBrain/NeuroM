@@ -46,7 +46,9 @@ from neurom.core.tree import ibifurcation_point
 from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from neurom.core.tree import i_branch_end_points
+from neurom.core.tree import make_copy
 from copy import deepcopy
+from itertools import izip
 
 REF_TREE = Tree(0)
 REF_TREE.add_child(Tree(11))
@@ -64,6 +66,17 @@ T1111 = REF_TREE2.children[0].children[0].add_child(Tree(1111))
 T11111 = T1111.add_child(Tree(11111))
 T11112 = T1111.add_child(Tree(11112))
 T11113 = T1111.add_child(Tree(11113))
+
+REF_TREE3 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
+REF_TREE3.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
+REF_TREE3.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
+REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
+REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
+REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
+REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
 
 def test_str():
     t = Tree('hello')
@@ -364,3 +377,23 @@ def test_branch_end_points():
 
     nt.assert_equal(_build_tuple(REF_TREE2.children[0].children[0].children[0]),
                     (11111, 11112, 11113))
+
+
+def test_make_copy():
+
+    tree_copy = make_copy(REF_TREE3)
+
+    # assert that the two trees have the same values
+
+    # first by total nodes
+    nt.assert_true(len(list(ipreorder(tree_copy))) == len(list(ipreorder(REF_TREE3))))
+
+    # then node by node
+    for val1, val2 in izip(val_iter(ipreorder(tree_copy)), val_iter(ipreorder(REF_TREE3))):
+
+        nt.assert_true(all(val1 == val2))
+
+    # assert that the tree values doe not have the same identity
+    for val1, val2 in izip(val_iter(ipreorder(tree_copy)), val_iter(ipreorder(REF_TREE3))):
+
+        nt.assert_false(val1 is val2)
