@@ -27,15 +27,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Copy
+''' Copy function for trees
 '''
 
-from neurom.core.tree import ipreorder, Tree
-from itertools import izip
+from neurom.core.tree import Tree
 
 
 def make_copy(tree):
+    '''
+    Copy a tree structure
 
+    Input : tree object
+
+    Returns : copied tree object
+    '''
     copy_head = Tree(tree.value)
 
     orig_children = [tree, ]
@@ -56,10 +61,3 @@ def make_copy(tree):
             copy_children.append(copy_child)
 
     return copy_head
-
-
-
-
-
-
-
