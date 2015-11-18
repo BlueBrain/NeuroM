@@ -60,7 +60,16 @@ def _affineTransform(A, t, tree, origin=np.array([0., 0., 0.])):
 
 def translate(tree, t):
     '''
-    translation
+    Translate the tree by t
+
+    Input :
+
+        tree : tree object
+        t : 3x1 translation vector
+
+    Returns:
+
+        A copy of the tree with the applied translation.
     '''
     # no rotation -> identity matrix
     R = np.identity(3)
@@ -111,25 +120,24 @@ def rodriguezToRotationMatrix(axis, angle):
     return R
 
 
-def rotate(tree, axis, angle, origin=np.array([0., 0., 0.])):
+def rotate(tree, axis, angle):
     '''
     Rotation around unit vector following the right hand rule
+
+    Input:
+
+        tree : object tree
+        axis : unit vector for the axis of rotation
+        angle : rotation angle in rads
+
+    Returns:
+
+        A copy of the tree with the applied translation.
     '''
 
     R = rodriguezToRotationMatrix(axis, angle)
 
-    return _affineTransform(R, np.zeros(3), tree, origin=origin)
-
-
-def debug_rodriguezToRotationMatrix(axis, angle):
-        ''' Rodriguez formula
-        '''
-        I3 = np.identity(3)
-        cs = np.cos(angle)
-
-        R = cs * I3 + np.sin(angle) * np.cross(I3, axis) + (1. - cs) * np.outer(axis, axis)
-
-        return R
+    return _affineTransform(R, np.zeros(3), tree, origin=np.zeros(3))
 
 
 if __name__ == "__main__":
@@ -140,22 +148,55 @@ if __name__ == "__main__":
 
     n = ezy.load_neuron('test_data/valid_set/Neuron.swc').neurites[0]
 
+    # unit vector of rotation axis
+    u_vec = np.array([0.01856633, 0.37132666, 0.92831665])
 
-    def test_affineTransform():pass
+    r_angle = np.pi / 3.
+
     def test_rotate():
+        '''test_rotate'''
+        m = rotate(n, u_vec, r_angle)
 
-        axis = np.array([-0.625,  1.25 ,  0.375])
+        # rotation matrix inverse equals its transpose
 
-        angle = np.pi / 3.
+        R = rodriguezToRotationMatrix(u_vec, r_angle)
+
+        Rinv = R.transpose()
+
+        # check that if the inverse rotation on the rotated result returns
+        # the initial coordinates
+        for v1, v2 in izip(val_iter(ipreorder(n)), val_iter(ipreorder(m))):
+
+            nt.assert_true(np.allclose(np.dot(Rinv, v2[:COLS.R]), v1[:COLS.R]))
 
     def test_translate():
-        t = np.array([-1.,20.,1000.])
+        '''test_transalte'''
+        t = np.array([-1., 20., 1000.])
         m = translate(n, t)
 
         for v1, v2 in izip(val_iter(ipreorder(n)), val_iter(ipreorder(m))):
             nt.assert_true(np.allclose(v2[:COLS.R] - v1[:COLS.R], t))
-    
-    def test_rodriguezToRotationMatrix():pass
 
+    def test_rodriguezToRotationMatrix():
+        '''test_rod'''
 
+        RES = np.array([[0.50017235, -0.80049871, 0.33019604],
+                        [0.80739289, 0.56894174, 0.15627544],
+                        [-0.3129606, 0.18843328, 0.9308859]])
+
+        R = rodriguezToRotationMatrix(u_vec, r_angle)
+
+        # assess rotation matrix properties:
+
+        # detR = +=1
+        nt.assert_almost_equal(np.linalg.det(R), 1.)
+
+        # R.T = R^-1
+        nt.assert_true(np.allclose(np.linalg.inv(R), R.transpose()))
+
+        # check againt calculated matrix
+        nt.assert_true(np.allclose(R, RES))
+
+    test_rodriguezToRotationMatrix()
+    test_rotate()
     test_translate()
