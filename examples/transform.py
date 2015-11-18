@@ -32,39 +32,57 @@ import numpy as np
 from neurom.core.tree import make_copy, ipreorder, val_iter
 from neurom.core.dataformat import COLS
 
-def _affineTransform(T, tree, origin=np.array([0.,0.,0.])):
 
-    # the 3x3 Rotation matrix in the
-    # 4x4 affine transform matrix T 
-    R = T[0:3,0:3]
-    t = T[0:3, 3]
+def _affineTransform(A, t, tree, origin=np.array([0., 0., 0.])):
+    '''
+    Apply an affine transform on your tree by applying a linear
+    transform A (e.g. rotation) and a non-linear transform t (translation)
 
+    Input:
+
+        A : 3x3 transformation matrix
+        t : 3x1 translation array
+        tree : tree object
+        origin : the point with respect of which the rotation is applied
+
+    Returns:
+
+        A copy of the tree with the affine transform. Original tree is left
+        unchanged
+    '''
     res_tree = make_copy(tree)
 
     for v in val_iter(ipreorder(res_tree)):
-
-        v[:COLS.R] = np.dot(R, v[:COLS.R]) + t
+        v[:COLS.R] = np.dot(A, v[:COLS.R] - origin) + t + origin
 
     return res_tree
 
+
 def translate(tree, t):
-
-    T = np.zeros([4,4])
-
+    '''
+    translation
+    '''
     # no rotation -> identity matrix
-    T[0:3, 0:3] = np.identity(3)
+    R = np.identity(3)
 
-    # translation
-    T[0:3, 3] = t
+    return _affineTransform(R, t, tree)
 
-    return _affineTransform(T, tree)
 
 def rodriguezToRotationMatrix(axis, angle):
+    '''
+    Generates transformation matrix from unit vector
+    and rotation angle. The rotation is applied in the direction
+    of the axis which is a unit vector following the right hand rule.
 
+    Inputs :
+
+        axis : unit vector of the direction of the rotation
+        angle : angle of rotation in rads
+
+    Returns : 3x3 Rotation matrix
+    '''
     ux, uy, uz = axis
 
-    R = np.zeros([3,3])
-    
     uxx = ux * ux
     uyy = uy * uy
     uzz = uz * uz
@@ -75,6 +93,8 @@ def rodriguezToRotationMatrix(axis, angle):
     sn = np.sin(angle)
     cs = np.cos(angle)
     cs1 = 1. - cs
+
+    R = np.zeros([3, 3])
 
     R[0, 0] = cs + uxx * cs1
     R[0, 1] = uxy * cs1 - uz * sn
@@ -92,12 +112,13 @@ def rodriguezToRotationMatrix(axis, angle):
 
 
 def rotate(tree, axis, angle, origin=np.array([0., 0., 0.])):
+    '''
+    Rotation around unit vector following the right hand rule
+    '''
 
-    T = np.zeros([4,4])
+    R = rodriguezToRotationMatrix(axis, angle)
 
-    T[0:3,0:3] = rodriguezToRotationMatrix(axis, angle)
-
-    return _affineTransform(T, tree)
+    return _affineTransform(R, np.zeros(3), tree, origin=origin)
 
 
 def debug_rodriguezToRotationMatrix(axis, angle):
@@ -106,6 +127,35 @@ def debug_rodriguezToRotationMatrix(axis, angle):
         I3 = np.identity(3)
         cs = np.cos(angle)
 
-        R = cs * I3 +  np.sin(angle) * np.cross(I3, axis) + (1. - cs) * np.outer(axis, axis)
+        R = cs * I3 + np.sin(angle) * np.cross(I3, axis) + (1. - cs) * np.outer(axis, axis)
 
         return R
+
+
+if __name__ == "__main__":
+
+    from neurom import ezy
+    from nose import tools as nt
+    from itertools import izip
+
+    n = ezy.load_neuron('test_data/valid_set/Neuron.swc').neurites[0]
+
+
+    def test_affineTransform():pass
+    def test_rotate():
+
+        axis = np.array([-0.625,  1.25 ,  0.375])
+
+        angle = np.pi / 3.
+
+    def test_translate():
+        t = np.array([-1.,20.,1000.])
+        m = translate(n, t)
+
+        for v1, v2 in izip(val_iter(ipreorder(n)), val_iter(ipreorder(m))):
+            nt.assert_true(np.allclose(v2[:COLS.R] - v1[:COLS.R], t))
+    
+    def test_rodriguezToRotationMatrix():pass
+
+
+    test_translate()
