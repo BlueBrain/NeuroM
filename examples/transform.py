@@ -75,7 +75,7 @@ def translate(tree, t):
     return _affineTransform(np.identity(3), t, tree)
 
 
-def rodriguezToRotationMatrix(axis, angle):
+def rodriguesToRotationMatrix(axis, angle):
     '''
     Generates transformation matrix from unit vector
     and rotation angle. The rotation is applied in the direction
@@ -133,7 +133,7 @@ def rotate(tree, axis, angle):
         A copy of the tree with the applied translation.
     '''
 
-    R = rodriguezToRotationMatrix(axis, angle)
+    R = rodriguesToRotationMatrix(axis, angle)
     return _affineTransform(R, np.zeros(3), tree, origin=np.zeros(3))
 
 
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
         # rotation matrix inverse equals its transpose
 
-        R = rodriguezToRotationMatrix(u_vec, r_angle)
+        R = rodriguesToRotationMatrix(u_vec, r_angle)
 
         Rinv = R.transpose()
 
@@ -174,14 +174,14 @@ if __name__ == "__main__":
         for v1, v2 in izip(val_iter(ipreorder(n)), val_iter(ipreorder(m))):
             nt.assert_true(np.allclose(v2[:COLS.R] - v1[:COLS.R], t))
 
-    def test_rodriguezToRotationMatrix():
+    def test_rodriguesToRotationMatrix():
         '''test_rod'''
 
         RES = np.array([[0.50017235, -0.80049871, 0.33019604],
                         [0.80739289, 0.56894174, 0.15627544],
                         [-0.3129606, 0.18843328, 0.9308859]])
 
-        R = rodriguezToRotationMatrix(u_vec, r_angle)
+        R = rodriguesToRotationMatrix(u_vec, r_angle)
 
         # assess rotation matrix properties:
 
@@ -194,6 +194,6 @@ if __name__ == "__main__":
         # check againt calculated matrix
         nt.assert_true(np.allclose(R, RES))
 
-    test_rodriguezToRotationMatrix()
+    test_rodriguesToRotationMatrix()
     test_rotate()
     test_translate()
