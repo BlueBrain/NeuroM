@@ -72,9 +72,7 @@ def translate(tree, t):
         A copy of the tree with the applied translation.
     '''
     # no rotation -> identity matrix
-    R = np.identity(3)
-
-    return _affineTransform(R, t, tree)
+    return _affineTransform(np.identity(3), t, tree)
 
 
 def rodriguezToRotationMatrix(axis, angle):
@@ -136,7 +134,6 @@ def rotate(tree, axis, angle):
     '''
 
     R = rodriguezToRotationMatrix(axis, angle)
-
     return _affineTransform(R, np.zeros(3), tree, origin=np.zeros(3))
 
 
