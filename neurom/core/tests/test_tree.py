@@ -46,7 +46,9 @@ from neurom.core.tree import ibifurcation_point
 from neurom.core.tree import isection
 from neurom.core.tree import val_iter
 from neurom.core.tree import i_branch_end_points
+from neurom.core.tree import make_copy
 from copy import deepcopy
+from itertools import izip
 
 REF_TREE = Tree(0)
 REF_TREE.add_child(Tree(11))
@@ -76,28 +78,10 @@ REF_TREE3.children[1].children[0].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.]
 REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
 REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
 
-REF_TREE4 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
-REF_TREE4.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
-REF_TREE4.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.]))) # swapped child addition
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
-
-REF_TREE5 = deepcopy(REF_TREE3)
-REF_TREE5.add_child(Tree('222222'))
-
 def test_str():
     t = Tree('hello')
     nt.ok_(str(t))
 
-def test_eq():
-    nt.assert_true(REF_TREE3 == REF_TREE3)
-    nt.assert_true(REF_TREE3 == REF_TREE4)
-    nt.assert_false(REF_TREE3 == REF_TREE5)
 
 def test_instantiate_tree():
     t = Tree('hello')
@@ -393,3 +377,36 @@ def test_branch_end_points():
 
     nt.assert_equal(_build_tuple(REF_TREE2.children[0].children[0].children[0]),
                     (11111, 11112, 11113))
+
+
+def test_make_copy():
+
+    tree_copy = make_copy(REF_TREE3)
+
+    # assert that the two trees have the same values
+
+    # first by total nodes
+    nt.assert_true(len(list(ipreorder(tree_copy))) == len(list(ipreorder(REF_TREE3))))
+
+    # then node by node
+    for val1, val2 in izip(val_iter(ipreorder(tree_copy)), val_iter(ipreorder(REF_TREE3))):
+
+        nt.assert_true(all(val1 == val2))
+
+    # assert that the tree values do not have the same identity
+    for val1, val2 in izip(val_iter(ipreorder(tree_copy)), val_iter(ipreorder(REF_TREE3))):
+
+        nt.assert_false(val1 is val2)
+
+    # create a deepcopy of the original tree for validation
+    validation_tree = deepcopy(REF_TREE3)
+
+    # modify copied tree
+    tree_copy.value[0:3] = np.array([1000.,1000.,-1000.])
+    tree_copy.children[0].add_child(Tree(np.array([0., 0., 0., 1., 1., 1., 1.])))
+
+    # check if anything changed in REF_TREE3 with respect to the validation deepcopy
+    nt.assert_true(len(list(ipreorder(validation_tree))) == len(list(ipreorder(REF_TREE3))))
+    for val1, val2 in izip(val_iter(ipreorder(REF_TREE3)), val_iter(ipreorder(validation_tree))):
+
+        nt.assert_true(all(val1 == val2))

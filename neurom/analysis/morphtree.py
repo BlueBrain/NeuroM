@@ -31,7 +31,7 @@
 These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
-from itertools import imap
+from itertools import imap, izip, product
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
 from neurom.core.tree import ipreorder
@@ -375,3 +375,41 @@ def principal_direction_extent(tree):
             extent -= scalar_projs[0]
 
     return extent
+
+
+def compare_trees(tree1, tree2):
+    '''
+    Comparison between all the nodes and their respective radii between two trees.
+    Ids are do not have to be identical between the trees, and swapping is allowed
+
+    Returns:
+
+        False if the trees are not identical. True otherwise.
+    '''
+    leaves1 = list(tr.ileaf(tree1))
+    leaves2 = list(tr.ileaf(tree2))
+
+    if len(leaves1) != len(leaves2):
+
+        return False
+
+    else:
+
+        nleaves = len(leaves1)
+
+        for leaf1, leaf2 in product(leaves1, leaves2):
+
+            is_equal = True
+
+            for node1, node2 in izip(tr.val_iter(tr.iupstream(leaf1)),
+                                     tr.val_iter(tr.iupstream(leaf2))):
+
+                if any(node1[0:5] != node2[0:5]):
+
+                    is_equal = False
+                    continue
+
+            if is_equal:
+                nleaves -= 1
+
+    return nleaves == 0
