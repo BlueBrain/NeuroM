@@ -127,9 +127,9 @@ def _affineTransform(tree, A, t, origin=None):
         A : 3x3 transformation matrix
         t : 3x1 translation array
         tree : tree object
-        origin : the point with respect of which the rotation is applied. If 
+        origin : the point with respect of which the rotation is applied. If
                  None then the x,y,z of the root node is assumed to be the
-                 origin
+                 origin.
 
     Returns:
 

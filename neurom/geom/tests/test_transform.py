@@ -100,7 +100,7 @@ def test_rotate():
 
 
     # check with origin
-    new_orig = np.array([-1., 0.1, 1.])
+    new_orig = np.array([-50., 45., 30.])
 
     m = gtr.rotate(TREE, TEST_UVEC, TEST_ANGLE, origin=new_orig)
     m = gtr.rotate(m, TEST_UVEC, -TEST_ANGLE, origin=new_orig)
@@ -146,10 +146,10 @@ def test_rodriguesToRotationMatrix():
 
 def test_affineTransform():
 
-    # test 1 : rotate 180 and translate, translate back and rotate 180
+    # rotate 180 and translate, translate back and rotate 180
     # change origin as well
 
-    new_orig = np.array([10. , 1., 2.])
+    new_orig = np.array([10. , 45., 50.])
 
     t = np.array([0.1, - 0.1, 40.3])
 
