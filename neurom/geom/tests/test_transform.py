@@ -41,9 +41,36 @@ TEST_UVEC =  np.array([ 0.01856633,  0.37132666,  0.92831665])
 
 TEST_ANGLE = np.pi / 3.
 
+def _Rx(angle):
+    sn = np.sin(angle)
+    cs = np.cos(angle)
+    return np.array([[1., 0., 0.],
+                     [0., cs, -sn],
+                     [0., sn, cs]])
+
+
+def _Ry(angle):
+    sn = np.sin(angle)
+    cs = np.cos(angle)
+    return np.array([[cs, 0., sn],
+                     [0., 1., 0.],
+                     [-sn, 0., cs]])
+
+
+def _Rz(angle):
+    sn = np.sin(angle)
+    cs = np.cos(angle)
+    return np.array([[cs, -sn, 0.],
+                     [sn, cs, 0.],
+                     [0., 0., 1.]])
+
+
 def _evaluate(tr1, tr2, comp_func):
 
     for v1, v2 in izip(val_iter(ipreorder(tr1)), val_iter(ipreorder(tr2))):
+        #print "v1 : ", v1[:COLS.R]
+        #print "v2 : ", v2[:COLS.R]
+        #print "-" * 10
         nt.assert_true(comp_func(v1[:COLS.R], v2[:COLS.R]))
 
 
@@ -72,6 +99,15 @@ def test_rotate():
     _evaluate(TREE, m, lambda x, y: np.allclose(np.dot(Rinv, y), x) )
 
 
+    # check with origin
+    new_orig = np.array([-1., 0.1, 1.])
+
+    m = gtr.rotate(TREE, TEST_UVEC, TEST_ANGLE, origin=new_orig)
+    m = gtr.rotate(m, TEST_UVEC, -TEST_ANGLE, origin=new_orig)
+
+    _evaluate(TREE, m, lambda x, y: np.allclose(x, y) )
+
+
 def test_rodriguesToRotationMatrix():
 
     RES = np.array([[0.50017235, -0.80049871, 0.33019604],
@@ -91,16 +127,33 @@ def test_rodriguesToRotationMatrix():
     # check against calculated matrix
     nt.assert_true(np.allclose(R, RES))
 
+    # check if opposite sign generates inverse
+    Rinv = gtr._rodriguesToRotationMatrix(TEST_UVEC, -TEST_ANGLE)
+
+    nt.assert_true(np.allclose(np.dot(Rinv, R), np.identity(3)))
+
+    # check basic rotations with a range of angles
+    for angle in np.linspace(0., 2. * np.pi, 10):
+
+        Rx = gtr._rodriguesToRotationMatrix(np.array([1., 0., 0.]), angle)
+        Ry = gtr._rodriguesToRotationMatrix(np.array([0., 1., 0.]), angle)
+        Rz = gtr._rodriguesToRotationMatrix(np.array([0., 0., 1.]), angle)
+
+        nt.assert_true(np.allclose(Rx, _Rx(angle)))
+        nt.assert_true(np.allclose(Ry, _Ry(angle)))
+        nt.assert_true(np.allclose(Rz, _Rz(angle)))
+
+
 def test_affineTransform():
 
     # test 1 : rotate 180 and translate, translate back and rotate 180
     # change origin as well
 
-    new_orig = np.array([-1. , 2., -6.])
+    new_orig = np.array([10. , 1., 2.])
 
     t = np.array([0.1, - 0.1, 40.3])
 
-    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
+    R = _Rz(np.pi)#gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
 
     # change origin, rotate 180 and translate
     m = gtr._affineTransform(TREE, R, t, origin=new_orig)

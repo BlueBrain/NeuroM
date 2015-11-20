@@ -69,6 +69,11 @@ def rotate(tree, axis, angle, origin=np.zeros(3)):
     return _affineTransform(tree, R, np.zeros(3), origin=origin)
 
 
+def _sin(x):
+    '''sine with case for pi'''
+    return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
+
+
 def _rodriguesToRotationMatrix(axis, angle):
     '''
     Generates transformation matrix from unit vector
@@ -82,7 +87,7 @@ def _rodriguesToRotationMatrix(axis, angle):
 
     Returns : 3x3 Rotation matrix
     '''
-    ux, uy, uz = axis
+    ux, uy, uz = axis / np.linalg.norm(axis)
 
     uxx = ux * ux
     uyy = uy * uy
@@ -91,8 +96,8 @@ def _rodriguesToRotationMatrix(axis, angle):
     uxz = ux * uz
     uyz = uy * uz
 
-    sn = np.sin(angle)
-    cs = np.cos(angle)
+    sn = _sin(angle)
+    cs = _sin(np.pi / 2. - angle)
     cs1 = 1. - cs
 
     R = np.zeros([3, 3])
