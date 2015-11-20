@@ -169,3 +169,44 @@ def test_bounding_box():
 
     for a, b in izip(nrn.bounding_box(), ref2):
         nt.assert_true(np.allclose(a, b))
+
+
+def test_copy():
+
+    soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])   
+    nrn1 = neuron.Neuron(soma, [TREE], name="Rabbit of Caerbannog")
+    nrn2 = neuron.copy()
+
+    # check if two neurons are identical
+
+    # somata
+    nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
+    nt.assert_true(nrn1.soma.radius == nrn2.soma.radius)
+    nt.assert_true(nrn1.soma.center == nrn2.soma.center)
+
+    for v1, v2 in izip(val_iter(ipreorder(nrn1.soma.iter())), val_iter(ipreorder(nrn2.soma.iter()))):
+
+        nt.assert_true(all(v1 == v2))
+
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        nt.assert_true(isinstance(neu2, type(neu1)))
+
+        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+
+            nt.assert_true(all(v1 == v2))
+
+    # check if the ids are different
+
+    # somata
+    nt.assert_true( nrn1.soma is not nrn2.soma)
+
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        nt.assert_true(neu1 is not neu2)
+
+    # check if changes are propagated
+
+
