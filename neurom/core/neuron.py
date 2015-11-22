@@ -192,7 +192,6 @@ class Neuron(object):
         return np.array([np.minimum(smin_xyz, nmin_xyz),
                          np.maximum(smax_xyz, nmax_xyz)])
 
-
     def copy(self):
         '''Return a copy of the Neuron object.
         '''

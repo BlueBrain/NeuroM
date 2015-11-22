@@ -207,6 +207,20 @@ def test_copy():
 
         nt.assert_true(neu1 is not neu2)
 
-    # check if changes are propagated
+    # check if changes are propagated between neurons
+
+    nrn2.soma.radius = 10.
+    nrn2.soma.center = (-1., -1., -1.)
+
+    nt.assert_false(nrn1.soma.radius == nrn2.soma.radius)
+    nt.assert_false(any(nrn2.soma.center == nrn2.soma.center))
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+
+            v2 = np.array(-1000., -1000., -1000., 1000., -100., -100., -100.)
+            nt.assert_false(any(v1 == v2))
+
 
 
