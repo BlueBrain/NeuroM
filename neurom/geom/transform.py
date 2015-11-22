@@ -29,48 +29,14 @@
 '''Transformation functions for tree objects'''
 
 import numpy as np
+from neurom.core.tree import Tree
+from neurom.core.neuron import Neuron
 from neurom.core.tree import make_copy, ipreorder, val_iter
 from neurom.core.dataformat import COLS
 
 
-def translate(tree, t):
-    '''
-    Translate the tree by t
-
-    Input :
-
-        tree : tree object
-        t : 3x1 translation vector
-
-    Returns:
-
-        A copy of the tree with the applied translation.
-    '''
-    # no rotation -> identity matrix
-    return _affineTransform(tree, np.identity(3), t)
-
-
-def rotate(tree, axis, angle, origin=np.zeros(3)):
-    '''
-    Rotation around unit vector following the right hand rule
-
-    Input:
-
-        tree : object tree
-        axis : unit vector for the axis of rotation
-        angle : rotation angle in rads
-
-    Returns:
-
-        A copy of the tree with the applied translation.
-    '''
-
-    R = _rodriguesToRotationMatrix(axis, angle)
-    return _affineTransform(tree, R, np.zeros(3), origin=origin)
-
-
 def _sin(x):
-    '''sine with case for pi'''
+    '''sine with case for pi multiples'''
     return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
 
 
@@ -117,7 +83,90 @@ def _rodriguesToRotationMatrix(axis, angle):
     return R
 
 
-def _affineTransform(tree, A, t, origin=None):
+def translate(obj, t):
+    '''
+    Translate object of supported type.
+
+    Input :
+
+        obj : object with one of the following types:
+             'TreeType', 'Neuron', 'ezyNeuron'
+
+    Returns: copy of the object with the applied translation
+    '''
+    if isinstance(obj, Tree):
+
+        res_tree = make_copy(obj)
+        _affineTransformTree(res_tree, np.identity(3), t)
+        return res_tree
+
+    elif isinstance(obj, Neuron):
+
+        res_nrn = obj.copy()
+        _affineTransformNeuron(res_nrn, np.identity(3), t)
+        return res_nrn
+
+    else:
+
+        raise TypeError("Input object type is not supported.")
+
+
+def rotate(obj, axis, angle, origin=None):
+    '''
+    Rotation around unit vector following the right hand rule
+
+    Input:
+
+        obj : obj to be rotated (e.g. tree, neuron)
+        axis : unit vector for the axis of rotation
+        angle : rotation angle in rads
+
+    Returns:
+
+        A copy of the object with the applied translation.
+    '''
+    R = _rodriguesToRotationMatrix(axis, angle)
+
+    if isinstance(obj, Tree):
+
+        res_tree = make_copy(obj)
+        _affineTransformTree(res_tree, R, np.zeros(3), origin)
+        return res_tree
+
+    elif isinstance(obj, Neuron):
+
+        res_nrn = obj.copy
+        _affineTransformNeuron(res_nrn, R, np.zeros(3), origin)
+        return res_nrn
+
+    else:
+
+        raise TypeError("Input object type is not supported.")
+
+
+def _affineTransformPoint(p, A, t, origin=None):
+    '''
+    Apply an affine transform on an iterable with x, y, z as its
+    first elements.
+    Input:
+
+        A : 3x3 transformation matrix
+        t : 3x1 translation array
+        point : iterable of the form (x, y, z, ....)
+        origin : the point with respect of which the rotation is applied.
+    '''
+
+    # if origin is None (0,0,0) is assumed
+    if origin is None:
+
+        p[:COLS.R] = np.dot(A, p[:COLS.R]) + t
+
+    else:
+
+        p[:COLS.R] = np.dot(A, p[:COLS.R] - origin) + t + origin
+
+
+def _affineTransformTree(tree, A, t, origin=None):
     '''
     Apply an affine transform on your tree by applying a linear
     transform A (e.g. rotation) and a non-linear transform t (translation)
@@ -130,22 +179,42 @@ def _affineTransform(tree, A, t, origin=None):
         origin : the point with respect of which the rotation is applied. If
                  None then the x,y,z of the root node is assumed to be the
                  origin.
-
-    Returns:
-
-        A copy of the tree with the affine transform. Original tree is left
-        unchanged
     '''
-    res_tree = make_copy(tree)
-
     # if no origin is specified, the position from the root node
     # becomes the origin
     if origin is None:
 
-        origin = res_tree.value[:COLS.R]
+        origin = tree.value[:COLS.R]
 
-    for v in val_iter(ipreorder(res_tree)):
+    for value in val_iter(ipreorder(tree)):
 
-        v[:COLS.R] = np.dot(A, v[:COLS.R] - origin) + t + origin
+        _affineTransformPoint(value, A, t, origin)
 
-    return res_tree
+
+def _affineTransformNeuron(neuron, A, t, origin=None):
+    '''
+    Apply an affine transform on a neuron object by applying a linear
+    transform A (e.g. rotation) and a non-linear transform t (translation)
+
+    Input:
+
+        A : 3x3 transformation matrix
+        t : 3x1 translation array
+        neuron : neuron object
+        origin : the point with respect of which the rotation is applied. If
+                 None then the x,y,z of the root node is assumed to be the
+                 origin.
+    '''
+    # if no origin is specified, the position of the soma center
+    # is assumed as the origin
+    if origin is None:
+
+        origin = np.array(neuron.soma.center)
+
+    for point in neuron.soma.iter():
+
+        _affineTransformPoint(point, A, t, origin=origin)
+
+    for neurite in neuron.neurites:
+
+        _affineTransformTree(neurite, A, t, origin=origin)
