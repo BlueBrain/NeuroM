@@ -63,6 +63,11 @@ class BaseSoma(object):
     def __init__(self, points):
         self._points = points
 
+    @property
+    def center(self):
+        '''Obtain the radius from the first stored point'''
+        return self._points[0][:COLS.R]
+
     def iter(self):
         '''Iterator to soma contents'''
         return iter(self._points)
@@ -75,12 +80,11 @@ class SomaA(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaA, self).__init__(points)
-        self.center = tuple(points[0][:COLS.R])
         self.radius = points[0][COLS.R]
 
     def __str__(self):
         return 'SomaA(%s) <center: %s, radius: %s>' % \
-             (repr(self._points), self.center, self.radius)
+            (repr(self._points), self.center, self.radius)
 
 
 class SomaB(BaseSoma):
@@ -94,12 +98,11 @@ class SomaB(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaB, self).__init__(points)
-        self.center = tuple(points[0][:COLS.R])
         self.radius = average_points_dist(points[0], (points[1], points[2]))
 
     def __str__(self):
         return 'SomaB(%s) <center: %s, radius: %s>' % \
-             (repr(self._points), self.center, self.radius)
+            (repr(self._points), self.center, self.radius)
 
 
 class SomaC(BaseSoma):
@@ -115,12 +118,11 @@ class SomaC(BaseSoma):
     '''
     def __init__(self, points):
         super(SomaC, self).__init__(points)
-        self.center = tuple(points[0][:COLS.R])
         self.radius = average_points_dist(points[0], points[1:])
 
     def __str__(self):
         return 'SomaC(%s) <center: %s, radius: %s>' % \
-             (repr(self._points), self.center, self.radius)
+            (repr(self._points), self.center, self.radius)
 
 
 def make_soma(points):
