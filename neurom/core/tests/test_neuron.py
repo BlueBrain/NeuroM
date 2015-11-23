@@ -186,7 +186,7 @@ def test_copy():
 
     for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
 
-        nt.assert_true(all(v1 == v2))
+        nt.assert_true(np.allclose(v1, v2))
 
     # neurites
     for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):

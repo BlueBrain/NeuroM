@@ -28,7 +28,8 @@
 
 import neurom.geom.transform as gtr
 from neurom.core.dataformat import COLS
-from neurom.core.tree import val_iter, ipreorder
+from neurom.core.tree import val_iter, ipreorder, Tree
+from neurom.core.neurom import Neuron
 from neurom.ezy import load_neuron
 from nose import tools as nt
 from itertools import izip
@@ -195,13 +196,14 @@ def test_affineTransformTree():
     R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
 
     # change origin, rotate 180 and translate
-    m = gtr._affineTransformTree(TREE, R, t, origin=new_orig)
+    m = make_copy(TREE)
+    gtr._affineTransformTree(m, R, t, origin=new_orig)
 
     # translate back
-    m = gtr._affineTransformTree(m, np.identity(3), -t, origin=np.zeros(3))
+    gtr._affineTransformTree(m, np.identity(3), -t, origin=np.zeros(3))
 
     # rotate back
-    m = gtr._affineTransformTree(m, R, np.zeros(3), origin=new_orig)
+    gtr._affineTransformTree(m, R, np.zeros(3), origin=new_orig)
 
     _evaluate(TREE, m, lambda x, y: np.allclose(x, y))
 
