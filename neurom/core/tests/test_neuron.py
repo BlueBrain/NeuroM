@@ -28,7 +28,7 @@
 
 from nose import tools as nt
 from neurom.core import neuron
-from neurom.core.tree import Tree, val_iter
+from neurom.core.tree import Tree, val_iter, ipreorder
 from neurom.exceptions import SomaError
 from itertools import izip
 import numpy as np

@@ -29,7 +29,7 @@
 import neurom.geom.transform as gtr
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter, ipreorder, Tree
-from neurom.core.neurom import Neuron
+from neurom.core.neuron import Neuron
 from neurom.ezy import load_neuron
 from nose import tools as nt
 from itertools import izip
