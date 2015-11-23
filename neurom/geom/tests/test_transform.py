@@ -28,7 +28,7 @@
 
 import neurom.geom.transform as gtr
 from neurom.core.dataformat import COLS
-from neurom.core.tree import val_iter, ipreorder, Tree
+from neurom.core.tree import val_iter, ipreorder, Tree, make_copy
 from neurom.core.neuron import Neuron
 from neurom.ezy import load_neuron
 from nose import tools as nt
@@ -80,13 +80,13 @@ def _evaluate(tr1, tr2, comp_func):
 
 def test_translate_dispatch():
 
-    nt.assert_true(isinstance(gtr.translate(Neuron, np.array([1.,1.,1.])), Neuron))
+    nt.assert_true(isinstance(gtr.translate(NEURON, np.array([1.,1.,1.])), Neuron))
     nt.assert_true(isinstance(gtr.translate(TREE, np.array([1.,1.,1.])), Tree))
 
 
 def test_rotate_dispatch():
 
-    nt.assert_true(isinstance(gtr.rotate(Neuron, TEST_UVEC, np.pi), Neuron))
+    nt.assert_true(isinstance(gtr.rotate(NEURON, TEST_UVEC, np.pi), Neuron))
     nt.assert_true(isinstance(gtr.rotate(TREE, TEST_UVEC, np.pi), Tree))
 
 def test_translate_tree():
