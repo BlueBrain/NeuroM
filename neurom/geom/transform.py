@@ -209,7 +209,7 @@ def _affineTransformNeuron(neuron, A, t, origin=None):
     # is assumed as the origin
     if origin is None:
 
-        origin = np.array(neuron.soma.center)
+        origin = neuron.soma.center
 
     for point in neuron.soma.iter():
 

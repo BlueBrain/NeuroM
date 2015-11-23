@@ -182,7 +182,6 @@ def test_copy():
     # somata
     nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
     nt.assert_true(nrn1.soma.radius == nrn2.soma.radius)
-    nt.assert_true(nrn1.soma.center == nrn2.soma.center)
 
     for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
 
@@ -210,10 +209,8 @@ def test_copy():
     # check if changes are propagated between neurons
 
     nrn2.soma.radius = 10.
-    nrn2.soma.center = (-1., -1., -1.)
 
     nt.assert_false(nrn1.soma.radius == nrn2.soma.radius)
-    nt.assert_false(any(nrn2.soma.center == nrn2.soma.center))
     # neurites
     for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
 
