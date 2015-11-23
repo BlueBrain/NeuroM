@@ -91,14 +91,14 @@ def test_make_SomaA():
     soma = neuron.make_soma(SOMA_A_PTS)
     nt.ok_('SomaA' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaA))
-    nt.assert_equal(soma.center, (11, 22, 33))
+    nt.assert_items_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 44)
 
 def test_make_SomaB():
     soma = neuron.make_soma(SOMA_B_PTS)
     nt.ok_('SomaB' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaB))
-    nt.assert_equal(soma.center, (11, 22, 33))
+    nt.assert_items_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 0.0)
 
 
@@ -106,7 +106,7 @@ def check_SomaC(points):
     soma = neuron.make_soma(points)
     nt.ok_('SomaC' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaC))
-    nt.assert_equal(soma.center, (11, 22, 33))
+    nt.assert_items_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 0.0)
 
 
@@ -129,7 +129,7 @@ def test_invalid_soma_points_2_raises_SomaError():
 def test_neuron():
     soma = neuron.make_soma(SOMA_A_PTS)
     nrn = neuron.Neuron(soma, ['foo', 'bar'])
-    nt.assert_equal(nrn.soma.center, (11, 22, 33))
+    nt.assert_items_equal(nrn.soma.center, (11, 22, 33))
     nt.assert_equal(nrn.neurites, ['foo', 'bar'])
     nt.assert_equal(nrn.name, 'Neuron')
     nrn = neuron.Neuron(soma, ['foo', 'bar'], 'test')

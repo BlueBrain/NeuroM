@@ -98,7 +98,7 @@ def calc_limits(data, dist=None, padding=0.25):
 # Neurite types of interest
 NEURITES_ = (ezy.TreeType.axon,
              ezy.TreeType.apical_dendrite,
-             ezy.TreeType.basal_dendrite)
+             ezy.TreeType.basal_dendrite,)
 
 # map feature names to functors that get us arrays of that
 # feature, for a given tree type
@@ -170,6 +170,10 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
         for typ, data in d.iteritems():
             dist = sim_params['components'][typ].get(feat, None)
             print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
+            # if no data available, skip this feature
+            if not data:
+                print "No data found for feature %s (%s)" % (feat, typ)
+                continue
             # print 'DATA', data
             num_bins = 100
             limits = calc_limits(data, dist)
