@@ -216,7 +216,7 @@ def test_copy():
 
         for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
 
-            v2 = np.array(-1000., -1000., -1000., 1000., -100., -100., -100.)
+            v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
             nt.assert_false(any(v1 == v2))
 
 
