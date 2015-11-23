@@ -106,10 +106,6 @@ def translate(obj, t):
         _affineTransformNeuron(res_nrn, np.identity(3), t)
         return res_nrn
 
-    else:
-
-        raise TypeError("Input object type is not supported.")
-
 
 def rotate(obj, axis, angle, origin=None):
     '''
@@ -135,13 +131,9 @@ def rotate(obj, axis, angle, origin=None):
 
     elif isinstance(obj, Neuron):
 
-        res_nrn = obj.copy
+        res_nrn = obj.copy()
         _affineTransformNeuron(res_nrn, R, np.zeros(3), origin)
         return res_nrn
-
-    else:
-
-        raise TypeError("Input object type is not supported.")
 
 
 def _affineTransformPoint(p, A, t, origin=None):
@@ -191,7 +183,7 @@ def _affineTransformTree(tree, A, t, origin=None):
         _affineTransformPoint(value, A, t, origin)
 
 
-def _affineTransformNeuron(neuron, A, t, origin=None):
+def _affineTransformNeuron(nrn, A, t, origin=None):
     '''
     Apply an affine transform on a neuron object by applying a linear
     transform A (e.g. rotation) and a non-linear transform t (translation)
@@ -208,13 +200,13 @@ def _affineTransformNeuron(neuron, A, t, origin=None):
     # if no origin is specified, the position of the soma center
     # is assumed as the origin
     if origin is None:
+        print nrn.soma.center
+        origin = nrn.soma.center
 
-        origin = neuron.soma.center
-
-    for point in neuron.soma.iter():
+    for point in nrn.soma.iter():
 
         _affineTransformPoint(point, A, t, origin=origin)
 
-    for neurite in neuron.neurites:
+    for neurite in nrn.neurites:
 
         _affineTransformTree(neurite, A, t, origin=origin)

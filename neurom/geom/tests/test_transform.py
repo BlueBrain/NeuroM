@@ -29,28 +29,28 @@
 import neurom.geom.transform as gtr
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter, ipreorder, Tree, make_copy
-from neurom.core.neuron import Neuron
+from neurom.core.neuron import Neuron, make_soma
 from neurom.ezy import load_neuron
 from nose import tools as nt
 from itertools import izip
 import numpy as np
 from copy import copy
 
-TREE = Tree([0.0, 0.0, 0.0, 1.0, 1, 1, 2] )
-T1 = TREE.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+TREE = Tree(np.array([0.0, 0.0, 0.0, 1.0, 1, 1, 2]))
+T1 = TREE.add_child(Tree(np.array([0.0, 1.0, 0.0, 1.0, 1, 1, 2])))
+T2 = T1.add_child(Tree(np.array([0.0, 2.0, 0.0, 1.0, 1, 1, 2])))
+T3 = T2.add_child(Tree(np.array([0.0, 4.0, 0.0, 2.0, 1, 1, 2])))
+T4 = T3.add_child(Tree(np.array([0.0, 5.0, 0.0, 2.0, 1, 1, 2])))
+T5 = T4.add_child(Tree(np.array([2.0, 5.0, 0.0, 1.0, 1, 1, 2])))
+T6 = T4.add_child(Tree(np.array([0.0, 5.0, 2.0, 1.0, 1, 1, 2])))
+T7 = T5.add_child(Tree(np.array([3.0, 5.0, 0.0, 0.75, 1, 1, 2])))
+T8 = T7.add_child(Tree(np.array([4.0, 5.0, 0.0, 0.75, 1, 1, 2])))
+T9 = T6.add_child(Tree(np.array([0.0, 5.0, 3.0, 0.75, 1, 1, 2])))
+T10 = T9.add_child(Tree(np.array([0.0, 6.0, 3.0, 0.75, 1, 1, 2])))
 
-SOMA = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])   
-NEURON = neuron.Neuron(SOMA, [TREE])
-TREE = NEURON.neurites[1]
+SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
+NEURON = Neuron(SOMA, [TREE])
+TREE = NEURON.neurites[0]
 
 
 TEST_UVEC =  np.array([ 0.01856633,  0.37132666,  0.92831665])
@@ -91,15 +91,16 @@ def _evaluate(tr1, tr2, comp_func):
 
 
 def test_translate_dispatch():
-
-    nt.assert_true(isinstance(gtr.translate(NEURON, np.array([1.,1.,1.])), Neuron))
-    nt.assert_true(isinstance(gtr.translate(TREE, np.array([1.,1.,1.])), Tree))
+    t = np.array([1.,1.,1.])
+    nt.assert_true(isinstance(gtr.translate(NEURON, t), Neuron))
+    nt.assert_true(isinstance(gtr.translate(TREE, t), Tree))
 
 
 def test_rotate_dispatch():
 
     nt.assert_true(isinstance(gtr.rotate(NEURON, TEST_UVEC, np.pi), Neuron))
     nt.assert_true(isinstance(gtr.rotate(TREE, TEST_UVEC, np.pi), Tree))
+
 
 def test_translate_tree():
 
@@ -176,6 +177,14 @@ def test_affineTransformPoint():
     point = TREE.value[:COLS.R]
     # rotate 180 and translate, translate back and rotate 180
     # change origin as well
+
+    m = copy(point)
+
+    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, 2. * np.pi)
+
+    gtr._affineTransformPoint(m, R, np.zeros(3))
+
+    nt.assert_true(np.allclose(point, m))
 
     new_orig = np.array([10. , 45., 50.])
 
