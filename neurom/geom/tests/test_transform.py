@@ -85,7 +85,7 @@ def test_translate_dispatch():
 
 def test_rotate_dispatch():
 
-    nt.assert_true(isinstance(grt.rotate(Neuron, TEST_UVEC, np.pi) Neuron))
+    nt.assert_true(isinstance(grt.rotate(Neuron, TEST_UVEC, np.pi), Neuron))
     nt.assert_true(isinstance(gtr.rotate(TREE, TEST_UVEC, np.pi), Tree))
 
 def test_translate_tree():

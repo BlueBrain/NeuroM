@@ -28,7 +28,7 @@
 
 from nose import tools as nt
 from neurom.core import neuron
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, val_iter
 from neurom.exceptions import SomaError
 from itertools import izip
 import numpy as np
@@ -184,7 +184,7 @@ def test_copy():
     nt.assert_true(nrn1.soma.radius == nrn2.soma.radius)
     nt.assert_true(nrn1.soma.center == nrn2.soma.center)
 
-    for v1, v2 in izip(val_iter(ipreorder(nrn1.soma.iter())), val_iter(ipreorder(nrn2.soma.iter()))):
+    for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
 
         nt.assert_true(all(v1 == v2))
 
