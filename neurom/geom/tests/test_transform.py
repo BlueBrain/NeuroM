@@ -79,13 +79,13 @@ def _evaluate(tr1, tr2, comp_func):
 
 def test_translate_dispatch():
 
-    nt.assert_true(isinstance(grt.translate(Neuron, np.array([1.,1.,1.])), Neuron))
+    nt.assert_true(isinstance(gtr.translate(Neuron, np.array([1.,1.,1.])), Neuron))
     nt.assert_true(isinstance(gtr.translate(TREE, np.array([1.,1.,1.])), Tree))
 
 
 def test_rotate_dispatch():
 
-    nt.assert_true(isinstance(grt.rotate(Neuron, TEST_UVEC, np.pi), Neuron))
+    nt.assert_true(isinstance(gtr.rotate(Neuron, TEST_UVEC, np.pi), Neuron))
     nt.assert_true(isinstance(gtr.rotate(TREE, TEST_UVEC, np.pi), Tree))
 
 def test_translate_tree():
@@ -195,13 +195,13 @@ def test_affineTransformTree():
     R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
 
     # change origin, rotate 180 and translate
-    m = gtr._affineTransform(TREE, R, t, origin=new_orig)
+    m = gtr._affineTransformTree(TREE, R, t, origin=new_orig)
 
     # translate back
-    m = gtr._affineTransform(m, np.identity(3), -t, origin=np.zeros(3))
+    m = gtr._affineTransformTree(m, np.identity(3), -t, origin=np.zeros(3))
 
     # rotate back
-    m = gtr._affineTransform(m, R, np.zeros(3), origin=new_orig)
+    m = gtr._affineTransformTree(m, R, np.zeros(3), origin=new_orig)
 
     _evaluate(TREE, m, lambda x, y: np.allclose(x, y))
 
@@ -228,7 +228,7 @@ def test_affineTransformNeuron():
     # rotate back
     gtr._affineTransformNeuron(m, R, np.zeros(3), origin=new_orig)
 
-    nt.asser_true(np.allclose(list(m.soma.iter()), list(NEURON.soma.iter())))
+    nt.assert_true(np.allclose(list(m.soma.iter()), list(NEURON.soma.iter())))
 
     for neu1, neu2 in izip(NEURON.neurites, m.neurites):
         _evaluate(neu1, neu2, lambda x, y: np.allclose(x, y))

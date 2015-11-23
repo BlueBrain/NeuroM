@@ -195,7 +195,7 @@ def test_copy():
 
         for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
 
-            nt.assert_true(all(v1 == v2))
+            nt.assert_true(np.allclose(v1, v2))
 
     # check if the ids are different
 
