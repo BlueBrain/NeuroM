@@ -92,7 +92,7 @@ def _evaluate(tr1, tr2, comp_func):
 
 def test_translate_dispatch():
 
-    nt.assert_true(isinstance(gtr.translate(, np.array([1.,1.,1.])), Neuron))
+    nt.assert_true(isinstance(gtr.translate(NEURON, np.array([1.,1.,1.])), Neuron))
     nt.assert_true(isinstance(gtr.translate(TREE, np.array([1.,1.,1.])), Tree))
 
 
