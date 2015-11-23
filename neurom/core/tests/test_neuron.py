@@ -175,7 +175,7 @@ def test_copy():
 
     soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])   
     nrn1 = neuron.Neuron(soma, [TREE], name="Rabbit of Caerbannog")
-    nrn2 = neuron.copy()
+    nrn2 = nrn1.copy()
 
     # check if two neurons are identical
 
