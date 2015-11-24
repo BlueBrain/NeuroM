@@ -40,6 +40,7 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 H5_PATH = os.path.join(DATA_PATH, 'h5')
 H5V1_PATH = os.path.join(H5_PATH, 'v1')
 H5V2_PATH = os.path.join(H5_PATH, 'v2')
+SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
 def test_read_h5v1_basic():
@@ -99,6 +100,16 @@ def test_consistency_between_v1_v2():
     nt.ok_(v1_data.adj_list == v2_data.adj_list)
 
 
+def test_consistency_between_h5_swc():
+    h5_data = readers.RawDataWrapper(readers.H5.read(
+            os.path.join(H5V1_PATH, 'Neuron.h5')))
+    swc_data = readers.RawDataWrapper(readers.SWC.read(
+            os.path.join(SWC_PATH, 'Neuron.swc')))
+    nt.ok_(np.allclose(h5_data.data_block.shape, swc_data.data_block.shape))
+    nt.ok_(len(h5_data.get_fork_points()) == len(swc_data.get_fork_points()))
+    nt.ok_(len(h5_data.get_end_points()) == len(swc_data.get_end_points()))
+
+
 def test_removed_duplicates():
     v1_data = readers.RawDataWrapper(readers.H5.read_v1(
             os.path.join(H5V1_PATH, 'Neuron.h5')))
@@ -118,6 +129,7 @@ def test_removed_duplicates():
         for ch in v1_data.get_children(i):
             nt.ok_(not np.allclose(v1_data.get_row(i)[0:4],
                                    v1_data.get_row(ch)[0:4]))
+
 
 def test_dont_remove_duplicates():
     v1_data = readers.RawDataWrapper(readers.H5.read_v1(
