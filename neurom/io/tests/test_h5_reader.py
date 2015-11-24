@@ -120,6 +120,14 @@ def test_dont_remove_duplicates():
         for ch in v1_data.get_children(i):
             nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
                                v1_data.get_row(ch)[0:4]))
+    for i in v2_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
+                               v1_data.get_row(ch)[0:4]))
+    for i in v_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
+                               v1_data.get_row(ch)[0:4]))
     
 
 class DataWrapper_Neuron(object):
