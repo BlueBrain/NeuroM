@@ -28,14 +28,30 @@
 
 import neurom.geom.transform as gtr
 from neurom.core.dataformat import COLS
-from neurom.core.tree import val_iter, ipreorder
+from neurom.core.tree import val_iter, ipreorder, Tree, make_copy
+from neurom.core.neuron import Neuron, make_soma
 from neurom.ezy import load_neuron
 from nose import tools as nt
 from itertools import izip
 import numpy as np
+from copy import copy
 
+TREE = Tree([0.0, 0.0, 0.0, 1.0, 1, 1, 2])
+T1 = TREE.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+T6 = T4.add_child(Tree(np.array([0.0, 5.0, 2.0, 1.0, 1, 1, 2])))
+T7 = T5.add_child(Tree(np.array([3.0, 5.0, 0.0, 0.75, 1, 1, 2])))
+T8 = T7.add_child(Tree(np.array([4.0, 5.0, 0.0, 0.75, 1, 1, 2])))
+T9 = T6.add_child(Tree(np.array([0.0, 5.0, 3.0, 0.75, 1, 1, 2])))
+T10 = T9.add_child(Tree(np.array([0.0, 6.0, 3.0, 0.75, 1, 1, 2])))
 
-TREE = load_neuron('test_data/valid_set/Neuron.swc').neurites[0]
+SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
+NEURON = Neuron(SOMA, [TREE])
+TREE = NEURON.neurites[0]
+
 
 TEST_UVEC =  np.array([ 0.01856633,  0.37132666,  0.92831665])
 
@@ -74,7 +90,19 @@ def _evaluate(tr1, tr2, comp_func):
         nt.assert_true(comp_func(v1[:COLS.R], v2[:COLS.R]))
 
 
-def test_translate():
+def test_translate_dispatch():
+    t = np.array([1.,1.,1.])
+    nt.assert_true(isinstance(gtr.translate(NEURON, t), Neuron))
+    nt.assert_true(isinstance(gtr.translate(TREE, t), Tree))
+
+
+def test_rotate_dispatch():
+
+    nt.assert_true(isinstance(gtr.rotate(NEURON, TEST_UVEC, np.pi), Neuron))
+    nt.assert_true(isinstance(gtr.rotate(TREE, TEST_UVEC, np.pi), Tree))
+
+
+def test_translate_tree():
 
     t = np.array([-100., 0.1, -2.4445])
 
@@ -82,10 +110,10 @@ def test_translate():
 
     # subtract the values node by node and assert if the changed tree values
     # minus the original result into the translation vector
-    _evaluate(TREE, m, lambda x, y : np.allclose(y - x, t))
+    _evaluate(TREE, m, lambda x, y : np.allclose([yi - xi for xi, yi in izip(x, y)], t))
 
 
-def test_rotate():
+def test_rotate_tree():
 
     m = gtr.rotate(TREE, TEST_UVEC, TEST_ANGLE)
 
@@ -144,7 +172,40 @@ def test_rodriguesToRotationMatrix():
         nt.assert_true(np.allclose(Rz, _Rz(angle)))
 
 
-def test_affineTransform():
+def test_affineTransformPoint():
+
+    point = TREE.value[:COLS.R]
+    # rotate 180 and translate, translate back and rotate 180
+    # change origin as well
+
+    m = copy(point)
+
+    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, 2. * np.pi)
+
+    gtr._affineTransformPoint(m, R, np.zeros(3))
+
+    nt.assert_true(np.allclose(point, m))
+
+    new_orig = np.array([10. , 45., 50.])
+
+    t = np.array([0.1, - 0.1, 40.3])
+
+    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
+
+    m = copy(point)
+
+    # change origin, rotate 180 and translate
+    gtr._affineTransformPoint(m, R, t, origin=new_orig)
+
+    # translate back
+    gtr._affineTransformPoint(m, np.identity(3), -t, origin=np.zeros(3))
+
+    # rotate back
+    gtr._affineTransformPoint(m, R, np.zeros(3), origin=new_orig)
+
+    nt.assert_true(np.allclose(point, m))
+
+def test_affineTransformTree():
 
     # rotate 180 and translate, translate back and rotate 180
     # change origin as well
@@ -153,18 +214,44 @@ def test_affineTransform():
 
     t = np.array([0.1, - 0.1, 40.3])
 
-    R = _Rz(np.pi)#gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
+    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
 
     # change origin, rotate 180 and translate
-    m = gtr._affineTransform(TREE, R, t, origin=new_orig)
+    m = make_copy(TREE)
+    gtr._affineTransformTree(m, R, t, origin=new_orig)
 
     # translate back
-    m = gtr._affineTransform(m, np.identity(3), -t, origin=np.zeros(3))
+    gtr._affineTransformTree(m, np.identity(3), -t, origin=np.zeros(3))
 
     # rotate back
-    m = gtr._affineTransform(m, R, np.zeros(3), origin=new_orig)
+    gtr._affineTransformTree(m, R, np.zeros(3), origin=new_orig)
 
     _evaluate(TREE, m, lambda x, y: np.allclose(x, y))
 
 
+def test_affineTransformNeuron():
 
+    # rotate 180 and translate, translate back and rotate 180
+    # change origin as well
+
+    new_orig = np.array([10. , 45., 50.])
+
+    t = np.array([0.1, - 0.1, 40.3])
+
+    R = gtr._rodriguesToRotationMatrix(TEST_UVEC, np.pi)
+
+    m = NEURON.copy()
+
+    # change origin, rotate 180 and translate
+    gtr._affineTransformNeuron(m, R, t, origin=new_orig)
+
+    # translate back
+    gtr._affineTransformNeuron(m, np.identity(3), -t, origin=np.zeros(3))
+
+    # rotate back
+    gtr._affineTransformNeuron(m, R, np.zeros(3), origin=new_orig)
+
+    nt.assert_true(np.allclose(list(m.soma.iter()), list(NEURON.soma.iter())))
+
+    for neu1, neu2 in izip(NEURON.neurites, m.neurites):
+        _evaluate(neu1, neu2, lambda x, y: np.allclose(x, y))

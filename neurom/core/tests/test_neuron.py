@@ -28,7 +28,7 @@
 
 from nose import tools as nt
 from neurom.core import neuron
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, val_iter, ipreorder
 from neurom.exceptions import SomaError
 from itertools import izip
 import numpy as np
@@ -169,3 +169,55 @@ def test_bounding_box():
 
     for a, b in izip(nrn.bounding_box(), ref2):
         nt.assert_true(np.allclose(a, b))
+
+
+def test_copy():
+
+    soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])   
+    nrn1 = neuron.Neuron(soma, [TREE], name="Rabbit of Caerbannog")
+    nrn2 = nrn1.copy()
+
+    # check if two neurons are identical
+
+    # somata
+    nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
+    nt.assert_true(nrn1.soma.radius == nrn2.soma.radius)
+
+    for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
+
+        nt.assert_true(np.allclose(v1, v2))
+
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        nt.assert_true(isinstance(neu2, type(neu1)))
+
+        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+
+            nt.assert_true(np.allclose(v1, v2))
+
+    # check if the ids are different
+
+    # somata
+    nt.assert_true( nrn1.soma is not nrn2.soma)
+
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        nt.assert_true(neu1 is not neu2)
+
+    # check if changes are propagated between neurons
+
+    nrn2.soma.radius = 10.
+
+    nt.assert_false(nrn1.soma.radius == nrn2.soma.radius)
+    # neurites
+    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+
+        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+
+            v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
+            nt.assert_false(any(v1 == v2))
+
+
+
