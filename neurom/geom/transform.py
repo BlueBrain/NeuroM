@@ -148,14 +148,27 @@ def _affineTransformPoint(p, A, t, origin=None):
         origin : the point with respect of which the rotation is applied.
     '''
 
-    # if origin is None (0,0,0) is assumed
-    if origin is None:
+    px, py, pz = p[:COLS.R]
 
-        p[:COLS.R] = np.dot(A, p[:COLS.R]) + t
+    if origin is not None:
 
-    else:
+        px -= origin[0]
+        py -= origin[1]
+        pz -= origin[2]
 
-        p[:COLS.R] = np.dot(A, p[:COLS.R] - origin) + t + origin
+    x = A[0, 0] * px + A[0, 1] * py + A[0, 2] * pz + t[0]
+    y = A[1, 0] * px + A[1, 1] * py + A[1, 2] * pz + t[1]
+    z = A[2, 0] * px + A[2, 1] * py + A[2, 2] * pz + t[2]
+
+    if origin is not None:
+
+        x += origin[0]
+        y += origin[1]
+        z += origin[2]
+
+    p[COLS.X] = x
+    p[COLS.Y] = y
+    p[COLS.Z] = z
 
 
 def _affineTransformTree(tree, A, t, origin=None):

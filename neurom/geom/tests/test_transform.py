@@ -36,12 +36,12 @@ from itertools import izip
 import numpy as np
 from copy import copy
 
-TREE = Tree(np.array([0.0, 0.0, 0.0, 1.0, 1, 1, 2]))
-T1 = TREE.add_child(Tree(np.array([0.0, 1.0, 0.0, 1.0, 1, 1, 2])))
-T2 = T1.add_child(Tree(np.array([0.0, 2.0, 0.0, 1.0, 1, 1, 2])))
-T3 = T2.add_child(Tree(np.array([0.0, 4.0, 0.0, 2.0, 1, 1, 2])))
-T4 = T3.add_child(Tree(np.array([0.0, 5.0, 0.0, 2.0, 1, 1, 2])))
-T5 = T4.add_child(Tree(np.array([2.0, 5.0, 0.0, 1.0, 1, 1, 2])))
+TREE = Tree([0.0, 0.0, 0.0, 1.0, 1, 1, 2])
+T1 = TREE.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
 T6 = T4.add_child(Tree(np.array([0.0, 5.0, 2.0, 1.0, 1, 1, 2])))
 T7 = T5.add_child(Tree(np.array([3.0, 5.0, 0.0, 0.75, 1, 1, 2])))
 T8 = T7.add_child(Tree(np.array([4.0, 5.0, 0.0, 0.75, 1, 1, 2])))
@@ -110,7 +110,7 @@ def test_translate_tree():
 
     # subtract the values node by node and assert if the changed tree values
     # minus the original result into the translation vector
-    _evaluate(TREE, m, lambda x, y : np.allclose(y - x, t))
+    _evaluate(TREE, m, lambda x, y : np.allclose([yi - xi for xi, yi in izip(x, y)], t))
 
 
 def test_rotate_tree():
