@@ -151,7 +151,6 @@ def test_dont_remove_duplicates():
             nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
                                v1_data.get_row(ch)[0:4]))
     
-
 class DataWrapper_Neuron(object):
     '''Base class for H5 tests'''
 
@@ -227,5 +226,83 @@ class TestRawDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
     def setup(self):
         self.data = readers.RawDataWrapper(readers.H5.read_v2(
             os.path.join(H5V2_PATH, 'Neuron.h5'), stage='raw'))
+        self.first_id = int(self.data.data_block[0][COLS.ID])
+        self.rows = len(self.data.data_block)
+
+
+class DataWrapper_Neuron_with_duplicates(object):
+    '''Base class for H5 tests'''
+
+    end_pts = [1, 386, 133, 782, 529, 914, 276, 661, 23, 408, 155, 925,
+               926, 804, 551, 298, 683, 45, 430, 177, 694, 826, 573, 320,
+               67, 452, 199, 716, 463, 848, 595, 342, 89, 221, 738, 485,
+               870, 232, 617, 364, 111, 760, 507, 892, 254, 639]
+
+    end_parents = [0, 385, 132, 781, 528, 913, 275, 660, 22, 407, 154, 924,
+                   0, 803, 550, 297, 682, 44, 429, 176, 693, 825, 572, 319,
+                   66, 451, 198, 715, 462, 847, 594, 341, 88, 220, 737, 484,
+                   869, 231, 616, 363, 110, 759, 506, 891, 253, 638]
+
+    fork_pts = [0, 12, 34, 56, 78, 100, 122, 144, 166, 188, 210, 243, 265,
+                287, 309, 331, 353, 375, 397, 419, 441, 474, 496, 518, 540,
+                562, 584, 606, 628, 650, 672, 705, 727, 749, 771, 793, 815,
+                837, 859, 881, 903]
+
+    fork_parents = [-1, 11, 33, 55, 77, 99, 121, 143, 165, 187, 209, 242,
+                    264, 286, 308, 330, 352, 374, 396, 418, 440, 473, 495,
+                    517, 539, 561, 583, 605, 627, 649, 671, 704, 726, 748,
+                    770, 792, 814, 836, 858, 880, 902]
+
+    def test_n_rows(self):
+        nt.assert_equal(self.rows, 927)
+
+    def test_first_id_0(self):
+        nt.ok_(self.first_id == 0)
+
+    def test_fork_points(self):
+        nt.assert_equal(len(self.data.get_fork_points()), 41)
+        nt.assert_equal(self.data.get_fork_points(),
+                        DataWrapper_Neuron_with_duplicates.fork_pts)
+
+    def test_get_endpoints(self):
+        print 'test_here', self.data.get_end_points()
+        nt.assert_equal(self.data.get_end_points(),
+                        DataWrapper_Neuron_with_duplicates.end_pts)
+
+    def test_end_points_have_no_children(self):
+        for p in DataWrapper_Neuron_with_duplicates.end_pts:
+            nt.ok_(len(self.data.get_children(p)) == 0)
+
+    def test_fork_point_parents(self):
+        fpar = [self.data.get_parent(i) for i in self.data.get_fork_points()]
+        nt.assert_equal(fpar, DataWrapper_Neuron_with_duplicates.fork_parents)
+
+    def test_end_point_parents(self):
+        epar = [self.data.get_parent(i) for i in self.data.get_end_points()]
+        nt.assert_equal(epar, DataWrapper_Neuron_with_duplicates.end_parents)
+
+    @nt.raises(LookupError)
+    def test_iter_row_low_id_raises(self):
+        self.data.iter_row(-1)
+
+    @nt.raises(LookupError)
+    def test_iter_row_high_id_raises(self):
+        self.data.iter_row(self.rows + self.first_id)
+
+
+class TestRawDataWrapper_Neuron_H5V1_with_duplicates(DataWrapper_Neuron_with_duplicates):
+    '''Test HDF5 v1 reading'''
+    def setup(self):
+        self.data = readers.RawDataWrapper(readers.H5.read_v1(
+            os.path.join(H5V1_PATH, 'Neuron.h5'), remove_duplicates=False))
+        self.first_id = int(self.data.data_block[0][COLS.ID])
+        self.rows = len(self.data.data_block)
+
+
+class TestRawDataWrapper_Neuron_H5V2_with_duplicates(DataWrapper_Neuron_with_duplicates):
+    '''Test HDF5 v2 reading'''
+    def setup(self):
+        self.data = readers.RawDataWrapper(readers.H5.read_v2(
+            os.path.join(H5V2_PATH, 'Neuron.h5'), stage='raw', remove_duplicates=False))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
