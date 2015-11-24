@@ -153,22 +153,20 @@ class H5(object):
             if they are present in points-groups representation.
             Returns points, groups with unique points.
         '''
-        def _find_last_point(group_id, groups, points):
+        def _find_last_point(group_id, groups):
             ''' Identifies and returns the id of the last point of a group'''
             group_initial_ids = np.sort(np.transpose(groups)[0])
 
             if group_id != len(group_initial_ids) - 1:
                 return group_initial_ids[np.where(group_initial_ids ==
                                                   groups[group_id][0])[0][0] + 1] - 1
-            else:
-                return len(points) - 1
 
         to_be_reduced = np.zeros(len(groups))
         to_be_removed = []
 
         for ig, g in enumerate(groups):
             if g[2] != -1 and np.allclose(points[g[0]],
-                                          points[_find_last_point(g[2], groups, points)]):
+                                          points[_find_last_point(g[2], groups)]):
                 # Remove duplicate from list of points
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
