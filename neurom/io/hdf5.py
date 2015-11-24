@@ -179,6 +179,8 @@ class H5(object):
             if they are present in points-groups representation.
             Returns points, groups with unique points.
         '''
+        import itertools
+
         def _find_last_point(group_id, groups):
             ''' Identifies and returns the id of the last point of a group'''
             group_initial_ids = np.sort(np.transpose(groups)[0])
@@ -201,7 +203,7 @@ class H5(object):
                     to_be_reduced[igg] = to_be_reduced[igg] + 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
-                           for i, j in zip(groups, to_be_reduced)])
+                           for i, j in itertools.izip(groups, to_be_reduced)])
         points = np.delete(points, to_be_removed, axis=0)
 
         return points, groups
