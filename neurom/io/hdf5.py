@@ -78,23 +78,29 @@ class H5(object):
     '''
 
     @staticmethod
-    def read_v1(filename):
+    def read_v1(filename, remove_duplicates=True):
         '''Read an HDF5 v1 file and return a tuple of data, offset, format.'''
         points, groups = _unpack_v1(h5py.File(filename, mode='r'))
-        data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V1'
 
     @staticmethod
-    def read_v2(filename, stage='raw'):
+    def read_v2(filename, stage='raw', remove_duplicates=True):
         '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
         points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
-        data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V2'
 
     @staticmethod
-    def read(filename):
+    def read(filename, remove_duplicates=True):
         '''Read a file and return a tuple of data, offset, format.
 
         * Tries to guess the format and the H5 version.
@@ -109,7 +115,10 @@ class H5(object):
                        if s in h5file['neuron1'])
             points, groups = _unpack_v2(h5py.File(filename, mode='r'),
                                         stage=stg)
-        data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, version
 
