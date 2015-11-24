@@ -174,10 +174,10 @@ class H5(object):
 
     @staticmethod
     def remove_duplicate_points(points, groups):
-        ''' Removes the duplicate points
-            from the beginning of a section,
-            if they are present in points-groups representation.
-            Returns points, groups with unique points.
+        ''' Removes the duplicate points from the beginning of a section, \
+        if they are present in points-groups representation.
+
+        Return: points, groups with unique points.
         '''
         import itertools
 
