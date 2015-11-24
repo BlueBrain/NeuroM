@@ -213,7 +213,7 @@ def _affineTransformNeuron(nrn, A, t, origin=None):
     # if no origin is specified, the position of the soma center
     # is assumed as the origin
     if origin is None:
-        print nrn.soma.center
+
         origin = nrn.soma.center
 
     for point in nrn.soma.iter():
