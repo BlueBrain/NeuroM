@@ -108,6 +108,18 @@ def test_removed_duplicates():
         for ch in v1_data.get_children(i):
             nt.ok_(not np.allclose(v1_data.get_row(i)[0:4],
                                    v1_data.get_row(ch)[0:4]))
+
+def test_dont_remove_duplicates():
+    v1_data = readers.RawDataWrapper(readers.H5.read_v1(
+            os.path.join(H5V1_PATH, 'Neuron.h5'), remove_duplicates=False))
+    v2_data = readers.RawDataWrapper(readers.H5.read_v2(
+            os.path.join(H5V2_PATH, 'Neuron.h5'), remove_duplicates=False))
+    v_data = readers.RawDataWrapper(readers.H5.read(
+            os.path.join(H5V2_PATH, 'Neuron.h5'), remove_duplicates=False))
+    for i in v1_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
+                               v1_data.get_row(ch)[0:4]))
     
 
 class DataWrapper_Neuron(object):
