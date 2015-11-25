@@ -196,15 +196,14 @@ if __name__ == '__main__':
 
     config = {'neuron_checks': []}
 
-    try:
-        with open(yaml_path, 'r') as stream:
+    if yaml_path:
+        try:
+            with open(yaml_path, 'r') as stream:
+                config = yaml.load(stream)
 
-            config = yaml.load(stream)
-
-    except yaml.scanner.ScannerError as e:
-
-        L.error('Invalid yaml file : \n %s', str(e))
-        sys.exit(1)
+        except yaml.scanner.ScannerError as e:
+            L.error('Invalid yaml file : \n %s', str(e))
+            sys.exit(1)
 
     if 'color' in config:
         import functools
@@ -223,10 +222,10 @@ if __name__ == '__main__':
         L.info(SEPARATOR)
         try:
             res = test_file(_f)
+            log_msg(res, 'Check result:')
         except NonConsecutiveIDsError as e:
             print 'ERROR in file %s: %s' % (_f, e.message)
-        except StandardError:
-            print 'ERROR: Could not read file %s.' % _f
+        except StandardError as e:
+            print 'ERROR: Could not read file %s: %s' % (_f, e.message)
 
-    log_msg(res, 'Check result:')
     L.info(SEPARATOR)
