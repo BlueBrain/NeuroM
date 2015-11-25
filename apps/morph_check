@@ -194,7 +194,7 @@ if __name__ == '__main__':
     yaml_path = args.config
     SEPARATOR = '=' * 40
 
-    config = {}
+    config = {'neuron_checks': []}
 
     try:
         with open(yaml_path, 'r') as stream:
