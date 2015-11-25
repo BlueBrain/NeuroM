@@ -26,27 +26,22 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology HDF5 data loading
+import os
+from neurom.io._hdf5mock import H5
+from nose import tools as nt
 
-Data is unpacked into a 2-dimensional raw data block:
-
-    [X, Y, Z, R, TYPE, ID, PARENT_ID]
-
-
-HDF5.V1 Input row format:
-            points: [X, Y, Z, D] (ID is position)
-            groups: [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
-
-There is one such row per measured point.
-
-'''
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+H5_PATH = os.path.join(DATA_PATH, 'h5')
+H5V1_PATH = os.path.join(H5_PATH, 'v1')
+H5V2_PATH = os.path.join(H5_PATH, 'v2')
 
 
-# TODO find a way to test this. Requires that h5py import
-# deep in neurom.io fails. How to simulate this without breaking
-# other tests?
-# pylint: disable=unused-import
-try:
-    from ._hdf5impl import H5, get_version, _unpack_v1, _unpack_v2
-except ImportError: # pragma: no cover
-    from ._hdf5mock import H5
+@nt.raises(ImportError)
+def test_read_h5_v1_raises():
+    H5.read(os.path.join(H5V1_PATH, 'Neuron.h5'))
+
+
+@nt.raises(ImportError)
+def test_read_h5_v2_raises():
+    H5.read(os.path.join(H5V2_PATH, 'Neuron.h5'))

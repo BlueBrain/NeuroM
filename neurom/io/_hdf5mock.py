@@ -25,28 +25,15 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+"""Mock module, loaded when h5py is not available
 
-''' Module for morphology HDF5 data loading
-
-Data is unpacked into a 2-dimensional raw data block:
-
-    [X, Y, Z, R, TYPE, ID, PARENT_ID]
+Hack to allow to run without h5py unless strictly necessary
+"""
 
 
-HDF5.V1 Input row format:
-            points: [X, Y, Z, D] (ID is position)
-            groups: [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
-
-There is one such row per measured point.
-
-'''
-
-
-# TODO find a way to test this. Requires that h5py import
-# deep in neurom.io fails. How to simulate this without breaking
-# other tests?
-# pylint: disable=unused-import
-try:
-    from ._hdf5impl import H5, get_version, _unpack_v1, _unpack_v2
-except ImportError: # pragma: no cover
-    from ._hdf5mock import H5
+class H5(object):
+    '''Mock H5 object to delay h5py import failure'''
+    @staticmethod
+    def read(*args, **kwargs): # pylint: disable=unused-argument
+        '''Mock read method'''
+        raise ImportError("h5py required to read HDF5 files")
