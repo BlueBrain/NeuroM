@@ -204,9 +204,9 @@ if __name__ == '__main__':
             L.error('Invalid yaml file : \n %s', str(e))
             sys.exit(1)
     else:
-        
+
         # set default checks
-        config['neuron_checks'].extend(['has_basal_dendrite', 
+        config['neuron_checks'].extend(['has_basal_dendrite',
                                         'has_axon',
                                         'has_apical_dendrite',
                                         'nonzero_segment_lengths',
