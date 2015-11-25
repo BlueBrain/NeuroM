@@ -46,32 +46,48 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 def test_read_h5v1_basic():
     data, offset, fmt = readers.H5.read(
         os.path.join(H5V1_PATH, 'Neuron.h5'))
-
     nt.ok_(fmt == 'H5V1')
     nt.ok_(offset == 0)
     nt.assert_equal(len(data), 847)
     nt.assert_equal(np.shape(data), (847, 7))
 
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V1_PATH, 'Neuron.h5'), remove_duplicates=False)
+    nt.ok_(fmt == 'H5V1')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 927)
+    nt.assert_equal(np.shape(data), (927, 7))
+
 
 def test_read_h5v2_repaired_basic():
     data, offset, fmt = readers.H5.read(
         os.path.join(H5V2_PATH, 'Neuron_2_branch.h5'))
-
     nt.ok_(fmt == 'H5V2')
     nt.ok_(offset == 0)
     nt.assert_equal(len(data), 442)
     nt.assert_equal(np.shape(data), (442, 7))
 
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V2_PATH, 'Neuron_2_branch.h5'), remove_duplicates=False)
+    nt.ok_(fmt == 'H5V2')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 482)
+    nt.assert_equal(np.shape(data), (482, 7))
 
 def test_read_h5v2_raw_basic():
     data, offset, fmt = readers.H5.read(
         os.path.join(H5V2_PATH, 'Neuron.h5'))
-
     nt.ok_(fmt == 'H5V2')
     nt.ok_(offset == 0)
     nt.assert_equal(len(data), 847)
     nt.assert_equal(np.shape(data), (847, 7))
 
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V2_PATH, 'Neuron.h5'), remove_duplicates=False)
+    nt.ok_(fmt == 'H5V2')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 927)
+    nt.assert_equal(np.shape(data), (927, 7))
 
 def test_get_version():
     v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r')
