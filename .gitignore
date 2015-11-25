@@ -11,3 +11,5 @@ pylint.txt
 doc/build
 doc/source/_neurom_build
 dist/*
+.DS_Store
+.ipynb_checkpoints

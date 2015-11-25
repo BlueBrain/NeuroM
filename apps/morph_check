@@ -155,7 +155,6 @@ def test_file(f):
         else:
 
             out = getattr(io_chk, check)(nrn)
-        print check
 
         if check in ['nonzero_section_lengths',
                      'nonzero_segment_lengths',
@@ -194,7 +193,7 @@ if __name__ == '__main__':
     yaml_path = args.config
     SEPARATOR = '=' * 40
 
-    config = {}
+    config = {'neuron_checks': [], 'options': []}
 
     if yaml_path:
         try:
@@ -204,6 +203,15 @@ if __name__ == '__main__':
         except yaml.scanner.ScannerError as e:
             L.error('Invalid yaml file : \n %s', str(e))
             sys.exit(1)
+    else:
+
+        # set default checks
+        config['neuron_checks'].extend(['has_basal_dendrite',
+                                        'has_axon',
+                                        'has_apical_dendrite',
+                                        'nonzero_segment_lengths',
+                                        'nonzero_section_lengths',
+                                        'nonzero_neurite_radii'])
 
     if 'color' in config:
         import functools
