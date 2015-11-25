@@ -11,27 +11,31 @@ from matplotlib.collections import PolyCollection
 
 import numpy as np
 
+
+def _total_lines(tree): 
+
+    return n_segments(tree) + n_bifurcations(tree) * 2
+
+
+def _n_lines(obj):
+
+    if isinstance(obj, Tree):
+
+        return _total_lines(tree)
+
+    elif isinstance(obj, Neuron):
+
+        return sum([_total_lines(neu) for neu in obj.neurites])
+
+    else:
+
+        return 0
+
+
 class Dendrogram(object):
 
 
     def __init__(self, obj):
-
-
-        def _tot_lines(tree): return n_segments(tree) + n_bifurcations(tree) * 2
-    
-        def _n_lines(obj):
-
-            if isinstance(obj, Tree):
-
-                return _tot_lines(tree)
-
-            elif isinstance(obj, Neuron):
-
-                return sum([_tot_lines(neu) for neu in obj.neurites])
-
-            else:
-
-                return 0
 
         self._tree = None
         self._n = 0
@@ -46,17 +50,25 @@ class Dendrogram(object):
 
     def run(self, obj):
 
+        n_previous = 0
         for neurite in obj.neurites:
 
             self._generate_dendro(neurite)
 
-        @property
-        def tr():
-            return _tree
+            self._neurites.append(self._lines[n_previous : self._n])
 
-        @property
-        def data():
-            return _lines
+            n_previous = self._n
+
+
+    @property
+    def tr():
+        return _tree
+
+
+    @property
+    def data():
+        return _lines
+
 
     def _vertical_segment(self, new_offsets, radii):
         '''Vertices fo a vertical segment
@@ -142,7 +154,7 @@ class Dendrogram(object):
                 #colors[self._n] = current_node.value[COLS.TYPE]
                 self._n += 1
 
-    def view(self, new_fig=True):
+    def view(self, new_fig=True, subplot=None):
 
 
         collection = PolyCollection(self._lines, closed=False, antialiaseds=True)
@@ -153,8 +165,8 @@ class Dendrogram(object):
         ax.autoscale(enable=True, tight=None)
 
         # dummy plots for color bar labels
-        for color, label in set(linked_colors):
-            ax.plot((0., 0.), (0., 0.), c=color, label=label)
+        #for color, label in set(linked_colors):
+        #    ax.plot((0., 0.), (0., 0.), c=color, label=label)
 
         # customization settings
         kwargs['xticks'] = []
