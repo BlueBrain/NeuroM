@@ -10,6 +10,7 @@ from neurom.view import common
 from matplotlib.collections import PolyCollection
 
 import numpy as np
+import sys
 
 
 def _total_lines(tree): 
@@ -21,7 +22,7 @@ def _n_lines(obj):
 
     if isinstance(obj, Tree):
 
-        return _total_lines(tree)
+        return _total_lines(obj)
 
     elif isinstance(obj, Neuron):
 
@@ -37,27 +38,54 @@ class Dendrogram(object):
 
     def __init__(self, obj):
 
-        self._tree = None
+        self._obj = obj
         self._n = 0
 
         self._max_dims = [0., 0.]
-        self._spacing = (40., 0.)
         self._offsets = [0., 0.]
 
-        self._neurites = []
+        self._trees = []
+        self._dims = [self._max_dims]
 
-        self._lines = np.zeros([_n_lines(obj), 4, 2])
+        self._lines = np.zeros([_n_lines(self._obj), 4, 2])
 
-    def run(self, obj):
+        print "nlines : ", _n_lines(self._obj)
+
+    def run(self):
+
+        sys.setrecursionlimit(100000)
+
+        spacing = (40., 0.)
 
         n_previous = 0
-        for neurite in obj.neurites:
+        #for neurite in self._obj.neurites if isinstance(self._obj, Neuron) else self._obj:
+        if isinstance(self._obj, Tree):
 
-            self._generate_dendro(neurite)
+            self._generate_dendro(self._obj, self._lines, spacing)
 
-            self._neurites.append(self._lines[n_previous : self._n])
+            self._trees = [self._lines]
 
-            n_previous = self._n
+        else:
+
+            for neurite in self._obj.neurites:
+
+                n_previous = 0
+
+                self._generate_dendro(neurite, self._lines, spacing)
+
+                # store in trees the sliced array of lines for each neurite
+                self._trees.append(self._lines[n_previous : self._n])
+
+                # store the max dims per neurite for view positioning
+                self._dims.append(self._max_dims)
+
+                # reset the max dimensions for the next tree in line
+                self._max_dims = [0., 0.]
+                self._offsets = [0., 0.]
+
+                # keep track of the next tree start index in list
+                n_previous = self._n
+
 
 
     @property
@@ -70,41 +98,46 @@ class Dendrogram(object):
         return _lines
 
 
-    def _vertical_segment(self, new_offsets, radii):
+    def _vertical_segment(self, old_offs, new_offs, spacing, radii):
         '''Vertices fo a vertical segment
         '''
-        return np.array(((new_offsets[0] - radii[0], self._offsets[1] + self._spacing[1]),
-                         (new_offsets[0] - radii[1], new_offsets[1]),
-                         (new_offsets[0] + radii[1], new_offsets[1]),
-                         (new_offsets[0] + radii[0], self._offsets[1] + self._spacing[1])))
+        return np.array(((new_offs[0] - radii[0], old_offs[1] + spacing[1]),
+                         (new_offs[0] - radii[1], new_offs[1]),
+                         (new_offs[0] + radii[1], new_offs[1]),
+                         (new_offs[0] + radii[0], old_offs[1] + spacing[1])))
 
 
-    def _horizontal_segment(self, new_offsets, diameter):
+    def _horizontal_segment(self, old_offs, new_offs, spacing, diameter):
         '''Vertices of a horizontal segmen
         '''
-        return np.array(((self._offsets[0], self._offsets[1] + self._spacing[1]),
-                         (new_offsets[0], self._offsets[1] + self._spacing[1]),
-                         (new_offsets[0], self._offsets[1] + self._spacing[1] - diameter),
-                         (self._offsets[0], self._offsets[1] + self._spacing[1] - diameter)))
+        return np.array(((old_offs[0], old_offs[1] + spacing[1]),
+                         (new_offs[0], old_offs[1] + spacing[1]),
+                         (new_offs[0], old_offs[1] + spacing[1] - diameter),
+                         (old_offs[0], old_offs[1] + spacing[1] - diameter)))
 
 
-    def _spacingx(self, node):
+    def _spacingx(self, node, max_dims, offsets, spacing):
         '''Determine the spacing of the current node depending on the number
            of the leaves of the tree
         '''
-        x_spacing = n_terminations(node) * self._spacing[0]
+        x_spacing = n_terminations(node) * spacing[0]
 
-        if x_spacing > self._max_dims[0]:
-            self._max_dims[0] = x_spacing
+        if x_spacing > max_dims[0]:
+            max_dims[0] = x_spacing
 
-        return self._offsets[0] - x_spacing / 2.
+        return offsets[0] - x_spacing / 2.
 
+    def _update_offsets(self, start_x, spacing, terminations, offsets, length):
 
-    def _generate_dendro(self, current_node):
+        return [start_x + spacing[0] * terminations / 2.,
+                offsets[1] + spacing[1] * 2. + length]
+
+    def _generate_dendro(self, current_node, lines, spacing):
         '''Recursive function for dendrogram line computations
         '''
-
-        start_x = self._spacingx(current_node)
+        offsets = self._offsets
+        max_dims = self._max_dims
+        start_x = self._spacingx(current_node, max_dims, offsets, spacing)
 
         radii = [0., 0.]
         # store the parent radius in order to construct polygonal segments
@@ -114,7 +147,7 @@ class Dendrogram(object):
         for child in current_node.children:
 
             # segment length
-            length = segment_length(list(val_iter((current_node, child))))
+            ln = segment_length(list(val_iter((current_node, child))))
 
             # extract the radius of the child node. Need both radius for
             # realistic segment representation
@@ -125,43 +158,60 @@ class Dendrogram(object):
 
             # horizontal spacing with respect to the number of
             # terminations
-            new_offsets = (start_x + self._spacing[0] * terminations / 2.,
-                           self._offsets[1] + self._spacing[1] * 2. + length)
+            new_offsets = self._update_offsets(start_x, spacing, terminations, offsets, ln)
 
-            # vertical segment
-            self._lines[self._n] = self._vertical_segment(new_offsets, radii)
+            # create and store vertical segment
+            lines[self._n] = self._vertical_segment(offsets, new_offsets, spacing, radii)
 
             # assign segment id to color array
-            #self.colors[self._n] = child.value[COLS.TYPE]
-
+            #colors[n[0]] = child.value[4]
             self._n += 1
 
-            if self._offsets[1] + self._spacing[1] * 2 + length > self._max_dims[1]:
-                self._max_dims[1] = self._offsets[1] + self._spacing[1] * 2. + length
+            if offsets[1] + spacing[1] * 2 + ln > max_dims[1]:
+                max_dims[1] = offsets[1] + spacing[1] * 2. + ln
 
+            self._offsets = new_offsets
+            self._max_dims = max_dims
             # recursive call to self.
-            self._generate_dendro(child)
+            self._generate_dendro(child, lines, spacing)
 
             # update the starting position for the next child
-            start_x += terminations * self._spacing[0]
+            start_x += terminations * spacing[0]
 
             # write the horizontal lines only for bifurcations, where the are actual horizontal lines
             # and not zero ones
-            if self._offsets[0] != new_offsets[0]:
+            if offsets[0] != new_offsets[0]:
 
                 # horizontal segment
-                self._lines[self._n] = self._horizontal_segment(new_offsets, 0.)
-                #colors[self._n] = current_node.value[COLS.TYPE]
+                lines[self._n] = self._horizontal_segment(offsets, new_offsets, spacing, 0.)
+                #colors[self._n] = current_node.value[4]
                 self._n += 1
 
-    def view(self, new_fig=True, subplot=None):
+    def displace(self, rectangles, t):
+        print
+        
+        for rectangle in rectangles:
+            print rectangle
+            
+            for line in rectangle:
+                print line, t
 
+                line[0] += t[0]
+                line[1] += t[1]
 
-        collection = PolyCollection(self._lines, closed=False, antialiaseds=True)
+    def view(self, new_fig=True, subplot=None, **kwargs):
+
 
         fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-        ax.add_collection(collection)
+        dist = 0.
+        for i, group in enumerate(self._trees):
+
+            dist += 0.5 
+            self.displace(group, [dist, 0.])
+            collection = PolyCollection(group, closed=False, antialiaseds=True)
+            ax.add_collection(collection)
+
         ax.autoscale(enable=True, tight=None)
 
         # dummy plots for color bar labels
@@ -169,11 +219,11 @@ class Dendrogram(object):
         #    ax.plot((0., 0.), (0., 0.), c=color, label=label)
 
         # customization settings
-        kwargs['xticks'] = []
-        kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
-        kwargs['xlabel'] = kwargs.get('xlabel', '')
-        kwargs['ylabel'] = kwargs.get('ylabel', '')
-        kwargs['no_legend'] = False
+        #kwargs['xticks'] = []
+        #kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
+        #kwargs['xlabel'] = kwargs.get('xlabel', '')
+        #kwargs['ylabel'] = kwargs.get('ylabel', '')
+        #kwargs['no_legend'] = False
 
         return common.plot_style(fig=fig, ax=ax, **kwargs)
 
