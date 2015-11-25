@@ -45,7 +45,7 @@ class Dendrogram(object):
         self._offsets = [0., 0.]
 
         self._trees = []
-        self._dims = [self._max_dims]
+        self._dims = []
 
         self._lines = np.zeros([_n_lines(self._obj), 4, 2])
 
@@ -191,10 +191,10 @@ class Dendrogram(object):
         print
         
         for rectangle in rectangles:
-            print rectangle
+
             
             for line in rectangle:
-                print line, t
+
 
                 line[0] += t[0]
                 line[1] += t[1]
@@ -206,10 +206,18 @@ class Dendrogram(object):
 
         dist = 0.
         for i, group in enumerate(self._trees):
-
-            dist += 0.5 
-            self.displace(group, [dist, 0.])
-            collection = PolyCollection(group, closed=False, antialiaseds=True)
+            print i
+            #if i > 0:
+            # dist += 0.5 * (self._dims[i-1][0] + self._dims[i][0])
+            #print dist
+            #print
+            dist += 10.
+            #print dist
+            #self.displace(group, [dist, 0.])
+            collection = PolyCollection(group, closed=False, antialiaseds=True, offsets=(0., dist))
+            #return collection
+            #if i == 0:
+            #    dist += 0.5 * self._dims[i][0]
             ax.add_collection(collection)
 
         ax.autoscale(enable=True, tight=None)
