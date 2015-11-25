@@ -29,6 +29,7 @@
 import os
 import numpy as np
 from neurom.io import readers
+from neurom.io import swc
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
@@ -46,7 +47,7 @@ def check_single_section_random_swc(data, fmt, offset=0):
 
 
 def test_read_swc_basic():
-    data, offset, fmt = readers.SWC.read(
+    data, offset, fmt = swc.SWC.read(
         os.path.join(SWC_PATH,
                      'random_trunk_off_0_16pt.swc'))
 
@@ -55,7 +56,7 @@ def test_read_swc_basic():
 
 def test_point_soma_swc():
 
-    data, offset, fmt = readers.SWC.read(
+    data, offset, fmt = swc.SWC.read(
         os.path.join(SWC_PATH,
                      'point_soma.swc'))
 
@@ -67,7 +68,7 @@ def test_point_soma_swc():
 
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
-        self.data = readers.RawDataWrapper(readers.SWC.read(
+        self.data = readers.RawDataWrapper(swc.SWC.read(
             os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc')))
         self.first_id = int(self.data.data_block[0][COLS.ID])
 

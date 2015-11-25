@@ -48,8 +48,7 @@ import numpy as np
 from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
-from neurom.io.swc import SWC
-from neurom.io.hdf5 import H5
+from neurom.utils import memoize
 
 
 def load_data(filename):
@@ -64,9 +63,21 @@ def load_data(filename):
     def unpack_data():
         '''Read an SWC file and return a tuple of data, offset, format.
         Forwards filename to appropriate reader depending on extension'''
-        _READERS = {'swc': SWC.read, 'h5': H5.read}
+        @memoize
+        def _h5_reader():
+            '''Lazy loading of HDF5 reader'''
+            from .hdf5 import H5
+            return H5.read
+
+        @memoize
+        def _swc_reader():
+            '''Lazy loading of SWC reader'''
+            from .swc import SWC
+            return SWC.read
+
+        _READERS = {'swc': _swc_reader, 'h5': _h5_reader}
         extension = os.path.splitext(filename)[1][1:]
-        return _READERS[extension.lower()](filename)
+        return _READERS[extension.lower()]()(filename)
 
     return RawDataWrapper(unpack_data())
 
