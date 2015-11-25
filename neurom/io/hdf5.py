@@ -78,27 +78,50 @@ class H5(object):
     '''
 
     @staticmethod
-    def read_v1(filename):
-        '''Read an HDF5 v1 file and return a tuple of data, offset, format.'''
+    def read_v1(filename, remove_duplicates=True):
+        '''Read an HDF5 v1 file and return a tuple of data, offset, format.
+
+        Parameters:
+            remove_duplicates: boolean, \
+            If True removes duplicate points \
+            from the beginning of each section.
+        '''
         points, groups = _unpack_v1(h5py.File(filename, mode='r'))
-        data = H5.unpack_data(points, groups)
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V1'
 
     @staticmethod
-    def read_v2(filename, stage='raw'):
-        '''Read an HDF5 v2 file and return a tuple of data, offset, format.'''
+    def read_v2(filename, stage='raw', remove_duplicates=True):
+        '''Read an HDF5 v2 file and return a tuple of data, offset, format.
+
+        Parameters:
+            remove_duplicates: boolean, \
+            If True removes duplicate points \
+            from the beginning of each section.
+        '''
         points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
-        data = H5.unpack_data(points, groups)
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, 'H5V2'
 
     @staticmethod
-    def read(filename):
+    def read(filename, remove_duplicates=True):
         '''Read a file and return a tuple of data, offset, format.
 
         * Tries to guess the format and the H5 version.
         * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
+
+        Parameters:
+            remove_duplicates: boolean, \
+            If True removes duplicate points \
+            from the beginning of each section.
         '''
         h5file = h5py.File(filename, mode='r')
         version = get_version(h5file)
@@ -109,7 +132,10 @@ class H5(object):
                        if s in h5file['neuron1'])
             points, groups = _unpack_v2(h5py.File(filename, mode='r'),
                                         stage=stg)
-        data = H5.unpack_data(points, groups)
+        if remove_duplicates:
+            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
+        else:
+            data = H5.unpack_data(points, groups)
         offset = 0  # H5 is index based, so there's no offset
         return data, offset, version
 
@@ -145,6 +171,44 @@ class H5(object):
                           find_group(i)[H5V1.GTYPE], i,
                           find_parent_id(i))
                          for i, p in enumerate(points)])
+
+    @staticmethod
+    def remove_duplicate_points(points, groups):
+        ''' Removes the duplicate points from the beginning of a section,
+        if they are present in points-groups representation.
+
+        Returns:
+            points, groups with unique points.
+
+        '''
+        import itertools
+
+        def _find_last_point(group_id, groups):
+            ''' Identifies and returns the id of the last point of a group'''
+            group_initial_ids = np.sort(np.transpose(groups)[0])
+
+            if group_id != len(group_initial_ids) - 1:
+                return group_initial_ids[np.where(group_initial_ids ==
+                                                  groups[group_id][0])[0][0] + 1] - 1
+
+        to_be_reduced = np.zeros(len(groups))
+        to_be_removed = []
+
+        for ig, g in enumerate(groups):
+            if g[2] != -1 and np.allclose(points[g[0]],
+                                          points[_find_last_point(g[2], groups)]):
+                # Remove duplicate from list of points
+                to_be_removed.append(g[0])
+                # Reduce the id of the following sections
+                # in groups structure by one
+                for igg in range(ig + 1, len(groups)):
+                    to_be_reduced[igg] = to_be_reduced[igg] + 1
+
+        groups = np.array([np.subtract(i, [j, 0, 0])
+                           for i, j in itertools.izip(groups, to_be_reduced)])
+        points = np.delete(points, to_be_removed, axis=0)
+
+        return points, groups
 
 
 def _unpack_v1(h5file):
