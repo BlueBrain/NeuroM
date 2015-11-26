@@ -15,6 +15,9 @@ TREE.children[0].add_child(Tree(np.array([-10., -10., -10., 7., 1., 0., 0.])))
 SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
 NEURON = Neuron(SOMA, [TREE, TREE, TREE])
 
+OLD_OFFS = [1.2, -1.2]
+NEW_OFFS = [2.3, -2.3]
+SPACING = (40., 0.)
 
 def test_n_rectangles_tree():
 
@@ -52,9 +55,6 @@ def test_displace():
 
 def test_vertical_segment():
 
-	old_offs = np.array([1.2, -1.2])
-	new_offs = np.array([2.3, -2.3])
-	spacing = (40., 0.)
 	radii = [10., 20.]
 
 	res = np.array([[ -7.7,  -1.2],
@@ -62,16 +62,13 @@ def test_vertical_segment():
        				[ 22.3,  -2.3],
        				[ 12.3,  -1.2]])
 
-	seg = dm._vertical_segment(old_offs, new_offs, spacing, radii)
+	seg = dm._vertical_segment(OLD_OFFS, NEW_OFFS, SPACING, radii)
 
 	nt.assert_true(np.allclose(seg, res))
 
 
 def test_horizontal_segment():
 
-	old_offs = np.array([1.2, -1.2])
-	new_offs = np.array([2.3, -2.3])
-	spacing = (40., 0.)
 	diameter = 10.
 
 	res = np.array([[  1.2,  -1.2],
@@ -79,7 +76,7 @@ def test_horizontal_segment():
        				[  2.3, -11.2],
        				[  1.2, -11.2]])
 
-	seg = dm._horizontal_segment(old_offs, new_offs, spacing, diameter)
+	seg = dm._horizontal_segment(OLD_OFFS, NEW_OFFS, SPACING, diameter)
 
 	nt.assert_true(np.allclose(seg, res))
 
@@ -87,19 +84,24 @@ def test_horizontal_segment():
 def test_spacingx():
 
 	xoffset = 100.2
-
 	xspace = 40.
-
 	max_dims = [10., 2.]
 
 	spx = dm._spacingx(TREE, max_dims, xoffset, xspace)
-
 
 	nt.assert_almost_equal(spx, 60.2)
 	nt.assert_almost_equal(max_dims[0], 2. * xspace)
 
 
-def test_update_offsets():pass
+def test_update_offsets():
+
+	start_x = -10.
+	length = 44.
+
+	offs = dm._update_offsets(start_x, SPACING, 2, OLD_OFFS, length)
+    
+	nt.assert_almost_equal(offs[0], 30.)
+	nt.assert_almost_equal(offs[1], 42.8)
 
 class TestDendrogram(object):
 
