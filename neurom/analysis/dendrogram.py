@@ -139,9 +139,9 @@ class Dendrogram(object):
         # by a neurite. It is updated recursively.
         self._max_dims = [0., 0.]
 
-        # trees store the segment collections for each neurite
-        # separately
-        self._trees = []
+        # stores indices that refer to the _rectangles array
+        # for each neurite
+        self._groups = []
 
         # dims store the max dimensions for each neurite
         # essential for the displacement in the plotting
@@ -149,8 +149,6 @@ class Dendrogram(object):
 
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
-
-        print "nlines : ", _n_rectangles(self._obj)
 
     def generate(self):
         '''Generate dendrogram
@@ -168,7 +166,7 @@ class Dendrogram(object):
 
             self._generate_dendro(self._obj, spacing, offsets)
 
-            self._trees = [self._rectangles]
+            self._groups = [(0., self._n)]
 
         else:
 
@@ -178,8 +176,9 @@ class Dendrogram(object):
 
                 self._generate_dendro(neurite, spacing, offsets)
 
-                # store in trees the sliced array of lines for each neurite
-                self._trees.append(self._rectangles[n_previous: self._n])
+                # store in trees the indices for the slice which corresponds
+                # to the current neurite
+                self._groups.append((n_previous, self._n))
 
                 # store the max dims per neurite for view positioning
                 self._dims.append(self._max_dims)
@@ -264,7 +263,10 @@ class Dendrogram(object):
         displacement = 0.
         colors = set()
 
-        for i, group in enumerate(self._trees):
+        for i, indices in enumerate(self._groups):
+
+            # slice rectangles array for the current neurite
+            group = self._rectangles[indices[0]: indices[1]]
 
             if i > 0:
                 displacement += 0.5 * (self._dims[i - 1][0] + self._dims[i][0])

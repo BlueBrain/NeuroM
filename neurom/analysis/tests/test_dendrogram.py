@@ -21,95 +21,129 @@ SPACING = (40., 0.)
 
 def test_n_rectangles_tree():
 
-	nt.assert_equal(dm._n_rectangles(TREE), 5)
+    nt.assert_equal(dm._n_rectangles(TREE), 5)
 
 
 def test_n_rectangles_neuron():
 
-	nt.assert_equal(dm._n_rectangles(NEURON), 15)
+    nt.assert_equal(dm._n_rectangles(NEURON), 15)
+
+
+def test_n_rectangles_other():
+
+    nt.assert_equal(dm._n_rectangles('I am unique.'), 0)
 
 
 def test_displace():
 
-	rects = np.array([[[-0.85351288,  0.0],
-				       [-0.72855526,  0.1],
-				       [ 0.72855526,  0.1],
-				       [ 0.85351288,  0.0]],
-			          [[-0.72855526,  0.1],
-			           [-0.54222909,  0.75137071],
-			           [ 0.54222909,  0.75137071],
-			           [ 0.72855526,  0.1]]])
+    rects = np.array([[[-0.85351288,  0.0],
+                       [-0.72855526,  0.1],
+                       [ 0.72855526,  0.1],
+                       [ 0.85351288,  0.0]],
+                      [[-0.72855526,  0.1],
+                       [-0.54222909,  0.75137071],
+                       [ 0.54222909,  0.75137071],
+                       [ 0.72855526,  0.1]]])
 
-	res = np.array([[[ 2.14648711,  -1.        ],
-				        [ 2.27144473,  -0.9       ],
-				        [ 3.72855526,  -0.9        ],
-				        [ 3.85351288,  -1.        ]],
-				       [[ 2.27144473,  -0.9       ],
-				        [ 2.45777091,  -0.24862929],
-				        [ 3.54222909,  -0.24862929],
-				        [ 3.72855526,  -0.9       ]]])
+    res = np.array([[[ 2.14648711,  -1.        ],
+                        [ 2.27144473,  -0.9       ],
+                        [ 3.72855526,  -0.9        ],
+                        [ 3.85351288,  -1.        ]],
+                       [[ 2.27144473,  -0.9       ],
+                        [ 2.45777091,  -0.24862929],
+                        [ 3.54222909,  -0.24862929],
+                        [ 3.72855526,  -0.9       ]]])
 
-	dm.displace(rects, (3., -1.))
-	nt.assert_true(np.allclose(rects, res))
+    dm.displace(rects, (3., -1.))
+    nt.assert_true(np.allclose(rects, res))
 
 
 def test_vertical_segment():
 
-	radii = [10., 20.]
+    radii = [10., 20.]
 
-	res = np.array([[ -7.7,  -1.2],
-       				[-17.7,  -2.3],
-       				[ 22.3,  -2.3],
-       				[ 12.3,  -1.2]])
+    res = np.array([[ -7.7,  -1.2],
+                    [-17.7,  -2.3],
+                    [ 22.3,  -2.3],
+                    [ 12.3,  -1.2]])
 
-	seg = dm._vertical_segment(OLD_OFFS, NEW_OFFS, SPACING, radii)
+    seg = dm._vertical_segment(OLD_OFFS, NEW_OFFS, SPACING, radii)
 
-	nt.assert_true(np.allclose(seg, res))
+    nt.assert_true(np.allclose(seg, res))
 
 
 def test_horizontal_segment():
 
-	diameter = 10.
+    diameter = 10.
 
-	res = np.array([[  1.2,  -1.2],
-       				[  2.3,  -1.2],
-       				[  2.3, -11.2],
-       				[  1.2, -11.2]])
+    res = np.array([[  1.2,  -1.2],
+                    [  2.3,  -1.2],
+                    [  2.3, -11.2],
+                    [  1.2, -11.2]])
 
-	seg = dm._horizontal_segment(OLD_OFFS, NEW_OFFS, SPACING, diameter)
+    seg = dm._horizontal_segment(OLD_OFFS, NEW_OFFS, SPACING, diameter)
 
-	nt.assert_true(np.allclose(seg, res))
+    nt.assert_true(np.allclose(seg, res))
 
 
 def test_spacingx():
 
-	xoffset = 100.2
-	xspace = 40.
-	max_dims = [10., 2.]
+    xoffset = 100.2
+    xspace = 40.
+    max_dims = [10., 2.]
 
-	spx = dm._spacingx(TREE, max_dims, xoffset, xspace)
+    spx = dm._spacingx(TREE, max_dims, xoffset, xspace)
 
-	nt.assert_almost_equal(spx, 60.2)
-	nt.assert_almost_equal(max_dims[0], 2. * xspace)
+    nt.assert_almost_equal(spx, 60.2)
+    nt.assert_almost_equal(max_dims[0], 2. * xspace)
 
 
 def test_update_offsets():
 
-	start_x = -10.
-	length = 44.
+    start_x = -10.
+    length = 44.
 
-	offs = dm._update_offsets(start_x, SPACING, 2, OLD_OFFS, length)
+    offs = dm._update_offsets(start_x, SPACING, 2, OLD_OFFS, length)
     
-	nt.assert_almost_equal(offs[0], 30.)
-	nt.assert_almost_equal(offs[1], 42.8)
+    nt.assert_almost_equal(offs[0], 30.)
+    nt.assert_almost_equal(offs[1], 42.8)
 
 class TestDendrogram(object):
 
-	def setUp(self):
+    def setUp(self):
 
-		self.dendro = dm.Dendrogram(NEURON)
+        self.dtr = dm.Dendrogram(TREE)
+        self.dnrn = dm.Dendrogram(NEURON)
 
-	def test_generate(self):pass
+    def test_init(self):
 
-	def test_generate_dendro(self):pass
+        nt.assert_true(np.allclose(self.dnrn._rectangles.shape, (15, 4, 2)))
+
+    def test_generate_tree(self):
+
+        self.dtr.generate()
+        nt.assert_true(np.allclose(self.dtr._rectangles.shape, (5, 4, 2)))
+        nt.assert_false(np.all(self.dtr._rectangles == 0.))
+
+    def test_generate_neuron(self):
+
+        self.dnrn.generate()
+        total = 0
+
+        for n0, n1 in self.dnrn._groups:
+
+            group = self.dnrn._rectangles[n0: n1]
+
+            total += group.shape[0]
+
+            nt.assert_false(np.all(group == 0.))
+
+        nt.assert_equal(total, 15)
+
+    def test_data(self):pass
+        #print self.dnrn.data, self.dtr.data
+        #nt.assert_false(np.all(self.dnrn.data == 0.))
+        #nt.assert_false(np.all(self.dtr.data == 0.))
+
+    def test_generate_dendro(self):pass
 
