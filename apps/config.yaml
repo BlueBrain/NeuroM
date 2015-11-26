@@ -59,8 +59,8 @@ options :
     
     # threshold
     nonzero_neurite_radii   : 0.007
-    nonzero_segment_lengths : 0.007
-    nonzero_section_lengths : 0.007
+    nonzero_segment_lengths : 0.01
+    nonzero_section_lengths : 0.01
 
     # tolerance/ratio, method
     has_flat_neurites       : [0.1, 'ratio']
