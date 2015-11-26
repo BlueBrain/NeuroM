@@ -46,10 +46,27 @@ def test_displace():
 				        [ 3.54222909,  -0.24862929],
 				        [ 3.72855526,  -0.9       ]]])
 
+	dm.displace(rects, (3., -1.))
 	nt.assert_true(np.allclose(rects, res))
 
 
-def test_vertical_segment():pass
+def test_vertical_segment():
+
+	old_offs = np.array([1.2, -1.2])
+	new_offs = np.array([2.3, -2.3])
+	spacing = (40., 0.)
+	radii = [10., 20.]
+
+	res = np.array([[ -7.7,  -1.2],
+       				[-17.7,  -2.3],
+       				[ 22.3,  -2.3],
+       				[ 12.3,  -1.2]])
+
+	seg = dm._vertical_segment(old_offs, new_offs, spacing, radii)
+
+	nt.assert_true(np.allclose(seg, res))
+
+
 def test_horizontal_segment():pass
 def test_spacingx():pass
 def test_update_offsets():pass
