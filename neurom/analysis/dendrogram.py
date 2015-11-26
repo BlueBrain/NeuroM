@@ -58,7 +58,7 @@ def _n_rectangles(obj):
 
     elif isinstance(obj, Neuron):
 
-        return sum([_total_rectangles(neu) for neu in obj.neurites])
+        return sum(_total_rectangles(neu) for neu in obj.neurites)
 
     else:
 
@@ -140,7 +140,7 @@ class Dendrogram(object):
 
         sys.setrecursionlimit(100000)
 
-        spacing = (40., 0.)
+        spacing = (10., 0.)
 
         offsets = (0., 0.)
 
