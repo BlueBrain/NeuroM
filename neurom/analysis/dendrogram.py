@@ -28,7 +28,7 @@
 
 '''Dendrogram helper functions and class'''
 
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, ipreorder
 from neurom.core.neuron import Neuron
 from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
 from neurom.analysis.morphmath import segment_length
@@ -36,6 +36,40 @@ from neurom.core.dataformat import COLS
 
 import numpy as np
 import sys
+
+
+def _recursion_handler(func):
+    ''' Decorator that takes a recursive function which operates on trees or neurons
+    and estimates the max number of calls to the recursive function. This is achieved
+    by finding the max number of nodes of the given tree or from the biggest neurite in
+    the given neuron.
+    '''
+
+    def depth(tree):
+        ''' Returns the depth which is defined as the number of nodes in a tree
+        '''
+        return sum(1 for _ in ipreorder(tree))
+
+    def set_limit(self):
+        ''' Set the recursion limit, run the function and restore its initial value
+        '''
+        neurites = self.obj.neurites if hasattr(self.obj, 'neurites') else [self.obj]
+
+        max_depth = max(depth(neu) for neu in neurites)
+
+        old_depth = sys.getrecursionlimit()
+
+        max_depth = old_depth if old_depth > max_depth else max_depth
+
+        sys.setrecursionlimit(max_depth)
+
+        func(self)
+
+        sys.setrecursionlimit(old_depth)
+
+        print "recursion after :", sys.getrecursionlimit()
+
+    return set_limit
 
 
 def _total_rectangles(tree):
@@ -134,12 +168,10 @@ class Dendrogram(object):
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
 
+    @_recursion_handler
     def generate(self):
         '''Generate dendrogram
         '''
-
-        sys.setrecursionlimit(100000)
-
         spacing = (10., 0.)
 
         offsets = (0., 0.)
@@ -254,3 +286,9 @@ class Dendrogram(object):
         '''
         neurites = self._obj.neurites if hasattr(self._obj, 'neurites') else [self._obj]
         return (neu.type for neu in neurites)
+
+    @property
+    def obj(self):
+        ''' Returns input object. Neuron or Tree.
+        '''
+        return self._obj
