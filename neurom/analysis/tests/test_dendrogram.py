@@ -83,7 +83,22 @@ def test_horizontal_segment():
 
 	nt.assert_true(np.allclose(seg, res))
 
-def test_spacingx():pass
+
+def test_spacingx():
+
+	xoffset = 100.2
+
+	xspace = 40.
+
+	max_dims = [10., 2.]
+
+	spx = dm._spacingx(TREE, max_dims, xoffset, xspace)
+
+
+	nt.assert_almost_equal(spx, 60.2)
+	nt.assert_almost_equal(max_dims[0], 2. * xspace)
+
+
 def test_update_offsets():pass
 
 class TestDendrogram(object):

@@ -99,16 +99,16 @@ def _horizontal_segment(old_offs, new_offs, spacing, diameter):
                      (old_offs[0], old_offs[1] + spacing[1] - diameter)))
 
 
-def _spacingx(node, max_dims, offsets, spacing):
+def _spacingx(node, max_dims, xoffset, xspace):
     '''Determine the spacing of the current node depending on the number
        of the leaves of the tree
     '''
-    x_spacing = n_terminations(node) * spacing[0]
+    x_spacing = n_terminations(node) * xspace
 
     if x_spacing > max_dims[0]:
         max_dims[0] = x_spacing
 
-    return offsets[0] - x_spacing / 2.
+    return xoffset - x_spacing / 2.
 
 
 def _update_offsets(start_x, spacing, terminations, offsets, length):
@@ -200,7 +200,7 @@ class Dendrogram(object):
         '''Recursive function for dendrogram line computations
         '''
         max_dims = self._max_dims
-        start_x = _spacingx(current_node, max_dims, offsets, spacing)
+        start_x = _spacingx(current_node, max_dims, offsets[0], spacing[0])
 
         radii = [0., 0.]
         # store the parent radius in order to construct polygonal segments
