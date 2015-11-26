@@ -221,7 +221,9 @@ def _unpack_v1(h5file):
 def _unpack_v2(h5file, stage):
     '''Unpack groups from HDF5 v2 file'''
     points = np.array(h5file['neuron1/%s/points' % stage])
-    groups = np.array(h5file['neuron1/structure/%s' % stage])
+    # from documentation: The /neuron1/structure/unraveled reuses /neuron1/structure/raw
+    groups_stage = stage if stage != 'unraveled' else 'raw'
+    groups = np.array(h5file['neuron1/structure/%s' % groups_stage])
     stypes = np.array(h5file['neuron1/structure/sectiontype'])
     groups = np.hstack([groups, stypes])
     groups[:, [1, 2]] = groups[:, [2, 1]]
