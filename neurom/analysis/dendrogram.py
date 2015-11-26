@@ -78,7 +78,7 @@ def displace(rectangles, t):
         for j in xrange(m):
 
             rectangles[i, j, 0] += t[0]
-            rectangles[i, j, 0] += t[1]
+            rectangles[i, j, 1] += t[1]
 
 
 def _vertical_segment(old_offs, new_offs, spacing, radii):
@@ -152,7 +152,7 @@ class Dendrogram(object):
 
         print "nlines : ", _n_rectangles(self._obj)
 
-    def run(self):
+    def generate(self):
         '''Generate dendrogram
         '''
 
