@@ -54,7 +54,7 @@ morphology files.
 Files are unloaded into neuron objects before testing. This means they must
 have a soma and no format errors.
 
-Errors checked for
+Default errors checked for
 ------------------
 * No soma
 * No axon
@@ -63,6 +63,12 @@ Errors checked for
 * Zero radius points
 * Zero length segments
 * Zero length sections
+
+Default options
+--------------
+* nonzero_neurite_radii: 0.007
+* nonzero_segment_lengths: 0.01
+* nonzero_section_lengths: 0.01
 
 Examples
 --------
