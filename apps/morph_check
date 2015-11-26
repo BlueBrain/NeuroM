@@ -213,9 +213,9 @@ if __name__ == '__main__':
                                    'nonzero_section_lengths',
                                    'nonzero_neurite_radii']
 
-        config['options'] = {"nonzero_neurite_radii"   : 0.007,
-                             "nonzero_segment_lengths" : 0.01,
-                             "nonzero_section_lengths" : 0.01}
+        config['options'] = {"nonzero_neurite_radii": 0.007,
+                             "nonzero_segment_lengths": 0.01,
+                             "nonzero_section_lengths": 0.01}
 
     if 'color' in config:
         import functools
