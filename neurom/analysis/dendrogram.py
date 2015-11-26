@@ -34,9 +34,6 @@ from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
 from neurom.analysis.morphmath import segment_length
 from neurom.core.dataformat import COLS
 
-from neurom.view import common
-from matplotlib.collections import PolyCollection
-
 import numpy as np
 import sys
 
@@ -66,19 +63,6 @@ def _n_rectangles(obj):
     else:
 
         return 0
-
-
-def displace(rectangles, t):
-    '''Displace the collection of rectangles
-    '''
-    n, m, _ = rectangles.shape
-
-    for i in xrange(n):
-
-        for j in xrange(m):
-
-            rectangles[i, j, 0] += t[0]
-            rectangles[i, j, 1] += t[1]
 
 
 def _vertical_segment(old_offs, new_offs, spacing, radii):
@@ -168,6 +152,8 @@ class Dendrogram(object):
 
             self._groups = [(0., self._n)]
 
+            self._dims.append(self._max_dims)
+
         else:
 
             n_previous = 0
@@ -188,12 +174,6 @@ class Dendrogram(object):
 
                 # keep track of the next tree start index in list
                 n_previous = self._n
-
-    @property
-    def data(self):
-        ''' data
-        '''
-        return self._rectangles
 
     def _generate_dendro(self, current_node, spacing, offsets):
         '''Recursive function for dendrogram line computations
@@ -248,56 +228,29 @@ class Dendrogram(object):
                 # colors[self._n] = current_node.value[4]
                 self._n += 1
 
-    def view(self, new_fig=True, subplot=None, **kwargs):
+    @property
+    def data(self):
+        ''' Returns the array with the rectangle collection
         '''
-        Dendrogram Viewer
+        return self._rectangles
+
+    @property
+    def groups(self):
+        ''' Returns the list of the indices for the slicing of the
+            rectangle array wich correspond to each neurite
         '''
+        return self._groups
 
-        def _format_str(string):
-            ''' string formatting
-            '''
-            return string.replace('TreeType.', '').replace('_', ' ').capitalize()
+    @property
+    def dims(self):
+        ''' Returns the list of the max dimensions for each neurite
+        '''
+        return self._dims
 
-        fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
-
-        displacement = 0.
-        colors = set()
-
-        for i, indices in enumerate(self._groups):
-
-            # slice rectangles array for the current neurite
-            group = self._rectangles[indices[0]: indices[1]]
-
-            if i > 0:
-                displacement += 0.5 * (self._dims[i - 1][0] + self._dims[i][0])
-
-            # arrange the trees without overlapping with each other
-            displace(group, (displacement, 0.))
-
-            # color
-            tree_type = self._obj.neurites[i].type
-
-            color = common.TREE_COLOR[tree_type]
-
-            # generate segment collection
-            collection = PolyCollection(group, closed=False, antialiaseds=True,
-                                        edgecolors=color, facecolors=color)
-
-            # add it to the axes
-            ax.add_collection(collection)
-
-            # dummy plot for the legend
-            if color not in colors:
-                ax.plot((0., 0.), (0., 0.), c=color, label=_format_str(str(tree_type)))
-                colors.add(color)
-
-        ax.autoscale(enable=True, tight=None)
-
-        # customization settings
-        # kwargs['xticks'] = []
-        kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
-        kwargs['xlabel'] = kwargs.get('xlabel', '')
-        kwargs['ylabel'] = kwargs.get('ylabel', '')
-        kwargs['no_legend'] = False
-
-        return common.plot_style(fig=fig, ax=ax, **kwargs)
+    @property
+    def types(self):
+        ''' Returns an iterator over the types of the neurites in the object.
+            If the object is a tree, then one value is returned.
+        '''
+        neurites = self._obj.neurites if hasattr(self._obj, 'neurites') else [self._obj]
+        return (neu.type for neu in neurites)

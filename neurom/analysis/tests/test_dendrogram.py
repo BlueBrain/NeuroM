@@ -3,14 +3,17 @@ import numpy as np
 from nose import tools as nt
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-
+from neurom.core.types import TreeType
+from neurom.analysis.morphtree import set_tree_type
 import neurom.analysis.dendrogram as dm
 
-TREE = Tree(np.array([0., 0., 0., 10., 1., 0., 0.]))
-TREE.add_child(Tree(np.array([3., 3., 3., 9., 1., 0., 0.])))
+TREE = Tree(np.array([0., 0., 0., 10., 4., 0., 0.]))
+TREE.add_child(Tree(np.array([3., 3., 3., 9., 4., 0., 0.])))
 
-TREE.children[0].add_child(Tree(np.array([10., 10., 10., 5., 1., 0., 0.])))
-TREE.children[0].add_child(Tree(np.array([-10., -10., -10., 7., 1., 0., 0.])))
+TREE.children[0].add_child(Tree(np.array([10., 10., 10., 5., 4., 0., 0.])))
+TREE.children[0].add_child(Tree(np.array([-10., -10., -10., 7., 4., 0., 0.])))
+
+set_tree_type(TREE)
 
 SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
 NEURON = Neuron(SOMA, [TREE, TREE, TREE])
@@ -32,30 +35,6 @@ def test_n_rectangles_neuron():
 def test_n_rectangles_other():
 
     nt.assert_equal(dm._n_rectangles('I am unique.'), 0)
-
-
-def test_displace():
-
-    rects = np.array([[[-0.85351288,  0.0],
-                       [-0.72855526,  0.1],
-                       [ 0.72855526,  0.1],
-                       [ 0.85351288,  0.0]],
-                      [[-0.72855526,  0.1],
-                       [-0.54222909,  0.75137071],
-                       [ 0.54222909,  0.75137071],
-                       [ 0.72855526,  0.1]]])
-
-    res = np.array([[[ 2.14648711,  -1.        ],
-                        [ 2.27144473,  -0.9       ],
-                        [ 3.72855526,  -0.9        ],
-                        [ 3.85351288,  -1.        ]],
-                       [[ 2.27144473,  -0.9       ],
-                        [ 2.45777091,  -0.24862929],
-                        [ 3.54222909,  -0.24862929],
-                        [ 3.72855526,  -0.9       ]]])
-
-    dm.displace(rects, (3., -1.))
-    nt.assert_true(np.allclose(rects, res))
 
 
 def test_vertical_segment():
@@ -115,19 +94,20 @@ class TestDendrogram(object):
         self.dtr = dm.Dendrogram(TREE)
         self.dnrn = dm.Dendrogram(NEURON)
 
+        self.dtr.generate()
+        self.dnrn.generate()
+
     def test_init(self):
 
         nt.assert_true(np.allclose(self.dnrn._rectangles.shape, (15, 4, 2)))
 
     def test_generate_tree(self):
 
-        self.dtr.generate()
         nt.assert_true(np.allclose(self.dtr._rectangles.shape, (5, 4, 2)))
         nt.assert_false(np.all(self.dtr._rectangles == 0.))
 
     def test_generate_neuron(self):
 
-        self.dnrn.generate()
         total = 0
 
         for n0, n1 in self.dnrn._groups:
@@ -140,10 +120,34 @@ class TestDendrogram(object):
 
         nt.assert_equal(total, 15)
 
-    def test_data(self):pass
-        #print self.dnrn.data, self.dtr.data
-        #nt.assert_false(np.all(self.dnrn.data == 0.))
-        #nt.assert_false(np.all(self.dtr.data == 0.))
+    def test_data(self):
+
+        nt.assert_false(np.all(self.dnrn.data == 0.))
+        nt.assert_false(np.all(self.dtr.data == 0.))
+
+    def test_groups(self):
+
+        nt.assert_false(not self.dnrn.groups)
+        nt.assert_false(not self.dtr.groups)
+
+    def test_dims(self):
+
+        nt.assert_false(not self.dnrn.dims)
+        nt.assert_false(not self.dtr.dims)
+
+    def test_types_tree(self):
+
+        for ctype in self.dtr.types:
+            print ctype
+            nt.assert_true(ctype == TreeType.apical_dendrite)
+
+    def test_types_neuron(self):
+
+        for ctype in self.dnrn.types:
+            print ctype
+            nt.assert_true(ctype == TreeType.apical_dendrite)
 
     def test_generate_dendro(self):pass
+
+
 
