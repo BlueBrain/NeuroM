@@ -89,6 +89,23 @@ def test_read_h5v2_raw_basic():
     nt.assert_equal(len(data), 927)
     nt.assert_equal(np.shape(data), (927, 7))
 
+
+def test_read_h5v2_raw_basic():
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V2_PATH, 'Neuron_unraveled.h5'))
+    nt.ok_(fmt == 'H5V2')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 847)
+    nt.assert_equal(np.shape(data), (847, 7))
+
+    data, offset, fmt = readers.H5.read(
+        os.path.join(H5V2_PATH, 'Neuron_unraveled.h5'), remove_duplicates=False)
+    nt.ok_(fmt == 'H5V2')
+    nt.ok_(offset == 0)
+    nt.assert_equal(len(data), 927)
+    nt.assert_equal(np.shape(data), (927, 7))
+
+
 def test_get_version():
     v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r')
     v2 = h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r')
