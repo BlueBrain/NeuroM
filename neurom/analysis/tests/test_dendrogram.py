@@ -67,7 +67,22 @@ def test_vertical_segment():
 	nt.assert_true(np.allclose(seg, res))
 
 
-def test_horizontal_segment():pass
+def test_horizontal_segment():
+
+	old_offs = np.array([1.2, -1.2])
+	new_offs = np.array([2.3, -2.3])
+	spacing = (40., 0.)
+	diameter = 10.
+
+	res = np.array([[  1.2,  -1.2],
+       				[  2.3,  -1.2],
+       				[  2.3, -11.2],
+       				[  1.2, -11.2]])
+
+	seg = dm._horizontal_segment(old_offs, new_offs, spacing, diameter)
+
+	nt.assert_true(np.allclose(seg, res))
+
 def test_spacingx():pass
 def test_update_offsets():pass
 
