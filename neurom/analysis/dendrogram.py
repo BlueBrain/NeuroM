@@ -67,8 +67,6 @@ def _recursion_handler(func):
 
         sys.setrecursionlimit(old_depth)
 
-        print "recursion after :", sys.getrecursionlimit()
-
     return set_limit
 
 
