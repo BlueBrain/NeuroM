@@ -38,36 +38,12 @@ import numpy as np
 import sys
 
 
-def _recursion_handler(func):
-    ''' Decorator that takes a recursive function which operates on trees or neurons
-    and estimates the max number of calls to the recursive function. This is achieved
-    by finding the max number of nodes of the given tree or from the biggest neurite in
-    the given neuron.
+def _max_recursion_depth(obj):
+    ''' Estimate recursion depth, which is defined as the number of nodes in a tree
     '''
+    neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
 
-    def depth(tree):
-        ''' Returns the depth which is defined as the number of nodes in a tree
-        '''
-        return sum(1 for _ in ipreorder(tree))
-
-    def set_limit(self):
-        ''' Set the recursion limit, run the function and restore its initial value
-        '''
-        neurites = self.obj.neurites if hasattr(self.obj, 'neurites') else [self.obj]
-
-        max_depth = max(depth(neu) for neu in neurites)
-
-        old_depth = sys.getrecursionlimit()
-
-        max_depth = old_depth if old_depth > max_depth else max_depth
-
-        sys.setrecursionlimit(max_depth)
-
-        func(self)
-
-        sys.setrecursionlimit(old_depth)
-
-    return set_limit
+    return max(sum(1 for _ in ipreorder(neu)) for neu in neurites)
 
 
 def _total_rectangles(tree):
@@ -169,7 +145,8 @@ class Dendrogram(object):
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
 
-    @_recursion_handler
+        self._max_rec_depth = _max_recursion_depth(self._obj)
+
     def generate(self):
         '''Generate dendrogram
         '''
@@ -178,6 +155,14 @@ class Dendrogram(object):
         offsets = (0., 0.)
 
         n_previous = 0
+
+        # set recursion limit with respect to
+        # the max number of nodes on the trees
+        old_depth = sys.getrecursionlimit()
+
+        max_depth = old_depth if old_depth > self._max_rec_depth else self._max_rec_depth
+
+        sys.setrecursionlimit(max_depth)
 
         if isinstance(self._obj, Tree):
 
@@ -207,6 +192,9 @@ class Dendrogram(object):
 
                 # keep track of the next tree start index in list
                 n_previous = self._n
+
+        # set it back to its initial value
+        sys.setrecursionlimit(old_depth)
 
     def _generate_dendro(self, current_node, spacing, offsets):
         '''Recursive function for dendrogram line computations
