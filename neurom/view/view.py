@@ -30,7 +30,7 @@
 Python module of NeuroM to visualize morphologies
 '''
 
-
+from itertools import izip
 from neurom.view import common
 from neurom.core.types import TreeType
 from matplotlib.collections import LineCollection
@@ -596,3 +596,85 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                              np.max(d) + get_default('white_space', **kwargs)])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
+
+
+def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=False, **kwargs):
+    ''' dendrogram docstring'''
+
+    from neurom.analysis.dendrogram import Dendrogram
+    from matplotlib.collections import PolyCollection
+
+    def _format_str(string):
+        ''' string formatting
+        '''
+        return string.replace('TreeType.', '').replace('_', ' ').capitalize()
+
+    def _displace(rectangles, t):
+        '''Displace the collection of rectangles
+        '''
+        n, m, _ = rectangles.shape
+
+        for i in xrange(n):
+
+            for j in xrange(m):
+
+                rectangles[i, j, 0] += t[0]
+                rectangles[i, j, 1] += t[1]
+
+    def _generate_collection(group, ax, ctype, colors):
+        ''' Render rectangle collection
+        '''
+        color = common.TREE_COLOR[ctype]
+
+        # generate segment collection
+        collection = PolyCollection(group, closed=False, antialiaseds=True,
+                                    edgecolors=color, facecolors=color)
+
+        # add it to the axes
+        ax.add_collection(collection)
+
+        # dummy plot for the legend
+        if color not in colors:
+            ax.plot((0., 0.), (0., 0.), c=color, label=_format_str(str(ctype)))
+            colors.add(color)
+
+    # create dendrogram and generate rectangle collection
+    dnd = Dendrogram(obj)
+    dnd.generate()
+
+    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+
+    # neurite displacement in figure
+    displacement = 0.
+
+    # set of unique colors that reflect the set of types of the neurites
+    colors = set()
+
+    for n, (indices, ctype) in enumerate(izip(dnd.groups, dnd.types)):
+
+        # slice rectangles array for the current neurite
+        group = dnd.data[indices[0]: indices[1]]
+
+        if n > 0:
+            # displace the neurites by half of their maximum x dimension
+            # plus half of the previous neurite's maxmimum x dimension
+            displacement += 0.5 * (dnd.dims[n - 1][0] + dnd.dims[n][0])
+
+        # arrange the trees without overlapping with each other
+        _displace(group, (displacement, 0.))
+
+        # create the polygonal collection of the dendrogram
+        # segments
+        _generate_collection(group, ax, ctype, colors)
+
+    ax.autoscale(enable=True, tight=None)
+
+    # customization settings
+    # kwargs['xticks'] = []
+    kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
+    kwargs['xlabel'] = kwargs.get('xlabel', '')
+    kwargs['ylabel'] = kwargs.get('ylabel', '')
+    kwargs['no_legend'] = False
+
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
+
