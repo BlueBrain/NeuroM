@@ -31,10 +31,12 @@
 These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
-from itertools import imap
+from itertools import imap, izip, product
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
+from neurom.core.tree import ipreorder
 import neurom.analysis.morphmath as mm
+from neurom.analysis.morphmath import pca
 from neurom.core.dataformat import COLS
 from neurom.core.tree import val_iter
 import numpy as np
@@ -247,12 +249,12 @@ def n_terminations(tree):
     return sum(1 for _ in tr.ileaf(tree))
 
 
-def trunk_radius(tree):
+def trunk_origin_radius(tree):
     '''Radius of the first point of a tree'''
     return tree.value[COLS.R]
 
 
-def trunk_length(tree):
+def trunk_section_length(tree):
     '''Length of the initial tree section
 
     Returns:
@@ -264,21 +266,21 @@ def trunk_length(tree):
         return 0.0
 
 
-def trunk_direction(tree, soma):
-    '''Vector of trunk direction defined as
+def trunk_origin_direction(tree, soma):
+    '''Vector of trunk origin direction defined as
        (initial tree point - soma center) of the tree.
     '''
     return mm.vector(tree.value, soma.center)
 
 
-def trunk_elevation(tree, soma):
+def trunk_origin_elevation(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-y half-plane.
 
        Returns:
            Angle in radians between -pi/2 and pi/2
     '''
-    vector = trunk_direction(tree, soma)
+    vector = trunk_origin_direction(tree, soma)
 
     norm_vector = np.linalg.norm(vector)
 
@@ -288,14 +290,14 @@ def trunk_elevation(tree, soma):
         raise ValueError("Norm of vector between soma center and tree is almost zero.")
 
 
-def trunk_azimuth(tree, soma):
+def trunk_origin_azimuth(tree, soma):
     '''Angle between x-axis and vector defined by (initial tree point - soma center)
        on the x-z plane.
 
        Returns:
            Angle in radians between -pi and pi
     '''
-    vector = trunk_direction(tree, soma)
+    vector = trunk_origin_direction(tree, soma)
 
     return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
@@ -335,3 +337,79 @@ def get_bounding_box(tree):
         max_xyz = np.maximum(p[:COLS.R], max_xyz)
 
     return np.array([min_xyz, max_xyz])
+
+
+def principal_direction_extent(tree):
+    '''Calculate the extent of a tree, that is the maximum distance between
+        the projections on the principal directions of the covariance matrix
+        of the x,y,z points of the nodes of the tree.
+
+        Input
+            tree : a tree object
+
+        Returns
+
+            extents : the extents for each of the eigenvectors of the cov matrix
+            eigs : eigenvalues of the covariance matrix
+            eigv : respective eigenvectors of the covariance matrix
+    '''
+    # extract the x,y,z coordinates of all the points in the tree
+    points = np.array([value[COLS.X: COLS.R]for value in val_iter(ipreorder(tree))])
+
+    # center the points around 0.0
+    points -= np.mean(points, axis=0)
+
+    # principal components
+    _, eigv = pca(points)
+
+    extent = np.zeros(3)
+
+    for i in range(eigv.shape[1]):
+
+        # orthogonal projection onto the direction of the v component
+        scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
+
+        extent[i] = scalar_projs[-1]
+
+        if scalar_projs[0] < 0.:
+            extent -= scalar_projs[0]
+
+    return extent
+
+
+def compare_trees(tree1, tree2):
+    '''
+    Comparison between all the nodes and their respective radii between two trees.
+    Ids are do not have to be identical between the trees, and swapping is allowed
+
+    Returns:
+
+        False if the trees are not identical. True otherwise.
+    '''
+    leaves1 = list(tr.ileaf(tree1))
+    leaves2 = list(tr.ileaf(tree2))
+
+    if len(leaves1) != len(leaves2):
+
+        return False
+
+    else:
+
+        nleaves = len(leaves1)
+
+        for leaf1, leaf2 in product(leaves1, leaves2):
+
+            is_equal = True
+
+            for node1, node2 in izip(tr.val_iter(tr.iupstream(leaf1)),
+                                     tr.val_iter(tr.iupstream(leaf2))):
+
+                if any(node1[0:5] != node2[0:5]):
+
+                    is_equal = False
+                    continue
+
+            if is_equal:
+                nleaves -= 1
+
+    return nleaves == 0

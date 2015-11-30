@@ -34,8 +34,8 @@ from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
 from neurom.exceptions import NonConsecutiveIDsError
-from neurom.io.readers import load_data
-from neurom.io.check import has_sequential_ids
+from . import load_data
+from . import check
 from neurom.utils import memoize
 import os
 
@@ -112,7 +112,7 @@ def load_neuron(filename, tree_action=None):
     """
 
     data = load_data(filename)
-    if not has_sequential_ids(data)[0]:
+    if not check.has_sequential_ids(data)[0]:
         raise NonConsecutiveIDsError('Non consecutive IDs found in raw data')
 
     nrn = make_neuron(data, tree_action)

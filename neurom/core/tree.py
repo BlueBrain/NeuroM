@@ -27,7 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from itertools import chain, imap, ifilter, repeat, izip, product
+from itertools import chain, imap, ifilter, repeat
+from copy import copy
 
 
 class Tree(object):
@@ -43,12 +44,6 @@ class Tree(object):
     def __str__(self):
         return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
             (self.value, self.parent, len(self.children))
-
-    def __eq__(self, other):
-        '''
-            Comparison operator between two trees
-        '''
-        return compare_trees(self, other)
 
     def add_child(self, tree):
         '''Add a child to the list of this tree's children
@@ -253,38 +248,32 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
     return chain_it if mapping is None else imap_val(mapping, chain_it)
 
 
-def compare_trees(tree1, tree2):
+def make_copy(tree):
     '''
-    Comparison between all the nodes and their respective radii between two trees.
-    Ids are do not have to be identical between the trees, and swapping is allowed
+    Copies a tree structure. A new tree is generated with the copied values
+    and node structure as the input one and is returned.
 
-    Returns:
+    Input : tree object
 
-        False if the trees are not identical. True otherwise.
+    Returns : copied tree object
     '''
-    leaves1 = list(ileaf(tree1))
-    leaves2 = list(ileaf(tree2))
+    copy_head = Tree(copy(tree.value))
 
-    if len(leaves1) != len(leaves2):
+    orig_children = [tree, ]
+    copy_children = [copy_head, ]
 
-        return False
+    while orig_children:
 
-    else:
+        orig_current_node = orig_children.pop()
+        copy_current_node = copy_children.pop()
 
-        nleaves = len(leaves1)
+        for c in orig_current_node.children:
 
-        for leaf1, leaf2 in product(leaves1, leaves2):
+            copy_child = Tree(copy(c.value))
 
-            is_equal = True
+            copy_current_node.add_child(copy_child)
 
-            for node1, node2 in izip(val_iter(iupstream(leaf1)), val_iter(iupstream(leaf2))):
+            orig_children.append(c)
+            copy_children.append(copy_child)
 
-                if any(node1[0:5] != node2[0:5]):
-
-                    is_equal = False
-                    continue
-
-            if is_equal:
-                nleaves -= 1
-
-    return nleaves == 0
+    return copy_head

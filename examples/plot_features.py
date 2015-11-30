@@ -98,15 +98,15 @@ def calc_limits(data, dist=None, padding=0.25):
 # Neurite types of interest
 NEURITES_ = (ezy.TreeType.axon,
              ezy.TreeType.apical_dendrite,
-             ezy.TreeType.basal_dendrite)
+             ezy.TreeType.basal_dendrite,)
 
 # map feature names to functors that get us arrays of that
 # feature, for a given tree type
 GET_NEURITE_FEATURE = {
-    'trunk_azimuth': lambda nrn, typ: [mt.trunk_azimuth(n, nrn.soma)
-                                       for n in nrn.neurites if n.type == typ],
-    'trunk_elevation': lambda nrn, typ: [mt.trunk_elevation(n, nrn.soma)
-                                         for n in nrn.neurites if n.type == typ],
+    'trunk_origin_azimuth': lambda nrn, typ: [mt.trunk_origin_azimuth(n, nrn.soma)
+                                              for n in nrn.neurites if n.type == typ],
+    'trunk_origin_elevation': lambda nrn, typ: [mt.trunk_origin_elevation(n, nrn.soma)
+                                                for n in nrn.neurites if n.type == typ],
     'segment_length': lambda n, typ: n.get_segment_lengths(typ),
     'section_length': lambda n, typ: n.get_section_lengths(typ),
 }
@@ -170,6 +170,10 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
         for typ, data in d.iteritems():
             dist = sim_params['components'][typ].get(feat, None)
             print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
+            # if no data available, skip this feature
+            if not data:
+                print "No data found for feature %s (%s)" % (feat, typ)
+                continue
             # print 'DATA', data
             num_bins = 100
             limits = calc_limits(data, dist)

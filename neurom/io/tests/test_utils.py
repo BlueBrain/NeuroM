@@ -29,7 +29,7 @@
 '''Test neurom.io.utils'''
 import os
 import numpy as np
-from neurom.io.readers import load_data
+from neurom import io
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
@@ -82,8 +82,8 @@ _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
-RAW_DATA = [load_data(f) for f in FILES]
-NO_SOMA_RAW_DATA = load_data(NO_SOMA_FILE)
+RAW_DATA = [io.load_data(f) for f in FILES]
+NO_SOMA_RAW_DATA = io.load_data(NO_SOMA_FILE)
 
 
 def test_get_soma_ids():

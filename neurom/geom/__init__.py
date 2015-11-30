@@ -26,12 +26,4 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#These requirements are assumed installed in the system.
-#numpy>=1.8.0
-#h5py>=2.2.1
-#matplotlib>=1.3.1
-#scipy>=0.13.3
-
-# These can be installed with pip if necessary.
-enum34>=1.0.4
-pyyaml>=3.11
+''' Geometrical Operations for NeuroM '''

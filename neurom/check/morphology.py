@@ -39,6 +39,7 @@ from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import find_tree_type
+from neurom.check.morphtree import is_flat, is_monotonic
 from itertools import chain
 
 
@@ -77,6 +78,36 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
     '''
     types = [treefun(n) for n in neuron.neurites]
     return types.count(TreeType.basal_dendrite) >= min_number
+
+
+def has_flat_neurites(neuron, tol=0.1, method='ratio'):
+    '''Check if a neuron has neurites that are flat within a tolerance
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance or the ratio
+        method : way of determining flatness, 'tolerance', 'ratio'
+
+    Returns:
+        Bool list corresponding to the flatness check for each neurite
+        in neuron neurites with respect to the given criteria
+    '''
+    return [is_flat(n, tol, method) for n in neuron.neurites]
+
+
+def has_monotonic_neurites(neuron):
+    '''Check if a neuron has neurites that are flat within a tolerance
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance or the ratio
+        method : way of determining flatness, 'tolerance', 'ratio'
+
+    Returns:
+        Bool list corresponding to the flatness check for each neurite
+        in neuron neurites with respect to the given criteria
+    '''
+    return [is_monotonic(n, 1e-6) for n in neuron.neurites]
 
 
 def nonzero_segment_lengths(neuron, threshold=0.0):

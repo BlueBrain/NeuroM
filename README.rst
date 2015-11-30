@@ -44,16 +44,25 @@ NeuroM is a Python-based toolkit for the analysis and processing of neuron morph
     :target: http://neurom.readthedocs.org/en/latest/
     :alt: Documentation Status
 
+Documentation
+=============
+
+NeuroM documentation is built and hosted on `readthedocs <https://readthedocs.org/>`_.
+
+* `latest snapshot <http://neurom.readthedocs.org/en/latest/>`_
+* `latest release <http://neurom.readthedocs.org/en/stable/>`_
+
 Dependencies
 ============
 
 The build-time and runtime dependencies of NeuroM are:
 
 * numpy
-* h5py
 * scipy
 * matplotlib
-* enum34
+* h5py (optional, required for reading HDF5 files)
+* enum34 (pip install takes care of this)
+* pyyaml (pip install takes care of this)
 
 Installation
 ============

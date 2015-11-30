@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,12 +27,31 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#These requirements are assumed installed in the system.
-#numpy>=1.8.0
-#h5py>=2.2.1
-#matplotlib>=1.3.1
-#scipy>=0.13.3
 
-# These can be installed with pip if necessary.
-enum34>=1.0.4
-pyyaml>=3.11
+'''Check if neuron diameters are monotonic'''
+
+from neurom.core.tree import ipreorder
+from neurom.core.dataformat import COLS
+
+
+def is_monotonic(tree, tol):
+    '''Check if tree is monotonic, that is if each child has smaller or
+        equal diameters from its parent
+
+        Input
+
+            tree : tree object
+
+        tol
+            numerical precision
+    '''
+
+    for node in ipreorder(tree):
+
+        if node.parent is not None:
+
+            if node.value[COLS.R] > node.parent.value[COLS.R] + tol:
+
+                return False
+
+    return True
