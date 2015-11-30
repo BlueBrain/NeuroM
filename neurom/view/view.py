@@ -604,19 +604,6 @@ def _format_str(string):
     return string.replace('TreeType.', '').replace('_', ' ').capitalize()
 
 
-def _displace(rectangles, t):
-    '''Displace the collection of rectangles
-    '''
-    n, m, _ = rectangles.shape
-
-    for i in xrange(n):
-
-        for j in xrange(m):
-
-            rectangles[i, j, 0] += t[0]
-            rectangles[i, j, 1] += t[1]
-
-
 def _generate_collection(group, ax, ctype, colors):
     ''' Render rectangle collection
     '''
@@ -654,7 +641,7 @@ def _render_dendrogram(dnd, ax, displacement):
             displacement += 0.5 * (dnd.dims[n - 1][0] + dnd.dims[n][0])
 
         # arrange the trees without overlapping with each other
-        _displace(group, (displacement, 0.))
+        group += (displacement, 0.)
 
         # create the polygonal collection of the dendrogram
         # segments
