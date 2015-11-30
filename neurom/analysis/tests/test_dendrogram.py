@@ -147,6 +147,12 @@ class TestDendrogram(object):
             print ctype
             nt.assert_true(ctype == TreeType.apical_dendrite)
 
+    def test_obj(self):
+
+    	nt.assert_true(NEURON is self.dnrn.obj)
+        nt.assert_true(TREE is self.dtr.obj)
+
+
     def test_generate_dendro(self):pass
 
 
