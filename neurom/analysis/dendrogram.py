@@ -138,9 +138,12 @@ class Dendrogram(object):
     '''Dendrogram
     '''
 
-    def __init__(self, obj):
+    def __init__(self, obj, show_diameters=True):
         '''Create dendrogram
         '''
+
+        # flag for diameters
+        self._show_diameters = show_diameters
 
         # input object, tree, or neuron
         self._obj = obj
@@ -214,7 +217,7 @@ class Dendrogram(object):
         radii = [0., 0.]
         # store the parent radius in order to construct polygonal segments
         # isntead of simple line segments
-        radii[0] = current_node.value[COLS.R] * self.scale
+        radii[0] = current_node.value[COLS.R] * self.scale if self._show_diameters else 1.
 
         for child in current_node.children:
 
@@ -223,7 +226,7 @@ class Dendrogram(object):
 
             # extract the radius of the child node. Need both radius for
             # realistic segment representation
-            radii[1] = child.value[COLS.R] * self.scale
+            radii[1] = child.value[COLS.R] * self.scale if self._show_diameters else 1.
 
             # number of leaves in child
             terminations = n_terminations(child)
