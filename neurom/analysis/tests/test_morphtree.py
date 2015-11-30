@@ -36,7 +36,7 @@ from neurom.analysis.morphmath import angle_3points
 from neurom.core.types import TreeType
 from neurom.io.utils import make_neuron
 from neurom.core.neuron import make_soma
-from neurom.io.readers import load_data
+from neurom import io
 
 import math
 import numpy as np
@@ -45,7 +45,7 @@ from itertools import izip
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
-data    = load_data(SWC_PATH + 'Neuron.swc')
+data    = io.load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
 tree0   = neuron0.neurites[0]
 tree_types = [TreeType.axon,
@@ -435,7 +435,7 @@ def test_branch_order():
 
 def test_principal_direction_extent():
 
-    points = np.array([[-10., 0., 0.], 
+    points = np.array([[-10., 0., 0.],
                         [-9., 0., 0.],
                         [9., 0., 0.],
                         [10., 0., 0.]])

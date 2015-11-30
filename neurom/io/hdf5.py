@@ -41,9 +41,9 @@ There is one such row per measured point.
 
 '''
 from neurom.utils import memoize
-
 import h5py
 import numpy as np
+import itertools
 
 
 def get_version(h5file):
@@ -57,8 +57,8 @@ def get_version(h5file):
         return 'H5V2'
 
 
-class H5V1(object):
-    '''Read HDF5 v1 files and unpack into internal raw data block
+class _H5STRUCT(object):
+    '''Define internal structure of HDF5 data
 
     Input row format:
         points: (PX, PY, PZ, PD) -> [X, Y, Z, D] (ID is position)
@@ -150,25 +150,25 @@ class H5(object):
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = np.searchsorted(groups[:, H5V1.GPFIRST], point_id, side='right')
+            bs = np.searchsorted(groups[:, _H5STRUCT.GPFIRST], point_id, side='right')
             bs = max(bs - 1, 0)
             return groups[bs]
 
         def find_parent_id(point_id):
             '''Find the parent ID of a point'''
             group = find_group(point_id)
-            if point_id != group[H5V1.GPFIRST]:
+            if point_id != group[_H5STRUCT.GPFIRST]:
                 # point is not first point in section
                 # so parent is previous point
                 return point_id - 1
             else:
                 # parent is last point in parent group
-                parent_group_id = group[H5V1.GPID]
+                parent_group_id = group[_H5STRUCT.GPID]
                 # get last point in parent group
-                return groups[parent_group_id + 1][H5V1.GPFIRST] - 1
+                return groups[parent_group_id + 1][_H5STRUCT.GPFIRST] - 1
 
-        return np.array([(p[H5V1.PX], p[H5V1.PY], p[H5V1.PZ], p[H5V1.PD] / 2.,
-                          find_group(i)[H5V1.GTYPE], i,
+        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ], p[_H5STRUCT.PD] / 2.,
+                          find_group(i)[_H5STRUCT.GTYPE], i,
                           find_parent_id(i))
                          for i, p in enumerate(points)])
 
@@ -181,7 +181,6 @@ class H5(object):
             points, groups with unique points.
 
         '''
-        import itertools
 
         def _find_last_point(group_id, groups):
             ''' Identifies and returns the id of the last point of a group'''
@@ -221,7 +220,9 @@ def _unpack_v1(h5file):
 def _unpack_v2(h5file, stage):
     '''Unpack groups from HDF5 v2 file'''
     points = np.array(h5file['neuron1/%s/points' % stage])
-    groups = np.array(h5file['neuron1/structure/%s' % stage])
+    # from documentation: The /neuron1/structure/unraveled reuses /neuron1/structure/raw
+    groups_stage = stage if stage != 'unraveled' else 'raw'
+    groups = np.array(h5file['neuron1/structure/%s' % groups_stage])
     stypes = np.array(h5file['neuron1/structure/sectiontype'])
     groups = np.hstack([groups, stypes])
     groups[:, [1, 2]] = groups[:, [2, 1]]

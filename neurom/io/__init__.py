@@ -27,3 +27,5 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ''' IO operations module for NeuroM '''
+
+from .readers import load_data
