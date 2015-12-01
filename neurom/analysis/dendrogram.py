@@ -66,15 +66,25 @@ def _n_rectangles(obj):
 
     elif isinstance(obj, Neuron):
 
-        return sum(_total_rectangles(neu) for neu in obj.neurites)
+        # + 1 accounts for the rectangle needed to represent the soma
+        return sum(_total_rectangles(neu) for neu in obj.neurites) + 1
 
     else:
 
         return 0
 
 
+def _square_segment(radius, origin):
+    '''Vertices for a square
+    '''
+    return np.array(((origin[0] - radius, origin[1] - radius),
+                     (origin[0] - radius, origin[1] + radius),
+                     (origin[0] + radius, origin[1] + radius),
+                     (origin[0] + radius, origin[1] - radius)))
+
+
 def _vertical_segment(old_offs, new_offs, spacing, radii):
-    '''Vertices fo a vertical rectangle
+    '''Vertices for a vertical rectangle
     '''
     return np.array(((new_offs[0] - radii[0], old_offs[1] + spacing[1]),
                      (new_offs[0] - radii[1], new_offs[1]),
@@ -110,6 +120,12 @@ def _update_offsets(start_x, spacing, terminations, offsets, length):
             offsets[1] + spacing[1] * 2. + length)
 
 
+def _max_diameter(tree):
+    '''Find max diameter in tree
+    '''
+    return 2. * max(node.value[COLS.R] for node in ipreorder(tree))
+
+
 class Dendrogram(object):
     '''Dendrogram
     '''
@@ -128,8 +144,6 @@ class Dendrogram(object):
         # it is updated recursively
         self._n = 0
 
-        self.scale = 1.
-
         # the maximum lengths in x and y that is occupied
         # by a neurite. It is updated recursively.
         self._max_dims = [0., 0.]
@@ -145,13 +159,18 @@ class Dendrogram(object):
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
 
+        # determine the maximum recursion depth for the given object
+        # which depends on the tree with the maximum number of nodes
         self._max_rec_depth = _max_recursion_depth(self._obj)
+
+    def _generate_soma(self):
+        '''soma'''
+        radius = self._obj.soma.radius
+        return _square_segment(radius, (0., -radius))
 
     def generate(self):
         '''Generate dendrogram
         '''
-        spacing = (10., 0.)
-
         offsets = (0., 0.)
 
         n_previous = 0
@@ -159,26 +178,26 @@ class Dendrogram(object):
         # set recursion limit with respect to
         # the max number of nodes on the trees
         old_depth = sys.getrecursionlimit()
-
         max_depth = old_depth if old_depth > self._max_rec_depth else self._max_rec_depth
-
         sys.setrecursionlimit(max_depth)
 
         if isinstance(self._obj, Tree):
 
-            self._generate_dendro(self._obj, spacing, offsets)
+            max_diameter = _max_diameter(self._obj)
 
-            self._groups = [(0., self._n)]
+            self._generate_dendro(self._obj, (max_diameter, 0.), offsets)
+
+            self._groups.append((0., self._n))
 
             self._dims.append(self._max_dims)
 
         else:
 
-            n_previous = 0
-
             for neurite in self._obj.neurites:
 
-                self._generate_dendro(neurite, spacing, offsets)
+                max_diameter = _max_diameter(neurite)
+
+                self._generate_dendro(neurite, (max_diameter, 0.), offsets)
 
                 # store in trees the indices for the slice which corresponds
                 # to the current neurite
@@ -205,7 +224,7 @@ class Dendrogram(object):
         radii = [0., 0.]
         # store the parent radius in order to construct polygonal segments
         # isntead of simple line segments
-        radii[0] = current_node.value[COLS.R] * self.scale if self._show_diameters else 1.
+        radii[0] = current_node.value[COLS.R] if self._show_diameters else 0.
 
         for child in current_node.children:
 
@@ -214,7 +233,7 @@ class Dendrogram(object):
 
             # extract the radius of the child node. Need both radius for
             # realistic segment representation
-            radii[1] = child.value[COLS.R] * self.scale if self._show_diameters else 1.
+            radii[1] = child.value[COLS.R] if self._show_diameters else 0.
 
             # number of leaves in child
             terminations = n_terminations(child)
@@ -244,9 +263,10 @@ class Dendrogram(object):
             # lines and not zero ones
             if offsets[0] != new_offsets[0]:
 
-                # horizontal segment
-                self._rectangles[self._n] = _horizontal_segment(offsets, new_offsets, spacing, 0.)
-                # colors[self._n] = current_node.value[4]
+                # horizontal segment. Thickness is either 0 if show_diameters is false
+                # or 1. if show_diameters is true
+                self._rectangles[self._n] = _horizontal_segment(offsets, new_offsets, spacing,
+                                                                float(self._show_diameters))
                 self._n += 1
 
     @property
@@ -273,11 +293,11 @@ class Dendrogram(object):
         ''' Returns an iterator over the types of the neurites in the object.
             If the object is a tree, then one value is returned.
         '''
-        neurites = self._obj.neurites if hasattr(self._obj, 'neurites') else [self._obj]
+        neurites = self._obj.neurites if hasattr(self._obj, 'neurites') else (self._obj,)
         return (neu.type for neu in neurites)
 
     @property
-    def obj(self):
-        ''' Returns input object. Neuron or Tree.
+    def soma(self):
+        ''' Returns soma
         '''
-        return self._obj
+        return self._generate_soma() if hasattr(self._obj, 'soma') else None
