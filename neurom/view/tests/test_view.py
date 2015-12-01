@@ -123,5 +123,4 @@ def test_neuron3d_no_neurites():
 def test_dendrogram():
 
     fig, ax = view.dendrogram(neuron0)
-    nt.ok_(np.allclose(ax.get_xlim(), (-55., 385.)))
-    nt.ok_(np.allclose(ax.get_xlim(), (-55., 385.)))
+    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
