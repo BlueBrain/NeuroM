@@ -647,6 +647,14 @@ def _render_dendrogram(dnd, ax, displacement):
         # segments
         _generate_collection(group, ax, ctype, colors)
 
+    soma_square = dnd.soma
+
+    if soma_square is not None:
+
+        _generate_collection((soma_square + (displacement / 2., 0.),), ax, TreeType.soma, colors)
+        ax.plot((displacement / 2., displacement), (0., 0.), color='k')
+        ax.plot((0., displacement / 2.), (0., 0.), color='k')
+
     return displacement
 
 
@@ -713,6 +721,7 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     # render dendrogram and take into account neurite displacement which
     # starts as zero. It is important to avoid overlapping of neurites
     # and to determine tha limits of the figure.
+
     displacement = _render_dendrogram(dnd, ax, 0.)
 
     # customization settings

@@ -29,7 +29,7 @@ def test_n_rectangles_tree():
 
 def test_n_rectangles_neuron():
 
-    nt.assert_equal(dm._n_rectangles(NEURON), 15)
+    nt.assert_equal(dm._n_rectangles(NEURON), 16)
 
 
 def test_n_rectangles_other():
@@ -99,7 +99,7 @@ class TestDendrogram(object):
 
     def test_init(self):
 
-        nt.assert_true(np.allclose(self.dnrn._rectangles.shape, (15, 4, 2)))
+        nt.assert_true(np.allclose(self.dnrn._rectangles.shape, (16, 4, 2)))
 
     def test_generate_tree(self):
 
@@ -146,11 +146,6 @@ class TestDendrogram(object):
         for ctype in self.dnrn.types:
             print ctype
             nt.assert_true(ctype == TreeType.apical_dendrite)
-
-    def test_obj(self):
-
-    	nt.assert_true(NEURON is self.dnrn.obj)
-        nt.assert_true(TREE is self.dtr.obj)
 
 
     def test_generate_dendro(self):pass
