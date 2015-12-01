@@ -265,8 +265,7 @@ class Dendrogram(object):
 
                 # horizontal segment. Thickness is either 0 if show_diameters is false
                 # or 1. if show_diameters is true
-                self._rectangles[self._n] = _horizontal_segment(offsets, new_offsets, spacing,
-                                                                float(self._show_diameters))
+                self._rectangles[self._n] = _horizontal_segment(offsets, new_offsets, spacing, 0.)
                 self._n += 1
 
     @property
