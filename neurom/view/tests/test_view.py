@@ -118,3 +118,10 @@ def test_neuron_no_neurites():
 def test_neuron3d_no_neurites():
     filename = os.path.join(SWC_PATH, 'point_soma.swc')
     f, a = view.neuron3d(load_neuron(filename))
+
+
+def test_dendrogram():
+
+    fig, ax = view.dendrogram(neuron0)
+    nt.ok_(np.allclose(ax.get_xlim(), (-55., 385.)))
+    nt.ok_(np.allclose(ax.get_xlim(), (-55., 385.)))

@@ -30,7 +30,7 @@
 Python module of NeuroM to visualize morphologies
 '''
 
-
+from itertools import izip
 from neurom.view import common
 from neurom.core.types import TreeType
 from matplotlib.collections import LineCollection
@@ -594,5 +594,133 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     if d:
         kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
                                              np.max(d) + get_default('white_space', **kwargs)])
+
+    return common.plot_style(fig=fig, ax=ax, **kwargs)
+
+
+def _format_str(string):
+    ''' string formatting
+    '''
+    return string.replace('TreeType.', '').replace('_', ' ').capitalize()
+
+
+def _generate_collection(group, ax, ctype, colors):
+    ''' Render rectangle collection
+    '''
+    from matplotlib.collections import PolyCollection
+
+    color = common.TREE_COLOR[ctype]
+
+    # generate segment collection
+    collection = PolyCollection(group, closed=False, antialiaseds=True,
+                                edgecolors='face', facecolors=color)
+
+    # add it to the axes
+    ax.add_collection(collection)
+
+    # dummy plot for the legend
+    if color not in colors:
+        ax.plot((0., 0.), (0., 0.), c=color, label=_format_str(str(ctype)))
+        colors.add(color)
+
+
+def _render_dendrogram(dnd, ax, displacement):
+    '''renders dendrogram
+    '''
+    # set of unique colors that reflect the set of types of the neurites
+    colors = set()
+
+    for n, (indices, ctype) in enumerate(izip(dnd.groups, dnd.types)):
+
+        # slice rectangles array for the current neurite
+        group = dnd.data[indices[0]: indices[1]]
+
+        if n > 0:
+            # displace the neurites by half of their maximum x dimension
+            # plus half of the previous neurite's maxmimum x dimension
+            displacement += 0.5 * (dnd.dims[n - 1][0] + dnd.dims[n][0])
+
+        # arrange the trees without overlapping with each other
+        group += (displacement, 0.)
+
+        # create the polygonal collection of the dendrogram
+        # segments
+        _generate_collection(group, ax, ctype, colors)
+
+    return displacement
+
+
+def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=False, **kwargs):
+    '''Generates a figure of the neuron,
+       that contains a soma and a list of trees.
+
+    Parameters:
+        obj: Neuron or tree
+        neurom.Neuron, neurom.Tree
+
+    Options:
+        show_diameters : boolean \
+            Determines if node diameters will \
+            be show or not.
+        linewidth: float \
+            Defines the linewidth of the tree, \
+            if diameter is set to False. \
+            Default value is 1.2.
+        alpha: float \
+            Defines throughe transparency of the tree. \
+            0.0 transparent through 1.0 opaque. \
+            Default value is 0.8.
+        treecolor: str or None \
+            Defines the color of the tree. \
+            If None the default values will be used, \
+            depending on the type of tree: \
+            Basal dendrite: "red" \
+            Axon : "blue" \
+            Apical dendrite: "purple" \
+            Undefined tree: "black" \
+            Default value is None.
+        new_fig: boolean \
+            Defines if the tree will be plotted \
+            in the current figure (False) \
+            or in a new figure (True) \
+            Default value is True.
+        subplot: matplotlib subplot value or False \
+            If False the default subplot 111 will be used. \
+            For any other value a matplotlib subplot \
+            will be generated. \
+            Default value is False.
+        diameter: boolean
+            If True the diameter, scaled with diameter_scale factor, \
+            will define the width of the tree lines. \
+            If False use linewidth to select the width of the tree lines. \
+            Default value is True.
+        diameter_scale: float \
+            Defines the scale factor that will be multiplied \
+            with the diameter to define the width of the tree line. \
+            Default value is 1.
+
+    Returns:
+        A 2D matplotlib figure with a dendrogram view.
+    '''
+    from neurom.analysis.dendrogram import Dendrogram
+
+    # create dendrogram and generate rectangle collection
+    dnd = Dendrogram(obj, show_diameters=show_diameters)
+    dnd.generate()
+
+    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes, subplot=subplot)
+
+    # render dendrogram and take into account neurite displacement which
+    # starts as zero. It is important to avoid overlapping of neurites
+    # and to determine tha limits of the figure.
+    displacement = _render_dendrogram(dnd, ax, 0.)
+
+    # customization settings
+    kwargs['xlim'] = [- dnd.dims[0][0] * 0.5, dnd.dims[-1][0] * 0.5 + displacement]
+
+    kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
+    kwargs['xlabel'] = kwargs.get('xlabel', '')
+    kwargs['ylabel'] = kwargs.get('ylabel', '')
+    kwargs['no_legend'] = False
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
