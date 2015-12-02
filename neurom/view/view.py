@@ -514,14 +514,13 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
 
 def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
-    '''Generates a figure of the neuron,
-       that contains a soma and a list of trees.
+    '''
+    Generates a figure of the neuron,
+    that contains a soma and a list of trees.
 
     Parameters:
-        neuron: Neuron
+        neuron: Neuron \
         neurom.Neuron object
-
-    Options:
         linewidth: float \
             Defines the linewidth of the tree, \
             if diameter is set to False. \
@@ -610,7 +609,7 @@ def _format_str(string):
 
 
 def _generate_collection(group, ax, ctype, colors):
-    ''' Render rectangle collection
+    ''' render rectangle collection
     '''
     from matplotlib.collections import PolyCollection
 
@@ -630,7 +629,7 @@ def _generate_collection(group, ax, ctype, colors):
 
 
 def _render_dendrogram(dnd, ax, displacement):
-    '''renders dendrogram
+    '''Renders dendrogram
     '''
     # set of unique colors that reflect the set of types of the neurites
     colors = set()
