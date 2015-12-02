@@ -426,7 +426,7 @@ def plot_title(fig, ax, **kwargs):
             Default value is None.
 
     Returns:
-        figure_output : figure, axes
+        matplotlib figure, axes
 
     """
 
@@ -452,51 +452,39 @@ def plot_labels(fig, ax, **kwargs):
     Function that defines the labels options
     of a matplotlib plot.
 
-    Parameters
-    ----------
-    fig: matplotlib figure
+    Parameters:
+        fig: matplotlib figure
+        ax: matplotlib axes
+        xlabel : str, \
+            The xlabel for the figure. \
+            For no_xlabel set to ''. \
+            Default value is "X".
+        ylabel : str, \
+            The xlabel for the figure. \
+            For no_ylabel set to ''. \
+            Default value is "Y".
+        zlabel : str, \
+            The zlabel for the figure. \
+            For no_zlabel set to ''. \
+            Default value is "Z".
+        label_fontsize : int, \
+            Defines the size of the labels' font. \
+            Default value is 14.
+        xlabel_arg : dict, \
+            Defines the arguments that will be passsed \
+            into matplotlib as xlabel arguments. \
+            Default value is None.
+        ylabel_arg : dict, \
+            Defines the arguments that will be passsed \
+            into matplotlib as ylabel arguments. \
+            Default value is None.
+        zlabel_arg : dict, \
+            Defines the arguments that will be passsed, \
+            into matplotlib as zlabel arguments. \
+            Default value is None.
 
-    ax: matplotlib axes
-
-    Options
-    -------
-    xlabel : str
-        The xlabel for the figure.
-        For no_xlabel set to ''.
-        Default value is "X".
-
-    ylabel : str
-        The xlabel for the figure.
-        For no_ylabel set to ''.
-        Default value is "Y".
-
-    zlabel : str
-        The zlabel for the figure.
-        For no_zlabel set to ''.
-        Default value is "Z".
-
-    label_fontsize : int
-        Defines the size of the labels' font.
-        Default value is 14.
-
-    xlabel_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as xlabel arguments.
-        Default value is None.
-
-    ylabel_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as ylabel arguments.
-        Default value is None.
-
-    zlabel_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as zlabel arguments.
-        Default value is None.
-
-    Returns
-    -------
-    figure_output : figure, axes
+    Returns:
+        matplotlib figure, axes
 
     """
 
