@@ -57,7 +57,9 @@ def get_default(variable, **kwargs):
 
 
 def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
-    '''Generates a 2d figure of the tree.
+    '''Generates a 2d figure of the tree's segments.
+       If the tree contains one single point the plot will be empty \
+       since no segments can be constructed.
 
     Parameters:
         tr: Tree \
