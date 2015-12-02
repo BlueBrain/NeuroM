@@ -455,36 +455,36 @@ def plot_labels(fig, ax, **kwargs):
     Parameters:
         fig: matplotlib figure
         ax: matplotlib axes
-        xlabel : str, \
+        xlabel (Optional[str]): \
             The xlabel for the figure. \
             For no_xlabel set to ''. \
             Default value is "X".
-        ylabel : str, \
+        ylabel (Optional[str]): \
             The xlabel for the figure. \
             For no_ylabel set to ''. \
             Default value is "Y".
-        zlabel : str, \
+        zlabel (Optional[str]): \
             The zlabel for the figure. \
             For no_zlabel set to ''. \
             Default value is "Z".
-        label_fontsize : int, \
+        label_fontsize (Optional[int]): \
             Defines the size of the labels' font. \
             Default value is 14.
-        xlabel_arg : dict, \
+        xlabel_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as xlabel arguments. \
             Default value is None.
-        ylabel_arg : dict, \
+        ylabel_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as ylabel arguments. \
             Default value is None.
-        zlabel_arg : dict, \
+        zlabel_arg (Optional[dict]): \
             Defines the arguments that will be passsed, \
             into matplotlib as zlabel arguments. \
             Default value is None.
 
     Returns:
-        matplotlib figure, axes
+        Matplotlib figure, axes
 
     """
 
@@ -524,33 +524,33 @@ def plot_ticks(fig, ax, **kwargs):
     Parameters:
         fig: matplotlib figure
         ax: matplotlib axes
-        xticks : list of ticks \
+        xticks (Optional[list of ticks]): \
             Defines the values of x ticks in the figure. \
             If None the xticks will not be modified. \
             For no_xticks set to []. \
             Default value is None.
-        yticks : list of ticks \
+        yticks (Optional[list of ticks]): \
             Defines the values of y ticks in the figure. \
             If None the yticks will not be modified. \
             For no_yticks set to []. \
             Default value is None.
-        zticks : list of ticks \
+        zticks (Optional[list of ticks]): \
             Defines the values of z ticks in the figure. \
             If None the zticks will not be modified. \
             For no_zticks set to []. \
             Default value is None.
-        tick_fontsize : int, \
+        tick_fontsize (Optional[int]): \
             Defines the size of the ticks' font. \
             Default value is 12.
-        xticks_arg : dict, \
+        xticks_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as xticks arguments. \
             Default value is None.
-        yticks_arg : dict, \
+        yticks_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as yticks arguments. \
             Default value is None.
-        zticks_arg : dict, \
+        zticks_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as zticks arguments. \
             Default value is None.
