@@ -601,23 +601,20 @@ def plot_limits(fig, ax, **kwargs):
 
     Parameters:
         fig: matplotlib figure
-
         ax: matplotlib axes
-
-        no_limits : boolean
-            Defines the presence of plot limits in the figure.
+        no_limits (Optional[boolean]): \
+            Defines the presence of plot limits in the figure. \
             Default value is False.
-
-        no_xlim : boolean
+        no_xlim (Optional[boolean]): \
             Defines the presence of plot x-limits in the figure. \
             Default value is False.
-        no_ylim : boolean, \
+        no_ylim (Optional[boolean]): \
             Defines the presence of plot y-limits in the figure. \
             Default value is False.
-        xlim: list of two floats, \
+        xlim (Optional[list of two floats]): \
             Defines the min and the max values in x-axis. \
             Default in None
-        ylim: list of two floats, \
+        ylimxlim (Optional[list of two floats]): \
             Defines the min and the max values in y-axis. \
             Default in None
 
