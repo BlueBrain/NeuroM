@@ -461,7 +461,8 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
 
 def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
-    '''Generates a 3d figure of the soma.
+    '''
+    Generates a 3d figure of the soma.
 
     Parameters:
         soma: Soma \
