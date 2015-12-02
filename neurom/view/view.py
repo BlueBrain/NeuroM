@@ -352,6 +352,9 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
 def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     '''Generates a figure of the tree in 3d.
+       If the tree contains one single point the plot will be empty \
+       since no segments can be constructed.
+
 
     Parameters:
         tr: Tree
