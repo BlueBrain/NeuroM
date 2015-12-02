@@ -131,7 +131,7 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
             Default value is False.
 
     Returns:
-        figure is no_axes is True, otherwise axes.
+        Figure is no_axes is True, otherwise axes.
     """
     if new_fig:
         fig = plt.figure()
@@ -407,20 +407,20 @@ def plot_title(fig, ax, **kwargs):
     Parameters:
         fig: matplotlib figure
         ax: matplotlib axes
-            pretitle : str \
+        pretitle(Optional[str]) : \
             String to include before the general title of the figure. \
             Default value is None.
-        posttitle : str \
+        posttitle (Optional[str]): \
             String to include after the general title of the figure. \
             Default value is None.
-        title : str \
+        title (Optional[str]): \
             Set the title for the figure. \
             If "" no title will be added. \
             Default value is "Figure".
-        title_fontsize : int \
+        title_fontsize (Optional[int]): \
             Defines the size of the title's font. \
             Default value is 14.
-        title_arg : dict \
+        title_arg (Optional[dict]): \
             Defines the arguments that will be passsed \
             into matplotlib as title arguments. \
             Default value is None.
@@ -599,37 +599,30 @@ def plot_limits(fig, ax, **kwargs):
     Function that defines the limit options
     of a matplotlib plot.
 
-    Parameters
-    ----------
-    fig: matplotlib figure
+    Parameters:
+        fig: matplotlib figure
 
-    ax: matplotlib axes
+        ax: matplotlib axes
 
-    Options
-    -------
-    no_limits : boolean
-        Defines the presence of plot limits in the figure.
-        Default value is False.
+        no_limits : boolean
+            Defines the presence of plot limits in the figure.
+            Default value is False.
 
-    no_xlim : boolean
-        Defines the presence of plot x-limits in the figure.
-        Default value is False.
+        no_xlim : boolean
+            Defines the presence of plot x-limits in the figure. \
+            Default value is False.
+        no_ylim : boolean, \
+            Defines the presence of plot y-limits in the figure. \
+            Default value is False.
+        xlim: list of two floats, \
+            Defines the min and the max values in x-axis. \
+            Default in None
+        ylim: list of two floats, \
+            Defines the min and the max values in y-axis. \
+            Default in None
 
-    no_ylim : boolean
-        Defines the presence of plot y-limits in the figure.
-        Default value is False.
-
-    xlim: list of two floats
-        Defines the min and the max values in x-axis.
-        Default in None
-
-    ylim: list of two floats
-        Defines the min and the max values in y-axis.
-        Default in None
-
-    Returns
-    -------
-    figure_output : figure, axes
+    Returns:
+        Matplotlib figure, axes
 
     """
     # Definition of limit options
