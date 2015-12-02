@@ -663,14 +663,13 @@ def _render_dendrogram(dnd, ax, displacement):
 
 
 def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=False, **kwargs):
-    '''Generates a figure of the neuron,
-       that contains a soma and a list of trees.
+    '''
+    Generates a figure of the neuron,
+    that contains a soma and a list of trees.
 
     Parameters:
-        obj: Neuron or tree
+        obj: Neuron or tree \
         neurom.Neuron, neurom.Tree
-
-    Options:
         show_diameters : boolean \
             Determines if node diameters will \
             be show or not.
@@ -701,15 +700,6 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
             For any other value a matplotlib subplot \
             will be generated. \
             Default value is False.
-        diameter: boolean
-            If True the diameter, scaled with diameter_scale factor, \
-            will define the width of the tree lines. \
-            If False use linewidth to select the width of the tree lines. \
-            Default value is True.
-        diameter_scale: float \
-            Defines the scale factor that will be multiplied \
-            with the diameter to define the width of the tree line. \
-            Default value is 1.
 
     Returns:
         A 2D matplotlib figure with a dendrogram view.
