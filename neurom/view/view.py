@@ -434,6 +434,8 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     if get_default('diameter', **kwargs):
         # TODO: This was originally a numpy array. Did it have to be one?
         linewidth = [2 * d * get_default('diameter_scale', **kwargs) for d in i_segment_radius(tr)]
+        if len(linewidth) == 0:
+            linewidth = get_default('linewidth', **kwargs)
 
     # Plot the collection of lines.
     collection = Line3DCollection(segs,
