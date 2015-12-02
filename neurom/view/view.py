@@ -603,13 +603,13 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
 
 def _format_str(string):
-    ''' string formatting
+    ''' String formatting
     '''
     return string.replace('TreeType.', '').replace('_', ' ').capitalize()
 
 
 def _generate_collection(group, ax, ctype, colors):
-    ''' render rectangle collection
+    ''' Render rectangle collection
     '''
     from matplotlib.collections import PolyCollection
 
