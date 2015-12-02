@@ -473,10 +473,8 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
     '''Generates a 3d figure of the soma.
 
     Parameters:
-        soma: Soma
+        soma: Soma \
         neurom.Soma object
-
-    Options:
         alpha: float \
             Defines throughe transparency of the tree. \
             0.0 transparent through 1.0 opaque. \
