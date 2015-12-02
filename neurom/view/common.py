@@ -94,13 +94,20 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
 
 def get_color(treecolor, tree_type):
     """
-    If treecolor is None returns the color depending on the type:
-    Basal dendrite: "red"
-    Axon : "blue"
-    Apical dendrite: "purple"
-    Soma tree: "black"
-    Undefined or any other type: "green"
-    Otherwise returns the treecolor.
+    If treecolor is None returns the color depending on the type, \
+    otherwise it returns the treecolor.
+
+    Returns: str color
+
+        basal dendrite: red
+
+        axon : blue
+
+        apical dendrite: purple
+
+        soma: black
+
+        undefined or any other type: green
     """
     if treecolor is not None:
         return treecolor
@@ -610,7 +617,7 @@ def plot_limits(fig, ax, **kwargs):
         xlim (Optional[list of two floats]): \
             Defines the min and the max values in x-axis. \
             Default in None
-        ylimxlim (Optional[list of two floats]): \
+        ylim (Optional[list of two floats]): \
             Defines the min and the max values in y-axis. \
             Default in None
 
