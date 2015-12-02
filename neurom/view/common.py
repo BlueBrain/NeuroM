@@ -404,39 +404,29 @@ def plot_title(fig, ax, **kwargs):
     Function that defines the title options
     of a matplotlib plot.
 
-    Parameters
-    ----------
-    fig: matplotlib figure
+    Parameters:
+        fig: matplotlib figure
+        ax: matplotlib axes
+            pretitle : str \
+            String to include before the general title of the figure. \
+            Default value is None.
+        posttitle : str \
+            String to include after the general title of the figure. \
+            Default value is None.
+        title : str \
+            Set the title for the figure. \
+            If "" no title will be added. \
+            Default value is "Figure".
+        title_fontsize : int \
+            Defines the size of the title's font. \
+            Default value is 14.
+        title_arg : dict \
+            Defines the arguments that will be passsed \
+            into matplotlib as title arguments. \
+            Default value is None.
 
-    ax: matplotlib axes
-
-    Options
-    -------
-    pretitle : str
-        String to include before the general title of the figure.
-        Default value is None.
-
-    posttitle : str
-        String to include after the general title of the figure.
-        Default value is None.
-
-    title : str
-        Set the title for the figure.
-        If "" no title will be added.
-        Default value is "Figure".
-
-    title_fontsize : int
-        Defines the size of the title's font.
-        Default value is 14.
-
-    title_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as title arguments.
-        Default value is None.
-
-    Returns
-    -------
-    figure_output : figure, axes
+    Returns:
+        figure_output : figure, axes
 
     """
 
