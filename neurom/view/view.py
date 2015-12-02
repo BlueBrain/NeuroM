@@ -255,14 +255,13 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
 
 
 def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
-    '''Generates a 2d figure of the neuron,
-       that contains a soma and a list of trees.
+    '''
+    Generates a 2d figure of the neuron,
+    that contains a soma and a list of trees.
 
     Parameters:
-        neuron: Neuron
+        neuron: Neuron \
         neurom.Neuron object
-
-    Options:
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
