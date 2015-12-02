@@ -141,3 +141,19 @@ def test_one_point_branch_without_diameter():
         nt.ok_(True)
     except:
         nt.ok_(False)
+
+def test_one_point_branch_with_diameter_3d():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree3d(test_tree, diameter=True)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
+
+def test_one_point_branch_without_diameter_3d():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree3d(test_tree, diameter=False)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
