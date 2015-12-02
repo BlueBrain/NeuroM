@@ -357,21 +357,17 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
 
     Parameters:
-        tr: Tree
+        tr: Tree \
         neurom.Tree object
-
-    Options:
-        linewidth: float
+        linewidth: float \
             Defines the linewidth of the tree, \
             if diameter is set to False. \
             Default value is 1.2.
-
-        alpha: float
+        alpha: float \
             Defines throughe transparency of the tree. \
             0.0 transparent through 1.0 opaque. \
             Default value is 0.8.
-
-        treecolor: str or None
+        treecolor: str or None \
             Defines the color of the tree. \
             If None the default values will be used, \
             depending on the type of tree: \
@@ -380,31 +376,26 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
             Apical dendrite: "purple" \
             Undefined tree: "black" \
             Default value is None.
-
-        new_fig: boolean
+        new_fig: boolean \
             Defines if the tree will be plotted \
             in the current figure (False) \
             or in a new figure (True) \
             Default value is True.
-
-        subplot: matplotlib subplot value or False
+        subplot: matplotlib subplot value or False \
             If False the default subplot 111 will be used. \
             For any other value a matplotlib subplot \
             will be generated. \
             Default value is False.
-
-        diameter: boolean
+        diameter: boolean \
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
             If False use linewidth to select the width of the tree lines. \
             Default value is True.
-
-        diameter_scale: float
+        diameter_scale: float \
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-
-        white_space: float
+        white_space: float \
             Defines the white space around \
             the boundary box of the morphology. \
             Default value is 1.
