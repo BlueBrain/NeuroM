@@ -44,7 +44,8 @@ from neurom.analysis.morphtree import i_segment_radius
 
 
 def get_default(variable, **kwargs):
-    '''Returns default variable or kwargs variable if it exists.
+    '''
+    Returns default variable or kwargs variable if it exists.
     '''
     default = {'linewidth': 1.2,
                'alpha': 0.8,
@@ -57,15 +58,14 @@ def get_default(variable, **kwargs):
 
 
 def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
-    '''Generates a 2d figure of the tree's segments.
-       If the tree contains one single point the plot will be empty \
-       since no segments can be constructed.
+    '''
+    Generates a 2d figure of the tree's segments. \
+    If the tree contains one single point the plot will be empty \
+    since no segments can be constructed.
 
     Parameters:
         tr: Tree \
             neurom.Tree object
-
-    Options:
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
@@ -255,7 +255,7 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
 
 def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     '''
-    Generates a 2d figure of the neuron,
+    Generates a 2d figure of the neuron, \
     that contains a soma and a list of trees.
 
     Parameters:
