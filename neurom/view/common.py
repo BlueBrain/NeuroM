@@ -68,7 +68,6 @@ def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
             general filename of the figure.
     Returns:
         str: String to include in the figure name and title, in a suitable form.
-
     """
     if not pretitle:
         pretitle = ""
@@ -352,8 +351,8 @@ def plot_style(fig, ax, **kwargs):
             Default value is False.
 
     Returns:
-        figure, axes
-        """
+        Matplotlib figure, axes
+    """
     # Definition of title/file naming variables
     prefile = kwargs.get('prefile', '')
     postfile = kwargs.get('postfile', '')
@@ -426,8 +425,7 @@ def plot_title(fig, ax, **kwargs):
             Default value is None.
 
     Returns:
-        matplotlib figure, axes
-
+        Matplotlib figure, axes
     """
 
     # Definition of title options
@@ -485,7 +483,6 @@ def plot_labels(fig, ax, **kwargs):
 
     Returns:
         Matplotlib figure, axes
-
     """
 
     # Definition of label options
@@ -557,7 +554,6 @@ def plot_ticks(fig, ax, **kwargs):
 
     Returns:
         Matplotlib figure, axes
-
     """
 
     # Definition of tick options
@@ -620,7 +616,6 @@ def plot_limits(fig, ax, **kwargs):
 
     Returns:
         Matplotlib figure, axes
-
     """
     # Definition of limit options
     no_xlim = kwargs.get('no_xlim', False)
@@ -646,28 +641,20 @@ def plot_legend(fig, ax, **kwargs):
     Function that defines the legend options
     of a matplotlib plot.
 
-    Parameters
-    ----------
-    fig: matplotlib figure
+    Parameters:
+        fig: matplotlib figure
+        ax: matplotlib axes
+        no_legend (Optional[boolean]): \
+            Defines the presence of a legend in the figure. \
+            If True the legend will not be included in the Figure. \
+            Default value is True.
+        legend_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as legend arguments. \
+            Default value is None.
 
-    ax: matplotlib axes
-
-    Options
-    -------
-    no_legend : boolean
-        Defines the presence of a legend in the figure.
-        If True the legend will not be included in the Figure.
-        Default value is True.
-
-    legend_arg : dict
-        Defines the arguments that will be passsed
-        into matplotlib as legend arguments.
-        Default value is None.
-
-    Returns
-    -------
-    figure_output : figure, axes
-
+    Returns:
+        Matplotlib figure, axes
     """
     # Definition of legend options
     no_legend = kwargs.get('no_legend', True)
