@@ -145,6 +145,8 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
         scale = get_default('diameter_scale', **kwargs)
         # TODO: This was originally a numpy array. Did it have to be one?
         linewidth = [2 * d * scale for d in i_segment_radius(tr)]
+        if len(linewidth) == 0:
+            linewidth = get_default('linewidth', **kwargs)
 
     # Plot the collection of lines.
     collection = LineCollection(segs,
