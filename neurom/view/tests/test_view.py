@@ -35,6 +35,7 @@ from neurom.analysis.morphtree import find_tree_type
 import os
 import numpy as np
 import pylab as plt
+from neurom.core.tree import Tree
 
 
 DATA_PATH = './test_data'
@@ -121,6 +122,14 @@ def test_neuron3d_no_neurites():
 
 
 def test_dendrogram():
-
     fig, ax = view.dendrogram(neuron0)
     nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
+
+
+def test_one_point_branch_with_diameter():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree(test_tree, diameter=True)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
