@@ -174,13 +174,12 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
 
 def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
-    '''Generates a 2d figure of the soma.
+    '''
+    Generates a 2d figure of the soma.
 
     Parameters:
-        soma: Soma
+        soma: Soma \
         neurom.Soma object
-
-    Options:
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
