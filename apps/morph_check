@@ -172,15 +172,6 @@ def test_file(f):
             if out:
                 L.debug('%d sections with zero length detected: %s', len(out), out)
 
-        elif check in ['has_monotonic_neurites', 'has_flat_neurites']:
-
-            ok = all(out)
-
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
-
-            if not all(out):
-                L.debug('%d out of %d neurites', sum(out), len(out))
-
         else:
 
             ok = out
