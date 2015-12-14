@@ -80,7 +80,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
     return types.count(TreeType.basal_dendrite) >= min_number
 
 
-def has_flat_neurites(neuron, tol=0.1, method='ratio'):
+def get_flat_neurites(neuron, tol=0.1, method='ratio'):
     '''Check if a neuron has neurites that are flat within a tolerance
 
     Argument:
@@ -92,22 +92,41 @@ def has_flat_neurites(neuron, tol=0.1, method='ratio'):
         Bool list corresponding to the flatness check for each neurite
         in neuron neurites with respect to the given criteria
     '''
-    return [is_flat(n, tol, method) for n in neuron.neurites]
+    return [n for n in neuron.neurites if is_flat(n, tol, method)]
 
 
-def has_monotonic_neurites(neuron):
-    '''Check if a neuron has neurites that are flat within a tolerance
+def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
+    '''Check that a neuron has no flat neurites
 
     Argument:
         neuron : The neuron object to test
         tol : the tolerance or the ratio
         method : way of determining flatness, 'tolerance', 'ratio'
+    '''
+    return len(get_flat_neurites(neuron, tol, method)) == 0
+
+
+def get_nonmonotonic_neurites(neuron, tol=1e-6):
+    '''Get neurites that are not monotonic
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance for testing monotonicity
 
     Returns:
-        Bool list corresponding to the flatness check for each neurite
-        in neuron neurites with respect to the given criteria
+        list of neurites that do not satisfy monotonicity test
     '''
-    return [is_monotonic(n, 1e-6) for n in neuron.neurites]
+    return [n for n in neuron.neurites if not is_monotonic(n, tol)]
+
+
+def has_all_monotonic_neurites(neuron, tol=1e-6):
+    '''Check that a neuron has no neurites that are not monotonic
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance for testing monotonicity
+    '''
+    return len(get_nonmonotonic_neurites(neuron, tol)) == 0
 
 
 def nonzero_segment_lengths(neuron, threshold=0.0):

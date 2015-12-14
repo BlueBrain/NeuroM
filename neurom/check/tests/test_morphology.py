@@ -41,6 +41,7 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
+
 def _load_neuron(name):
     if name.endswith('.swc'):
         path = os.path.join(SWC_PATH, name)
@@ -48,12 +49,13 @@ def _load_neuron(name):
         path = os.path.join(H5V1_PATH, name)
     return name, load_neuron(path)
 
+
 def _make_monotonic(neuron):
     for neurite in neuron.neurites:
-        radius = 1.
         for node in ipreorder(neurite):
             if node.parent is not None:
                 node.value[COLS.R] = node.parent.value[COLS.R] / 2.
+
 
 def _make_flat(neuron):
     for neurite in neuron.neurites:
@@ -137,29 +139,52 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not check.has_basal_dendrite(n))
 
 
-def test_has_flat_neurites():
+def test_get_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_false(any(check.has_flat_neurites(n, 1e-6, method='tolerance')))
-    nt.assert_false(any(check.has_flat_neurites(n, 0.1, method='ratio')))
+    nt.assert_equal(len(check.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
+    nt.assert_equal(len(check.get_flat_neurites(n, 0.1, method='ratio')), 0)
 
     _make_flat(n)
 
-    nt.assert_true(all(check.has_flat_neurites(n, 1e-6, method='tolerance')))
-    nt.assert_true(all(check.has_flat_neurites(n, 0.1, method='ratio')))
+    nt.assert_equal(len(check.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
+    nt.assert_equal(len(check.get_flat_neurites(n, 0.1, method='ratio')), 4)
 
 
-
-def test_has_monotonic_neurites():
+def test_has_no_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_false(any(check.has_monotonic_neurites(n)))
+    nt.assert_true(check.has_no_flat_neurites(n, 1e-6, method='tolerance'))
+    nt.assert_true(check.has_no_flat_neurites(n, 0.1, method='ratio'))
+
+    _make_flat(n)
+
+    nt.assert_false(check.has_no_flat_neurites(n, 1e-6, method='tolerance'))
+    nt.assert_false(check.has_no_flat_neurites(n, 0.1, method='ratio'))
+
+
+def test_has_all_monotonic_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+
+    nt.assert_false(check.has_all_monotonic_neurites(n))
 
     _make_monotonic(n)
 
-    nt.assert_true(all(check.has_monotonic_neurites(n)))
+    nt.assert_true(check.has_all_monotonic_neurites(n))
+
+
+def test_get_nonmonotonic_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+
+    nt.assert_equal(len(check.get_nonmonotonic_neurites(n)), 4)
+
+    _make_monotonic(n)
+
+    nt.assert_equal(len(check.get_nonmonotonic_neurites(n)), 0)
 
 
 def test_nonzero_neurite_radii_good_data():
