@@ -164,18 +164,14 @@ def test_file(f):
             out = getattr(morph_chk, check)(nrn)
 
         ok = chk_ok(out)
+        log_msg(ok, check.replace('_', ' ').capitalize() + '?')
 
         if check in ['nonzero_section_lengths',
                      'nonzero_segment_lengths',
                      'nonzero_neurite_radii']:
 
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
-
             if not ok:
                 L.debug('%d failing sections detected: %s', len(out), out)
-
-        else:
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
 
         result &= ok
 
