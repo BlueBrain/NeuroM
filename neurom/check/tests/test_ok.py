@@ -26,20 +26,69 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Basic tools to check neuronal morphologies. '''
+from neurom.check import ok
+import numpy as np
+from nose import tools as nt
 
 
-def ok(result):
-    '''Boolean test result
+def test_true_is_ok():
+    nt.assert_true(ok(True))
 
-    Return a boolean pass status for a test result. Some tests
-    return iterables of failures. A non empty iterable result is
-    a failure.
 
-    Returns: True if result is True or an empty iterable,\
-    False otherwise.
-    '''
-    try:
-        return len(result) == 0
-    except TypeError:
-        return result is True
+def test_false_is_not_ok():
+    nt.assert_true(not ok(False))
+
+
+def test_empty_list_is_ok():
+    nt.assert_true(ok([]))
+
+
+def test_empty_dict_is_ok():
+    nt.assert_true(ok({}))
+
+
+def test_empty_tuple_is_ok():
+    nt.assert_true(ok(tuple()))
+
+
+def test_empty_set_is_ok():
+    nt.assert_true(ok(set()))
+
+
+def test_empty_string_is_ok():
+    nt.assert_true(ok(""))
+
+
+def test_empty_ndarray_is_ok():
+    nt.assert_true(ok(np.array([])))
+
+
+def test_list_is_not_ok():
+    nt.assert_false(ok([1,2,3]))
+
+
+def test_dict_is_not_ok():
+    nt.assert_false(ok({1:1, 2:2, 3:3}))
+
+
+def test_tuple_is_not_ok():
+    nt.assert_false(ok((1,2,3)))
+
+
+def test_ndarray_is_not_ok():
+    nt.assert_false(ok(np.array([1,2,3])))
+
+
+def test_set_is_not_ok():
+    nt.assert_false(ok({1,2,3}))
+
+
+def test_string_is_not_ok():
+    nt.assert_false(ok("123"))
+
+
+def test_anything_is_not_ok():
+    class Foo(object):
+        pass
+    nt.assert_false(ok(Foo()))
+    nt.assert_false(ok(123))
