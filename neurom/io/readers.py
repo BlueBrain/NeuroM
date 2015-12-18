@@ -98,7 +98,7 @@ class RawDataWrapper(object):
     * PID: ID of parent point
     '''
     def __init__(self, raw_data):
-        self.data_block, self._offset, self.fmt = raw_data
+        self.data_block, self.fmt = raw_data
         self.adj_list = defaultdict(list)
         self._id_map = {}
         for i, row in enumerate(self.data_block):
@@ -165,9 +165,8 @@ class RawDataWrapper(object):
         row predicate pred.
         '''
         if start_id is None:
-            start_id = self._offset
+            start_id = 0
 
-        start_id = self._get_idx(start_id)
         if start_id < 0 or start_id >= self.data_block.shape[0]:
             raise LookupError('Invalid id: {0}'.format(start_id))
 
