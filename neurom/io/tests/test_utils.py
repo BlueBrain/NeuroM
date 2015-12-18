@@ -33,7 +33,7 @@ from neurom import io
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.exceptions import SomaError, NonConsecutiveIDsError
+from neurom.exceptions import SomaError
 from nose import tools as nt
 
 
@@ -180,6 +180,5 @@ def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)
 
 
-@nt.raises(NonConsecutiveIDsError)
-def test_load_neuron_no_consecutive_ids_raises_NonConsecutiveIDsError():
+def test_load_neuron_no_consecutive_ids_loads():
     utils.load_neuron(NON_CONSECUTIVE_ID_FILE);

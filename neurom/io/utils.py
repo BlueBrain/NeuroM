@@ -33,9 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.exceptions import NonConsecutiveIDsError
 from . import load_data
-from . import check
 from neurom.utils import memoize
 import os
 
@@ -107,14 +105,9 @@ def load_neuron(filename, tree_action=None):
         tree_action: optional function to run on each of the neuron's
         neurite trees.
     Raises: SomaError if no soma points in data.
-    Raises: NonConsecutiveIDsError if filename contains non-consecutive
-    point IDs
     """
 
     data = load_data(filename)
-    if not check.has_sequential_ids(data)[0]:
-        raise NonConsecutiveIDsError('Non consecutive IDs found in raw data')
-
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]
 

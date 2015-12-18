@@ -37,8 +37,3 @@ class NeuroMError(StandardError):
 class SomaError(NeuroMError):
     '''Exception for soma construction errors'''
     pass
-
-
-class NonConsecutiveIDsError(NeuroMError):
-    '''Exception for raw data with non-consecutive point IDs'''
-    pass
