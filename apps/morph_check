@@ -32,8 +32,7 @@
 from neurom.io.utils import load_neuron, get_morph_files
 from neurom.check import ok as chk_ok
 from neurom.check import morphology as morph_chk
-from neurom.exceptions import SomaError
-from neurom.exceptions import NonConsecutiveIDsError
+from neurom.exceptions import SomaError, IDSequenceError
 import argparse
 import logging
 import yaml
@@ -219,8 +218,8 @@ if __name__ == '__main__':
         try:
             res = test_file(_f, _config)
             log_msg(res, 'Check result:')
-        except NonConsecutiveIDsError as e:
-            print 'ERROR in file %s: %s' % (_f, e.message)
+        except IDSequenceError as e:
+            print 'ID ERROR in file %s: %s' % (_f, e.message)
         except StandardError as e:
             print 'ERROR: Could not read file %s: %s' % (_f, e.message)
 
