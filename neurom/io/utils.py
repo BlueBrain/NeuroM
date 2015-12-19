@@ -33,7 +33,9 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
+from neurom.exceptions import IDSequenceError
 from . import load_data
+from . import check
 from neurom.utils import memoize
 import os
 
@@ -108,6 +110,8 @@ def load_neuron(filename, tree_action=None):
     """
 
     data = load_data(filename)
+    if not check.has_increasing_ids(data)[0]:
+        raise IDSequenceError('Invald ID sequence found in raw data')
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]
 

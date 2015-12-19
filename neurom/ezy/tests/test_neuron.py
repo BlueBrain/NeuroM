@@ -35,7 +35,7 @@ from copy import deepcopy
 from neurom import ezy
 from collections import namedtuple
 from neurom.core.types import TreeType
-from neurom.exceptions import SomaError
+from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
 from neurom.core.dataformat import COLS
 from neurom.core.tree import ipreorder, val_iter
@@ -58,6 +58,12 @@ def test_construct_neuron():
 @nt.raises(SomaError)
 def test_construct_neuron_no_soma_raises_SomaError():
     filename = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+    ezy.load_neuron(filename)
+
+
+@nt.raises(IDSequenceError)
+def test_construct_neuron_invalid_id_sequence_raises():
+    filename = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
     ezy.load_neuron(filename)
 
 

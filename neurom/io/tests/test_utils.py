@@ -33,7 +33,7 @@ from neurom import io
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.exceptions import SomaError
+from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
 
 
@@ -56,6 +56,9 @@ NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
 NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
                                        'non_sequential_trunk_off_1_16pt.swc')
+
+INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH,
+                                        'non_increasing_trunk_off_1_16pt.swc')
 
 SOMA_IDS = [[1, 2, 3],
             [],
@@ -178,6 +181,11 @@ def test_get_morph_files():
 @nt.raises(SomaError)
 def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)
+
+
+@nt.raises(IDSequenceError)
+def test_load_neuron_invalid_id_sequence_raises():
+    utils.load_neuron(INVALID_ID_SEQUENCE_FILE);
 
 
 def test_load_neuron_no_consecutive_ids_loads():

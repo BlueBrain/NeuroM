@@ -63,6 +63,7 @@ class Neuron(CoreNeuron):
 
     Raises:
         neurom.exceptions.SomaError if no soma can be built from the data
+        neurom.exceptions.IDSequenceError if ID sequence invalid
 
     Example:
         get the segment lengths of all apical dendrites in a neuron morphology.

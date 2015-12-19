@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Example SWC file with non-consecutive indices.
-# This should fail to load early.
 #
 1 0 0 0 0 0 -1
 2 1 1 1 1 1 1
