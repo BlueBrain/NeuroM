@@ -90,6 +90,7 @@ def make_neuron(raw_data, tree_action=None):
         tree_action: optional function to run on the built trees.
     Raises:
         SomaError if no soma points in raw_data or points incompatible with soma.
+        IDSequenceError if filename contains invalid ID sequence
     '''
     _soma = make_soma([raw_data.get_row(s_id)
                        for s_id in get_soma_ids(raw_data)])
@@ -106,7 +107,9 @@ def load_neuron(filename, tree_action=None):
         filename: the path of the file storing morphology data
         tree_action: optional function to run on each of the neuron's
         neurite trees.
-    Raises: SomaError if no soma points in data.
+    Raises:
+        SomaError if no soma points in data.
+        IDSequenceError if filename contains invalid ID sequence
     """
 
     data = load_data(filename)
