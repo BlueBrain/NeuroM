@@ -90,6 +90,44 @@ def test_angle_3points_half_pi():
     nt.ok_(angle_3points(orig, vec1, vec2)==pi/2.0)
 
 
+def test_angle_3points_quarter_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 0.0, 0.0)
+    vec2 = (2.0, 2.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, -3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 0.0, 3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 0.0, -3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+
+def test_angle_3points_three_quarter_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 0.0, 0.0)
+    vec2 = (-2.0, 2.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3* pi / 4.0)
+
+    vec2 = (-3.0, -3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 0.0, 3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 0.0, -3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+
 def test_angle_3points_equal_points_returns_zero():
     orig = (0.0, 1.0, 0.0)
     vec1 = (1.0, 0.0, 0.0)
