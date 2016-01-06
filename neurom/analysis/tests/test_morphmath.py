@@ -74,34 +74,42 @@ def test_point_dist():
     nt.ok_(dist==sqrt(3))
 
 
-def test_angle_3points():
+def test_angle_3points_half_pi():
+    orig = (0.0, 0.0, 0.0)
     vec1 = (1.0, 0.0, 0.0)
-    vec2 = (0.0, 1.0, 0.0)
-    orig = (0.0,0.0,0.0)
-    angle=angle_3points(orig, vec1, vec2)
-    nt.ok_(angle==pi/2.0)
+    vec2 = (0.0, 2.0, 0.0)
+    nt.ok_(angle_3points(orig, vec1, vec2)==pi/2.0)
+
+    vec2 = (0.0, 0.0, 3.0)
+    nt.ok_(angle_3points(orig, vec1, vec2)==pi/2.0)
+
+    vec2 = (0.0, 0.0, -3.0)
+    nt.ok_(angle_3points(orig, vec1, vec2)==pi/2.0)
+
+    vec1 = (0.0, 4.0, 0.0)
+    nt.ok_(angle_3points(orig, vec1, vec2)==pi/2.0)
 
 
 def test_angle_3points_equal_points_returns_zero():
+    orig = (0.0, 1.0, 0.0)
     vec1 = (1.0, 0.0, 0.0)
     vec2 = (0.0, 1.0, 0.0)
-    orig = (0.0,1.0,0.0)
-    a = angle_3points(orig,vec1,vec2)
+    a = angle_3points(orig, vec1, vec2)
     nt.assert_equal(a, 0.0)
 
 
 def test_angle_3points_opposing_returns_pi():
+    orig = (0.0, 0.0, 0.0)
     vec1 = (1.0, 1.0, 1.0)
     vec2 = (-2.0, -2.0, -2.0)
-    orig = (0.0,0.0,0.0)
     angle=angle_3points(orig, vec1, vec2)
     nt.assert_equal(angle, pi)
 
 
 def test_angle_3points_collinear_returns_zero():
+    orig = (0.0, 0.0, 0.0)
     vec1 = (1.0, 1.0, 1.0)
     vec2 = (2.0, 2.0, 2.0)
-    orig = (0.0,0.0,0.0)
     angle=angle_3points(orig, vec1, vec2)
     nt.assert_equal(angle, 0.0)
 
