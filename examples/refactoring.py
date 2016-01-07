@@ -65,6 +65,8 @@ class Neurite(object):
 
 
 def i_neurites(neurites, func, neu_filter=None):
+    '''iterate over neurites
+    '''
     ns = (neurites if neu_filter is None else filter(neu_filter, neurites))
     return chain(*imap(func, ns))
 
