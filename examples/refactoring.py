@@ -64,6 +64,11 @@ class Neurite(object):
         return self._type
 
 
+def i_neurites(neurites, func, neu_filter=None):
+    ns = (neurites if neu_filter is None else filter(neu_filter, neurites))
+    return chain(*imap(func, ns))
+
+
 class Neuron(object):
     ''' Neuron Class
     '''
@@ -79,31 +84,19 @@ class Neuron(object):
         self.neurites = neurites
         self.name = name
 
-    def _i_neurites(self, func, tree_filter=None):
-        '''Returns a mapped iterator to all the neuron's neurites
-
-        Provides access to all the elements of all the neurites
-        in one iteration sequence.
-
-        Parameters:
-            iterator_type: type of the iteration (segment, section, triplet...)
-            mapping: optional function to apply to the iterator's target.
-            tree_filter: optional top level filter on properties of neurite tree objects.
-        '''
-        nrt = (self.neurites if tree_filter is None else filter(tree_filter, self.neurites))
-        return chain(*imap(func, nrt))
-
     def segments(self, neurite_type=TreeType.all):
         '''Returns segments
         '''
-        return self._i_neurites(lambda n: n.segments(),
-                                tree_filter=lambda t: checkTreeType(neurite_type, t.type))
+        return i_neurites(self.neurites,
+                          lambda n: n.segments(),
+                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
 
     def sections(self, neurite_type=TreeType.all):
         '''Returns sections
         '''
-        return self._i_neurites(lambda n: n.sections(),
-                                tree_filter=lambda t: checkTreeType(neurite_type, t.type))
+        return i_neurites(self.neurites,
+                          lambda n: n.sections(),
+                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
 
 
 class Population(object):
@@ -116,6 +109,7 @@ class Population(object):
             name: Optional name for this Population.
         '''
         self.neurons = neurons
+        self.neurites = list(chain(*(neu.neurites for neu in self.neurons)))
         self.name = name
 
     @property
@@ -124,21 +118,19 @@ class Population(object):
         '''
         return (neu.soma for neu in self.neurons)
 
-    @property
-    def neurites(self):
-        '''Returns population neurites
-        '''
-        return chain(*(neu.neurites for neu in self.neurons))
-
     def segments(self, neurite_type=TreeType.all):
-        '''Returns population semgments
+        '''Returns segments
         '''
-        return chain(*(nrn.segments(neurite_type) for nrn in self.neurons))
+        return i_neurites(self.neurites,
+                          lambda n: n.segments(),
+                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
 
     def sections(self, neurite_type=TreeType.all):
-        '''Returns population sections
+        '''Returns sections
         '''
-        return chain(*(nrn.sections(neurite_type) for nrn in self.neurons))
+        return i_neurites(self.neurites,
+                          lambda n: n.sections(),
+                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
 
 if __name__ == '__main__':
     from neurom.core.tree import Tree
