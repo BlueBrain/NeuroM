@@ -32,7 +32,7 @@
 from neurom.io.utils import load_neuron, get_morph_files
 from neurom.check import ok as chk_ok
 from neurom.check import morphology as morph_chk
-from neurom.exceptions import SomaError, IDSequenceError
+from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
 import argparse
 import logging
 import yaml
@@ -57,6 +57,7 @@ have a soma and no format errors.
 Default errors checked for
 ------------------
 * No soma
+* Disconnected points
 * No axon
 * No apical dendrite
 * No basal dendrite
@@ -140,9 +141,14 @@ def test_file(f, config):
     try:
         nrn = load_neuron(f)
         log_msg(True, 'Has valid soma?')
+        log_msg(True, 'All points connected?')
     except SomaError:
         log_msg(False, 'Has valid soma?')
         L.warning('Cannot continue without a soma... Aborting')
+        return False
+    except DisconnectedPointError as e:
+        log_msg(False, 'All points connected')
+        L.warning(e.message)
         return False
 
     result = True

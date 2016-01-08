@@ -33,7 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.exceptions import IDSequenceError
+from neurom.exceptions import IDSequenceError, DisconnectedPointError
 from . import load_data
 from . import check
 from neurom.utils import memoize
@@ -115,6 +115,9 @@ def load_neuron(filename, tree_action=None):
     data = load_data(filename)
     if not check.has_increasing_ids(data)[0]:
         raise IDSequenceError('Invald ID sequence found in raw data')
+    if not check.all_points_connected(data)[0]:
+        raise DisconnectedPointError('Disconnected point detected')
+
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]
 

@@ -42,3 +42,8 @@ class SomaError(NeuroMError):
 class IDSequenceError(NeuroMError):
     '''Exception for raw data with illegal point ID sequence'''
     pass
+
+
+class DisconnectedPointError(NeuroMError):
+    '''Exception for raw data with disconnected points'''
+    pass

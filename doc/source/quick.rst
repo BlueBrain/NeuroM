@@ -76,6 +76,7 @@ For example,
     INFO: ========================================
     INFO: Check file test_data/swc/Neuron.swc...
     INFO:                     Has valid soma? PASS
+    INFO:               All points connected? PASS
     INFO:                 Has basal dendrite? PASS
     INFO:                           Has axon? PASS
     INFO:                Has apical dendrite? PASS
