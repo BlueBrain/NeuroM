@@ -1,0 +1,164 @@
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from nose import tools as nt
+import os
+from neurom.io.utils import make_neuron
+from neurom import io
+from neurom.core.tree import Tree
+from neurom import segments as seg
+
+import math
+from itertools import izip
+
+
+class MockNeuron(object):
+    pass
+
+
+DATA_PATH = './test_data'
+SWC_PATH = os.path.join(DATA_PATH, 'swc/')
+
+data    = io.load_data(SWC_PATH + 'Neuron.swc')
+neuron0 = make_neuron(data)
+tree0   = neuron0.neurites[0]
+
+def _form_neuron_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    return T
+
+
+def _form_simple_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(Tree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(Tree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
+    T4 = T3.add_child(Tree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
+
+    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(Tree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(Tree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
+    T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
+
+    return T
+
+
+NEURON_TREE = _form_neuron_tree()
+SIMPLE_TREE = _form_simple_tree()
+
+NEURON = MockNeuron()
+NEURON.neurites = [NEURON_TREE]
+
+SIMPLE_NEURON = MockNeuron()
+SIMPLE_NEURON.neurites = [SIMPLE_TREE]
+
+def _form_branching_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
+    return T
+
+BRANCHING_TREE = _form_branching_tree()
+
+
+def test_segment_lengths():
+
+
+    lg = [l for l in seg.itr(NEURON, seg.length)]
+
+    nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
+
+
+def test_segment_volumes():
+
+    sv = (l/math.pi for l in seg.itr(NEURON, seg.volume))
+
+    ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
+           0.5625, 4.6666667, 0.7708333, 0.5625)
+
+    for a, b in izip(sv, ref):
+        nt.assert_almost_equal(a, b)
+
+
+def test_segment_areas():
+
+    sa = (l/math.pi for l in seg.itr(NEURON, seg.area))
+
+    ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
+           1.5, 6.7082039, 1.8038587, 1.5)
+
+    for a, b in izip(sa, ref):
+        nt.assert_almost_equal(a, b)
+
+
+def test_segment_radius():
+
+    rad = [r for r in seg.itr(NEURON, seg.radius)]
+
+    nt.eq_(rad,
+           [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
+
+
+def test_n_segments():
+    nt.eq_(seg.n_segments(NEURON), 10)
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [NEURON_TREE, NEURON_TREE, NEURON_TREE]
+    nt.eq_(seg.n_segments(neuron_b), 30)
+
+
+def test_segment_radial_dists():
+
+    origin = [0.0, 0.0, 0.0]
+
+    rd = [d for d in seg.itr(SIMPLE_NEURON, seg.radial_dist(origin))]
+
+    nt.eq_(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
