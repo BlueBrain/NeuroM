@@ -44,6 +44,33 @@ def has_sequential_ids(raw_data):
     return len(steps) == 0, steps
 
 
+def all_points_connected(raw_data):
+    '''Check that all points are connected
+
+    Point's parent ID must exist and parent must be declared
+    before child.
+
+    Returns:
+        tuple (bool, list of IDs that have no parent)
+    '''
+    ids = raw_data.get_col(COLS.ID)
+    bad_ids = [int(ids[i]) for i in xrange(1, len(ids))
+               if raw_data.data_block[i][COLS.P] not in ids[:i]]
+
+    return len(bad_ids) == 0, bad_ids
+
+
+def has_increasing_ids(raw_data):
+    '''Check that IDs are increasing
+
+    returns tuple (bool, list of IDs that are inconsistent
+    with their predecessor)
+    '''
+    ids = raw_data.get_col(COLS.ID)
+    steps = [int(j) for (i, j) in zip(ids, ids[1:]) if i >= j]
+    return len(steps) == 0, steps
+
+
 def has_soma_points(raw_data):
     '''Checks if the TYPE column of raw data block has
     an element of type soma'''

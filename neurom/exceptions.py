@@ -39,6 +39,11 @@ class SomaError(NeuroMError):
     pass
 
 
-class NonConsecutiveIDsError(NeuroMError):
-    '''Exception for raw data with non-consecutive point IDs'''
+class IDSequenceError(NeuroMError):
+    '''Exception for raw data with illegal point ID sequence'''
+    pass
+
+
+class DisconnectedPointError(NeuroMError):
+    '''Exception for raw data with disconnected points'''
     pass

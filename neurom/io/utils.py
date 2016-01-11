@@ -33,7 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.exceptions import NonConsecutiveIDsError
+from neurom.exceptions import IDSequenceError, DisconnectedPointError
 from . import load_data
 from . import check
 from neurom.utils import memoize
@@ -90,6 +90,7 @@ def make_neuron(raw_data, tree_action=None):
         tree_action: optional function to run on the built trees.
     Raises:
         SomaError if no soma points in raw_data or points incompatible with soma.
+        IDSequenceError if filename contains invalid ID sequence
     '''
     _soma = make_soma([raw_data.get_row(s_id)
                        for s_id in get_soma_ids(raw_data)])
@@ -106,14 +107,16 @@ def load_neuron(filename, tree_action=None):
         filename: the path of the file storing morphology data
         tree_action: optional function to run on each of the neuron's
         neurite trees.
-    Raises: SomaError if no soma points in data.
-    Raises: NonConsecutiveIDsError if filename contains non-consecutive
-    point IDs
+    Raises:
+        SomaError if no soma points in data.
+        IDSequenceError if filename contains invalid ID sequence
     """
 
     data = load_data(filename)
-    if not check.has_sequential_ids(data)[0]:
-        raise NonConsecutiveIDsError('Non consecutive IDs found in raw data')
+    if not check.has_increasing_ids(data)[0]:
+        raise IDSequenceError('Invald ID sequence found in raw data')
+    if not check.all_points_connected(data)[0]:
+        raise DisconnectedPointError('Disconnected point detected')
 
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]

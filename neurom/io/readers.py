@@ -98,10 +98,12 @@ class RawDataWrapper(object):
     * PID: ID of parent point
     '''
     def __init__(self, raw_data):
-        self.data_block, self._offset, self.fmt = raw_data
+        self.data_block, self.fmt = raw_data
         self.adj_list = defaultdict(list)
-        for row in self.data_block:
+        self._id_map = {}
+        for i, row in enumerate(self.data_block):
             self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
+            self._id_map[int(row[COLS.ID])] = i
         self._ids = np.array(self.data_block[:, COLS.ID],
                              dtype=np.int32).tolist()
         self._id_set = set(self._ids)
@@ -113,25 +115,25 @@ class RawDataWrapper(object):
 
         raise LookupError('Invalid id: {0}'.format(idx))
 
-    def _apply_offset(self, idx):
+    def _get_idx(self, idx):
         ''' Apply global offset to an id'''
-        return idx - self._offset
+        return self._id_map[idx]
 
     def get_parent(self, idx):
         '''get the parent of element with id idx'''
         if idx not in self._id_set:
             raise LookupError('Invalid id: {0}'.format(idx))
-        return int(self.data_block[self._apply_offset(idx)][COLS.P])
+        return int(self.data_block[self._get_idx(idx)][COLS.P])
 
     def get_point(self, idx):
         '''Get point data for element idx'''
-        idx = self._apply_offset(idx)
+        idx = self._get_idx(idx)
         p = as_point(self.data_block[idx]) if idx > ROOT_ID else None
         return p
 
     def get_row(self, idx):
         '''Get row from idx'''
-        idx = self._apply_offset(idx)
+        idx = self._get_idx(idx)
         return self.data_block[idx] if idx > ROOT_ID else None
 
     def get_col(self, col_id):
@@ -163,9 +165,8 @@ class RawDataWrapper(object):
         row predicate pred.
         '''
         if start_id is None:
-            start_id = self._offset
+            start_id = 0
 
-        start_id = self._apply_offset(start_id)
         if start_id < 0 or start_id >= self.data_block.shape[0]:
             raise LookupError('Invalid id: {0}'.format(start_id))
 

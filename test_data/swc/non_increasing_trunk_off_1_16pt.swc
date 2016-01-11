@@ -26,20 +26,22 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Basic tools to check neuronal morphologies. '''
-
-
-def ok(result):
-    '''Boolean test result
-
-    Return a boolean pass status for a test result. Some tests
-    return iterables of failures. A non empty iterable result is
-    a failure.
-
-    Returns: True if result is True or an empty iterable,\
-    False otherwise.
-    '''
-    try:
-        return len(result) == 0
-    except TypeError:
-        return result is True
+# Example SWC file with non-increasing indices.
+# This should fail to load early.
+#
+1 0 0 0 0 0 -1
+2 1 1 1 1 1 1
+3 2 2 2 2 2 2
+4 3 3 3 3 3 3
+7 6 6 6 6 6 6
+6 5 5 5 5 5 4
+8 7 7 7 7 7 7
+9 0 8 8 8 8 8
+10 2 9 9 9 9 9
+11 2 10 10 10 10 10
+13 4 12 12 12 12 12
+12 3 11 11 11 11 11
+14 5 13 13 13 13 13
+15 6 14 14 14 14 14
+16 7 15 15 15 15 15
+17 0 16 16 16 16 16

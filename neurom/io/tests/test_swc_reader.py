@@ -39,29 +39,27 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
-def check_single_section_random_swc(data, fmt, offset=0):
+def check_single_section_random_swc(data, fmt):
     nt.ok_(fmt == 'SWC')
-    nt.ok_(offset == 0)
     nt.ok_(len(data) == 16)
     nt.ok_(np.shape(data) == (16, 7))
 
 
 def test_read_swc_basic():
-    data, offset, fmt = swc.SWC.read(
+    data, fmt = swc.SWC.read(
         os.path.join(SWC_PATH,
                      'random_trunk_off_0_16pt.swc'))
 
-    check_single_section_random_swc(data, fmt, offset)
+    check_single_section_random_swc(data, fmt)
 
 
 def test_point_soma_swc():
 
-    data, offset, fmt = swc.SWC.read(
+    data, fmt = swc.SWC.read(
         os.path.join(SWC_PATH,
                      'point_soma.swc'))
 
     nt.ok_(fmt == 'SWC')
-    nt.ok_(offset == 1)
     nt.ok_(len(data) == 1)
     nt.ok_(np.shape(data) == (1, 7))
 

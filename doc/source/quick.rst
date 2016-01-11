@@ -73,17 +73,18 @@ For example,
 .. code-block:: bash
 
     $ morph_check test_data/swc/Neuron.swc # single file
-    INFO: ================================
+    INFO: ========================================
     INFO: Check file test_data/swc/Neuron.swc...
-    INFO: Has valid soma? PASS
-    INFO: Has Apical Dendrite? PASS
-    INFO: Has Basal Dendrite? PASS
-    INFO: All neurites have non-zero radius? PASS
-    INFO: All segments have non-zero length? PASS
-    INFO: All sections have non-zero length? PASS
-    INFO: Check result: PASS
-    INFO: ================================
-
+    INFO:                     Has valid soma? PASS
+    INFO:               All points connected? PASS
+    INFO:                 Has basal dendrite? PASS
+    INFO:                           Has axon? PASS
+    INFO:                Has apical dendrite? PASS
+    INFO:            Nonzero segment lengths? PASS
+    INFO:            Nonzero section lengths? PASS
+    INFO:              Nonzero neurite radii? PASS
+    INFO:                       Check result: PASS
+    INFO: ========================================
 
     $ morph_check test_data/swc # all files in directory
     # loops over all morphology files found in test_data/swc

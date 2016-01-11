@@ -39,7 +39,6 @@ There is one such row per measured point.
 
 '''
 import numpy as np
-from neurom.core.dataformat import COLS
 
 
 class SWC(object):
@@ -52,10 +51,9 @@ class SWC(object):
 
     @staticmethod
     def read(filename):
-        '''Read an SWC file and return a tuple of data, offset, format.'''
+        '''Read an SWC file and return a tuple of data, format.'''
         data = np.loadtxt(filename)
         if len(np.shape(data)) == 1:
             data = np.reshape(data, (1, -1))
         data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
-        offset = data[0][COLS.ID]
-        return data, offset, 'SWC'
+        return data, 'SWC'

@@ -33,7 +33,7 @@ from neurom import io
 from neurom.io import utils
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.exceptions import SomaError, NonConsecutiveIDsError
+from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
 from nose import tools as nt
 
 
@@ -54,8 +54,13 @@ FILES = [os.path.join(SWC_PATH, f)
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
+DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
+
 NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
                                        'non_sequential_trunk_off_1_16pt.swc')
+
+INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH,
+                                        'non_increasing_trunk_off_1_16pt.swc')
 
 SOMA_IDS = [[1, 2, 3],
             [],
@@ -162,7 +167,7 @@ def test_load_neuron_deep_neuron():
        recursion limit can be loaded)
     '''
     deep_neuron = os.path.join(DATA_PATH, 'h5/v1/deep_neuron.h5')
-    nrn = utils.load_neuron(deep_neuron)
+    utils.load_neuron(deep_neuron)
 
 
 def test_get_morph_files():
@@ -175,11 +180,20 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
+@nt.raises(DisconnectedPointError)
+def test_load_neuron_disconnected_points_raises():
+    utils.load_neuron(DISCONNECTED_POINTS_FILE)
+
+
 @nt.raises(SomaError)
 def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)
 
 
-@nt.raises(NonConsecutiveIDsError)
-def test_load_neuron_no_consecutive_ids_raises_NonConsecutiveIDsError():
+@nt.raises(IDSequenceError)
+def test_load_neuron_invalid_id_sequence_raises():
+    utils.load_neuron(INVALID_ID_SEQUENCE_FILE);
+
+
+def test_load_neuron_no_consecutive_ids_loads():
     utils.load_neuron(NON_CONSECUTIVE_ID_FILE);

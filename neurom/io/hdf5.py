@@ -79,7 +79,7 @@ class H5(object):
 
     @staticmethod
     def read_v1(filename, remove_duplicates=True):
-        '''Read an HDF5 v1 file and return a tuple of data, offset, format.
+        '''Read an HDF5 v1 file and return a tuple of data, format.
 
         Parameters:
             remove_duplicates: boolean, \
@@ -91,12 +91,11 @@ class H5(object):
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
             data = H5.unpack_data(points, groups)
-        offset = 0  # H5 is index based, so there's no offset
-        return data, offset, 'H5V1'
+        return data, 'H5V1'
 
     @staticmethod
     def read_v2(filename, stage='raw', remove_duplicates=True):
-        '''Read an HDF5 v2 file and return a tuple of data, offset, format.
+        '''Read an HDF5 v2 file and return a tuple of data, format.
 
         Parameters:
             remove_duplicates: boolean, \
@@ -108,12 +107,11 @@ class H5(object):
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
             data = H5.unpack_data(points, groups)
-        offset = 0  # H5 is index based, so there's no offset
-        return data, offset, 'H5V2'
+        return data, 'H5V2'
 
     @staticmethod
     def read(filename, remove_duplicates=True):
-        '''Read a file and return a tuple of data, offset, format.
+        '''Read a file and return a tuple of data, format.
 
         * Tries to guess the format and the H5 version.
         * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
@@ -136,8 +134,7 @@ class H5(object):
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
             data = H5.unpack_data(points, groups)
-        offset = 0  # H5 is index based, so there's no offset
-        return data, offset, version
+        return data, version
 
     @staticmethod
     def unpack_data(points, groups):
