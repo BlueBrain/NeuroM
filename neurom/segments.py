@@ -38,13 +38,14 @@ iter_type = tr.isegment
 
 
 def itr(neuron, mapping=None, filt=None):
-    '''Iterator to neuron's segments
+    '''Iterator to a neuron or neuron population's segments
 
-    Applies a filter function and a mapping.
+    Applies a neurite filter function and a segment mapping.
 
     Example:
         Get the lengths of segments in a neuron and a population
 
+        >>> from neurom import segments as seg
         >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
         >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
 
