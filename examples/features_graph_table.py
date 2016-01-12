@@ -31,6 +31,34 @@
 '''
 import pylab as pl
 from itertools import product
+import sys
+import argparse
+
+
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(description='Feature Comparison Between Different Cells')
+
+    parser.add_argument('-d',
+                        '--datapath',
+                        help='Data directory')
+
+    parser.add_argument('-c',
+                        '--collapsible',
+                        action='store_true',
+                        default=False)
+
+    parser.add_argument('-o',
+                        '--odir',
+                        default='.',
+                        help='Output path')
+
+    parser.add_argument('-f',
+                        '--features',
+                        nargs='+',
+                        help='List features separated by spaces')
+
+    return parser.parse_args()
 
 
 def _stylize(ax, cell, feature, row, col):
@@ -90,7 +118,7 @@ def plot_feature_comparison(features, cells, function=histogram, collapsible=Fal
     Nf = len(features)
     Nc = len(cells) if not collapsible else 1
 
-    _, axes = pl.subplots(nrows=Nf, ncols=Nc, squeeze=False)
+    f, axes = pl.subplots(nrows=Nf, ncols=Nc, squeeze=False)
 
     for i, j in product(range(Nf), range(Nc)):
 
@@ -105,15 +133,20 @@ def plot_feature_comparison(features, cells, function=histogram, collapsible=Fal
         if collapsible:
             ax.legend(loc='best', fontsize='small')
 
+    return f
 
 if __name__ == '__main__':
     from neurom.ezy import load_neurons
 
-    nrns = load_neurons('test_data/valid_set')
+    args = parse_args()
 
-    FEATURES = ['segment_lengths', 'section_lengths',
-                'section_radial_distances', 'local_bifurcation_angles']
+    try:
+        nrns = load_neurons(args.datapath)
+    except OSError:
+        print "path not existing: {0}".format(args.datapath)
+        sys.exit()
 
-    plot_feature_comparison(FEATURES, nrns, histogram, collapsible=True)
+    fig = plot_feature_comparison(args.features, nrns, histogram, collapsible=args.collapsible)
 
+    fig.savefig('output.png')
     pl.show()
