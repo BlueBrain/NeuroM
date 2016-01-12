@@ -110,17 +110,18 @@ def _form_branching_tree():
 BRANCHING_TREE = _form_branching_tree()
 
 
-def test_segment_lengths():
 
 
-    lg = [l for l in seg.itr(NEURON, seg.length)]
+def _check_segment_lengths(obj):
+
+    lg = [l for l in seg.itr(obj, seg.length)]
 
     nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
 
-def test_segment_volumes():
+def _check_segment_volumes(obj):
 
-    sv = (l/math.pi for l in seg.itr(NEURON, seg.volume))
+    sv = (l/math.pi for l in seg.itr(obj, seg.volume))
 
     ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
            0.5625, 4.6666667, 0.7708333, 0.5625)
@@ -129,9 +130,9 @@ def test_segment_volumes():
         nt.assert_almost_equal(a, b)
 
 
-def test_segment_areas():
+def _check_segment_areas(obj):
 
-    sa = (l/math.pi for l in seg.itr(NEURON, seg.area))
+    sa = (l/math.pi for l in seg.itr(obj, seg.area))
 
     ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
            1.5, 6.7082039, 1.8038587, 1.5)
@@ -140,25 +141,57 @@ def test_segment_areas():
         nt.assert_almost_equal(a, b)
 
 
-def test_segment_radius():
+def _check_segment_radius(obj):
 
-    rad = [r for r in seg.itr(NEURON, seg.radius)]
+    rad = [r for r in seg.itr(obj, seg.radius)]
 
     nt.eq_(rad,
            [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
 
 
-def test_n_segments():
-    nt.eq_(seg.n_segments(NEURON), 10)
-    neuron_b = MockNeuron()
-    neuron_b.neurites = [NEURON_TREE, NEURON_TREE, NEURON_TREE]
-    nt.eq_(seg.n_segments(neuron_b), 30)
+def _check_n_segments(obj, n):
+    nt.eq_(seg.n_segments(obj), n)
 
 
-def test_segment_radial_dists():
+def _check_segment_radial_dists(obj):
 
     origin = [0.0, 0.0, 0.0]
 
     rd = [d for d in seg.itr(SIMPLE_NEURON, seg.radial_dist(origin))]
 
     nt.eq_(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
+
+
+def test_segment_volumes():
+    _check_segment_volumes(NEURON)
+    _check_segment_volumes(NEURON_TREE)
+
+
+def test_segment_lengths():
+    _check_segment_lengths(NEURON)
+    _check_segment_lengths(NEURON_TREE)
+
+
+def test_segment_areas():
+    _check_segment_areas(NEURON)
+    _check_segment_areas(NEURON_TREE)
+
+
+def test_segment_radius():
+    _check_segment_radius(NEURON)
+    _check_segment_radius(NEURON_TREE)
+
+
+def test_n_segments():
+    _check_n_segments(NEURON, 10)
+    _check_n_segments(NEURON_TREE, 10)
+
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [NEURON_TREE, NEURON_TREE, NEURON_TREE]
+
+    _check_n_segments(neuron_b, 30)
+
+
+def test_segment_radial_dists():
+    _check_segment_radial_dists(SIMPLE_NEURON)
+    _check_segment_radial_dists(SIMPLE_TREE)

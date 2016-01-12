@@ -37,8 +37,8 @@ import neurom.analysis.morphmath as mm
 iter_type = tr.isegment
 
 
-def itr(neuron, mapping=None, filt=None):
-    '''Iterator to a neuron or neuron population's segments
+def itr(obj, mapping=None, filt=None):
+    '''Iterator to a neurite, neuron or neuron population's segments
 
     Applies a neurite filter function and a segment mapping.
 
@@ -48,9 +48,12 @@ def itr(neuron, mapping=None, filt=None):
         >>> from neurom import segments as seg
         >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
         >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
-
+        >>> neurite = nrn.neurites[0]
+        >>> tree_lengths = [l for l in seg.itr(neurite, seg.length)]
     '''
-    return tr.i_chain(neuron.neurites, iter_type, mapping, filt)
+    #  TODO: optimize case of single neurite and move code to neurom.core.tree
+    neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
+    return tr.i_chain(neurites, iter_type, mapping, filt)
 
 
 length = mm.segment_length
