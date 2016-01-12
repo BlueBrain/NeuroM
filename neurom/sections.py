@@ -50,6 +50,13 @@ def itr(obj, mapping=None, filt=None):
         >>> population_lengths = [l for l in sec.itr(pop, sec.length)]
         >>> neurite = nrn.neurites[0]
         >>> tree_lengths = [l for l in sec.itr(neurite, sec.length)]
+
+    Example:
+        Get the number of sections in a neuron
+
+        >>> from neurom import sections as sec
+        >>> n = sec.count(nrn)
+
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
     neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
