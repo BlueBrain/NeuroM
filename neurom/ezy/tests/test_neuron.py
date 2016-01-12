@@ -39,12 +39,12 @@ from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
 from neurom.core.dataformat import COLS
 from neurom.core.tree import ipreorder, val_iter
-from neurom.analysis.morphtree import i_section_length
-from neurom.analysis.morphtree import i_segment_length
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom.analysis.morphtree import i_section_path_length
+from neurom import sections as sec
+from neurom import segments as seg
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -87,10 +87,7 @@ class TestEzyNeuron(object):
         nt.assert_true(self.neuron.name == 'Neuron')
 
     def test_get_section_lengths(self):
-        ref_seclen = []
-        for t in self.neuron.neurites:
-            ref_seclen.extend(ll for ll in i_section_length(t))
-
+        ref_seclen = [l for l in sec.itr(self.neuron, sec.length)]
         seclen = self.neuron.get_section_lengths()
         nt.assert_equal(len(seclen), 84)
         nt.assert_true(np.all(seclen == ref_seclen))
@@ -118,10 +115,7 @@ class TestEzyNeuron(object):
         s = self.neuron.get_section_lengths(TreeType.soma)
 
     def test_get_segment_lengths(self):
-        ref_seglen = []
-        for t in self.neuron.neurites:
-            ref_seglen.extend(ll for ll in i_segment_length(t))
-
+        ref_seglen = [l for l in seg.itr(self.neuron, seg.length)]
         seglen = self.neuron.get_segment_lengths()
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == ref_seglen))

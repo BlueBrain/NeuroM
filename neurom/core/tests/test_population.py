@@ -29,8 +29,6 @@
 from nose import tools as nt
 from neurom.core.population import Population
 from neurom.ezy import Neuron, load_neuron
-from neurom.analysis.morphtree import i_section_length
-from neurom.analysis.morphtree import i_segment_length
 
 NRN1 = load_neuron('test_data/swc/Neuron.swc')
 NRN2 = load_neuron('test_data/swc/Single_basal.swc')
