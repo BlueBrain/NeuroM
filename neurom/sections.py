@@ -26,56 +26,69 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions and iterators for neuron neurite segment morphometrics
+'''Basic functions and iterators for neuron neurite section morphometrics
 
 '''
-import functools
+from itertools import izip
 from neurom.core import tree as tr
 import neurom.analysis.morphmath as mm
 
 
-iter_type = tr.isegment
+iter_type = tr.isection
 
 
 def itr(obj, mapping=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population's segments
+    '''Iterator to a neurite, neuron or neuron population's sections
 
-    Applies a neurite filter function and a segment mapping.
+    Applies a neurite filter function and a section mapping.
 
     Example:
-        Get the lengths of segments in a neuron, a population,\
-            and a neurite
+        Get the lengths of sections in a neuron and a population
 
-        >>> from neurom import segments as seg
-        >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
-        >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
+        >>> from neurom import sections as sec
+        >>> neuron_lengths = [l for l in sec.itr(nrn, sec.length)]
+        >>> population_lengths = [l for l in sec.itr(pop, sec.length)]
         >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in seg.itr(neurite, seg.length)]
-
-    Example:
-        Get the number of segments in a neuron
-
-        >>> from neurom import segments as seg
-        >>> n = seg.count(nrn)
-
+        >>> tree_lengths = [l for l in sec.itr(neurite, sec.length)]
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
     neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
     return tr.i_chain(neurites, iter_type, mapping, filt)
 
 
-length = mm.segment_length
-radius = mm.segment_radius
-volume = mm.segment_volume
-area = mm.segment_area
+length = mm.section_length
 
 
-def radial_dist(pos):
-    '''Return a function that calculates radial distance for a segment
+def _aggregate_segments(section, f):
+    '''Sum the result of applying a function to all segments in a section'''
+    return sum(f((a, b))
+               for a, b in izip(section, section[1:]))
+
+
+def volume(section):
+    '''Calculate the total volume of a segment'''
+    return _aggregate_segments(section, mm.segment_volume)
+
+
+def area(section):
+    '''Calculate the surface area of a section'''
+    return _aggregate_segments(section, mm.segment_area)
+
+
+def radial_dist(pos, use_start_point=False):
+    '''Return a function that calculates radial distance for a section
 
     Radial distance calculater WRT pos
+
+    TODO: Can we simplify this to use the middle point?
     '''
-    return functools.partial(mm.segment_radial_dist, pos=pos)
+    sec_idx = 0 if use_start_point else -1
+
+    def _dist(section):
+        '''Hacky closure'''
+        return mm.point_dist(pos, section[sec_idx])
+
+    return _dist
 
 
 def count(neuron):
