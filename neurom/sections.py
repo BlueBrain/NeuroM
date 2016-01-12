@@ -63,7 +63,8 @@ def itr(obj, mapping=None, filt=None):
     return tr.i_chain(neurites, iter_type, mapping, filt)
 
 
-length = mm.section_length
+def length(section):
+    return mm.section_length(section)
 
 
 def _aggregate_segments(section, f):

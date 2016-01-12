@@ -148,18 +148,18 @@ def _check_section_radial_dists_end_point(obj):
 
     origin = [0.0, 0.0, 0.0]
 
-    rd = [d for d in seg.itr(obj, sec.radial_dist(origin))]
+    rd = [d for d in sec.itr(obj, sec.radial_dist(origin))]
 
-    nt.eq_(rd, [2.0, 4.0, 6.0, 8.0, 2.0, 4.0, 6.0, 8.0])
+    nt.eq_(rd, [8.0, 8.0])
 
 
 def _check_section_radial_dists_start_point(obj):
 
     origin = [0.0, 0.0, 0.0]
 
-    rd = [d for d in seg.itr(obj, sec.radial_dist(origin, True))]
+    rd = [d for d in sec.itr(obj, sec.radial_dist(origin, True))]
 
-    nt.eq_(rd, [0.0, 2.0, 4.0, 6.0, 0.0, 2.0, 4.0, 6.0])
+    nt.eq_(rd, [0.0, 0.0])
 
 
 def test_length():
@@ -179,7 +179,9 @@ def test_segment_area():
 
 def test_segment_radial_dists_end_point():
     _check_section_radial_dists_end_point(SIMPLE_NEURON)
+    _check_section_radial_dists_end_point(SIMPLE_TREE)
 
 
 def test_segment_radial_dists_start_point():
     _check_section_radial_dists_start_point(SIMPLE_NEURON)
+    _check_section_radial_dists_start_point(SIMPLE_TREE)
