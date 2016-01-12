@@ -42,7 +42,6 @@ from neurom.core.tree import ipreorder, val_iter
 from neurom.analysis.morphtree import i_local_bifurcation_angle
 from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
-from neurom.analysis.morphtree import i_section_path_length
 from neurom import sections as sec
 from neurom import segments as seg
 
@@ -240,26 +239,17 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(rad_dists), 21)
 
     def test_get_section_path_distances_endpoint(self):
-        ref_sec_path_len_start = []
-        for t in self.neuron.neurites:
-            ref_sec_path_len_start.extend(
-                ll for ll in i_section_path_length(t, use_start_point=True))
 
-        ref_sec_path_len = []
-        for t in self.neuron.neurites:
-            ref_sec_path_len.extend(ll for ll in i_section_path_length(t))
-
+        ref_sec_path_len_start = [l for l in sec.itr(self.neuron, sec.start_point_path_length)]
+        ref_sec_path_len = [l for l in sec.itr(self.neuron, sec.end_point_path_length)]
         path_lengths = self.neuron.get_section_path_distances()
         nt.assert_true(ref_sec_path_len != ref_sec_path_len_start)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == ref_sec_path_len))
 
     def test_get_section_path_distances_start_point(self):
-        ref_sec_path_len_start = []
-        for t in self.neuron.neurites:
-            ref_sec_path_len_start.extend(
-                ll for ll in i_section_path_length(t, use_start_point=True))
 
+        ref_sec_path_len_start = [l for l in sec.itr(self.neuron, sec.start_point_path_length)]
         path_lengths = self.neuron.get_section_path_distances(use_start_point=True)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == ref_sec_path_len_start))

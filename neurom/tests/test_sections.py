@@ -162,6 +162,15 @@ def _check_section_radial_dists_start_point(obj):
     nt.eq_(rd, [0.0, 0.0])
 
 
+def _check_path_length_end_point(obj, ref):
+    pl = [l for l in sec.itr(obj, sec.end_point_path_length)]
+    nt.eq_(pl, ref)
+
+
+def _check_path_length_start_point(obj, ref):
+    pl = [l for l in sec.itr(obj, sec.start_point_path_length)]
+    nt.eq_(pl, ref)
+
 def test_length():
     _check_length(NEURON)
     _check_length(NEURON_TREE)
@@ -185,3 +194,24 @@ def test_segment_radial_dists_end_point():
 def test_segment_radial_dists_start_point():
     _check_section_radial_dists_start_point(SIMPLE_NEURON)
     _check_section_radial_dists_start_point(SIMPLE_TREE)
+
+
+def test_end_point_path_length():
+    simple_ref = [8, 8]
+    _check_path_length_end_point(SIMPLE_NEURON, simple_ref)
+    _check_path_length_end_point(SIMPLE_TREE, simple_ref)
+
+    ref = [4.0, 5.0, 9.0, 8.0, 9.0, 9.4142135623730958, 22.618864096458349]
+    _check_path_length_end_point(NEURON, ref)
+    _check_path_length_end_point(NEURON_TREE, ref)
+
+
+def test_start_point_path_length():
+    simple_ref = [0, 0]
+    _check_path_length_start_point(SIMPLE_NEURON, simple_ref)
+    _check_path_length_start_point(SIMPLE_TREE, simple_ref)
+
+    ref = [0, 4.0, 5.0, 5.0, 8.0, 8.0, 4.0]
+    _check_path_length_start_point(NEURON, ref)
+    _check_path_length_start_point(NEURON_TREE, ref)
+

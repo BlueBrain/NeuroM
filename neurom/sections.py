@@ -30,8 +30,10 @@
 
 '''
 from itertools import izip
+from functools import wraps
 from neurom.core import tree as tr
 import neurom.analysis.morphmath as mm
+import neurom.analysis.morphtree as mt
 
 
 iter_type = tr.isection
@@ -60,10 +62,28 @@ def itr(obj, mapping=None, filt=None):
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
     neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
-    return tr.i_chain(neurites, iter_type, mapping, filt)
+    return tr.i_chain2(neurites, iter_type, mapping, filt)
 
 
+def to_val(fun):
+    '''Decorate tree value function to accept trees'''
+    def _deep_map(data):
+        '''Recursive map function. Maintains type of iterables'''
+        return (type(data)(_deep_map(x) for x in data)
+                if hasattr(data, '__iter__')
+                else data.value)
+
+    @wraps(fun)
+    def _val_transformer(data):
+        '''Transform argument to tree values'''
+        return fun(_deep_map(data))
+
+    return _val_transformer
+
+
+@to_val
 def length(section):
+    '''Return the length of a section'''
     return mm.section_length(section)
 
 
@@ -73,14 +93,34 @@ def _aggregate_segments(section, f):
                for a, b in izip(section, section[1:]))
 
 
+@to_val
 def volume(section):
     '''Calculate the total volume of a segment'''
     return _aggregate_segments(section, mm.segment_volume)
 
 
+@to_val
 def area(section):
     '''Calculate the surface area of a section'''
     return _aggregate_segments(section, mm.segment_area)
+
+
+def end_point_path_length(tree_section):
+    '''Calculate the path length of a section't end point to the tree root
+
+    Note:
+        This function's argument is section of Tree objects
+    '''
+    return mt.path_length(tree_section[-1])
+
+
+def start_point_path_length(tree_section):
+    '''Calculate the path length of a section't starting point to the tree root
+
+    Note:
+        This function's argument is section of Tree objects
+    '''
+    return mt.path_length(tree_section[0])
 
 
 def radial_dist(pos, use_start_point=False):
@@ -92,6 +132,7 @@ def radial_dist(pos, use_start_point=False):
     '''
     sec_idx = 0 if use_start_point else -1
 
+    @to_val
     def _dist(section):
         '''Hacky closure'''
         return mm.point_dist(pos, section[sec_idx])
