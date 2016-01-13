@@ -87,12 +87,20 @@ def extract_stats(files):
                 value = getattr(nrn, ns)(n)
                 L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
                 if isinstance(value, np.ndarray):
-                    value = {
-                        'mean': np.mean(value),
-                        'std': np.std(value),
-                        'min': np.min(value),
-                        'max': np.max(value),
-                    }
+                    if len(value) > 0:
+                        value = {
+                            'mean': np.mean(value),
+                            'std': np.std(value),
+                            'min': np.min(value),
+                            'max': np.max(value),
+                        }
+                    else:
+                        value = {
+                            'mean': 0.,
+                            'std': 0.,
+                            'min': 0.,
+                            'max': 0.,
+                        }                        
                 stats[stat_name][n.name] = value
 
         for ns in SCALAR_STATS:
