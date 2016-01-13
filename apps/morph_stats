@@ -157,6 +157,7 @@ def extract_populations_stats(files):
 
         for ns in SCALAR_STATS:
             value = np.array([getattr(nrn, ns)() for nrn in pop.neurons])
+            L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
             value = calculate_stats(value)
             stats[stat_name][n.name] = value
 
