@@ -65,13 +65,17 @@ def itr(obj, mapping=None, filt=None):
     return tr.i_chain2(neurites, iter_type, mapping, filt)
 
 
+#  TODO: If this proves useful, more it to neurom.core.tree
 def to_val(fun):
     '''Decorate tree value function to accept trees'''
     def _deep_map(data):
-        '''Recursive map function. Maintains type of iterables'''
+        '''Recursive Tree -> Tree.data transformation function.
+
+        Maintains type of iterables
+        '''
         return (type(data)(_deep_map(x) for x in data)
                 if hasattr(data, '__iter__')
-                else data.value)
+                else (data.value if isinstance(data, tr.Tree) else data))
 
     @wraps(fun)
     def _val_transformer(data):
