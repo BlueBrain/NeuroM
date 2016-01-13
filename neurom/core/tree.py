@@ -178,10 +178,10 @@ def itriplet(tree):
 
     Post-order iteration yielding tuples with three consecutive sub-trees
     '''
-    return chain(
-        *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
-              ifilter(lambda n: not is_root(n) and not is_leaf(n),
-                      ipreorder(tree))))
+    return chain.from_iterable(
+        imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
+             ifilter(lambda n: not is_root(n) and not is_leaf(n),
+                     ipreorder(tree))))
 
 
 def i_branch_end_points(fork_point):
@@ -244,7 +244,7 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
     nrt = (trees if tree_filter is None
            else filter(tree_filter, trees))
 
-    chain_it = chain(*imap(iterator_type, nrt))
+    chain_it = chain.from_iterable(imap(iterator_type, nrt))
     return chain_it if mapping is None else imap_val(mapping, chain_it)
 
 
@@ -263,7 +263,7 @@ def i_chain2(trees, iterator_type, mapping=None, tree_filter=None):
     nrt = (trees if tree_filter is None
            else filter(tree_filter, trees))
 
-    chain_it = chain(*imap(iterator_type, nrt))
+    chain_it = chain.from_iterable(imap(iterator_type, nrt))
     return chain_it if mapping is None else imap(mapping, chain_it)
 
 
