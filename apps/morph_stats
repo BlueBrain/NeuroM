@@ -29,17 +29,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of extracting basic statistics'''
+import collections
 import argparse
 import json
 import logging
 import os
 import sys
 
-from itertools import chain
+from functools import partial
 import numpy as np
 
+from neurom.stats import scalar_stats
 from neurom.core.types import NEURITES
-from neurom.ezy import load_neuron, load_population
+from neurom.ezy import load_neuron, load_neurons
 from neurom.io.utils import get_morph_files
 
 L = logging.getLogger(__name__)
@@ -50,17 +52,13 @@ NEURITE_STATS = [
     'get_segment_lengths',
     'get_local_bifurcation_angles',
     'get_remote_bifurcation_angles',
-    'get_n_sections_per_neurite'
-]
-
-
-NEURITE_STATS_INT = [
+    'get_n_sections_per_neurite',
     'get_n_sections',
     'get_n_neurites'
 ]
 
 
-SCALAR_STATS = [
+NEURON_STATS = [
     'get_soma_radius',
     'get_soma_surface_area',
 ]
@@ -78,90 +76,78 @@ def parse_args():
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
                         help='-v for INFO, -vv for DEBUG')
 
-    parser.add_argument('--dir_as_pop',
+    parser.add_argument('--as-population',
                         action='store_true',
                         default=False,
                         help='If more than one directories are specified in the \
                               datapaths and this flag is enabled the cells in each dir\
                               will be treated as a population')
+
+    parser.add_argument('--single-group',
+                        action='store_true',
+                        default=False,
+                        help='If more than one directories are specified in the \
+                              datapaths, as-population is enabled, then all the \
+                              directories will be treated as a single population')
+
     return parser.parse_args()
 
 
-def calculate_stats(values):
-    '''Calculate basic stats
+def _flatten_array(l):
+    '''Flattens an array of any depth.
     '''
-    # check if array is empty
-    if len(values) > 0:
-        stats = {
-            'mean': np.mean(values),
-            'std': np.std(values),
-            'min': np.min(values),
-            'max': np.max(values),
-        }
+    if isinstance(l, collections.Iterable):
+        for el in l:
+            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+                for sub in _flatten_array(el):
+                    yield sub
+            else:
+                yield el
     else:
-        stats = {
-            'mean': 0.,
-            'std': 0.,
-            'min': 0.,
-            'max': 0.,
-        }
+        yield l
+
+
+def pfunc(ns, n=None):
+    ''' Partially fills the arguments of the function that is applied on
+    neurons
+    '''
+    if n is None:
+        return partial(lambda x, ns: getattr(x, ns)(), ns=ns)
+    else:
+        return partial(lambda x, ns, n: getattr(x, ns)(n), ns=ns, n=n)
+
+
+def eval_stats(func, neurons):
+    ''' Apply the input function on the neuron objects, flatten the array if nested,
+    make it a single element array if the result is not iterable and extract the stats
+    '''
+
+    value = np.fromiter(_flatten_array(func(nrn) for nrn in neurons), np.float)
+
+    stat_functions = ('min', 'max', 'median', 'mean', 'std')
+    try:
+        value = scalar_stats(value)
+    except ValueError:
+        value = {key: 0. for key in stat_functions}
+
+    return value
+
+
+def extract_stats(neurons):
+    '''Extract stats from neurons'''
+
+    stats = {}
+    for ns in NEURITE_STATS:
+        stat_name = ns[4:]
+        stats[stat_name] = {}
+        for n in NEURITES:
+            stats[stat_name][n.name] = eval_stats(pfunc(ns, n), neurons)
+            L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(stats[stat_name][n.name]))
+
+    for ns in NEURON_STATS:
+        stats[ns[4:]] = eval_stats(pfunc(ns), neurons)
+
     return stats
-
-
-def extract_neurons_stats(files):
-    '''Extract stats from files'''
-    results = {}
-    for _f in files:
-        nrn = load_neuron(_f)
-        stats = results[_f] = {}
-        for ns in NEURITE_STATS + NEURITE_STATS_INT:
-            stat_name = ns[4:]
-            stats[stat_name] = {}
-            for n in NEURITES:
-                value = getattr(nrn, ns)(n)
-                L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
-                if isinstance(value, np.ndarray):
-                    value = calculate_stats(value)
-                stats[stat_name][n.name] = value
-
-        for ns in SCALAR_STATS:
-            stats[ns[4:]] = getattr(nrn, ns)()
-    return results
-
-
-def extract_populations_stats(files):
-    '''Extract stats from directories treated as populations'''
-    results = {}
-
-    for _f in files:
-        pop = load_population(_f)
-        stats = results[_f] = {}
-        for ns in NEURITE_STATS:
-            stat_name = ns[4:]
-            stats[stat_name] = {}
-            for n in NEURITES:
-                value = np.fromiter(chain.from_iterable(getattr(nrn, ns)(n) for nrn in pop.neurons),
-                                    np.float)
-                L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
-                value = calculate_stats(value)
-                stats[stat_name][n.name] = value
-
-        for ns in NEURITE_STATS_INT:
-            stat_name = ns[4:]
-            stats[stat_name] = {}
-            for n in NEURITES:
-                value = np.array([getattr(nrn, ns)(n) for nrn in pop.neurons])
-                L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
-                value = calculate_stats(value)
-                stats[stat_name][n.name] = value
-
-        for ns in SCALAR_STATS:
-            value = np.array([getattr(nrn, ns)() for nrn in pop.neurons])
-            L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(value))
-            value = calculate_stats(value)
-            stats[stat_name][n.name] = value
-
-    return results
 
 
 if __name__ == '__main__':
@@ -172,24 +158,27 @@ if __name__ == '__main__':
 
     data_paths = args.datapaths
 
-    # treat a directory as a population
-    if args.dir_as_pop:
+    _results = {}
 
-        _stats = extract_populations_stats(data_paths)
+    for _path in data_paths:
 
-    # otherwise concatenate all the found files
-    else:
+        # if the path is not a directory then parse it as a single neuron
+        if os.path.isfile(_path):
 
-        _files = []
-        for data_path in data_paths:
+            _results[_path] = extract_stats((load_neuron(_path),))
 
-            if os.path.isfile(data_path):
-                _files.append(data_path)
-            elif os.path.isdir(data_path):
-                _files.extend(get_morph_files(data_path))
+        elif os.path.isdir(_path):
+
+            # treat the directory as a single population
+            if args.as_population:
+                _results[_path] = extract_stats(load_neurons(_path))
+
+            # otherwise process each neuron file separately
             else:
-                L.error('Invalid data path %s', data_path)
-                sys.exit(1)
-        _stats = extract_neurons_stats(_files)
+                for _f in get_morph_files(_path):
+                    _results[_f] = extract_stats((load_neuron(_f),))
+        else:
+            L.error('Invalid data path %s', _path)
+            sys.exit(1)
 
-    print json.dumps(_stats, indent=2, separators=(',', ':'))
+    print json.dumps(_results, indent=2, separators=(',', ':'))
