@@ -39,10 +39,10 @@ import neurom.analysis.morphtree as mt
 iter_type = tr.isection
 
 
-def itr(obj, mapping=None, filt=None):
+def itr(obj, mapfun=None, filt=None):
     '''Iterator to a neurite, neuron or neuron population's sections
 
-    Applies a neurite filter function and a section mapping.
+    Applies a neurite filter function and a section mapping function.
 
     Example:
         Get the lengths of sections in a neuron and a population
@@ -62,7 +62,18 @@ def itr(obj, mapping=None, filt=None):
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
     neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
-    return tr.i_chain2(neurites, iter_type, mapping, filt)
+    return tr.i_chain2(neurites, mapfun.iter_type, mapfun, filt)
+
+
+def section_function(fun):
+    '''Decorate a function with an iteration type member'''
+    @wraps(fun)
+    def _wrapper(*args, **kwargs):
+        '''Simply pass arguments to wrapped function'''
+        return fun(*args, **kwargs)
+
+    _wrapper.iter_type = tr.isection
+    return _wrapper
 
 
 #  TODO: If this proves useful, more it to neurom.core.tree
@@ -85,6 +96,13 @@ def to_val(fun):
     return _val_transformer
 
 
+@section_function
+def identity(section):
+    '''Hack to bind iteration type to do-nothing function'''
+    return section
+
+
+@section_function
 @to_val
 def length(section):
     '''Return the length of a section'''
@@ -97,18 +115,21 @@ def _aggregate_segments(section, f):
                for a, b in izip(section, section[1:]))
 
 
+@section_function
 @to_val
 def volume(section):
     '''Calculate the total volume of a segment'''
     return _aggregate_segments(section, mm.segment_volume)
 
 
+@section_function
 @to_val
 def area(section):
     '''Calculate the surface area of a section'''
     return _aggregate_segments(section, mm.segment_area)
 
 
+@section_function
 def end_point_path_length(tree_section):
     '''Calculate the path length of a section't end point to the tree root
 
@@ -118,6 +139,7 @@ def end_point_path_length(tree_section):
     return mt.path_length(tree_section[-1])
 
 
+@section_function
 def start_point_path_length(tree_section):
     '''Calculate the path length of a section't starting point to the tree root
 
@@ -137,6 +159,7 @@ def radial_dist(pos, use_start_point=False):
     sec_idx = 0 if use_start_point else -1
 
     @to_val
+    @section_function
     def _dist(section):
         '''Hacky closure'''
         return mm.point_dist(pos, section[sec_idx])
@@ -148,4 +171,4 @@ def count(neuron):
     """
     Return number of segments in neuron or population
     """
-    return sum(1 for _ in itr(neuron))
+    return sum(1 for _ in itr(neuron, identity))
