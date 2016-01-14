@@ -213,14 +213,19 @@ def i_branch_end_points(fork_point):
     return imap(next_end_point, fork_point.children)
 
 
+def as_elements(trees):
+    '''Recursive Tree -> Tree.value transformation function.
+
+    Maintains type of containing iterables
+    '''
+    return (type(trees)(as_elements(t) for t in trees)
+            if hasattr(trees, '__iter__')
+            else (trees.value if isinstance(trees, Tree) else trees))
+
+
 def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
-    def _deep_map(f, data):
-        '''Recursive map function. Maintains type of iterables'''
-        return (type(data)(_deep_map(f, x) for x in data)
-                if hasattr(data, '__iter__')
-                else f(data))
-    return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
+    return imap(as_elements, tree_iterator)
 
 
 def imap_val(f, tree_iterator):

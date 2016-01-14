@@ -39,6 +39,8 @@ import neurom.analysis.morphtree as mt
 iter_type = tr.isection
 
 
+# TODO: Move to higher level module. This is no longer
+# specific to sections
 def itr(obj, mapfun=None, filt=None):
     '''Iterator to a neurite, neuron or neuron population's sections
 
@@ -65,45 +67,36 @@ def itr(obj, mapfun=None, filt=None):
     return tr.i_chain2(neurites, mapfun.iter_type, mapfun, filt)
 
 
-def section_function(fun):
-    '''Decorate a function with an iteration type member'''
-    @wraps(fun)
-    def _wrapper(*args, **kwargs):
-        '''Simply pass arguments to wrapped function'''
-        return fun(*args, **kwargs)
+def section_function(as_tree=False):
+    '''Decorate a section function such that it can be used in neurite iteration
 
-    _wrapper.iter_type = tr.isection
-    return _wrapper
+    Parameters:
+        as_tree: specifies whether the function argument is a section of trees\
+            or elements
+    '''
+    def _section_function(fun):
+        '''Decorate a function with an iteration type member'''
+        @wraps(fun)
+        def _wrapper(section):
+            '''Simply pass arguments to wrapped function'''
+            if not as_tree:
+                section = tr.as_elements(section)
+            return fun(section)
 
+        _wrapper.iter_type = tr.isection
+        return _wrapper
 
-#  TODO: If this proves useful, more it to neurom.core.tree
-def to_val(fun):
-    '''Decorate tree value function to accept trees'''
-    def _deep_map(data):
-        '''Recursive Tree -> Tree.data transformation function.
-
-        Maintains type of iterables
-        '''
-        return (type(data)(_deep_map(x) for x in data)
-                if hasattr(data, '__iter__')
-                else (data.value if isinstance(data, tr.Tree) else data))
-
-    @wraps(fun)
-    def _val_transformer(data):
-        '''Transform argument to tree values'''
-        return fun(_deep_map(data))
-
-    return _val_transformer
+    _section_function.iter_type = tr.isection
+    return _section_function
 
 
-@section_function
+@section_function(as_tree=False)
 def identity(section):
     '''Hack to bind iteration type to do-nothing function'''
     return section
 
 
-@section_function
-@to_val
+@section_function(as_tree=False)
 def length(section):
     '''Return the length of a section'''
     return mm.section_length(section)
@@ -115,21 +108,19 @@ def _aggregate_segments(section, f):
                for a, b in izip(section, section[1:]))
 
 
-@section_function
-@to_val
+@section_function(as_tree=False)
 def volume(section):
     '''Calculate the total volume of a segment'''
     return _aggregate_segments(section, mm.segment_volume)
 
 
-@section_function
-@to_val
+@section_function(as_tree=False)
 def area(section):
     '''Calculate the surface area of a section'''
     return _aggregate_segments(section, mm.segment_area)
 
 
-@section_function
+@section_function(as_tree=True)
 def end_point_path_length(tree_section):
     '''Calculate the path length of a section't end point to the tree root
 
@@ -139,7 +130,7 @@ def end_point_path_length(tree_section):
     return mt.path_length(tree_section[-1])
 
 
-@section_function
+@section_function(as_tree=True)
 def start_point_path_length(tree_section):
     '''Calculate the path length of a section't starting point to the tree root
 
@@ -158,8 +149,7 @@ def radial_dist(pos, use_start_point=False):
     '''
     sec_idx = 0 if use_start_point else -1
 
-    @to_val
-    @section_function
+    @section_function(as_tree=False)
     def _dist(section):
         '''Hacky closure'''
         return mm.point_dist(pos, section[sec_idx])
