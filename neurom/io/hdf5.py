@@ -102,7 +102,9 @@ class H5(object):
             If True removes duplicate points \
             from the beginning of each section.
         '''
-        points, groups = _unpack_v2(h5py.File(filename, mode='r'), stage)
+        h5file = h5py.File(filename, mode='r')
+        points, groups = _unpack_v2(h5file, stage)
+        h5file.close()
         if remove_duplicates:
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
@@ -124,12 +126,14 @@ class H5(object):
         h5file = h5py.File(filename, mode='r')
         version = get_version(h5file)
         if version == 'H5V1':
-            points, groups = _unpack_v1(h5py.File(filename, mode='r'))
+            points, groups = _unpack_v1(h5file)
         elif version == 'H5V2':
             stg = next(s for s in ('repaired', 'unraveled', 'raw')
                        if s in h5file['neuron1'])
-            points, groups = _unpack_v2(h5py.File(filename, mode='r'),
-                                        stage=stg)
+            points, groups = _unpack_v2(h5file, stage=stg)
+
+        h5file.close()
+
         if remove_duplicates:
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
