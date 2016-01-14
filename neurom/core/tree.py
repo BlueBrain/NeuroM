@@ -178,10 +178,10 @@ def itriplet(tree):
 
     Post-order iteration yielding tuples with three consecutive sub-trees
     '''
-    return chain(
-        *imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
-              ifilter(lambda n: not is_root(n) and not is_leaf(n),
-                      ipreorder(tree))))
+    return chain.from_iterable(
+        imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
+             ifilter(lambda n: not is_root(n) and not is_leaf(n),
+                     ipreorder(tree))))
 
 
 def i_branch_end_points(fork_point):
@@ -213,14 +213,19 @@ def i_branch_end_points(fork_point):
     return imap(next_end_point, fork_point.children)
 
 
+def as_elements(trees):
+    '''Recursive Tree -> Tree.value transformation function.
+
+    Maintains type of containing iterables
+    '''
+    return (type(trees)(as_elements(t) for t in trees)
+            if hasattr(trees, '__iter__')
+            else (trees.value if isinstance(trees, Tree) else trees))
+
+
 def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
-    def _deep_map(f, data):
-        '''Recursive map function. Maintains type of iterables'''
-        return (type(data)(_deep_map(f, x) for x in data)
-                if hasattr(data, '__iter__')
-                else f(data))
-    return imap(lambda t: _deep_map(lambda n: n.value, t), tree_iterator)
+    return imap(as_elements, tree_iterator)
 
 
 def imap_val(f, tree_iterator):
@@ -244,8 +249,27 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
     nrt = (trees if tree_filter is None
            else filter(tree_filter, trees))
 
-    chain_it = chain(*imap(iterator_type, nrt))
+    chain_it = chain.from_iterable(imap(iterator_type, nrt))
     return chain_it if mapping is None else imap_val(mapping, chain_it)
+
+
+def i_chain2(trees, iterator_type, mapping=None, tree_filter=None):
+    '''Returns a mapped iterator to a collection of trees
+
+    Provides access to all the elements of all the trees
+    in one iteration sequence.
+
+    Parameters:
+        trees: iterator or iterable of tree objects
+        iterator_type: type of the iteration (segment, section, triplet...)
+        mapping: optional function to apply to the iterator's target.
+        tree_filter: optional top level filter on properties of tree objects.
+    '''
+    nrt = (trees if tree_filter is None
+           else filter(tree_filter, trees))
+
+    chain_it = chain.from_iterable(imap(iterator_type, nrt))
+    return chain_it if mapping is None else imap(mapping, chain_it)
 
 
 def make_copy(tree):

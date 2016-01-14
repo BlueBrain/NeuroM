@@ -43,13 +43,21 @@ def itr(obj, mapping=None, filt=None):
     Applies a neurite filter function and a segment mapping.
 
     Example:
-        Get the lengths of segments in a neuron and a population
+        Get the lengths of segments in a neuron, a population,\
+            and a neurite
 
         >>> from neurom import segments as seg
         >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
         >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
         >>> neurite = nrn.neurites[0]
         >>> tree_lengths = [l for l in seg.itr(neurite, seg.length)]
+
+    Example:
+        Get the number of segments in a neuron
+
+        >>> from neurom import segments as seg
+        >>> n = seg.count(nrn)
+
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
     neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
@@ -70,7 +78,7 @@ def radial_dist(pos):
     return functools.partial(mm.segment_radial_dist, pos=pos)
 
 
-def n_segments(neuron):
+def count(neuron):
     """
     Return number of segments in neuron or population
     """

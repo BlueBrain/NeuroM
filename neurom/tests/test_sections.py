@@ -32,6 +32,7 @@ from neurom.io.utils import make_neuron
 from neurom import io
 from neurom.core.tree import Tree
 from neurom import segments as seg
+from neurom import sections as sec
 
 import math
 from itertools import izip
@@ -47,21 +48,6 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 data    = io.load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
 tree0   = neuron0.neurites[0]
-
-def _make_neuron_tree():
-    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
-    return T
 
 
 def _make_simple_tree():
@@ -79,15 +65,6 @@ def _make_simple_tree():
 
     return T
 
-
-NEURON_TREE = _make_neuron_tree()
-SIMPLE_TREE = _make_simple_tree()
-
-NEURON = MockNeuron()
-NEURON.neurites = [NEURON_TREE]
-
-SIMPLE_NEURON = MockNeuron()
-SIMPLE_NEURON.neurites = [SIMPLE_TREE]
 
 def _make_branching_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
@@ -107,91 +84,134 @@ def _make_branching_tree():
     T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
-BRANCHING_TREE = _make_branching_tree()
 
+SIMPLE_TREE = _make_simple_tree()
+SIMPLE_NEURON = MockNeuron()
+SIMPLE_NEURON.neurites = [SIMPLE_TREE]
 
+NEURON_TREE = _make_branching_tree()
 
-
-def _check_segment_lengths(obj):
-
-    lg = [l for l in seg.itr(obj, seg.length)]
-
-    nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
-
-
-def _check_segment_volumes(obj):
-
-    sv = (l/math.pi for l in seg.itr(obj, seg.volume))
-
-    ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
-           0.5625, 4.6666667, 0.7708333, 0.5625)
-
-    for a, b in izip(sv, ref):
-        nt.assert_almost_equal(a, b)
-
-
-def _check_segment_areas(obj):
-
-    sa = (l/math.pi for l in seg.itr(obj, seg.area))
-
-    ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
-           1.5, 6.7082039, 1.8038587, 1.5)
-
-    for a, b in izip(sa, ref):
-        nt.assert_almost_equal(a, b)
-
-
-def _check_segment_radius(obj):
-
-    rad = [r for r in seg.itr(obj, seg.radius)]
-
-    nt.eq_(rad,
-           [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
-
+NEURON = MockNeuron()
+NEURON.neurites = [NEURON_TREE]
 
 def _check_count(obj, n):
-    nt.eq_(seg.count(obj), n)
+    nt.eq_(sec.count(obj), n)
 
 
-def _check_segment_radial_dists(obj):
+def _check_length(obj):
+    sec_len = [l for l in sec.itr(obj, sec.length)]
+    seg_len = [l for l in seg.itr(obj, seg.length)]
+    sum_sec_len = sum(sec_len)
+    sum_seg_len = sum(seg_len)
 
-    origin = [0.0, 0.0, 0.0]
+    # check that sum of section lengths is same as sum of segment lengths
+    nt.eq_(sum_sec_len, sum_seg_len)
 
-    rd = [d for d in seg.itr(SIMPLE_NEURON, seg.radial_dist(origin))]
-
-    nt.eq_(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
-
-
-def test_segment_volumes():
-    _check_segment_volumes(NEURON)
-    _check_segment_volumes(NEURON_TREE)
+    nt.assert_almost_equal(sum_sec_len, 33.0330776588)
 
 
-def test_segment_lengths():
-    _check_segment_lengths(NEURON)
-    _check_segment_lengths(NEURON_TREE)
+def _check_volume(obj):
+    sec_vol = [l for l in sec.itr(obj, sec.volume)]
+    seg_vol = [l for l in seg.itr(obj, seg.volume)]
+    sum_sec_vol = sum(sec_vol)
+    sum_seg_vol = sum(seg_vol)
+
+    # check that sum of section volumes is same as sum of segment lengths
+    nt.assert_almost_equal(sum_sec_vol, sum_seg_vol)
+
+    nt.assert_almost_equal(sum_sec_vol, 307.68010178856395)
 
 
-def test_segment_areas():
-    _check_segment_areas(NEURON)
-    _check_segment_areas(NEURON_TREE)
+def _check_area(obj):
+    sec_area = [l for l in sec.itr(obj, sec.area)]
+    seg_area = [l for l in seg.itr(obj, seg.area)]
+    sum_sec_area = sum(sec_area)
+    sum_seg_area = sum(seg_area)
 
+    # check that sum of section areas is same as sum of segment lengths
+    nt.assert_almost_equal(sum_sec_area, sum_seg_area)
 
-def test_segment_radius():
-    _check_segment_radius(NEURON)
-    _check_segment_radius(NEURON_TREE)
+    nt.assert_almost_equal(sum_sec_area, 349.75070138106133)
 
 
 def test_count():
-    _check_count(NEURON, 10)
-    _check_count(NEURON_TREE, 10)
+    _check_count(NEURON, 7)
+    _check_count(NEURON_TREE, 7)
 
     neuron_b = MockNeuron()
     neuron_b.neurites = [NEURON_TREE, NEURON_TREE, NEURON_TREE]
 
-    _check_count(neuron_b, 30)
+    _check_count(neuron_b, 21)
 
 
-def test_segment_radial_dists():
-    _check_segment_radial_dists(SIMPLE_NEURON)
-    _check_segment_radial_dists(SIMPLE_TREE)
+def _check_section_radial_dists_end_point(obj):
+
+    origin = [0.0, 0.0, 0.0]
+
+    rd = [d for d in sec.itr(obj, sec.radial_dist(origin))]
+
+    nt.eq_(rd, [8.0, 8.0])
+
+
+def _check_section_radial_dists_start_point(obj):
+
+    origin = [0.0, 0.0, 0.0]
+
+    rd = [d for d in sec.itr(obj, sec.radial_dist(origin, True))]
+
+    nt.eq_(rd, [0.0, 0.0])
+
+
+def _check_path_length_end_point(obj, ref):
+    pl = [l for l in sec.itr(obj, sec.end_point_path_length)]
+    nt.eq_(pl, ref)
+
+
+def _check_path_length_start_point(obj, ref):
+    pl = [l for l in sec.itr(obj, sec.start_point_path_length)]
+    nt.eq_(pl, ref)
+
+def test_length():
+    _check_length(NEURON)
+    _check_length(NEURON_TREE)
+
+
+def test_segment_volume():
+    _check_volume(NEURON)
+    _check_volume(NEURON_TREE)
+
+
+def test_segment_area():
+    _check_area(NEURON)
+    _check_area(NEURON_TREE)
+
+
+def test_segment_radial_dists_end_point():
+    _check_section_radial_dists_end_point(SIMPLE_NEURON)
+    _check_section_radial_dists_end_point(SIMPLE_TREE)
+
+
+def test_segment_radial_dists_start_point():
+    _check_section_radial_dists_start_point(SIMPLE_NEURON)
+    _check_section_radial_dists_start_point(SIMPLE_TREE)
+
+
+def test_end_point_path_length():
+    simple_ref = [8, 8]
+    _check_path_length_end_point(SIMPLE_NEURON, simple_ref)
+    _check_path_length_end_point(SIMPLE_TREE, simple_ref)
+
+    ref = [4.0, 5.0, 9.0, 8.0, 9.0, 9.4142135623730958, 22.618864096458349]
+    _check_path_length_end_point(NEURON, ref)
+    _check_path_length_end_point(NEURON_TREE, ref)
+
+
+def test_start_point_path_length():
+    simple_ref = [0, 0]
+    _check_path_length_start_point(SIMPLE_NEURON, simple_ref)
+    _check_path_length_start_point(SIMPLE_TREE, simple_ref)
+
+    ref = [0, 4.0, 5.0, 5.0, 8.0, 8.0, 4.0]
+    _check_path_length_start_point(NEURON, ref)
+    _check_path_length_start_point(NEURON_TREE, ref)
+
