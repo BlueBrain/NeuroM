@@ -30,9 +30,9 @@
 
 '''Examples of basic data checks'''
 from neurom.io.utils import load_neuron, get_morph_files
-from neurom.check import morphology as io_chk
-from neurom.exceptions import SomaError
-from neurom.exceptions import NonConsecutiveIDsError
+from neurom.check import ok as chk_ok
+from neurom.check import morphology as morph_chk
+from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
 import argparse
 import logging
 import yaml
@@ -57,6 +57,7 @@ have a soma and no format errors.
 Default errors checked for
 ------------------
 * No soma
+* Disconnected points
 * No axon
 * No apical dendrite
 * No basal dendrite
@@ -132,7 +133,7 @@ def log_msg(ok, msg, color=False):
           '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
 
-def test_file(f):
+def test_file(f, config):
     '''Run tests on a morphology file'''
 
     L.info('Check file %s...', f)
@@ -140,9 +141,14 @@ def test_file(f):
     try:
         nrn = load_neuron(f)
         log_msg(True, 'Has valid soma?')
+        log_msg(True, 'All points connected?')
     except SomaError:
         log_msg(False, 'Has valid soma?')
         L.warning('Cannot continue without a soma... Aborting')
+        return False
+    except DisconnectedPointError as e:
+        log_msg(False, 'All points connected')
+        L.warning(e.message)
         return False
 
     result = True
@@ -150,41 +156,22 @@ def test_file(f):
     for check in config['neuron_checks']:
 
         if check in config['options']:
-
             fargs = config['options'][check]
-
             if isinstance(fargs, list):
-                out = getattr(io_chk, check)(nrn, *fargs)
+                out = getattr(morph_chk, check)(nrn, *fargs)
             else:
-                out = getattr(io_chk, check)(nrn, fargs)
-
+                out = getattr(morph_chk, check)(nrn, fargs)
         else:
+            out = getattr(morph_chk, check)(nrn)
 
-            out = getattr(io_chk, check)(nrn)
+        ok = chk_ok(out)
+        log_msg(ok, check.replace('_', ' ').capitalize() + '?')
 
-        if check in ['nonzero_section_lengths',
-                     'nonzero_segment_lengths',
-                     'nonzero_neurite_radii']:
-
-            ok = not out
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
-
-            if out:
-                L.debug('%d sections with zero length detected: %s', len(out), out)
-
-        elif check in ['has_monotonic_neurites', 'has_flat_neurites']:
-
-            ok = all(out)
-
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
-
-            if not all(out):
-                L.debug('%d out of %d neurites', sum(out), len(out))
-
-        else:
-
-            ok = out
-            log_msg(ok, check.replace('_', ' ').capitalize() + '?')
+        try:
+            if len(out) > 0:
+                L.debug('%d failing sections detected: %s', len(out), out)
+        except TypeError:
+            pass
 
         result &= ok
 
@@ -202,26 +189,26 @@ if __name__ == '__main__':
     if yaml_path:
         try:
             with open(yaml_path, 'r') as stream:
-                config = yaml.load(stream)
+                _config = yaml.load(stream)
 
         except yaml.scanner.ScannerError as e:
             L.error('Invalid yaml file : \n %s', str(e))
             sys.exit(1)
     else:
         # set default checks
-        config = {'neuron_checks': ['has_basal_dendrite',
-                                    'has_axon',
-                                    'has_apical_dendrite',
-                                    'nonzero_segment_lengths',
-                                    'nonzero_section_lengths',
-                                    'nonzero_neurite_radii'],
-                  'options': {"nonzero_neurite_radii": 0.007,
-                              "nonzero_segment_lengths": 0.01,
-                              "nonzero_section_lengths": 0.01}}
+        _config = {'neuron_checks': ['has_basal_dendrite',
+                                     'has_axon',
+                                     'has_apical_dendrite',
+                                     'nonzero_segment_lengths',
+                                     'nonzero_section_lengths',
+                                     'nonzero_neurite_radii'],
+                   'options': {"nonzero_neurite_radii": 0.007,
+                               "nonzero_segment_lengths": 0.01,
+                               "nonzero_section_lengths": 0.01}}
 
-    if 'color' in config:
+    if 'color' in _config:
         import functools
-        log_msg = functools.partial(log_msg, color=config['color'])
+        log_msg = functools.partial(log_msg, color=_config['color'])
 
     if os.path.isfile(data_path):
         files = [data_path]
@@ -235,10 +222,10 @@ if __name__ == '__main__':
     for _f in files:
         L.info(SEPARATOR)
         try:
-            res = test_file(_f)
+            res = test_file(_f, _config)
             log_msg(res, 'Check result:')
-        except NonConsecutiveIDsError as e:
-            print 'ERROR in file %s: %s' % (_f, e.message)
+        except IDSequenceError as e:
+            print 'ID ERROR in file %s: %s' % (_f, e.message)
         except StandardError as e:
             print 'ERROR: Could not read file %s: %s' % (_f, e.message)
 

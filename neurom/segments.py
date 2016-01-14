@@ -26,20 +26,52 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Basic tools to check neuronal morphologies. '''
+'''Basic functions and iterators for neuron neurite segment morphometrics
+
+'''
+import functools
+from neurom.core import tree as tr
+import neurom.analysis.morphmath as mm
 
 
-def ok(result):
-    '''Boolean test result
+iter_type = tr.isegment
 
-    Return a boolean pass status for a test result. Some tests
-    return iterables of failures. A non empty iterable result is
-    a failure.
 
-    Returns: True if result is True or an empty iterable,\
-    False otherwise.
+def itr(obj, mapping=None, filt=None):
+    '''Iterator to a neurite, neuron or neuron population's segments
+
+    Applies a neurite filter function and a segment mapping.
+
+    Example:
+        Get the lengths of segments in a neuron and a population
+
+        >>> from neurom import segments as seg
+        >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
+        >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
+        >>> neurite = nrn.neurites[0]
+        >>> tree_lengths = [l for l in seg.itr(neurite, seg.length)]
     '''
-    try:
-        return len(result) == 0
-    except TypeError:
-        return result is True
+    #  TODO: optimize case of single neurite and move code to neurom.core.tree
+    neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
+    return tr.i_chain(neurites, iter_type, mapping, filt)
+
+
+length = mm.segment_length
+radius = mm.segment_radius
+volume = mm.segment_volume
+area = mm.segment_area
+
+
+def radial_dist(pos):
+    '''Return a function that calculates radial distance for a segment
+
+    Radial distance calculater WRT pos
+    '''
+    return functools.partial(mm.segment_radial_dist, pos=pos)
+
+
+def n_segments(neuron):
+    """
+    Return number of segments in neuron or population
+    """
+    return sum(1 for _ in itr(neuron))

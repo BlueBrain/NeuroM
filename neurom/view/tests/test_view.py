@@ -35,6 +35,7 @@ from neurom.analysis.morphtree import find_tree_type
 import os
 import numpy as np
 import pylab as plt
+from neurom.core.tree import Tree
 
 
 DATA_PATH = './test_data'
@@ -118,3 +119,41 @@ def test_neuron_no_neurites():
 def test_neuron3d_no_neurites():
     filename = os.path.join(SWC_PATH, 'point_soma.swc')
     f, a = view.neuron3d(load_neuron(filename))
+
+
+def test_dendrogram():
+    fig, ax = view.dendrogram(neuron0)
+    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
+
+
+def test_one_point_branch_with_diameter():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree(test_tree, diameter=True)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
+
+def test_one_point_branch_without_diameter():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree(test_tree, diameter=False)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
+
+def test_one_point_branch_with_diameter_3d():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree3d(test_tree, diameter=True)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)
+
+def test_one_point_branch_without_diameter_3d():
+    test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
+    try:
+        view.tree3d(test_tree, diameter=False)
+        nt.ok_(True)
+    except:
+        nt.ok_(False)

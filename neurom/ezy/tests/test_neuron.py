@@ -35,7 +35,7 @@ from copy import deepcopy
 from neurom import ezy
 from collections import namedtuple
 from neurom.core.types import TreeType
-from neurom.exceptions import SomaError, NonConsecutiveIDsError
+from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
 from neurom.core.dataformat import COLS
 from neurom.core.tree import ipreorder, val_iter
@@ -61,8 +61,13 @@ def test_construct_neuron_no_soma_raises_SomaError():
     ezy.load_neuron(filename)
 
 
-@nt.raises(NonConsecutiveIDsError)
-def test_construct_neuron_non_consecutive_ids_raises_NonConsecutiveIDsError():
+@nt.raises(IDSequenceError)
+def test_construct_neuron_invalid_id_sequence_raises():
+    filename = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
+    ezy.load_neuron(filename)
+
+
+def test_construct_neuron_non_consecutive_ids_loads():
     filename = os.path.join(SWC_PATH, 'non_sequential_trunk_off_1_16pt.swc')
     ezy.load_neuron(filename)
 
@@ -362,15 +367,15 @@ class TestEzyNeuron(object):
 
     def test_compare_neurites(self):
 
-        fake_neuron = namedtuple('Neuron', 'neurites')        
+        fake_neuron = namedtuple('Neuron', 'neurites')
         fake_neuron.neurites = []
         nt.assert_false(self.neuron._compare_neurites(fake_neuron, TreeType.axon))
         nt.assert_true(fake_neuron, fake_neuron)
 
         neuron2 = deepcopy(self.neuron)
-        
+
         n_types = set([n.type for n in self.neuron.neurites])
-        
+
         for n_type in n_types:
             nt.assert_true(self.neuron._compare_neurites(neuron2, n_type))
 

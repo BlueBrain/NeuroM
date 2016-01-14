@@ -74,21 +74,82 @@ def test_point_dist():
     nt.ok_(dist==sqrt(3))
 
 
-def test_angle_3points():
+def test_angle_3points_half_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 0.0, 0.0)
+    vec2 = (0.0, 2.0, 0.0)
+    nt.eq_(angle_3points(orig, vec1, vec2), pi / 2.0)
+
+    vec2 = (0.0, 0.0, 3.0)
+    nt.eq_(angle_3points(orig, vec1, vec2), pi / 2.0)
+
+    vec2 = (0.0, 0.0, -3.0)
+    nt.eq_(angle_3points(orig, vec1, vec2), pi / 2.0)
+
+    vec1 = (0.0, 4.0, 0.0)
+    nt.eq_(angle_3points(orig, vec1, vec2), pi / 2.0)
+
+
+def test_angle_3points_quarter_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 0.0, 0.0)
+    vec2 = (2.0, 2.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, -3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 0.0, 3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+    vec2 = (3.0, 0.0, -3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), pi / 4.0)
+
+
+def test_angle_3points_three_quarter_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 0.0, 0.0)
+    vec2 = (-2.0, 2.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3* pi / 4.0)
+
+    vec2 = (-3.0, -3.0, 0.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 0.0, 3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+    vec2 = (-3.0, 0.0, -3.0)
+    nt.assert_equal(angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
+
+
+def test_angle_3points_equal_points_returns_zero():
+    orig = (0.0, 1.0, 0.0)
     vec1 = (1.0, 0.0, 0.0)
     vec2 = (0.0, 1.0, 0.0)
-    orig = (0.0,0.0,0.0)
+    a = angle_3points(orig, vec1, vec2)
+    nt.assert_equal(a, 0.0)
+
+
+def test_angle_3points_opposing_returns_pi():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 1.0, 1.0)
+    vec2 = (-2.0, -2.0, -2.0)
     angle=angle_3points(orig, vec1, vec2)
-    nt.ok_(angle==pi/2.0)
+    nt.assert_equal(angle, pi)
 
 
-def test_angle_3points_equal_points_returns_nan():
-    vec1 = (1.0, 0.0, 0.0)
-    vec2 = (0.0, 1.0, 0.0)
-    orig = (0.0,1.0,0.0)
-    a = angle_3points(orig,vec1,vec2)
-    nt.ok_(np.isnan(a))
-    nt.ok_(math.isnan(a))
+def test_angle_3points_collinear_returns_zero():
+    orig = (0.0, 0.0, 0.0)
+    vec1 = (1.0, 1.0, 1.0)
+    vec2 = (2.0, 2.0, 2.0)
+    angle=angle_3points(orig, vec1, vec2)
+    nt.assert_equal(angle, 0.0)
 
 
 def soma_points(radius=5,number_points=20):
@@ -215,13 +276,13 @@ def test_pca():
     p = np.array([[4., 2., 0.6],
                  [4.2, 2.1, 0.59],
                  [3.9, 2.0, 0.58],
-                 [4.3, 2.1, 0.62], 
+                 [4.3, 2.1, 0.62],
                  [4.1, 2.2, 0.63]])
 
-    RES_COV = np.array([[0.025, 0.0075, 0.00175], 
-                        [0.0075, 0.0070, 0.00135], 
+    RES_COV = np.array([[0.025, 0.0075, 0.00175],
+                        [0.0075, 0.0070, 0.00135],
                         [0.00175, 0.00135, 0.00043]])
-    
+
     RES_EIGV = np.array([[ 0.93676841,  0.34958469, -0.0159843 ],
                         [ 0.34148069, -0.92313136, -0.1766902 ],
                         [ 0.0765238 , -0.16005947,  0.98413672]])
