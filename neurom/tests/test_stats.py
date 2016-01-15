@@ -140,3 +140,16 @@ def test_fit_results_dict_exponential_min_max():
     nt.assert_equal(d['min'], -100)
     nt.assert_equal(d['max'], 100)
     nt.assert_equal(d['type'], 'exponential')
+
+def test_scalar_stats():
+
+    data = np.array([1.,2.,3.,4.,5.])
+
+    result = st.scalar_stats(data)
+
+    RESULT = {'mean': 3.,
+              'max': 5.,
+              'min': 1.,
+              'std': 1.4142135623730951}
+
+    nt.assert_true(RESULT == result)
