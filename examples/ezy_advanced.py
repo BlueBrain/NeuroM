@@ -36,11 +36,14 @@ morphometrics functionality.
 
 from __future__ import print_function
 from itertools import imap
+from neurom import segments as seg
+from neurom import sections as sec
+from neurom import bifurcations as bif
+from neurom import iter_neurites
 from neurom import ezy
+from neurom.core.types import tree_type_checker
 from neurom.core.tree import isection
-from neurom.core.tree import ibifurcation_point
 from neurom.core.dataformat import COLS
-from neurom.analysis import morphmath as mm
 from neurom.analysis import morphtree as mt
 import numpy as np
 
@@ -60,23 +63,23 @@ if __name__ == '__main__':
     # Get length of all neurites in cell by iterating over sections,
     # and summing the section lengths
     print('Total neurite length:',
-          sum(nrn.iter_sections(mm.path_distance)))
+          sum(iter_neurites(nrn, sec.end_point_path_length)))
 
     # Get length of all neurites in cell by iterating over segments,
     # and summing the segment lengths.
     # This should yield the same result as iterating over sections.
     print('Total neurite length:',
-          sum(nrn.iter_segments(mm.segment_length)))
+          sum(iter_neurites(nrn, seg.length)))
 
     # get volume of all neurites in cell by summing over segment
     # volumes
     print('Total neurite volume:',
-          sum(nrn.iter_segments(mm.segment_volume)))
+          sum(iter_neurites(nrn, seg.volume)))
 
     # get area of all neurites in cell by summing over segment
     # areas
     print('Total neurite surface area:',
-          sum(nrn.iter_segments(mm.segment_area)))
+          sum(iter_neurites(nrn, seg.area)))
 
     # get total number of points in cell.
     # iter_points needs a mapping function, so we pass the identity.
@@ -90,11 +93,12 @@ if __name__ == '__main__':
 
     # get mean radius of segments
     print('Mean radius of segments:',
-          np.mean([r for r in nrn.iter_segments(mm.segment_radius)]))
+          np.mean(list(iter_neurites(nrn, seg.radius))))
 
     # get stats for the segment taper rate, for different types of neurite
     for ttype in ezy.NEURITE_TYPES:
-        seg_taper_rate = list(nrn.iter_segments(mm.segment_taper_rate, ttype))
+        ttt = ttype
+        seg_taper_rate = list(iter_neurites(nrn, seg.taper_rate, tree_type_checker(ttt)))
         print('Segment taper rate (', ttype,
               '):\n  mean=', np.mean(seg_taper_rate),
               ', std=', np.std(seg_taper_rate),
@@ -103,16 +107,12 @@ if __name__ == '__main__':
               sep='')
 
     # Number of bifurcation points.
-    # This uses the more generic iter_neurites method, in which
-    # we can decide the type of iteration. Here we iterate over
-    # bifurcation points.
-    print('Number of bifurcation points:',
-          sum(1 for _ in nrn.iter_neurites(ibifurcation_point)))
+    print('Number of bifurcation points:', bif.count(nrn))
 
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
-          sum(1 for _ in nrn.iter_neurites(ibifurcation_point,
-                                           neurite_type=ezy.TreeType.apical_dendrite)))
+          sum(1 for _ in iter_neurites(nrn, bif.identity,
+                                       tree_type_checker(ezy.TreeType.apical_dendrite))))
 
     # Maximum branch order
     # This is complicated and will be factored into a helper function.

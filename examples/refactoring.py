@@ -33,7 +33,7 @@ import neurom.analysis.morphtree as mtr
 
 from neurom.core.types import TreeType
 
-from neurom.core.types import checkTreeType
+from neurom.core.types import tree_type_checker
 
 from itertools import chain, imap
 
@@ -91,14 +91,14 @@ class Neuron(object):
         '''
         return i_neurites(self.neurites,
                           lambda n: n.segments(),
-                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
+                          neu_filter=tree_type_checker(neurite_type))
 
     def sections(self, neurite_type=TreeType.all):
         '''Returns sections
         '''
         return i_neurites(self.neurites,
                           lambda n: n.sections(),
-                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
+                          neu_filter=tree_type_checker(neurite_type))
 
 
 class Population(object):
@@ -125,14 +125,14 @@ class Population(object):
         '''
         return i_neurites(self.neurites,
                           lambda n: n.segments(),
-                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
+                          neu_filter=tree_type_checker(neurite_type))
 
     def sections(self, neurite_type=TreeType.all):
         '''Returns sections
         '''
         return i_neurites(self.neurites,
                           lambda n: n.sections(),
-                          neu_filter=lambda t: checkTreeType(neurite_type, t.type))
+                          neu_filter=tree_type_checker(neurite_type))
 
 if __name__ == '__main__':
     from neurom.core.tree import Tree
