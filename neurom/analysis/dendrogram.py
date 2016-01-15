@@ -163,7 +163,7 @@ class Dendrogram(object):
 
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
-        print self._rectangles.shape
+
         # determine the maximum recursion depth for the given object
         # which depends on the tree with the maximum number of nodes
         self._max_rec_depth = _max_recursion_depth(self._obj)
@@ -216,7 +216,7 @@ class Dendrogram(object):
 
                 # keep track of the next tree start index in list
                 n_previous = self._n
-        print self._n
+
         # set it back to its initial value
         sys.setrecursionlimit(old_depth)
 
