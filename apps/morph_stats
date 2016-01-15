@@ -69,8 +69,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Morphology statistics extractor',
                                      epilog='Note: Outputs json')
 
-    parser.add_argument('datapaths',
-                        nargs='+',
+    parser.add_argument('datapath',
                         help='Paths to morphology data files or directories')
 
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
@@ -79,16 +78,7 @@ def parse_args():
     parser.add_argument('--as-population',
                         action='store_true',
                         default=False,
-                        help='If more than one directories are specified in the \
-                              datapaths and this flag is enabled the cells in each dir\
-                              will be treated as a population')
-
-    parser.add_argument('--single-group',
-                        action='store_true',
-                        default=False,
-                        help='If more than one directories are specified in the \
-                              datapaths, as-population is enabled, then all the \
-                              directories will be treated as a single population')
+                        help='If enabled the directory is treated as a population')
 
     return parser.parse_args()
 
@@ -156,29 +146,19 @@ if __name__ == '__main__':
                                logging.INFO,
                                logging.DEBUG)[min(args.verbose, 2)])
 
-    data_paths = args.datapaths
-
+    _f = args.datapath
     _results = {}
 
-    for _path in data_paths:
-
-        # if the path is not a directory then parse it as a single neuron
-        if os.path.isfile(_path):
-
-            _results[_path] = extract_stats((load_neuron(_path),))
-
-        elif os.path.isdir(_path):
-
-            # treat the directory as a single population
-            if args.as_population:
-                _results[_path] = extract_stats(load_neurons(_path))
-
-            # otherwise process each neuron file separately
-            else:
-                for _f in get_morph_files(_path):
-                    _results[_f] = extract_stats((load_neuron(_f),))
+    if os.path.isfile(_f):
+        _results[_f] = extract_stats((load_neuron(_f),))
+    elif os.path.isdir(_f):
+        if not args.as_population:
+            for _p in get_morph_files(_f):
+                _results[_p] = extract_stats((load_neuron(_p),))
         else:
-            L.error('Invalid data path %s', _path)
-            sys.exit(1)
+            _results[_f] = extract_stats(load_neurons(_f))
+    else:
+        L.error("Invalid data path %s", _f)
+        sys.exit(1)
 
     print json.dumps(_results, indent=2, separators=(',', ':'))
