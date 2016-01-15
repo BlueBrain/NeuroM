@@ -27,3 +27,5 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ''' NeuroM '''
+
+from .core import iter_neurites

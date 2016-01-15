@@ -32,6 +32,7 @@ from neurom.io.utils import make_neuron
 from neurom import io
 from neurom.core.tree import Tree
 from neurom import segments as seg
+from neurom import iter_neurites
 
 import math
 from itertools import izip
@@ -114,14 +115,14 @@ BRANCHING_TREE = _make_branching_tree()
 
 def _check_segment_lengths(obj):
 
-    lg = [l for l in seg.itr(obj, seg.length)]
+    lg = [l for l in iter_neurites(obj, seg.length)]
 
     nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
 
 def _check_segment_volumes(obj):
 
-    sv = (l/math.pi for l in seg.itr(obj, seg.volume))
+    sv = (l/math.pi for l in iter_neurites(obj, seg.volume))
 
     ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
            0.5625, 4.6666667, 0.7708333, 0.5625)
@@ -132,7 +133,7 @@ def _check_segment_volumes(obj):
 
 def _check_segment_areas(obj):
 
-    sa = (l/math.pi for l in seg.itr(obj, seg.area))
+    sa = (l/math.pi for l in iter_neurites(obj, seg.area))
 
     ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
            1.5, 6.7082039, 1.8038587, 1.5)
@@ -143,7 +144,7 @@ def _check_segment_areas(obj):
 
 def _check_segment_radius(obj):
 
-    rad = [r for r in seg.itr(obj, seg.radius)]
+    rad = [r for r in iter_neurites(obj, seg.radius)]
 
     nt.eq_(rad,
            [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
@@ -157,9 +158,17 @@ def _check_segment_radial_dists(obj):
 
     origin = [0.0, 0.0, 0.0]
 
-    rd = [d for d in seg.itr(SIMPLE_NEURON, seg.radial_dist(origin))]
+    rd = [d for d in iter_neurites(SIMPLE_NEURON, seg.radial_dist(origin))]
 
     nt.eq_(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
+
+
+def _check_segment_taper_rate(obj):
+
+    tp = [t for t in iter_neurites(obj, seg.taper_rate)]
+
+    nt.eq_(tp,
+           [0.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.0, 1.0, 0.5, 0.0])
 
 
 def test_segment_volumes():
@@ -195,3 +204,8 @@ def test_count():
 def test_segment_radial_dists():
     _check_segment_radial_dists(SIMPLE_NEURON)
     _check_segment_radial_dists(SIMPLE_TREE)
+
+
+def test_segment_taper_rate():
+    _check_segment_taper_rate(NEURON)
+    _check_segment_taper_rate(NEURON_TREE)
