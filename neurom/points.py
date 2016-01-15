@@ -26,29 +26,54 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Core functionality and data types of NeuroM '''
+'''Basic functions and iterators for neuron neurite point morphometrics
 
-from .tree import i_chain2 as _chain_neurites
-from .tree import Tree as _Tree
+'''
+import functools
+from neurom.core import tree as tr
+from neurom import iter_neurites
+from neurom.core.dataformat import COLS
 
 
-def iter_neurites(obj, mapfun=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population
+iter_type = tr.ipreorder
 
-    Applies optional neurite filter and element mapping functions.
 
-    Example:
-        Get the lengths of sections in a neuron and a population
+def point_function(as_tree=False):
+    '''Decorate a point function such that it can be used in neurite iteration
 
-        >>> from neurom import sections as sec
-        >>> neuron_lengths = [l for l in iter_neurites(nrn, sec.length)]
-        >>> population_lengths = [l for l in iter_neurites(pop, sec.length)]
-        >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in iter_neurites(neurite, sec.length)]
-
+    Parameters:
+        as_tree: specifies whether the function argument is a point of trees\
+            or elements
     '''
-    #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, _Tree) else obj.neurites
-    iter_type = None if mapfun is None else mapfun.iter_type
+    def _point_function(fun):
+        '''Decorate a function with an iteration type member'''
+        @functools.wraps(fun)
+        def _wrapper(point):
+            '''Simply pass arguments to wrapped function'''
+            if not as_tree:
+                point = tr.as_elements(point)
+            return fun(point)
 
-    return _chain_neurites(neurites, iter_type, mapfun, filt)
+        _wrapper.iter_type = tr.ipreorder
+        return _wrapper
+
+    return _point_function
+
+
+@point_function(as_tree=True)
+def identity(point):
+    '''Hack to bind iteration type to do-nothing function'''
+    return point
+
+
+@point_function(as_tree=False)
+def radius(point):
+    '''Get the radius of a point'''
+    return point[COLS.R]
+
+
+def count(neuron):
+    """
+    Return number of segments in neuron or population
+    """
+    return sum(1 for _ in iter_neurites(neuron, identity))

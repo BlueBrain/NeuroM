@@ -26,29 +26,58 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Core functionality and data types of NeuroM '''
+from nose import tools as nt
+import os
+from neurom.io.utils import make_neuron
+from neurom import io
+from neurom.core.tree import Tree
+from neurom import points as pts
+from neurom import iter_neurites
 
-from .tree import i_chain2 as _chain_neurites
-from .tree import Tree as _Tree
+import math
+from itertools import izip
 
 
-def iter_neurites(obj, mapfun=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population
+class MockNeuron(object):
+    pass
 
-    Applies optional neurite filter and element mapping functions.
 
-    Example:
-        Get the lengths of sections in a neuron and a population
+def _make_tree():
+    '''This tree has 3 branching points'''
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 2.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 3.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 4.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 5.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 6.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 7.0, 1, 1, 2]))
+    return T
 
-        >>> from neurom import sections as sec
-        >>> neuron_lengths = [l for l in iter_neurites(nrn, sec.length)]
-        >>> population_lengths = [l for l in iter_neurites(pop, sec.length)]
-        >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in iter_neurites(neurite, sec.length)]
+TREE = _make_tree()
+NEURON = MockNeuron()
+NEURON.neurites = [TREE]
 
-    '''
-    #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, _Tree) else obj.neurites
-    iter_type = None if mapfun is None else mapfun.iter_type
 
-    return _chain_neurites(neurites, iter_type, mapfun, filt)
+def _check_radius(obj):
+
+    radii = [r for r in iter_neurites(obj, pts.radius)]
+    nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7])
+
+def _check_count(obj, n):
+    nt.eq_(pts.count(obj), n)
+
+
+def test_radius():
+    _check_radius(NEURON)
+    _check_radius(TREE)
+
+
+def test_count():
+    _check_count(TREE, 7)
+    _check_count(NEURON, 7)
+
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [TREE, TREE, TREE]
+
+    _check_count(neuron_b, 21)

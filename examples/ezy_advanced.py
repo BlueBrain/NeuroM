@@ -35,15 +35,13 @@ morphometrics functionality.
 '''
 
 from __future__ import print_function
-from itertools import imap
 from neurom import segments as seg
 from neurom import sections as sec
 from neurom import bifurcations as bif
+from neurom import points as pts
 from neurom import iter_neurites
 from neurom import ezy
 from neurom.core.types import tree_type_checker
-from neurom.core.tree import isection
-from neurom.core.dataformat import COLS
 from neurom.analysis import morphtree as mt
 import numpy as np
 
@@ -82,14 +80,14 @@ if __name__ == '__main__':
           sum(iter_neurites(nrn, seg.area)))
 
     # get total number of points in cell.
-    # iter_points needs a mapping function, so we pass the identity.
+    # iter_neurites needs a mapping function, so we pass the identity.
     print('Total number of points:',
-          sum(1 for _ in nrn.iter_points(lambda p: p)))
+          sum(1 for _ in iter_neurites(nrn, pts.identity)))
 
     # get mean radius of points in cell.
     # p[COLS.R] yields the radius for point p.
     print('Mean radius of points:',
-          np.mean([r for r in nrn.iter_points(lambda p: p[COLS.R])]))
+          np.mean([r for r in iter_neurites(nrn, pts.radius)]))
 
     # get mean radius of segments
     print('Mean radius of segments:',
@@ -115,15 +113,15 @@ if __name__ == '__main__':
                                        tree_type_checker(ezy.TreeType.apical_dendrite))))
 
     # Maximum branch order
-    # This is complicated and will be factored into a helper function.
-    # We iterate over sections, calcumating the branch order for each one.
-    # The reason we cannot simply call nen.iter_sections(mt.branch_order) is
-    # that mt.branch_order requires sections of tree nodes for navigation, but
-    # nrn.iter_sections iterates over the sections of points.
-    # TODO: This whole tree data business has to be refactored and simplified.
+    # We create a custom branch_order section_function
+    # and use the generalized iteration method
+    @sec.section_function(as_tree=True)
+    def branch_order(s):
+        '''Get the branch order of a section'''
+        return mt.branch_order(s)
+
     print('Maximum branch order:',
-          np.max([bo for bo in nrn.iter_neurites(
-              lambda t: imap(mt.branch_order, isection(t)))]))
+          max(bo for bo in iter_neurites(nrn, branch_order)))
 
     # Neuron's bounding box
     print('Bounding box ((min x, y, z), (max x, y, z))',

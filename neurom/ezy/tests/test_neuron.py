@@ -37,11 +37,9 @@ from collections import namedtuple
 from neurom.core.types import TreeType
 from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
-from neurom.core.dataformat import COLS
-from neurom.core.tree import ipreorder, val_iter
 from neurom import sections as sec
 from neurom import segments as seg
-from neurom import bifurcations
+from neurom import bifurcations as bifs
 from neurom import iter_neurites
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -149,7 +147,7 @@ class TestEzyNeuron(object):
 
     def test_get_local_bifurcation_angles(self):
 
-        ref_local_bifangles = list(iter_neurites(self.neuron, bifurcations.local_angle))
+        ref_local_bifangles = list(iter_neurites(self.neuron, bifs.local_angle))
 
         local_bifangles = self.neuron.get_local_bifurcation_angles()
         nt.assert_equal(len(local_bifangles), 40)
@@ -177,7 +175,7 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(s), 0)
 
     def test_get_remote_bifurcation_angles(self):
-        ref_remote_bifangles = list(iter_neurites(self.neuron, bifurcations.remote_angle))
+        ref_remote_bifangles = list(iter_neurites(self.neuron, bifs.remote_angle))
         remote_bifangles = self.neuron.get_remote_bifurcation_angles()
         nt.assert_equal(len(remote_bifangles), 40)
         nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
@@ -324,14 +322,6 @@ class TestEzyNeuron(object):
         nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.basal_dendrite),
                               [7.972322416776259, 8.2245287740603779])
         nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.axon), [9.579117366740002])
-
-    def test_iter_points(self):
-        ref_point_radii = []
-        for t in self.neuron.neurites:
-            ref_point_radii.extend(p[COLS.R] for p in val_iter(ipreorder(t)))
-
-        rads = [r for r in self.neuron.iter_points(lambda p: p[COLS.R])]
-        nt.assert_true(np.all(ref_point_radii == rads))
 
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view
