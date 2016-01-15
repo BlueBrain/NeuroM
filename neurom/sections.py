@@ -62,7 +62,7 @@ def section_function(as_tree=False):
     return _section_function
 
 
-@section_function(as_tree=False)
+@section_function(as_tree=True)
 def identity(section):
     '''Hack to bind iteration type to do-nothing function'''
     return section
