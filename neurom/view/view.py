@@ -722,8 +722,8 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     kwargs['xlim'] = [- dnd.dims[0][0] * 0.5, dnd.dims[-1][0] * 0.5 + displacement]
 
     kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
-    kwargs['xlabel'] = kwargs.get('xlabel', '')
-    kwargs['ylabel'] = kwargs.get('ylabel', '')
+    kwargs['xlabel'] = kwargs.get('xlabel', 'micrometers (um)')
+    kwargs['ylabel'] = kwargs.get('ylabel', 'micrometers (um)')
     kwargs['no_legend'] = False
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
