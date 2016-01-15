@@ -30,7 +30,7 @@
 
 from neurom.core.tree import Tree, ipreorder
 from neurom.core.neuron import Neuron
-from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
+from neurom.analysis.morphtree import n_terminations
 from neurom.analysis.morphmath import segment_length
 from neurom.core.dataformat import COLS
 
@@ -52,7 +52,12 @@ def _total_rectangles(tree):
     for the dendrogram. There is a vertical line for each segment
     and two horizontal line at each branching point
     '''
-    return n_segments(tree) + n_bifurcations(tree) * 2
+    def f(children):
+        '''Calculates number of lines needed for the children of a node
+        '''
+        return 2 * len(children) if len(children) != 1 else 1
+
+    return sum(f(node.children) for node in ipreorder(tree))
 
 
 def _n_rectangles(obj):
@@ -158,7 +163,7 @@ class Dendrogram(object):
 
         # initialize the number of rectangles
         self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
-
+        print self._rectangles.shape
         # determine the maximum recursion depth for the given object
         # which depends on the tree with the maximum number of nodes
         self._max_rec_depth = _max_recursion_depth(self._obj)
@@ -211,7 +216,7 @@ class Dendrogram(object):
 
                 # keep track of the next tree start index in list
                 n_previous = self._n
-
+        print self._n
         # set it back to its initial value
         sys.setrecursionlimit(old_depth)
 
