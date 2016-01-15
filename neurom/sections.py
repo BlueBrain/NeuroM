@@ -32,39 +32,12 @@
 from itertools import izip
 from functools import wraps
 from neurom.core import tree as tr
+from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 import neurom.analysis.morphtree as mt
 
 
 iter_type = tr.isection
-
-
-# TODO: Move to higher level module. This is no longer
-# specific to sections
-def itr(obj, mapfun=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population's sections
-
-    Applies a neurite filter function and a section mapping function.
-
-    Example:
-        Get the lengths of sections in a neuron and a population
-
-        >>> from neurom import sections as sec
-        >>> neuron_lengths = [l for l in sec.itr(nrn, sec.length)]
-        >>> population_lengths = [l for l in sec.itr(pop, sec.length)]
-        >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in sec.itr(neurite, sec.length)]
-
-    Example:
-        Get the number of sections in a neuron
-
-        >>> from neurom import sections as sec
-        >>> n = sec.count(nrn)
-
-    '''
-    #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
-    return tr.i_chain2(neurites, mapfun.iter_type, mapfun, filt)
 
 
 def section_function(as_tree=False):
@@ -86,7 +59,6 @@ def section_function(as_tree=False):
         _wrapper.iter_type = tr.isection
         return _wrapper
 
-    _section_function.iter_type = tr.isection
     return _section_function
 
 
@@ -161,4 +133,4 @@ def count(neuron):
     """
     Return number of segments in neuron or population
     """
-    return sum(1 for _ in itr(neuron, identity))
+    return sum(1 for _ in iter_neurites(neuron, identity))

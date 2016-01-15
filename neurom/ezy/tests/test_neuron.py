@@ -44,6 +44,7 @@ from neurom.analysis.morphtree import i_remote_bifurcation_angle
 from neurom.analysis.morphtree import i_section_radial_dist
 from neurom import sections as sec
 from neurom import segments as seg
+from neurom import iter_neurites
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -86,7 +87,7 @@ class TestEzyNeuron(object):
         nt.assert_true(self.neuron.name == 'Neuron')
 
     def test_get_section_lengths(self):
-        ref_seclen = [l for l in sec.itr(self.neuron, sec.length)]
+        ref_seclen = [l for l in iter_neurites(self.neuron, sec.length)]
         seclen = self.neuron.get_section_lengths()
         nt.assert_equal(len(seclen), 84)
         nt.assert_true(np.all(seclen == ref_seclen))
@@ -114,7 +115,7 @@ class TestEzyNeuron(object):
         s = self.neuron.get_section_lengths(TreeType.soma)
 
     def test_get_segment_lengths(self):
-        ref_seglen = [l for l in seg.itr(self.neuron, seg.length)]
+        ref_seglen = [l for l in iter_neurites(self.neuron, seg.length)]
         seglen = self.neuron.get_segment_lengths()
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == ref_seglen))
@@ -240,8 +241,8 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_endpoint(self):
 
-        ref_sec_path_len_start = [l for l in sec.itr(self.neuron, sec.start_point_path_length)]
-        ref_sec_path_len = [l for l in sec.itr(self.neuron, sec.end_point_path_length)]
+        ref_sec_path_len_start = [l for l in iter_neurites(self.neuron, sec.start_point_path_length)]
+        ref_sec_path_len = [l for l in iter_neurites(self.neuron, sec.end_point_path_length)]
         path_lengths = self.neuron.get_section_path_distances()
         nt.assert_true(ref_sec_path_len != ref_sec_path_len_start)
         nt.assert_equal(len(path_lengths), 84)
@@ -249,7 +250,7 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_start_point(self):
 
-        ref_sec_path_len_start = [l for l in sec.itr(self.neuron, sec.start_point_path_length)]
+        ref_sec_path_len_start = [l for l in iter_neurites(self.neuron, sec.start_point_path_length)]
         path_lengths = self.neuron.get_section_path_distances(use_start_point=True)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == ref_sec_path_len_start))

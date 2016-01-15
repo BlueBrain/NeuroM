@@ -31,6 +31,7 @@ import os
 from neurom.io.utils import make_neuron
 from neurom import io
 from neurom.core.tree import Tree
+from neurom import iter_neurites
 from neurom import segments as seg
 from neurom import sections as sec
 
@@ -99,8 +100,8 @@ def _check_count(obj, n):
 
 
 def _check_length(obj):
-    sec_len = [l for l in sec.itr(obj, sec.length)]
-    seg_len = [l for l in seg.itr(obj, seg.length)]
+    sec_len = [l for l in iter_neurites(obj, sec.length)]
+    seg_len = [l for l in iter_neurites(obj, seg.length)]
     sum_sec_len = sum(sec_len)
     sum_seg_len = sum(seg_len)
 
@@ -111,8 +112,8 @@ def _check_length(obj):
 
 
 def _check_volume(obj):
-    sec_vol = [l for l in sec.itr(obj, sec.volume)]
-    seg_vol = [l for l in seg.itr(obj, seg.volume)]
+    sec_vol = [l for l in iter_neurites(obj, sec.volume)]
+    seg_vol = [l for l in iter_neurites(obj, seg.volume)]
     sum_sec_vol = sum(sec_vol)
     sum_seg_vol = sum(seg_vol)
 
@@ -123,8 +124,8 @@ def _check_volume(obj):
 
 
 def _check_area(obj):
-    sec_area = [l for l in sec.itr(obj, sec.area)]
-    seg_area = [l for l in seg.itr(obj, seg.area)]
+    sec_area = [l for l in iter_neurites(obj, sec.area)]
+    seg_area = [l for l in iter_neurites(obj, seg.area)]
     sum_sec_area = sum(sec_area)
     sum_seg_area = sum(seg_area)
 
@@ -148,7 +149,7 @@ def _check_section_radial_dists_end_point(obj):
 
     origin = [0.0, 0.0, 0.0]
 
-    rd = [d for d in sec.itr(obj, sec.radial_dist(origin))]
+    rd = [d for d in iter_neurites(obj, sec.radial_dist(origin))]
 
     nt.eq_(rd, [8.0, 8.0])
 
@@ -157,18 +158,18 @@ def _check_section_radial_dists_start_point(obj):
 
     origin = [0.0, 0.0, 0.0]
 
-    rd = [d for d in sec.itr(obj, sec.radial_dist(origin, True))]
+    rd = [d for d in iter_neurites(obj, sec.radial_dist(origin, True))]
 
     nt.eq_(rd, [0.0, 0.0])
 
 
 def _check_path_length_end_point(obj, ref):
-    pl = [l for l in sec.itr(obj, sec.end_point_path_length)]
+    pl = [l for l in iter_neurites(obj, sec.end_point_path_length)]
     nt.eq_(pl, ref)
 
 
 def _check_path_length_start_point(obj, ref):
-    pl = [l for l in sec.itr(obj, sec.start_point_path_length)]
+    pl = [l for l in iter_neurites(obj, sec.start_point_path_length)]
     nt.eq_(pl, ref)
 
 def test_length():
