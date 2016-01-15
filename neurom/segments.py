@@ -31,43 +31,46 @@
 '''
 import functools
 from neurom.core import tree as tr
+from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 
 
 iter_type = tr.isegment
 
 
-def itr(obj, mapping=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population's segments
+def segment_function(as_tree=False):
+    '''Decorate a segment function such that it can be used in neurite iteration
 
-    Applies a neurite filter function and a segment mapping.
-
-    Example:
-        Get the lengths of segments in a neuron, a population,\
-            and a neurite
-
-        >>> from neurom import segments as seg
-        >>> neuron_lengths = [l for l in seg.itr(nrn, seg.length)]
-        >>> population_lengths = [l for l in seg.itr(pop, seg.length)]
-        >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in seg.itr(neurite, seg.length)]
-
-    Example:
-        Get the number of segments in a neuron
-
-        >>> from neurom import segments as seg
-        >>> n = seg.count(nrn)
-
+    Parameters:
+        as_tree: specifies whether the function argument is a segment of trees\
+            or elements
     '''
-    #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, tr.Tree) else obj.neurites
-    return tr.i_chain(neurites, iter_type, mapping, filt)
+    def _segment_function(fun):
+        '''Decorate a function with an iteration type member'''
+        @functools.wraps(fun)
+        def _wrapper(segment):
+            '''Simply pass arguments to wrapped function'''
+            if not as_tree:
+                segment = tr.as_elements(segment)
+            return fun(segment)
+
+        _wrapper.iter_type = tr.isegment
+        return _wrapper
+
+    return _segment_function
 
 
-length = mm.segment_length
-radius = mm.segment_radius
-volume = mm.segment_volume
-area = mm.segment_area
+length = segment_function(as_tree=False)(mm.segment_length)
+radius = segment_function(as_tree=False)(mm.segment_radius)
+volume = segment_function(as_tree=False)(mm.segment_volume)
+area = segment_function(as_tree=False)(mm.segment_area)
+taper_rate = segment_function(as_tree=False)(mm.segment_taper_rate)
+
+
+@segment_function(as_tree=False)
+def identity(segment):
+    '''Hack to bind iteration type to do-nothing function'''
+    return segment
 
 
 def radial_dist(pos):
@@ -75,11 +78,16 @@ def radial_dist(pos):
 
     Radial distance calculater WRT pos
     '''
-    return functools.partial(mm.segment_radial_dist, pos=pos)
+    @segment_function(as_tree=False)
+    def _rad_dist(segment):
+        '''Capture pos and invoke radial distance calculation'''
+        return mm.segment_radial_dist(segment, pos)
+
+    return _rad_dist
 
 
 def count(neuron):
     """
     Return number of segments in neuron or population
     """
-    return sum(1 for _ in itr(neuron))
+    return sum(1 for _ in iter_neurites(neuron, identity))
