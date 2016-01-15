@@ -69,14 +69,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Morphology statistics extractor',
                                      epilog='Note: Outputs json')
 
-<<<<<<< HEAD
-    parser.add_argument('datapaths',
-                        nargs='+',
-                        help='Path to a morphology data file or a directory')
-=======
     parser.add_argument('datapath',
-                        help='Paths to morphology data files or directories')
->>>>>>> f796db8d941a11295db13413d92b48fd089086d2
+                        help='Path to a morphology data file or a directory')
 
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
                         help='-v for INFO, -vv for DEBUG')
