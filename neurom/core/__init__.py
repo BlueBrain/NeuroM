@@ -31,6 +31,7 @@
 from .tree import i_chain2 as _chain_neurites
 from .tree import Tree as _Tree
 
+
 def iter_neurites(obj, mapfun=None, filt=None):
     '''Iterator to a neurite, neuron or neuron population
 
