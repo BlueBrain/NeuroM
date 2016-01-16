@@ -38,9 +38,10 @@ import numpy as np
 from neurom.core.tree import isegment
 from neurom.core.tree import val_iter
 from neurom.io.readers import COLS
+from neurom.segments import radius as segment_radius
+from neurom import iter_neurites
 from neurom.analysis.morphtree import get_bounding_box
 from neurom.analysis.morphtree import get_tree_type
-from neurom.analysis.morphtree import i_segment_radius
 
 
 def get_default(variable, **kwargs):
@@ -146,7 +147,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     if get_default('diameter', **kwargs):
         scale = get_default('diameter_scale', **kwargs)
         # TODO: This was originally a numpy array. Did it have to be one?
-        linewidth = [2 * d * scale for d in i_segment_radius(tr)]
+        linewidth = [2 * d * scale for d in iter_neurites(tr, segment_radius)]
         if len(linewidth) == 0:
             linewidth = get_default('linewidth', **kwargs)
 
@@ -433,7 +434,8 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     # Definition of the linewidth according to diameter, if diameter is True.
     if get_default('diameter', **kwargs):
         # TODO: This was originally a numpy array. Did it have to be one?
-        linewidth = [2 * d * get_default('diameter_scale', **kwargs) for d in i_segment_radius(tr)]
+        linewidth = [2 * d * get_default('diameter_scale', **kwargs)
+                     for d in iter_neurites(tr, segment_radius)]
         if len(linewidth) == 0:
             linewidth = get_default('linewidth', **kwargs)
 

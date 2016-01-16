@@ -209,7 +209,7 @@ class Neuron(CoreNeuron):
 
         Parameters:
             iterator_type: Type of iterator with which to perform the iteration.\
-            (e.g. isegment, isection, i_section_path_length)
+            (e.g. isegment, isection)
             mapping: mapping function to be applied to the target of iteration.\
             (e.g. segment_length). Must be compatible with the iterator_type.
             neurite_type: TreeType object. Neurites of incompatible type are\
@@ -248,7 +248,7 @@ class Neuron(CoreNeuron):
 
         Parameters:
             iterator_type: Type of iterator with which to perform the iteration.
-            (e.g. isegment, isection, i_section_path_length)
+            (e.g. isegment, isection)
             mapping: mapping function to be applied to the target of iteration.
             (e.g. segment_length). Must be compatible with the iterator_type.
             neurite_type: TreeType object. Neurites of incompatible type are

@@ -153,62 +153,6 @@ def _form_branching_tree():
 BRANCHING_TREE = _form_branching_tree()
 
 
-def test_segment_lengths():
-
-    T = NEURON_TREE
-
-    lg = [l for l in mtr.i_segment_length(T)]
-
-    nt.assert_equal(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
-
-
-def test_segment_volumes():
-
-    T = NEURON_TREE
-
-    sv = (l/math.pi for l in mtr.i_segment_volume(T))
-
-    ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
-           0.5625, 4.6666667, 0.7708333, 0.5625)
-
-    for a, b in izip(sv, ref):
-        nt.assert_almost_equal(a, b)
-
-
-def test_segment_areas():
-
-    T = NEURON_TREE
-
-    sa = (l/math.pi for l in mtr.i_segment_area(T))
-
-    ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
-           1.5, 6.7082039, 1.8038587, 1.5)
-
-    for a, b in izip(sa, ref):
-        nt.assert_almost_equal(a, b)
-
-
-
-def test_segment_radiuss():
-
-    T = NEURON_TREE
-
-    rad = [r for r in mtr.i_segment_radius(T)]
-
-    nt.assert_equal(rad,
-                    [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
-
-
-def test_segment_radial_dists():
-    T = SIMPLE_TREE
-
-    p= [0.0, 0.0, 0.0]
-
-    rd = [d for d in mtr.i_segment_radial_dist(p,T)]
-
-    nt.assert_equal(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
-
-
 def test_segment_path_length():
     leaves = [l for l in tr.ileaf(NEURON_TREE)]
     for l in leaves:
@@ -240,12 +184,6 @@ def test_get_tree_type():
         # tree.type should already exists here, from previous action.
         nt.ok_(mtr.get_tree_type(test_tree) == tree_types[en_tree])
 
-def test_i_section_length():
-    T = SIMPLE_TREE
-    nt.assert_equal([l for l in mtr.i_section_length(T)], [8.0, 8.0])
-    T2 = NEURON_TREE
-    nt.ok_([l for l in mtr.i_section_length(T2)] == [5.0, 4.0, 4.0])
-
 
 def test_i_section_radial_dists():
     T1 = SIMPLE_TREE
@@ -276,56 +214,6 @@ def test_i_section_radial_dists():
 
     nt.assert_equal([d for d in mtr.i_section_radial_dist(T2, p0, use_start_point=True)],
                     [0.0, 5.0, 5.0])
-
-
-def test_i_section_path_length():
-    T1 = SIMPLE_TREE
-    T2 = NEURON_TREE
-
-    nt.assert_equal([d for d in mtr.i_section_path_length(T1)],
-                    [8.0, 8.0])
-
-    nt.assert_equal([d for d in mtr.i_section_path_length(T1, use_start_point=True)],
-                    [0.0, 0.0])
-
-    nt.assert_equal([d for d in mtr.i_section_path_length(T2)], [5.0, 9.0, 9.0])
-
-    nt.assert_equal([d for d in mtr.i_section_path_length(T2, use_start_point=True)],
-                    [0.0, 5.0, 5.0])
-
-
-def test_i_segment_meander_angles():
-    T = NEURON_TREE
-    ref = [math.pi * a for a in (1.0, 1.0, 1.0, 0.5, 0.5, 1.0, 1.0, 1.0, 0.5)]
-    for i, m in enumerate(mtr.i_segment_meander_angle(T)):
-        nt.assert_almost_equal(m, ref[i])
-
-
-def test_i_local_bifurcation_angles():
-    T = BRANCHING_TREE
-    ref = (0.25, 0.5, 0.25)  # ref angles in pi radians
-    for i, b in enumerate(mtr.i_local_bifurcation_angle(T)):
-        nt.assert_almost_equal(b / math.pi, ref[i])
-
-
-def test_i_remote_bifurcation_angles():
-    T = BRANCHING_TREE
-
-    # (fork point, end point, end point) tuples calculated by hand
-    # from BRANCHING_TREE
-    refs = (((0, 4, 0), (0, 5, 0), (15, 15, 0)),
-            ((0, 5, 0), (4, 5, 0), (0, 5, 3)),
-            ((0, 5, 3), (0, 6, 3), (0, 6, 4)))
-
-    ref_angles = tuple(angle_3points(p[0], p[1], p[2]) / math.pi for p in refs)
-    ref = (0.2985898, 0.5, 0.25)  # ref angles in pi radians
-    # sanity check
-    for i, b in enumerate(ref_angles):
-        nt.assert_almost_equal(b, ref[i])
-
-    for i, b in enumerate(mtr.i_remote_bifurcation_angle(T)):
-        nt.assert_almost_equal(b / math.pi, ref_angles[i])
-        nt.assert_almost_equal(b / math.pi, ref[i])
 
 
 def test_n_sections():
