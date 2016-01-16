@@ -129,8 +129,8 @@ def radial_dist(pos, use_start_point=False):
     return _dist
 
 
-def count(neuron):
+def count(neuron, tree_filter=None):
     """
     Return number of segments in neuron or population
     """
-    return sum(1 for _ in iter_neurites(neuron, identity))
+    return sum(1 for _ in iter_neurites(neuron, identity, tree_filter))

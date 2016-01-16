@@ -253,7 +253,7 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
     return chain_it if mapping is None else imap_val(mapping, chain_it)
 
 
-def i_chain2(trees, iterator_type, mapping=None, tree_filter=None):
+def i_chain2(trees, iterator_type=ipreorder, mapping=None, tree_filter=None):
     '''Returns a mapped iterator to a collection of trees
 
     Provides access to all the elements of all the trees
