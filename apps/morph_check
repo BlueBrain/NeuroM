@@ -230,3 +230,7 @@ if __name__ == '__main__':
             print 'ERROR: Could not read file %s: %s' % (_f, e.message)
 
     L.info(SEPARATOR)
+
+    exit_status = 0 if res else 1
+
+    sys.exit(exit_status)
