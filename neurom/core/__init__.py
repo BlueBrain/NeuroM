@@ -27,3 +27,28 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ''' Core functionality and data types of NeuroM '''
+
+from .tree import i_chain2 as _chain_neurites
+from .tree import Tree as _Tree
+
+
+def iter_neurites(obj, mapfun=None, filt=None):
+    '''Iterator to a neurite, neuron or neuron population
+
+    Applies optional neurite filter and element mapping functions.
+
+    Example:
+        Get the lengths of sections in a neuron and a population
+
+        >>> from neurom import sections as sec
+        >>> neuron_lengths = [l for l in iter_neurites(nrn, sec.length)]
+        >>> population_lengths = [l for l in iter_neurites(pop, sec.length)]
+        >>> neurite = nrn.neurites[0]
+        >>> tree_lengths = [l for l in iter_neurites(neurite, sec.length)]
+
+    '''
+    #  TODO: optimize case of single neurite and move code to neurom.core.tree
+    neurites = [obj] if isinstance(obj, _Tree) else obj.neurites
+    iter_type = None if mapfun is None else mapfun.iter_type
+
+    return _chain_neurites(neurites, iter_type, mapfun, filt)

@@ -35,12 +35,13 @@ morphometrics functionality.
 '''
 
 from __future__ import print_function
-from itertools import imap
+from neurom import segments as seg
+from neurom import sections as sec
+from neurom import bifurcations as bif
+from neurom import points as pts
+from neurom import iter_neurites
 from neurom import ezy
-from neurom.core.tree import isection
-from neurom.core.tree import ibifurcation_point
-from neurom.core.dataformat import COLS
-from neurom.analysis import morphmath as mm
+from neurom.core.types import tree_type_checker
 from neurom.analysis import morphtree as mt
 import numpy as np
 
@@ -60,41 +61,42 @@ if __name__ == '__main__':
     # Get length of all neurites in cell by iterating over sections,
     # and summing the section lengths
     print('Total neurite length:',
-          sum(nrn.iter_sections(mm.path_distance)))
+          sum(iter_neurites(nrn, sec.end_point_path_length)))
 
     # Get length of all neurites in cell by iterating over segments,
     # and summing the segment lengths.
     # This should yield the same result as iterating over sections.
     print('Total neurite length:',
-          sum(nrn.iter_segments(mm.segment_length)))
+          sum(iter_neurites(nrn, seg.length)))
 
     # get volume of all neurites in cell by summing over segment
     # volumes
     print('Total neurite volume:',
-          sum(nrn.iter_segments(mm.segment_volume)))
+          sum(iter_neurites(nrn, seg.volume)))
 
     # get area of all neurites in cell by summing over segment
     # areas
     print('Total neurite surface area:',
-          sum(nrn.iter_segments(mm.segment_area)))
+          sum(iter_neurites(nrn, seg.area)))
 
     # get total number of points in cell.
-    # iter_points needs a mapping function, so we pass the identity.
+    # iter_neurites needs a mapping function, so we pass the identity.
     print('Total number of points:',
-          sum(1 for _ in nrn.iter_points(lambda p: p)))
+          sum(1 for _ in iter_neurites(nrn, pts.identity)))
 
     # get mean radius of points in cell.
     # p[COLS.R] yields the radius for point p.
     print('Mean radius of points:',
-          np.mean([r for r in nrn.iter_points(lambda p: p[COLS.R])]))
+          np.mean([r for r in iter_neurites(nrn, pts.radius)]))
 
     # get mean radius of segments
     print('Mean radius of segments:',
-          np.mean([r for r in nrn.iter_segments(mm.segment_radius)]))
+          np.mean(list(iter_neurites(nrn, seg.radius))))
 
     # get stats for the segment taper rate, for different types of neurite
     for ttype in ezy.NEURITE_TYPES:
-        seg_taper_rate = list(nrn.iter_segments(mm.segment_taper_rate, ttype))
+        ttt = ttype
+        seg_taper_rate = list(iter_neurites(nrn, seg.taper_rate, tree_type_checker(ttt)))
         print('Segment taper rate (', ttype,
               '):\n  mean=', np.mean(seg_taper_rate),
               ', std=', np.std(seg_taper_rate),
@@ -103,27 +105,23 @@ if __name__ == '__main__':
               sep='')
 
     # Number of bifurcation points.
-    # This uses the more generic iter_neurites method, in which
-    # we can decide the type of iteration. Here we iterate over
-    # bifurcation points.
-    print('Number of bifurcation points:',
-          sum(1 for _ in nrn.iter_neurites(ibifurcation_point)))
+    print('Number of bifurcation points:', bif.count(nrn))
 
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
-          sum(1 for _ in nrn.iter_neurites(ibifurcation_point,
-                                           neurite_type=ezy.TreeType.apical_dendrite)))
+          sum(1 for _ in iter_neurites(nrn, bif.identity,
+                                       tree_type_checker(ezy.TreeType.apical_dendrite))))
 
     # Maximum branch order
-    # This is complicated and will be factored into a helper function.
-    # We iterate over sections, calcumating the branch order for each one.
-    # The reason we cannot simply call nen.iter_sections(mt.branch_order) is
-    # that mt.branch_order requires sections of tree nodes for navigation, but
-    # nrn.iter_sections iterates over the sections of points.
-    # TODO: This whole tree data business has to be refactored and simplified.
+    # We create a custom branch_order section_function
+    # and use the generalized iteration method
+    @sec.section_function(as_tree=True)
+    def branch_order(s):
+        '''Get the branch order of a section'''
+        return mt.branch_order(s)
+
     print('Maximum branch order:',
-          np.max([bo for bo in nrn.iter_neurites(
-              lambda t: imap(mt.branch_order, isection(t)))]))
+          max(bo for bo in iter_neurites(nrn, branch_order)))
 
     # Neuron's bounding box
     print('Bounding box ((min x, y, z), (max x, y, z))',

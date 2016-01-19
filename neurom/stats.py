@@ -33,6 +33,7 @@ Nothing fancy. Just commonly used functions using scipy functionality.'''
 from collections import namedtuple
 from collections import OrderedDict
 from scipy import stats as _st
+import numpy as np
 
 
 FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
@@ -110,3 +111,24 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
     '''
     fit_results = [fit(data, d) for d in distr_to_check]
     return min(fit_results, key=lambda fit: fit.errs[0])
+
+
+def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
+    '''Calculate the stats from the given numpy functions
+
+    Parameters:
+        data: array of data points to be used for the stats
+
+    Options:
+        functions: tuple of numpy stat functions to apply on data
+
+    Returns:
+        Dictionary with tha name of the function as key and the result
+        as the respective value
+    '''
+    stats = {}
+    for func in functions:
+
+        stats[func] = getattr(np, func)(data)
+
+    return stats

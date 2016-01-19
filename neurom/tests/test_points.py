@@ -27,26 +27,57 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from nose import tools as nt
-from neurom.core.population import Population
-from neurom.ezy import Neuron, load_neuron
+import os
+from neurom.io.utils import make_neuron
+from neurom import io
+from neurom.core.tree import Tree
+from neurom import points as pts
+from neurom import iter_neurites
 
-NRN1 = load_neuron('test_data/swc/Neuron.swc')
-NRN2 = load_neuron('test_data/swc/Single_basal.swc')
-NRN3 = load_neuron('test_data/swc/Neuron_small_radius.swc')
+import math
+from itertools import izip
 
-NEURONS = [NRN1, NRN2, NRN3]
-TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
 
-def test_population():
-	pop = Population(NEURONS, name='foo')
+class MockNeuron(object):
+    pass
 
-	nt.assert_equal(len(pop.neurons), 3)
-	nt.ok_(pop.neurons[0].name, 'Neuron')
-	nt.ok_(pop.neurons[1].name, 'Single_basal')
-	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
 
-	nt.assert_equal(len(pop.somata), 3)
+def _make_tree():
+    '''This tree has 3 branching points'''
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 2.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 3.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 4.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 5.0, 1, 1, 2]))
+    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 6.0, 1, 1, 2]))
+    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 7.0, 1, 1, 2]))
+    return T
 
-	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
+TREE = _make_tree()
+NEURON = MockNeuron()
+NEURON.neurites = [TREE]
 
-	nt.assert_equal(pop.name, 'foo')
+
+def _check_radius(obj):
+
+    radii = [r for r in iter_neurites(obj, pts.radius)]
+    nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7])
+
+def _check_count(obj, n):
+    nt.eq_(pts.count(obj), n)
+
+
+def test_radius():
+    _check_radius(NEURON)
+    _check_radius(TREE)
+
+
+def test_count():
+    _check_count(TREE, 7)
+    _check_count(NEURON, 7)
+
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [TREE, TREE, TREE]
+
+    _check_count(neuron_b, 21)
