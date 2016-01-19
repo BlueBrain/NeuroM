@@ -157,7 +157,6 @@ def compare_two(data1, data2, test='ks_2samp'):
     '''
     results = getattr(_st, test)(data1, data2)
 
-    stats = {'dist': results[0]}
-    stats['p-value'] = results[1]
+    Stats = namedtuple('Stats', ['dist', 'pvalue'])
 
-    return stats
+    return Stats(*results)
