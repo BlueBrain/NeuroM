@@ -26,64 +26,50 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions and iterators for neuron neurite segment morphometrics
+'''Basic functions and iterators for neuron neurite point morphometrics
 
 '''
 import functools
 from neurom.core import tree as tr
 from neurom import iter_neurites
-import neurom.analysis.morphmath as mm
+from neurom.core.dataformat import COLS
 
 
-iter_type = tr.isegment
+iter_type = tr.ipreorder
 
 
-def segment_function(as_tree=False):
-    '''Decorate a segment function such that it can be used in neurite iteration
+def point_function(as_tree=False):
+    '''Decorate a point function such that it can be used in neurite iteration
 
     Parameters:
-        as_tree: specifies whether the function argument is a segment of trees\
+        as_tree: specifies whether the function argument is a point of trees\
             or elements
     '''
-    def _segment_function(fun):
+    def _point_function(fun):
         '''Decorate a function with an iteration type member'''
         @functools.wraps(fun)
-        def _wrapper(segment):
+        def _wrapper(point):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                segment = tr.as_elements(segment)
-            return fun(segment)
+                point = tr.as_elements(point)
+            return fun(point)
 
-        _wrapper.iter_type = tr.isegment
+        _wrapper.iter_type = tr.ipreorder
         return _wrapper
 
-    return _segment_function
+    return _point_function
 
 
-length = segment_function(as_tree=False)(mm.segment_length)
-radius = segment_function(as_tree=False)(mm.segment_radius)
-volume = segment_function(as_tree=False)(mm.segment_volume)
-area = segment_function(as_tree=False)(mm.segment_area)
-taper_rate = segment_function(as_tree=False)(mm.segment_taper_rate)
-
-
-@segment_function(as_tree=True)
-def identity(segment):
+@point_function(as_tree=True)
+def identity(point):
     '''Hack to bind iteration type to do-nothing function'''
-    return segment
+    return point
 
 
-def radial_dist(pos):
-    '''Return a function that calculates radial distance for a segment
-
-    Radial distance calculater WRT pos
-    '''
-    @segment_function(as_tree=False)
-    def _rad_dist(segment):
-        '''Capture pos and invoke radial distance calculation'''
-        return mm.segment_radial_dist(segment, pos)
-
-    return _rad_dist
+@point_function(as_tree=False)
+def radius(point):
+    '''Get the radius of a point'''
+    return point[COLS.R]
 
 
 def count(neuron):

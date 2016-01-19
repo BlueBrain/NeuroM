@@ -26,68 +26,54 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions and iterators for neuron neurite segment morphometrics
+'''Basic functions and iterators for neuron neurite triplet morphometrics
 
 '''
 import functools
 from neurom.core import tree as tr
 from neurom import iter_neurites
-import neurom.analysis.morphmath as mm
+from neurom.analysis import morphmath as mm
 
 
-iter_type = tr.isegment
+iter_type = tr.itriplet
 
 
-def segment_function(as_tree=False):
-    '''Decorate a segment function such that it can be used in neurite iteration
+def triplet_function(as_tree=False):
+    '''Decorate a triples function such that it can be used in neurite iteration
 
     Parameters:
-        as_tree: specifies whether the function argument is a segment of trees\
-            or elements
+        as_tree: specifies whether the function argument is a\
+            triplet of trees or elements
     '''
-    def _segment_function(fun):
+    def _triplet_function(fun):
         '''Decorate a function with an iteration type member'''
         @functools.wraps(fun)
-        def _wrapper(segment):
+        def _wrapper(triplet):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                segment = tr.as_elements(segment)
-            return fun(segment)
+                triplet = tr.as_elements(triplet)
+            return fun(triplet)
 
-        _wrapper.iter_type = tr.isegment
+        _wrapper.iter_type = tr.itriplet
         return _wrapper
 
-    return _segment_function
+    return _triplet_function
 
 
-length = segment_function(as_tree=False)(mm.segment_length)
-radius = segment_function(as_tree=False)(mm.segment_radius)
-volume = segment_function(as_tree=False)(mm.segment_volume)
-area = segment_function(as_tree=False)(mm.segment_area)
-taper_rate = segment_function(as_tree=False)(mm.segment_taper_rate)
-
-
-@segment_function(as_tree=True)
-def identity(segment):
+@triplet_function(as_tree=True)
+def identity(triplet):
     '''Hack to bind iteration type to do-nothing function'''
-    return segment
+    return triplet
 
 
-def radial_dist(pos):
-    '''Return a function that calculates radial distance for a segment
-
-    Radial distance calculater WRT pos
-    '''
-    @segment_function(as_tree=False)
-    def _rad_dist(segment):
-        '''Capture pos and invoke radial distance calculation'''
-        return mm.segment_radial_dist(segment, pos)
-
-    return _rad_dist
+@triplet_function(as_tree=False)
+def meander_angle(triplet):
+    '''Return the angle between a triplet of consecutive points'''
+    return mm.angle_3points(triplet[1], triplet[0], triplet[2])
 
 
 def count(neuron):
     """
-    Return number of segments in neuron or population
+    Return number of triplets in neuron or population
     """
     return sum(1 for _ in iter_neurites(neuron, identity))

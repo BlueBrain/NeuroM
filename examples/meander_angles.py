@@ -33,7 +33,8 @@ import numpy as np
 from neurom.core.dataformat import COLS
 from neurom.io.readers import load_data
 from neurom.io.utils import make_neuron
-from neurom.analysis.morphtree import i_segment_meander_angle
+from neurom import triplets as trip
+from neurom import iter_neurites
 
 
 # root level logger. This would be a top level application logger.
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 
     for tt in nrn.neurites:
         print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
-        for a in i_segment_meander_angle(tt):
+        for a in iter_neurites(tt, trip.meander_angle):
             LOG.debug('Angle %f', a)
             if np.isnan(a):
                 LOG.warn('Found NaN angle. Check for zero length segments!')

@@ -42,13 +42,17 @@ class TreeType(Enum):
     all = 32
 
 
-def checkTreeType(ref, target):
-    '''Check whether target has the same type as ref
+def tree_type_checker(ref):
+    '''Tree type checker functor'''
+    def check_tree_type(tree):
+        '''Check whether tree has the same type as ref
 
-    Returns:
-        True if ref in the same type as target or ref is TreeType.all
-    '''
-    return ref is TreeType.all or target is ref
+        Returns:
+            True if ref in the same type as tree.type or ref is TreeType.all
+        '''
+        return ref is TreeType.all or tree.type is ref
+
+    return check_tree_type
 
 
 NEURITES = (TreeType.all,

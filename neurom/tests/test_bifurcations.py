@@ -31,7 +31,7 @@ import os
 from neurom.io.utils import make_neuron
 from neurom import io
 from neurom.core.tree import Tree
-from neurom import segments as seg
+from neurom import bifurcations as bif
 from neurom import iter_neurites
 
 import math
@@ -91,6 +91,7 @@ SIMPLE_NEURON = MockNeuron()
 SIMPLE_NEURON.neurites = [SIMPLE_TREE]
 
 def _make_branching_tree():
+    '''This tree has 3 branching points'''
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
     T = Tree(p)
     T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
@@ -109,103 +110,58 @@ def _make_branching_tree():
     return T
 
 BRANCHING_TREE = _make_branching_tree()
+BRANCHING_NEURON = MockNeuron()
+BRANCHING_NEURON.neurites = [BRANCHING_TREE]
 
 
+def _check_local_bifurcation_angles(obj):
+
+    angles = [a for a in iter_neurites(obj, bif.local_angle)]
+
+    nt.eq_(angles, [math.pi / 4, math.pi / 2, math.pi / 4])
 
 
-def _check_segment_lengths(obj):
+def _check_remote_bifurcation_angles(obj):
 
-    lg = [l for l in iter_neurites(obj, seg.length)]
+    angles = [a for a in iter_neurites(obj, bif.remote_angle)]
 
-    nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
-
-
-def _check_segment_volumes(obj):
-
-    sv = (l/math.pi for l in iter_neurites(obj, seg.volume))
-
-    ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
-           0.5625, 4.6666667, 0.7708333, 0.5625)
-
-    for a, b in izip(sv, ref):
-        nt.assert_almost_equal(a, b)
-
-
-def _check_segment_areas(obj):
-
-    sa = (l/math.pi for l in iter_neurites(obj, seg.area))
-
-    ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
-           1.5, 6.7082039, 1.8038587, 1.5)
-
-    for a, b in izip(sa, ref):
-        nt.assert_almost_equal(a, b)
-
-
-def _check_segment_radius(obj):
-
-    rad = [r for r in iter_neurites(obj, seg.radius)]
-
-    nt.eq_(rad,
-           [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
+    nt.eq_(angles,
+           [0.9380474917927135, math.pi / 2, math.pi / 4])
 
 
 def _check_count(obj, n):
-    nt.eq_(seg.count(obj), n)
+    nt.eq_(bif.count(obj), n)
 
 
-def _check_segment_radial_dists(obj):
+def _check_points(obj):
+    @bif.bifurcation_point_function(as_tree=False)
+    def point(bif):
+        return bif[:4]
 
-    origin = [0.0, 0.0, 0.0]
-
-    rd = [d for d in iter_neurites(SIMPLE_NEURON, seg.radial_dist(origin))]
-
-    nt.eq_(rd, [1.0, 3.0, 5.0, 7.0, 1.0, 3.0, 5.0, 7.0])
-
-
-def _check_segment_taper_rate(obj):
-
-    tp = [t for t in iter_neurites(obj, seg.taper_rate)]
-
-    nt.eq_(tp,
-           [0.0, 0.0, 1.0, 0.0, 1.0, 0.5, 0.0, 1.0, 0.5, 0.0])
+    bif_points = [p for p in iter_neurites(obj, point)]
+    nt.eq_(bif_points,
+           [[0.0, 4.0, 0.0, 2.0], [0.0, 5.0, 0.0, 2.0], [0.0, 5.0, 3.0, 0.75]])
 
 
-def test_segment_volumes():
-    _check_segment_volumes(NEURON)
-    _check_segment_volumes(NEURON_TREE)
+def test_local_bifurcation_angle():
+    _check_local_bifurcation_angles(BRANCHING_NEURON)
+    _check_local_bifurcation_angles(BRANCHING_TREE)
 
 
-def test_segment_lengths():
-    _check_segment_lengths(NEURON)
-    _check_segment_lengths(NEURON_TREE)
+def test_remote_bifurcation_angle():
+    _check_remote_bifurcation_angles(BRANCHING_NEURON)
+    _check_remote_bifurcation_angles(BRANCHING_TREE)
 
 
-def test_segment_areas():
-    _check_segment_areas(NEURON)
-    _check_segment_areas(NEURON_TREE)
-
-
-def test_segment_radius():
-    _check_segment_radius(NEURON)
-    _check_segment_radius(NEURON_TREE)
+def test_points():
+    _check_points(BRANCHING_NEURON)
 
 
 def test_count():
-    _check_count(NEURON, 10)
-    _check_count(NEURON_TREE, 10)
+    _check_count(BRANCHING_TREE, 3)
+    _check_count(BRANCHING_NEURON, 3)
 
     neuron_b = MockNeuron()
-    neuron_b.neurites = [NEURON_TREE, NEURON_TREE, NEURON_TREE]
+    neuron_b.neurites = [BRANCHING_TREE, BRANCHING_TREE, BRANCHING_TREE]
 
-    _check_count(neuron_b, 30)
-
-
-def test_segment_radial_dists():
-    _check_segment_radial_dists(SIMPLE_NEURON)
-    _check_segment_radial_dists(SIMPLE_TREE)
-
-
-def test_segment_taper_rate():
-    _check_segment_taper_rate(NEURON)
-    _check_segment_taper_rate(NEURON_TREE)
+    _check_count(neuron_b, 9)
