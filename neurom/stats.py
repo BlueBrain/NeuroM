@@ -132,3 +132,32 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
         stats[func] = getattr(np, func)(data)
 
     return stats
+
+
+def compare_two(data1, data2, test='ks_2samp'):
+    '''Compares two distributions of data
+       and assess two scores: a distance between them
+       and a probability they are drawn from the same
+       distribution.
+
+    Parameters:
+        data1: numpy array of dataset 1
+        data2: numpy array of dataset 2
+        test: string\
+            Defines the statistical test to be used, based\
+            on the scipy available modules.\
+            Accepted tests: ks_2samp(default), mannwhitneyu
+
+    Returns:
+        dist: float\
+            High numbers define high dissimilarity between the two datasets
+        p-value: float\
+            Small numbers define high probability the data come from\
+            same dataset.
+    '''
+    results = getattr(_st, test)(data1, data2)
+
+    stats = {'dist': results[0]}
+    stats['p-value'] = results[1]
+
+    return stats
