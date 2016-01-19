@@ -400,8 +400,9 @@ def plot_style(fig, ax, **kwargs):
     if not show_plot:
         plt.close()
         return (None, None)
-
-    return fig, ax
+    else:
+        plt.show()
+        return fig, ax
 
 
 def plot_title(fig, ax, **kwargs):
