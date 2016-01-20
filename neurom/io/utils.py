@@ -33,7 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.exceptions import IDSequenceError, DisconnectedPointError
+from neurom.exceptions import IDSequenceError, DisconnectedPointError, MissingParentError
 from . import load_data
 from . import check
 from neurom.utils import memoize
@@ -115,8 +115,10 @@ def load_neuron(filename, tree_action=None):
     data = load_data(filename)
     if not check.has_increasing_ids(data)[0]:
         raise IDSequenceError('Invald ID sequence found in raw data')
-    if not check.all_points_connected(data)[0]:
+    if not check.no_disconnected_components(data)[0]:
         raise DisconnectedPointError('Disconnected point detected')
+    if not check.no_missing_parents(data)[0]:
+        raise MissingParentError('Missing parents detected')
 
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]
@@ -141,7 +143,7 @@ def load_trees(filename, tree_action=None):
     _trees = [make_tree(data, iseg, tree_action)
               for iseg in get_initial_segment_ids(data)]
 
-    _disconn_ids = check.all_points_connected(data)[1]
+    _disconn_ids = check.no_disconnected_components(data)[1]
 
     for t in _disconn_ids:
         _trees.append(make_tree(data, t))

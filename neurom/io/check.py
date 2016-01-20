@@ -44,8 +44,8 @@ def has_sequential_ids(raw_data):
     return len(steps) == 0, steps
 
 
-def all_points_connected(raw_data):
-    '''Check that all points are connected
+def no_missing_parents(raw_data):
+    '''Check that all points have existing parents
 
     Point's parent ID must exist and parent must be declared
     before child.
@@ -56,6 +56,15 @@ def all_points_connected(raw_data):
     ids = raw_data.get_col(COLS.ID)
     bad_ids = [int(ids[i]) for i in xrange(1, len(ids))
                if raw_data.data_block[i][COLS.P] not in ids[:i]]
+
+    return len(bad_ids) == 0, bad_ids
+
+
+def no_disconnected_components(raw_data):
+
+    dblock = raw_data.data_block
+    bad_ids = [int(dblock[i][COLS.ID]) for i in xrange(1, len(dblock))
+               if dblock[i][COLS.P] == -1]
 
     return len(bad_ids) == 0, bad_ids
 

@@ -47,3 +47,8 @@ class IDSequenceError(NeuroMError):
 class DisconnectedPointError(NeuroMError):
     '''Exception for raw data with disconnected points'''
     pass
+
+
+class MissingParentError(NeuroMError):
+    '''Exception for raw data with missing parent IDs'''
+    pass
