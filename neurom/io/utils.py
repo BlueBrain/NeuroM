@@ -124,6 +124,31 @@ def load_neuron(filename, tree_action=None):
     return nrn
 
 
+def load_trees(filename, tree_action=None):
+    """Load all trees in an input file
+
+    Loads all trees, regardless of whether they are connected
+    Args:
+        filename: the path of the file storing morphology data
+        tree_action: optional function to run on each of the neuron's
+        neurite trees.
+    Raises:
+        IDSequenceError if filename contains non-incremental ID sequence
+    """
+    data = load_data(filename)
+    if not check.has_increasing_ids(data)[0]:
+        raise IDSequenceError('Invald ID sequence found in raw data')
+    _trees = [make_tree(data, iseg, tree_action)
+              for iseg in get_initial_segment_ids(data)]
+
+    _disconn_ids = check.all_points_connected(data)[1]
+
+    for t in _disconn_ids:
+        _trees.append(make_tree(data, t))
+
+    return _trees
+
+
 def get_morph_files(directory):
     '''Get a list of all morphology files in a directory
 
