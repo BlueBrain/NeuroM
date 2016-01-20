@@ -55,29 +55,39 @@ def _make_tree():
     return T
 
 TREE = _make_tree()
+TREES = [TREE, TREE, TREE]
 NEURON = MockNeuron()
 NEURON.neurites = [TREE]
+POPULATION = MockNeuron()
+POPULATION.neurites = [TREE, TREE, TREE]
 
-
-def _check_radius(obj):
+def _check_radius0(obj):
 
     radii = [r for r in iter_neurites(obj, pts.radius)]
     nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7])
+
+
+def _check_radius1(obj):
+
+    radii = [r for r in iter_neurites(obj, pts.radius)]
+    nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7,
+                   1, 2, 3, 4, 5, 6, 7,
+                   1, 2, 3, 4, 5, 6, 7])
+
 
 def _check_count(obj, n):
     nt.eq_(pts.count(obj), n)
 
 
 def test_radius():
-    _check_radius(NEURON)
-    _check_radius(TREE)
+    _check_radius0(NEURON)
+    _check_radius0(TREE)
+    _check_radius1(TREES)
+    _check_radius1(POPULATION)
 
 
 def test_count():
     _check_count(TREE, 7)
     _check_count(NEURON, 7)
-
-    neuron_b = MockNeuron()
-    neuron_b.neurites = [TREE, TREE, TREE]
-
-    _check_count(neuron_b, 21)
+    _check_count(POPULATION, 21)
+    _check_count(TREES, 21)
