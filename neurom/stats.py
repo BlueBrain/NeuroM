@@ -134,7 +134,7 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     return stats
 
 
-def compare_two(data1, data2, test='ks_2samp'):
+def compare_two(data1, data2, test):
     '''Compares two distributions of data
        and assess two scores: a distance between them
        and a probability they are drawn from the same
@@ -146,7 +146,7 @@ def compare_two(data1, data2, test='ks_2samp'):
         test: string\
             Defines the statistical test to be used, based\
             on the scipy available modules.\
-            Accepted tests: ks_2samp(default), mannwhitneyu
+            Accepted tests: ks_2samp, mannwhitneyu
 
     Returns:
         dist: float\
