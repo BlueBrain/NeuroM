@@ -1,4 +1,5 @@
-# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+
+# Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
@@ -26,53 +27,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Type enumerations'''
+from nose import tools as nt
+from mock import Mock
 
-from enum import Enum, unique
-
-
-@unique
-class TreeType(Enum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
+from neurom.core.types import TreeType, tree_type_checker, NEURITES
 
 
-def tree_type_checker(*ref):
-    '''Tree type checker functor
+def test_tree_type_checker():
+    #check that when TreeType.all, we accept all trees, w/o checking type
+    tree_filter = tree_type_checker(TreeType.all)
+    nt.ok_(tree_filter('fake_tree'))
 
-    Returns:
-        Functor that takes a tree, and returns true if that tree matches any of
-        TreeTypes in ref
+    mock_tree = Mock()
+    mock_tree.type = TreeType.axon
 
-    Ex:
-        >>> from neurom.core.types import TreeType, tree_type_checker
-        >>> tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
-        >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
-    '''
-    ref = tuple(ref)
-    if TreeType.all in ref:
-        check_tree_type = lambda _: True
-    else:
-        def check_tree_type(tree):
-            '''Check whether tree has the same type as ref
+    #single arg
+    tree_filter = tree_type_checker(TreeType.axon)
+    nt.ok_(tree_filter(mock_tree))
 
-            Returns:
-                True if ref in the same type as tree.type or ref is TreeType.all
-            '''
-            return tree.type in ref
+    mock_tree.type = TreeType.basal_dendrite
+    nt.ok_(not tree_filter(mock_tree))
 
-    return check_tree_type
+    #multiple args
+    tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
+    nt.ok_(tree_filter(mock_tree))
 
-
-NEURITES = (TreeType.all,
-            TreeType.axon,
-            TreeType.basal_dendrite,
-            TreeType.apical_dendrite)
-
-
-ROOT_ID = -1
+    tree_filter = tree_type_checker(*NEURITES)
+    nt.ok_(tree_filter('fake_tree'))
