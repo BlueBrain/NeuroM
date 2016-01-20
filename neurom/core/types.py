@@ -56,7 +56,9 @@ def tree_type_checker(*ref):
     '''
     ref = tuple(ref)
     if TreeType.all in ref:
-        check_tree_type = lambda _: True
+        def check_tree_type(_):
+            '''Always returns true'''
+            return True
     else:
         def check_tree_type(tree):
             '''Check whether tree has the same type as ref
