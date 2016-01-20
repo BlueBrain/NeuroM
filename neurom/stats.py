@@ -34,9 +34,26 @@ from collections import namedtuple
 from collections import OrderedDict
 from scipy import stats as _st
 import numpy as np
-
+from enum import Enum, unique
 
 FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
+
+
+@unique
+class Stat_tests(Enum):
+    '''Enum representing valid statistical tests of scipy'''
+    ks = 1
+    wilcoxon = 2
+
+
+def get_test(stat_test):
+    '''Returns the correct stat test'''
+    sts = {Stat_tests.ks: 'ks_2samp', Stat_tests.wilcoxon: 'wilcoxon'}
+
+    if stat_test in Stat_tests:
+        return sts[stat_test]
+    else:
+        raise Exception('Statistical test not recognized. Choose from ks, wilcoxon.')
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
@@ -134,7 +151,7 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     return stats
 
 
-def compare_two(data1, data2, test):
+def compare_two(data1, data2, test=Stat_tests.ks):
     '''Compares two distributions of data
        and assess two scores: a distance between them
        and a probability they are drawn from the same
@@ -143,10 +160,10 @@ def compare_two(data1, data2, test):
     Parameters:
         data1: numpy array of dataset 1
         data2: numpy array of dataset 2
-        test: string\
+        test: Stat_tests\
             Defines the statistical test to be used, based\
             on the scipy available modules.\
-            Accepted tests: ks_2samp, mannwhitneyu
+            Accepted tests: ks_2samp, wilcoxon
 
     Returns:
         dist: float\
@@ -155,8 +172,7 @@ def compare_two(data1, data2, test):
             Small numbers define high probability the data come from\
             same dataset.
     '''
-    results = getattr(_st, test)(data1, data2)
-
+    results = getattr(_st, get_test(test))(data1, data2)
     Stats = namedtuple('Stats', ['dist', 'pvalue'])
 
     return Stats(*results)
