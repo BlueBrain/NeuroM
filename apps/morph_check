@@ -32,7 +32,7 @@
 from neurom.io.utils import load_neuron, get_morph_files
 from neurom.check import ok as chk_ok
 from neurom.check import morphology as morph_chk
-from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
+from neurom.exceptions import SomaError, IDSequenceError, MultipleTrees, MissingParentError
 import argparse
 import logging
 import yaml
@@ -146,7 +146,7 @@ def test_file(f, config):
         log_msg(False, 'Has valid soma?')
         L.warning('Cannot continue without a soma... Aborting')
         return False
-    except DisconnectedPointError as e:
+    except (MissingParentError, MultipleTrees) as e:
         log_msg(False, 'All points connected')
         L.warning(e.message)
         return False

@@ -68,20 +68,20 @@ def test_has_sequential_ids_bad_data():
     nt.ok_(ids == [6, 217, 428, 639])
 
 
-def test_has_all_points_connected_bad_data():
+def test_is_single_tree_bad_data():
 
     f = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
 
-    ok, ids = io.check.no_disconnected_components(io.load_data(f))
+    ok, ids = io.check.is_single_tree(io.load_data(f))
     nt.ok_(not ok)
     nt.eq_(ids, [6, 217, 428, 639])
 
 
-def test_has_all_points_connected_good_data():
+def test_is_single_tree_good_data():
 
     f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-    ok, ids = io.check.no_disconnected_components(io.load_data(f))
+    ok, ids = io.check.is_single_tree(io.load_data(f))
     nt.ok_(ok)
     nt.eq_(len(ids), 0)
 

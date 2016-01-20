@@ -60,8 +60,14 @@ def no_missing_parents(raw_data):
     return len(bad_ids) == 0, bad_ids
 
 
-def no_disconnected_components(raw_data):
+def is_single_tree(raw_data):
+    '''Check that data forms a single tree
 
+    Only the first point has ID of -1.
+
+    Note:
+        This assumes no_missing_parents passed.
+    '''
     dblock = raw_data.data_block
     bad_ids = [int(dblock[i][COLS.ID]) for i in xrange(1, len(dblock))
                if dblock[i][COLS.P] == -1]

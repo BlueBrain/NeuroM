@@ -44,8 +44,8 @@ class IDSequenceError(NeuroMError):
     pass
 
 
-class DisconnectedPointError(NeuroMError):
-    '''Exception for raw data with disconnected points'''
+class MultipleTrees(NeuroMError):
+    '''Exception for raw data with multiple trees'''
     pass
 
 

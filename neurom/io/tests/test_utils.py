@@ -37,7 +37,7 @@ from neurom import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.core import tree
 from neurom.exceptions import (SomaError, IDSequenceError,
-                               DisconnectedPointError, MissingParentError)
+                               MultipleTrees, MissingParentError)
 from nose import tools as nt
 
 
@@ -225,7 +225,7 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
-@nt.raises(DisconnectedPointError)
+@nt.raises(MultipleTrees)
 def test_load_neuron_disconnected_points_raises():
     utils.load_neuron(DISCONNECTED_POINTS_FILE)
 
