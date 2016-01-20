@@ -70,7 +70,7 @@ def test_has_sequential_ids_bad_data():
 
 def test_has_all_points_connected_bad_data():
 
-    f = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
+    f = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
 
     ok, ids = io.check.all_points_connected(io.load_data(f))
     nt.ok_(not ok)
