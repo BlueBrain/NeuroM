@@ -206,6 +206,19 @@ def test_load_trees_no_soma():
     nt.eq_(len(trees), 1)
 
 
+def test_load_trees_postaction():
+
+    def post_action(t):
+        t.foo = 'bar'
+
+    filepath = os.path.join(SWC_PATH, 'Neuron.swc')
+    trees = utils.load_trees(filepath, tree_action=post_action)
+    nt.eq_(len(trees), 4)  # sanity check
+
+    for t in trees:
+        nt.ok_(hasattr(t, 'foo') and t.foo == 'bar')
+
+
 def test_load_neuron_disconnected_components():
 
     filepath = DISCONNECTED_POINTS_FILE
