@@ -180,9 +180,22 @@ def test_compare_two_error():
 
 def test_total_score():
 
-    testList = (([1.,1., 1],[1.,1.,1.]),
+    testList1 = (([1.,1., 1],[1.,1.,1.]),
                 ([2.,3.,4.,5.],[2.,3.,4.,5.]))
 
-    score = st.total_score(testList)
-
+    score = st.total_score(testList1)
     nt.assert_almost_equal(score, 0.)
+
+    testList2 = (([1.,1., 1],[2.,2.,2.]),
+                ([2.,3.,4.,5.],[2.,3.,4.,5.]))
+
+    score = st.total_score(testList2, p=1)
+    nt.assert_almost_equal(score, 1.)
+
+    testList3 = (([1.,1., 1],[2.,2.,2.]),
+                ([3.,3.,3.,3.],[4., 4., 4., 4.]))
+
+    score = st.total_score(testList3, p=2)
+    nt.assert_almost_equal(score, np.sqrt(2.))
+
+
