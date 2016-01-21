@@ -172,3 +172,8 @@ def test_compare_two():
     nt.assert_almost_equal(results3.dist, 1.0)
     nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
 
+@nt.raises(TypeError)
+def test_compare_two_error():
+    data = np.array([1., 1., 2., 2.])
+    data_same = np.array([1.0, 1.0, 2.0, 2.0])
+    results1 = st.compare_two(data, data_same, test='test')
