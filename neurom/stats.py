@@ -186,7 +186,10 @@ def total_score(paired_dats, p=2, test=StatTests.ks):
 
     Options:
         p : integer that defines the order of p-norm
-        ks_test:
+        test: Stat_tests\
+            Defines the statistical test to be used, based\
+            on the scipy available modules.\
+            Accepted tests: ks_2samp, wilcoxon
 
     Returns:
         A float corresponding to the p-norm of the scores that have
