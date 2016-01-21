@@ -151,7 +151,7 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     return stats
 
 
-def compare_two(data1, data2, test=Stat_tests.ks):
+def compare_two(data1, data2, test=StatTests.ks):
     '''Compares two distributions of data
        and assess two scores: a distance between them
        and a probability they are drawn from the same
