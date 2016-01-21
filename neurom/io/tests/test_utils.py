@@ -107,9 +107,9 @@ def test_get_soma_ids():
         nt.ok_(utils.get_soma_ids(d) == SOMA_IDS[i])
 
 
-def test_get_initial_segment_ids():
+def test_get_initial_neurite_segment_ids():
     for i, d in enumerate(RAW_DATA):
-        nt.ok_(utils.get_initial_segment_ids(d) == INIT_IDS[i])
+        nt.ok_(utils.get_initial_neurite_segment_ids(d) == INIT_IDS[i])
 
 
 def _check_trees(trees):
@@ -128,7 +128,7 @@ def _check_trees(trees):
 
 def test_make_tree():
     rd = RAW_DATA[0]
-    seg_ids = utils.get_initial_segment_ids(rd)
+    seg_ids = utils.get_initial_neurite_segment_ids(rd)
     trees = [utils.make_tree(rd, seg_id) for seg_id in seg_ids]
     nt.ok_(len(trees) == len(INIT_IDS[0]))
     _check_trees(trees)
@@ -139,7 +139,7 @@ def test_make_tree_postaction():
         t.foo = 'bar'
 
     rd = RAW_DATA[0]
-    seg_ids = utils.get_initial_segment_ids(rd)
+    seg_ids = utils.get_initial_neurite_segment_ids(rd)
     trees = [utils.make_tree(rd, root_id=seg_id, post_action=post_action)
              for seg_id in seg_ids]
     for t in trees:
@@ -198,6 +198,13 @@ def test_load_trees_good_neuron():
     # Check data are the same in tree collection and neuron's neurites
     for a, b in izip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
         nt.ok_(np.all(a == b))
+
+
+def test_load_trees_no_soma():
+
+    trees = utils.load_trees(NO_SOMA_FILE)
+    nt.eq_(len(trees), 1)
+
 
 def test_load_neuron_disconnected_components():
 
