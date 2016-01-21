@@ -40,18 +40,18 @@ FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
 
 
 @unique
-class Stat_tests(Enum):
+class StatTests(Enum):
     '''Enum representing valid statistical tests of scipy'''
     ks = 1
     wilcoxon = 2
 
 
-def get_test(stat_test):
+def get_test(stest):
     '''Returns the correct stat test'''
-    sts = {Stat_tests.ks: 'ks_2samp', Stat_tests.wilcoxon: 'wilcoxon'}
+    sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon'}
 
-    if stat_test in Stat_tests:
-        return sts[stat_test]
+    if stest in StatTests:
+        return sts[StatTests]
     else:
         raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon.')
 

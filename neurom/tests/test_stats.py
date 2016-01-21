@@ -160,15 +160,15 @@ def test_compare_two():
     data_close = np.array([1.02, 1.01, 2.001, 2.0003])
     data_far = np.array([200., 100., 201])
 
-    results1 = st.compare_two(data, data_same, test=st.Stat_tests.ks)
+    results1 = st.compare_two(data, data_same, test=st.StatTests.ks)
     nt.assert_almost_equal(results1.dist, 0.0)
     nt.assert_almost_equal(results1.pvalue, 1.0)
 
-    results2 = st.compare_two(data, data_close, test=st.Stat_tests.ks)
+    results2 = st.compare_two(data, data_close, test=st.StatTests.ks)
     nt.assert_almost_equal(results2.dist, 0.5)
     nt.assert_almost_equal(results2.pvalue, 0.5344157, places=5)
 
-    results3 = st.compare_two(data, data_far, test=st.Stat_tests.ks)
+    results3 = st.compare_two(data, data_far, test=st.StatTests.ks)
     nt.assert_almost_equal(results3.dist, 1.0)
     nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
 
