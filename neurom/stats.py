@@ -176,3 +176,21 @@ def compare_two(data1, data2, test=StatTests.ks):
     Stats = namedtuple('Stats', ['dist', 'pvalue'])
 
     return Stats(*results)
+
+
+def total_score(paired_dats, p=2, test=StatTests.ks):
+    '''
+    Parameters:
+        paired_dats: a list of tuples or where each tuple
+                         contains the paired data lists from two datasets
+
+    Options:
+        p : integer that defines the order of p-norm
+        ks_test:
+
+    Returns:
+        A float corresponding to the p-norm of the scores that have
+        been calculated
+    '''
+    scores = np.array([compare_two(fL1, fL2, test=test).dist for fL1, fL2 in paired_dats])
+    return np.linalg.norm(scores, p)

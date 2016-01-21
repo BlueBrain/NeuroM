@@ -177,3 +177,12 @@ def test_compare_two_error():
     data = np.array([1., 1., 2., 2.])
     data_same = np.array([1.0, 1.0, 2.0, 2.0])
     results1 = st.compare_two(data, data_same, test='test')
+
+def test_total_score():
+
+    testList = (([1.,1., 1],[1.,1.,1.]),
+                ([2.,3.,4.,5.],[2.,3.,4.,5.]))
+
+    score = st.total_score(testList)
+
+    nt.assert_almost_equal(score, 0.)
