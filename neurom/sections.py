@@ -112,10 +112,7 @@ def start_point_path_length(tree_section):
     return mt.path_length(tree_section[0])
 
 
-@section_function(as_tree=True)
-def branch_order(tree_section):
-    '''Calculate the branch order of a section'''
-    return mt.branch_order(tree_section)
+branch_order = section_function(as_tree=True)(mt.branch_order)
 
 
 def radial_dist(pos, use_start_point=False):
