@@ -53,7 +53,7 @@ def get_test(stat_test):
     if stat_test in Stat_tests:
         return sts[stat_test]
     else:
-        raise Exception('Statistical test not recognized. Choose from ks, wilcoxon.')
+        raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon.')
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
