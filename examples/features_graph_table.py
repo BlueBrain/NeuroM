@@ -32,19 +32,12 @@
 import pylab as pl
 from itertools import product
 from neurom.io.utils import get_morph_files
-from neurom.core.neuron import SomaError
-from neurom.ezy import load_neuron
 from neurom.io.utils import load_trees
 import argparse
 
-
-class FakeNeuron(object):
-    '''
-    Fake Neuron Class to bypass the no soma swc files
-    '''
-    def __init__(self, trees, name):
-        self.neurites = trees
-        self.name = name
+from neurom.ezy import Neuron as ezyNeuron
+from neurom.core.neuron import Neuron as coreNeuron, make_soma
+from neurom.exceptions import IDSequenceError
 
 
 def parse_args():
@@ -81,10 +74,13 @@ def _stylize(ax, cell, feature, row, col):
     else:
         ax.set_yticks([])
     if row == 0 and len(cell) == 1:
-        ax.set_title(cell[0].name)
+        title = cell[0].name
+        title = title.replace('../../../Data/BigNeuron/20160113_merged_gold_gt/auto_recons/', '')
+        title = title.replace('.swc', '')
+        ax.set_title(title, fontsize='xx-small')
 
 
-def histogram(neurons, feature, ax, bins=25, normed=True, cumulative=False):
+def histogram(neurons, feature, ax, bins=15, normed=True, cumulative=False):
     '''
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -110,12 +106,14 @@ def histogram(neurons, feature, ax, bins=25, normed=True, cumulative=False):
     feature_values = [getattr(neuron, 'get_' + feature)() for neuron in neurons]
     labels = [neuron.name for neuron in neurons]
     # generate histogram
-    ax.hist(feature_values, bins=bins, cumulative=cumulative,
-            normed=normed, label=labels)
+    try:
+        ax.hist(feature_values, bins=bins, cumulative=cumulative, normed=normed, label=labels)
+    except ValueError:
+        pass
 
 
 def plot_feature_comparison(features, cells, function=histogram, collapsible=False):
-    ''' Plots the comparison of the histograms of the features of choice for
+    '''Plots the comparison of the histograms of the features of choice for
     the list of cells that is provided.
 
     features: list of strings
@@ -148,26 +146,23 @@ def plot_feature_comparison(features, cells, function=histogram, collapsible=Fal
     return f
 
 if __name__ == '__main__':
-
+    import numpy as np
     args = parse_args()
     nrns = []
 
-    for neuronFile in get_morph_files(args):
+    for neuronFile in get_morph_files(args.datapath):
 
         try:
+            soma = make_soma([np.array([11, 22, 33, 44, 1, 1, -1]), ])
 
-            nrn = load_neuron(args.datapath)
+            trees = load_trees(neuronFile)
+            cn = coreNeuron(soma, trees, name=neuronFile)
 
-        except SomaError:
-
-            nrn = FakeNeuron(load_trees(neuronFile), name=neuronFile)
-
-        except OSError:
-            print "path not existing: {0}".format(args.datapath)
-
-        nrns.append(nrn)
+            nrn = ezyNeuron(cn)
+            nrns.append(nrn)
+        except IDSequenceError:
+            pass
 
     fig = plot_feature_comparison(args.features, nrns, histogram, collapsible=args.collapsible)
 
     fig.savefig('output.eps')
-    pl.show()
