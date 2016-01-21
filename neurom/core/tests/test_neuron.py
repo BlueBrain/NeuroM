@@ -32,38 +32,44 @@ from neurom.core.tree import Tree, val_iter, ipreorder
 from neurom.exceptions import SomaError
 from itertools import izip
 import numpy as np
+import math
 
 SOMA_A_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
 SOMA_B_PTS = [
     [11, 22, 33, 44, 1, 1, -1],
     [11, 22, 33, 44, 2, 1, 1],
-    [11, 22, 33, 44, 3, 1, 2]
+    [11, 22, 33, 44, 3, 1, 2],
 ]
 
 SOMA_C_PTS_4 = [
-    [11, 22, 33, 44, 1, 1, -1],
-    [11, 22, 33, 44, 2, 1, 1],
-    [11, 22, 33, 44, 3, 1, 2],
-    [11, 22, 33, 44, 4, 1, 3]
+    [1, 0, 0, 44, 1, 1, -1],
+    [0, 1, 0, 44, 2, 1, 1],
+    [-1, 0, 0, 44, 3, 1, 2],
+    [0, -1, 0, 44, 4, 1, 3],
 ]
 
-SOMA_C_PTS_5 = [
-    [11, 22, 33, 44, 1, 1, -1],
-    [11, 22, 33, 44, 2, 1, 1],
-    [11, 22, 33, 44, 3, 1, 2],
-    [11, 22, 33, 44, 4, 1, 3],
-    [11, 22, 33, 44, 5, 1, 4]
-]
-
+sin_pi_by_4 = math.cos(math.pi/4.)
+cos_pi_by_4 = math.sin(math.pi/4.)
 
 SOMA_C_PTS_6 = [
-    [11, 22, 33, 44, 1, 1, -1],
-    [11, 22, 33, 44, 2, 1, 1],
-    [11, 22, 33, 44, 3, 1, 2],
-    [11, 22, 33, 44, 4, 1, 3],
-    [11, 22, 33, 44, 5, 1, 4],
-    [11, 22, 33, 44, 6, 1, 5]
+    [1, 0, 0, 44, 1, 1, -1],
+    [sin_pi_by_4, cos_pi_by_4, 0, 44, 1, 1, -1],
+    [0, 1, 0, 44, 2, 1, 1],
+    [-1, 0, 0, 44, 3, 1, 2],
+    [-sin_pi_by_4, -cos_pi_by_4, 0, 44, 1, 1, -1],
+    [0, -1, 0, 44, 4, 1, 3],
+]
+
+SOMA_C_PTS_8 = [
+    [1, 0, 0, 44, 1, 1, -1],
+    [sin_pi_by_4, cos_pi_by_4, 0, 44, 1, 1, -1],
+    [0, 1, 0, 44, 2, 1, 1],
+    [-sin_pi_by_4, cos_pi_by_4, 0, 44, 1, 1, -1],
+    [-1, 0, 0, 44, 3, 1, 2],
+    [-sin_pi_by_4, -cos_pi_by_4, 0, 44, 1, 1, -1],
+    [0, -1, 0, 44, 4, 1, 3],
+    [sin_pi_by_4, -cos_pi_by_4, 0, 44, 1, 1, -1],
 ]
 
 
@@ -99,21 +105,21 @@ def test_make_SomaB():
     nt.ok_('SomaB' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaB))
     nt.assert_items_equal(soma.center, (11, 22, 33))
-    nt.ok_(soma.radius == 0.0)
+    nt.eq_(soma.radius, 0.0)
 
 
 def check_SomaC(points):
     soma = neuron.make_soma(points)
     nt.ok_('SomaC' in str(soma))
     nt.ok_(isinstance(soma, neuron.SomaC))
-    nt.assert_items_equal(soma.center, (11, 22, 33))
-    nt.ok_(soma.radius == 0.0)
+    np.testing.assert_allclose(soma.center, (0., 0., 0.), atol=1e-16)
+    nt.eq_(soma.radius, 1.0)
 
 
 def test_make_SomaC():
     check_SomaC(SOMA_C_PTS_4)
-    check_SomaC(SOMA_C_PTS_5)
     check_SomaC(SOMA_C_PTS_6)
+    check_SomaC(SOMA_C_PTS_8)
 
 
 @nt.raises(SomaError)
@@ -173,7 +179,7 @@ def test_bounding_box():
 
 def test_copy():
 
-    soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])   
+    soma = neuron.make_soma([[0, 0, 0, 1, 1, 1, -1]])
     nrn1 = neuron.Neuron(soma, [TREE], name="Rabbit of Caerbannog")
     nrn2 = nrn1.copy()
 
@@ -181,7 +187,7 @@ def test_copy():
 
     # somata
     nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
-    nt.assert_true(nrn1.soma.radius == nrn2.soma.radius)
+    nt.eq_(nrn1.soma.radius, nrn2.soma.radius)
 
     for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
 
@@ -210,7 +216,7 @@ def test_copy():
 
     nrn2.soma.radius = 10.
 
-    nt.assert_false(nrn1.soma.radius == nrn2.soma.radius)
+    nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
     # neurites
     for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
 
@@ -218,6 +224,3 @@ def test_copy():
 
             v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
             nt.assert_false(any(v1 == v2))
-
-
-
