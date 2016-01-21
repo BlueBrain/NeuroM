@@ -51,7 +51,7 @@ def get_test(stest):
     sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon'}
 
     if stest in StatTests:
-        return sts[StatTests]
+        return sts[stest]
     else:
         raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon.')
 
