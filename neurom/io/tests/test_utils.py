@@ -28,12 +28,16 @@
 
 '''Test neurom.io.utils'''
 import os
+from itertools import izip
 import numpy as np
 from neurom import io
 from neurom.io import utils
+from neurom import points as pts
+from neurom import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
+from neurom.exceptions import (SomaError, IDSequenceError,
+                               MultipleTrees, MissingParentError)
 from nose import tools as nt
 
 
@@ -54,7 +58,9 @@ FILES = [os.path.join(SWC_PATH, f)
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
-DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
+DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
+
+MISSING_PARENTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
 NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
                                        'non_sequential_trunk_off_1_16pt.swc')
@@ -89,6 +95,11 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 RAW_DATA = [io.load_data(f) for f in FILES]
 NO_SOMA_RAW_DATA = io.load_data(NO_SOMA_FILE)
+
+
+class MockNeuron(object):
+    def __init__(self, trees):
+        self.neurites = trees
 
 
 def test_get_soma_ids():
@@ -170,6 +181,40 @@ def test_load_neuron_deep_neuron():
     utils.load_neuron(deep_neuron)
 
 
+def test_load_trees_good_neuron():
+    '''Check trees in good neuron are the same as trees from loaded neuron'''
+    filepath = os.path.join(SWC_PATH, 'Neuron.swc')
+    nrn = utils.load_neuron(filepath)
+    trees = utils.load_trees(filepath)
+    nt.eq_(len(nrn.neurites), 4)
+    nt.eq_(len(nrn.neurites), len(trees))
+
+    nrn2 = MockNeuron(trees)
+
+    @pts.point_function(as_tree=False)
+    def elem(point):
+        return point
+
+    # Check data are the same in tree collection and neuron's neurites
+    for a, b in izip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
+        nt.ok_(np.all(a == b))
+
+def test_load_neuron_disconnected_components():
+
+    filepath = DISCONNECTED_POINTS_FILE
+    trees = utils.load_trees(filepath)
+    nt.eq_(len(trees), 8)
+
+    # tree ID - number of points map
+    ref_ids_pts = {4: 1, 215: 1, 426: 1, 637: 1, 6: 209, 217: 209, 428: 209, 639: 209}
+
+    ids_pts =  {}
+    for t in trees:
+        ids_pts[t.value[COLS.ID]] = pts.count(t)
+
+    nt.eq_(ref_ids_pts, ids_pts)
+
+
 def test_get_morph_files():
     ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5',
                'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
@@ -180,9 +225,14 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
-@nt.raises(DisconnectedPointError)
+@nt.raises(MultipleTrees)
 def test_load_neuron_disconnected_points_raises():
     utils.load_neuron(DISCONNECTED_POINTS_FILE)
+
+
+@nt.raises(MissingParentError)
+def test_load_neuron_missing_parents_raises():
+    utils.load_neuron(MISSING_PARENTS_FILE)
 
 
 @nt.raises(SomaError)
@@ -193,6 +243,11 @@ def test_load_neuron_no_soma_raises_SomaError():
 @nt.raises(IDSequenceError)
 def test_load_neuron_invalid_id_sequence_raises():
     utils.load_neuron(INVALID_ID_SEQUENCE_FILE);
+
+
+@nt.raises(IDSequenceError)
+def test_load_trees_invalid_id_sequence_raises():
+    utils.load_trees(INVALID_ID_SEQUENCE_FILE);
 
 
 def test_load_neuron_no_consecutive_ids_loads():

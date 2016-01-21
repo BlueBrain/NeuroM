@@ -93,10 +93,10 @@ class SomaB(BaseSoma):
     '''
     Type B: 3point soma
     Represented by 3 points.
-    Reference: neuromorpho.org
-    The first point constitutes the center of the soma.
-    An equivalent radius (rs) is computed as the average distance
-    of the other two points.
+    Reference: http://neuromorpho.org/SomaFormat.html
+        'The first point constitutes the center of the soma.
+        An equivalent radius (rs) is computed as the average distance
+        of the other two points.'
     '''
     def __init__(self, points):
         super(SomaB, self).__init__(points)
@@ -111,16 +111,19 @@ class SomaC(BaseSoma):
     '''
     Type C: multiple points soma
     Represented by a contour.
-    Reference: neuromorpho.org
-    The first point constitutes the center of the soma,
-    with coordinates (xs, ys, zs) corresponding to the
-    average of all the points in the single contour.
-    An equivalent radius (rs) is computed as the average distance
-    of each point of the single contour from this center.
+
+    The equivalent radius as the average distance to the center.
     '''
     def __init__(self, points):
         super(SomaC, self).__init__(points)
-        self.radius = average_points_dist(points[0], points[1:])
+        points = np.array(self._points)
+        self.radius = average_points_dist(self.center, points[:, :COLS.R])
+
+    @property
+    def center(self):
+        '''Obtain the center from the average of all points'''
+        points = np.array(self._points)
+        return list(np.mean(points[:, :COLS.R], axis=0))
 
     def __str__(self):
         return 'SomaC(%s) <center: %s, radius: %s>' % \

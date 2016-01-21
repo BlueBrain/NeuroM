@@ -48,7 +48,8 @@ def iter_neurites(obj, mapfun=None, filt=None):
 
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, _Tree) else obj.neurites
+    neurites = ([obj] if isinstance(obj, _Tree)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
     iter_type = None if mapfun is None else mapfun.iter_type
 
     return _chain_neurites(neurites, iter_type, mapfun, filt)
