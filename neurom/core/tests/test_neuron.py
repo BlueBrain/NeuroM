@@ -34,15 +34,15 @@ from itertools import izip
 import numpy as np
 import math
 
-SOMA_A_PTS = [[11, 22, 33, 44, 1, 1, -1]]
+SOMA_SINGLE_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
-SOMA_B_PTS = [
+SOMA_THREEPOINTS_PTS = [
     [11, 22, 33, 44, 1, 1, -1],
     [11, 22, 33, 44, 2, 1, 1],
     [11, 22, 33, 44, 3, 1, 2],
 ]
 
-SOMA_C_PTS_4 = [
+SOMA_SIMPLECONTOUR_PTS_4 = [
     [1, 0, 0, 44, 1, 1, -1],
     [0, 1, 0, 44, 2, 1, 1],
     [-1, 0, 0, 44, 3, 1, 2],
@@ -52,7 +52,7 @@ SOMA_C_PTS_4 = [
 sin_pi_by_4 = math.cos(math.pi/4.)
 cos_pi_by_4 = math.sin(math.pi/4.)
 
-SOMA_C_PTS_6 = [
+SOMA_SIMPLECONTOUR_PTS_6 = [
     [1, 0, 0, 44, 1, 1, -1],
     [sin_pi_by_4, cos_pi_by_4, 0, 44, 1, 1, -1],
     [0, 1, 0, 44, 2, 1, 1],
@@ -61,7 +61,7 @@ SOMA_C_PTS_6 = [
     [0, -1, 0, 44, 4, 1, 3],
 ]
 
-SOMA_C_PTS_8 = [
+SOMA_SIMPLECONTOUR_PTS_8 = [
     [1, 0, 0, 44, 1, 1, -1],
     [sin_pi_by_4, cos_pi_by_4, 0, 44, 1, 1, -1],
     [0, 1, 0, 44, 2, 1, 1],
@@ -93,33 +93,33 @@ T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
 T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
 T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
 
-def test_make_SomaA():
-    soma = neuron.make_soma(SOMA_A_PTS)
-    nt.ok_('SomaA' in str(soma))
-    nt.ok_(isinstance(soma, neuron.SomaA))
+def test_make_Soma_SinglePoint():
+    soma = neuron.make_soma(SOMA_SINGLE_PTS)
+    nt.ok_('SomaSinglePoint' in str(soma))
+    nt.ok_(isinstance(soma, neuron.SomaSinglePoint))
     nt.assert_items_equal(soma.center, (11, 22, 33))
     nt.ok_(soma.radius == 44)
 
-def test_make_SomaB():
-    soma = neuron.make_soma(SOMA_B_PTS)
-    nt.ok_('SomaB' in str(soma))
-    nt.ok_(isinstance(soma, neuron.SomaB))
+def test_make_Soma_ThreePoint():
+    soma = neuron.make_soma(SOMA_THREEPOINTS_PTS)
+    nt.ok_('SomaThreePoint' in str(soma))
+    nt.ok_(isinstance(soma, neuron.SomaThreePoint))
     nt.assert_items_equal(soma.center, (11, 22, 33))
     nt.eq_(soma.radius, 0.0)
 
 
 def check_SomaC(points):
     soma = neuron.make_soma(points)
-    nt.ok_('SomaC' in str(soma))
-    nt.ok_(isinstance(soma, neuron.SomaC))
+    nt.ok_('SomaSimpleContour' in str(soma))
+    nt.ok_(isinstance(soma, neuron.SomaSimpleContour))
     np.testing.assert_allclose(soma.center, (0., 0., 0.), atol=1e-16)
     nt.eq_(soma.radius, 1.0)
 
 
 def test_make_SomaC():
-    check_SomaC(SOMA_C_PTS_4)
-    check_SomaC(SOMA_C_PTS_6)
-    check_SomaC(SOMA_C_PTS_8)
+    check_SomaC(SOMA_SIMPLECONTOUR_PTS_4)
+    check_SomaC(SOMA_SIMPLECONTOUR_PTS_6)
+    check_SomaC(SOMA_SIMPLECONTOUR_PTS_8)
 
 
 @nt.raises(SomaError)
@@ -133,7 +133,7 @@ def test_invalid_soma_points_2_raises_SomaError():
 
 
 def test_neuron():
-    soma = neuron.make_soma(SOMA_A_PTS)
+    soma = neuron.make_soma(SOMA_SINGLE_PTS)
     nrn = neuron.Neuron(soma, ['foo', 'bar'])
     nt.assert_items_equal(nrn.soma.center, (11, 22, 33))
     nt.assert_equal(nrn.neurites, ['foo', 'bar'])
@@ -143,7 +143,7 @@ def test_neuron():
 
 
 def test_i_neurites_chains():
-    soma = neuron.make_soma(SOMA_A_PTS)
+    soma = neuron.make_soma(SOMA_SINGLE_PTS)
     nrn = neuron.Neuron(soma, ['foo', 'bar', 'baz'])
     s = 'foobarbaz'
     for i, j in izip(s, nrn.i_neurites(iter)):
@@ -151,7 +151,7 @@ def test_i_neurites_chains():
 
 
 def test_i_neurites_filter():
-    soma = neuron.make_soma(SOMA_A_PTS)
+    soma = neuron.make_soma(SOMA_SINGLE_PTS)
     nrn = neuron.Neuron(soma, ['foo', 'bar', 'baz'])
     ref = 'barbaz'
     for i, j in izip(ref,
@@ -169,7 +169,7 @@ def test_bounding_box():
     for a, b in izip(nrn.bounding_box(), ref1):
         nt.assert_true(np.allclose(a, b))
 
-    soma = neuron.make_soma(SOMA_A_PTS)
+    soma = neuron.make_soma(SOMA_SINGLE_PTS)
     nrn = neuron.Neuron(soma, [TREE])
     ref2 = ((-33, -22, -11), (55, 66, 77))
 
