@@ -37,7 +37,7 @@ from neurom.io.readers import load_data
 from neurom.io.utils import make_tree
 from neurom.io.utils import make_neuron
 from neurom.io.utils import get_soma_ids
-from neurom.io.utils import get_initial_segment_ids
+from neurom.io.utils import get_initial_neurite_segment_ids
 from neurom.core import tree
 from neurom.core import neuron
 from neurom.core.dataformat import COLS
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     rd = load_data(filename)
 
-    init_seg_ids = get_initial_segment_ids(rd)
+    init_seg_ids = get_initial_neurite_segment_ids(rd)
 
     trees = [make_tree(rd, sg) for sg in init_seg_ids]
 

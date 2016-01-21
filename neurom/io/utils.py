@@ -143,8 +143,7 @@ def load_trees(filename, tree_action=None):
         raise IDSequenceError('Invald ID sequence found in raw data')
 
     _ids = get_initial_neurite_segment_ids(data)
-    _ids.extend(data.get_ids(lambda r: r[COLS.P] == -1
-                             and r[COLS.TYPE] != POINT_TYPE.SOMA))
+    _ids.extend(data.get_ids(lambda r: r[COLS.P] == -1 and r[COLS.TYPE] != POINT_TYPE.SOMA))
 
     return [make_tree(data, i, tree_action) for i in _ids]
 
