@@ -104,7 +104,7 @@ def plot_feature(feature, cell):
     '''Plot a feature
     '''
     fig = pl.figure()
-    ax = f.add_subplot(111)
+    ax = fig.add_subplot(111)
 
     if cell is not None:
         try:
@@ -138,5 +138,5 @@ if __name__ == '__main__':
 
             f = plot_feature(_feature, nrn)
             figname = "{0}_{1}_{2}.eps".format(i, j, _name)
-            f.savefig(figname)
+            f.savefig(os.path.join(args.odir, figname))
             pl.close(f)
