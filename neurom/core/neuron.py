@@ -39,21 +39,21 @@ import numpy as np
 class SOMA_TYPE(object):
     '''Enumeration holding soma types
 
-    * Type A: single point at centre
-    * Type B: Three points on circumference of sphere
-    * Type C: More than three points
+    * Type SinglePoint: single point at centre
+    * Type ThreePoint: Three points on circumference of sphere
+    * Type SimpleContour: More than three points
     * INVALID: Not satisfying any of the above
     '''
-    INVALID, A, B, C = xrange(4)
+    INVALID, SinglePoint, ThreePoint, SimpleContour = xrange(4)
 
     @staticmethod
     def get_type(points):
         '''get the type of the soma'''
         npoints = len(points)
         return {0: SOMA_TYPE.INVALID,
-                1: SOMA_TYPE.A,
-                3: SOMA_TYPE.B,
-                2: SOMA_TYPE.INVALID}.get(npoints, SOMA_TYPE.C)
+                1: SOMA_TYPE.SinglePoint,
+                3: SOMA_TYPE.ThreePoint,
+                2: SOMA_TYPE.INVALID}.get(npoints, SOMA_TYPE.SimpleContour)
 
 
 class BaseSoma(object):
@@ -75,21 +75,21 @@ class BaseSoma(object):
         return iter(self._points)
 
 
-class SomaA(BaseSoma):
+class SomaSinglePoint(BaseSoma):
     '''
     Type A: 1point soma
     Represented by a single point.
     '''
     def __init__(self, points):
-        super(SomaA, self).__init__(points)
+        super(SomaSinglePoint, self).__init__(points)
         self.radius = points[0][COLS.R]
 
     def __str__(self):
-        return 'SomaA(%s) <center: %s, radius: %s>' % \
+        return 'SomaSinglePoint(%s) <center: %s, radius: %s>' % \
             (repr(self._points), self.center, self.radius)
 
 
-class SomaB(BaseSoma):
+class SomaThreePoint(BaseSoma):
     '''
     Type B: 3point soma
     Represented by 3 points.
@@ -99,23 +99,26 @@ class SomaB(BaseSoma):
         of the other two points.'
     '''
     def __init__(self, points):
-        super(SomaB, self).__init__(points)
+        super(SomaThreePoint, self).__init__(points)
         self.radius = average_points_dist(points[0], (points[1], points[2]))
 
     def __str__(self):
-        return 'SomaB(%s) <center: %s, radius: %s>' % \
+        return 'SomaThreePoint(%s) <center: %s, radius: %s>' % \
             (repr(self._points), self.center, self.radius)
 
 
-class SomaC(BaseSoma):
+class SomaSimpleContour(BaseSoma):
     '''
     Type C: multiple points soma
     Represented by a contour.
 
     The equivalent radius as the average distance to the center.
+
+    Note: This doesn't currently check to see if the contour is in a plane. Also
+    the radii of the points are not taken into account.
     '''
     def __init__(self, points):
-        super(SomaC, self).__init__(points)
+        super(SomaSimpleContour, self).__init__(points)
         points = np.array(self._points)
         self.radius = average_points_dist(self.center, points[:, :COLS.R])
 
@@ -126,14 +129,14 @@ class SomaC(BaseSoma):
         return list(np.mean(points[:, :COLS.R], axis=0))
 
     def __str__(self):
-        return 'SomaC(%s) <center: %s, radius: %s>' % \
+        return 'SomaSimpleContour(%s) <center: %s, radius: %s>' % \
             (repr(self._points), self.center, self.radius)
 
 
 def make_soma(points):
     '''Make a soma object from a set of points
 
-    Infers the soma type (SomaA, SomaB or SomaC) from the points.
+    Infers the soma type (SomaSinglePoint, SomaThreePoint or SomaSimpleContour) from the points.
 
     Raises:
         SomaError if no soma points found or points incompatible with soma.
@@ -142,9 +145,9 @@ def make_soma(points):
     if stype == SOMA_TYPE.INVALID:
         raise SomaError('Invalid soma points')
 
-    return {SOMA_TYPE.A: SomaA,
-            SOMA_TYPE.B: SomaB,
-            SOMA_TYPE.C: SomaC}[stype](points)
+    return {SOMA_TYPE.SinglePoint: SomaSinglePoint,
+            SOMA_TYPE.ThreePoint: SomaThreePoint,
+            SOMA_TYPE.SimpleContour: SomaSimpleContour}[stype](points)
 
 
 class Neuron(object):
