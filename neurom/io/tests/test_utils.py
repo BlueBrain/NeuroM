@@ -36,7 +36,8 @@ from neurom import points as pts
 from neurom import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.core import tree
-from neurom.exceptions import SomaError, IDSequenceError, DisconnectedPointError
+from neurom.exceptions import (SomaError, IDSequenceError,
+                               MultipleTrees, MissingParentError)
 from nose import tools as nt
 
 
@@ -57,7 +58,9 @@ FILES = [os.path.join(SWC_PATH, f)
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
-DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
+DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
+
+MISSING_PARENTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
 NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
                                        'non_sequential_trunk_off_1_16pt.swc')
@@ -198,7 +201,7 @@ def test_load_trees_good_neuron():
 
 def test_load_neuron_disconnected_components():
 
-    filepath = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
+    filepath = DISCONNECTED_POINTS_FILE
     trees = utils.load_trees(filepath)
     nt.eq_(len(trees), 8)
 
@@ -222,9 +225,14 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
-@nt.raises(DisconnectedPointError)
+@nt.raises(MultipleTrees)
 def test_load_neuron_disconnected_points_raises():
     utils.load_neuron(DISCONNECTED_POINTS_FILE)
+
+
+@nt.raises(MissingParentError)
+def test_load_neuron_missing_parents_raises():
+    utils.load_neuron(MISSING_PARENTS_FILE)
 
 
 @nt.raises(SomaError)
