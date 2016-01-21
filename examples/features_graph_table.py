@@ -31,8 +31,20 @@
 '''
 import pylab as pl
 from itertools import product
-import sys
+from neurom.io.utils import get_morph_files
+from neurom.core.neuron import SomaError
+from neurom.ezy import load_neuron
+from neurom.io.utils import load_trees
 import argparse
+
+
+class FakeNeuron(object):
+    '''
+    Fake Neuron Class to bypass the no soma swc files
+    '''
+    def __init__(self, trees, name):
+        self.neurites = trees
+        self.name = name
 
 
 def parse_args():
@@ -136,17 +148,26 @@ def plot_feature_comparison(features, cells, function=histogram, collapsible=Fal
     return f
 
 if __name__ == '__main__':
-    from neurom.ezy import load_neurons
 
     args = parse_args()
+    nrns = []
 
-    try:
-        nrns = load_neurons(args.datapath)
-    except OSError:
-        print "path not existing: {0}".format(args.datapath)
-        sys.exit()
+    for neuronFile in get_morph_files(args):
+
+        try:
+
+            nrn = load_neuron(args.datapath)
+
+        except SomaError:
+
+            nrn = FakeNeuron(load_trees(neuronFile), name=neuronFile)
+
+        except OSError:
+            print "path not existing: {0}".format(args.datapath)
+
+        nrns.append(nrn)
 
     fig = plot_feature_comparison(args.features, nrns, histogram, collapsible=args.collapsible)
 
-    fig.savefig('output.png')
+    fig.savefig('output.eps')
     pl.show()
