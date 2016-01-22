@@ -87,7 +87,7 @@ def boxplots(collect_all, new_fig=True, subplot=False,
                              'Section area',
                              'Section path length',
                              'Segment lengths',
-                             'Segment meander angles')):
+                             'Segment meander angles'), **kwargs):
     '''Plots a list of boxplots for each feature in feature_list for object 1.
     Then presents the value of object 2 for each feature as an colored objected
     in the same boxplot.
@@ -118,6 +118,6 @@ def boxplots(collect_all, new_fig=True, subplot=False,
     ax.set_yticklabels(feature_titles)
 
     fig, ax = common.plot_style(fig, ax, xlabel='Normalized units (dimensionless)',
-                                title='Summarizing features')
+                                title='Summarizing features', tight=True, **kwargs)
 
     return fig, ax
