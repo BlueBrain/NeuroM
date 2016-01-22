@@ -176,3 +176,26 @@ def compare_two(data1, data2, test=StatTests.ks):
     Stats = namedtuple('Stats', ['dist', 'pvalue'])
 
     return Stats(*results)
+
+
+def total_score(paired_dats, p=2, test=StatTests.ks):
+    '''Calculates the p-norm of the distances that have been calculated from the statistical
+    test that has been applied on all the paired datasets.
+
+    Parameters:
+        paired_dats: a list of tuples or where each tuple
+                         contains the paired data lists from two datasets
+
+    Options:
+        p : integer that defines the order of p-norm
+        test: Stat_tests\
+            Defines the statistical test to be used, based\
+            on the scipy available modules.\
+            Accepted tests: ks_2samp, wilcoxon
+
+    Returns:
+        A float corresponding to the p-norm of the distances that have
+        been calculated. 0 corresponds to high similarity while 1 to low.
+    '''
+    scores = np.array([compare_two(fL1, fL2, test=test).dist for fL1, fL2 in paired_dats])
+    return np.linalg.norm(scores, p)

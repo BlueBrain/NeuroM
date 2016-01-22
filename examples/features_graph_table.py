@@ -30,21 +30,13 @@
 '''Example for comparison of the same feature of multiple cells
 '''
 import pylab as pl
-from itertools import product
 from neurom.io.utils import get_morph_files
-from neurom.core.neuron import SomaError
-from neurom.ezy import load_neuron
 from neurom.io.utils import load_trees
 import argparse
 
-
-class FakeNeuron(object):
-    '''
-    Fake Neuron Class to bypass the no soma swc files
-    '''
-    def __init__(self, trees, name):
-        self.neurites = trees
-        self.name = name
+from neurom.ezy import Neuron as ezyNeuron
+from neurom.core.neuron import Neuron as coreNeuron, make_soma
+from neurom.exceptions import IDSequenceError
 
 
 def parse_args():
@@ -73,18 +65,14 @@ def parse_args():
     return parser.parse_args()
 
 
-def _stylize(ax, cell, feature, row, col):
+def stylize(ax, name, feature):
     '''Stylization modifications to the plots
     '''
-    if col == 0:
-        ax.set_ylabel(feature)
-    else:
-        ax.set_yticks([])
-    if row == 0 and len(cell) == 1:
-        ax.set_title(cell[0].name)
+    ax.set_ylabel(feature)
+    ax.set_title(name, fontsize='small')
 
 
-def histogram(neurons, feature, ax, bins=25, normed=True, cumulative=False):
+def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
     '''
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -107,67 +95,48 @@ def histogram(neurons, feature, ax, bins=25, normed=True, cumulative=False):
     '''
 
     # concatenate the string 'get_' with a feature to generate the respective function's name
-    feature_values = [getattr(neuron, 'get_' + feature)() for neuron in neurons]
-    labels = [neuron.name for neuron in neurons]
+    feature_values = getattr(neuron, 'get_' + feature)()
     # generate histogram
-    ax.hist(feature_values, bins=bins, cumulative=cumulative,
-            normed=normed, label=labels)
+    ax.hist(feature_values, bins=bins, cumulative=cumulative, normed=normed)
 
 
-def plot_feature_comparison(features, cells, function=histogram, collapsible=False):
-    ''' Plots the comparison of the histograms of the features of choice for
-    the list of cells that is provided.
-
-    features: list of strings
-
-    cells : list of neuron objects
-
-    function: the function that is applied to display the morphometrics e.g. histogram
-
-    collapsible: if True instead of a  N x M view where N x M (features x cells), all the cells
-                 collapse on the same histogram and the appropriate legend is displayed
+def plot_feature(feature, cell):
+    '''Plot a feature
     '''
-    Nf = len(features)
-    Nc = len(cells) if not collapsible else 1
+    fig = pl.figure()
+    ax = fig.add_subplot(111)
 
-    f, axes = pl.subplots(nrows=Nf, ncols=Nc, squeeze=False)
+    if cell is not None:
+        try:
+            histogram(cell, feature, ax)
+        except ValueError:
+            pass
+        stylize(ax, cell.name, feature)
+    return fig
 
-    for i, j in product(range(Nf), range(Nc)):
-
-        ax = axes[i, j]
-        cell = [cells[j]] if not collapsible else cells
-        feature = features[i]
-
-        function(cell, feature, ax)
-
-        _stylize(ax, cell, feature, i, j)
-
-        if collapsible:
-            ax.legend(loc='best', fontsize='small')
-
-    return f
 
 if __name__ == '__main__':
+    import numpy as np
+    import os
 
     args = parse_args()
     nrns = []
 
-    for neuronFile in get_morph_files(args):
+    for j, neuronFile in enumerate(get_morph_files(args.datapath)):
+        _name = os.path.splitext(os.path.split(neuronFile)[-1])[0]
+        nrn = None
 
         try:
+            soma = make_soma([np.array([11, 22, 33, 44, 1, 1, -1]), ])
+            trees = load_trees(neuronFile)
+            cn = coreNeuron(soma, trees, name=_name)
+            nrn = ezyNeuron(cn)
+        except IDSequenceError:
+            pass
 
-            nrn = load_neuron(args.datapath)
+        for i, _feature in enumerate(args.features):
 
-        except SomaError:
-
-            nrn = FakeNeuron(load_trees(neuronFile), name=neuronFile)
-
-        except OSError:
-            print "path not existing: {0}".format(args.datapath)
-
-        nrns.append(nrn)
-
-    fig = plot_feature_comparison(args.features, nrns, histogram, collapsible=args.collapsible)
-
-    fig.savefig('output.eps')
-    pl.show()
+            f = plot_feature(_feature, nrn)
+            figname = "{0}_{1}_{2}.eps".format(i, j, _name)
+            f.savefig(os.path.join(args.odir, figname))
+            pl.close(f)
