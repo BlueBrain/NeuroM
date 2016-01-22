@@ -48,8 +48,8 @@ def get_mod_features(object1, object2, flist, collect_all, mod):
     return collect_all
 
 
-def get_features(object1, object2, tri_list=('meander_angle'),
-                 seg_list=('length'), bif_list=(), # TODO: 'remote_angle', 'local_angle'
+def get_features(object1, object2, tri_list=('meander_angle',),
+                 seg_list=('length',), bif_list=(), # TODO: 'remote_angle', 'local_angle'
                  sec_list=('end_point_path_length', 'area', 'length')):
     '''Plots a list of boxplots for each feature in feature_list for object 1.
     Then presents the value of object 2 for each feature as an colored objected
