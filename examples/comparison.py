@@ -117,7 +117,7 @@ def boxplots(collect_all, new_fig=True, subplot=False,
 
     ax.set_yticklabels(feature_titles)
 
-    fig, ax = common.plot_style(fig, ax, xlabel='Normalized units (dimensionless)',
+    fig, ax = common.plot_style(fig, ax, xlabel='Normalized units (dimensionless)', ylabel=''
                                 title='Summarizing features', tight=True, **kwargs)
 
     return fig, ax
