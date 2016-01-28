@@ -248,7 +248,7 @@ if __name__ == '__main__':
     L.info(SEPARATOR)
 
     with open(args.output_file, 'w') as json_output:
-        json.dump(summary, json_output)
+        json.dump(summary, json_output, indent=4)
 
     exit_status = 0 if res else 1
 
