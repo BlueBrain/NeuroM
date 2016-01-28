@@ -38,6 +38,8 @@ import logging
 import yaml
 import os
 import sys
+import json
+
 
 DESCRIPTION = '''
 NeuroM Morphology Checker
@@ -48,7 +50,7 @@ EPILOG = '''
 Description
 -----------
 
-Performs checks on reconstructed morphologies frim data contained in
+Performs checks on reconstructed morphologies from data contained in
 morphology files.
 
 Files are unloaded into neuron objects before testing. This means they must
@@ -117,10 +119,13 @@ def parse_args():
 
     parser.add_argument('-C', '--config', help='Configuration File')
 
+    parser.add_argument('-o', '--output', dest='output_file',
+                        default='summary.json', help='Summary output file name')
+
     return parser.parse_args()
 
 
-def log_msg(ok, msg, color=False):
+def log_msg(ok, msg, color=False, summary_dict=None):
     '''Helper to log message to the right level'''
     if color:
         CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
@@ -132,24 +137,29 @@ def log_msg(ok, msg, color=False):
     L.log(LOG_LEVELS[ok],
           '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
+    if summary_dict is not None:
+        summary_dict[msg] = 'PASS' if ok else 'FAIL'
+
 
 def test_file(f, config):
     '''Run tests on a morphology file'''
 
     L.info('Check file %s...', f)
 
+    summary_ = {}
+
     try:
         nrn = load_neuron(f)
-        log_msg(True, 'Has valid soma?')
-        log_msg(True, 'All points connected?')
+        log_msg(True, 'Has valid soma?', summary_dict=summary_)
+        log_msg(True, 'All points connected?', summary_dict=summary_)
     except SomaError:
-        log_msg(False, 'Has valid soma?')
+        log_msg(False, 'Has valid soma?', summary_dict=summary_)
         L.warning('Cannot continue without a soma... Aborting')
-        return False
+        return False, None
     except (MissingParentError, MultipleTrees) as e:
-        log_msg(False, 'All points connected')
+        log_msg(False, 'All points connected', summary_dict=summary_)
         L.warning(e.message)
-        return False
+        return False, None
 
     result = True
 
@@ -165,7 +175,7 @@ def test_file(f, config):
             out = getattr(morph_chk, check)(nrn)
 
         ok = chk_ok(out)
-        log_msg(ok, check.replace('_', ' ').capitalize() + '?')
+        log_msg(ok, check.replace('_', ' ').capitalize() + '?', summary_dict=summary_)
 
         try:
             if len(out) > 0:
@@ -175,7 +185,7 @@ def test_file(f, config):
 
         result &= ok
 
-    return result
+    return result, {f: summary_}
 
 
 if __name__ == '__main__':
@@ -185,6 +195,8 @@ if __name__ == '__main__':
     data_path = args.datapath
     yaml_path = args.config
     SEPARATOR = '=' * 40
+
+    summary = {}
 
     if yaml_path:
         try:
@@ -219,17 +231,24 @@ if __name__ == '__main__':
         L.error('Invalid data path %s', data_path)
         sys.exit(1)
 
+    res = True
+
     for _f in files:
         L.info(SEPARATOR)
         try:
-            res = test_file(_f, _config)
-            log_msg(res, 'Check result:')
+            status, summ = test_file(_f, _config)
+            log_msg(status, 'Check result:')
+            res &= status
+            summary.update(summ)
         except IDSequenceError as e:
             print 'ID ERROR in file %s: %s' % (_f, e.message)
         except StandardError as e:
             print 'ERROR: Could not read file %s: %s' % (_f, e.message)
 
     L.info(SEPARATOR)
+
+    with open(args.output_file, 'w') as json_output:
+        json.dump(summary, json_output, indent=4)
 
     exit_status = 0 if res else 1
 
