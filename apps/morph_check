@@ -33,6 +33,7 @@ from neurom.io.utils import load_neuron, get_morph_files
 from neurom.check import ok as chk_ok
 from neurom.check import morphology as morph_chk
 from neurom.exceptions import SomaError, IDSequenceError, MultipleTrees, MissingParentError
+from collections import OrderedDict
 import argparse
 import functools
 import logging
@@ -126,7 +127,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def log_msg(ok, msg, color=False, summary_dict=None):
+def log_msg(msg, ok, color=False):
     '''Helper to log message to the right level'''
     if color:
         CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
@@ -138,30 +139,27 @@ def log_msg(ok, msg, color=False, summary_dict=None):
     L.log(LOG_LEVELS[ok],
           '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
-    if summary_dict is not None:
-        summary_dict[msg] = 'PASS' if ok else 'FAIL'
-
 
 def check_file(f, config):
     '''Run tests on a morphology file'''
 
-    L.info('Check file %s...', f)
+    L.info('File: %s', f)
     if 'color' in config:
         _log_msg = functools.partial(log_msg, color=config['color'])
 
-    summary = {}
+    summary = OrderedDict()
 
     try:
         nrn = load_neuron(f)
-        _log_msg(True, 'Has valid soma?', summary_dict=summary)
-        _log_msg(True, 'All points connected?', summary_dict=summary)
+        summary['Has valid soma'] = True
+        summary['All points connected'] = True
     except SomaError:
-        _log_msg(False, 'Has valid soma?', summary_dict=summary)
-        L.warning('Cannot continue without a soma... Aborting')
+        summary['Has valid soma'] = False
+        L.error('No valid soma detected... Aborting')
         return False, None
     except (MissingParentError, MultipleTrees) as e:
-        _log_msg(False, 'All points connected', summary_dict=summary)
-        L.warning(e.message)
+        summary['All points connected'] = False
+        L.error(e.message)
         return False, None
 
     result = True
@@ -178,18 +176,21 @@ def check_file(f, config):
             out = getattr(morph_chk, check)(nrn)
 
         ok = chk_ok(out)
-        _log_msg(ok, check.replace('_', ' ').capitalize() + '?',
-                 summary_dict=summary)
+        msg = check.replace('_', ' ').capitalize()
+        summary[msg] = ok
 
         try:
             if len(out) > 0:
-                L.debug('%d failing sections detected: %s', len(out), out)
+                L.debug('%s: %d failing ids detected: %s', msg, len(out), out)
         except TypeError:
             pass
 
         result &= ok
 
-    _log_msg(result, 'STATUS', summary_dict=summary)
+    summary['ALL'] = result
+
+    for m, s in summary.iteritems():
+        _log_msg(m, s)
 
     return result, {f: summary}
 
@@ -208,9 +209,9 @@ def check_files(files, config):
             res &= status
             summary.update(summ)
         except IDSequenceError as e:
-            print 'ID ERROR in file %s: %s' % (_f, e.message)
+            L.error('ID ERROR in file %s: %s', _f, e.message)
         except StandardError as e:
-            print 'ERROR: Could not read file %s: %s' % (_f, e.message)
+            L.error('Could not read file %s: %s', _f, e.message)
 
     L.info(SEPARATOR)
 
@@ -240,7 +241,6 @@ def run_checks(args):
         try:
             with open(args.config, 'r') as stream:
                 _config = yaml.load(stream)
-
         except yaml.scanner.ScannerError as e:
             L.error('Invalid yaml file : \n %s', str(e))
             sys.exit(1)
@@ -251,7 +251,7 @@ def run_checks(args):
     if os.path.isfile(args.datapath):
         _files = [args.datapath]
     elif os.path.isdir(args.datapath):
-        print 'Checking files in directory', args.datapath
+        L.info('Checking files in directory %s', args.datapath)
         _files = get_morph_files(args.datapath)
     else:
         L.error('Invalid data path %s', args.datapath)
