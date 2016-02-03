@@ -39,6 +39,19 @@ import math
 from itertools import izip
 
 
+# Mock tree holding integers, not points
+MOCK_TREE = Tree(0)
+MOCK_TREE.add_child(Tree(11))
+MOCK_TREE.add_child(Tree(12))
+MOCK_TREE.children[0].add_child(Tree(111))
+MOCK_TREE.children[0].add_child(Tree(112))
+MOCK_TREE.children[1].add_child(Tree(121))
+MOCK_TREE.children[1].add_child(Tree(122))
+MOCK_TREE.children[1].children[0].add_child(Tree(1211))
+MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12111))
+MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12112))
+
+
 class MockNeuron(object):
     pass
 
@@ -177,22 +190,22 @@ def test_length():
     _check_length(NEURON_TREE)
 
 
-def test_segment_volume():
+def test_section_volume():
     _check_volume(NEURON)
     _check_volume(NEURON_TREE)
 
 
-def test_segment_area():
+def test_section_area():
     _check_area(NEURON)
     _check_area(NEURON_TREE)
 
 
-def test_segment_radial_dists_end_point():
+def test_section_radial_dists_end_point():
     _check_section_radial_dists_end_point(SIMPLE_NEURON)
     _check_section_radial_dists_end_point(SIMPLE_TREE)
 
 
-def test_segment_radial_dists_start_point():
+def test_section_radial_dists_start_point():
     _check_section_radial_dists_start_point(SIMPLE_NEURON)
     _check_section_radial_dists_start_point(SIMPLE_TREE)
 
@@ -216,3 +229,9 @@ def test_start_point_path_length():
     _check_path_length_start_point(NEURON, ref)
     _check_path_length_start_point(NEURON_TREE, ref)
 
+
+
+def test_section_branch_order():
+
+    sec_bo = [bo for bo in iter_neurites(MOCK_TREE, sec.branch_order)]
+    nt.eq_(sec_bo, [0, 1, 1, 0, 1, 2, 2, 1])

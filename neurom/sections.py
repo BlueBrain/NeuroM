@@ -112,6 +112,9 @@ def start_point_path_length(tree_section):
     return mt.path_length(tree_section[0])
 
 
+branch_order = section_function(as_tree=True)(mt.branch_order)
+
+
 def radial_dist(pos, use_start_point=False):
     '''Return a function that calculates radial distance for a section
 
