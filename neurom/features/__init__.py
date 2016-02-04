@@ -77,6 +77,11 @@ def _dispatch_feature(feature_enum):
 
 
 def feature_factory(feature_enum):
-    '''Feature Factory
+    '''Feature Factory. It takes a feature enumeration as input and Returns
+    the respective function to apply on loaded object.
+
+    Example:
+    >> func = feature_factoryr(NeuriteFeatures.segment_lengths)
+    >> result = func(neuron)
     '''
     return _pkg(_dispatch_feature(feature_enum))
