@@ -26,13 +26,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+''' Functionality for Feature Extraction'''
+
 from enum import Enum as _Enum
-from functools import wraps
 from decorator import decorator as _dec
-import numpy as np
+import numpy as _np
 
 
 class NeuriteFeatures(_Enum):
+    '''Neurite Features
+    '''
     segment_lengths = 1
     section_number = 2
     per_neurite_section_number = 3
@@ -45,12 +48,10 @@ class NeuriteFeatures(_Enum):
 
 
 class NeuronFeatures(_Enum):
+    '''Neuron Features
+    '''
     soma_radius = 10
     soma_surface_area = 11
-
-
-def listAll():
-    return [f for f in NeuriteFeatures] + [f for f in NeuronFeatures]
 
 
 @_dec
@@ -58,18 +59,24 @@ def _pkg(func, *args, **kwargs):
     '''Packaging decorator. The decorator from the decorator module
     preserves the function signature with exact arguments upon wrapping
     '''
-    return np.fromiter(func(*args, **kwargs), np.float)
+    return _np.fromiter(func(*args, **kwargs), _np.float)
 
 
-def ffunc(feature_enum):
-    import neurite_features
-    import neuron_features
-
+def _dispatch_feature(feature_enum):
+    '''
+    Returns the function that corresponds to the respective feature
+    '''
+    import neurom.features.neurite_features as _neuf
+    import neurom.features.neuron_features as _nrnf
     if isinstance(feature_enum, NeuriteFeatures):
-        return _pkg(getattr(neurite_features, feature_enum.name))
+        return getattr(_neuf, feature_enum.name)
     elif isinstance(feature_enum, NeuronFeatures):
-        return _pkg(getattr(neuron_features, feature_enum.name))
+        return getattr(_nrnf, feature_enum.name)
     else:
         raise TypeError("Uknown Enum type")
 
 
+def feature_factory(feature_enum):
+    '''Feature Factory
+    '''
+    return _pkg(_dispatch_feature(feature_enum))
