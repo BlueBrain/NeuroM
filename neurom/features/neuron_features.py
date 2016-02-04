@@ -34,7 +34,8 @@ from neurom.core.neuron import Neuron
 
 @_dec
 def _make_iterable(func, *args, **kwargs):
-    ''' Makes iterable
+    ''' Takes care of the neuron feature input. By using this decorator the neuron functions
+    can take as an input a single neuron, list of neurons or a population.
     '''
     obj = args[0]
     neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
