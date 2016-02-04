@@ -50,8 +50,8 @@ class NeuriteFeatures(_Enum):
 class NeuronFeatures(_Enum):
     '''Neuron Features
     '''
-    soma_radius = 10
-    soma_surface_area = 11
+    soma_radius = 1
+    soma_surface_area = 2
 
 
 @_dec
