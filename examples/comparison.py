@@ -31,13 +31,34 @@
 import numpy as np
 from neurom.core import iter_neurites
 
+from neurom import triplets as tri
+from neurom import segments as seg
+from neurom import bifurcations as bif
+from neurom import sections as sec
 
-def get_mod_features(object1, object2, flist, collect_all, mod):
+feature_map = {'Meander_angle': tri.meander_angle,
+               'Segment_length': seg.length,
+               'Bif_angles': bif.local_angle,
+               'Section_path_length': sec.end_point_path_length,
+               'Section_area': sec.area,
+               'Section_length': sec.length}
+
+features = ('Meander_angle',
+            'Segment_length',
+            'Bif_angles',
+            'Section_path_length',
+            'Section_area',
+            'Section_length',)
+
+
+def get_features(object1, object2, flist=features):
     '''Computes features from module mod'''
+    collect_all = []
+
     for feat in flist:
 
-        feature_pop = np.array([l for l in iter_neurites(object1, getattr(mod, feat))])
-        feature_neu = np.array([l for l in iter_neurites(object2, getattr(mod, feat))])
+        feature_pop = np.array([l for l in iter_neurites(object1, feature_map[feat])])
+        feature_neu = np.array([l for l in iter_neurites(object2, feature_map[feat])])
 
         # Standardization of data: (data - mean(data))/ std(data)
         m = np.mean(feature_pop)
@@ -48,52 +69,14 @@ def get_mod_features(object1, object2, flist, collect_all, mod):
     return collect_all
 
 
-def get_features(object1, object2, tri_list=('meander_angle',),
-                 seg_list=('length',), bif_list=(), # TODO: 'remote_angle', 'local_angle'
-                 sec_list=('end_point_path_length', 'area', 'length')):
+def boxplots(data_all, new_fig=True, subplot=False,
+             feature_titles=features, **kwargs):
     '''Plots a list of boxplots for each feature in feature_list for object 1.
     Then presents the value of object 2 for each feature as an colored objected
     in the same boxplot.
 
     Parameters:
-        object1: list\
-            List of neurons.
-        object2 : list\
-            List of neurons.
-        feature_list : list\
-            List of strings, representing the features of interest.
-
-    Returns:
-        collect_all:\
-            A list of pairs of flattened data for each feature.
-    '''
-    from neurom import triplets as tri
-    from neurom import segments as seg
-    from neurom import bifurcations as bif
-    from neurom import sections as sec
-
-    collect_all = []
-
-    collect_all = get_mod_features(object1, object2, tri_list, collect_all, tri)
-    collect_all = get_mod_features(object1, object2, seg_list, collect_all, seg)
-    collect_all = get_mod_features(object1, object2, bif_list, collect_all, bif)
-    collect_all = get_mod_features(object1, object2, sec_list, collect_all, sec)
-
-    return collect_all
-
-
-def boxplots(collect_all, new_fig=True, subplot=False,
-             feature_titles=('Section length',
-                             'Section area',
-                             'Section path length',
-                             'Segment lengths',
-                             'Segment meander angles'), **kwargs):
-    '''Plots a list of boxplots for each feature in feature_list for object 1.
-    Then presents the value of object 2 for each feature as an colored objected
-    in the same boxplot.
-
-    Parameters:
-        collect_all:\
+        data_all:\
             A list of pairs of flattened data for each feature.
         new_fig (Optional[bool]):\
             Default is False, which returns the default matplotlib axes 111\
@@ -110,10 +93,10 @@ def boxplots(collect_all, new_fig=True, subplot=False,
 
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-    ax.boxplot(list(np.transpose(np.array(collect_all))[0]), vert=False)
+    ax.boxplot(list(np.transpose(np.array(data_all))[0]), vert=False)
 
-    for idata, data in enumerate(collect_all):
-        ax.scatter(np.median(data[1]), len(collect_all) - idata, s=100, color='r', marker='s')
+    for idata, data in enumerate(data_all):
+        ax.scatter(np.median(data[1]), len(data_all) - idata, s=100, color='r', marker='s')
 
     ax.set_yticklabels(feature_titles)
 
