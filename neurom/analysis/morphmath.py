@@ -203,5 +203,11 @@ def pca(points):
     '''
     return np.linalg.eig(np.cov(points.transpose()))
 
+
+def sphere_area(r):
+    ''' Compute the area of a sphere with radius r
+    '''
+    return 4. * math.pi * r ** 2
+
 # Useful alias for path_distance
 section_length = path_distance

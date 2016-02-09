@@ -43,6 +43,7 @@ from neurom.analysis.morphmath import segment_radial_dist
 from neurom.analysis.morphmath import taper_rate
 from neurom.analysis.morphmath import segment_taper_rate
 from neurom.analysis.morphmath import pca
+from neurom.analysis.morphmath import sphere_area
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
@@ -294,3 +295,7 @@ def test_pca():
     nt.assert_true(np.allclose(eigv[:,0], RES_EIGV[:,0]) or np.allclose(eigv[:, 0], -1. * RES_EIGV[:, 0]))
     nt.assert_true(np.allclose(eigv[:,1], RES_EIGV[:,1]) or np.allclose(eigv[:, 1], -1. * RES_EIGV[:, 1]))
     nt.assert_true(np.allclose(eigv[:,2], RES_EIGV[:,2]) or np.allclose(eigv[:, 2], -1. * RES_EIGV[:, 2]))
+
+def test_sphere_area():
+    area = sphere_area(0.5)
+    nt.assert_almost_equal(area, pi)
