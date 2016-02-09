@@ -28,30 +28,11 @@
 
 ''' Functionality for Feature Extraction'''
 
-from enum import Enum as _Enum
+
 from decorator import decorator as _dec
 import numpy as _np
-
-
-class NeuriteFeatures(_Enum):
-    '''Neurite Features
-    '''
-    segment_lengths = 1
-    section_number = 2
-    per_neurite_section_number = 3
-    section_lengths = 4
-    section_path_distances = 5
-    section_radial_distances = 6
-    local_bifurcation_angles = 7
-    remote_bifurcation_angles = 8
-    neurite_number = 9
-
-
-class NeuronFeatures(_Enum):
-    '''Neuron Features
-    '''
-    soma_radius = 1
-    soma_surface_area = 2
+from neurom.features import neurite_features as _neuf
+from neurom.features import neuron_features as _nrnf
 
 
 @_dec
@@ -62,26 +43,12 @@ def _pkg(func, *args, **kwargs):
     return _np.fromiter(func(*args, **kwargs), _np.float)
 
 
-def _dispatch_feature(feature_enum):
-    '''
-    Returns the function that corresponds to the respective feature
-    '''
-    import neurom.features.neurite_features as _neuf
-    import neurom.features.neuron_features as _nrnf
-    if isinstance(feature_enum, NeuriteFeatures):
-        return getattr(_neuf, feature_enum.name)
-    elif isinstance(feature_enum, NeuronFeatures):
-        return getattr(_nrnf, feature_enum.name)
-    else:
-        raise TypeError("Uknown Enum type")
+NEURITEFEATURES = {'section_lengths': _pkg(_neuf.section_lengths),
+                   'section_number': _pkg(_neuf.section_number),
+                   'local_bifurcation_angles': _pkg(_neuf.local_bifurcation_angles),
+                   'remote_bifurcation_angles': _pkg(_neuf.remote_bifurcation_angles),
+                   'segment_lengths': _pkg(_neuf.segment_lengths)}
 
 
-def feature_factory(feature_enum):
-    '''Feature Factory. It takes a feature enumeration as input and Returns
-    the respective function to apply on loaded object.
-
-    Example:
-    >> func = feature_factoryr(NeuriteFeatures.segment_lengths)
-    >> result = func(neuron)
-    '''
-    return _pkg(_dispatch_feature(feature_enum))
+NEURONFEATURES = {'soma_radius': _pkg(_nrnf.soma_radius),
+                  'soma_surface_area': _pkg(_nrnf.soma_surface_area)}

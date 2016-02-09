@@ -157,18 +157,18 @@ def test_per_neurite_section_number():
 
 def test_per_neurite_section_number_axon():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.axon))
-    nt.assert_equal(len(nsecs), 1)
-    nt.assert_equal(nsecs, [21])
+    nt.assert_equal(len(nsecs), 4)
+    nt.assert_equal(nsecs, [21, 0, 0, 0])
 
 def test_n_sections_per_neurite_basal():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.basal_dendrite))
-    nt.assert_equal(len(nsecs), 2)
-    nt.assert_true(np.all(nsecs == [21, 21]))
+    nt.assert_equal(len(nsecs), 4)
+    nt.assert_true(np.all(nsecs == [0, 21, 21, 0]))
 
 def test_n_sections_per_neurite_apical():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.apical_dendrite))
-    nt.assert_equal(len(nsecs), 1)
-    nt.assert_true(np.all(nsecs == [21]))
+    nt.assert_equal(len(nsecs), 4)
+    nt.assert_true(np.all(nsecs == [0,0,0,21]))
 
 def test_neurite_number():
     nt.assert_equal(nf.neurite_number(NEURON).next(), 4)

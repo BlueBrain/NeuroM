@@ -34,23 +34,49 @@ from neurom import segments as _seg
 from neurom import sections as _sec
 from neurom import bifurcations as _bifs
 from neurom import iter_neurites
+from functools import wraps
 
 
-def section_lengths(neurites, neurite_type=TreeType.all):
-    '''Get an iterable containing the lengths of all sections of a given type'''
-    return iter_neurites(neurites, _sec.length, _ttc(neurite_type))
+def wrapper(mapfun):
+    ''' Wrapper around already existing feature functions
+    '''
+    def wrapped(neurites, neurite_type=TreeType.all):
+        '''Extracts feature from an object with neurites, i.e. either neurite, neuron, or population
+        '''
+        return iter_neurites(neurites, mapfun, _ttc(neurite_type))
+    return wrapped
 
 
-def section_number(neurites, neurite_type=TreeType.all):
-    '''Get the number of sections of a given type'''
-    yield _sec.count(neurites, _ttc(neurite_type))
+def number(f):
+    ''' Counts the output of the wrapper wrapper.
+    '''
+    @wraps(f)
+    def wrapped(neurites, neurite_type=TreeType.all):
+        ''' placeholderg'''
+        yield sum(1 for _ in f(neurites, neurite_type))
+    return wrapped
+
+
+section_lengths = wrapper(_sec.length)
+section_number = number(wrapper(_sec.identity))
+segment_lengths = wrapper(_seg.length)
+local_bifurcation_angles = wrapper(_bifs.local_angle)
+remote_bifurcation_angles = wrapper(_bifs.remote_angle)
+
+
+def neurite_number(obj, neurite_type=TreeType.all):
+    '''Get an iterable with the number of neurites for a given neurite type
+    '''
+    neurites = ([obj] if isinstance(obj, TreeType)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    yield sum(1 for n in neurites if _ttc(neurite_type)(n))
 
 
 def per_neurite_section_number(obj, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     neurites = ([obj] if isinstance(obj, TreeType)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
-    return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
+    return (section_number(n, neurite_type).next() for n in neurites)
 
 
 def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
@@ -71,40 +97,3 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
-
-
-def segment_lengths(neurites, neurite_type=TreeType.all):
-    '''Get an iterable containing the lengths of all segments of a given type'''
-    return iter_neurites(neurites, _seg.length, _ttc(neurite_type))
-
-
-def local_bifurcation_angles(neurites, neurite_type=TreeType.all):
-    '''Get local bifircation angles of all segments of a given type
-
-    The local bifurcation angle is defined as the angle between
-    the first segments of the bifurcation branches.
-
-    Returns:
-        Iterable containing bifurcation angles in radians
-    '''
-    return iter_neurites(neurites, _bifs.local_angle, _ttc(neurite_type))
-
-
-def remote_bifurcation_angles(neurites, neurite_type=TreeType.all):
-    '''Get remote bifircation angles of all segments of a given type
-
-    The remote bifurcation angle is defined as the angle between
-    the lines joining the bifurcation point to the last points
-    of the bifurcated sections.
-
-    Returns:
-        Iterable containing bifurcation angles in radians
-    '''
-    return iter_neurites(neurites, _bifs.remote_angle, _ttc(neurite_type))
-
-
-def neurite_number(obj, neurite_type=TreeType.all):
-    '''Get the number of neurites of a given type in a neuron'''
-    neurites = ([obj] if isinstance(obj, TreeType)
-                else (obj.neurites if hasattr(obj, 'neurites') else obj))
-    yield sum(1. for n in neurites if _ttc(neurite_type)(n))
