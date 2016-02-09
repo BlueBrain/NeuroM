@@ -181,7 +181,6 @@ def test_neurite_number():
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.undefined).next(), 0)
 
 def test_trunk_origin_radii():
-    print list(nf.trunk_origin_radii(NEURON))
     nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON)),
                           [0.85351288499400002,
                            0.18391483031299999,
