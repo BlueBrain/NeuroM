@@ -16,5 +16,5 @@ def test_soma_radius():
     nt.assert_almost_equal(nf.soma_radius(NEURON).next(), 0.170710678)
 
 def test_soma_surface_area():
-    area = 4. * math.pi * (nf.soma_radius(NEURON).next() ** 2)
+    area = 4. * math.pi * nf.soma_radius(NEURON).next() ** 2
     nt.assert_almost_equal(nf.soma_surface_area(NEURON).next(), area)
