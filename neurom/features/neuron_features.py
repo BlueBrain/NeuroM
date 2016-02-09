@@ -28,29 +28,32 @@
 
 ''' Neuron Related Features'''
 import math
-from decorator import decorator as _dec
 from neurom.core.neuron import Neuron
+from functools import wraps
 
 
-@_dec
-def _make_iterable(func, *args, **kwargs):
-    ''' Takes care of the neuron feature input. By using this decorator the neuron functions
-    can take as an input a single neuron, list of neurons or a population.
+def iter_neurons(func):
+    ''' If a single neuron is provided to the function it passes the argument as a list of a single
+    element. If a population is passed as an argument, it replaces it by its neurons.
     '''
-    obj = args[0]
-    neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
-                                                     else obj)
-    args = tuple([neurons] + [a for i, a in enumerate(args) if i > 0])
-    return func(*args, **kwargs)
+    @wraps(func)
+    def wrapped(obj, **kwargs):
+        ''' Takes care of the neuron feature input. By using this decorator the neuron functions
+        can take as an input a single neuron, list of neurons or a population.
+        '''
+        neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
+                                                         else obj)
+        return func(neurons, **kwargs)
+    return wrapped
 
 
-@_make_iterable
+@iter_neurons
 def soma_radius(neurons):
     '''Get the radius of the soma'''
     return (nrn.soma.radius for nrn in neurons)
 
 
-@_make_iterable
+@iter_neurons
 def soma_surface_area(neurons):
     '''Get the surface area of the soma.
 

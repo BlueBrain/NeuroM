@@ -37,7 +37,7 @@ from neurom import iter_neurites
 from functools import wraps
 
 
-def wrapper(mapfun):
+def feature_getter(mapfun):
     ''' Wrapper around already existing feature functions
     '''
     def wrapped(neurites, neurite_type=TreeType.all):
@@ -47,7 +47,7 @@ def wrapper(mapfun):
     return wrapped
 
 
-def number(f):
+def count(f):
     ''' Counts the output of the wrapper wrapper.
     '''
     @wraps(f)
@@ -57,11 +57,11 @@ def number(f):
     return wrapped
 
 
-section_lengths = wrapper(_sec.length)
-section_number = number(wrapper(_sec.identity))
-segment_lengths = wrapper(_seg.length)
-local_bifurcation_angles = wrapper(_bifs.local_angle)
-remote_bifurcation_angles = wrapper(_bifs.remote_angle)
+section_lengths = feature_getter(_sec.length)
+section_number = count(feature_getter(_sec.identity))
+segment_lengths = feature_getter(_seg.length)
+local_bifurcation_angles = feature_getter(_bifs.local_angle)
+remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
 
 
 def neurite_number(obj, neurite_type=TreeType.all):

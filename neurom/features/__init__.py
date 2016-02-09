@@ -29,26 +29,39 @@
 ''' Functionality for Feature Extraction'''
 
 
-from decorator import decorator as _dec
 import numpy as _np
+from functools import wraps
 from neurom.features import neurite_features as _neuf
 from neurom.features import neuron_features as _nrnf
 
 
-@_dec
-def _pkg(func, *args, **kwargs):
+def make_iterable(f, iterable_type=_np.ndarray):
     '''Packaging decorator. The decorator from the decorator module
     preserves the function signature with exact arguments upon wrapping
     '''
-    return _np.fromiter(func(*args, **kwargs), _np.float)
+    @wraps(f)
+    def wrapped(obj, **kwargs):
+        ''' Feature function
+        '''
+        result = f(obj, **kwargs)
+
+        if iterable_type is None:
+            return result
+        elif iterable_type is _np.ndarray:
+            return _np.fromiter(result, _np.float)
+        elif iterable_type is list or iterable_type is tuple:
+            return iterable_type(result)
+        else:
+            raise TypeError('Unknown iterable type')
+    return wrapped
 
 
-NEURITEFEATURES = {'section_lengths': _pkg(_neuf.section_lengths),
-                   'section_number': _pkg(_neuf.section_number),
-                   'local_bifurcation_angles': _pkg(_neuf.local_bifurcation_angles),
-                   'remote_bifurcation_angles': _pkg(_neuf.remote_bifurcation_angles),
-                   'segment_lengths': _pkg(_neuf.segment_lengths)}
+NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
+                   'section_number': make_iterable(_neuf.section_number),
+                   'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
+                   'remote_bifurcation_angles': make_iterable(_neuf.remote_bifurcation_angles),
+                   'segment_lengths': make_iterable(_neuf.segment_lengths)}
 
 
-NEURONFEATURES = {'soma_radius': _pkg(_nrnf.soma_radius),
-                  'soma_surface_area': _pkg(_nrnf.soma_surface_area)}
+NEURONFEATURES = {'soma_radius': make_iterable(_nrnf.soma_radius),
+                  'soma_surface_area': make_iterable(_nrnf.soma_surface_area)}
