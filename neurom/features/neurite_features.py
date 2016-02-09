@@ -76,6 +76,7 @@ def count(f):
 
 
 section_lengths = feature_getter(_sec.length)
+section_branch_orders = feature_getter(_sec.branch_order)
 section_number = count(feature_getter(_sec.identity))
 segment_lengths = feature_getter(_seg.length)
 local_bifurcation_angles = feature_getter(_bifs.local_angle)

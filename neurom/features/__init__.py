@@ -40,10 +40,10 @@ def make_iterable(f, iterable_type=_np.ndarray):
     preserves the function signature with exact arguments upon wrapping
     '''
     @wraps(f)
-    def wrapped(obj, **kwargs):
+    def wrapped(obj, *args, **kwargs):
         ''' Feature function
         '''
-        result = f(obj, **kwargs)
+        result = f(obj, *args, **kwargs)
 
         if iterable_type is None:
             return result
@@ -58,6 +58,7 @@ def make_iterable(f, iterable_type=_np.ndarray):
 
 NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
                    'section_number': make_iterable(_neuf.section_number),
+                   'section_branch_orders': make_iterable(_neuf.section_branch_orders),
                    'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
                    'remote_bifurcation_angles': make_iterable(_neuf.remote_bifurcation_angles),
                    'segment_lengths': make_iterable(_neuf.segment_lengths),
