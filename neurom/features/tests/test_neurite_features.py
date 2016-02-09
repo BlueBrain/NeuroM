@@ -2,6 +2,7 @@
 import os
 from nose import tools as nt
 import numpy as np
+from neurom.core.tree import Tree
 from neurom.core.types import TreeType
 from neurom.features import neurite_features as nf
 import neurom.sections as sec
@@ -204,3 +205,19 @@ def test_get_trunk_section_lengths():
     nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.basal_dendrite)),
                           [7.972322416776259, 8.2245287740603779])
     nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.axon)), [9.579117366740002])
+
+def test_principal_directions_extent():
+    points = np.array([[-10., 0., 0.],
+                    [-9., 0., 0.],
+                    [9., 0., 0.],
+                    [10., 0., 0.]])
+
+    tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
+    tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
+
+    neurites = [tree, tree, tree]
+    extents = list(nf.principal_directions_extent(neurites, direction='first'))
+
+    nt.assert_true(np.allclose(extents, [20., 20., 20.]))

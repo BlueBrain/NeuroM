@@ -35,6 +35,7 @@ from neurom import sections as _sec
 from neurom import bifurcations as _bifs
 from neurom import points as _pts
 from neurom.analysis.morphtree import trunk_section_length
+from neurom.analysis.morphtree import principal_direction_extent as _pdext
 from neurom import iter_neurites
 from functools import wraps
 
@@ -113,3 +114,22 @@ def trunk_origin_radii(obj, neurite_type=TreeType.all):
     neurites = ([obj] if isinstance(obj, TreeType)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
     return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))
+
+
+def principal_directions_extent(obj, neurite_type=TreeType.all, direction='first'):
+    ''' Get principal direction extent of either a neurite or the total neurites
+    from a neuron or a population.
+
+    Parameters:
+        direction: string \
+        it can be either 'first', 'second' or 'third' \
+        corresponding to the respective principal direction \
+        of the extent
+
+    Returns:
+        Iterator containing the extents of the input neurites
+    '''
+    n = 0 if direction == 'first' else (1 if direction == 'second' else 2)
+    neurites = ([obj] if isinstance(obj, TreeType)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    return (_pdext(t)[n] for t in neurites if _ttc(neurite_type)(t))
