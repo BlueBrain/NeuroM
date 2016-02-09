@@ -79,7 +79,7 @@ def per_neurite_section_number(obj, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     neurites = ([obj] if isinstance(obj, TreeType)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
-    return (section_number(n, neurite_type).next() for n in neurites)
+    return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
 
 
 def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
