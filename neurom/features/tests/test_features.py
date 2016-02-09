@@ -1,8 +1,13 @@
 import numpy as np
 from neurom.features import make_iterable
 from nose import tools as nt
+from types import GeneratorType
 
 def f(n): return (x for x in range(n))
+
+def test_make_iterable_none():
+	res = make_iterable(f, iterable_type=None)(5)
+	nt.assert_true(isinstance(res, GeneratorType))
 
 def test_make_iterable_numpy():
     
