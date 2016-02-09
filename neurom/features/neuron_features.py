@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ''' Neuron Related Features'''
-import math
 from neurom.core.neuron import Neuron
 from functools import wraps
 
@@ -60,4 +59,4 @@ def soma_surface_area(neurons):
     Note:
         The surface area is calculated by assuming the soma is spherical.
     '''
-    return (4. * math.pi * nrn.get_soma_radius() ** 2 for nrn in neurons)
+    return (nrn.get_soma_surface_area() for nrn in neurons)
