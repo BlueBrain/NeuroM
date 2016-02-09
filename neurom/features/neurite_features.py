@@ -33,6 +33,8 @@ from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
 from neurom import bifurcations as _bifs
+from neurom import points as _pts
+from neurom.analysis.morphtree import trunk_section_length
 from neurom import iter_neurites
 from functools import wraps
 
@@ -97,3 +99,17 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
+
+
+def trunk_section_lengths(obj, neurite_type=TreeType.all):
+    '''Get the trunk section lengths of a given type in a neuron'''
+    neurites = ([obj] if isinstance(obj, TreeType)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    return (trunk_section_length(t) for t in neurites if _ttc(neurite_type)(t))
+
+
+def trunk_origin_radii(obj, neurite_type=TreeType.all):
+    '''Get the trunk origin radii of a given type in a neuron'''
+    neurites = ([obj] if isinstance(obj, TreeType)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))

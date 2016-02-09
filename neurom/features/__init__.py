@@ -60,7 +60,9 @@ NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
                    'section_number': make_iterable(_neuf.section_number),
                    'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
                    'remote_bifurcation_angles': make_iterable(_neuf.remote_bifurcation_angles),
-                   'segment_lengths': make_iterable(_neuf.segment_lengths)}
+                   'segment_lengths': make_iterable(_neuf.segment_lengths),
+                   'trunk_origin_radii': make_iterable(_neuf.trunk_origin_radii),
+                   'trunk_section_lengths': make_iterable(_neuf.trunk_section_lengths)}
 
 
 NEURONFEATURES = {'soma_radius': make_iterable(_nrnf.soma_radius),

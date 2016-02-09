@@ -178,3 +178,29 @@ def test_neurite_number():
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.apical_dendrite).next(), 1)
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.soma).next(), 0)
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.undefined).next(), 0)
+
+def test_trunk_origin_radii():
+    print list(nf.trunk_origin_radii(NEURON))
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON)),
+                          [0.85351288499400002,
+                           0.18391483031299999,
+                           0.66943255462899998,
+                           0.14656092843999999])
+
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.apical_dendrite)),
+                          [0.14656092843999999])
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.basal_dendrite)),
+                          [0.18391483031299999,
+                           0.66943255462899998])
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.axon)),
+                          [0.85351288499400002])
+
+def test_get_trunk_section_lengths():
+    nt.assert_items_equal(nf.trunk_section_lengths(NEURON), [9.579117366740002,
+                                                                   7.972322416776259,
+                                                                   8.2245287740603779,
+                                                                   9.212707985134525])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.apical_dendrite)), [9.212707985134525])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.basal_dendrite)),
+                          [7.972322416776259, 8.2245287740603779])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.axon)), [9.579117366740002])
