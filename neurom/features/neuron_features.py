@@ -37,13 +37,13 @@ def iter_neurons(func):
     element. If a population is passed as an argument, it replaces it by its neurons.
     '''
     @wraps(func)
-    def wrapped(obj, **kwargs):
+    def wrapped(obj, *args, **kwargs):
         ''' Takes care of the neuron feature input. By using this decorator the neuron functions
         can take as an input a single neuron, list of neurons or a population.
         '''
         neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
                                                          else obj)
-        return func(neurons, **kwargs)
+        return func(neurons, *args, **kwargs)
     return wrapped
 
 
