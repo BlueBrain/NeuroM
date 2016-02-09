@@ -206,7 +206,7 @@ def test_get_trunk_section_lengths():
                           [7.972322416776259, 8.2245287740603779])
     nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.axon)), [9.579117366740002])
 
-def test_principal_directions_extent():
+def test_principal_directions_extents():
     points = np.array([[-10., 0., 0.],
                     [-9., 0., 0.],
                     [9., 0., 0.],
@@ -218,6 +218,9 @@ def test_principal_directions_extent():
     tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
 
     neurites = [tree, tree, tree]
-    extents = list(nf.principal_directions_extent(neurites, direction='first'))
-
-    nt.assert_true(np.allclose(extents, [20., 20., 20.]))
+    extents0 = list(nf.principal_directions_extents(neurites, direction='first'))
+    nt.assert_true(np.allclose(extents0, [20., 20., 20.]))
+    extents1 = list(nf.principal_directions_extents(neurites, direction='second'))
+    nt.assert_true(np.allclose(extents1, [0., 0., 0.]))
+    extents2 = list(nf.principal_directions_extents(neurites, direction='third'))
+    nt.assert_true(np.allclose(extents2, [0., 0., 0.]))

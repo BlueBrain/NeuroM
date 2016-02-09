@@ -116,7 +116,7 @@ def trunk_origin_radii(obj, neurite_type=TreeType.all):
     return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))
 
 
-def principal_directions_extent(obj, neurite_type=TreeType.all, direction='first'):
+def principal_directions_extents(obj, neurite_type=TreeType.all, direction='first'):
     ''' Get principal direction extent of either a neurite or the total neurites
     from a neuron or a population.
 
