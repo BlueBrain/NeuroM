@@ -28,8 +28,11 @@
 
 ''' Neuron Related Features'''
 from neurom.core.neuron import Neuron
+from neurom.core.types import tree_type_checker as _ttc
 from functools import wraps
+from neurom.core.types import TreeType
 from neurom.analysis.morphmath import sphere_area
+from neurom.analysis.morphtree import trunk_origin_elevation, trunk_origin_azimuth
 
 
 def as_neuron_list(func):
@@ -48,16 +51,37 @@ def as_neuron_list(func):
 
 
 @as_neuron_list
-def soma_radius(neurons):
+def soma_radii(neurons):
     '''Get the radius of the soma'''
     return (nrn.soma.radius for nrn in neurons)
 
 
 @as_neuron_list
-def soma_surface_area(neurons):
+def soma_surface_areas(neurons):
     '''Get the surface area of the soma.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
     '''
     return (sphere_area(nrn.soma.radius) for nrn in neurons)
+
+
+@as_neuron_list
+def trunk_origin_azimuths(neurons, neurite_type=TreeType.all):
+    '''Applies the trunk_origin_azimuth function on the soma and the neurites of each
+    neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_azimuth(neu, nrn.soma)
+
+
+@as_neuron_list
+def trunk_origin_elevations(neurons, neurite_type=TreeType.all):
+    '''Applies the trunk_origin_elevation function on the soma and the neurites of each neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_elevation(neu, nrn.soma)
