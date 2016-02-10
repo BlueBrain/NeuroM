@@ -222,8 +222,8 @@ def partition(tree):
     '''
     def partition_at_point(bif_point):
         '''Partition at each bif point.'''
-        n = n_sections(bif_point.children[0])
-        m = n_sections(bif_point.children[1])
+        n = float(n_sections(bif_point.children[0]))
+        m = float(n_sections(bif_point.children[1]))
         return max(n, m) / min(n, m)
 
     return [partition_at_point(i)
