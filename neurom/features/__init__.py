@@ -44,10 +44,7 @@ def make_iterable(f, iterable_type=_np.ndarray):
         ''' Feature function
         '''
         result = f(obj, *args, **kwargs)
-
-        if iterable_type is None:
-            return result
-        elif iterable_type is _np.ndarray:
+        if iterable_type is _np.ndarray:
             return _np.fromiter(result, _np.float)
         elif iterable_type is list or iterable_type is tuple:
             return iterable_type(result)
