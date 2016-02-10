@@ -54,6 +54,8 @@ def make_iterable(f, iterable_type=_np.ndarray):
 
 
 NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
+                   'section_areas': make_iterable(_neuf.section_areas),
+                   'section_volumes': make_iterable(_neuf.section_volumes),
                    'section_number': make_iterable(_neuf.section_number),
                    'section_branch_orders': make_iterable(_neuf.section_branch_orders),
                    'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
