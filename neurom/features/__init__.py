@@ -40,14 +40,11 @@ def make_iterable(f, iterable_type=_np.ndarray):
     preserves the function signature with exact arguments upon wrapping
     '''
     @wraps(f)
-    def wrapped(obj, **kwargs):
+    def wrapped(obj, *args, **kwargs):
         ''' Feature function
         '''
-        result = f(obj, **kwargs)
-
-        if iterable_type is None:
-            return result
-        elif iterable_type is _np.ndarray:
+        result = f(obj, *args, **kwargs)
+        if iterable_type is _np.ndarray:
             return _np.fromiter(result, _np.float)
         elif iterable_type is list or iterable_type is tuple:
             return iterable_type(result)
@@ -58,9 +55,14 @@ def make_iterable(f, iterable_type=_np.ndarray):
 
 NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
                    'section_number': make_iterable(_neuf.section_number),
+                   'section_branch_orders': make_iterable(_neuf.section_branch_orders),
                    'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
                    'remote_bifurcation_angles': make_iterable(_neuf.remote_bifurcation_angles),
-                   'segment_lengths': make_iterable(_neuf.segment_lengths)}
+                   'segment_lengths': make_iterable(_neuf.segment_lengths),
+                   'trunk_origin_radii': make_iterable(_neuf.trunk_origin_radii),
+                   'trunk_section_lengths': make_iterable(_neuf.trunk_section_lengths),
+                   'partition': make_iterable(_neuf.partition),
+                   'principal_direction_extents': make_iterable(_neuf.principal_directions_extents)}
 
 
 NEURONFEATURES = {'soma_radius': make_iterable(_nrnf.soma_radius),

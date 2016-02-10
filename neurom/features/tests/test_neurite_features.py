@@ -2,6 +2,7 @@
 import os
 from nose import tools as nt
 import numpy as np
+from neurom.core.tree import Tree
 from neurom.core.types import TreeType
 from neurom.features import neurite_features as nf
 import neurom.sections as sec
@@ -133,6 +134,35 @@ def test_remote_bifurcation_angles_invalid():
     s = list(nf.remote_bifurcation_angles(NEURON, neurite_type=TreeType.undefined))
     nt.assert_equal(len(s), 0)
 
+def test_section_radial_distances_endpoint():
+    ref_sec_rad_dist_start = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist_start.extend(
+            ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
+
+    ref_sec_rad_dist = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist.extend(ll for ll in iter_neurites(t, sec.radial_dist(t.value)))
+
+    rad_dists = list(nf.section_radial_distances(NEURON))
+    nt.assert_true(ref_sec_rad_dist != ref_sec_rad_dist_start)
+    nt.assert_equal(len(rad_dists), 84)
+    nt.assert_true(np.all(rad_dists == ref_sec_rad_dist))
+
+def test_section_radial_distances_start_point():
+    ref_sec_rad_dist_start = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist_start.extend(
+            ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
+
+    rad_dists = list(nf.section_radial_distances(NEURON, use_start_point=True))
+    nt.assert_equal(len(rad_dists), 84)
+    nt.assert_true(np.all(rad_dists == ref_sec_rad_dist_start))
+
+def test_section_radial_axon():
+    rad_dists = list(nf.section_radial_distances(NEURON, neurite_type=TreeType.axon))
+    nt.assert_equal(len(rad_dists), 21)
+
 def test_section_number_all():
     nt.assert_equal(nf.section_number(NEURON).next(), 84)
     nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.all).next(), 84)
@@ -157,18 +187,18 @@ def test_per_neurite_section_number():
 
 def test_per_neurite_section_number_axon():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.axon))
-    nt.assert_equal(len(nsecs), 4)
-    nt.assert_equal(nsecs, [21, 0, 0, 0])
+    nt.assert_equal(len(nsecs), 1)
+    nt.assert_equal(nsecs, [21])
 
 def test_n_sections_per_neurite_basal():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.basal_dendrite))
-    nt.assert_equal(len(nsecs), 4)
-    nt.assert_true(np.all(nsecs == [0, 21, 21, 0]))
+    nt.assert_equal(len(nsecs), 2)
+    nt.assert_true(np.all(nsecs == [21, 21]))
 
 def test_n_sections_per_neurite_apical():
     nsecs = list(nf.per_neurite_section_number(NEURON, neurite_type=TreeType.apical_dendrite))
-    nt.assert_equal(len(nsecs), 4)
-    nt.assert_true(np.all(nsecs == [0,0,0,21]))
+    nt.assert_equal(len(nsecs), 1)
+    nt.assert_true(np.all(nsecs == [21]))
 
 def test_neurite_number():
     nt.assert_equal(nf.neurite_number(NEURON).next(), 4)
@@ -178,3 +208,47 @@ def test_neurite_number():
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.apical_dendrite).next(), 1)
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.soma).next(), 0)
     nt.assert_equal(nf.neurite_number(NEURON, neurite_type=TreeType.undefined).next(), 0)
+
+def test_trunk_origin_radii():
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON)),
+                          [0.85351288499400002,
+                           0.18391483031299999,
+                           0.66943255462899998,
+                           0.14656092843999999])
+
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.apical_dendrite)),
+                          [0.14656092843999999])
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.basal_dendrite)),
+                          [0.18391483031299999,
+                           0.66943255462899998])
+    nt.assert_items_equal(list(nf.trunk_origin_radii(NEURON, TreeType.axon)),
+                          [0.85351288499400002])
+
+def test_get_trunk_section_lengths():
+    nt.assert_items_equal(nf.trunk_section_lengths(NEURON), [9.579117366740002,
+                                                                   7.972322416776259,
+                                                                   8.2245287740603779,
+                                                                   9.212707985134525])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.apical_dendrite)), [9.212707985134525])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.basal_dendrite)),
+                          [7.972322416776259, 8.2245287740603779])
+    nt.assert_items_equal(list(nf.trunk_section_lengths(NEURON, TreeType.axon)), [9.579117366740002])
+
+def test_principal_directions_extents():
+    points = np.array([[-10., 0., 0.],
+                    [-9., 0., 0.],
+                    [9., 0., 0.],
+                    [10., 0., 0.]])
+
+    tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
+    tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
+    tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
+
+    neurites = [tree, tree, tree]
+    extents0 = list(nf.principal_directions_extents(neurites, direction='first'))
+    nt.assert_true(np.allclose(extents0, [20., 20., 20.]))
+    extents1 = list(nf.principal_directions_extents(neurites, direction='second'))
+    nt.assert_true(np.allclose(extents1, [0., 0., 0.]))
+    extents2 = list(nf.principal_directions_extents(neurites, direction='third'))
+    nt.assert_true(np.allclose(extents2, [0., 0., 0.]))
