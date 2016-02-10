@@ -79,6 +79,15 @@ def remote_angle(bifurcation_point):
                             end_points[1].value)
 
 
+@bifurcation_point_function(as_tree=True)
+def partition(bifurcation_point):
+    '''Calculate the partition on each bif point
+    '''
+    n = float(mt.n_sections(bifurcation_point.children[0]))
+    m = float(mt.n_sections(bifurcation_point.children[1]))
+    return max(n, m) / min(n, m)
+
+
 def count(neuron):
     """
     Return number of bifurcation points in neuron or population

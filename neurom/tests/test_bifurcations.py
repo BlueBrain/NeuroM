@@ -113,6 +113,25 @@ BRANCHING_TREE = _make_branching_tree()
 BRANCHING_NEURON = MockNeuron()
 BRANCHING_NEURON.neurites = [BRANCHING_TREE]
 
+def _make_odd_tree():
+    ''' The infamous invisible tree. This should fail check
+    in case of integer division in partition
+    '''
+    p = [0.0, 0.0, 0.0, 0.0, 0, 0, 0]
+    T = Tree(p)
+    T.add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    return T
+
+ODD_TREE = _make_odd_tree()
+ODD_NEURON = MockNeuron()
+ODD_NEURON.neurites = [ODD_TREE]
 
 def _check_local_bifurcation_angles(obj):
 
@@ -127,6 +146,12 @@ def _check_remote_bifurcation_angles(obj):
 
     nt.eq_(angles,
            [0.9380474917927135, math.pi / 2, math.pi / 4])
+
+
+def _check_partition(obj):
+    p = [a for a in iter_neurites(ODD_NEURON, bif.partition)]
+
+    nt.eq_(p, [5./3., 1., 3., 1.])
 
 
 def _check_count(obj, n):
@@ -151,6 +176,11 @@ def test_local_bifurcation_angle():
 def test_remote_bifurcation_angle():
     _check_remote_bifurcation_angles(BRANCHING_NEURON)
     _check_remote_bifurcation_angles(BRANCHING_TREE)
+
+
+def test_partition():
+    _check_partition(ODD_TREE)
+    _check_partition(ODD_NEURON)
 
 
 def test_points():
