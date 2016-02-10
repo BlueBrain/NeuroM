@@ -134,6 +134,35 @@ def test_remote_bifurcation_angles_invalid():
     s = list(nf.remote_bifurcation_angles(NEURON, neurite_type=TreeType.undefined))
     nt.assert_equal(len(s), 0)
 
+def test_section_radial_distances_endpoint():
+    ref_sec_rad_dist_start = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist_start.extend(
+            ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
+
+    ref_sec_rad_dist = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist.extend(ll for ll in iter_neurites(t, sec.radial_dist(t.value)))
+
+    rad_dists = list(nf.section_radial_distances(NEURON))
+    nt.assert_true(ref_sec_rad_dist != ref_sec_rad_dist_start)
+    nt.assert_equal(len(rad_dists), 84)
+    nt.assert_true(np.all(rad_dists == ref_sec_rad_dist))
+
+def test_section_radial_distances_start_point():
+    ref_sec_rad_dist_start = []
+    for t in NEURON.neurites:
+        ref_sec_rad_dist_start.extend(
+            ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
+
+    rad_dists = list(nf.section_radial_distances(NEURON, use_start_point=True))
+    nt.assert_equal(len(rad_dists), 84)
+    nt.assert_true(np.all(rad_dists == ref_sec_rad_dist_start))
+
+def test_section_radial_axon():
+    rad_dists = list(nf.section_radial_distances(NEURON, neurite_type=TreeType.axon))
+    nt.assert_equal(len(rad_dists), 21)
+
 def test_section_number_all():
     nt.assert_equal(nf.section_number(NEURON).next(), 84)
     nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.all).next(), 84)

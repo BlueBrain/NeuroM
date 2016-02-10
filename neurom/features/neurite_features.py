@@ -29,6 +29,8 @@
 ''' Neurite Related Features'''
 
 from neurom.core.types import TreeType
+from functools import partial
+from neurom.analysis.morphtree import i_section_radial_dist as _irad_dist
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
@@ -114,6 +116,26 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
+
+
+@ensure_neurite_list
+def section_radial_distances(neurites, origin=None, use_start_point=False,
+                             neurite_type=TreeType.all):
+    '''Get an iterable containing section radial distances to origin of\
+       all neurites of a given type
+
+    Parameters:
+        origin: Point wrt which radial dirtance is calulated\
+                (default tree root)
+        use_start_point: if true, use the section's first point,\
+                         otherwise use the end-point (default False)
+        neurite_type: Type of neurites to be considered (default all)
+    '''
+    def f(n):
+        '''neurite identity function'''
+        return n
+    f.iter_type = partial(_irad_dist, pos=origin, use_start_point=use_start_point)
+    return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
 @ensure_neurite_list
