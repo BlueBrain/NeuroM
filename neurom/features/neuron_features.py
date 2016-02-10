@@ -32,7 +32,7 @@ from functools import wraps
 from neurom.analysis.morphmath import sphere_area
 
 
-def iter_neurons(func):
+def as_neuron_list(func):
     ''' If a single neuron is provided to the function it passes the argument as a list of a single
     element. If a population is passed as an argument, it replaces it by its neurons.
     '''
@@ -47,13 +47,13 @@ def iter_neurons(func):
     return wrapped
 
 
-@iter_neurons
+@as_neuron_list
 def soma_radius(neurons):
     '''Get the radius of the soma'''
     return (nrn.soma.radius for nrn in neurons)
 
 
-@iter_neurons
+@as_neuron_list
 def soma_surface_area(neurons):
     '''Get the surface area of the soma.
 

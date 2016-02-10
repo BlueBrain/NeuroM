@@ -42,7 +42,7 @@ from neurom import iter_neurites
 from functools import wraps
 
 
-def ensure_neurite_list(f):
+def as_neurite_list(f):
     ''' Ensures that a list of neurites will be provided to the function
     regardless of the nature of the argument, e.g. single neurite, neuron,
     or population.
@@ -85,14 +85,14 @@ local_bifurcation_angles = feature_getter(_bifs.local_angle)
 remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
 
 
-@ensure_neurite_list
+@as_neurite_list
 def neurite_number(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of neurites for a given neurite type
     '''
     yield sum(1 for n in neurites if _ttc(neurite_type)(n))
 
 
-@ensure_neurite_list
+@as_neurite_list
 def per_neurite_section_number(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
@@ -118,7 +118,7 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
 
 
-@ensure_neurite_list
+@as_neurite_list
 def section_radial_distances(neurites, origin=None, use_start_point=False,
                              neurite_type=TreeType.all):
     '''Get an iterable containing section radial distances to origin of\
@@ -138,19 +138,19 @@ def section_radial_distances(neurites, origin=None, use_start_point=False,
     return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
-@ensure_neurite_list
+@as_neurite_list
 def trunk_section_lengths(neurites, neurite_type=TreeType.all):
     '''Get the trunk section lengths of a given type in a neuron'''
     return (trunk_section_length(t) for t in neurites if _ttc(neurite_type)(t))
 
 
-@ensure_neurite_list
+@as_neurite_list
 def trunk_origin_radii(neurites, neurite_type=TreeType.all):
     '''Get the trunk origin radii of a given type in a neuron'''
     return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))
 
 
-@ensure_neurite_list
+@as_neurite_list
 def principal_directions_extents(neurites, neurite_type=TreeType.all, direction='first'):
     ''' Get principal direction extent of either a neurite or the total neurites
     from a neuron or a population.
