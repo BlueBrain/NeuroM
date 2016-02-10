@@ -83,6 +83,7 @@ section_number = count(feature_getter(_sec.identity))
 segment_lengths = feature_getter(_seg.length)
 local_bifurcation_angles = feature_getter(_bifs.local_angle)
 remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
+partition = feature_getter(_bifs.partition)
 
 
 @as_neurite_list
