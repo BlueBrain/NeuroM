@@ -45,6 +45,7 @@ def test_trunk_origin_elevations():
 
     pop = [n0, n1]
     nt.eq_(list(nf.trunk_origin_elevations(pop)), [0.0, np.pi/2., -np.pi/2.])
+    nt.eq_(list(nf.trunk_origin_elevations(pop, neurite_type=TreeType.axon)), [])
 
 def test_trunk_origin_azimuths():
     n0 = MockNeuron()
@@ -77,3 +78,4 @@ def test_trunk_origin_azimuths():
     pop[4].soma = s4
     pop[5].soma = s5
     nt.eq_(list(nf.trunk_origin_azimuths(pop)), [-np.pi/2., np.pi/2., 0.0, np.pi/4., 0.0, np.pi])
+    nt.eq_(list(nf.trunk_origin_azimuths(pop, neurite_type=TreeType.axon)), [])
