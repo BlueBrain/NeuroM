@@ -81,8 +81,10 @@ section_volumes = feature_getter(_sec.volume)
 section_branch_orders = feature_getter(_sec.branch_order)
 section_number = count(feature_getter(_sec.identity))
 segment_lengths = feature_getter(_seg.length)
+segment_number = count(feature_getter(_seg.identity))
 local_bifurcation_angles = feature_getter(_bifs.local_angle)
 remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
+bifurcation_number = count(feature_getter(_bifs.identity))
 partition = feature_getter(_bifs.partition)
 
 
