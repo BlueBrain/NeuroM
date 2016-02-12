@@ -59,7 +59,7 @@ Performs validation tests on reconstructed morphologies
 from data contained in morphology files, against a group
 of morphology files, that are defined as the target.
 
-Files are unloaded into neuron objects before testing. 
+Files are unloaded into neuron objects before testing.
 This means they must have a soma and no format errors.
 
 Default validation features
@@ -221,6 +221,7 @@ CONFIG = {'neuron_checks': ['section_number',
                       'section_lengths': 0.1,
                       'local_bifurcation_angles': 0.1},
           'color': True}
+
 
 def validate_morphs(files, target_files, config):
     '''Validate a bunch of files'''
