@@ -71,7 +71,7 @@ def _match_section(section, match):
     Returns:
         value associated with match[section_type], None if no match
     '''
-    #TODO: rewrite this so it is more clear, and handles sets & dictionaries for matching
+    # TODO: rewrite this so it is more clear, and handles sets & dictionaries for matching
     for i in range(5):
         if i >= len(section):
             return None
@@ -137,7 +137,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
         Generator of values corresponding to [X, Y, Z, R, TYPE, ID, PARENT_ID]
     '''
     for row in subsection:
-        #TODO: Figure out what these correspond to in neurolucida
+        # TODO: Figure out what these correspond to in neurolucida
         if row in ('Low', 'Generated', 'High', ):
             continue
         elif isinstance(row[0], (str, unicode)):
@@ -149,7 +149,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
         elif isinstance(row[0], list):
             split_parent = offset - 1
             try:
-                #TODO: do this more efficiently instead of a full list scan for '|'
+                # TODO: do this more efficiently instead of a full list scan for '|'
                 split_index = row.index('|')
                 slices = (slice(0, split_index), slice(split_index + 1, len(row)), )
             except ValueError:
@@ -169,7 +169,7 @@ def _extract_section(section):
 
     Note: PARENT_ID starts at 0
     '''
-    #try and detect type
+    # try and detect type
     _type = WANTED_SECTIONS.get(section[0][0], None)
 
     start = 1
@@ -213,7 +213,7 @@ def _sections_to_raw_data(sections):
         ret[pos:end, :] = neurite
         ret[pos:end, COLS.P] += pos
         ret[pos:end, COLS.ID] += pos
-        #TODO: attach the neurite at the closest point on the soma
+        # TODO: attach the neurite at the closest point on the soma
         ret[pos, COLS.P] = len(soma) - 1
         pos = end
 
