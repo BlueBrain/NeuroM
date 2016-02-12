@@ -29,7 +29,7 @@ def test__get_tokens():
 
 
 def test__parse_section():
-    with patch('neurom.io.nasc._match_section') as mock_match:
+    with patch('neurom.io.neurolucida._match_section') as mock_match:
         mock_match.return_value = False # want all sections
 
         token_iter = iter(['(', '(', '(', ')', ')', ')'])
