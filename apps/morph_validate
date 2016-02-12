@@ -186,7 +186,7 @@ def validate_morph(f, d, config):
     if os.path.isdir(d):
         pop = load_population(d)
     elif os.path.isfile(d):
-        L.info('Warning: You are testing against signle cell!')
+        L.info('Warning: You are testing against a single cell!')
         pop = load_neuron(d)
 
     for feature in config['neuron_checks']:
