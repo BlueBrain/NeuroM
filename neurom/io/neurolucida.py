@@ -173,7 +173,7 @@ def _extract_section(section):
     _type = WANTED_SECTIONS.get(section[0][0], None)
 
     start = 1
-    #CellBody often has [['"CellBody"'], ['CellBody'] as its first two elements
+    # CellBody often has [['"CellBody"'], ['CellBody'] as its first two elements
     if _type is None:
         _type = WANTED_SECTIONS.get(section[1][0], None)
         if _type is None:  # can't determine the type
