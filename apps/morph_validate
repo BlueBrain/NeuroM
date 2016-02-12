@@ -1,0 +1,292 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+'''Example of basic morphology validation'''
+from neurom.io.utils import load_neuron, get_morph_files
+from neurom.ezy import load_population
+from neurom.features import NEURITEFEATURES as nf
+from neurom import stats
+from neurom.exceptions import SomaError, IDSequenceError, MultipleTrees, MissingParentError
+from neurom.check import ok as chk_ok
+
+from collections import OrderedDict
+import argparse
+import functools
+import logging
+import yaml
+import os
+import sys
+import json
+
+
+DESCRIPTION = '''
+NeuroM Morphology Validation
+============================
+'''
+
+EPILOG = '''
+Description
+-----------
+
+Performs validation tests on reconstructed morphologies
+from data contained in morphology files, against a group
+of morphology files, that are defined as the target.
+
+Files are unloaded into neuron objects before testing. 
+This means they must have a soma and no format errors.
+
+Default validation features
+------------------
+* Section number
+* Section lengths
+* Bifurcation angles
+* Section path distances
+* Section radial distances
+
+Default values for statistical test threshold
+--------------
+* Section number: 0.1
+* Section lengths: 0.1
+* Bifurcation angles: 0.1
+* Section path distances: 0.1
+* Section radial distances: 0.1
+
+Examples
+--------
+morph_check --help               # print this help
+morph_check some/path/neuron.h5  # Process an HDF5 file
+morph_check some/path/neuron.swc # Process an SWC file
+morph_check some/path/           # Process all HDF5 and SWC files found in directory
+'''
+
+L = logging.getLogger(__name__)
+
+
+def check_feature(feature, neuron, pop, fargs):
+    '''Runs a statistical test for a
+       selected feature and returns
+       True or False according to the results.
+    '''
+    neuron_data = nf[feature](neuron)
+    pop_data = nf[feature](pop)
+
+    results = stats.compare_two(neuron_data, pop_data)
+
+    return bool(results.dist < fargs)
+
+
+def _setup_logging(debug, log_file):
+    """ Set up logger """
+
+    fmt = logging.Formatter('%(levelname)06s: %(message)s')
+
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(level=level)
+    log = logging.getLogger()
+    log.handlers[0].setFormatter(fmt)
+
+    if log_file:
+        handler = logging.FileHandler(log_file)
+        handler.setFormatter(fmt)
+        log = logging.getLogger()
+        log.addHandler(handler)
+        log.setLevel(logging.DEBUG)
+
+
+def parse_args():
+    '''Parse command line arguments'''
+    parser = argparse.ArgumentParser(description=DESCRIPTION,
+                                     formatter_class=argparse.RawTextHelpFormatter,
+                                     epilog=EPILOG)
+    parser.add_argument('datapath',
+                        help='Path to morphology data file or directory')
+
+    parser.add_argument('targetpath',
+                        help='Path to population morphology data file or directory')
+
+    parser.add_argument('-d', '--debug',
+                        action='store_true',
+                        help="Log DEBUG information")
+
+    parser.add_argument('-l', '--log', dest='log_file',
+                        default="", help="File to log to")
+
+    parser.add_argument('-C', '--config', help='Configuration File')
+
+    parser.add_argument('-o', '--output', dest='output_file',
+                        default='summary.json', help='Summary output file name')
+
+    return parser.parse_args()
+
+
+def log_msg(msg, ok, color=False):
+    '''Helper to log message to the right level'''
+    if color:
+        CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
+    else:
+        CGREEN = CRED = CEND = ''
+
+    LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
+
+    L.log(LOG_LEVELS[ok],
+          '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
+
+
+def validate_morph(f, d, config):
+    '''Run validation tests on a morphology file'''
+
+    L.info('File: %s', f)
+    if 'color' in config:
+        _log_msg = functools.partial(log_msg, color=config['color'])
+
+    summary = OrderedDict()
+
+    try:
+        nrn = load_neuron(f)
+        summary['Has valid soma'] = True
+        summary['All points connected'] = True
+    except SomaError:
+        summary['Has valid soma'] = False
+        L.error('No valid soma detected... Aborting')
+        return False, None
+    except (MissingParentError, MultipleTrees) as e:
+        summary['All points connected'] = False
+        L.error(e.message)
+        return False, None
+
+    result = True
+
+    if os.path.isdir(d):
+        pop = load_population(d)
+    elif os.path.isfile(d):
+        L.info('Warning: You are testing against signle cell!')
+        pop = load_neuron(d)
+
+    for feature in config['neuron_checks']:
+        fargs = config['options'][feature]
+        out = check_feature(feature, nrn, pop, fargs)
+
+        ok = chk_ok(out)
+        msg = feature.replace('_', ' ').capitalize()
+        summary[msg] = ok
+
+        try:
+            if len(out) > 0:
+                L.debug('%s: %d failing ids detected: %s', msg, len(out), out)
+        except TypeError:
+            pass
+
+        result &= ok
+
+    summary['ALL'] = result
+
+    for m, s in summary.iteritems():
+        _log_msg(m, s)
+
+    return result, {f: summary}
+
+
+# Default check configuration parameters
+CONFIG = {'neuron_checks': ['section_number',
+                            'section_lengths',
+                            'local_bifurcation_angles'],
+          'options': {'section_number': 0.1,
+                      'section_lengths': 0.1,
+                      'local_bifurcation_angles': 0.1},
+          'color': True}
+
+def validate_morphs(files, target_files, config):
+    '''Validate a bunch of files'''
+
+    SEPARATOR = '=' * 40
+    summary = {}
+    res = True
+
+    for _f in files:
+        L.info(SEPARATOR)
+        try:
+            status, summ = validate_morph(_f, target_files, config)
+            res &= status
+            summary.update(summ)
+        except IDSequenceError as e:
+            L.error('ID ERROR in file %s: %s', _f, e.message)
+        except StandardError as e:
+            L.error('Could not read file %s: %s', _f, e.message)
+
+    L.info(SEPARATOR)
+
+    status = 'PASS' if res else 'FAIL'
+
+    return {'files': summary, 'STATUS': status}
+
+
+def run_validation(args):
+    '''Run all the checks'''
+    _setup_logging(args.debug, args.log_file)
+
+    if args.config:
+        try:
+            with open(args.config, 'r') as stream:
+                _config = yaml.load(stream)
+        except yaml.scanner.ScannerError as e:
+            L.error('Invalid yaml file : \n %s', str(e))
+            sys.exit(1)
+    else:
+        # set default checks
+        _config = CONFIG
+
+    if os.path.isfile(args.datapath):
+        _files = [args.datapath]
+    elif os.path.isdir(args.datapath):
+        L.info('Checking files in directory %s', args.datapath)
+        _files = get_morph_files(args.datapath)
+    else:
+        L.error('Invalid data path %s', args.datapath)
+        sys.exit(1)
+
+    if os.path.isfile(args.targetpath) or os.path.isdir(args.targetpath):
+        _target_files = args.targetpath
+    else:
+        L.error('Invalid target path %s', args.targetpath)
+        sys.exit(1)
+
+    summary_ = validate_morphs(_files, _target_files, _config)
+
+    with open(args.output_file, 'w') as json_output:
+        json.dump(summary_, json_output, indent=4)
+
+    return 0 if summary_['STATUS'] == 'PASS' else 1
+
+
+if __name__ == '__main__':
+
+    _args = parse_args()
+    exit_status = run_validation(_args)
+    sys.exit(exit_status)
