@@ -192,10 +192,8 @@ def validate_morph(f, d, config):
     for feature in config['neuron_checks']:
         fargs = config['options'][feature]
         out = check_feature(feature, nrn, pop, fargs)
-
-        ok = chk_ok(out)
         msg = feature.replace('_', ' ').capitalize()
-        summary[msg] = ok
+        summary[msg] = chk_ok(out)
 
         try:
             if len(out) > 0:
@@ -203,7 +201,7 @@ def validate_morph(f, d, config):
         except TypeError:
             pass
 
-        result &= ok
+        result &= chk_ok(out)
 
     summary['ALL'] = result
 
