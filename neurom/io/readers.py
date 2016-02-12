@@ -58,10 +58,11 @@ def load_data(filename):
 
         * SWC (case-insensitive extension ".swc")
         * H5 v1 and v2 (case-insensitive extension ".h5"). Attempts to
-          determine the version from the contents of the file.
+          determine the version from the contents of the file
+        * Neurolucida ASCII (case-insensitive extension ".asc")
     '''
     def unpack_data():
-        '''Read an SWC file and return a tuple of data, offset, format.
+        '''Read an file and return a tuple of data, offset, format.
         Forwards filename to appropriate reader depending on extension'''
         @memoize
         def _h5_reader():
@@ -75,7 +76,16 @@ def load_data(filename):
             from .swc import SWC
             return SWC.read
 
-        _READERS = {'swc': _swc_reader, 'h5': _h5_reader}
+        @memoize
+        def _neurolucida_reader():
+            '''Lazy loading of Neurolucida ASCII reader'''
+            from .neurolucida import NeurolucidaASC
+            return NeurolucidaASC.read
+
+        _READERS = {'swc': _swc_reader,
+                    'h5': _h5_reader,
+                    'asc': _neurolucida_reader,
+                    }
         extension = os.path.splitext(filename)[1][1:]
         return _READERS[extension.lower()]()(filename)
 
