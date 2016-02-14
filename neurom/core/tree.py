@@ -28,6 +28,7 @@
 
 '''Generic tree class and iteration functions'''
 from itertools import chain, imap, ifilter, repeat
+from collections import deque
 from copy import copy
 
 
@@ -77,7 +78,7 @@ def is_root(tree):
 
 def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
-    children = [tree, ]
+    children = deque((tree, ))
     while children:
         cur_node = children.pop()
         children.extend(reversed(cur_node.children))
