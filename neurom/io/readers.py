@@ -82,10 +82,11 @@ def load_data(filename):
             from .neurolucida import NeurolucidaASC
             return NeurolucidaASC.read
 
-        _READERS = {'swc': _swc_reader,
-                    'h5': _h5_reader,
-                    'asc': _neurolucida_reader,
-                    }
+        _READERS = {
+            'swc': _swc_reader,
+            'h5': _h5_reader,
+            'asc': _neurolucida_reader,
+        }
         extension = os.path.splitext(filename)[1][1:]
         return _READERS[extension.lower()]()(filename)
 

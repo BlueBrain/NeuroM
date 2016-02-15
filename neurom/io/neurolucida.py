@@ -143,7 +143,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
         elif isinstance(row[0], (str, unicode)):
             if 4 == len(row):
                 yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]),
-                        _type, offset, parent)
+                       _type, offset, parent)
                 parent = offset
                 offset += 1
         elif isinstance(row[0], list):
@@ -227,7 +227,9 @@ class NeurolucidaASC(object):
         '''return a 'raw_data' np.array with the full neuron, and the format of the file
         suitable to be wrapped by RawDataWrapper
         '''
+        L.warning('This is an experimental reader. There are no guarantees regarding ability to '
+                  'parse Neurolucida .asc files or correctness of output.')
         with open(morph_file) as morph_fd:
             sections = _parse_sections(morph_fd)
         raw_data = _sections_to_raw_data(sections)
-        return raw_data, 'Neurolucida ASCII'
+        return raw_data, 'Beta Neurolucida ASCII'
