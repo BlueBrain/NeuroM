@@ -45,6 +45,8 @@ neuron_checks :
     - section_number
     - section_lengths
     - local_bifurcation_angles
+    - section_path_distances
+    - section_radial_distances
 
 ##############################################
 # OPTIONS
@@ -56,3 +58,5 @@ options :
     section_number   : 0.1
     section_lengths : 0.1
     local_bifurcation_angles : 0.1
+    section_path_distances   : 0.1
+    section_radial_distances   : 0.1
