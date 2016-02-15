@@ -214,7 +214,7 @@ def validate_morph(f, d, config):
 # Default check configuration parameters
 CONFIG = {'neuron_checks': ['section_number',
                             'section_lengths',
-                            'local_bifurcation_angles', 
+                            'local_bifurcation_angles',
                             'section_path_distances',
                             'section_radial_distances'],
           'options': {'section_number': 0.1,
