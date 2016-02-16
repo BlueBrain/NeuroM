@@ -28,5 +28,5 @@
 
 ''' IO operations module for NeuroM '''
 
-from .readers import load_data
+from .readers import load_data, unpack_raw_data
 from . import check
