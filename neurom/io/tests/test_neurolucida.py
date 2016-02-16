@@ -7,8 +7,14 @@ import numpy as np
 from nose.tools import ok_, eq_
 from mock import patch
 
+import neurom.io as io
+from neurom.io.readers import RawDataWrapper
 import neurom.io.neurolucida as nasc
 from neurom.core.dataformat import COLS, POINT_TYPE
+
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+NEUROLUCIDA_PATH = os.path.join(DATA_PATH, 'neurolucida')
 
 
 def test__match_section():
@@ -211,3 +217,9 @@ def test_read():
         ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
     finally:
         os.remove(temp_file)
+
+
+def test_load_neurolucida_ascii():
+    f = os.path.join(NEUROLUCIDA_PATH, 'sample.asc')
+    ascii = io.load_data(f)
+    ok_(isinstance(ascii, RawDataWrapper))
