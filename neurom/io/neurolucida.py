@@ -88,7 +88,19 @@ def _get_tokens(morph_fd):
     for line in morph_fd.readlines():
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
+        squash_token = []
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
+            if squash_token:
+                print squash_token
+                squash_token.append(token)
+                if token.endswith('"'):
+                    token = ' '.join(squash_token)
+                    squash_token = []
+                else:
+                    continue
+            elif token.startswith('"') and not token.endswith('"'):
+                squash_token.append(token)
+                continue
             yield token
 
 
