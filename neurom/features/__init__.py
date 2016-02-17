@@ -30,7 +30,7 @@
 
 
 import numpy as _np
-from functools import wraps
+from decorator import decorate as _decorate
 from neurom.features import neurite_features as _neuf
 from neurom.features import neuron_features as _nrnf
 
@@ -39,7 +39,6 @@ def make_iterable(f, iterable_type=_np.ndarray):
     '''Packaging decorator. The decorator from the decorator module
     preserves the function signature with exact arguments upon wrapping
     '''
-    @wraps(f)
     def wrapped(obj, *args, **kwargs):
         ''' Feature function
         '''
@@ -50,7 +49,7 @@ def make_iterable(f, iterable_type=_np.ndarray):
             return iterable_type(result)
         else:
             raise TypeError('Unknown iterable type')
-    return wrapped
+    return _decorate(f, wrapped)
 
 
 NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
