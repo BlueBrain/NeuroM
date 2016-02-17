@@ -51,7 +51,7 @@ from neurom.core.dataformat import ROOT_ID
 from neurom.utils import memoize
 
 
-def unpack_raw_data(filename):
+def _unpack_raw_data(filename):
     '''Parse a morphology file into internal representation data block
 
     Forwards filename to appropriate parser depending on extension.
@@ -101,7 +101,7 @@ def load_data(filename):
         * Neurolucida ASCII (case-insensitive extension ".asc")
     '''
 
-    return RawDataWrapper(unpack_raw_data(filename))
+    return RawDataWrapper(_unpack_raw_data(filename))
 
 
 class RawDataWrapper(object):
