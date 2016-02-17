@@ -33,9 +33,9 @@ def test__get_tokens():
     tokens = list(nasc._get_tokens(morph_fd))
     eq_(tokens, ['(', 'Baz', '(', '"Bar"', '(', '"Foo"', ')', ')', ')'])
 
-    morph_fd = StringIO('(Baz("Cell Body"("Foo")))')
+    morph_fd = StringIO('(Baz("Cell Bar Body"("Foo")))')
     tokens = list(nasc._get_tokens(morph_fd))
-    eq_(tokens, ['(', 'Baz', '(', '"Cell Body"', '(', '"Foo"', ')', ')', ')'])
+    eq_(tokens, ['(', 'Baz', '(', '"Cell Bar Body"', '(', '"Foo"', ')', ')', ')'])
 
 
 def test__parse_section():
