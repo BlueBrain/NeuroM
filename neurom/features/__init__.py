@@ -30,20 +30,21 @@
 
 
 import numpy as _np
-from functools import wraps
+from decorator import decorator as _decorator
 from neurom.features import neurite_features as _neuf
 from neurom.features import neuron_features as _nrnf
 
 
-def make_iterable(f, iterable_type=_np.ndarray):
-    '''Packaging decorator. The decorator from the decorator module
-    preserves the function signature with exact arguments upon wrapping
+def make_iterable(iterable_type=_np.ndarray):
+    '''Decorator factory. Dispatches the decorator that
+    corresponds to the type of iterable which is given as
+    an argument.
     '''
-    @wraps(f)
-    def wrapped(obj, *args, **kwargs):
+    @_decorator
+    def wrapped(f, *args, **kwargs):
         ''' Feature function
         '''
-        result = f(obj, *args, **kwargs)
+        result = f(*args, **kwargs)
         if iterable_type is _np.ndarray:
             return _np.fromiter(result, _np.float)
         elif iterable_type is list or iterable_type is tuple:
@@ -53,25 +54,27 @@ def make_iterable(f, iterable_type=_np.ndarray):
     return wrapped
 
 
-NEURITEFEATURES = {'section_lengths': make_iterable(_neuf.section_lengths),
-                   'section_areas': make_iterable(_neuf.section_areas),
-                   'section_volumes': make_iterable(_neuf.section_volumes),
-                   'section_path_distances': make_iterable(_neuf.section_path_distances),
-                   'section_number': make_iterable(_neuf.section_number),
-                   'section_branch_orders': make_iterable(_neuf.section_branch_orders),
-                   'section_radial_distances': make_iterable(_neuf.section_radial_distances),
-                   'local_bifurcation_angles': make_iterable(_neuf.local_bifurcation_angles),
-                   'remote_bifurcation_angles': make_iterable(_neuf.remote_bifurcation_angles),
-                   'bifurcation_number': make_iterable(_neuf.bifurcation_number),
-                   'segment_lengths': make_iterable(_neuf.segment_lengths),
-                   'segment_number': make_iterable(_neuf.segment_number),
-                   'trunk_origin_radii': make_iterable(_neuf.trunk_origin_radii),
-                   'trunk_section_lengths': make_iterable(_neuf.trunk_section_lengths),
-                   'partition': make_iterable(_neuf.partition),
-                   'principal_direction_extents': make_iterable(_neuf.principal_directions_extents)}
+NEURITEFEATURES = {
+    'section_lengths': make_iterable()(_neuf.section_lengths),
+    'section_areas': make_iterable()(_neuf.section_areas),
+    'section_volumes': make_iterable()(_neuf.section_volumes),
+    'section_path_distances': make_iterable()(_neuf.section_path_distances),
+    'section_number': make_iterable()(_neuf.section_number),
+    'section_branch_orders': make_iterable()(_neuf.section_branch_orders),
+    'section_radial_distances': make_iterable()(_neuf.section_radial_distances),
+    'local_bifurcation_angles': make_iterable()(_neuf.local_bifurcation_angles),
+    'remote_bifurcation_angles': make_iterable()(_neuf.remote_bifurcation_angles),
+    'bifurcation_number': make_iterable()(_neuf.bifurcation_number),
+    'segment_lengths': make_iterable()(_neuf.segment_lengths),
+    'segment_number': make_iterable()(_neuf.segment_number),
+    'trunk_origin_radii': make_iterable()(_neuf.trunk_origin_radii),
+    'trunk_section_lengths': make_iterable()(_neuf.trunk_section_lengths),
+    'partition': make_iterable()(_neuf.partition),
+    'principal_direction_extents': make_iterable()(_neuf.principal_directions_extents)
+}
 
 
-NEURONFEATURES = {'soma_radii': make_iterable(_nrnf.soma_radii),
-                  'soma_surface_areas': make_iterable(_nrnf.soma_surface_areas),
-                  'trunk_origin_elevations': make_iterable(_nrnf.trunk_origin_elevations),
-                  'trunk_origin_azimuths': make_iterable(_nrnf.trunk_origin_azimuths)}
+NEURONFEATURES = {'soma_radii': make_iterable()(_nrnf.soma_radii),
+                  'soma_surface_areas': make_iterable()(_nrnf.soma_surface_areas),
+                  'trunk_origin_elevations': make_iterable()(_nrnf.trunk_origin_elevations),
+                  'trunk_origin_azimuths': make_iterable()(_nrnf.trunk_origin_azimuths)}
