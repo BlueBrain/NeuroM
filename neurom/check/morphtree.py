@@ -129,7 +129,7 @@ def is_zigzagging(tree):
         return dist <= max_radius(seg) + max_radius(other)
 
     def is_seg_projection_within_other(seg, other):
-        '''projection lies within the length of the cylinder
+        '''Checks if a segment is in proximity of another one upstream
         '''
         s1 = coords(other[0])
         s2 = coords(other[1])

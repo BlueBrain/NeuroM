@@ -130,7 +130,10 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
 
 
 def get_zigzagging_neurites(neuron):
-    '''blah
+    '''Get neurites that have zigzags. A zigzag is the placement of
+    a point near a previous segment during the reconstruction, causing
+    a zigzag jump in the morphology which can cause issues with meshing
+    algorithms.
     '''
     return [n for n in neuron.neurites if is_zigzagging(n)]
 
