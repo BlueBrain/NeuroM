@@ -89,7 +89,7 @@ morph_check some/path/           # Process all HDF5 and SWC files found in direc
 L = logging.getLogger(__name__)
 
 
-def check_feature(feature, neuron, pop, fargs):
+def check_feature(feature, neuron, pop, fargs, test):
     '''Runs a statistical test for a
        selected feature and returns
        True or False according to the results.
@@ -97,7 +97,7 @@ def check_feature(feature, neuron, pop, fargs):
     neuron_data = nf[feature](neuron)
     pop_data = nf[feature](pop)
 
-    results = stats.compare_two(neuron_data, pop_data)
+    results = stats.compare_two(neuron_data, pop_data, getattr(stats.StatTests, test))
 
     return bool(results.dist < fargs)
 
@@ -162,6 +162,8 @@ def log_msg(msg, ok, color=False):
 def validate_morph(f, d, config):
     '''Run validation tests on a morphology file'''
 
+    test = config['stat_test']
+
     L.info('File: %s', f)
     if 'color' in config:
         _log_msg = functools.partial(log_msg, color=config['color'])
@@ -191,7 +193,7 @@ def validate_morph(f, d, config):
 
     for feature in config['neuron_checks']:
         fargs = config['options'][feature]
-        out = check_feature(feature, nrn, pop, fargs)
+        out = check_feature(feature, nrn, pop, fargs, test)
         msg = feature.replace('_', ' ').capitalize()
         summary[msg] = chk_ok(out)
 
@@ -222,7 +224,8 @@ CONFIG = {'neuron_checks': ['section_number',
                       'local_bifurcation_angles': 0.1,
                       'section_path_distances': 0.1,
                       'section_radial_distances': 0.1},
-          'color': True}
+          'color': True, 
+          'stat_test': 'ks'}
 
 
 def validate_morphs(files, target_files, config):
