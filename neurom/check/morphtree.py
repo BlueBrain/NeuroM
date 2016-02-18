@@ -113,7 +113,7 @@ def is_zigzagging(tree):
     def is_not_zero_seg(seg):
         ''' Returns True if segment has zero length
         '''
-        return not np.all(coords(seg[0]) == coords(seg[1]))
+        return not np.allclose(coords(seg[0]), coords(seg[1]))
 
     def is_in_the_same_verse(seg, other):
         ''' Checks if the vectors face the same direction. This
