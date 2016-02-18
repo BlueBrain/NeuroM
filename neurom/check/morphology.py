@@ -39,7 +39,7 @@ from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import find_tree_type
-from neurom.check.morphtree import is_flat, is_monotonic
+from neurom.check.morphtree import is_flat, is_monotonic, is_zigzagging
 from itertools import chain
 
 
@@ -127,6 +127,12 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
         tol : the tolerance for testing monotonicity
     '''
     return len(get_nonmonotonic_neurites(neuron, tol)) == 0
+
+
+def get_zigzagging_neurites(neuron):
+    '''blah
+    '''
+    return [n for n in neuron.neurites if is_zigzagging(n)]
 
 
 def nonzero_segment_lengths(neuron, threshold=0.0):
