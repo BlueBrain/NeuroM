@@ -47,21 +47,54 @@ def test_vector():
 
 
 def test_scalar_projection():
-
-    v1 = np.array([4., 1.])
-    v2 = np.array([2., 3.])
+    v1 = np.array([4., 1., 0.])
+    v2 = np.array([2., 3., 0.])
 
     res = mm.scalar_projection(v1, v2)
     nt.assert_true(np.isclose(res, 3.0508510792387602))
 
 
-def test_vector_projection():
+def test_scalar_projection_collinear():
+    v1 = np.array([1., 2., 0.])
+    v2 = np.array([4., 6., 0.])
 
-    v1 = np.array([4., 1.])
-    v2 = np.array([2., 3.])
+    res = mm.scalar_projection(v1, v2)
+
+    nt.assert_true(np.allclose(res, 16./np.linalg.norm(v2)))
+
+
+def test_scalar_projection_perpendicular():
+    v1 = np.array([3., 0., 0.])
+    v2 = np.array([0., 1.5, 0.])
+
+    res = mm.scalar_projection(v1, v2)
+    nt.assert_true(np.allclose(res, 0.))
+
+
+def test_vector_projection():
+    v1 = np.array([4., 1., 0.])
+    v2 = np.array([2., 3., 0.])
 
     res = mm.vector_projection(v1, v2)
-    nt.assert_true(np.allclose(res, np.array([1.6923076923076923, 2.5384615384615383])))
+    nt.assert_true(np.allclose(res, (1.6923076923076923, 2.5384615384615383, 0.)))
+
+
+def test_vector_projection_collinear():
+
+    v1 = np.array([1., 2., 3.])
+    v2 = np.array([4., 8., 6.])
+
+    res = mm.vector_projection(v1, v2)
+    nt.assert_true(np.allclose(res, (38./29., 76./29., 57./29.)))
+
+
+def test_vector_projection_perpendicular():
+
+    v1 = np.array([2., 0., 0.])
+    v2 = np.array([0., 3., 0.])
+
+    res = mm.vector_projection(v1, v2)
+    nt.assert_true(np.allclose(res, (0.,0.,0.)))
 
 
 def test_dist_point_line():
