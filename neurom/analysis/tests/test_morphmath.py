@@ -56,11 +56,11 @@ def test_scalar_projection():
 
 def test_scalar_projection_collinear():
     v1 = np.array([1., 2., 0.])
-    v2 = np.array([4., 6., 0.])
+    v2 = np.array([4., 8., 0.])
 
     res = mm.scalar_projection(v1, v2)
 
-    nt.assert_true(np.allclose(res, 16./np.linalg.norm(v2)))
+    nt.assert_true(np.allclose(res, 20./np.linalg.norm(v2)))
 
 
 def test_scalar_projection_perpendicular():
@@ -82,10 +82,10 @@ def test_vector_projection():
 def test_vector_projection_collinear():
 
     v1 = np.array([1., 2., 3.])
-    v2 = np.array([4., 8., 6.])
+    v2 = np.array([4., 8., 12.])
 
     res = mm.vector_projection(v1, v2)
-    nt.assert_true(np.allclose(res, (38./29., 76./29., 57./29.)))
+    nt.assert_true(np.allclose(res, v1))
 
 
 def test_vector_projection_perpendicular():
