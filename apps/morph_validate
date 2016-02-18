@@ -162,8 +162,6 @@ def log_msg(msg, ok, color=False):
 def validate_morph(f, d, config):
     '''Run validation tests on a morphology file'''
 
-    test = config['stat_test']
-
     L.info('File: %s', f)
     if 'color' in config:
         _log_msg = functools.partial(log_msg, color=config['color'])
@@ -193,7 +191,7 @@ def validate_morph(f, d, config):
 
     for feature in config['neuron_checks']:
         fargs = config['options'][feature]
-        out = check_feature(feature, nrn, pop, fargs, test)
+        out = check_feature(feature, nrn, pop, fargs, config['stat_test'])
         msg = feature.replace('_', ' ').capitalize()
         summary[msg] = chk_ok(out)
 
@@ -224,7 +222,7 @@ CONFIG = {'neuron_checks': ['section_number',
                       'local_bifurcation_angles': 0.1,
                       'section_path_distances': 0.1,
                       'section_radial_distances': 0.1},
-          'color': True, 
+          'color': True,
           'stat_test': 'ks'}
 
 
