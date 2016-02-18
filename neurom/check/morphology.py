@@ -39,7 +39,7 @@ from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import find_tree_type
-from neurom.check.morphtree import is_flat, is_monotonic, is_zigzagging
+from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
 from itertools import chain
 
 
@@ -129,13 +129,13 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
     return len(get_nonmonotonic_neurites(neuron, tol)) == 0
 
 
-def get_zigzagging_neurites(neuron):
-    '''Get neurites that have zigzags. A zigzag is the placement of
+def get_back_tracking_neurites(neuron):
+    '''Get neurites that have back-tracks. A back-track is the placement of
     a point near a previous segment during the reconstruction, causing
     a zigzag jump in the morphology which can cause issues with meshing
     algorithms.
     '''
-    return [n for n in neuron.neurites if is_zigzagging(n)]
+    return [n for n in neuron.neurites if is_back_tracking(n)]
 
 
 def nonzero_segment_lengths(neuron, threshold=0.0):

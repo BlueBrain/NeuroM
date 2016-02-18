@@ -62,7 +62,7 @@ def _generate_tree(mode):
 
 	return tree
 
-def _generate_zigzag_tree(n, dev):
+def _generate_back_track_tree(n, dev):
 	t = Tree(np.array([0., 0., 0., 0.2, 1., 0., 0.]))
 	t.add_child(Tree(np.array([0., 1., 0., 0.15, 1., 0., 0.])))
 	t.children[0].add_child(Tree(np.array([0., 2., 0., 0.14, 1., 0., 0.])))
@@ -98,26 +98,26 @@ def test_is_flat():
 	nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
 	nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
 
-def test_is_zigzagging():
+def test_is_back_tracking():
 
-	# case 1: a zigzag falls directly on a previous node
-	t = _generate_zigzag_tree(5, (0., 0., 0.))
-	nt.assert_true(mt.is_zigzagging(t))
+	# case 1: a back-track falls directly on a previous node
+	t = _generate_back_track_tree(5, (0., 0., 0.))
+	nt.assert_true(mt.is_back_tracking(t))
 
 	# case 2: a zigzag is close to another segment
-	t = _generate_zigzag_tree(5, (0.1, -0.1, 0.02))
-	nt.assert_true(mt.is_zigzagging(t))
+	t = _generate_back_track_tree(5, (0.1, -0.1, 0.02))
+	nt.assert_true(mt.is_back_tracking(t))
 
 	# case 3: a zigzag is close to another segment 2
-	t = _generate_zigzag_tree(5, (-0.2, 0.04, 0.144))
-	nt.assert_true(mt.is_zigzagging(t))
+	t = _generate_back_track_tree(5, (-0.2, 0.04, 0.144))
+	nt.assert_true(mt.is_back_tracking(t))
 
 	# case 4: a zigzag far from civilization
-	t = _generate_zigzag_tree(5, (10., -10., 10.))
-	nt.assert_false(mt.is_zigzagging(t))
+	t = _generate_back_track_tree(5, (10., -10., 10.))
+	nt.assert_false(mt.is_back_tracking(t))
 
 	# case 5: a zigzag on another section
 	# currently zigzag is defined on the same section
 	# thus this test should not be true
-	t = _generate_zigzag_tree(3, (-0.2, 0.04, 0.144))
-	nt.assert_false(mt.is_zigzagging(t))
+	t = _generate_back_track_tree(3, (-0.2, 0.04, 0.144))
+	nt.assert_false(mt.is_back_tracking(t))

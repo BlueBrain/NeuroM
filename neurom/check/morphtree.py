@@ -91,7 +91,7 @@ def is_flat(tree, tol, method='tolerance'):
         return any(ext < float(tol))
 
 
-def is_zigzagging(tree):
+def is_back_tracking(tree):
     ''' zigzag
     '''
     def paired(n):
