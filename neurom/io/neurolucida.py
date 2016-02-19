@@ -88,8 +88,18 @@ def _get_tokens(morph_fd):
     for line in morph_fd.readlines():
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
+        squash_token = []  # quoted strings get squashed into one token
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
-            yield token
+            if squash_token:
+                squash_token.append(token)
+                if token.endswith('"'):
+                    token = ' '.join(squash_token)
+                    squash_token = []
+                    yield token
+            elif token.startswith('"') and not token.endswith('"'):
+                squash_token.append(token)
+            else:
+                yield token
 
 
 def _parse_section(token_iter):
