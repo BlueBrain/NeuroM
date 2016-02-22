@@ -80,10 +80,15 @@ Default values for statistical test threshold
 
 Examples
 --------
-morph_check --help               # print this help
-morph_check some/path/neuron.h5  # Process an HDF5 file
-morph_check some/path/neuron.swc # Process an SWC file
-morph_check some/path/           # Process all HDF5 and SWC files found in directory
+# To print this help
+morph_validate --help
+# To compare neuron1 with neuron2:
+morph_validate some/path/neuron1.h5 some/other/path/neuron2.h5
+# To compare neuron1 with population2
+morph_validate some/path/neuron1.h5 some/other/path/population2/
+# To compare all neurons of population1 with population2
+morph_validate some/path/population1 some/other/path/population2/
+
 '''
 
 L = logging.getLogger(__name__)
