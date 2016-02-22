@@ -67,6 +67,7 @@ NEURITEFEATURES = {
     'bifurcation_number': make_iterable()(_neuf.bifurcation_number),
     'segment_lengths': make_iterable()(_neuf.segment_lengths),
     'segment_number': make_iterable()(_neuf.segment_number),
+    'segment_taper_rates': make_iterable()(_neuf.segment_taper_rates),
     'trunk_origin_radii': make_iterable()(_neuf.trunk_origin_radii),
     'trunk_section_lengths': make_iterable()(_neuf.trunk_section_lengths),
     'partition': make_iterable()(_neuf.partition),
