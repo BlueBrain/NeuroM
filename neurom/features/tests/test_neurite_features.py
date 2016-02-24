@@ -163,40 +163,40 @@ def test_section_radial_axon():
     rad_dists = list(nf.section_radial_distances(NEURON, neurite_type=TreeType.axon))
     nt.assert_equal(len(rad_dists), 21)
 
-def test_section_number_all():
-    nt.assert_equal(nf.section_number(NEURON).next(), 84)
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.all).next(), 84)
+def test_number_of_sections_all():
+    nt.assert_equal(nf.number_of_sections(NEURON).next(), 84)
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.all).next(), 84)
 
-def test_section_number_axon():
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.axon).next(), 21)
+def test_number_of_sections_axon():
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.axon).next(), 21)
 
-def test_section_number_basal():
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.basal_dendrite).next(), 42)
+def test_number_of_sections_basal():
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.basal_dendrite).next(), 42)
 
 def test_n_sections_apical():
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.apical_dendrite).next(), 21)
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.apical_dendrite).next(), 21)
 
 def test_seciton_number_invalid():
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.soma).next(), 0)
-    nt.assert_equal(nf.section_number(NEURON, neurite_type=TreeType.undefined).next(), 0)
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.soma).next(), 0)
+    nt.assert_equal(nf.number_of_sections(NEURON, neurite_type=TreeType.undefined).next(), 0)
 
-def test_per_neurite_section_number():
-    nsecs = list(nf.section_number_per_neurite(NEURON))
+def test_per_neurite_number_of_sections():
+    nsecs = list(nf.number_of_sections_per_neurite(NEURON))
     nt.assert_equal(len(nsecs), 4)
     nt.assert_true(np.all(nsecs == [21, 21, 21, 21]))
 
-def test_per_neurite_section_number_axon():
-    nsecs = list(nf.section_number_per_neurite(NEURON, neurite_type=TreeType.axon))
+def test_per_neurite_number_of_sections_axon():
+    nsecs = list(nf.number_of_sections_per_neurite(NEURON, neurite_type=TreeType.axon))
     nt.assert_equal(len(nsecs), 1)
     nt.assert_equal(nsecs, [21])
 
 def test_n_sections_per_neurite_basal():
-    nsecs = list(nf.section_number_per_neurite(NEURON, neurite_type=TreeType.basal_dendrite))
+    nsecs = list(nf.number_of_sections_per_neurite(NEURON, neurite_type=TreeType.basal_dendrite))
     nt.assert_equal(len(nsecs), 2)
     nt.assert_true(np.all(nsecs == [21, 21]))
 
 def test_n_sections_per_neurite_apical():
-    nsecs = list(nf.section_number_per_neurite(NEURON, neurite_type=TreeType.apical_dendrite))
+    nsecs = list(nf.number_of_sections_per_neurite(NEURON, neurite_type=TreeType.apical_dendrite))
     nt.assert_equal(len(nsecs), 1)
     nt.assert_true(np.all(nsecs == [21]))
 
