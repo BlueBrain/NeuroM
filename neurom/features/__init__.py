@@ -60,6 +60,7 @@ NEURITEFEATURES = {
     'section_volumes': make_iterable()(_neuf.section_volumes),
     'section_path_distances': make_iterable()(_neuf.section_path_distances),
     'section_number': make_iterable()(_neuf.section_number),
+    'section_number_per_neurite': make_iterable()(_neuf.section_number_per_neurite),
     'section_branch_orders': make_iterable()(_neuf.section_branch_orders),
     'section_radial_distances': make_iterable()(_neuf.section_radial_distances),
     'local_bifurcation_angles': make_iterable()(_neuf.local_bifurcation_angles),

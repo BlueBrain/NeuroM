@@ -96,7 +96,7 @@ def neurite_number(neurites, neurite_type=TreeType.all):
 
 
 @as_neurite_list
-def per_neurite_section_number(neurites, neurite_type=TreeType.all):
+def section_number_per_neurite(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
 
