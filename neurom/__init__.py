@@ -28,4 +28,5 @@
 
 ''' NeuroM '''
 
+from .version import VERSION as __version__
 from .core import iter_neurites
