@@ -46,19 +46,19 @@ def test_vector():
     nt.ok_(np.all(vec ==(-2.0, 2.0, 0.0)))
 
 
-def test_two_points_fraction():
+def test_linear_interpolate():
     p0 = np.array([-1.,-1.,-1.])
     p1 = np.array([1.,1.,1.])
 
-    res = mm.two_points_fraction(p0, p1, 0.0)
+    res = mm.linear_interpolate(p0, p1, 0.0)
     nt.assert_true(np.allclose(res, (-1., -1., -1.)))
-    res = mm.two_points_fraction(p0, p1, 0.25)
+    res = mm.linear_interpolate(p0, p1, 0.25)
     nt.assert_true(np.allclose(res, (-0.5, -0.5, -0.5)))
-    res = mm.two_points_fraction(p0, p1, 0.5)
+    res = mm.linear_interpolate(p0, p1, 0.5)
     nt.assert_true(np.allclose(res, (0., 0., 0.)))
-    res = mm.two_points_fraction(p0, p1, 0.75)
+    res = mm.linear_interpolate(p0, p1, 0.75)
     nt.assert_true(np.allclose(res, (0.5, 0.5, 0.5)))
-    res = mm.two_points_fraction(p0, p1, 1.0)
+    res = mm.linear_interpolate(p0, p1, 1.0)
     nt.assert_true(np.allclose(res, (1., 1., 1.)))
 
 

@@ -83,9 +83,9 @@ def point_at_path_fraction(segment, fraction):
     Returns:
         The 3D coordinates of the aforementioned point
     '''
-    return mm.two_points_fraction(segment[0].value,
-                                  segment[1].value,
-                                  fraction)
+    return mm.linear_interpolate(segment[0].value,
+                                 segment[1].value,
+                                 fraction)
 
 
 def radial_dist(pos):

@@ -47,7 +47,7 @@ def vector(p1, p2):
     return np.subtract(p1[0:3], p2[0:3])
 
 
-def two_points_fraction(p1, p2, fraction):
+def linear_interpolate(p1, p2, fraction):
     '''Returns the point p where:
         |p1p| = fraction * |p1p2|
     '''
@@ -87,7 +87,7 @@ def path_fraction_point(points, fraction):
     frac_length = fraction * path_distance(points)
     p0, p1, cumm_length = path_until_threshold(points, frac_length)
     fraction = 1. - (cumm_length - frac_length) / point_dist(p0, p1)
-    return two_points_fraction(p0, p1, fraction)
+    return linear_interpolate(p0, p1, fraction)
 
 
 def scalar_projection(v1, v2):
