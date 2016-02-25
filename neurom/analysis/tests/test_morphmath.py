@@ -46,6 +46,74 @@ def test_vector():
     nt.ok_(np.all(vec ==(-2.0, 2.0, 0.0)))
 
 
+def test_two_points_fraction():
+    p0 = np.array([-1.,-1.,-1.])
+    p1 = np.array([1.,1.,1.])
+
+    res = mm.two_points_fraction(p0, p1, 0.0)
+    nt.assert_true(np.allclose(res, (-1., -1., -1.)))
+    res = mm.two_points_fraction(p0, p1, 0.25)
+    nt.assert_true(np.allclose(res, (-0.5, -0.5, -0.5)))
+    res = mm.two_points_fraction(p0, p1, 0.5)
+    nt.assert_true(np.allclose(res, (0., 0., 0.)))
+    res = mm.two_points_fraction(p0, p1, 0.75)
+    nt.assert_true(np.allclose(res, (0.5, 0.5, 0.5)))
+    res = mm.two_points_fraction(p0, p1, 1.0)
+    nt.assert_true(np.allclose(res, (1., 1., 1.)))
+
+
+def test_path_fraction_point_two_points():
+
+    points = [np.array([-1.,-1.,-1.]), np.array([1.,1.,1.])]
+
+    res = mm.path_fraction_point(points, 0.0)
+    nt.assert_true(np.allclose(res, (-1.,-1.,-1.)))
+    res = mm.path_fraction_point(points, 0.25)
+    nt.assert_true(np.allclose(res, (-0.5,-0.5,-0.5)))
+    res = mm.path_fraction_point(points, 1.0)
+    nt.assert_true(np.allclose(res, (1.,1.,1.)))
+
+def test_path_fraction_three_symmetric_points():
+
+    points = [np.array((1., 0., 0.)),
+              np.array((0., 0., 0.)),
+              np.array((0., 0., 1.))]
+
+    res = mm.path_fraction_point(points, 0.0)
+    nt.assert_true(np.allclose(res, (1., 0., 0.)))          
+
+    res = mm.path_fraction_point(points, 0.25)
+    nt.assert_true(np.allclose(res, (0.5, 0., 0.)))
+
+    res = mm.path_fraction_point(points, 0.5)
+    nt.assert_true(np.allclose(res, (0., 0., 0.)))
+
+    res = mm.path_fraction_point(points, 0.75)
+    nt.assert_true(np.allclose(res, (0., 0., 0.5)))
+
+    res = mm.path_fraction_point(points, 1.0)
+    nt.assert_true(np.allclose(res, (0., 0., 1.)))
+
+def test_path_fraction_many_points():
+    x = lambda theta: np.cos(theta)
+    y = lambda theta: np.sin(theta)
+    points = [np.array((x(theta), y(theta), 2.)) for theta in (0., np.pi/4., np.pi/2., 3.*np.pi/4., np.pi)]
+    
+    res = mm.path_fraction_point(points, 0.)
+    nt.assert_true(np.allclose(res, (x(0.), y(0.), 2.)))
+
+    res = mm.path_fraction_point(points, 0.25)
+    nt.assert_true(np.allclose(res, (x(np.pi/4.), y(np.pi/4.), 2.)))
+
+    res = mm.path_fraction_point(points, 0.5)
+    nt.assert_true(np.allclose(res, (x(np.pi/2.), y(np.pi/2.), 2.)))
+
+    res = mm.path_fraction_point(points, 0.75)
+    nt.assert_true(np.allclose(res, (x(3.*np.pi/4.), y(3.*np.pi/4.), 2.)))
+
+    res = mm.path_fraction_point(points, 1.)
+    nt.assert_true(np.allclose(res, (x(np.pi), y(np.pi), 2.)))
+
 def test_scalar_projection():
     v1 = np.array([4., 1., 0.])
     v2 = np.array([2., 3., 0.])

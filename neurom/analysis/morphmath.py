@@ -47,6 +47,49 @@ def vector(p1, p2):
     return np.subtract(p1[0:3], p2[0:3])
 
 
+def two_points_fraction(p1, p2, fraction):
+    '''Returns the point p where:
+        |p1p| = fraction * |p1p2|
+    '''
+    return np.array((p1[0] + fraction * (p2[0] - p1[0]),
+                     p1[1] + fraction * (p2[1] - p1[1]),
+                     p1[2] + fraction * (p2[2] - p1[2])))
+
+
+def path_fraction_point(points, fraction):
+    '''Computes the point which corresponds to the fraction
+    of the path length along the piecewise linear curve which
+    is constructed from the set of points.
+
+    Args:
+        points: an iterable of indexable objects with indices
+        0, 1, 2 correspoding to 3D cartesian coordinates
+
+    Returns:
+        The 3D coordinates of the aforementioned point
+    '''
+    def path_until_threshold(points, fraction_path_length):
+        ''' Calculates the cummulative path length of the
+        line segments until the threshold frac_length is met. It
+        returns the two points between which lies the point that
+        corresponds to the fraction and the cummulative length.
+        '''
+        n = 0
+        cummulative_length = point_dist(points[0], points[1])
+        # stop if the cummulative path length becomes
+        # greater or equal to the desired one or
+        # if all points are used up
+        while cummulative_length < fraction_path_length and n <= len(points) - 1:
+            n += 1
+            cummulative_length += point_dist(points[n], points[n + 1])
+        return points[n], points[n + 1], cummulative_length
+
+    frac_length = fraction * path_distance(points)
+    p0, p1, cumm_length = path_until_threshold(points, frac_length)
+    fraction = 1. - (cumm_length - frac_length) / point_dist(p0, p1)
+    return two_points_fraction(p0, p1, fraction)
+
+
 def scalar_projection(v1, v2):
     '''compute the scalar projection of v1 upon v2
 

@@ -30,7 +30,7 @@ from nose import tools as nt
 import os
 from neurom.io.utils import make_neuron
 from neurom import io
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, isection
 from neurom import iter_neurites
 from neurom import segments as seg
 from neurom import sections as sec
@@ -230,8 +230,13 @@ def test_start_point_path_length():
     _check_path_length_start_point(NEURON_TREE, ref)
 
 
-
 def test_section_branch_order():
 
     sec_bo = [bo for bo in iter_neurites(MOCK_TREE, sec.branch_order)]
     nt.eq_(sec_bo, [0, 1, 1, 0, 1, 2, 2, 1])
+
+
+def test_point_at_path_fraction():
+    section = isection(SIMPLE_TREE).next()
+    res = sec.point_at_path_fraction(section, 0.5)
+    nt.eq_(tuple(res), (0., 4., 0.))

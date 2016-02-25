@@ -73,6 +73,21 @@ def identity(segment):
     return segment
 
 
+def point_at_path_fraction(segment, fraction):
+    '''Computes the point p between two points p1, p2
+    for which |p1p| = fraction * |p1p2|
+
+    Args:
+        fraction: float between 0. and 1.
+
+    Returns:
+        The 3D coordinates of the aforementioned point
+    '''
+    return mm.two_points_fraction(segment[0].value[:3],
+                                  segment[1].value[:3],
+                                  fraction)
+
+
 def radial_dist(pos):
     '''Return a function that calculates radial distance for a segment
 

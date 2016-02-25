@@ -209,3 +209,10 @@ def test_segment_radial_dists():
 def test_segment_taper_rate():
     _check_segment_taper_rate(NEURON)
     _check_segment_taper_rate(NEURON_TREE)
+
+
+def test_point_at_path_fraction():
+
+    res = seg.point_at_path_fraction((Tree((1.,1.,1.)),Tree((2.,2.,2.))), 0.5)
+
+    nt.eq_(tuple(res), (1.5, 1.5, 1.5))
