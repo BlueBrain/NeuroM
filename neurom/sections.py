@@ -103,7 +103,7 @@ def point_at_path_fraction(section, fraction):
     Returns:
         The 3D coordinates of the aforementioned point
     '''
-    return mm.path_fraction_point(tuple(n.value[:3] for n in section), fraction)
+    return mm.path_fraction_point(tuple(n.value for n in section), fraction)
 
 
 @section_function(as_tree=True)

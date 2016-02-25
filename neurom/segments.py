@@ -83,8 +83,8 @@ def point_at_path_fraction(segment, fraction):
     Returns:
         The 3D coordinates of the aforementioned point
     '''
-    return mm.two_points_fraction(segment[0].value[:3],
-                                  segment[1].value[:3],
+    return mm.two_points_fraction(segment[0].value,
+                                  segment[1].value,
                                   fraction)
 
 
