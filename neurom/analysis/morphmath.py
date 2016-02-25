@@ -47,6 +47,45 @@ def vector(p1, p2):
     return np.subtract(p1[0:3], p2[0:3])
 
 
+def scalar_projection(v1, v2):
+    '''compute the scalar projection of v1 upon v2
+
+    Args:
+        v1, v2: iterable
+        indices 0, 1, 2 corresponding to cartesian coordinates
+
+    Returns:
+        3-vector of the projection of point p onto the direction of v
+    '''
+    return np.dot(v1, v2) / np.linalg.norm(v2)
+
+
+def vector_projection(v1, v2):
+    '''compute the vector projection of v1 upon v2
+
+    Args:
+        v1, v2: iterable
+        indices 0, 1, 2 corresponding to cartesian coordinates
+
+    Returns:
+        3-vector of the projection of point p onto the direction of v
+    '''
+    return scalar_projection(v1, v2) * v2 / np.linalg.norm(v2)
+
+
+def dist_point_line(p, l1, l2):
+    '''compute the orthogonal distance between from the line that goes through
+    the points l1, l2 and the point p
+
+    Args:
+        p, l1, l2 : iterable
+        point
+        indices 0, 1, 2 corresponding to cartesian coordinates
+    '''
+    cross_prod = np.cross(l2 - l1, p - l1)
+    return np.linalg.norm(cross_prod) / np.linalg.norm(l2 - l1)
+
+
 def point_dist2(p1, p2):
     '''compute the square of the euclidian distance between two 3D points
 

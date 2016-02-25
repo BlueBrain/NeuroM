@@ -185,6 +185,12 @@ def test_get_nonmonotonic_neurites():
     nt.assert_equal(len(check_morph.get_nonmonotonic_neurites(n)), 0)
 
 
+def test_get_back_tracking_neurites():
+
+    _, n = _load_neuron('Neuron.swc')
+    nt.assert_equal(len(check_morph.get_back_tracking_neurites(n)), 4)
+
+
 def test_nonzero_neurite_radii_good_data():
     files = ['Neuron.swc',
              'Single_apical.swc',

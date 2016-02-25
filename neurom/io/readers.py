@@ -51,6 +51,45 @@ from neurom.core.dataformat import ROOT_ID
 from neurom.utils import memoize
 
 
+def _unpack_raw_data(filename):
+    '''Parse a morphology file into internal representation data block
+
+    Forwards filename to appropriate parser depending on extension.
+
+    Parameters:
+        filename: path to morphology file
+
+    Returns:
+        tuple of (raw data block, input file format string).
+    '''
+
+    @memoize
+    def _h5_reader():
+        '''Lazy loading of HDF5 reader'''
+        from .hdf5 import H5
+        return H5.read
+
+    @memoize
+    def _swc_reader():
+        '''Lazy loading of SWC reader'''
+        from .swc import SWC
+        return SWC.read
+
+    @memoize
+    def _neurolucida_reader():
+        '''Lazy loading of Neurolucida ASCII reader'''
+        from .neurolucida import NeurolucidaASC
+        return NeurolucidaASC.read
+
+    _READERS = {
+        'swc': _swc_reader,
+        'h5': _h5_reader,
+        'asc': _neurolucida_reader,
+    }
+    extension = os.path.splitext(filename)[1][1:]
+    return _READERS[extension.lower()]()(filename)
+
+
 def load_data(filename):
     '''Unpack filename and return a RawDataWrapper object containing the data
 
@@ -58,28 +97,11 @@ def load_data(filename):
 
         * SWC (case-insensitive extension ".swc")
         * H5 v1 and v2 (case-insensitive extension ".h5"). Attempts to
-          determine the version from the contents of the file.
+          determine the version from the contents of the file
+        * Neurolucida ASCII (case-insensitive extension ".asc")
     '''
-    def unpack_data():
-        '''Read an SWC file and return a tuple of data, offset, format.
-        Forwards filename to appropriate reader depending on extension'''
-        @memoize
-        def _h5_reader():
-            '''Lazy loading of HDF5 reader'''
-            from .hdf5 import H5
-            return H5.read
 
-        @memoize
-        def _swc_reader():
-            '''Lazy loading of SWC reader'''
-            from .swc import SWC
-            return SWC.read
-
-        _READERS = {'swc': _swc_reader, 'h5': _h5_reader}
-        extension = os.path.splitext(filename)[1][1:]
-        return _READERS[extension.lower()]()(filename)
-
-    return RawDataWrapper(unpack_data())
+    return RawDataWrapper(_unpack_raw_data(filename))
 
 
 class RawDataWrapper(object):
