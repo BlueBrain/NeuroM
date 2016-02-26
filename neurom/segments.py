@@ -31,6 +31,7 @@
 '''
 import functools
 from neurom.core import tree as tr
+from neurom.core.dataformat import COLS
 from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 
@@ -71,6 +72,21 @@ taper_rate = segment_function(as_tree=False)(mm.segment_taper_rate)
 def identity(segment):
     '''Hack to bind iteration type to do-nothing function'''
     return segment
+
+
+def cross_section_at_fraction(segment, fraction):
+    ''' Computes the point p along the line segment that connects the
+    two ends of a segment p1p2 where |p1p| = fraction * |p1p2| along
+    with the respective radius.
+    Args:
+        fraction: float between 0. and 1.
+
+    Returns: tuple
+        The 3D coordinates of the aforementioned point,
+        Its respective radius
+    '''
+    return (mm.linear_interpolate(segment[0].value, segment[1].value, fraction),
+            mm.interpolate_radius(segment[0].value[COLS.R], segment[1].value[COLS.R], fraction))
 
 
 def radial_dist(pos):

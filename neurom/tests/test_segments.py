@@ -209,3 +209,11 @@ def test_segment_radial_dists():
 def test_segment_taper_rate():
     _check_segment_taper_rate(NEURON)
     _check_segment_taper_rate(NEURON_TREE)
+
+
+def test_cross_section_at_fraction():
+
+    res = seg.cross_section_at_fraction((Tree((1.,1.,1., 1.)),Tree((2.,2.,2., 2.))), 0.5)
+    print res
+    nt.eq_(tuple(res[0]), (1.5, 1.5, 1.5))
+    nt.assert_equal(res[1], 1.5)
