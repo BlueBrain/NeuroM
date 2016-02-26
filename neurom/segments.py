@@ -31,6 +31,7 @@
 '''
 import functools
 from neurom.core import tree as tr
+from neurom.core.dataformat import COLS
 from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 
@@ -73,19 +74,19 @@ def identity(segment):
     return segment
 
 
-def point_at_path_fraction(segment, fraction):
-    '''Computes the point p between two points p1, p2
-    for which |p1p| = fraction * |p1p2|
-
+def cross_section_at_fraction(segment, fraction):
+    ''' Computes the point p along the line segment that connects the
+    two ends of a segment p1p2 where |p1p| = fraction * |p1p2| along
+    with the respective radius.
     Args:
         fraction: float between 0. and 1.
 
-    Returns:
-        The 3D coordinates of the aforementioned point
+    Returns: tuple
+        The 3D coordinates of the aforementioned point,
+        Its respective radius
     '''
-    return mm.linear_interpolate(segment[0].value,
-                                 segment[1].value,
-                                 fraction)
+    return (mm.linear_interpolate(segment[0].value, segment[1].value, fraction),
+            mm.interpolate_radius(segment[0].value[COLS.R], segment[1].value[COLS.R], fraction))
 
 
 def radial_dist(pos):
