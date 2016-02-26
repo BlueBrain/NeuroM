@@ -62,6 +62,23 @@ def test_linear_interpolate():
     nt.assert_true(np.allclose(res, (1., 1., 1.)))
 
 
+def test_interpolate_radius_r1_g_r2():
+    res = mm.interpolate_radius(2.,1.,0.1)
+    nt.assert_equal(res, 1.9)
+
+def test_interpolate_radius_r2_g_r1():
+    res = mm.interpolate_radius(1., 2., 0.2)
+    nt.assert_equal(res, 1.2)
+
+def test_interpolate_radius_extreme_cases():
+    res = mm.interpolate_radius(1., 1., 0.2)
+    nt.assert_equal(res, 1.)
+    res = mm.interpolate_radius(0., 2., 0.3)
+    nt.assert_equal(res, 2. * 0.3)
+    res = mm.interpolate_radius(3., 0., 0.15)
+    nt.assert_equal(res, 3. * (1. - 0.15))
+
+
 def test_path_fraction_point_two_points():
 
     points = [np.array([-1.,-1.,-1.]), np.array([1.,1.,1.])]

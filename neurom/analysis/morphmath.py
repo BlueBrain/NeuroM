@@ -56,6 +56,32 @@ def linear_interpolate(p1, p2, fraction):
                      p1[2] + fraction * (p2[2] - p1[2])))
 
 
+def interpolate_radius(r1, r2, fraction):
+    '''Calculate the radius that corresponds to a point P that lies at a fraction of the length
+    of a cut cone P1P2 where P1, P2 are the centers of the circles that bound the shape with radii
+    r1 and r2 respectively.
+
+    Args:
+        r1: float
+            Radius of the first node of the segment.
+        r2: float
+            Radius of the second node of the segment
+        fraction: float
+            The fraction at which the interpolated radius is calculated.
+
+    Returns: float
+        The interpolated radius.
+
+    Note: The fraction is assumed from point P1, not from point P2.
+    '''
+    def f(a, b, c):
+        ''' Returns the length of the interpolated radius calculated
+        using similar triangles.
+        '''
+        return a + c * (b - a)
+    return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
+
+
 def path_fraction_point(points, fraction):
     '''Computes the point which corresponds to the fraction
     of the path length along the piecewise linear curve which
