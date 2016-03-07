@@ -28,10 +28,9 @@
 
 from neurom.check import morphtree
 from neurom.ezy import load_neuron
-from neurom.check.morphtree import is_monotonic
-from neurom.check.morphtree import is_flat
+from neurom.check import morphtree as mt
 from neurom.core.dataformat import COLS
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, ipreorder, val_iter
 from nose import tools as nt
 import numpy as np
 import os
@@ -63,6 +62,19 @@ def _generate_tree(mode):
 
 	return tree
 
+def _generate_back_track_tree(n, dev):
+	t = Tree(np.array([0., 0., 0., 0.2, 1., 0., 0.]))
+	t.add_child(Tree(np.array([0., 1., 0., 0.15, 1., 0., 0.])))
+	t.children[0].add_child(Tree(np.array([0., 2., 0., 0.14, 1., 0., 0.])))
+	t.children[0].children[0].add_child(Tree(np.array([1., 3., 0., 0.15, 1., 0., 0.])))
+	t.children[0].children[0].add_child(Tree(np.array([1., -3., 0., 0.15, 1., 0., 0.])))
+	t.children[0].children[0].children[0].add_child(Tree(np.array([2., 4., 0., 0.11, 1., 0., 0.])))
+	t.children[0].children[0].children[1].add_child(Tree(np.array([2., -4., 0., 0.12, 1., 0., 0.])))
+	t.children[0].children[0].children[1].children[0].add_child(Tree(tuple(val_iter(ipreorder(t)))[n] + np.array([dev[0],dev[1],dev[2], 0.11, 1.,0.,0.])))
+	t.children[0].children[0].children[1].children[0].children[0].add_child(Tree(np.array([3., -5., 0., 0.1, 1., 0., 0.])))
+	t.children[0].children[0].children[1].children[0].children[0].children[0].add_child(Tree(np.array([4.,-6., 0., 0.1, 1., 0., 0.])))
+	return t
+
 
 def test_is_monotonic():
 
@@ -75,15 +87,37 @@ def test_is_monotonic():
 	# tree with increasing radii
 	incr_diams = _generate_tree(2)
 
-	nt.assert_true(is_monotonic(decr_diams, 1e-6))
-	nt.assert_true(is_monotonic(equl_diams, 1e-6))
-	nt.assert_false(is_monotonic(incr_diams, 1e-6))
+	nt.assert_true(mt.is_monotonic(decr_diams, 1e-6))
+	nt.assert_true(mt.is_monotonic(equl_diams, 1e-6))
+	nt.assert_false(mt.is_monotonic(incr_diams, 1e-6))
 
 def test_is_flat():
 
 	neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
 
-	nt.assert_false(is_flat(neu_tree, 1e-6, method='tolerance'))
-	nt.assert_false(is_flat(neu_tree, 0.1, method='ratio'))
+	nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
+	nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
 
+def test_is_back_tracking():
 
+	# case 1: a back-track falls directly on a previous node
+	t = _generate_back_track_tree(5, (0., 0., 0.))
+	nt.assert_true(mt.is_back_tracking(t))
+
+	# case 2: a zigzag is close to another segment
+	t = _generate_back_track_tree(5, (0.1, -0.1, 0.02))
+	nt.assert_true(mt.is_back_tracking(t))
+
+	# case 3: a zigzag is close to another segment 2
+	t = _generate_back_track_tree(5, (-0.2, 0.04, 0.144))
+	nt.assert_true(mt.is_back_tracking(t))
+
+	# case 4: a zigzag far from civilization
+	t = _generate_back_track_tree(5, (10., -10., 10.))
+	nt.assert_false(mt.is_back_tracking(t))
+
+	# case 5: a zigzag on another section
+	# currently zigzag is defined on the same section
+	# thus this test should not be true
+	t = _generate_back_track_tree(3, (-0.2, 0.04, 0.144))
+	nt.assert_false(mt.is_back_tracking(t))
