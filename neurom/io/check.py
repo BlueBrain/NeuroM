@@ -46,18 +46,16 @@ def has_sequential_ids(raw_data):
 
 def no_missing_parents(raw_data):
     '''Check that all points have existing parents
-
+%tim
     Point's parent ID must exist and parent must be declared
     before child.
 
     Returns:
         tuple (bool, list of IDs that have no parent)
     '''
-    ids = raw_data.get_col(COLS.ID)
-    bad_ids = [int(ids[i]) for i in xrange(1, len(ids))
-               if raw_data.data_block[i][COLS.P] not in ids[:i]]
-
-    return len(bad_ids) == 0, bad_ids
+    ids = np.setdiff1d(raw_data.get_col(COLS.P),
+                       raw_data.get_col(COLS.ID))[1:]
+    return len(ids) == 0, list(ids.astype(np.int) + 1)
 
 
 def is_single_tree(raw_data):
