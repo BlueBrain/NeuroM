@@ -92,6 +92,20 @@ def area(section):
     return _aggregate_segments(section, mm.segment_area)
 
 
+def point_at_path_fraction(section, fraction):
+    '''Computes the point which corresponds to the fraction
+    of the path length along the piecewise linear curve which
+    is constructed from the section points.
+
+    Args:
+        0, 1, 2 correspoding to 3D cartesian coordinates
+
+    Returns:
+        The 3D coordinates of the aforementioned point
+    '''
+    return mm.path_fraction_point(tuple(n.value for n in section), fraction)
+
+
 @section_function(as_tree=True)
 def end_point_path_length(tree_section):
     '''Calculate the path length of a section't end point to the tree root
