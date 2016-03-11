@@ -33,7 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.exceptions import IDSequenceError, DisconnectedPointError
+from neurom.exceptions import IDSequenceError, MultipleTrees, MissingParentError
 from . import load_data
 from . import check
 from neurom.utils import memoize
@@ -47,12 +47,12 @@ def get_soma_ids(rdw):
 
 
 @memoize
-def get_initial_segment_ids(rdw):
-    '''Returns a list of IDs of initial tree segments
+def get_initial_neurite_segment_ids(rdw):
+    '''Returns a list of IDs of initial neurite tree segments
 
     These are defined as non-soma points whose perent is a soma point.
     '''
-    l = list(itertools.chain(*[rdw.get_children(s) for s in get_soma_ids(rdw)]))
+    l = list(itertools.chain.from_iterable([rdw.get_children(s) for s in get_soma_ids(rdw)]))
     return [i for i in l if rdw.get_row(i)[COLS.TYPE] != POINT_TYPE.SOMA]
 
 
@@ -95,7 +95,7 @@ def make_neuron(raw_data, tree_action=None):
     _soma = make_soma([raw_data.get_row(s_id)
                        for s_id in get_soma_ids(raw_data)])
     _trees = [make_tree(raw_data, iseg, tree_action)
-              for iseg in get_initial_segment_ids(raw_data)]
+              for iseg in get_initial_neurite_segment_ids(raw_data)]
 
     return Neuron(_soma, _trees)
 
@@ -115,13 +115,37 @@ def load_neuron(filename, tree_action=None):
     data = load_data(filename)
     if not check.has_increasing_ids(data)[0]:
         raise IDSequenceError('Invald ID sequence found in raw data')
-    if not check.all_points_connected(data)[0]:
-        raise DisconnectedPointError('Disconnected point detected')
+    if not check.is_single_tree(data)[0]:
+        raise MultipleTrees('Multiple trees detected')
+    if not check.no_missing_parents(data)[0]:
+        raise MissingParentError('Missing parents detected')
 
     nrn = make_neuron(data, tree_action)
     nrn.name = os.path.splitext(os.path.basename(filename))[0]
 
     return nrn
+
+
+def load_trees(filename, tree_action=None):
+    """Load all trees in an input file
+
+    Loads all trees, regardless of whether they are connected
+    Args:
+        filename: the path of the file storing morphology data
+        tree_action: optional function to run on each of the neuron's
+        neurite trees.
+    Raises:
+        IDSequenceError if filename contains non-incremental ID sequence
+    """
+    data = load_data(filename)
+
+    if not check.has_increasing_ids(data)[0]:
+        raise IDSequenceError('Invald ID sequence found in raw data')
+
+    _ids = get_initial_neurite_segment_ids(data)
+    _ids.extend(data.get_ids(lambda r: r[COLS.P] == -1 and r[COLS.TYPE] != POINT_TYPE.SOMA))
+
+    return [make_tree(data, i, tree_action) for i in _ids]
 
 
 def get_morph_files(directory):

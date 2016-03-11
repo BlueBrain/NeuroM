@@ -62,7 +62,7 @@ def section_function(as_tree=False):
     return _section_function
 
 
-@section_function(as_tree=False)
+@section_function(as_tree=True)
 def identity(section):
     '''Hack to bind iteration type to do-nothing function'''
     return section
@@ -92,6 +92,20 @@ def area(section):
     return _aggregate_segments(section, mm.segment_area)
 
 
+def point_at_path_fraction(section, fraction):
+    '''Computes the point which corresponds to the fraction
+    of the path length along the piecewise linear curve which
+    is constructed from the section points.
+
+    Args:
+        0, 1, 2 correspoding to 3D cartesian coordinates
+
+    Returns:
+        The 3D coordinates of the aforementioned point
+    '''
+    return mm.path_fraction_point(tuple(n.value for n in section), fraction)
+
+
 @section_function(as_tree=True)
 def end_point_path_length(tree_section):
     '''Calculate the path length of a section't end point to the tree root
@@ -112,6 +126,9 @@ def start_point_path_length(tree_section):
     return mt.path_length(tree_section[0])
 
 
+branch_order = section_function(as_tree=True)(mt.branch_order)
+
+
 def radial_dist(pos, use_start_point=False):
     '''Return a function that calculates radial distance for a section
 
@@ -129,8 +146,8 @@ def radial_dist(pos, use_start_point=False):
     return _dist
 
 
-def count(neuron):
+def count(neuron, tree_filter=None):
     """
     Return number of segments in neuron or population
     """
-    return sum(1 for _ in iter_neurites(neuron, identity))
+    return sum(1 for _ in iter_neurites(neuron, identity, tree_filter))

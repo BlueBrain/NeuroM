@@ -28,6 +28,7 @@
 
 '''Generic tree class and iteration functions'''
 from itertools import chain, imap, ifilter, repeat
+from collections import deque
 from copy import copy
 
 
@@ -77,7 +78,7 @@ def is_root(tree):
 
 def ipreorder(tree):
     '''Depth-first pre-order iteration of tree nodes'''
-    children = [tree, ]
+    children = deque((tree, ))
     while children:
         cur_node = children.pop()
         children.extend(reversed(cur_node.children))
@@ -253,7 +254,7 @@ def i_chain(trees, iterator_type, mapping=None, tree_filter=None):
     return chain_it if mapping is None else imap_val(mapping, chain_it)
 
 
-def i_chain2(trees, iterator_type, mapping=None, tree_filter=None):
+def i_chain2(trees, iterator_type=ipreorder, mapping=None, tree_filter=None):
     '''Returns a mapped iterator to a collection of trees
 
     Provides access to all the elements of all the trees

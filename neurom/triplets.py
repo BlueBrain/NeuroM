@@ -26,55 +26,54 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Type enumerations'''
+'''Basic functions and iterators for neuron neurite triplet morphometrics
 
-from enum import Enum, unique
-
-
-@unique
-class TreeType(Enum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
+'''
+import functools
+from neurom.core import tree as tr
+from neurom import iter_neurites
+from neurom.analysis import morphmath as mm
 
 
-def tree_type_checker(*ref):
-    '''Tree type checker functor
+iter_type = tr.itriplet
 
-    Returns:
-        Functor that takes a tree, and returns true if that tree matches any of
-        TreeTypes in ref
 
-    Ex:
-        >>> from neurom.core.types import TreeType, tree_type_checker
-        >>> tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
-        >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
+def triplet_function(as_tree=False):
+    '''Decorate a triples function such that it can be used in neurite iteration
+
+    Parameters:
+        as_tree: specifies whether the function argument is a\
+            triplet of trees or elements
     '''
-    ref = tuple(ref)
-    if TreeType.all in ref:
-        def check_tree_type(_):
-            '''Always returns true'''
-            return True
-    else:
-        def check_tree_type(tree):
-            '''Check whether tree has the same type as ref
+    def _triplet_function(fun):
+        '''Decorate a function with an iteration type member'''
+        @functools.wraps(fun)
+        def _wrapper(triplet):
+            '''Simply pass arguments to wrapped function'''
+            if not as_tree:
+                triplet = tr.as_elements(triplet)
+            return fun(triplet)
 
-            Returns:
-                True if ref in the same type as tree.type or ref is TreeType.all
-            '''
-            return tree.type in ref
+        _wrapper.iter_type = tr.itriplet
+        return _wrapper
 
-    return check_tree_type
+    return _triplet_function
 
 
-NEURITES = (TreeType.all,
-            TreeType.axon,
-            TreeType.basal_dendrite,
-            TreeType.apical_dendrite)
+@triplet_function(as_tree=True)
+def identity(triplet):
+    '''Hack to bind iteration type to do-nothing function'''
+    return triplet
 
 
-ROOT_ID = -1
+@triplet_function(as_tree=False)
+def meander_angle(triplet):
+    '''Return the angle between a triplet of consecutive points'''
+    return mm.angle_3points(triplet[1], triplet[0], triplet[2])
+
+
+def count(neuron):
+    """
+    Return number of triplets in neuron or population
+    """
+    return sum(1 for _ in iter_neurites(neuron, identity))

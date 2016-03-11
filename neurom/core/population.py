@@ -43,5 +43,5 @@ class Population(object):
         '''
         self.neurons = neurons
         self.somata = [neu.soma for neu in neurons]
-        self.neurites = list(chain(*(neu.neurites for neu in neurons)))
+        self.neurites = list(chain.from_iterable((neu.neurites for neu in neurons)))
         self.name = name

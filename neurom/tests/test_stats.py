@@ -140,3 +140,62 @@ def test_fit_results_dict_exponential_min_max():
     nt.assert_equal(d['min'], -100)
     nt.assert_equal(d['max'], 100)
     nt.assert_equal(d['type'], 'exponential')
+
+def test_scalar_stats():
+
+    data = np.array([1.,2.,3.,4.,5.])
+
+    result = st.scalar_stats(data)
+
+    RESULT = {'mean': 3.,
+              'max': 5.,
+              'min': 1.,
+              'std': 1.4142135623730951}
+
+    nt.assert_true(RESULT == result)
+
+def test_compare_two():
+    data = np.array([1., 1., 2., 2.])
+    data_same = np.array([1.0, 1.0, 2.0, 2.0])
+    data_close = np.array([1.02, 1.01, 2.001, 2.0003])
+    data_far = np.array([200., 100., 201])
+
+    results1 = st.compare_two(data, data_same)
+    nt.assert_almost_equal(results1.dist, 0.0)
+    nt.assert_almost_equal(results1.pvalue, 1.0)
+
+    results2 = st.compare_two(data, data_close)
+    nt.assert_almost_equal(results2.dist, 0.5)
+    nt.assert_almost_equal(results2.pvalue, 0.5344157, places=5)
+
+    results3 = st.compare_two(data, data_far)
+    nt.assert_almost_equal(results3.dist, 1.0)
+    nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
+
+@nt.raises(TypeError)
+def test_compare_two_error():
+    data = np.array([1., 1., 2., 2.])
+    data_same = np.array([1.0, 1.0, 2.0, 2.0])
+    results1 = st.compare_two(data, data_same, test='test')
+
+def test_total_score():
+
+    testList1 = (([1.,1., 1],[1.,1.,1.]),
+                ([2.,3.,4.,5.],[2.,3.,4.,5.]))
+
+    score = st.total_score(testList1)
+    nt.assert_almost_equal(score, 0.)
+
+    testList2 = (([1.,1., 1],[2.,2.,2.]),
+                ([2.,3.,4.,5.],[2.,3.,4.,5.]))
+
+    score = st.total_score(testList2, p=1)
+    nt.assert_almost_equal(score, 1.)
+
+    testList3 = (([1.,1., 1],[2.,2.,2.]),
+                ([3.,3.,3.,3.],[4., 4., 4., 4.]))
+
+    score = st.total_score(testList3, p=2)
+    nt.assert_almost_equal(score, np.sqrt(2.))
+
+

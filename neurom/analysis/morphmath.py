@@ -47,6 +47,114 @@ def vector(p1, p2):
     return np.subtract(p1[0:3], p2[0:3])
 
 
+def linear_interpolate(p1, p2, fraction):
+    '''Returns the point p where:
+        |p1p| = fraction * |p1p2|
+    '''
+    return np.array((p1[0] + fraction * (p2[0] - p1[0]),
+                     p1[1] + fraction * (p2[1] - p1[1]),
+                     p1[2] + fraction * (p2[2] - p1[2])))
+
+
+def interpolate_radius(r1, r2, fraction):
+    '''Calculate the radius that corresponds to a point P that lies at a fraction of the length
+    of a cut cone P1P2 where P1, P2 are the centers of the circles that bound the shape with radii
+    r1 and r2 respectively.
+
+    Args:
+        r1: float
+            Radius of the first node of the segment.
+        r2: float
+            Radius of the second node of the segment
+        fraction: float
+            The fraction at which the interpolated radius is calculated.
+
+    Returns: float
+        The interpolated radius.
+
+    Note: The fraction is assumed from point P1, not from point P2.
+    '''
+    def f(a, b, c):
+        ''' Returns the length of the interpolated radius calculated
+        using similar triangles.
+        '''
+        return a + c * (b - a)
+    return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
+
+
+def path_fraction_point(points, fraction):
+    '''Computes the point which corresponds to the fraction
+    of the path length along the piecewise linear curve which
+    is constructed from the set of points.
+
+    Args:
+        points: an iterable of indexable objects with indices
+        0, 1, 2 correspoding to 3D cartesian coordinates
+
+    Returns:
+        The 3D coordinates of the aforementioned point
+    '''
+    def path_until_threshold(points, fraction_path_length):
+        ''' Calculates the cummulative path length of the
+        line segments until the threshold frac_length is met. It
+        returns the two points between which lies the point that
+        corresponds to the fraction and the cummulative length.
+        '''
+        n = 0
+        cummulative_length = point_dist(points[0], points[1])
+        # stop if the cummulative path length becomes
+        # greater or equal to the desired one or
+        # if all points are used up
+        while cummulative_length < fraction_path_length and n <= len(points) - 1:
+            n += 1
+            cummulative_length += point_dist(points[n], points[n + 1])
+        return points[n], points[n + 1], cummulative_length
+
+    frac_length = fraction * path_distance(points)
+    p0, p1, cumm_length = path_until_threshold(points, frac_length)
+    fraction = 1. - (cumm_length - frac_length) / point_dist(p0, p1)
+    return linear_interpolate(p0, p1, fraction)
+
+
+def scalar_projection(v1, v2):
+    '''compute the scalar projection of v1 upon v2
+
+    Args:
+        v1, v2: iterable
+        indices 0, 1, 2 corresponding to cartesian coordinates
+
+    Returns:
+        3-vector of the projection of point p onto the direction of v
+    '''
+    return np.dot(v1, v2) / np.linalg.norm(v2)
+
+
+def vector_projection(v1, v2):
+    '''compute the vector projection of v1 upon v2
+
+    Args:
+        v1, v2: iterable
+        indices 0, 1, 2 corresponding to cartesian coordinates
+
+    Returns:
+        3-vector of the projection of point p onto the direction of v
+    '''
+    return scalar_projection(v1, v2) * v2 / np.linalg.norm(v2)
+
+
+def dist_point_line(p, l1, l2):
+    '''compute the orthogonal distance between from the line that goes through
+    the points l1, l2 and the point p
+
+    Args:
+        p, l1, l2 : iterable
+        point
+        indices 0, 1, 2 corresponding to cartesian coordinates
+    '''
+    cross_prod = np.cross(l2 - l1, p - l1)
+    return np.linalg.norm(cross_prod) / np.linalg.norm(l2 - l1)
+
+
 def point_dist2(p1, p2):
     '''compute the square of the euclidian distance between two 3D points
 
@@ -202,6 +310,12 @@ def pca(points):
         Eigenvalues and respective eigenvectors
     '''
     return np.linalg.eig(np.cov(points.transpose()))
+
+
+def sphere_area(r):
+    ''' Compute the area of a sphere with radius r
+    '''
+    return 4. * math.pi * r ** 2
 
 # Useful alias for path_distance
 section_length = path_distance

@@ -31,7 +31,7 @@
 These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
-from itertools import imap, izip, product
+from itertools import izip, product
 from neurom.core import tree as tr
 from neurom.core.types import TreeType
 from neurom.core.tree import ipreorder
@@ -70,76 +70,6 @@ def branch_order(tree_section):
     return bo - 2 if tr.is_forking_point(node) else bo - 1
 
 
-def i_segment_length(tree):
-    ''' return an iterator of tree segment lengths
-    '''
-    return tr.imap_val(mm.segment_length, tr.isegment(tree))
-
-
-def i_segment_radius(tree):
-    ''' return an iterator of tree segment radii
-    '''
-    return tr.imap_val(mm.segment_radius, tr.isegment(tree))
-
-
-def i_segment_volume(tree):
-    ''' return an iterator of tree segment volumes
-    '''
-    return tr.imap_val(mm.segment_volume, tr.isegment(tree))
-
-
-def i_segment_area(tree):
-    ''' return an iterator of tree segment areas
-    '''
-    return tr.imap_val(mm.segment_area, tr.isegment(tree))
-
-
-def i_segment_radial_dist(pos, tree):
-    '''Return an iterator of radial distances of tree segments to a given point
-
-    The radial distance is the euclidian distance between the mid-point of
-    the segment and the point in question.
-
-    Parameters:
-        pos: origin to which disrances are measured. It must have at least 3
-        components. The first 3 components are (x, y, z).
-
-        tree: tree of raw data rows.
-
-    '''
-    return tr.imap_val(lambda s: mm.segment_radial_dist(s, pos), tr.isegment(tree))
-
-
-def i_segment_meander_angle(tree):
-    '''Return an iterator to a tree meander angle
-
-    The meander angle is defined as the angle between to adjacent  segments.
-    Applies neurom.morphmath.angle_3points to triplets of
-    '''
-
-    return tr.imap_val(lambda t: mm.angle_3points(t[1], t[0], t[2]), tr.itriplet(tree))
-
-
-def i_local_bifurcation_angle(tree):
-    '''Return the opening angle between two out-going segments
-    in a bifurcation point
-    '''
-    return imap(local_bifurcation_angle,
-                tr.ibifurcation_point(tree))
-
-
-def i_remote_bifurcation_angle(tree):
-    '''Return the opening angle between the last segments of two out-going
-    sections of a bifurcation point
-    '''
-    def _remangle(t):
-        '''Helper to calculate the remote angle'''
-        end_points = tuple(p for p in tr.i_branch_end_points(t))
-        return mm.angle_3points(t.value, end_points[0].value, end_points[1].value)
-
-    return imap(_remangle, tr.ibifurcation_point(tree))
-
-
 def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''Return an iterator of radial distances of tree sections to a given point
 
@@ -159,21 +89,6 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
     pos = tree.value if pos is None else pos
     sec_idx = 0 if use_start_point else -1
     return tr.imap_val(lambda s: mm.point_dist(s[sec_idx], pos), tr.isection(tree))
-
-
-def i_section_path_length(tree, use_start_point=False):
-    '''Return an iterator of path lengths of tree sections
-
-    Path lengths are measured to the tree's root.
-
-    Parameters:
-        tree: tree object
-        use_start_point: If true, calculate path length from section start point,\
-            else from end-point (default, False)
-
-    '''
-    sec_idx = 0 if use_start_point else -1
-    return imap(lambda s: path_length(s[sec_idx]), tr.isection(tree))
 
 
 def find_tree_type(tree):
@@ -212,13 +127,6 @@ def get_tree_type(tree):
         set_tree_type(tree)
 
     return tree.type
-
-
-def i_section_length(tree):
-    """
-    Return an iterator of tree section lengths
-    """
-    return tr.imap_val(mm.section_length, tr.isection(tree))
 
 
 def n_sections(tree):
@@ -261,7 +169,8 @@ def trunk_section_length(tree):
         Length of first section of tree or 0 if single point tree
     '''
     try:
-        return i_section_length(tree).next()
+        _it = tr.imap_val(mm.section_length, tr.isection(tree))
+        return _it.next()
     except StopIteration:
         return 0.0
 
@@ -313,8 +222,8 @@ def partition(tree):
     '''
     def partition_at_point(bif_point):
         '''Partition at each bif point.'''
-        n = n_sections(bif_point.children[0])
-        m = n_sections(bif_point.children[1])
+        n = float(n_sections(bif_point.children[0]))
+        m = float(n_sections(bif_point.children[1]))
         return max(n, m) / min(n, m)
 
     return [partition_at_point(i)

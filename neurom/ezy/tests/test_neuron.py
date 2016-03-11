@@ -37,13 +37,9 @@ from collections import namedtuple
 from neurom.core.types import TreeType
 from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
-from neurom.core.dataformat import COLS
-from neurom.core.tree import ipreorder, val_iter
-from neurom.analysis.morphtree import i_local_bifurcation_angle
-from neurom.analysis.morphtree import i_remote_bifurcation_angle
-from neurom.analysis.morphtree import i_section_radial_dist
 from neurom import sections as sec
 from neurom import segments as seg
+from neurom import bifurcations as bifs
 from neurom import iter_neurites
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -87,7 +83,7 @@ class TestEzyNeuron(object):
         nt.assert_true(self.neuron.name == 'Neuron')
 
     def test_get_section_lengths(self):
-        ref_seclen = [l for l in iter_neurites(self.neuron, sec.length)]
+        ref_seclen = list(iter_neurites(self.neuron, sec.length))
         seclen = self.neuron.get_section_lengths()
         nt.assert_equal(len(seclen), 84)
         nt.assert_true(np.all(seclen == ref_seclen))
@@ -115,7 +111,7 @@ class TestEzyNeuron(object):
         s = self.neuron.get_section_lengths(TreeType.soma)
 
     def test_get_segment_lengths(self):
-        ref_seglen = [l for l in iter_neurites(self.neuron, seg.length)]
+        ref_seglen = list(iter_neurites(self.neuron, seg.length))
         seglen = self.neuron.get_segment_lengths()
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == ref_seglen))
@@ -150,9 +146,8 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(s), 0)
 
     def test_get_local_bifurcation_angles(self):
-        ref_local_bifangles = []
-        for t in self.neuron.neurites:
-            ref_local_bifangles.extend(a for a in i_local_bifurcation_angle(t))
+
+        ref_local_bifangles = list(iter_neurites(self.neuron, bifs.local_angle))
 
         local_bifangles = self.neuron.get_local_bifurcation_angles()
         nt.assert_equal(len(local_bifangles), 40)
@@ -180,10 +175,7 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(s), 0)
 
     def test_get_remote_bifurcation_angles(self):
-        ref_remote_bifangles = []
-        for t in self.neuron.neurites:
-            ref_remote_bifangles.extend(a for a in i_remote_bifurcation_angle(t))
-
+        ref_remote_bifangles = list(iter_neurites(self.neuron, bifs.remote_angle))
         remote_bifangles = self.neuron.get_remote_bifurcation_angles()
         nt.assert_equal(len(remote_bifangles), 40)
         nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
@@ -214,11 +206,11 @@ class TestEzyNeuron(object):
         ref_sec_rad_dist_start = []
         for t in self.neuron.neurites:
             ref_sec_rad_dist_start.extend(
-                ll for ll in i_section_radial_dist(t, use_start_point=True))
+                ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
 
         ref_sec_rad_dist = []
         for t in self.neuron.neurites:
-            ref_sec_rad_dist.extend(ll for ll in i_section_radial_dist(t))
+            ref_sec_rad_dist.extend(ll for ll in iter_neurites(t, sec.radial_dist(t.value)))
 
         rad_dists = self.neuron.get_section_radial_distances()
         nt.assert_true(ref_sec_rad_dist != ref_sec_rad_dist_start)
@@ -229,7 +221,7 @@ class TestEzyNeuron(object):
         ref_sec_rad_dist_start = []
         for t in self.neuron.neurites:
             ref_sec_rad_dist_start.extend(
-                ll for ll in i_section_radial_dist(t, use_start_point=True))
+                ll for ll in iter_neurites(t, sec.radial_dist(t.value, use_start_point=True)))
 
         rad_dists = self.neuron.get_section_radial_distances(use_start_point=True)
         nt.assert_equal(len(rad_dists), 84)
@@ -241,8 +233,8 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_endpoint(self):
 
-        ref_sec_path_len_start = [l for l in iter_neurites(self.neuron, sec.start_point_path_length)]
-        ref_sec_path_len = [l for l in iter_neurites(self.neuron, sec.end_point_path_length)]
+        ref_sec_path_len_start = list(iter_neurites(self.neuron, sec.start_point_path_length))
+        ref_sec_path_len = list(iter_neurites(self.neuron, sec.end_point_path_length))
         path_lengths = self.neuron.get_section_path_distances()
         nt.assert_true(ref_sec_path_len != ref_sec_path_len_start)
         nt.assert_equal(len(path_lengths), 84)
@@ -250,7 +242,7 @@ class TestEzyNeuron(object):
 
     def test_get_section_path_distances_start_point(self):
 
-        ref_sec_path_len_start = [l for l in iter_neurites(self.neuron, sec.start_point_path_length)]
+        ref_sec_path_len_start = list(iter_neurites(self.neuron, sec.start_point_path_length))
         path_lengths = self.neuron.get_section_path_distances(use_start_point=True)
         nt.assert_equal(len(path_lengths), 84)
         nt.assert_true(np.all(path_lengths == ref_sec_path_len_start))
@@ -330,14 +322,6 @@ class TestEzyNeuron(object):
         nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.basal_dendrite),
                               [7.972322416776259, 8.2245287740603779])
         nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.axon), [9.579117366740002])
-
-    def test_iter_points(self):
-        ref_point_radii = []
-        for t in self.neuron.neurites:
-            ref_point_radii.extend(p[COLS.R] for p in val_iter(ipreorder(t)))
-
-        rads = [r for r in self.neuron.iter_points(lambda p: p[COLS.R])]
-        nt.assert_true(np.all(ref_point_radii == rads))
 
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view

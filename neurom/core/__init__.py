@@ -35,7 +35,7 @@ from .tree import Tree as _Tree
 def iter_neurites(obj, mapfun=None, filt=None):
     '''Iterator to a neurite, neuron or neuron population
 
-    Applies a neurite filter function and a mapping function.
+    Applies optional neurite filter and element mapping functions.
 
     Example:
         Get the lengths of sections in a neuron and a population
@@ -48,5 +48,8 @@ def iter_neurites(obj, mapfun=None, filt=None):
 
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = [obj] if isinstance(obj, _Tree) else obj.neurites
-    return _chain_neurites(neurites, mapfun.iter_type, mapfun, filt)
+    neurites = ([obj] if isinstance(obj, _Tree)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    iter_type = None if mapfun is None else mapfun.iter_type
+
+    return _chain_neurites(neurites, iter_type, mapfun, filt)

@@ -33,9 +33,27 @@ Nothing fancy. Just commonly used functions using scipy functionality.'''
 from collections import namedtuple
 from collections import OrderedDict
 from scipy import stats as _st
-
+import numpy as np
+from enum import Enum, unique
 
 FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
+
+
+@unique
+class StatTests(Enum):
+    '''Enum representing valid statistical tests of scipy'''
+    ks = 1
+    wilcoxon = 2
+
+
+def get_test(stest):
+    '''Returns the correct stat test'''
+    sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon'}
+
+    if stest in StatTests:
+        return sts[stest]
+    else:
+        raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon.')
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
@@ -110,3 +128,74 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
     '''
     fit_results = [fit(data, d) for d in distr_to_check]
     return min(fit_results, key=lambda fit: fit.errs[0])
+
+
+def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
+    '''Calculate the stats from the given numpy functions
+
+    Parameters:
+        data: array of data points to be used for the stats
+
+    Options:
+        functions: tuple of numpy stat functions to apply on data
+
+    Returns:
+        Dictionary with tha name of the function as key and the result
+        as the respective value
+    '''
+    stats = {}
+    for func in functions:
+
+        stats[func] = getattr(np, func)(data)
+
+    return stats
+
+
+def compare_two(data1, data2, test=StatTests.ks):
+    '''Compares two distributions of data
+       and assess two scores: a distance between them
+       and a probability they are drawn from the same
+       distribution.
+
+    Parameters:
+        data1: numpy array of dataset 1
+        data2: numpy array of dataset 2
+        test: Stat_tests\
+            Defines the statistical test to be used, based\
+            on the scipy available modules.\
+            Accepted tests: ks_2samp, wilcoxon
+
+    Returns:
+        dist: float\
+            High numbers define high dissimilarity between the two datasets
+        p-value: float\
+            Small numbers define high probability the data come from\
+            same dataset.
+    '''
+    results = getattr(_st, get_test(test))(data1, data2)
+    Stats = namedtuple('Stats', ['dist', 'pvalue'])
+
+    return Stats(*results)
+
+
+def total_score(paired_dats, p=2, test=StatTests.ks):
+    '''Calculates the p-norm of the distances that have been calculated from the statistical
+    test that has been applied on all the paired datasets.
+
+    Parameters:
+        paired_dats: a list of tuples or where each tuple
+                         contains the paired data lists from two datasets
+
+    Options:
+        p : integer that defines the order of p-norm
+        test: Stat_tests\
+            Defines the statistical test to be used, based\
+            on the scipy available modules.\
+            Accepted tests: ks_2samp, wilcoxon
+
+    Returns:
+        A float corresponding to the p-norm of the distances that have
+        been calculated. 0 corresponds to high similarity while 1 to low.
+    '''
+    scores = np.array([compare_two(fL1, fL2, test=test).dist for fL1, fL2 in paired_dats])
+    return np.linalg.norm(scores, p)

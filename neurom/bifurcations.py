@@ -26,84 +26,70 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions and iterators for neuron neurite segment morphometrics
+'''Basic functions and iterators for neuron neurite bifurcation point morphometrics
 
 '''
 import functools
 from neurom.core import tree as tr
-from neurom.core.dataformat import COLS
 from neurom import iter_neurites
-import neurom.analysis.morphmath as mm
+from neurom.analysis import morphmath as mm
+from neurom.analysis import morphtree as mt
 
 
-iter_type = tr.isegment
+iter_type = tr.ibifurcation_point
 
 
-def segment_function(as_tree=False):
-    '''Decorate a segment function such that it can be used in neurite iteration
+def bifurcation_point_function(as_tree=False):
+    '''Decorate a bifurcation_point function such that it can be used in neurite iteration
 
     Parameters:
-        as_tree: specifies whether the function argument is a segment of trees\
-            or elements
+        as_tree: specifies whether the function argument is a\
+            bifurcation point of trees or elements
     '''
-    def _segment_function(fun):
+    def _bifurcation_point_function(fun):
         '''Decorate a function with an iteration type member'''
         @functools.wraps(fun)
-        def _wrapper(segment):
+        def _wrapper(bifurcation_point):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                segment = tr.as_elements(segment)
-            return fun(segment)
+                bifurcation_point = tr.as_elements(bifurcation_point)
+            return fun(bifurcation_point)
 
-        _wrapper.iter_type = tr.isegment
+        _wrapper.iter_type = tr.ibifurcation_point
         return _wrapper
 
-    return _segment_function
+    return _bifurcation_point_function
 
 
-length = segment_function(as_tree=False)(mm.segment_length)
-radius = segment_function(as_tree=False)(mm.segment_radius)
-volume = segment_function(as_tree=False)(mm.segment_volume)
-area = segment_function(as_tree=False)(mm.segment_area)
-taper_rate = segment_function(as_tree=False)(mm.segment_taper_rate)
+local_angle = bifurcation_point_function(as_tree=True)(mt.local_bifurcation_angle)
 
 
-@segment_function(as_tree=True)
-def identity(segment):
+@bifurcation_point_function(as_tree=True)
+def identity(bifurcation_point):
     '''Hack to bind iteration type to do-nothing function'''
-    return segment
+    return bifurcation_point
 
 
-def cross_section_at_fraction(segment, fraction):
-    ''' Computes the point p along the line segment that connects the
-    two ends of a segment p1p2 where |p1p| = fraction * |p1p2| along
-    with the respective radius.
-    Args:
-        fraction: float between 0. and 1.
+@bifurcation_point_function(as_tree=True)
+def remote_angle(bifurcation_point):
+    '''Calculate the remote bifurcation angle'''
+    end_points = tuple(p for p in tr.i_branch_end_points(bifurcation_point))
+    return mm.angle_3points(bifurcation_point.value,
+                            end_points[0].value,
+                            end_points[1].value)
 
-    Returns: tuple
-        The 3D coordinates of the aforementioned point,
-        Its respective radius
+
+@bifurcation_point_function(as_tree=True)
+def partition(bifurcation_point):
+    '''Calculate the partition on each bif point
     '''
-    return (mm.linear_interpolate(segment[0].value, segment[1].value, fraction),
-            mm.interpolate_radius(segment[0].value[COLS.R], segment[1].value[COLS.R], fraction))
-
-
-def radial_dist(pos):
-    '''Return a function that calculates radial distance for a segment
-
-    Radial distance calculater WRT pos
-    '''
-    @segment_function(as_tree=False)
-    def _rad_dist(segment):
-        '''Capture pos and invoke radial distance calculation'''
-        return mm.segment_radial_dist(segment, pos)
-
-    return _rad_dist
+    n = float(mt.n_sections(bifurcation_point.children[0]))
+    m = float(mt.n_sections(bifurcation_point.children[1]))
+    return max(n, m) / min(n, m)
 
 
 def count(neuron):
     """
-    Return number of segments in neuron or population
+    Return number of bifurcation points in neuron or population
     """
     return sum(1 for _ in iter_neurites(neuron, identity))

@@ -26,13 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
+from os.path import join as joinp
+
 from nose import tools as nt
 from neurom.core.population import Population
 from neurom.ezy import Neuron, load_neuron
 
-NRN1 = load_neuron('test_data/swc/Neuron.swc')
-NRN2 = load_neuron('test_data/swc/Single_basal.swc')
-NRN3 = load_neuron('test_data/swc/Neuron_small_radius.swc')
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = joinp(_path, '../../../test_data')
+
+NRN1 = load_neuron(joinp(DATA_PATH, 'swc/Neuron.swc'))
+NRN2 = load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc'))
+NRN3 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc'))
 
 NEURONS = [NRN1, NRN2, NRN3]
 TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)

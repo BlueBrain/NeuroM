@@ -26,55 +26,71 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Type enumerations'''
+from nose import tools as nt
+import os
+from neurom.io.utils import make_neuron
+from neurom import io
+from neurom.core.tree import Tree
+from neurom import triplets as trip
+from neurom import iter_neurites
 
-from enum import Enum, unique
-
-
-@unique
-class TreeType(Enum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
+import math
+from itertools import izip
 
 
-def tree_type_checker(*ref):
-    '''Tree type checker functor
-
-    Returns:
-        Functor that takes a tree, and returns true if that tree matches any of
-        TreeTypes in ref
-
-    Ex:
-        >>> from neurom.core.types import TreeType, tree_type_checker
-        >>> tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
-        >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
-    '''
-    ref = tuple(ref)
-    if TreeType.all in ref:
-        def check_tree_type(_):
-            '''Always returns true'''
-            return True
-    else:
-        def check_tree_type(tree):
-            '''Check whether tree has the same type as ref
-
-            Returns:
-                True if ref in the same type as tree.type or ref is TreeType.all
-            '''
-            return tree.type in ref
-
-    return check_tree_type
+class MockNeuron(object):
+    pass
 
 
-NEURITES = (TreeType.all,
-            TreeType.axon,
-            TreeType.basal_dendrite,
-            TreeType.apical_dendrite)
+DATA_PATH = './test_data'
+SWC_PATH = os.path.join(DATA_PATH, 'swc/')
+
+data    = io.load_data(SWC_PATH + 'Neuron.swc')
+neuron0 = make_neuron(data)
+tree0   = neuron0.neurites[0]
 
 
-ROOT_ID = -1
+def _make_simple_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(Tree([2.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(Tree([2.0, 6.0, 0.0, 1.0, 1, 1, 1]))
+
+    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(Tree([2.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(Tree([6.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+
+    return T
+
+
+SIMPLE_TREE = _make_simple_tree()
+SIMPLE_NEURON = MockNeuron()
+SIMPLE_NEURON.neurites = [SIMPLE_TREE]
+
+
+def _check_meander_angles(obj):
+
+    angles = [a for a in iter_neurites(obj, trip.meander_angle)]
+
+    nt.eq_(angles,
+           [math.pi / 2, math.pi / 2, math.pi / 2, math.pi])
+
+
+def _check_count(obj, n):
+    nt.eq_(trip.count(obj), n)
+
+
+def test_meander_angles():
+    _check_meander_angles(SIMPLE_TREE)
+    _check_meander_angles(SIMPLE_NEURON)
+
+
+def test_count():
+    _check_count(SIMPLE_NEURON, 4)
+    _check_count(SIMPLE_TREE, 4)
+
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [SIMPLE_TREE, SIMPLE_TREE, SIMPLE_TREE]
+
+    _check_count(neuron_b, 12)
