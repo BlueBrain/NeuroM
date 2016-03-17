@@ -54,7 +54,7 @@ def no_missing_parents(raw_data):
     '''
     ids = np.setdiff1d(raw_data.get_col(COLS.P),
                        raw_data.get_col(COLS.ID))[1:]
-    return len(ids) == 0, list(ids.astype(np.int) + 1)
+    return len(ids) == 0, ids.astype(np.int) + 1
 
 
 def is_single_tree(raw_data):
