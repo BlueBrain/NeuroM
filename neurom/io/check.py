@@ -46,7 +46,6 @@ def has_sequential_ids(raw_data):
 
 def no_missing_parents(raw_data):
     '''Check that all points have existing parents
-%tim
     Point's parent ID must exist and parent must be declared
     before child.
 
