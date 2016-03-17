@@ -92,7 +92,7 @@ def test_has_no_missing_parents_bad_data():
 
     ok, ids = io.check.no_missing_parents(io.load_data(f))
     nt.ok_(not ok)
-    nt.eq_(ids, [6, 217, 428, 639])
+    nt.eq_(list(ids), [6, 217, 428, 639])
 
 
 def test_has_no_missing_parents_good_data():
