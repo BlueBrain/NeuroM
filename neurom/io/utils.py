@@ -39,6 +39,7 @@ from . import check
 from neurom.utils import memoize
 import os
 
+
 @memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
