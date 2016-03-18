@@ -52,13 +52,13 @@ def as_neuron_list(func):
 
 @as_neuron_list
 def soma_radii(neurons):
-    '''Get the radius of the soma'''
+    '''Get the radius of the soma (\xce\xbcm).'''
     return (nrn.soma.radius for nrn in neurons)
 
 
 @as_neuron_list
 def soma_surface_areas(neurons):
-    '''Get the surface area of the soma.
+    '''Get the surface area of the soma (\xce\xbcm²).
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
