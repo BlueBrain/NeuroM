@@ -38,7 +38,7 @@ from . import load_data
 from . import check
 from neurom.utils import memoize
 import os
-
+from collections import deque
 
 @memoize
 def get_soma_ids(rdw):

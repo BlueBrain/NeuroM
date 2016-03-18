@@ -106,7 +106,6 @@ def find_tree_type(tree):
     tree_types = tuple(TreeType)
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
-    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 
     return tree_types[int(np.median(types))]
 
