@@ -319,6 +319,8 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs['new_fig'] = False
     kwargs['subplot'] = subplot
 
+    kwargs['final'] = False
+
     soma(nrn.soma, plane=plane, **kwargs)
 
     kwargs['title'] = kwargs.get('title', 'Neuron view')
@@ -346,6 +348,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
                                              np.max(v) + get_default('white_space', **kwargs)])
 
+    kwargs['final'] = True
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
@@ -572,6 +575,8 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['new_axes'] = False
     kwargs['title'] = kwargs.get('title', 'Neuron view')
 
+    kwargs['final'] = False
+
     soma3d(nrn.soma, **kwargs)
 
     h = []
@@ -601,6 +606,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
         kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
                                              np.max(d) + get_default('white_space', **kwargs)])
 
+    kwargs['final'] = True
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 

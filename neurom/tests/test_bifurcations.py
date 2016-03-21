@@ -109,9 +109,35 @@ def _make_branching_tree():
     T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
+
+def _make_branching_tree_zero_length_bif_segments():
+    '''This tree has 3 branching points'''
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = Tree(p)
+    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5_0 = T4.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T5_0.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6_0 = T4.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T6 = T6_0.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10_0 = T9.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T10_0.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
+    return T
+
+
 BRANCHING_TREE = _make_branching_tree()
 BRANCHING_NEURON = MockNeuron()
 BRANCHING_NEURON.neurites = [BRANCHING_TREE]
+
+ZERO_SEG_BIF_TREE = _make_branching_tree_zero_length_bif_segments()
 
 def _make_odd_tree():
     ''' The infamous invisible tree. This should fail check
@@ -128,6 +154,7 @@ def _make_odd_tree():
     T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
     T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
     return T
+
 
 ODD_TREE = _make_odd_tree()
 ODD_NEURON = MockNeuron()
@@ -171,6 +198,7 @@ def _check_points(obj):
 def test_local_bifurcation_angle():
     _check_local_bifurcation_angles(BRANCHING_NEURON)
     _check_local_bifurcation_angles(BRANCHING_TREE)
+    _check_local_bifurcation_angles(ZERO_SEG_BIF_TREE)
 
 
 def test_remote_bifurcation_angle():
