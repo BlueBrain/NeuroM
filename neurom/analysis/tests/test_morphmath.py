@@ -386,6 +386,19 @@ def test_segment_radius():
     nt.ok_(mm.segment_radius(((0,0,0,4),(0,0,0,6))) == 5)
 
 
+def test_segment_x_coordinate():
+    nt.ok_(mm.segment_x_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
+    nt.ok_(mm.segment_x_coordinate(((0,0,0,4),(1,0,0,6))) == 0.5)
+
+def test_segment_y_coordinate():
+    nt.ok_(mm.segment_y_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
+    nt.ok_(mm.segment_y_coordinate(((0,0,0,4),(0,1,0,6))) == 0.5)
+
+def test_segment_z_coordinate():
+    nt.ok_(mm.segment_z_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
+    nt.ok_(mm.segment_z_coordinate(((0,0,0,4),(0,0,1,6))) == 0.5)
+
+
 def test_segment_radial_dist():
     seg = ((11,11,11), (33, 33, 33))
     nt.assert_almost_equal(mm.segment_radial_dist(seg, (0,0,0)),
