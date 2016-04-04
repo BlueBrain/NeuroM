@@ -371,6 +371,8 @@ def plot_style(fig, ax, **kwargs):
     show_plot = kwargs.get('show_plot', True)
     tight = kwargs.get('tight', False)
 
+    final = kwargs.get('final', True)
+
     # Definition of save options
     output_path = kwargs.get('output_path', None)
 
@@ -401,7 +403,8 @@ def plot_style(fig, ax, **kwargs):
         plt.close()
         return (None, None)
     else:
-        plt.show()
+        if final:
+            plt.show()
         return fig, ax
 
 
