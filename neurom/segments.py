@@ -70,6 +70,7 @@ x_coordinate = segment_function(as_tree=False)(mm.segment_x_coordinate)
 y_coordinate = segment_function(as_tree=False)(mm.segment_y_coordinate)
 z_coordinate = segment_function(as_tree=False)(mm.segment_z_coordinate)
 
+
 @segment_function(as_tree=True)
 def identity(segment):
     '''Hack to bind iteration type to do-nothing function'''
