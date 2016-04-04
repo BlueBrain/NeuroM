@@ -33,14 +33,15 @@ import pylab as plt
 from neurom.view import common
 from neurom.view import view
 import numpy as np
+from neurom.core.types import TreeType
 
 
-def extract_density(population, plane='xy', bins=100):
+def extract_density(population, plane='xy', bins=100, neurite_type=TreeType.basal_dendrite):
     '''Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
-    horiz = nf['segment_' + plane[0] + '_coordinates'](population)
-    vert = nf['segment_' + plane[1] + '_coordinates'](population)
+    horiz = nf['segment_' + plane[0] + '_coordinates'](population, neurite_type=neurite_type)
+    vert = nf['segment_' + plane[1] + '_coordinates'](population, neurite_type=neurite_type)
 
     return np.histogram2d(np.array(horiz), np.array(vert),
                           bins=(bins, bins))
@@ -50,13 +51,14 @@ def plot_density(population, # pylint: disable=too-many-arguments, too-many-loca
                  bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
                  colorlabel='Nodes per unit area', labelfontsize=16,
                  color_map='Reds', no_colorbar=False, threshold=0.01,
-                 **kwargs):
+                 neurite_type=TreeType.basal_dendrite, **kwargs):
     '''Plots the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
     fig, ax = fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-    H1, xedges1, yedges1 = extract_density(population, plane=plane, bins=bins)
+    H1, xedges1, yedges1 = extract_density(population, plane=plane, bins=bins,
+                                           neurite_type=neurite_type)
 
     mask = H1 < threshold  # mask = H1==0
     H2 = np.ma.masked_array(H1, mask)
@@ -83,7 +85,7 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
                            bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
                            colorlabel='Nodes per unit area', labelfontsize=16,
                            color_map='Reds', no_colorbar=False, threshold=0.01,
-                           **kwargs):
+                           neurite_type=TreeType.basal_dendrite, **kwargs):
     '''Plots the 2d histogram of the center
        coordinates of segments in the selected plane
        and superimposes the view of the first neurite of the collection.
@@ -92,4 +94,5 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
 
     return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,
-                        color_map=color_map, no_colorbar=no_colorbar, threshold=threshold, **kwargs)
+                        color_map=color_map, no_colorbar=no_colorbar, threshold=threshold,
+                        neurite_type=neurite_type, **kwargs)
