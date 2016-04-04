@@ -3,6 +3,7 @@ import pylab as plt
 from neurom.view import common
 from neurom.view import view
 
+
 def extract_density(population, plane='xy', bins=100):
 
     horiz = nf['segment_' + plane[0] + '_coordinates'](pop)
@@ -46,7 +47,7 @@ def plot_neuron_on_density(population, plane='xy', bins=100, new_fig=True, subpl
                            color_map='Reds', no_colorbar=False, threshold=0.01, **kwargs):
 
     fig, ax = view.tree(pop.neurites[0], new_fig=new_fig)
-    
+
     return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,
                         color_map=color_map, no_colorbar=no_colorbar, threshold=threshold, **kwargs)
