@@ -85,6 +85,11 @@ segment_lengths = feature_getter(_seg.length)
 number_of_segments = count(feature_getter(_seg.identity))
 segment_taper_rates = feature_getter(_seg.taper_rate)
 
+segment_radii = feature_getter(_seg.radius)
+segment_x_coordinates = feature_getter(_seg.x_coordinate)
+segment_y_coordinates = feature_getter(_seg.y_coordinate)
+segment_z_coordinates = feature_getter(_seg.z_coordinate)
+
 local_bifurcation_angles = feature_getter(_bifs.local_angle)
 remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
 bifurcation_number = count(feature_getter(_bifs.identity))

@@ -236,6 +236,30 @@ def segment_radius(seg):
     return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
 
 
+def segment_x_coordinate(seg):
+    '''Return the mean x coordinate of a segment
+
+    Returns: arithmetic mean of the x coordinates of the points in seg
+    '''
+    return (seg[0][COLS.X] + seg[1][COLS.X]) / 2.
+
+
+def segment_y_coordinate(seg):
+    '''Return the mean y coordinate of a segment
+
+    Returns: arithmetic mean of the y coordinates of the points in seg
+    '''
+    return (seg[0][COLS.Y] + seg[1][COLS.Y]) / 2.
+
+
+def segment_z_coordinate(seg):
+    '''Return the mean z coordinate of a segment
+
+    Returns: arithmetic mean of the z coordinates of the points in seg
+    '''
+    return (seg[0][COLS.Z] + seg[1][COLS.Z]) / 2.
+
+
 def segment_radial_dist(seg, pos):
     '''Return the radial distance of a tree segment to a given point
 
