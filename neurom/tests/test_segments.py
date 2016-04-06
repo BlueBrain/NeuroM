@@ -150,6 +150,30 @@ def _check_segment_radius(obj):
            [1.0, 1.0, 1.5, 2.0, 1.5, 0.875, 0.75, 1.5, 0.875, 0.75])
 
 
+def _check_segment_x_coordinate(obj):
+
+    xcoord = [s for s in iter_neurites(obj, seg.x_coordinate)]
+
+    nt.eq_(xcoord,
+           [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+
+def _check_segment_y_coordinate(obj):
+
+    ycoord = [s for s in iter_neurites(obj, seg.y_coordinate)]
+
+    nt.eq_(ycoord,
+           [1.0, 3.0, 5.0, 7.0, 0.0, 0.0, 0.0, 0.0])
+
+
+def _check_segment_z_coordinate(obj):
+
+    zcoord = [s for s in iter_neurites(obj, seg.z_coordinate)]
+
+    nt.eq_(zcoord,
+           [0.0, 0.0, 0.0, 0.0, 1.0, 3.0, 5.0, 7.0])
+
+
 def _check_count(obj, n):
     nt.eq_(seg.count(obj), n)
 
@@ -190,6 +214,14 @@ def test_segment_radius():
     _check_segment_radius(NEURON)
     _check_segment_radius(NEURON_TREE)
 
+def test_segment_x_coordinate():
+    _check_segment_x_coordinate(SIMPLE_TREE)
+
+def test_segment_y_coordinate():
+    _check_segment_y_coordinate(SIMPLE_TREE)
+
+def test_segment_z_coordinate():
+    _check_segment_z_coordinate(SIMPLE_TREE)
 
 def test_count():
     _check_count(NEURON, 10)

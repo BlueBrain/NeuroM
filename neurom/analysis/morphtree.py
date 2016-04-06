@@ -51,10 +51,22 @@ def path_length(tree):
 def local_bifurcation_angle(bifurcation_point):
     '''Return the opening angle between two out-going segments
     in a bifurcation point
+
+    The bifurcation angle is defined as the angle between the first non-zero
+    length segments of a bifurcation point.
     '''
+    def _skip_0_length(p, c):
+        '''Return the first child c with non-zero distance to parent p'''
+        while np.all(p.value[:COLS.R] == c.value[:COLS.R])\
+                and not tr.is_leaf(c) and not tr.is_forking_point(c):
+            c = c.children[0]
+        return c
+
+    ch = (_skip_0_length(bifurcation_point, bifurcation_point.children[0]),
+          _skip_0_length(bifurcation_point, bifurcation_point.children[1]))
+
     return mm.angle_3points(bifurcation_point.value,
-                            bifurcation_point.children[0].value,
-                            bifurcation_point.children[1].value)
+                            ch[0].value, ch[1].value)
 
 
 def branch_order(tree_section):
