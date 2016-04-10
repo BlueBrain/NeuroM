@@ -34,6 +34,7 @@ from neurom.analysis import morphtree as _mt
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
+from neurom.core.tree import isection
 from neurom import bifurcations as _bifs
 from neurom import points as _pts
 from neurom import iter_neurites
@@ -107,6 +108,13 @@ def neurite_number(neurites, neurite_type=TreeType.all):
 def number_of_sections_per_neurite(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
+
+
+@as_neurite_list
+def total_length_per_neurite(neurites, neurite_type=TreeType.all):
+    '''Get an iterable with the total length of a neurite for a given neurite type'''
+    return (sum(_sec.length(ss) for ss in isection(n))
+            for n in neurites if _ttc(neurite_type)(n))
 
 
 def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
