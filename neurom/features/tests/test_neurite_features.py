@@ -44,7 +44,6 @@ def test_section_lengths_apical():
 def test_total_length_per_neurite_axon():
     tl = list(nf.total_length_per_neurite(NEURON, neurite_type=TreeType.axon))
     nt.assert_equal(len(tl), 1)
-    print tl
     nt.assert_true(np.allclose(tl, (207.87975221)))
 
 def test_total_length_per_neurite_basal():
@@ -54,6 +53,21 @@ def test_total_length_per_neurite_basal():
 
 def test_total_length_per_neurite_apical():
     tl = list(nf.total_length_per_neurite(NEURON, neurite_type=TreeType.apical_dendrite))
+    nt.assert_equal(len(tl), 1)
+    nt.assert_true(np.allclose(tl, (214.37304578)))
+
+def test_total_length_axon():
+    tl = list(nf.total_length(NEURON, neurite_type=TreeType.axon))
+    nt.assert_equal(len(tl), 1)
+    nt.assert_true(np.allclose(tl, (207.87975221)))
+
+def test_total_length_per_neurite_basal():
+    tl = list(nf.total_length(NEURON, neurite_type=TreeType.basal_dendrite))
+    nt.assert_equal(len(tl), 1)
+    nt.assert_true(np.allclose(tl, (418.43241644)))
+
+def test_total_length_apical():
+    tl = list(nf.total_length(NEURON, neurite_type=TreeType.apical_dendrite))
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (214.37304578)))
 
