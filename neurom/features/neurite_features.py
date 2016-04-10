@@ -31,7 +31,6 @@
 from neurom.core.types import TreeType
 from functools import partial
 from neurom.analysis import morphtree as _mt
-from neurom.analysis import morphmath as _mm
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
