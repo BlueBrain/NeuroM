@@ -61,7 +61,7 @@ def test_total_length_axon():
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (207.87975221)))
 
-def test_total_length_per_neurite_basal():
+def test_total_length_basal():
     tl = list(nf.total_length(NEURON, neurite_type=TreeType.basal_dendrite))
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (418.43241644)))
