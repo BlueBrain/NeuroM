@@ -76,6 +76,16 @@ def count(f):
     return wrapped
 
 
+def sum_feature(f):
+    ''' Counts the output of the wrapper wrapper.
+    '''
+    @wraps(f)
+    def wrapped(neurites, neurite_type=TreeType.all):
+        ''' yields the sum of the function'''
+        yield sum(f(neurites, neurite_type))
+    return wrapped
+
+
 section_lengths = feature_getter(_sec.length)
 section_areas = feature_getter(_sec.area)
 section_volumes = feature_getter(_sec.volume)
@@ -98,6 +108,15 @@ partition = feature_getter(_bifs.partition)
 
 
 @as_neurite_list
+def total_length_per_neurite(neurites, neurite_type=TreeType.all):
+    '''Get an iterable with the total length of a neurite for a given neurite type'''
+    return (sum(_sec.length(ss) for ss in isection(n))
+            for n in neurites if _ttc(neurite_type)(n))
+
+total_length = sum_feature(total_length_per_neurite)
+
+
+@as_neurite_list
 def neurite_number(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of neurites for a given neurite type
     '''
@@ -108,19 +127,6 @@ def neurite_number(neurites, neurite_type=TreeType.all):
 def number_of_sections_per_neurite(neurites, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
     return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
-
-
-@as_neurite_list
-def total_length_per_neurite(neurites, neurite_type=TreeType.all):
-    '''Get an iterable with the total length of a neurite for a given neurite type'''
-    return (sum(_sec.length(ss) for ss in isection(n))
-            for n in neurites if _ttc(neurite_type)(n))
-
-
-@as_neurite_list
-def total_length(neurites, neurite_type=TreeType.all):
-    '''Get an iterable with the total length of a neuron for a given neurite type'''
-    yield sum(total_length_per_neurite(neurites, neurite_type=neurite_type))
 
 
 def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
