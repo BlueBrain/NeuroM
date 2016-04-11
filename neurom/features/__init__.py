@@ -76,7 +76,9 @@ NEURITEFEATURES = {
     'trunk_origin_radii': make_iterable()(_neuf.trunk_origin_radii),
     'trunk_section_lengths': make_iterable()(_neuf.trunk_section_lengths),
     'partition': make_iterable()(_neuf.partition),
-    'principal_direction_extents': make_iterable()(_neuf.principal_directions_extents)
+    'principal_direction_extents': make_iterable()(_neuf.principal_directions_extents),
+    'total_length_per_neurite': make_iterable()(_neuf.total_length_per_neurite),
+    'total_length': make_iterable()(_neuf.total_length)
 }
 
 

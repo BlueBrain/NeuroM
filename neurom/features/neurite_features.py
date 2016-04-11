@@ -34,6 +34,7 @@ from neurom.analysis import morphtree as _mt
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
+from neurom.core.tree import isection
 from neurom import bifurcations as _bifs
 from neurom import points as _pts
 from neurom import iter_neurites
@@ -75,6 +76,16 @@ def count(f):
     return wrapped
 
 
+def sum_feature(f):
+    ''' Counts the output of the wrapper wrapper.
+    '''
+    @wraps(f)
+    def wrapped(neurites, neurite_type=TreeType.all):
+        ''' yields the sum of the function'''
+        yield sum(f(neurites, neurite_type))
+    return wrapped
+
+
 section_lengths = feature_getter(_sec.length)
 section_areas = feature_getter(_sec.area)
 section_volumes = feature_getter(_sec.volume)
@@ -94,6 +105,15 @@ local_bifurcation_angles = feature_getter(_bifs.local_angle)
 remote_bifurcation_angles = feature_getter(_bifs.remote_angle)
 bifurcation_number = count(feature_getter(_bifs.identity))
 partition = feature_getter(_bifs.partition)
+
+
+@as_neurite_list
+def total_length_per_neurite(neurites, neurite_type=TreeType.all):
+    '''Get an iterable with the total length of a neurite for a given neurite type'''
+    return (sum(_sec.length(ss) for ss in isection(n))
+            for n in neurites if _ttc(neurite_type)(n))
+
+total_length = sum_feature(total_length_per_neurite)
 
 
 @as_neurite_list
