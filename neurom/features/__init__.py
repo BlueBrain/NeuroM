@@ -30,59 +30,51 @@
 
 
 import numpy as _np
-from decorator import decorator as _decorator
 from neurom.features import neurite_features as _neuf
 from neurom.features import neuron_features as _nrnf
 
 
-def make_iterable(iterable_type=_np.ndarray):
-    '''Decorator factory. Dispatches the decorator that
-    corresponds to the type of iterable which is given as
-    an argument.
-    '''
-    @_decorator
-    def wrapped(f, *args, **kwargs):
-        ''' Feature function
-        '''
-        result = f(*args, **kwargs)
-        if iterable_type is _np.ndarray:
-            return _np.fromiter(result, _np.float)
-        elif iterable_type is list or iterable_type is tuple:
-            return iterable_type(result)
-        else:
-            raise TypeError('Unknown iterable type')
-    return wrapped
-
-
 NEURITEFEATURES = {
-    'section_lengths': make_iterable()(_neuf.section_lengths),
-    'section_areas': make_iterable()(_neuf.section_areas),
-    'section_volumes': make_iterable()(_neuf.section_volumes),
-    'section_path_distances': make_iterable()(_neuf.section_path_distances),
-    'number_of_sections': make_iterable()(_neuf.number_of_sections),
-    'number_of_sections_per_neurite': make_iterable()(_neuf.number_of_sections_per_neurite),
-    'section_branch_orders': make_iterable()(_neuf.section_branch_orders),
-    'section_radial_distances': make_iterable()(_neuf.section_radial_distances),
-    'local_bifurcation_angles': make_iterable()(_neuf.local_bifurcation_angles),
-    'remote_bifurcation_angles': make_iterable()(_neuf.remote_bifurcation_angles),
-    'bifurcation_number': make_iterable()(_neuf.bifurcation_number),
-    'segment_lengths': make_iterable()(_neuf.segment_lengths),
-    'number_of_segments': make_iterable()(_neuf.number_of_segments),
-    'segment_taper_rates': make_iterable()(_neuf.segment_taper_rates),
-    'segment_radii': make_iterable()(_neuf.segment_radii),
-    'segment_x_coordinates': make_iterable()(_neuf.segment_x_coordinates),
-    'segment_y_coordinates': make_iterable()(_neuf.segment_y_coordinates),
-    'segment_z_coordinates': make_iterable()(_neuf.segment_z_coordinates),
-    'trunk_origin_radii': make_iterable()(_neuf.trunk_origin_radii),
-    'trunk_section_lengths': make_iterable()(_neuf.trunk_section_lengths),
-    'partition': make_iterable()(_neuf.partition),
-    'principal_direction_extents': make_iterable()(_neuf.principal_directions_extents),
-    'total_length_per_neurite': make_iterable()(_neuf.total_length_per_neurite),
-    'total_length': make_iterable()(_neuf.total_length)
+    'section_lengths': _neuf.section_lengths,
+    'section_areas': _neuf.section_areas,
+    'section_volumes': _neuf.section_volumes,
+    'section_path_distances': _neuf.section_path_distances,
+    'number_of_sections': _neuf.number_of_sections,
+    'number_of_sections_per_neurite': _neuf.number_of_sections_per_neurite,
+    'number_of_neurites': _neuf.neurite_number,
+    'section_branch_orders': _neuf.section_branch_orders,
+    'section_radial_distances': _neuf.section_radial_distances,
+    'local_bifurcation_angles': _neuf.local_bifurcation_angles,
+    'remote_bifurcation_angles': _neuf.remote_bifurcation_angles,
+    'bifurcation_number': _neuf.bifurcation_number,
+    'segment_lengths': _neuf.segment_lengths,
+    'number_of_segments': _neuf.number_of_segments,
+    'segment_taper_rates': _neuf.segment_taper_rates,
+    'segment_radii': _neuf.segment_radii,
+    'segment_x_coordinates': _neuf.segment_x_coordinates,
+    'segment_y_coordinates': _neuf.segment_y_coordinates,
+    'segment_z_coordinates': _neuf.segment_z_coordinates,
+    'trunk_origin_radii': _neuf.trunk_origin_radii,
+    'trunk_section_lengths': _neuf.trunk_section_lengths,
+    'partition': _neuf.partition,
+    'principal_direction_extents': _neuf.principal_directions_extents,
+    'total_length_per_neurite': _neuf.total_length_per_neurite,
+    'total_length': _neuf.total_length
+}
+
+NEURONFEATURES = {
+    'soma_radii': _nrnf.soma_radii,
+    'soma_surface_areas': _nrnf.soma_surface_areas,
+    'trunk_origin_elevations': _nrnf.trunk_origin_elevations,
+    'trunk_origin_azimuths': _nrnf.trunk_origin_azimuths
 }
 
 
-NEURONFEATURES = {'soma_radii': make_iterable()(_nrnf.soma_radii),
-                  'soma_surface_areas': make_iterable()(_nrnf.soma_surface_areas),
-                  'trunk_origin_elevations': make_iterable()(_nrnf.trunk_origin_elevations),
-                  'trunk_origin_azimuths': make_iterable()(_nrnf.trunk_origin_azimuths)}
+def get_feature(feature, *args, **kwargs):
+    '''Neuron feature getter helper
+
+    Returns features as a 1D numpy array.
+    '''
+    feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
+               else NEURONFEATURES[feature])
+    return _np.fromiter(feature(*args, **kwargs), _np.float)
