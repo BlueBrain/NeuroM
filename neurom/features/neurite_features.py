@@ -41,21 +41,6 @@ from neurom import iter_neurites
 from functools import wraps
 
 
-def as_neurite_list(f):
-    ''' Ensures that a list of neurites will be provided to the function
-    regardless of the nature of the argument, e.g. single neurite, neuron,
-    or population.
-    '''
-    @wraps(f)
-    def wrapped(obj, *args, **kwargs):
-        ''' Wrapping function f to always receive a neurite list
-        '''
-        neurites = ([obj] if isinstance(obj, TreeType)
-                    else (obj.neurites if hasattr(obj, 'neurites') else obj))
-        return f(neurites, *args, **kwargs)
-    return wrapped
-
-
 def feature_getter(mapfun):
     ''' Wrapper around already existing feature functions
     '''
@@ -107,26 +92,23 @@ bifurcation_number = count(feature_getter(_bifs.identity))
 partition = feature_getter(_bifs.partition)
 
 
-@as_neurite_list
-def total_length_per_neurite(neurites, neurite_type=TreeType.all):
+def total_length_per_neurite(neurons, neurite_type=TreeType.all):
     '''Get an iterable with the total length of a neurite for a given neurite type'''
     return (sum(_sec.length(ss) for ss in isection(n))
-            for n in neurites if _ttc(neurite_type)(n))
+            for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 total_length = sum_feature(total_length_per_neurite)
 
 
-@as_neurite_list
-def neurite_number(neurites, neurite_type=TreeType.all):
+def neurite_number(neurons, neurite_type=TreeType.all):
     '''Get an iterable with the number of neurites for a given neurite type
     '''
-    yield sum(1 for n in neurites if _ttc(neurite_type)(n))
+    yield sum(1 for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def number_of_sections_per_neurite(neurites, neurite_type=TreeType.all):
+def number_of_sections_per_neurite(neurons, neurite_type=TreeType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
-    return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
+    return (_sec.count(n) for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
 def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
@@ -169,20 +151,18 @@ def section_radial_distances(neurites, origin=None, use_start_point=False,
     return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
-@as_neurite_list
-def trunk_section_lengths(neurites, neurite_type=TreeType.all):
+def trunk_section_lengths(neurons, neurite_type=TreeType.all):
     '''Get the trunk section lengths of a given type in a neuron'''
-    return (_mt.trunk_section_length(t) for t in neurites if _ttc(neurite_type)(t))
+    return (_mt.trunk_section_length(t)
+            for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def trunk_origin_radii(neurites, neurite_type=TreeType.all):
+def trunk_origin_radii(neurons, neurite_type=TreeType.all):
     '''Get the trunk origin radii of a given type in a neuron'''
-    return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))
+    return (_pts.radius(t) for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def principal_directions_extents(neurites, neurite_type=TreeType.all, direction='first'):
+def principal_directions_extents(neurons, neurite_type=TreeType.all, direction='first'):
     ''' Get principal direction extent of either a neurite or the total neurites
     from a neuron or a population.
 
@@ -196,4 +176,5 @@ def principal_directions_extents(neurites, neurite_type=TreeType.all, direction=
         Iterator containing the extents of the input neurites
     '''
     n = 0 if direction == 'first' else (1 if direction == 'second' else 2)
-    return (_mt.principal_direction_extent(t)[n] for t in neurites if _ttc(neurite_type)(t))
+    return (_mt.principal_direction_extent(t)[n]
+            for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
