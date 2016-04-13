@@ -28,7 +28,7 @@
 
 '''Example for generating density plots'''
 
-from neurom.features import NEURITEFEATURES as nf
+from neurom.features import get_feature as get_feat
 import pylab as plt
 from neurom.view import common
 from neurom.view import view
@@ -40,8 +40,10 @@ def extract_density(population, plane='xy', bins=100, neurite_type=TreeType.basa
     '''Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
-    horiz = nf['segment_' + plane[0] + '_coordinates'](population, neurite_type=neurite_type)
-    vert = nf['segment_' + plane[1] + '_coordinates'](population, neurite_type=neurite_type)
+    horiz = get_feat('segment_%s_coordinates' % plane[0],
+                     population, neurite_type=neurite_type)
+    vert = get_feat('segment_%s_coordinates' % plane[1],
+                    population, neurite_type=neurite_type)
 
     return np.histogram2d(np.array(horiz), np.array(vert),
                           bins=(bins, bins))
