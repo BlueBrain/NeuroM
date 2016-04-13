@@ -48,6 +48,7 @@ NEURITEFEATURES = {
     'bifurcation_number': _impl.bifurcation_number,
     'segment_lengths': _impl.segment_lengths,
     'number_of_segments': _impl.number_of_segments,
+    'segment_radial_distances': _impl.segment_radial_distances,
     'segment_taper_rates': _impl.segment_taper_rates,
     'segment_radii': _impl.segment_radii,
     'segment_x_coordinates': _impl.segment_x_coordinates,
