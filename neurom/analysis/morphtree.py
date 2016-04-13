@@ -75,11 +75,11 @@ def branch_order(tree_section):
     The branching order is defined as the depth of the tree section.
 
     Note:
-        The first level has branch order 0.
+        The first level has branch order 1.
     '''
     node = tree_section[-1]
     bo = sum(1 for _ in tr.iforking_point(node, tr.iupstream))
-    return bo - 2 if tr.is_forking_point(node) else bo - 1
+    return bo - 1 if tr.is_forking_point(node) else bo
 
 
 def i_section_radial_dist(tree, pos=None, use_start_point=False):
