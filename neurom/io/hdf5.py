@@ -40,10 +40,9 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from neurom.utils import memoize
 import h5py
 import numpy as np
-import itertools
+from itertools import izip, izip_longest
 
 
 def get_version(h5file):
@@ -144,16 +143,23 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
-        @memoize
+        group_ids = groups[:, _H5STRUCT.GPFIRST]
+
+        # Create a point_id -> group_id map
+        group_id_map = {}
+        for i, (j, k) in enumerate(izip_longest(group_ids,
+                                                group_ids[1:],
+                                                fillvalue=len(points))):
+            for l in xrange(int(j), int(k)):
+                group_id_map[l] = i
+
         def find_group(point_id):
             '''Find the structure group a points id belongs to
 
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = np.searchsorted(groups[:, _H5STRUCT.GPFIRST], point_id, side='right')
-            bs = max(bs - 1, 0)
-            return groups[bs]
+            return groups[group_id_map[point_id]]
 
         def find_parent_id(point_id):
             '''Find the parent ID of a point'''
@@ -166,9 +172,10 @@ class H5(object):
                 # parent is last point in parent group
                 parent_group_id = group[_H5STRUCT.GPID]
                 # get last point in parent group
-                return groups[parent_group_id + 1][_H5STRUCT.GPFIRST] - 1
+                return group_ids[parent_group_id + 1] - 1
 
-        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ], p[_H5STRUCT.PD] / 2.,
+        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ],
+                          p[_H5STRUCT.PD] / 2.,
                           find_group(i)[_H5STRUCT.GTYPE], i,
                           find_parent_id(i))
                          for i, p in enumerate(points)])
@@ -183,29 +190,29 @@ class H5(object):
 
         '''
 
-        def _find_last_point(group_id, groups):
+        group_initial_ids = groups[:, 0]
+        group_len = len(group_initial_ids)
+
+        def _find_last_point(group_id):
             ''' Identifies and returns the id of the last point of a group'''
-            group_initial_ids = np.sort(np.transpose(groups)[0])
+            return group_initial_ids[group_id + 1] - 1
 
-            if group_id != len(group_initial_ids) - 1:
-                return group_initial_ids[np.where(group_initial_ids ==
-                                                  groups[group_id][0])[0][0] + 1] - 1
-
-        to_be_reduced = np.zeros(len(groups))
+        to_be_reduced = np.zeros(group_len)
         to_be_removed = []
 
+        # This is the slow part
         for ig, g in enumerate(groups):
             if g[2] != -1 and np.allclose(points[g[0]],
-                                          points[_find_last_point(g[2], groups)]):
+                                          points[_find_last_point(g[2])]):
                 # Remove duplicate from list of points
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
                 # in groups structure by one
-                for igg in range(ig + 1, len(groups)):
-                    to_be_reduced[igg] = to_be_reduced[igg] + 1
+                to_be_reduced[ig + 1:] += 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
-                           for i, j in itertools.izip(groups, to_be_reduced)])
+                           for i, j in izip(groups, to_be_reduced)])
+
         points = np.delete(points, to_be_removed, axis=0)
 
         return points, groups

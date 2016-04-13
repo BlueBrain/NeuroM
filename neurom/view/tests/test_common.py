@@ -39,7 +39,7 @@ from neurom.view.common import plot_limits
 from neurom.view.common import plot_ticks
 from neurom.view.common import plot_sphere
 from neurom.view.common import get_color
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 
 import os
 import numpy as np
@@ -191,14 +191,14 @@ def test_plot_style():
     os.rmdir(fig_dir)
 
 def test_get_color():
-    nt.ok_(get_color(None, TreeType.basal_dendrite) == "red")
-    nt.ok_(get_color(None, TreeType.axon) == "blue")
-    nt.ok_(get_color(None, TreeType.apical_dendrite) == "purple")
-    nt.ok_(get_color(None, TreeType.soma) == "black")
-    nt.ok_(get_color(None, TreeType.undefined) == "green")
+    nt.ok_(get_color(None, NeuriteType.basal_dendrite) == "red")
+    nt.ok_(get_color(None, NeuriteType.axon) == "blue")
+    nt.ok_(get_color(None, NeuriteType.apical_dendrite) == "purple")
+    nt.ok_(get_color(None, NeuriteType.soma) == "black")
+    nt.ok_(get_color(None, NeuriteType.undefined) == "green")
     nt.ok_(get_color(None, 'wrong') == "green")
     nt.ok_(get_color('blue', 'wrong') == "blue")
-    nt.ok_(get_color('yellow', TreeType.axon) == "yellow")
+    nt.ok_(get_color('yellow', NeuriteType.axon) == "yellow")
 
 def test_plot_sphere():
     fig0, ax0 = get_figure(params={'projection':'3d'})

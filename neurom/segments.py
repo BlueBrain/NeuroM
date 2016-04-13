@@ -52,7 +52,7 @@ def segment_function(as_tree=False):
         def _wrapper(segment):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                segment = tr.as_elements(segment)
+                segment = (segment[0].value, segment[-1].value)
             return fun(segment)
 
         _wrapper.iter_type = tr.isegment
@@ -62,6 +62,7 @@ def segment_function(as_tree=False):
 
 
 length = segment_function(as_tree=False)(mm.segment_length)
+length2 = segment_function(as_tree=False)(mm.segment_length2)
 radius = segment_function(as_tree=False)(mm.segment_radius)
 volume = segment_function(as_tree=False)(mm.segment_volume)
 area = segment_function(as_tree=False)(mm.segment_area)

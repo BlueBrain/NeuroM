@@ -177,7 +177,7 @@ def point_dist(p1, p2):
     Returns:
         The euclidian distance between the points.
     '''
-    return np.linalg.norm(vector(p1, p2))
+    return np.sqrt(point_dist2(p1, p2))
 
 
 def angle_3points(p0, p1, p2):
@@ -226,6 +226,14 @@ def segment_length(seg):
     Returns: Euclidian distance between centres of points in seg
     '''
     return point_dist(seg[0], seg[1])
+
+
+def segment_length2(seg):
+    '''Return the square of the length of a segment.
+
+    Returns: Square of Euclidian distance between centres of points in seg
+    '''
+    return point_dist2(seg[0], seg[1])
 
 
 def segment_radius(seg):

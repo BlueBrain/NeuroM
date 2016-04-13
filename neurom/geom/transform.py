@@ -90,7 +90,7 @@ def translate(obj, t):
     Input :
 
         obj : object with one of the following types:
-             'TreeType', 'Neuron', 'ezyNeuron'
+             'NeuriteType', 'Neuron', 'ezyNeuron'
 
     Returns: copy of the object with the applied translation
     '''
