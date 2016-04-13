@@ -33,7 +33,7 @@ from nose import tools as nt
 from itertools import izip
 from neurom.ezy import load_population
 from neurom.ezy.population import Population
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -60,8 +60,8 @@ class TestEzyPopulation(object):
         nrts_all = sum(len(neuron.neurites) for neuron in self.pop.neurons)
         nt.assert_equal(nrts_all, self.pop.get_n_neurites())
 
-        nrts_axons = sum(nrn.get_n_neurites(neurite_type=TreeType.axon) for nrn in self.pop.neurons)
-        nt.assert_equal(nrts_axons, self.pop.get_n_neurites(neurite_type=TreeType.axon))
+        nrts_axons = sum(nrn.get_n_neurites(neurite_type=NeuriteType.axon) for nrn in self.pop.neurons)
+        nt.assert_equal(nrts_axons, self.pop.get_n_neurites(neurite_type=NeuriteType.axon))
 
 
     def test_iter_neurites(self):

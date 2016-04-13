@@ -32,15 +32,11 @@ from copy import deepcopy
 from neurom.core.tree import Tree
 import neurom.core.tree as tr
 import neurom.analysis.morphtree as mtr
-from neurom.analysis.morphmath import angle_3points
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.io.utils import make_neuron
 from neurom.core.neuron import make_soma
 from neurom import io
-
-import math
 import numpy as np
-from itertools import izip
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
@@ -48,10 +44,10 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 data    = io.load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data)
 tree0   = neuron0.neurites[0]
-tree_types = [TreeType.axon,
-              TreeType.basal_dendrite,
-              TreeType.basal_dendrite,
-              TreeType.apical_dendrite]
+tree_types = [NeuriteType.axon,
+              NeuriteType.basal_dendrite,
+              NeuriteType.basal_dendrite,
+              NeuriteType.apical_dendrite]
 
 
 # Mock tree holding integers, not points

@@ -32,7 +32,7 @@ Python module of NeuroM to visualize morphologies
 
 from itertools import izip
 from neurom.view import common
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.core.tree import isegment
@@ -225,7 +225,7 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     # Definition of the tree color depending on the tree type.
-    treecolor = common.get_color(treecolor, tree_type=TreeType.soma)
+    treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
 
     # Plot the outline of the soma as a circle, is outline is selected.
     if not outline:
@@ -500,7 +500,7 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     # Definition of the tree color depending on the tree type.
-    treecolor = common.get_color(treecolor, tree_type=TreeType.soma)
+    treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
 
     xs = sm.center[0]
     ys = sm.center[1]
@@ -613,7 +613,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 def _format_str(string):
     ''' String formatting
     '''
-    return string.replace('TreeType.', '').replace('_', ' ').capitalize()
+    return string.replace('NeuriteType.', '').replace('_', ' ').capitalize()
 
 
 def _generate_collection(group, ax, ctype, colors):
@@ -663,7 +663,7 @@ def _render_dendrogram(dnd, ax, displacement):
 
     if soma_square is not None:
 
-        _generate_collection((soma_square + (displacement / 2., 0.),), ax, TreeType.soma, colors)
+        _generate_collection((soma_square + (displacement / 2., 0.),), ax, NeuriteType.soma, colors)
         ax.plot((displacement / 2., displacement), (0., 0.), color='k')
         ax.plot((0., displacement / 2.), (0., 0.), color='k')
 

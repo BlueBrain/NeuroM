@@ -34,7 +34,7 @@ import numpy as np
 from copy import deepcopy
 from neurom import ezy
 from collections import namedtuple
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.exceptions import SomaError, IDSequenceError
 from nose import tools as nt
 from neurom import sections as sec
@@ -88,27 +88,27 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(seclen), 84)
         nt.assert_true(np.all(seclen == ref_seclen))
 
-        seclen = self.neuron.get_section_lengths(TreeType.all)
+        seclen = self.neuron.get_section_lengths(NeuriteType.all)
         nt.assert_equal(len(seclen), 84)
         nt.assert_true(np.all(seclen == ref_seclen))
 
     def test_get_section_lengths_axon(self):
-        s = self.neuron.get_section_lengths(TreeType.axon)
+        s = self.neuron.get_section_lengths(NeuriteType.axon)
         nt.assert_equal(len(s), 21)
 
     def test_get_section_lengths_basal(self):
-        s = self.neuron.get_section_lengths(TreeType.basal_dendrite)
+        s = self.neuron.get_section_lengths(NeuriteType.basal_dendrite)
         nt.assert_equal(len(s), 42)
 
     def test_get_section_lengths_apical(self):
-        s = self.neuron.get_section_lengths(TreeType.apical_dendrite)
+        s = self.neuron.get_section_lengths(NeuriteType.apical_dendrite)
         nt.assert_equal(len(s), 21)
 
     def test_get_section_lengths_invalid(self):
-        s = self.neuron.get_section_lengths(TreeType.soma)
+        s = self.neuron.get_section_lengths(NeuriteType.soma)
         nt.assert_equal(len(s), 0)
-        s = self.neuron.get_section_lengths(TreeType.undefined)
-        s = self.neuron.get_section_lengths(TreeType.soma)
+        s = self.neuron.get_section_lengths(NeuriteType.undefined)
+        s = self.neuron.get_section_lengths(NeuriteType.soma)
 
     def test_get_segment_lengths(self):
         ref_seglen = list(iter_neurites(self.neuron, seg.length))
@@ -116,7 +116,7 @@ class TestEzyNeuron(object):
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == ref_seglen))
 
-        seglen = self.neuron.get_segment_lengths(TreeType.all)
+        seglen = self.neuron.get_segment_lengths(NeuriteType.all)
         nt.assert_equal(len(seglen), 840)
         nt.assert_true(np.all(seglen == ref_seglen))
 
@@ -128,21 +128,21 @@ class TestEzyNeuron(object):
         nt.assert_almost_equal(self.neuron.get_soma_surface_area(), area)
 
     def test_get_segment_lengths_axon(self):
-        s = self.neuron.get_segment_lengths(TreeType.axon)
+        s = self.neuron.get_segment_lengths(NeuriteType.axon)
         nt.assert_equal(len(s), 210)
 
     def test_get_segment_lengths_basal(self):
-        s = self.neuron.get_segment_lengths(TreeType.basal_dendrite)
+        s = self.neuron.get_segment_lengths(NeuriteType.basal_dendrite)
         nt.assert_equal(len(s), 420)
 
     def test_get_segment_lengths_apical(self):
-        s = self.neuron.get_segment_lengths(TreeType.apical_dendrite)
+        s = self.neuron.get_segment_lengths(NeuriteType.apical_dendrite)
         nt.assert_equal(len(s), 210)
 
     def test_get_segment_lengths_invalid(self):
-        s = self.neuron.get_segment_lengths(TreeType.soma)
+        s = self.neuron.get_segment_lengths(NeuriteType.soma)
         nt.assert_equal(len(s), 0)
-        s = self.neuron.get_segment_lengths(TreeType.undefined)
+        s = self.neuron.get_segment_lengths(NeuriteType.undefined)
         nt.assert_equal(len(s), 0)
 
     def test_get_local_bifurcation_angles(self):
@@ -152,26 +152,26 @@ class TestEzyNeuron(object):
         local_bifangles = self.neuron.get_local_bifurcation_angles()
         nt.assert_equal(len(local_bifangles), 40)
         nt.assert_true(np.all(local_bifangles == ref_local_bifangles))
-        local_bifangles = self.neuron.get_local_bifurcation_angles(TreeType.all)
+        local_bifangles = self.neuron.get_local_bifurcation_angles(NeuriteType.all)
         nt.assert_equal(len(local_bifangles), 40)
         nt.assert_true(np.all(local_bifangles == ref_local_bifangles))
 
     def test_get_local_bifurcation_angles_axon(self):
-        s = self.neuron.get_local_bifurcation_angles(TreeType.axon)
+        s = self.neuron.get_local_bifurcation_angles(NeuriteType.axon)
         nt.assert_equal(len(s), 10)
 
     def test_get_local_bifurcation_angles_basal(self):
-        s = self.neuron.get_local_bifurcation_angles(TreeType.basal_dendrite)
+        s = self.neuron.get_local_bifurcation_angles(NeuriteType.basal_dendrite)
         nt.assert_equal(len(s), 20)
 
     def test_get_local_bifurcation_angles_apical(self):
-        s = self.neuron.get_local_bifurcation_angles(TreeType.apical_dendrite)
+        s = self.neuron.get_local_bifurcation_angles(NeuriteType.apical_dendrite)
         nt.assert_equal(len(s), 10)
 
     def test_get_local_bifurcation_angles_invalid(self):
-        s = self.neuron.get_local_bifurcation_angles(TreeType.soma)
+        s = self.neuron.get_local_bifurcation_angles(NeuriteType.soma)
         nt.assert_equal(len(s), 0)
-        s = self.neuron.get_local_bifurcation_angles(TreeType.undefined)
+        s = self.neuron.get_local_bifurcation_angles(NeuriteType.undefined)
         nt.assert_equal(len(s), 0)
 
     def test_get_remote_bifurcation_angles(self):
@@ -179,26 +179,26 @@ class TestEzyNeuron(object):
         remote_bifangles = self.neuron.get_remote_bifurcation_angles()
         nt.assert_equal(len(remote_bifangles), 40)
         nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
-        remote_bifangles = self.neuron.get_remote_bifurcation_angles(TreeType.all)
+        remote_bifangles = self.neuron.get_remote_bifurcation_angles(NeuriteType.all)
         nt.assert_equal(len(remote_bifangles), 40)
         nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
 
     def test_get_remote_bifurcation_angles_axon(self):
-        s = self.neuron.get_remote_bifurcation_angles(TreeType.axon)
+        s = self.neuron.get_remote_bifurcation_angles(NeuriteType.axon)
         nt.assert_equal(len(s), 10)
 
     def test_get_remote_bifurcation_angles_basal(self):
-        s = self.neuron.get_remote_bifurcation_angles(TreeType.basal_dendrite)
+        s = self.neuron.get_remote_bifurcation_angles(NeuriteType.basal_dendrite)
         nt.assert_equal(len(s), 20)
 
     def test_get_remote_bifurcation_angles_apical(self):
-        s = self.neuron.get_remote_bifurcation_angles(TreeType.apical_dendrite)
+        s = self.neuron.get_remote_bifurcation_angles(NeuriteType.apical_dendrite)
         nt.assert_equal(len(s), 10)
 
     def test_get_remote_bifurcation_angles_invalid(self):
-        s = self.neuron.get_remote_bifurcation_angles(TreeType.soma)
+        s = self.neuron.get_remote_bifurcation_angles(NeuriteType.soma)
         nt.assert_equal(len(s), 0)
-        s = self.neuron.get_remote_bifurcation_angles(TreeType.undefined)
+        s = self.neuron.get_remote_bifurcation_angles(NeuriteType.undefined)
         nt.assert_equal(len(s), 0)
 
 
@@ -228,7 +228,7 @@ class TestEzyNeuron(object):
         nt.assert_true(np.all(rad_dists == ref_sec_rad_dist_start))
 
     def test_get_section_radial_axon(self):
-        rad_dists = self.neuron.get_section_radial_distances(neurite_type=TreeType.axon)
+        rad_dists = self.neuron.get_section_radial_distances(neurite_type=NeuriteType.axon)
         nt.assert_equal(len(rad_dists), 21)
 
     def test_get_section_path_distances_endpoint(self):
@@ -248,26 +248,26 @@ class TestEzyNeuron(object):
         nt.assert_true(np.all(path_lengths == ref_sec_path_len_start))
 
     def test_get_section_path_distances_axon(self):
-        path_lengths = self.neuron.get_section_path_distances(neurite_type=TreeType.axon)
+        path_lengths = self.neuron.get_section_path_distances(neurite_type=NeuriteType.axon)
         nt.assert_equal(len(path_lengths), 21)
 
 
     def test_get_n_sections(self):
         nt.assert_equal(self.neuron.get_n_sections(), 84)
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.all), 84)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.all), 84)
 
     def test_get_n_sections_axon(self):
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.axon), 21)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.axon), 21)
 
     def test_get_n_sections_basal(self):
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.basal_dendrite), 42)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.basal_dendrite), 42)
 
     def test_get_n_sections_apical(self):
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.apical_dendrite), 21)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.apical_dendrite), 21)
 
     def test_get_n_sections_invalid(self):
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.soma), 0)
-        nt.assert_equal(self.neuron.get_n_sections(TreeType.undefined), 0)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.soma), 0)
+        nt.assert_equal(self.neuron.get_n_sections(NeuriteType.undefined), 0)
 
     def test_get_n_sections_per_neurite(self):
         nsecs = self.neuron.get_n_sections_per_neurite()
@@ -275,28 +275,28 @@ class TestEzyNeuron(object):
         nt.assert_true(np.all(nsecs == [21, 21, 21, 21]))
 
     def test_get_n_sections_per_neurite_axon(self):
-        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.axon)
+        nsecs = self.neuron.get_n_sections_per_neurite(NeuriteType.axon)
         nt.assert_equal(len(nsecs), 1)
         nt.assert_equal(nsecs, [21])
 
     def test_get_n_sections_per_neurite_basal(self):
-        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.basal_dendrite)
+        nsecs = self.neuron.get_n_sections_per_neurite(NeuriteType.basal_dendrite)
         nt.assert_equal(len(nsecs), 2)
         nt.assert_true(np.all(nsecs == [21, 21]))
 
     def test_get_n_sections_per_neurite_apical(self):
-        nsecs = self.neuron.get_n_sections_per_neurite(TreeType.apical_dendrite)
+        nsecs = self.neuron.get_n_sections_per_neurite(NeuriteType.apical_dendrite)
         nt.assert_equal(len(nsecs), 1)
         nt.assert_true(np.all(nsecs == [21]))
 
     def test_get_n_neurites(self):
         nt.assert_equal(self.neuron.get_n_neurites(), 4)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.all), 4)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.axon), 1)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.basal_dendrite), 2)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.apical_dendrite), 1)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.soma), 0)
-        nt.assert_equal(self.neuron.get_n_neurites(TreeType.undefined), 0)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.all), 4)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.axon), 1)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.basal_dendrite), 2)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.apical_dendrite), 1)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.soma), 0)
+        nt.assert_equal(self.neuron.get_n_neurites(NeuriteType.undefined), 0)
 
     def test_get_trunk_origin_radii(self):
         nt.assert_items_equal(self.neuron.get_trunk_origin_radii(),
@@ -305,23 +305,23 @@ class TestEzyNeuron(object):
                                0.66943255462899998,
                                0.14656092843999999])
 
-        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(TreeType.apical_dendrite),
+        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(NeuriteType.apical_dendrite),
                               [0.14656092843999999])
-        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(TreeType.basal_dendrite),
+        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(NeuriteType.basal_dendrite),
                               [0.18391483031299999,
                                0.66943255462899998])
-        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(TreeType.axon),
+        nt.assert_items_equal(self.neuron.get_trunk_origin_radii(NeuriteType.axon),
                               [0.85351288499400002])
 
     def test_get_trunk_section_lengths(self):
         nt.assert_items_equal(self.neuron.get_trunk_section_lengths(), [9.579117366740002,
-                                                                       7.972322416776259,
-                                                                       8.2245287740603779,
-                                                                       9.212707985134525])
-        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.apical_dendrite), [9.212707985134525])
-        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.basal_dendrite),
+                                                                        7.972322416776259,
+                                                                        8.2245287740603779,
+                                                                        9.212707985134525])
+        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(NeuriteType.apical_dendrite), [9.212707985134525])
+        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(NeuriteType.basal_dendrite),
                               [7.972322416776259, 8.2245287740603779])
-        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(TreeType.axon), [9.579117366740002])
+        nt.assert_items_equal(self.neuron.get_trunk_section_lengths(NeuriteType.axon), [9.579117366740002])
 
     def test_view(self):
         # Neuron.plot simply forwards arguments to neurom.view.view
@@ -338,7 +338,7 @@ class TestEzyNeuron(object):
 
         fake_neuron = namedtuple('Neuron', 'neurites')
         fake_neuron.neurites = []
-        nt.assert_false(self.neuron._compare_neurites(fake_neuron, TreeType.axon))
+        nt.assert_false(self.neuron._compare_neurites(fake_neuron, NeuriteType.axon))
         nt.assert_true(fake_neuron, fake_neuron)
 
         neuron2 = deepcopy(self.neuron)
