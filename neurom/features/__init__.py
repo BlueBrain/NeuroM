@@ -69,6 +69,7 @@ NEURITEFEATURES = {
     'segment_lengths': make_iterable()(_neuf.segment_lengths),
     'number_of_segments': make_iterable()(_neuf.number_of_segments),
     'segment_taper_rates': make_iterable()(_neuf.segment_taper_rates),
+    'segment_radial_distances': make_iterable()(_neuf.segment_radial_distances),
     'segment_radii': make_iterable()(_neuf.segment_radii),
     'segment_x_coordinates': make_iterable()(_neuf.segment_x_coordinates),
     'segment_y_coordinates': make_iterable()(_neuf.segment_y_coordinates),

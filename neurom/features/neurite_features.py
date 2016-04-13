@@ -84,7 +84,6 @@ number_of_sections = count(feature_getter(_sec.identity))
 segment_lengths = feature_getter(_seg.length)
 number_of_segments = count(feature_getter(_seg.identity))
 segment_taper_rates = feature_getter(_seg.taper_rate)
-
 segment_radii = feature_getter(_seg.radius)
 segment_x_coordinates = feature_getter(_seg.x_coordinate)
 segment_y_coordinates = feature_getter(_seg.y_coordinate)
@@ -127,6 +126,24 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
+
+
+def segment_radial_distances(neurites, neurite_type=TreeType.all):
+    '''Get an iterable containing section radial distances to origin of\
+       all neurites of a given type
+
+    Parameters:
+        origin: Point wrt which radial dirtance is calulated\
+                (default tree root)
+        use_start_point: if true, use the section's first point,\
+                         otherwise use the end-point (default False)
+        neurite_type: Type of neurites to be considered (default all)
+    '''
+    def f(n):
+        '''neurite identity function'''
+        return n
+    f.iter_type = _mt.i_segment_radial_dist
+    return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
 def section_radial_distances(neurites, origin=None, use_start_point=False,
