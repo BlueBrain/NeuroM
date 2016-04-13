@@ -30,43 +30,42 @@
 
 
 import numpy as _np
-from neurom.features import neurite_features as _neuf
-from neurom.features import neuron_features as _nrnf
+from . import _impl
 
 
 NEURITEFEATURES = {
-    'section_lengths': _neuf.section_lengths,
-    'section_areas': _neuf.section_areas,
-    'section_volumes': _neuf.section_volumes,
-    'section_path_distances': _neuf.section_path_distances,
-    'number_of_sections': _neuf.number_of_sections,
-    'number_of_sections_per_neurite': _neuf.number_of_sections_per_neurite,
-    'number_of_neurites': _neuf.neurite_number,
-    'section_branch_orders': _neuf.section_branch_orders,
-    'section_radial_distances': _neuf.section_radial_distances,
-    'local_bifurcation_angles': _neuf.local_bifurcation_angles,
-    'remote_bifurcation_angles': _neuf.remote_bifurcation_angles,
-    'bifurcation_number': _neuf.bifurcation_number,
-    'segment_lengths': _neuf.segment_lengths,
-    'number_of_segments': _neuf.number_of_segments,
-    'segment_taper_rates': _neuf.segment_taper_rates,
-    'segment_radii': _neuf.segment_radii,
-    'segment_x_coordinates': _neuf.segment_x_coordinates,
-    'segment_y_coordinates': _neuf.segment_y_coordinates,
-    'segment_z_coordinates': _neuf.segment_z_coordinates,
-    'trunk_origin_radii': _neuf.trunk_origin_radii,
-    'trunk_section_lengths': _neuf.trunk_section_lengths,
-    'partition': _neuf.partition,
-    'principal_direction_extents': _neuf.principal_directions_extents,
-    'total_length_per_neurite': _neuf.total_length_per_neurite,
-    'total_length': _neuf.total_length
+    'section_lengths': _impl.section_lengths,
+    'section_areas': _impl.section_areas,
+    'section_volumes': _impl.section_volumes,
+    'section_path_distances': _impl.section_path_distances,
+    'number_of_sections': _impl.number_of_sections,
+    'number_of_sections_per_neurite': _impl.number_of_sections_per_neurite,
+    'number_of_neurites': _impl.neurite_number,
+    'section_branch_orders': _impl.section_branch_orders,
+    'section_radial_distances': _impl.section_radial_distances,
+    'local_bifurcation_angles': _impl.local_bifurcation_angles,
+    'remote_bifurcation_angles': _impl.remote_bifurcation_angles,
+    'bifurcation_number': _impl.bifurcation_number,
+    'segment_lengths': _impl.segment_lengths,
+    'number_of_segments': _impl.number_of_segments,
+    'segment_taper_rates': _impl.segment_taper_rates,
+    'segment_radii': _impl.segment_radii,
+    'segment_x_coordinates': _impl.segment_x_coordinates,
+    'segment_y_coordinates': _impl.segment_y_coordinates,
+    'segment_z_coordinates': _impl.segment_z_coordinates,
+    'trunk_origin_radii': _impl.trunk_origin_radii,
+    'trunk_section_lengths': _impl.trunk_section_lengths,
+    'partition': _impl.partition,
+    'principal_direction_extents': _impl.principal_directions_extents,
+    'total_length_per_neurite': _impl.total_length_per_neurite,
+    'total_length': _impl.total_length
 }
 
 NEURONFEATURES = {
-    'soma_radii': _nrnf.soma_radii,
-    'soma_surface_areas': _nrnf.soma_surface_areas,
-    'trunk_origin_elevations': _nrnf.trunk_origin_elevations,
-    'trunk_origin_azimuths': _nrnf.trunk_origin_azimuths
+    'soma_radii': _impl.soma_radii,
+    'soma_surface_areas': _impl.soma_surface_areas,
+    'trunk_origin_elevations': _impl.trunk_origin_elevations,
+    'trunk_origin_azimuths': _impl.trunk_origin_azimuths
 }
 
 
