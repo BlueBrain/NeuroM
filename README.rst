@@ -143,17 +143,17 @@ Examples
 
 .. code-block:: python
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+    >>> from neurom.ezy import load_neuron, get_feature, NeuriteType
+    >>> nrn = load_neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = get_feature('segment_lengths', nrn, NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = get_feature('section_lengths', nrn, NeuriteType.axon)
 
 
 - Visualize a neuronal morphology:
 
 .. code-block:: python
 
-    >>> # Initialize nrn as above
+    >>> from neurom import ezy
     >>> fig, ax = ezy.view(nrn)
     >>> fig.show()
 

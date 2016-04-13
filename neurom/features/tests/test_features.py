@@ -4,7 +4,7 @@ from nose import tools as nt
 import numpy as np
 from neurom.core.tree import Tree
 from neurom.core.neuron import make_soma
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 import neurom.sections as sec
 import neurom.segments as seg
 import neurom.bifurcations as bifs
@@ -33,66 +33,66 @@ def test_section_lengths():
     nt.assert_equal(len(seclen), 84)
     nt.assert_true(np.all(seclen == ref_seclen))
 
-    seclen = get_feat('section_lengths', NEURON, neurite_type=TreeType.all)
+    seclen = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.all)
     nt.assert_equal(len(seclen), 84)
     nt.assert_true(np.all(seclen == ref_seclen))
 
 
 def test_section_lengths_axon():
-    s = get_feat('section_lengths', NEURON, neurite_type=TreeType.axon)
+    s = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(s), 21)
 
 
 def test_total_lengths_basal():
-    s = get_feat('section_lengths', NEURON, neurite_type=TreeType.basal_dendrite)
+    s = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(s), 42)
 
 
 def test_section_lengths_apical():
-    s = get_feat('section_lengths', NEURON, neurite_type=TreeType.apical_dendrite)
+    s = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(s), 21)
 
 
 def test_total_length_per_neurite_axon():
-    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=TreeType.axon)
+    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (207.87975221)))
 
 
 def test_total_length_per_neurite_basal():
-    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=TreeType.basal_dendrite)
+    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(tl), 2)
     nt.assert_true(np.allclose(tl, (211.11737442, 207.31504202)))
 
 
 def test_total_length_per_neurite_apical():
-    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=TreeType.apical_dendrite)
+    tl = get_feat('total_length_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (214.37304578)))
 
 
 def test_total_length_axon():
-    tl = get_feat('total_length', NEURON, neurite_type=TreeType.axon)
+    tl = get_feat('total_length', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (207.87975221)))
 
 
 def test_total_length_basal():
-    tl = get_feat('total_length', NEURON, neurite_type=TreeType.basal_dendrite)
+    tl = get_feat('total_length', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (418.43241644)))
 
 
 def test_total_length_apical():
-    tl = get_feat('total_length', NEURON, neurite_type=TreeType.apical_dendrite)
+    tl = get_feat('total_length', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(tl), 1)
     nt.assert_true(np.allclose(tl, (214.37304578)))
 
 
 def test_section_lengths_invalid():
-    s = get_feat('section_lengths', NEURON, neurite_type=TreeType.soma)
+    s = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.soma)
     nt.assert_equal(len(s), 0)
-    s = get_feat('section_lengths', NEURON, neurite_type=TreeType.undefined)
+    s = get_feat('section_lengths', NEURON, neurite_type=NeuriteType.undefined)
     nt.assert_equal(len(s), 0)
 
 
@@ -115,7 +115,7 @@ def test_section_path_distances_start_point():
 
 
 def test_section_path_distances_axon():
-    path_lengths = get_feat('section_path_distances', NEURON, neurite_type=TreeType.axon)
+    path_lengths = get_feat('section_path_distances', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(path_lengths), 21)
 
 
@@ -125,7 +125,7 @@ def test_segment_lengths():
     nt.assert_equal(len(seglen), 840)
     nt.assert_true(np.all(seglen == ref_seglen))
 
-    seglen = get_feat('segment_lengths', NEURON, neurite_type=TreeType.all)
+    seglen = get_feat('segment_lengths', NEURON, neurite_type=NeuriteType.all)
     nt.assert_equal(len(seglen), 840)
     nt.assert_true(np.all(seglen == ref_seglen))
 
@@ -137,28 +137,28 @@ def test_local_bifurcation_angles():
     local_bifangles = get_feat('local_bifurcation_angles', NEURON)
     nt.assert_equal(len(local_bifangles), 40)
     nt.assert_true(np.all(local_bifangles == ref_local_bifangles))
-    local_bifangles = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.all)
+    local_bifangles = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.all)
     nt.assert_equal(len(local_bifangles), 40)
     nt.assert_true(np.all(local_bifangles == ref_local_bifangles))
 
 def test_local_bifurcation_angles_axon():
-    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.axon)
+    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(s), 10)
 
 def test_local_bifurcation_angles_basal():
-    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.basal_dendrite)
+    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(s), 20)
 
 
 def test_local_bifurcation_angles_apical():
-    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.apical_dendrite)
+    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(s), 10)
 
 
 def test_local_bifurcation_angles_invalid():
-    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.soma)
+    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.soma)
     nt.assert_equal(len(s), 0)
-    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=TreeType.undefined)
+    s = get_feat('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.undefined)
     nt.assert_equal(len(s), 0)
 
 
@@ -167,30 +167,30 @@ def test_remote_bifurcation_angles():
     remote_bifangles = get_feat('remote_bifurcation_angles', NEURON)
     nt.assert_equal(len(remote_bifangles), 40)
     nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
-    remote_bifangles = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.all)
+    remote_bifangles = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.all)
     nt.assert_equal(len(remote_bifangles), 40)
     nt.assert_true(np.all(remote_bifangles == ref_remote_bifangles))
 
 
 def test_remote_bifurcation_angles_axon():
-    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.axon)
+    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(s), 10)
 
 
 def test_remote_bifurcation_angles_basal():
-    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.basal_dendrite)
+    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(s), 20)
 
 
 def test_remote_bifurcation_angles_apical():
-    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.apical_dendrite)
+    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(s), 10)
 
 
 def test_remote_bifurcation_angles_invalid():
-    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.soma)
+    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.soma)
     nt.assert_equal(len(s), 0)
-    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=TreeType.undefined)
+    s = get_feat('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.undefined)
     nt.assert_equal(len(s), 0)
 
 
@@ -222,30 +222,30 @@ def test_section_radial_distances_start_point():
 
 
 def test_section_radial_axon():
-    rad_dists = get_feat('section_radial_distances', NEURON, neurite_type=TreeType.axon)
+    rad_dists = get_feat('section_radial_distances', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(rad_dists), 21)
 
 
 def test_number_of_sections_all():
     nt.assert_equal(get_feat('number_of_sections', NEURON)[0], 84)
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.all)[0], 84)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.all)[0], 84)
 
 
 def test_number_of_sections_axon():
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.axon)[0], 21)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.axon)[0], 21)
 
 
 def test_number_of_sections_basal():
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.basal_dendrite)[0], 42)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 42)
 
 
 def test_n_sections_apical():
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.apical_dendrite)[0], 21)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 21)
 
 
 def test_seciton_number_invalid():
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.soma)[0], 0)
-    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=TreeType.undefined)[0], 0)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.soma)[0], 0)
+    nt.assert_equal(get_feat('number_of_sections', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
 
 
 def test_per_neurite_number_of_sections():
@@ -255,31 +255,31 @@ def test_per_neurite_number_of_sections():
 
 
 def test_per_neurite_number_of_sections_axon():
-    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=TreeType.axon)
+    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.axon)
     nt.assert_equal(len(nsecs), 1)
     nt.assert_equal(nsecs, [21])
 
 
 def test_n_sections_per_neurite_basal():
-    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=TreeType.basal_dendrite)
+    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.assert_equal(len(nsecs), 2)
     nt.assert_true(np.all(nsecs == [21, 21]))
 
 
 def test_n_sections_per_neurite_apical():
-    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=TreeType.apical_dendrite)
+    nsecs = get_feat('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.assert_equal(len(nsecs), 1)
     nt.assert_true(np.all(nsecs == [21]))
 
 
 def test_neurite_number():
     nt.assert_equal(get_feat('number_of_neurites', NEURON)[0], 4)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.all)[0], 4)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.axon)[0], 1)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.basal_dendrite)[0], 2)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.apical_dendrite)[0], 1)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.soma)[0], 0)
-    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=TreeType.undefined)[0], 0)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.all)[0], 4)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.axon)[0], 1)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 2)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 1)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.soma)[0], 0)
+    nt.assert_equal(get_feat('number_of_neurites', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
 
 
 def test_trunk_origin_radii():
@@ -289,32 +289,32 @@ def test_trunk_origin_radii():
                            0.66943255462899998,
                            0.14656092843999999])
 
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, TreeType.apical_dendrite),
+    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.apical_dendrite),
                           [0.14656092843999999])
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, TreeType.basal_dendrite),
+    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.basal_dendrite),
                           [0.18391483031299999,
                            0.66943255462899998])
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, TreeType.axon),
+    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.axon),
                           [0.85351288499400002])
 
 
 def test_get_trunk_section_lengths():
     nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON), [9.579117366740002,
-                                                                7.972322416776259,
-                                                                8.2245287740603779,
-                                                                9.212707985134525])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, TreeType.apical_dendrite),
+                                                                      7.972322416776259,
+                                                                      8.2245287740603779,
+                                                                      9.212707985134525])
+    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.apical_dendrite),
                           [9.212707985134525])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, TreeType.basal_dendrite),
+    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.basal_dendrite),
                           [7.972322416776259, 8.2245287740603779])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, TreeType.axon), [9.579117366740002])
+    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.axon), [9.579117366740002])
 
 
 def test_principal_directions_extents():
     points = np.array([[-10., 0., 0.],
-                    [-9., 0., 0.],
-                    [9., 0., 0.],
-                    [10., 0., 0.]])
+                       [-9., 0., 0.],
+                       [9., 0., 0.],
+                       [10., 0., 0.]])
 
     tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
     tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
@@ -344,21 +344,21 @@ def test_trunk_origin_elevations():
 
     s = make_soma([[0, 0, 0, 4]])
     t0 = Tree((1, 0, 0, 2))
-    t0.type = TreeType.basal_dendrite
+    t0.type = NeuriteType.basal_dendrite
     t1 = Tree((0, 1, 0, 2))
-    t1.type = TreeType.basal_dendrite
+    t1.type = NeuriteType.basal_dendrite
     n0.neurites = [t0, t1]
     n0.soma = s
 
     t2 = Tree((0, -1, 0, 2))
-    t2.type = TreeType.basal_dendrite
+    t2.type = NeuriteType.basal_dendrite
     n1.neurites = [t2]
     n1.soma = s
 
     pop = [n0, n1]
     nt.assert_true(np.all(get_feat('trunk_origin_elevations', pop) ==
                           [0.0, np.pi/2., -np.pi/2.]))
-    nt.eq_(len(get_feat('trunk_origin_elevations', pop, neurite_type=TreeType.axon)), 0)
+    nt.eq_(len(get_feat('trunk_origin_elevations', pop, neurite_type=NeuriteType.axon)), 0)
 
 def test_trunk_origin_azimuths():
     n0 = MockNeuron()
@@ -369,7 +369,7 @@ def test_trunk_origin_azimuths():
     n5 = MockNeuron()
 
     t = Tree((0, 0, 0, 2))
-    t.type = TreeType.basal_dendrite
+    t.type = NeuriteType.basal_dendrite
     n0.neurites = [t]
     n1.neurites = [t]
     n2.neurites = [t]
@@ -392,4 +392,4 @@ def test_trunk_origin_azimuths():
     pop[5].soma = s5
     nt.assert_true(np.all(get_feat('trunk_origin_azimuths', pop) ==
                           [-np.pi/2., np.pi/2., 0.0, np.pi/4., 0.0, np.pi]))
-    nt.eq_(len(get_feat('trunk_origin_azimuths', pop, neurite_type=TreeType.axon)), 0)
+    nt.eq_(len(get_feat('trunk_origin_azimuths', pop, neurite_type=NeuriteType.axon)), 0)

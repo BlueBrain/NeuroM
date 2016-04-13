@@ -74,11 +74,12 @@ if __name__ == '__main__':
 
     # print mean end-to-end distance per neurite type
     print('Mean end-to-end distance for axons: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.TreeType.axon))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.NeuriteType.axon))
     print('Mean end-to-end distance for basal dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.TreeType.basal_dendrite))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.NeuriteType.basal_dendrite))
     print('Mean end-to-end distance for apical dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.TreeType.apical_dendrite))
+          mean_end_to_end_dist(n for n in nrn.neurites
+                               if n.type == ezy.NeuriteType.apical_dendrite))
 
     print 'End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):'
     for nrte in nrn.neurites:

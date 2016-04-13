@@ -33,7 +33,7 @@ different iteration modes.
 '''
 from itertools import izip, product
 from neurom.core import tree as tr
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.core.tree import ipreorder
 import neurom.analysis.morphmath as mm
 from neurom.analysis.morphmath import pca
@@ -115,7 +115,7 @@ def find_tree_type(tree):
         The type of the tree
     """
 
-    tree_types = tuple(TreeType)
+    tree_types = tuple(NeuriteType)
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]

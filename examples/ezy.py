@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
-    # The allowed types are members of the TreeType enumeration.
+    # The allowed types are members of the NeuriteType enumeration.
     # NEURITE_TYPES is a list of valid neurite types.
 
     # We start by calling methods for different neurite types separately
@@ -82,29 +82,29 @@ if __name__ == '__main__':
 
     # number of neurites
     print('Number of neurites (all):', nrn.get_n_neurites())
-    print('Number of neurites (axons):', nrn.get_n_neurites(ezy.TreeType.axon))
+    print('Number of neurites (axons):', nrn.get_n_neurites(ezy.NeuriteType.axon))
     print('Number of neurites (apical dendrites):',
-          nrn.get_n_neurites(ezy.TreeType.apical_dendrite))
+          nrn.get_n_neurites(ezy.NeuriteType.apical_dendrite))
     print('Number of neurites (basal dendrites):',
-          nrn.get_n_neurites(ezy.TreeType.basal_dendrite))
+          nrn.get_n_neurites(ezy.NeuriteType.basal_dendrite))
 
     # number of sections
     print('Number of sections:', nrn.get_n_sections())
-    print('Number of sections (axons):', nrn.get_n_sections(ezy.TreeType.axon))
+    print('Number of sections (axons):', nrn.get_n_sections(ezy.NeuriteType.axon))
     print('Number of sections (apical dendrites):',
-          nrn.get_n_sections(ezy.TreeType.apical_dendrite))
+          nrn.get_n_sections(ezy.NeuriteType.apical_dendrite))
     print('Number of sections (basal dendrites):',
-          nrn.get_n_sections(ezy.TreeType.basal_dendrite))
+          nrn.get_n_sections(ezy.NeuriteType.basal_dendrite))
 
     # number of sections per neurite
     print('Number of sections per neurite:',
           nrn.get_n_sections_per_neurite())
     print('Number of sections per neurite (axons):',
-          nrn.get_n_sections_per_neurite(ezy.TreeType.axon))
+          nrn.get_n_sections_per_neurite(ezy.NeuriteType.axon))
     print('Number of sections per neurite (apical dendrites):',
-          nrn.get_n_sections_per_neurite(ezy.TreeType.apical_dendrite))
+          nrn.get_n_sections_per_neurite(ezy.NeuriteType.apical_dendrite))
     print('Number of sections per neurite (basal dendrites):',
-          nrn.get_n_sections_per_neurite(ezy.TreeType.basal_dendrite))
+          nrn.get_n_sections_per_neurite(ezy.NeuriteType.basal_dendrite))
 
     # OK, this is getting repetitive, so lets loop over valid neurite types.
     # The following methods return arrays of measurements. We will gather some

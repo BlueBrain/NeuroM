@@ -3,7 +3,7 @@ import numpy as np
 from nose import tools as nt
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.analysis.morphtree import set_tree_type
 import neurom.analysis.dendrogram as dm
 
@@ -15,7 +15,7 @@ TREE.children[0].add_child(Tree(np.array([-10., -10., -10., 7., 4., 0., 0.])))
 
 set_tree_type(TREE)
 
-SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
+SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))
 NEURON = Neuron(SOMA, [TREE, TREE, TREE])
 
 OLD_OFFS = [1.2, -1.2]
@@ -83,7 +83,7 @@ def test_update_offsets():
     length = 44.
 
     offs = dm._update_offsets(start_x, SPACING, 2, OLD_OFFS, length)
-    
+
     nt.assert_almost_equal(offs[0], 30.)
     nt.assert_almost_equal(offs[1], 42.8)
 
@@ -139,13 +139,13 @@ class TestDendrogram(object):
 
         for ctype in self.dtr.types:
             print ctype
-            nt.assert_true(ctype == TreeType.apical_dendrite)
+            nt.assert_true(ctype == NeuriteType.apical_dendrite)
 
     def test_types_neuron(self):
 
         for ctype in self.dnrn.types:
             print ctype
-            nt.assert_true(ctype == TreeType.apical_dendrite)
+            nt.assert_true(ctype == NeuriteType.apical_dendrite)
 
 
     def test_generate_dendro(self):pass

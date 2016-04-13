@@ -96,9 +96,9 @@ def calc_limits(data, dist=None, padding=0.25):
 
 
 # Neurite types of interest
-NEURITES_ = (ezy.TreeType.axon,
-             ezy.TreeType.apical_dendrite,
-             ezy.TreeType.basal_dendrite,)
+NEURITES_ = (ezy.NeuriteType.axon,
+             ezy.NeuriteType.apical_dendrite,
+             ezy.NeuriteType.basal_dendrite,)
 
 # map feature names to functors that get us arrays of that
 # feature, for a given tree type
