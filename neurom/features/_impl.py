@@ -28,8 +28,10 @@
 
 ''' Neurite Related Features'''
 
-from neurom.core.types import TreeType
+from functools import wraps
 from functools import partial
+from neurom.core.types import TreeType
+from neurom.core.neuron import Neuron
 from neurom.analysis import morphtree as _mt
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
@@ -38,7 +40,8 @@ from neurom.core.tree import isection
 from neurom import bifurcations as _bifs
 from neurom import points as _pts
 from neurom import iter_neurites
-from functools import wraps
+from neurom.analysis.morphmath import sphere_area
+from neurom.analysis.morphtree import trunk_origin_elevation, trunk_origin_azimuth
 
 
 def feature_getter(mapfun):
@@ -178,3 +181,55 @@ def principal_directions_extents(neurons, neurite_type=TreeType.all, direction='
     n = 0 if direction == 'first' else (1 if direction == 'second' else 2)
     return (_mt.principal_direction_extent(t)[n]
             for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
+
+
+def as_neuron_list(func):
+    ''' If a single neuron is provided to the function it passes the argument as a list of a single
+    element. If a population is passed as an argument, it replaces it by its neurons.
+    '''
+    @wraps(func)
+    def wrapped(obj, *args, **kwargs):
+        ''' Takes care of the neuron feature input. By using this decorator the neuron functions
+        can take as an input a single neuron, list of neurons or a population.
+        '''
+        neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
+                                                         else obj)
+        return func(neurons, *args, **kwargs)
+    return wrapped
+
+
+@as_neuron_list
+def soma_radii(neurons):
+    '''Get the radius of the soma'''
+    return (nrn.soma.radius for nrn in neurons)
+
+
+@as_neuron_list
+def soma_surface_areas(neurons):
+    '''Get the surface area of the soma.
+
+    Note:
+        The surface area is calculated by assuming the soma is spherical.
+    '''
+    return (sphere_area(nrn.soma.radius) for nrn in neurons)
+
+
+@as_neuron_list
+def trunk_origin_azimuths(neurons, neurite_type=TreeType.all):
+    '''Applies the trunk_origin_azimuth function on the soma and the neurites of each
+    neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_azimuth(neu, nrn.soma)
+
+
+@as_neuron_list
+def trunk_origin_elevations(neurons, neurite_type=TreeType.all):
+    '''Applies the trunk_origin_elevation function on the soma and the neurites of each neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_elevation(neu, nrn.soma)
