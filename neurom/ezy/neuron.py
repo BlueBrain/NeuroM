@@ -95,22 +95,22 @@ class Neuron(CoreNeuron):
                    [NeuriteType.axon, NeuriteType.basal_dendrite,
                     NeuriteType.apical_dendrite, NeuriteType.undefined])
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_section_lengths(self, neurite_type=NeuriteType.all):
         '''Get an iterable containing the lengths of all sections of a given type'''
         return self._pkg(_sec.length, neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_segment_lengths(self, neurite_type=NeuriteType.all):
         '''Get an iterable containing the lengths of all segments of a given type'''
         return self._pkg(_seg.length, neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_soma_radius(self):
         '''Get the radius of the soma'''
         return self.soma.radius
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_soma_surface_area(self):
         '''Get the surface area of the soma.
 
@@ -119,7 +119,7 @@ class Neuron(CoreNeuron):
         '''
         return 4 * math.pi * self.get_soma_radius() ** 2
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_local_bifurcation_angles(self, neurite_type=NeuriteType.all):
         '''Get local bifircation angles of all segments of a given type
 
@@ -131,7 +131,7 @@ class Neuron(CoreNeuron):
         '''
         return self._pkg(_bifs.local_angle, neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_remote_bifurcation_angles(self, neurite_type=NeuriteType.all):
         '''Get remote bifircation angles of all segments of a given type
 
@@ -144,7 +144,7 @@ class Neuron(CoreNeuron):
         '''
         return self._pkg(_bifs.remote_angle, neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_section_radial_distances(self, origin=None, use_start_point=False,
                                      neurite_type=NeuriteType.all):
         '''Get an iterable containing section radial distances to origin of\
@@ -161,7 +161,7 @@ class Neuron(CoreNeuron):
                                                                   use_start_point),
                                   neurite_type=neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_section_path_distances(self, use_start_point=False,
                                    neurite_type=NeuriteType.all):
         '''
@@ -182,13 +182,13 @@ class Neuron(CoreNeuron):
                       else _sec.end_point_path_length)
         return self._pkg(magic_iter, neurite_type)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_n_sections(self, neurite_type=NeuriteType.all):
         '''Get the number of sections of a given type'''
         tree_filter = tree_type_checker(neurite_type)
         return _sec.count(self, tree_filter)
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_n_sections_per_neurite(self, neurite_type=NeuriteType.all):
         '''Get an iterable with the number of sections for a given neurite type'''
         tree_filter = tree_type_checker(neurite_type)
@@ -196,13 +196,13 @@ class Neuron(CoreNeuron):
             [_sec.count(n) for n in self.neurites if tree_filter(n)]
         )
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_n_neurites(self, neurite_type=NeuriteType.all):
         '''Get the number of neurites of a given type in a neuron'''
         tree_filter = tree_type_checker(neurite_type)
         return sum(1 for n in self.neurites if tree_filter(n))
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_trunk_origin_radii(self, neurite_type=NeuriteType.all):
         '''Get the trunk origin radii of a given type in a neuron'''
         tree_filter = tree_type_checker(neurite_type)
@@ -210,7 +210,7 @@ class Neuron(CoreNeuron):
             [_pts.radius(t) for t in self.neurites if tree_filter(t)]
         )
 
-    @deprecated('Use ezy.get_feature instead.')
+    @deprecated('Use ezy.get instead.')
     def get_trunk_section_lengths(self, neurite_type=NeuriteType.all):
         '''Get the trunk section lengths of a given type in a neuron'''
         tree_filter = tree_type_checker(neurite_type)

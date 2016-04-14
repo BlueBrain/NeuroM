@@ -33,7 +33,7 @@ import numpy as np
 from nose import tools as nt
 from neurom import ezy
 from neurom.ezy import NeuriteType
-from neurom.features import get_feature as get
+from neurom.features import get
 
 
 
