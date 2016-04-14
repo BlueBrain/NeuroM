@@ -28,6 +28,7 @@
 
 '''NeuroM helper utilities'''
 import functools
+import warnings
 
 
 def memoize(fun):
@@ -50,3 +51,21 @@ def memoize(fun):
             _cache[args] = fun(*args, **kwargs)
         return _cache[args]
     return memoizer
+
+
+def deprecated(msg=""):
+    '''Issue a deprecation warning for a function'''
+    def _deprecated(fun):
+        '''Issue a deprecation warning for a function'''
+        @functools.wraps(fun)
+        def _wrapper(*args, **kwargs):
+            '''Issue deprecation warning and forward arguments to fun'''
+            warnings.simplefilter('always', DeprecationWarning)
+            warnings.warn('Call to deprecated function %s. %s' % (fun.__name__, msg),
+                          category=DeprecationWarning, stacklevel=2)
+            warnings.simplefilter('default', DeprecationWarning)
+            return fun(*args, **kwargs)
+
+        return _wrapper
+
+    return _deprecated
