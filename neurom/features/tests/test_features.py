@@ -10,7 +10,7 @@ import neurom.segments as seg
 import neurom.bifurcations as bifs
 from neurom import iter_neurites
 from neurom.ezy import load_neuron
-from neurom.features import get_feature as get_feat
+from neurom.features import get as get_feat
 
 
 _path = os.path.dirname(os.path.abspath(__file__))

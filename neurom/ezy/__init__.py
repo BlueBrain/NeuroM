@@ -64,7 +64,7 @@ from ..core.types import NEURITES as NEURITE_TYPES
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d
 from ..io.utils import get_morph_files
-from ..features import get_feature
+from ..features import get
 from ..io.utils import load_neuron as _load
 from ..analysis.morphtree import set_tree_type as _set_tt
 

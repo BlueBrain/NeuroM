@@ -69,7 +69,7 @@ NEURONFEATURES = {
 }
 
 
-def get_feature(feature, *args, **kwargs):
+def get(feature, *args, **kwargs):
     '''Neuron feature getter helper
 
     Returns features as a 1D numpy array.
