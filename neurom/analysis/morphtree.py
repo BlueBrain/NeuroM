@@ -33,7 +33,7 @@ different iteration modes.
 '''
 from itertools import izip, product
 from neurom.core import tree as tr
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.core.tree import ipreorder
 import neurom.analysis.morphmath as mm
 from neurom.analysis.morphmath import pca
@@ -75,11 +75,11 @@ def branch_order(tree_section):
     The branching order is defined as the depth of the tree section.
 
     Note:
-        The first level has branch order 0.
+        The first level has branch order 1.
     '''
     node = tree_section[-1]
     bo = sum(1 for _ in tr.iforking_point(node, tr.iupstream))
-    return bo - 2 if tr.is_forking_point(node) else bo - 1
+    return bo - 1 if tr.is_forking_point(node) else bo
 
 
 def i_segment_radial_dist(tree):
@@ -129,7 +129,7 @@ def find_tree_type(tree):
         The type of the tree
     """
 
-    tree_types = tuple(TreeType)
+    tree_types = tuple(NeuriteType)
 
     types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
 

@@ -68,9 +68,9 @@ FEATURE_MAP = {
 
 # Map component name to filtering parameters where applicable
 PARAM_MAP = {
-    'basal_dendrite': {'neurite_type': ezy.TreeType.basal_dendrite},
-    'apical_dendrite': {'neurite_type': ezy.TreeType.apical_dendrite},
-    'axon': {'neurite_type': ezy.TreeType.axon},
+    'basal_dendrite': {'neurite_type': ezy.NeuriteType.basal_dendrite},
+    'apical_dendrite': {'neurite_type': ezy.NeuriteType.apical_dendrite},
+    'axon': {'neurite_type': ezy.NeuriteType.axon},
     'soma': None
 }
 

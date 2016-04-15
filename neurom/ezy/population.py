@@ -29,7 +29,7 @@
 
 '''Population Class with basic analysis and plotting capabilities'''
 
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.core.population import Population as CorePopulation
 
 
@@ -52,7 +52,7 @@ class Population(CorePopulation):
         '''
         return iter(self.somata)
 
-    def get_n_neurites(self, neurite_type=TreeType.all):
+    def get_n_neurites(self, neurite_type=NeuriteType.all):
         '''Get the number of neurites of a given type in a population'''
         return sum(nrn.get_n_neurites(neurite_type=neurite_type) for nrn in self.iter_neurons())
 

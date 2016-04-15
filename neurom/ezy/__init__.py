@@ -37,8 +37,8 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.TreeType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.TreeType.axon)
+    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.NeuriteType.axon)
 
     View it in 2D and 3D
 
@@ -59,13 +59,17 @@ Examples:
 import os
 from .neuron import Neuron
 from .population import Population
-from .neuron import TreeType
+from .neuron import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d
 from ..io.utils import get_morph_files
+from ..features import get
 from ..io.utils import load_neuron as _load
 from ..analysis.morphtree import set_tree_type as _set_tt
+
+
+TreeType = NeuriteType  # For backwards compatibility
 
 
 def load_neuron(filename):
