@@ -233,7 +233,7 @@ def test_start_point_path_length():
 def test_section_branch_order():
 
     sec_bo = [bo for bo in iter_neurites(MOCK_TREE, sec.branch_order)]
-    nt.eq_(sec_bo, [0, 1, 1, 0, 1, 2, 2, 1])
+    nt.eq_(sec_bo, [1, 2, 2, 1, 2, 3, 3, 2])
 
 
 def test_point_at_path_fraction():

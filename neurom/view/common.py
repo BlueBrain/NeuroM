@@ -30,7 +30,7 @@
 Module containing the common functionality
 to be used by view-plot modules.
 """
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 import os
 import matplotlib
 
@@ -45,11 +45,11 @@ from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 
 
 # Map tree type to color
-TREE_COLOR = {TreeType.basal_dendrite: 'red',
-              TreeType.apical_dendrite: 'purple',
-              TreeType.axon: 'blue',
-              TreeType.soma: 'black',
-              TreeType.undefined: 'green'}
+TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
+              NeuriteType.apical_dendrite: 'purple',
+              NeuriteType.axon: 'blue',
+              NeuriteType.soma: 'black',
+              NeuriteType.undefined: 'green'}
 
 
 def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):

@@ -31,7 +31,7 @@
 
 import numpy as np
 from neurom.core.tree import val_iter, Tree
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.view import common
 from neurom.analysis.morphmath import segment_length
 from neurom.analysis.morphtree import n_segments, n_bifurcations, n_terminations
@@ -195,9 +195,9 @@ def _generate_segment_collection(tree, show_diameters):
 
     for val in colors:
 
-        color_string = common.TREE_COLOR[tuple(TreeType)[int(val)]]
+        color_string = common.TREE_COLOR[tuple(NeuriteType)[int(val)]]
 
-        type_string = str(tuple(TreeType)[int(val)]).split('.')[-1]
+        type_string = str(tuple(NeuriteType)[int(val)]).split('.')[-1]
 
         linked_colors.append((color_string, type_string))
 

@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
           sum(1 for _ in iter_neurites(nrn, bif.identity,
-                                       tree_type_checker(ezy.TreeType.apical_dendrite))))
+                                       tree_type_checker(ezy.NeuriteType.apical_dendrite))))
 
     # Maximum branch order
     # We create a custom branch_order section_function

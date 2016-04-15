@@ -31,7 +31,7 @@
 from neurom.core.tree import isegment, isection
 import neurom.analysis.morphtree as mtr
 
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 
 from neurom.core.types import tree_type_checker
 
@@ -86,14 +86,14 @@ class Neuron(object):
         self.neurites = neurites
         self.name = name
 
-    def segments(self, neurite_type=TreeType.all):
+    def segments(self, neurite_type=NeuriteType.all):
         '''Returns segments
         '''
         return i_neurites(self.neurites,
                           lambda n: n.segments(),
                           neu_filter=tree_type_checker(neurite_type))
 
-    def sections(self, neurite_type=TreeType.all):
+    def sections(self, neurite_type=NeuriteType.all):
         '''Returns sections
         '''
         return i_neurites(self.neurites,
@@ -120,14 +120,14 @@ class Population(object):
         '''
         return (neu.soma for neu in self.neurons)
 
-    def segments(self, neurite_type=TreeType.all):
+    def segments(self, neurite_type=NeuriteType.all):
         '''Returns segments
         '''
         return i_neurites(self.neurites,
                           lambda n: n.segments(),
                           neu_filter=tree_type_checker(neurite_type))
 
-    def sections(self, neurite_type=TreeType.all):
+    def sections(self, neurite_type=NeuriteType.all):
         '''Returns sections
         '''
         return i_neurites(self.neurites,

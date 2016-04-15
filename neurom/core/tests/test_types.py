@@ -30,26 +30,26 @@
 from nose import tools as nt
 from mock import Mock
 
-from neurom.core.types import TreeType, tree_type_checker, NEURITES
+from neurom.core.types import NeuriteType, tree_type_checker, NEURITES
 
 
 def test_tree_type_checker():
-    #check that when TreeType.all, we accept all trees, w/o checking type
-    tree_filter = tree_type_checker(TreeType.all)
+    #check that when NeuriteType.all, we accept all trees, w/o checking type
+    tree_filter = tree_type_checker(NeuriteType.all)
     nt.ok_(tree_filter('fake_tree'))
 
     mock_tree = Mock()
-    mock_tree.type = TreeType.axon
+    mock_tree.type = NeuriteType.axon
 
     #single arg
-    tree_filter = tree_type_checker(TreeType.axon)
+    tree_filter = tree_type_checker(NeuriteType.axon)
     nt.ok_(tree_filter(mock_tree))
 
-    mock_tree.type = TreeType.basal_dendrite
+    mock_tree.type = NeuriteType.basal_dendrite
     nt.ok_(not tree_filter(mock_tree))
 
     #multiple args
-    tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
+    tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
     nt.ok_(tree_filter(mock_tree))
 
     tree_filter = tree_type_checker(*NEURITES)
