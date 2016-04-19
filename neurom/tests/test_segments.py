@@ -120,6 +120,13 @@ def _check_segment_lengths(obj):
     nt.eq_(lg, [1.0, 1.0, 2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 1.0])
 
 
+def _check_segment_lengths2(obj):
+
+    lg = [l for l in iter_neurites(obj, seg.length2)]
+
+    nt.eq_(lg, [1.0, 1.0, 4.0, 1.0, 4.0, 1.0, 1.0, 4.0, 1.0, 1.0])
+
+
 def _check_segment_volumes(obj):
 
     sv = (l/math.pi for l in iter_neurites(obj, seg.volume))
@@ -203,6 +210,11 @@ def test_segment_volumes():
 def test_segment_lengths():
     _check_segment_lengths(NEURON)
     _check_segment_lengths(NEURON_TREE)
+
+
+def test_segment_lengths2():
+    _check_segment_lengths2(NEURON)
+    _check_segment_lengths2(NEURON_TREE)
 
 
 def test_segment_areas():
