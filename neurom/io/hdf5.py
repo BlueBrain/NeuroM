@@ -184,17 +184,16 @@ class H5(object):
         '''
 
         group_initial_ids = groups[:, 0]
+        group_len = len(group_initial_ids)
 
         def _find_last_point(group_id):
             ''' Identifies and returns the id of the last point of a group'''
+            return group_initial_ids[group_id + 1] - 1
 
-            if group_id != len(group_initial_ids) - 1:
-                return group_initial_ids[np.where(group_initial_ids ==
-                                                  groups[group_id][0])[0][0] + 1] - 1
-
-        to_be_reduced = np.zeros(len(groups))
+        to_be_reduced = [0] * group_len
         to_be_removed = []
 
+        # This is the slow part
         for ig, g in enumerate(groups):
             if g[2] != -1 and np.allclose(points[g[0]],
                                           points[_find_last_point(g[2])]):
@@ -202,11 +201,12 @@ class H5(object):
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
                 # in groups structure by one
-                for igg in xrange(ig + 1, len(groups)):
-                    to_be_reduced[igg] = to_be_reduced[igg] + 1
+                for igg in xrange(ig + 1, group_len):
+                    to_be_reduced[igg] += 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
                            for i, j in itertools.izip(groups, to_be_reduced)])
+
         points = np.delete(points, to_be_removed, axis=0)
 
         return points, groups
