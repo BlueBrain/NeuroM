@@ -201,7 +201,7 @@ class H5(object):
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
                 # in groups structure by one
-                for igg in range(ig + 1, len(groups)):
+                for igg in xrange(ig + 1, len(groups)):
                     to_be_reduced[igg] = to_be_reduced[igg] + 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
