@@ -44,8 +44,13 @@ import numpy as np
 
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
-    return np.sum(s for s in
-                  tr.imap_val(mm.segment_length, tr.isegment(tree, tr.iupstream)))
+    t = tree
+    l = 0
+    while t.parent is not None:
+        l += mm.segment_length((t.parent.value, t.value))
+        t = t.parent
+
+    return l
 
 
 def local_bifurcation_angle(bifurcation_point):
