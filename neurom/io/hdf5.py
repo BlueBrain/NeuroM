@@ -183,9 +183,10 @@ class H5(object):
 
         '''
 
-        def _find_last_point(group_id, groups):
+        group_initial_ids = groups[:, 0]
+
+        def _find_last_point(group_id):
             ''' Identifies and returns the id of the last point of a group'''
-            group_initial_ids = np.sort(np.transpose(groups)[0])
 
             if group_id != len(group_initial_ids) - 1:
                 return group_initial_ids[np.where(group_initial_ids ==
@@ -196,7 +197,7 @@ class H5(object):
 
         for ig, g in enumerate(groups):
             if g[2] != -1 and np.allclose(points[g[0]],
-                                          points[_find_last_point(g[2], groups)]):
+                                          points[_find_last_point(g[2])]):
                 # Remove duplicate from list of points
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
