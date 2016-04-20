@@ -179,10 +179,10 @@ class RawDataWrapper(object):
         else:
             return list(r[COLS.ID] for r in self.iter_row(None, pred))
 
-    def get_soma_ids(self):
+    def get_soma_rows(self):
         '''Get the IDs of all soma points'''
         db = self.data_block
-        return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA][:, COLS.ID]
+        return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
