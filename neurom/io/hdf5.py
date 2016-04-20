@@ -153,17 +153,8 @@ class H5(object):
             for l in xrange(int(j), int(k)):
                 group_id_map[l] = i
 
-        def find_group(point_id):
-            '''Find the structure group a points id belongs to
-
-            Return: group or section point_id belongs to. Last group if
-                    point_id out of bounds.
-            '''
-            return groups[group_id_map[point_id]]
-
-        def find_parent_id(point_id):
+        def find_parent_id(point_id, group):
             '''Find the parent ID of a point'''
-            group = find_group(point_id)
             if point_id != group[_H5STRUCT.GPFIRST]:
                 # point is not first point in section
                 # so parent is previous point
@@ -179,7 +170,8 @@ class H5(object):
         db[:, _H5STRUCT.PD] /= 2
         # TODO: see about vectorizing this?
         for i in xrange(len(points)):
-            db[i][4:7] = [find_group(i)[_H5STRUCT.GTYPE], i, find_parent_id(i)]
+            grp = groups[group_id_map[i]]
+            db[i][4:7] = [grp[_H5STRUCT.GTYPE], i, find_parent_id(i, grp)]
 
         return db
 
