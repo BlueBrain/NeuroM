@@ -42,6 +42,7 @@ NEURITEFEATURES = {
     'number_of_sections_per_neurite': _impl.number_of_sections_per_neurite,
     'number_of_neurites': _impl.neurite_number,
     'section_branch_orders': _impl.section_branch_orders,
+    'segment_radial_distances': _impl.segment_radial_distances,
     'section_radial_distances': _impl.section_radial_distances,
     'local_bifurcation_angles': _impl.local_bifurcation_angles,
     'remote_bifurcation_angles': _impl.remote_bifurcation_angles,
