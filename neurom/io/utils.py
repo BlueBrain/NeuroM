@@ -157,4 +157,4 @@ def get_morph_files(directory):
     lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
     return [m for m in lsdir
             if os.path.isfile(m) and
-            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
+            os.path.splitext(m)[1].lower() in ('.swc', '.h5', '.asc')]
