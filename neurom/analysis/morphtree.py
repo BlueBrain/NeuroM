@@ -87,20 +87,6 @@ def branch_order(tree_section):
     return bo - 1 if tr.is_forking_point(node) else bo
 
 
-def i_segment_radial_dist(tree):
-    '''Return an iterator of radial distances of tree segments
-
-    The radial distance is the euclidian distance between the either the
-    middle point of the segment and the first node of the tree.
-
-    Parameters:
-        tree: tree object
-
-    '''
-    pos = tree.value
-    return tr.imap_val(lambda s: mm.segment_radial_dist(s, pos), tr.isegment(tree))
-
-
 def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''Return an iterator of radial distances of tree sections to a given point
 

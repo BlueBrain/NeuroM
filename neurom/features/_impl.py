@@ -30,9 +30,11 @@
 
 from functools import wraps
 from functools import partial
+from neurom.core import tree as _tr
 from neurom.core.types import NeuriteType
 from neurom.core.neuron import Neuron
 from neurom.analysis import morphtree as _mt
+from neurom.analysis import morphmath as _mm
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
@@ -148,10 +150,24 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all):
                          otherwise use the end-point (default False)
         neurite_type: Type of neurites to be considered (default all)
     '''
+
+    def i_segment_radial_dist(tree):
+        '''Return an iterator of radial distances of tree segments
+
+        The radial distance is the euclidian distance between the either the
+        middle point of the segment and the first node of the tree.
+
+        Parameters:
+            tree: tree object
+        '''
+        pos = tree.value
+        return _tr.imap_val(lambda s: _mm.segment_radial_dist(s, pos), _tr.isegment(tree))
+
     def f(n):
         '''neurite identity function'''
         return n
-    f.iter_type = _mt.i_segment_radial_dist
+
+    f.iter_type = i_segment_radial_dist
     return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
