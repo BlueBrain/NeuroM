@@ -144,6 +144,8 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        group_ids = groups[:, _H5STRUCT.GPFIRST]
+
         @memoize
         def find_group(point_id):
             '''Find the structure group a points id belongs to
@@ -151,7 +153,7 @@ class H5(object):
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = np.searchsorted(groups[:, _H5STRUCT.GPFIRST], point_id, side='right')
+            bs = np.searchsorted(group_ids, point_id, side='right')
             bs = max(bs - 1, 0)
             return groups[bs]
 
@@ -166,7 +168,7 @@ class H5(object):
                 # parent is last point in parent group
                 parent_group_id = group[_H5STRUCT.GPID]
                 # get last point in parent group
-                return groups[parent_group_id + 1][_H5STRUCT.GPFIRST] - 1
+                return group_ids[parent_group_id + 1] - 1
 
         return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ], p[_H5STRUCT.PD] / 2.,
                           find_group(i)[_H5STRUCT.GTYPE], i,
@@ -190,7 +192,7 @@ class H5(object):
             ''' Identifies and returns the id of the last point of a group'''
             return group_initial_ids[group_id + 1] - 1
 
-        to_be_reduced = [0] * group_len
+        to_be_reduced = np.zeros(group_len)
         to_be_removed = []
 
         # This is the slow part
@@ -201,8 +203,7 @@ class H5(object):
                 to_be_removed.append(g[0])
                 # Reduce the id of the following sections
                 # in groups structure by one
-                for igg in xrange(ig + 1, group_len):
-                    to_be_reduced[igg] += 1
+                to_be_reduced[ig + 1:] += 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
                            for i, j in itertools.izip(groups, to_be_reduced)])
