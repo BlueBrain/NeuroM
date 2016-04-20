@@ -141,14 +141,15 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=Neurite
 
 def segment_radial_distances(neurites, neurite_type=NeuriteType.all):
     '''Get an iterable containing section radial distances to origin of\
-       all neurites of a given type
+        all neurites of a given type
 
     Parameters:
         origin: Point wrt which radial dirtance is calulated\
-                (default tree root)
+            (default tree root)
         use_start_point: if true, use the section's first point,\
-                         otherwise use the end-point (default False)
+            otherwise use the end-point (default False)
         neurite_type: Type of neurites to be considered (default all)
+
     '''
 
     def i_segment_radial_dist(tree):

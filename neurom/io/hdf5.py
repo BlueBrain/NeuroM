@@ -197,7 +197,6 @@ class H5(object):
             ''' Identifies and returns the id of the last point of a group'''
             return group_initial_ids[group_id + 1] - 1
 
-<<<<<<< HEAD
         to_be_reduced = np.zeros(group_len)
         to_be_removed = []
 
