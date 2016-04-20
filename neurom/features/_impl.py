@@ -137,7 +137,7 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=Neurite
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
 
 
-def segment_radial_distances(neurites, neurite_type=TreeType.all):
+def segment_radial_distances(neurites, neurite_type=NeuriteType.all):
     '''Get an iterable containing section radial distances to origin of\
        all neurites of a given type
 
