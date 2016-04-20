@@ -40,10 +40,9 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from neurom.utils import memoize
 import h5py
 import numpy as np
-import itertools
+from itertools import izip, izip_longest
 
 
 def get_version(h5file):
@@ -146,16 +145,21 @@ class H5(object):
 
         group_ids = groups[:, _H5STRUCT.GPFIRST]
 
-        @memoize
+        # Create a point_id -> group_id map
+        group_id_map = {}
+        for i, (j, k) in enumerate(izip_longest(group_ids,
+                                                group_ids[1:],
+                                                fillvalue=len(points))):
+            for l in xrange(int(j), int(k)):
+                group_id_map[l] = i
+
         def find_group(point_id):
             '''Find the structure group a points id belongs to
 
             Return: group or section point_id belongs to. Last group if
                     point_id out of bounds.
             '''
-            bs = np.searchsorted(group_ids, point_id, side='right')
-            bs = max(bs - 1, 0)
-            return groups[bs]
+            return groups[group_id_map[point_id]]
 
         def find_parent_id(point_id):
             '''Find the parent ID of a point'''
@@ -170,7 +174,8 @@ class H5(object):
                 # get last point in parent group
                 return group_ids[parent_group_id + 1] - 1
 
-        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ], p[_H5STRUCT.PD] / 2.,
+        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ],
+                          p[_H5STRUCT.PD] / 2.,
                           find_group(i)[_H5STRUCT.GTYPE], i,
                           find_parent_id(i))
                          for i, p in enumerate(points)])
@@ -206,7 +211,7 @@ class H5(object):
                 to_be_reduced[ig + 1:] += 1
 
         groups = np.array([np.subtract(i, [j, 0, 0])
-                           for i, j in itertools.izip(groups, to_be_reduced)])
+                           for i, j in izip(groups, to_be_reduced)])
 
         points = np.delete(points, to_be_removed, axis=0)
 
