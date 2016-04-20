@@ -48,6 +48,7 @@ import numpy as np
 from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
+from neurom.core.dataformat import POINT_TYPE
 from neurom.utils import memoize
 
 
@@ -177,6 +178,11 @@ class RawDataWrapper(object):
             return list(self._ids)
         else:
             return list(r[COLS.ID] for r in self.iter_row(None, pred))
+
+    def get_soma_rows(self):
+        '''Get the IDs of all soma points'''
+        db = self.data_block
+        return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
