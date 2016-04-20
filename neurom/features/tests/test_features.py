@@ -194,6 +194,15 @@ def test_remote_bifurcation_angles_invalid():
     nt.assert_equal(len(s), 0)
 
 
+def test_segment_radial_distances():
+    ref_segs = []
+    for t in NEURON.neurites:
+        ref_segs.extend(ll for ll in iter_neurites(t, seg.radial_dist(t.value)))
+
+    rad_dists = get_feat('segment_radial_distances', NEURON)
+    nt.assert_true(np.all(rad_dists == ref_segs))
+
+
 def test_section_radial_distances_endpoint():
     ref_sec_rad_dist_start = []
     for t in NEURON.neurites:
