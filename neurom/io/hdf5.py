@@ -174,11 +174,14 @@ class H5(object):
                 # get last point in parent group
                 return group_ids[parent_group_id + 1] - 1
 
-        return np.array([(p[_H5STRUCT.PX], p[_H5STRUCT.PY], p[_H5STRUCT.PZ],
-                          p[_H5STRUCT.PD] / 2.,
-                          find_group(i)[_H5STRUCT.GTYPE], i,
-                          find_parent_id(i))
-                         for i, p in enumerate(points)])
+        db = np.zeros((len(points), 7))
+        db[:, : -3] = points
+        db[:, _H5STRUCT.PD] /= 2
+        # TODO: see about vectorizing this?
+        for i in xrange(len(points)):
+            db[i][4:7] = [find_group(i)[_H5STRUCT.GTYPE], i, find_parent_id(i)]
+
+        return db
 
     @staticmethod
     def remove_duplicate_points(points, groups):
