@@ -44,8 +44,13 @@ import numpy as np
 
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
-    return np.sum(s for s in
-                  tr.imap_val(mm.segment_length, tr.isegment(tree, tr.iupstream)))
+    t = tree
+    l2 = []
+    while t.parent is not None:
+        l2.append(mm.segment_length2((t.parent.value, t.value)))
+        t = t.parent
+
+    return np.sum(np.sqrt(l2))
 
 
 def local_bifurcation_angle(bifurcation_point):
@@ -131,7 +136,7 @@ def find_tree_type(tree):
 
     tree_types = tuple(NeuriteType)
 
-    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
+    types = np.array([node.value[COLS.TYPE] for node in tr.ipreorder(tree)])
 
     return tree_types[int(np.median(types))]
 

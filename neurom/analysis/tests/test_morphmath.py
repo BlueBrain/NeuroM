@@ -97,7 +97,7 @@ def test_path_fraction_three_symmetric_points():
               np.array((0., 0., 1.))]
 
     res = mm.path_fraction_point(points, 0.0)
-    nt.assert_true(np.allclose(res, (1., 0., 0.)))          
+    nt.assert_true(np.allclose(res, (1., 0., 0.)))
 
     res = mm.path_fraction_point(points, 0.25)
     nt.assert_true(np.allclose(res, (0.5, 0., 0.)))
@@ -115,7 +115,7 @@ def test_path_fraction_many_points():
     x = lambda theta: np.cos(theta)
     y = lambda theta: np.sin(theta)
     points = [np.array((x(theta), y(theta), 2.)) for theta in (0., np.pi/4., np.pi/2., 3.*np.pi/4., np.pi)]
-    
+
     res = mm.path_fraction_point(points, 0.)
     nt.assert_true(np.allclose(res, (x(0.), y(0.), 2.)))
 
