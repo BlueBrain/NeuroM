@@ -51,7 +51,7 @@ def point_function(as_tree=False):
         def _wrapper(point):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                point = tr.as_elements(point)
+                point = point.value
             return fun(point)
 
         _wrapper.iter_type = tr.ipreorder
