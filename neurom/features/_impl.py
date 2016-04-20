@@ -28,40 +28,30 @@
 
 ''' Neurite Related Features'''
 
-from neurom.core.types import TreeType
+from functools import wraps
 from functools import partial
+from neurom.core.types import NeuriteType
+from neurom.core.neuron import Neuron
 from neurom.analysis import morphtree as _mt
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
+from neurom.core.tree import isection
 from neurom import bifurcations as _bifs
 from neurom import points as _pts
 from neurom import iter_neurites
-from functools import wraps
-
-
-def as_neurite_list(f):
-    ''' Ensures that a list of neurites will be provided to the function
-    regardless of the nature of the argument, e.g. single neurite, neuron,
-    or population.
-    '''
-    @wraps(f)
-    def wrapped(obj, *args, **kwargs):
-        ''' Wrapping function f to always receive a neurite list
-        '''
-        neurites = ([obj] if isinstance(obj, TreeType)
-                    else (obj.neurites if hasattr(obj, 'neurites') else obj))
-        return f(neurites, *args, **kwargs)
-    return wrapped
+from neurom.analysis.morphmath import sphere_area
+from neurom.analysis.morphtree import trunk_origin_elevation, trunk_origin_azimuth
 
 
 def feature_getter(mapfun):
     ''' Wrapper around already existing feature functions
     '''
-    def wrapped(neurites, neurite_type=TreeType.all):
+    def wrapped(neurites, neurite_type=NeuriteType.all):
         '''Extracts feature from an object with neurites, i.e. either neurite, neuron, or population
         '''
         return iter_neurites(neurites, mapfun, _ttc(neurite_type))
+
     return wrapped
 
 
@@ -69,9 +59,21 @@ def count(f):
     ''' Counts the output of the wrapper wrapper.
     '''
     @wraps(f)
-    def wrapped(neurites, neurite_type=TreeType.all):
+    def wrapped(neurites, neurite_type=NeuriteType.all):
         ''' placeholderg'''
         yield sum(1 for _ in f(neurites, neurite_type))
+
+    return wrapped
+
+
+def sum_feature(f):
+    ''' Counts the output of the wrapper wrapper.
+    '''
+    @wraps(f)
+    def wrapped(neurites, neurite_type=NeuriteType.all):
+        ''' yields the sum of the function'''
+        yield sum(f(neurites, neurite_type))
+
     return wrapped
 
 
@@ -96,33 +98,40 @@ bifurcation_number = count(feature_getter(_bifs.identity))
 partition = feature_getter(_bifs.partition)
 
 
-@as_neurite_list
-def neurite_number(neurites, neurite_type=TreeType.all):
+def total_length_per_neurite(neurons, neurite_type=NeuriteType.all):
+    '''Get an iterable with the total length of a neurite for a given neurite type'''
+    return (sum(_sec.length(ss) for ss in isection(n))
+            for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
+
+total_length = sum_feature(total_length_per_neurite)
+
+
+def neurite_number(neurons, neurite_type=NeuriteType.all):
     '''Get an iterable with the number of neurites for a given neurite type
     '''
-    yield sum(1 for n in neurites if _ttc(neurite_type)(n))
+    yield sum(1 for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def number_of_sections_per_neurite(neurites, neurite_type=TreeType.all):
+def number_of_sections_per_neurite(neurons, neurite_type=NeuriteType.all):
     '''Get an iterable with the number of sections for a given neurite type'''
-    return (_sec.count(n) for n in neurites if _ttc(neurite_type)(n))
+    return (_sec.count(n) for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-def section_path_distances(neurites, use_start_point=False, neurite_type=TreeType.all):
+def section_path_distances(neurites, use_start_point=False, neurite_type=NeuriteType.all):
     '''
     Get section path distances of all neurites of a given type
     The section path distance is measured to the neurite's root.
 
     Parameters:
         use_start_point: boolean\
-        if true, use the section's first point,\
-        otherwise use the end-point (default False)
-        neurite_type: TreeType\
-        Type of neurites to be considered (default all)
+            if true, use the section's first point,\
+            otherwise use the end-point (default False)
+        neurite_type: NeuriteType\
+            Type of neurites to be considered (default all)
 
     Returns:
         Iterable containing the section path distances.
+
     '''
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
@@ -130,16 +139,17 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=TreeTyp
 
 
 def section_radial_distances(neurites, origin=None, use_start_point=False,
-                             neurite_type=TreeType.all):
+                             neurite_type=NeuriteType.all):
     '''Get an iterable containing section radial distances to origin of\
-       all neurites of a given type
+        all neurites of a given type
 
     Parameters:
         origin: Point wrt which radial dirtance is calulated\
-                (default tree root)
+            (default tree root)
         use_start_point: if true, use the section's first point,\
-                         otherwise use the end-point (default False)
+            otherwise use the end-point (default False)
         neurite_type: Type of neurites to be considered (default all)
+
     '''
     def f(n):
         '''neurite identity function'''
@@ -149,31 +159,83 @@ def section_radial_distances(neurites, origin=None, use_start_point=False,
     return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
-@as_neurite_list
-def trunk_section_lengths(neurites, neurite_type=TreeType.all):
+def trunk_section_lengths(neurons, neurite_type=NeuriteType.all):
     '''Get the trunk section lengths of a given type in a neuron'''
-    return (_mt.trunk_section_length(t) for t in neurites if _ttc(neurite_type)(t))
+    return (_mt.trunk_section_length(t)
+            for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def trunk_origin_radii(neurites, neurite_type=TreeType.all):
+def trunk_origin_radii(neurons, neurite_type=NeuriteType.all):
     '''Get the trunk origin radii of a given type in a neuron'''
-    return (_pts.radius(t) for t in neurites if _ttc(neurite_type)(t))
+    return (_pts.radius(t) for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 
-@as_neurite_list
-def principal_directions_extents(neurites, neurite_type=TreeType.all, direction='first'):
+def principal_directions_extents(neurons, neurite_type=NeuriteType.all, direction='first'):
     ''' Get principal direction extent of either a neurite or the total neurites
     from a neuron or a population.
 
     Parameters:
         direction: string \
-        it can be either 'first', 'second' or 'third' \
-        corresponding to the respective principal direction \
-        of the extent
+            it can be either 'first', 'second' or 'third' \
+            corresponding to the respective principal direction \
+            of the extent
 
     Returns:
         Iterator containing the extents of the input neurites
+
     '''
     n = 0 if direction == 'first' else (1 if direction == 'second' else 2)
-    return (_mt.principal_direction_extent(t)[n] for t in neurites if _ttc(neurite_type)(t))
+    return (_mt.principal_direction_extent(t)[n]
+            for t in iter_neurites(neurons, filt=_ttc(neurite_type)))
+
+
+def as_neuron_list(func):
+    ''' If a single neuron is provided to the function it passes the argument as a list of a single
+    element. If a population is passed as an argument, it replaces it by its neurons.
+    '''
+    @wraps(func)
+    def wrapped(obj, *args, **kwargs):
+        ''' Takes care of the neuron feature input. By using this decorator the neuron functions
+        can take as an input a single neuron, list of neurons or a population.
+        '''
+        neurons = [obj] if isinstance(obj, Neuron) else (obj.neurons if hasattr(obj, 'neurons')
+                                                         else obj)
+        return func(neurons, *args, **kwargs)
+    return wrapped
+
+
+@as_neuron_list
+def soma_radii(neurons):
+    '''Get the radius of the soma'''
+    return (nrn.soma.radius for nrn in neurons)
+
+
+@as_neuron_list
+def soma_surface_areas(neurons):
+    '''Get the surface area of the soma.
+
+    Note:
+        The surface area is calculated by assuming the soma is spherical.
+    '''
+    return (sphere_area(nrn.soma.radius) for nrn in neurons)
+
+
+@as_neuron_list
+def trunk_origin_azimuths(neurons, neurite_type=NeuriteType.all):
+    '''Applies the trunk_origin_azimuth function on the soma and the neurites of each
+    neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_azimuth(neu, nrn.soma)
+
+
+@as_neuron_list
+def trunk_origin_elevations(neurons, neurite_type=NeuriteType.all):
+    '''Applies the trunk_origin_elevation function on the soma and the neurites of each neuron.
+    '''
+    for nrn in neurons:
+        for neu in nrn.neurites:
+            if _ttc(neurite_type)(neu):
+                yield trunk_origin_elevation(neu, nrn.soma)

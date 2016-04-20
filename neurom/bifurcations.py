@@ -52,7 +52,7 @@ def bifurcation_point_function(as_tree=False):
         def _wrapper(bifurcation_point):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                bifurcation_point = tr.as_elements(bifurcation_point)
+                bifurcation_point = bifurcation_point.value
             return fun(bifurcation_point)
 
         _wrapper.iter_type = tr.ibifurcation_point

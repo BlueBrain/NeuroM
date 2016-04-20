@@ -30,7 +30,7 @@
 Python module of NeuroM to check neurons.
 '''
 
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.core.tree import ipreorder
 from neurom.core.tree import isegment
 from neurom.core.tree import isection
@@ -51,7 +51,7 @@ def has_axon(neuron, treefun=find_tree_type):
         treefun: Optional function to calculate the tree type of
         neuron's neurites
     '''
-    return TreeType.axon in [treefun(n) for n in neuron.neurites]
+    return NeuriteType.axon in [treefun(n) for n in neuron.neurites]
 
 
 def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
@@ -64,7 +64,7 @@ def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
         neurites
     '''
     types = [treefun(n) for n in neuron.neurites]
-    return types.count(TreeType.apical_dendrite) >= min_number
+    return types.count(NeuriteType.apical_dendrite) >= min_number
 
 
 def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
@@ -77,7 +77,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
         neurites
     '''
     types = [treefun(n) for n in neuron.neurites]
-    return types.count(TreeType.basal_dendrite) >= min_number
+    return types.count(NeuriteType.basal_dendrite) >= min_number
 
 
 def get_flat_neurites(neuron, tol=0.1, method='ratio'):

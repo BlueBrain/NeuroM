@@ -51,7 +51,7 @@ def triplet_function(as_tree=False):
         def _wrapper(triplet):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                triplet = tr.as_elements(triplet)
+                triplet = (triplet[0].value, triplet[1].value, triplet[2].value)
             return fun(triplet)
 
         _wrapper.iter_type = tr.itriplet

@@ -28,20 +28,22 @@
 
 '''Example for generating density plots'''
 
-from neurom.features import NEURITEFEATURES as nf
+from neurom.features import get as get_feat
 import pylab as plt
 from neurom.view import common
 from neurom.view import view
 import numpy as np
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 
 
-def extract_density(population, plane='xy', bins=100, neurite_type=TreeType.basal_dendrite):
+def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.basal_dendrite):
     '''Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
-    horiz = nf['segment_' + plane[0] + '_coordinates'](population, neurite_type=neurite_type)
-    vert = nf['segment_' + plane[1] + '_coordinates'](population, neurite_type=neurite_type)
+    horiz = get_feat('segment_%s_coordinates' % plane[0],
+                     population, neurite_type=neurite_type)
+    vert = get_feat('segment_%s_coordinates' % plane[1],
+                    population, neurite_type=neurite_type)
 
     return np.histogram2d(np.array(horiz), np.array(vert),
                           bins=(bins, bins))
@@ -51,7 +53,7 @@ def plot_density(population, # pylint: disable=too-many-arguments, too-many-loca
                  bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
                  colorlabel='Nodes per unit area', labelfontsize=16,
                  color_map='Reds', no_colorbar=False, threshold=0.01,
-                 neurite_type=TreeType.basal_dendrite, **kwargs):
+                 neurite_type=NeuriteType.basal_dendrite, **kwargs):
     '''Plots the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
@@ -85,7 +87,7 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
                            bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
                            colorlabel='Nodes per unit area', labelfontsize=16,
                            color_map='Reds', no_colorbar=False, threshold=0.01,
-                           neurite_type=TreeType.basal_dendrite, **kwargs):
+                           neurite_type=NeuriteType.basal_dendrite, **kwargs):
     '''Plots the 2d histogram of the center
        coordinates of segments in the selected plane
        and superimposes the view of the first neurite of the collection.

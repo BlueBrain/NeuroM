@@ -33,7 +33,7 @@ different iteration modes.
 '''
 from itertools import izip, product
 from neurom.core import tree as tr
-from neurom.core.types import TreeType
+from neurom.core.types import NeuriteType
 from neurom.core.tree import ipreorder
 import neurom.analysis.morphmath as mm
 from neurom.analysis.morphmath import pca
@@ -44,8 +44,13 @@ import numpy as np
 
 def path_length(tree):
     '''Get the path length from a sub-tree to the root node'''
-    return np.sum(s for s in
-                  tr.imap_val(mm.segment_length, tr.isegment(tree, tr.iupstream)))
+    t = tree
+    l2 = []
+    while t.parent is not None:
+        l2.append(mm.segment_length2((t.parent.value, t.value)))
+        t = t.parent
+
+    return np.sum(np.sqrt(l2))
 
 
 def local_bifurcation_angle(bifurcation_point):
@@ -75,11 +80,11 @@ def branch_order(tree_section):
     The branching order is defined as the depth of the tree section.
 
     Note:
-        The first level has branch order 0.
+        The first level has branch order 1.
     '''
     node = tree_section[-1]
     bo = sum(1 for _ in tr.iforking_point(node, tr.iupstream))
-    return bo - 2 if tr.is_forking_point(node) else bo - 1
+    return bo - 1 if tr.is_forking_point(node) else bo
 
 
 def i_section_radial_dist(tree, pos=None, use_start_point=False):
@@ -115,10 +120,9 @@ def find_tree_type(tree):
         The type of the tree
     """
 
-    tree_types = tuple(TreeType)
+    tree_types = tuple(NeuriteType)
 
-    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
-    types = [node[COLS.TYPE] for node in tr.val_iter(tr.ipreorder(tree))]
+    types = np.array([node.value[COLS.TYPE] for node in tr.ipreorder(tree)])
 
     return tree_types[int(np.median(types))]
 

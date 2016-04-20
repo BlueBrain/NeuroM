@@ -32,7 +32,7 @@ from enum import Enum, unique
 
 
 @unique
-class TreeType(Enum):
+class NeuriteType(Enum):
     '''Enum representing valid tree types'''
     undefined = 1
     soma = 2
@@ -47,15 +47,15 @@ def tree_type_checker(*ref):
 
     Returns:
         Functor that takes a tree, and returns true if that tree matches any of
-        TreeTypes in ref
+        NeuriteTypes in ref
 
     Ex:
-        >>> from neurom.core.types import TreeType, tree_type_checker
-        >>> tree_filter = tree_type_checker(TreeType.axon, TreeType.basal_dendrite)
+        >>> from neurom.core.types import NeuriteType, tree_type_checker
+        >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
         >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
     '''
     ref = tuple(ref)
-    if TreeType.all in ref:
+    if NeuriteType.all in ref:
         def check_tree_type(_):
             '''Always returns true'''
             return True
@@ -64,17 +64,17 @@ def tree_type_checker(*ref):
             '''Check whether tree has the same type as ref
 
             Returns:
-                True if ref in the same type as tree.type or ref is TreeType.all
+                True if ref in the same type as tree.type or ref is NeuriteType.all
             '''
             return tree.type in ref
 
     return check_tree_type
 
 
-NEURITES = (TreeType.all,
-            TreeType.axon,
-            TreeType.basal_dendrite,
-            TreeType.apical_dendrite)
+NEURITES = (NeuriteType.all,
+            NeuriteType.axon,
+            NeuriteType.basal_dendrite,
+            NeuriteType.apical_dendrite)
 
 
 ROOT_ID = -1

@@ -53,7 +53,7 @@ def section_function(as_tree=False):
         def _wrapper(section):
             '''Simply pass arguments to wrapped function'''
             if not as_tree:
-                section = tr.as_elements(section)
+                section = tuple(t.value for t in section)
             return fun(section)
 
         _wrapper.iter_type = tr.isection
