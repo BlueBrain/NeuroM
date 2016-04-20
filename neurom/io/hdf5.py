@@ -197,6 +197,7 @@ class H5(object):
             ''' Identifies and returns the id of the last point of a group'''
             return group_initial_ids[group_id + 1] - 1
 
+<<<<<<< HEAD
         to_be_reduced = np.zeros(group_len)
         to_be_removed = []
 
@@ -214,7 +215,6 @@ class H5(object):
                            for i, j in izip(groups, to_be_reduced)])
 
         points = np.delete(points, to_be_removed, axis=0)
-
         return points, groups
 
 
