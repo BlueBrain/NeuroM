@@ -43,7 +43,7 @@ import os
 @memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
-    return rdw.get_ids(lambda r: r[COLS.TYPE] == POINT_TYPE.SOMA)
+    return rdw.get_soma_ids().tolist()
 
 
 @memoize
