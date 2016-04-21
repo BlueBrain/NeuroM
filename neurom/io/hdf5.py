@@ -43,6 +43,7 @@ There is one such row per measured point.
 import h5py
 import numpy as np
 from itertools import izip, izip_longest
+from ..core.dataformat import COLS
 
 
 def get_version(h5file):
@@ -167,17 +168,17 @@ class H5(object):
                 # get last point in parent group
                 return group_ids[parent_group_id + 1] - 1
 
-        def get_group(point_id):
+        def get_type(point_id):
             '''Find the group of a point'''
             return groups[group_id_map[point_id]][_H5STRUCT.GTYPE]
 
         n_points = len(points)
         db = np.zeros((n_points, 7))
-        db[:, : -3] = points
+        db[:, : _H5STRUCT.PD + 1] = points
         db[:, _H5STRUCT.PD] /= 2
-        db[:, 5] = np.arange(n_points)
-        db[:, 6] = np.vectorize(find_parent_id)(db[:, 5])
-        db[:, 4] = np.vectorize(get_group)(db[:, 5])
+        db[:, COLS.ID] = np.arange(n_points)
+        db[:, COLS.P] = np.vectorize(find_parent_id)(db[:, COLS.ID])
+        db[:, COLS.TYPE] = np.vectorize(get_type)(db[:, COLS.ID])
 
         return db
 
