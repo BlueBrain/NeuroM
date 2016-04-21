@@ -147,14 +147,16 @@ class H5(object):
 
         # Create a point_id -> group_id map
         group_id_map = {}
+
         for i, (j, k) in enumerate(izip_longest(group_ids,
                                                 group_ids[1:],
                                                 fillvalue=len(points))):
             for l in xrange(int(j), int(k)):
                 group_id_map[l] = i
 
-        def find_parent_id(point_id, group):
+        def find_parent_id(point_id):
             '''Find the parent ID of a point'''
+            group = groups[group_id_map[point_id]]
             if point_id != group[_H5STRUCT.GPFIRST]:
                 # point is not first point in section
                 # so parent is previous point
@@ -165,13 +167,17 @@ class H5(object):
                 # get last point in parent group
                 return group_ids[parent_group_id + 1] - 1
 
-        db = np.zeros((len(points), 7))
+        def get_group(point_id):
+            '''Find the group of a point'''
+            return groups[group_id_map[point_id]][_H5STRUCT.GTYPE]
+
+        n_points = len(points)
+        db = np.zeros((n_points, 7))
         db[:, : -3] = points
         db[:, _H5STRUCT.PD] /= 2
-        # TODO: see about vectorizing this?
-        for i in xrange(len(points)):
-            grp = groups[group_id_map[i]]
-            db[i][4:7] = [grp[_H5STRUCT.GTYPE], i, find_parent_id(i, grp)]
+        db[:, 5] = np.arange(n_points)
+        db[:, 6] = np.vectorize(find_parent_id)(db[:, 5])
+        db[:, 4] = np.vectorize(get_group)(db[:, 5])
 
         return db
 
