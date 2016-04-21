@@ -148,10 +148,13 @@ class H5(object):
 
         # Create a point_id -> group_id map
         group_id_map = {}
+        # Create a point ID to type map
+        id2typ = np.zeros(len(points))
 
         for i, (j, k) in enumerate(izip_longest(group_ids,
                                                 group_ids[1:],
                                                 fillvalue=len(points))):
+            id2typ[int(j): int(k)] = groups[i][_H5STRUCT.GTYPE]
             for l in xrange(int(j), int(k)):
                 group_id_map[l] = i
 
@@ -168,17 +171,13 @@ class H5(object):
                 # get last point in parent group
                 return group_ids[parent_group_id + 1] - 1
 
-        def get_type(point_id):
-            '''Find the group of a point'''
-            return groups[group_id_map[point_id]][_H5STRUCT.GTYPE]
-
         n_points = len(points)
         db = np.zeros((n_points, 7))
         db[:, : _H5STRUCT.PD + 1] = points
         db[:, _H5STRUCT.PD] /= 2
         db[:, COLS.ID] = np.arange(n_points)
         db[:, COLS.P] = np.vectorize(find_parent_id)(db[:, COLS.ID])
-        db[:, COLS.TYPE] = np.vectorize(get_type)(db[:, COLS.ID])
+        db[:, COLS.TYPE] = id2typ
 
         return db
 
