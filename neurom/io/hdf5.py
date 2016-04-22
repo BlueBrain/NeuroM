@@ -144,40 +144,31 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        n_points = len(points)
         group_ids = groups[:, _H5STRUCT.GPFIRST]
 
-        # Create a point_id -> group_id map
-        group_id_map = {}
-        # Create a point ID to type map
-        id2typ = np.zeros(len(points))
+        # point_id -> group_id map
+        pid_map = np.zeros(n_points)
+        #  point ID -> type map
+        typ_map = np.zeros(n_points)
 
         for i, (j, k) in enumerate(izip_longest(group_ids,
                                                 group_ids[1:],
-                                                fillvalue=len(points))):
-            id2typ[int(j): int(k)] = groups[i][_H5STRUCT.GTYPE]
-            for l in xrange(int(j), int(k)):
-                group_id_map[l] = i
+                                                fillvalue=n_points)):
+            j = int(j)
+            k = int(k)
+            typ_map[j: k] = groups[i][_H5STRUCT.GTYPE]
+            # parent is last point in previous group
+            pid_map[j] = group_ids[groups[i][_H5STRUCT.GPID] + 1] - 1
+            # parent is previous point
+            pid_map[j + 1: k] = np.arange(j, k - 1)
 
-        def find_parent_id(point_id):
-            '''Find the parent ID of a point'''
-            group = groups[group_id_map[point_id]]
-            if point_id != group[_H5STRUCT.GPFIRST]:
-                # point is not first point in section
-                # so parent is previous point
-                return point_id - 1
-            else:
-                # parent is last point in parent group
-                parent_group_id = group[_H5STRUCT.GPID]
-                # get last point in parent group
-                return group_ids[parent_group_id + 1] - 1
-
-        n_points = len(points)
         db = np.zeros((n_points, 7))
         db[:, : _H5STRUCT.PD + 1] = points
-        db[:, _H5STRUCT.PD] /= 2
+        db[:, _H5STRUCT.PD] /= 2  # Store radius, not diameter
         db[:, COLS.ID] = np.arange(n_points)
-        db[:, COLS.P] = np.vectorize(find_parent_id)(db[:, COLS.ID])
-        db[:, COLS.TYPE] = id2typ
+        db[:, COLS.P] = pid_map
+        db[:, COLS.TYPE] = typ_map
 
         return db
 
