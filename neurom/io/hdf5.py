@@ -43,6 +43,7 @@ There is one such row per measured point.
 import h5py
 import numpy as np
 from itertools import izip, izip_longest
+from ..core.dataformat import COLS
 
 
 def get_version(h5file):
@@ -143,35 +144,31 @@ class H5(object):
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
+        n_points = len(points)
         group_ids = groups[:, _H5STRUCT.GPFIRST]
 
-        # Create a point_id -> group_id map
-        group_id_map = {}
+        # point_id -> group_id map
+        pid_map = np.zeros(n_points)
+        #  point ID -> type map
+        typ_map = np.zeros(n_points)
+
         for i, (j, k) in enumerate(izip_longest(group_ids,
                                                 group_ids[1:],
-                                                fillvalue=len(points))):
-            for l in xrange(int(j), int(k)):
-                group_id_map[l] = i
+                                                fillvalue=n_points)):
+            j = int(j)
+            k = int(k)
+            typ_map[j: k] = groups[i][_H5STRUCT.GTYPE]
+            # parent is last point in previous group
+            pid_map[j] = group_ids[groups[i][_H5STRUCT.GPID] + 1] - 1
+            # parent is previous point
+            pid_map[j + 1: k] = np.arange(j, k - 1)
 
-        def find_parent_id(point_id, group):
-            '''Find the parent ID of a point'''
-            if point_id != group[_H5STRUCT.GPFIRST]:
-                # point is not first point in section
-                # so parent is previous point
-                return point_id - 1
-            else:
-                # parent is last point in parent group
-                parent_group_id = group[_H5STRUCT.GPID]
-                # get last point in parent group
-                return group_ids[parent_group_id + 1] - 1
-
-        db = np.zeros((len(points), 7))
-        db[:, : -3] = points
-        db[:, _H5STRUCT.PD] /= 2
-        # TODO: see about vectorizing this?
-        for i in xrange(len(points)):
-            grp = groups[group_id_map[i]]
-            db[i][4:7] = [grp[_H5STRUCT.GTYPE], i, find_parent_id(i, grp)]
+        db = np.zeros((n_points, 7))
+        db[:, : _H5STRUCT.PD + 1] = points
+        db[:, _H5STRUCT.PD] /= 2  # Store radius, not diameter
+        db[:, COLS.ID] = np.arange(n_points)
+        db[:, COLS.P] = pid_map
+        db[:, COLS.TYPE] = typ_map
 
         return db
 
