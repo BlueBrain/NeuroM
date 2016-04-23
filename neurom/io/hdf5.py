@@ -42,7 +42,7 @@ There is one such row per measured point.
 '''
 import h5py
 import numpy as np
-from itertools import izip, izip_longest
+from itertools import izip_longest
 from ..core.dataformat import COLS
 
 
@@ -182,14 +182,11 @@ class H5(object):
 
         '''
 
-        group_initial_ids = groups[:, 0]
-        group_len = len(group_initial_ids)
+        group_initial_ids = groups[:, _H5STRUCT.GPFIRST]
 
-        to_be_reduced = np.zeros(group_len)
+        to_be_reduced = np.zeros(len(group_initial_ids))
         to_be_removed = []
 
-        # This is the slow part
-        # groups: (GPFIRST, GTYPE, GPID) -> [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
         for ig, g in enumerate(groups):
             iid, typ, pid = g[_H5STRUCT.GPFIRST], g[_H5STRUCT.GTYPE], g[_H5STRUCT.GPID]
             # Remove first point from sections that are
@@ -201,10 +198,9 @@ class H5(object):
                 # in groups structure by one
                 to_be_reduced[ig + 1:] += 1
 
-        groups = np.array([np.subtract(i, [j, 0, 0])
-                           for i, j in izip(groups, to_be_reduced)])
-
+        groups[:, _H5STRUCT.GPFIRST] = groups[:, _H5STRUCT.GPFIRST] - to_be_reduced
         points = np.delete(points, to_be_removed, axis=0)
+
         return points, groups
 
 
