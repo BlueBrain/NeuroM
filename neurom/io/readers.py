@@ -124,8 +124,12 @@ class RawDataWrapper(object):
         self.data_block, self.fmt = raw_data
         self.adj_list = defaultdict(list)
         self._id_map = {}
+        # this loop takes all the time in the world
         for i, row in enumerate(self.data_block):
+            # and building this adjacency list takes most of that.
             self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
+            # TODO: This is only needed for SWC. Re-factor so
+            # that is isn't run when using H5
             self._id_map[int(row[COLS.ID])] = i
         self._ids = np.array(self.data_block[:, COLS.ID],
                              dtype=np.int32).tolist()
