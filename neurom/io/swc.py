@@ -39,6 +39,9 @@ There is one such row per measured point.
 
 '''
 import numpy as np
+from ..core.dataformat import COLS
+from ..core.dataformat import ROOT_ID
+from .datawrapper import RawDataWrapper
 
 
 class SWC(object):
@@ -56,4 +59,54 @@ class SWC(object):
         if len(np.shape(data)) == 1:
             data = np.reshape(data, (1, -1))
         data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
-        return data, 'SWC'
+        return SWCRawDataWrapper(data, 'SWC')
+
+
+class SWCRawDataWrapper(RawDataWrapper):
+    '''Specialization of RawDataWrapper for SWC data
+
+    SWC data has looser requirements on the point IDs, so
+    an ID to array index look-up table must be maintained.
+
+    Index validity is checked and mappings performed before
+    delegating to base class methods.
+    '''
+    def __init__(self, raw_data, fmt):
+        super(SWCRawDataWrapper, self).__init__(raw_data, fmt)
+
+        self._id_map = {}
+        for i, row in enumerate(self.data_block):
+            self._id_map[int(row[COLS.ID])] = i
+
+        self._ids = np.array(self.data_block[:, COLS.ID],
+                             dtype=np.int32).tolist()
+        self._id_set = set(self._ids)
+
+    def _get_idx(self, idx):
+        ''' Apply global offset to an id'''
+        return self._id_map[idx]
+
+    def get_children(self, idx):
+        ''' get list of ids of children of parent with id idx'''
+        if idx in self._id_set or idx == ROOT_ID:
+            return super(SWCRawDataWrapper, self).get_children(idx)
+
+        raise LookupError('Invalid id: {0}'.format(idx))
+
+    def get_parent(self, idx):
+        '''get the parent of element with id idx'''
+        if idx not in self._id_set:
+            raise LookupError('Invalid id: {0}'.format(idx))
+
+        idx = self._get_idx(idx)
+        return super(SWCRawDataWrapper, self).get_parent(idx)
+
+    def get_point(self, idx):
+        '''Get point data for element idx'''
+        idx = self._get_idx(idx)
+        return super(SWCRawDataWrapper, self).get_point(idx)
+
+    def get_row(self, idx):
+        '''Get row from idx'''
+        idx = self._get_idx(idx)
+        return super(SWCRawDataWrapper, self).get_row(idx)

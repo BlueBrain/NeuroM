@@ -35,6 +35,7 @@ import logging
 import numpy as np
 
 from neurom.core.dataformat import COLS, POINT_TYPE
+from .datawrapper import RawDataWrapper
 
 
 WANTED_SECTIONS = {
@@ -242,4 +243,4 @@ class NeurolucidaASC(object):
         with open(morph_file) as morph_fd:
             sections = _parse_sections(morph_fd)
         raw_data = _sections_to_raw_data(sections)
-        return raw_data, 'Beta Neurolucida ASCII'
+        return RawDataWrapper(raw_data, 'Beta Neurolucida ASCII')

@@ -28,9 +28,8 @@
 
 import os
 import numpy as np
-from neurom.io import readers
+from neurom.io import ROOT_ID, COLS
 from neurom.io import swc
-from neurom.core.dataformat import COLS
 from nose import tools as nt
 
 
@@ -46,28 +45,17 @@ def check_single_section_random_swc(data, fmt):
 
 
 def test_read_swc_basic():
-    data, fmt = swc.SWC.read(
+    rdw = swc.SWC.read(
         os.path.join(SWC_PATH,
                      'random_trunk_off_0_16pt.swc'))
 
-    check_single_section_random_swc(data, fmt)
-
-
-def test_point_soma_swc():
-
-    data, fmt = swc.SWC.read(
-        os.path.join(SWC_PATH,
-                     'point_soma.swc'))
-
-    nt.ok_(fmt == 'SWC')
-    nt.ok_(len(data) == 1)
-    nt.ok_(np.shape(data) == (1, 7))
+    check_single_section_random_swc(rdw.data_block, rdw.fmt)
 
 
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
-        self.data = readers.RawDataWrapper(swc.SWC.read(
-            os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc')))
+        self.data = swc.SWC.read(
+            os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
 
     def test_data_structure(self):
@@ -111,7 +99,7 @@ class TestRawDataWrapper_SingleSectionRandom(object):
             else:
                 nt.ok_(len(children) == 0)
 
-        nt.ok_(self.data.get_children(readers.ROOT_ID) == [ids[0]])
+        nt.ok_(self.data.get_children(ROOT_ID) == [ids[0]])
 
     def test_get_endpoints(self):
         # end-point is last point

@@ -8,9 +8,9 @@ from nose.tools import ok_, eq_
 from mock import patch
 
 import neurom.io as io
-from neurom.io.readers import RawDataWrapper
+from neurom.io.datawrapper import RawDataWrapper
 import neurom.io.neurolucida as nasc
-from neurom.core.dataformat import COLS, POINT_TYPE
+from neurom.core.dataformat import COLS
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -213,10 +213,11 @@ def test_read():
         os.close(fd)
         with open(temp_file, 'w') as fd:
             fd.write(MORPH_ASC)
-        raw_data, _ = nasc.NeurolucidaASC.read(temp_file)
+        rdw = nasc.NeurolucidaASC.read(temp_file)
+        raw_data = rdw.data_block
 
         eq_(raw_data.shape, (15, 7))
-        ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 15))) #correct ID
+        ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 15)))  # correct ID
         # 3 is ID of end of the soma, 2 sections attach to this
         ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
     finally:

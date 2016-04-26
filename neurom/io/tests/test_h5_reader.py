@@ -29,7 +29,7 @@
 import os
 import numpy as np
 import h5py
-from neurom.io import readers, hdf5, swc
+from neurom.io import hdf5, swc
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
@@ -69,8 +69,7 @@ def test_consistency_between_v1_v2():
 
 def test_consistency_between_h5_swc():
     h5_data = hdf5.H5.read(os.path.join(H5V1_PATH, 'Neuron.h5'))
-    swc_data = readers.RawDataWrapper(swc.SWC.read(
-            os.path.join(SWC_PATH, 'Neuron.swc')))
+    swc_data = swc.SWC.read(os.path.join(SWC_PATH, 'Neuron.swc'))
     nt.ok_(np.allclose(h5_data.data_block.shape, swc_data.data_block.shape))
     nt.ok_(len(h5_data.get_fork_points()) == len(swc_data.get_fork_points()))
     nt.ok_(len(h5_data.get_end_points()) == len(swc_data.get_end_points()))
