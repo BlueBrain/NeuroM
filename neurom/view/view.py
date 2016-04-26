@@ -37,7 +37,7 @@ from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.core.tree import isegment
 from neurom.core.tree import val_iter
-from neurom.io.readers import COLS
+from neurom.io import COLS
 from neurom.segments import radius as segment_radius
 from neurom import iter_neurites
 from neurom.analysis.morphtree import get_bounding_box

@@ -50,7 +50,7 @@ def get_soma_ids(rdw):
 def get_initial_neurite_segment_ids(rdw):
     '''Returns a list of IDs of initial neurite tree segments
 
-    These are defined as non-soma points whose perent is a soma point.
+    These are defined as non-soma points whose parent is a soma point.
     '''
     l = list(itertools.chain.from_iterable([rdw.get_children(s) for s in get_soma_ids(rdw)]))
     return [i for i in l if rdw.get_row(i)[COLS.TYPE] != POINT_TYPE.SOMA]

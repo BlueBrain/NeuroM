@@ -44,6 +44,7 @@ import h5py
 import numpy as np
 from itertools import izip_longest
 from ..core.dataformat import COLS
+from .datawrapper import RawDataWrapper
 
 
 def get_version(h5file):
@@ -57,59 +58,14 @@ def get_version(h5file):
         return 'H5V2'
 
 
-class _H5STRUCT(object):
-    '''Define internal structure of HDF5 data
-
-    Input row format:
-        points: (PX, PY, PZ, PD) -> [X, Y, Z, D] (ID is position)
-        groups: (GPFIRST, GTYPE, GPID) -> [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
-
-    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
-    '''
-
-    (PX, PY, PZ, PD) = xrange(4)  # points
-    (GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
-
-
 class H5(object):
     '''Read HDF5 v1 or v2 files and unpack into internal raw data block
 
     Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
     '''
 
-    @staticmethod
-    def read_v1(filename, remove_duplicates=True):
-        '''Read an HDF5 v1 file and return a tuple of data, format.
-
-        Parameters:
-            remove_duplicates: boolean, \
-            If True removes duplicate points \
-            from the beginning of each section.
-        '''
-        points, groups = _unpack_v1(h5py.File(filename, mode='r'))
-        if remove_duplicates:
-            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
-        else:
-            data = H5.unpack_data(points, groups)
-        return data, 'H5V1'
-
-    @staticmethod
-    def read_v2(filename, stage='raw', remove_duplicates=True):
-        '''Read an HDF5 v2 file and return a tuple of data, format.
-
-        Parameters:
-            remove_duplicates: boolean, \
-            If True removes duplicate points \
-            from the beginning of each section.
-        '''
-        h5file = h5py.File(filename, mode='r')
-        points, groups = _unpack_v2(h5file, stage)
-        h5file.close()
-        if remove_duplicates:
-            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
-        else:
-            data = H5.unpack_data(points, groups)
-        return data, 'H5V2'
+    (PX, PY, PZ, PD) = xrange(4)  # points
+    (GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
 
     @staticmethod
     def read(filename, remove_duplicates=True):
@@ -138,14 +94,15 @@ class H5(object):
             data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
         else:
             data = H5.unpack_data(points, groups)
-        return data, version
+
+        return RawDataWrapper(data, version)
 
     @staticmethod
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
         n_points = len(points)
-        group_ids = groups[:, _H5STRUCT.GPFIRST]
+        group_ids = groups[:, H5.GPFIRST]
 
         # point_id -> group_id map
         pid_map = np.zeros(n_points)
@@ -157,15 +114,15 @@ class H5(object):
                                                 fillvalue=n_points)):
             j = int(j)
             k = int(k)
-            typ_map[j: k] = groups[i][_H5STRUCT.GTYPE]
+            typ_map[j: k] = groups[i][H5.GTYPE]
             # parent is last point in previous group
-            pid_map[j] = group_ids[groups[i][_H5STRUCT.GPID] + 1] - 1
+            pid_map[j] = group_ids[groups[i][H5.GPID] + 1] - 1
             # parent is previous point
             pid_map[j + 1: k] = np.arange(j, k - 1)
 
         db = np.zeros((n_points, 7))
-        db[:, : _H5STRUCT.PD + 1] = points
-        db[:, _H5STRUCT.PD] /= 2  # Store radius, not diameter
+        db[:, : H5.PD + 1] = points
+        db[:, H5.PD] /= 2  # Store radius, not diameter
         db[:, COLS.ID] = np.arange(n_points)
         db[:, COLS.P] = pid_map
         db[:, COLS.TYPE] = typ_map
@@ -182,23 +139,23 @@ class H5(object):
 
         '''
 
-        group_initial_ids = groups[:, _H5STRUCT.GPFIRST]
+        group_initial_ids = groups[:, H5.GPFIRST]
 
         to_be_reduced = np.zeros(len(group_initial_ids))
         to_be_removed = []
 
         for ig, g in enumerate(groups):
-            iid, typ, pid = g[_H5STRUCT.GPFIRST], g[_H5STRUCT.GTYPE], g[_H5STRUCT.GPID]
+            iid, typ, pid = g[H5.GPFIRST], g[H5.GTYPE], g[H5.GPID]
             # Remove first point from sections that are
             # not the root section, a soma, or a child of a soma
-            if pid != -1 and typ != 1 and groups[pid][_H5STRUCT.GTYPE] != 1:
+            if pid != -1 and typ != 1 and groups[pid][H5.GTYPE] != 1:
                 # Remove duplicate from list of points
                 to_be_removed.append(iid)
                 # Reduce the id of the following sections
                 # in groups structure by one
                 to_be_reduced[ig + 1:] += 1
 
-        groups[:, _H5STRUCT.GPFIRST] = groups[:, _H5STRUCT.GPFIRST] - to_be_reduced
+        groups[:, H5.GPFIRST] = groups[:, H5.GPFIRST] - to_be_reduced
         points = np.delete(points, to_be_removed, axis=0)
 
         return points, groups
