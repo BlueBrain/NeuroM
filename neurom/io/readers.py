@@ -49,46 +49,6 @@ from neurom.core.point import as_point
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.dataformat import POINT_TYPE
-from neurom.utils import memoize
-
-
-def _unpack_raw_data(filename):
-    '''Parse a morphology file into internal representation data block
-
-    Forwards filename to appropriate parser depending on extension.
-
-    Parameters:
-        filename: path to morphology file
-
-    Returns:
-        tuple of (raw data block, input file format string).
-    '''
-
-    @memoize
-    def _h5_reader():
-        '''Lazy loading of HDF5 reader'''
-        from .hdf5 import H5
-        return H5.read
-
-    @memoize
-    def _swc_reader():
-        '''Lazy loading of SWC reader'''
-        from .swc import SWC
-        return SWC.read
-
-    @memoize
-    def _neurolucida_reader():
-        '''Lazy loading of Neurolucida ASCII reader'''
-        from .neurolucida import NeurolucidaASC
-        return NeurolucidaASC.read
-
-    _READERS = {
-        'swc': _swc_reader,
-        'h5': _h5_reader,
-        'asc': _neurolucida_reader,
-    }
-    extension = os.path.splitext(filename)[1][1:]
-    return _READERS[extension.lower()]()(filename)
 
 
 def load_data(filename):
@@ -102,7 +62,28 @@ def load_data(filename):
         * Neurolucida ASCII (case-insensitive extension ".asc")
     '''
 
-    return RawDataWrapper(_unpack_raw_data(filename))
+    def read_h5(filename):
+        '''Lazy loading of HDF5 reader'''
+        from .hdf5 import H5
+        return H5.read(filename)
+
+    def read_swc(filename):
+        '''Lazy loading of SWC reader'''
+        from .swc import SWC
+        return RawDataWrapper(SWC.read(filename))
+
+    def read_neurolucida(filename):
+        '''Lazy loading of Neurolucida ASCII reader'''
+        from .neurolucida import NeurolucidaASC
+        return RawDataWrapper(NeurolucidaASC.read(filename))
+
+    _READERS = {
+        'swc': read_swc,
+        'h5': read_h5,
+        'asc': read_neurolucida,
+    }
+    extension = os.path.splitext(filename)[1][1:]
+    return _READERS[extension.lower()](filename)
 
 
 class RawDataWrapper(object):
