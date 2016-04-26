@@ -46,7 +46,6 @@ from itertools import izip_longest, ifilter
 from collections import defaultdict
 from ..core.dataformat import COLS
 from ..core.point import as_point
-from ..core.dataformat import ROOT_ID
 from ..core.dataformat import POINT_TYPE
 
 
@@ -61,25 +60,14 @@ def get_version(h5file):
         return 'H5V2'
 
 
-class _H5STRUCT(object):
-    '''Define internal structure of HDF5 data
-
-    Input row format:
-        points: (PX, PY, PZ, PD) -> [X, Y, Z, D] (ID is position)
-        groups: (GPFIRST, GTYPE, GPID) -> [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
+class H5(object):
+    '''Read HDF5 v1 or v2 files and unpack into internal raw data block
 
     Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
     '''
 
     (PX, PY, PZ, PD) = xrange(4)  # points
     (GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
-
-
-class H5(object):
-    '''Read HDF5 v1 or v2 files and unpack into internal raw data block
-
-    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
-    '''
 
     @staticmethod
     def read(filename, remove_duplicates=True):
@@ -109,14 +97,14 @@ class H5(object):
         else:
             data = H5.unpack_data(points, groups)
 
-        return _RDW((data, version))
+        return H5DataWrapper(data, version)
 
     @staticmethod
     def unpack_data(points, groups):
         '''Unpack data from h5 data groups into internal format'''
 
         n_points = len(points)
-        group_ids = groups[:, _H5STRUCT.GPFIRST]
+        group_ids = groups[:, H5.GPFIRST]
 
         # point_id -> group_id map
         pid_map = np.zeros(n_points)
@@ -128,15 +116,15 @@ class H5(object):
                                                 fillvalue=n_points)):
             j = int(j)
             k = int(k)
-            typ_map[j: k] = groups[i][_H5STRUCT.GTYPE]
+            typ_map[j: k] = groups[i][H5.GTYPE]
             # parent is last point in previous group
-            pid_map[j] = group_ids[groups[i][_H5STRUCT.GPID] + 1] - 1
+            pid_map[j] = group_ids[groups[i][H5.GPID] + 1] - 1
             # parent is previous point
             pid_map[j + 1: k] = np.arange(j, k - 1)
 
         db = np.zeros((n_points, 7))
-        db[:, : _H5STRUCT.PD + 1] = points
-        db[:, _H5STRUCT.PD] /= 2  # Store radius, not diameter
+        db[:, : H5.PD + 1] = points
+        db[:, H5.PD] /= 2  # Store radius, not diameter
         db[:, COLS.ID] = np.arange(n_points)
         db[:, COLS.P] = pid_map
         db[:, COLS.TYPE] = typ_map
@@ -153,23 +141,23 @@ class H5(object):
 
         '''
 
-        group_initial_ids = groups[:, _H5STRUCT.GPFIRST]
+        group_initial_ids = groups[:, H5.GPFIRST]
 
         to_be_reduced = np.zeros(len(group_initial_ids))
         to_be_removed = []
 
         for ig, g in enumerate(groups):
-            iid, typ, pid = g[_H5STRUCT.GPFIRST], g[_H5STRUCT.GTYPE], g[_H5STRUCT.GPID]
+            iid, typ, pid = g[H5.GPFIRST], g[H5.GTYPE], g[H5.GPID]
             # Remove first point from sections that are
             # not the root section, a soma, or a child of a soma
-            if pid != -1 and typ != 1 and groups[pid][_H5STRUCT.GTYPE] != 1:
+            if pid != -1 and typ != 1 and groups[pid][H5.GTYPE] != 1:
                 # Remove duplicate from list of points
                 to_be_removed.append(iid)
                 # Reduce the id of the following sections
                 # in groups structure by one
                 to_be_reduced[ig + 1:] += 1
 
-        groups[:, _H5STRUCT.GPFIRST] = groups[:, _H5STRUCT.GPFIRST] - to_be_reduced
+        groups[:, H5.GPFIRST] = groups[:, H5.GPFIRST] - to_be_reduced
         points = np.delete(points, to_be_removed, axis=0)
 
         return points, groups
@@ -194,7 +182,7 @@ def _unpack_v2(h5file, stage):
     return points, groups
 
 
-class _RDW(object):
+class H5DataWrapper(object):
     '''Class holding an array of data and an offset to the first element
     and giving basic access to its elements
 
@@ -209,25 +197,22 @@ class _RDW(object):
     * ID: Identifier for a point. Non-negative, increases by one for each row.
     * PID: ID of parent point
     '''
-    def __init__(self, raw_data):
-        self.data_block, self.fmt = raw_data
+    def __init__(self, raw_data, fmt):
+        self.data_block = raw_data
+        self.fmt = fmt
         self.adj_list = defaultdict(list)
+
         # this loop takes all the time in the world
         for row in self.data_block:
             # and building this adjacency list takes most of that.
             self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
 
     def get_children(self, idx):
-        ''' get list of ids of children of parent with id idx'''
+        ''' get list of ids of children of parent with id idx
 
-        def _valid_id(idx):
-            '''Check if idx is a valid id'''
-            return idx == ROOT_ID or (len(self.data_block) > idx and -1 < idx)
-
-        if _valid_id(idx):
-            return self.adj_list[idx]
-
-        raise LookupError('Invalid id: {0}'.format(idx))
+        Returns empty list if no parent with id idx
+        '''
+        return self.adj_list[idx]
 
     def get_parent(self, idx):
         '''get the parent of element with id idx'''
@@ -235,12 +220,11 @@ class _RDW(object):
 
     def get_point(self, idx):
         '''Get point data for element idx'''
-        p = as_point(self.data_block[idx]) if idx > ROOT_ID else None
-        return p
+        return as_point(self.data_block[idx])
 
     def get_row(self, idx):
         '''Get row from idx'''
-        return self.data_block[idx] if idx > ROOT_ID else None
+        return self.data_block[idx]
 
     def get_col(self, col_id):
         '''Get column from ID'''
