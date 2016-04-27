@@ -3,7 +3,6 @@
 from collections import defaultdict
 from collections import namedtuple
 import sys
-import numpy as np
 from neurom.io.hdf5 import H5
 from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
@@ -72,25 +71,6 @@ def load_nrn(filename):
 def n_segments(section):
     '''Number of segments in a section'''
     return len(section.value) - 1
-
-
-def _mag2(point):
-    '''magniture squared of a point'''
-    return np.dot(point, point)
-
-
-mag2 = np.vectorize(_mag2)
-
-
-def section_length_(section):
-    '''path length of a section
-
-    TODO: this doesn't work!
-    '''
-    xyz = section.value[:, : 3]
-    vecs = np.diff(xyz, axis=0)
-    d2 = mag2(vecs)
-    return np.sum(np.sqrt(d2))
 
 
 def do_new_stuff(filename):
