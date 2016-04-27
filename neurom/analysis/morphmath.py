@@ -217,7 +217,10 @@ def path_distance(points):
     """
     Compute the path distance from given set of points
     """
-    return sum(point_dist(p[0], p[1]) for p in izip(points, islice(points, 1, None)))
+
+    d2 = [point_dist2(p[0], p[1])
+          for p in izip(points, islice(points, 1, None))]
+    return np.sum(np.sqrt(d2))
 
 
 def segment_length(seg):

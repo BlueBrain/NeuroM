@@ -62,14 +62,14 @@ class RawDataWrapper(object):
     * ID: Identifier for a point. Non-negative, increases by one for each row.
     * PID: ID of parent point
     '''
-    def __init__(self, raw_data, fmt):
+    def __init__(self, raw_data, fmt, sections=None):
         self.data_block = raw_data
         self.fmt = fmt
+        self.sections = sections
         self.adj_list = defaultdict(list)
 
         # this loop takes all the time in the world
         for row in self.data_block:
-            # and building this adjacency list takes most of that.
             self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
 
     def get_children(self, idx):
