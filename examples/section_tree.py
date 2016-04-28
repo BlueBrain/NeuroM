@@ -3,12 +3,14 @@
 from collections import defaultdict
 from collections import namedtuple
 import sys
+import numpy as np
 from neurom.io.hdf5 import H5
 from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
-from neurom.core.tree import i_chain2
+from neurom.core.tree import i_chain2, iupstream
 from neurom.analysis import morphmath as mm
 from neurom import ezy
+
 
 (START, END, TYPE, ID, PID) = xrange(5)
 
@@ -47,7 +49,7 @@ def make_tree(rdw, adj_list, root_node=0):
     return head_node
 
 
-def init_neurite_sections(rdw):
+def get_neurite_sections(rdw):
     '''Get the section IDs of the intitial neurite sections'''
     sec = rdw.sections
     return [ss[ID] for ss in sec if sec[ss[PID]][TYPE] == POINT_TYPE.SOMA]
@@ -61,7 +63,7 @@ def load_nrn(filename):
     adj_list = buid_adjacency_list(rdw)
 
     # get the initial neurite sections
-    trunks = init_neurite_sections(rdw)
+    trunks = get_neurite_sections(rdw)
     trees = [make_tree(rdw, adj_list, trunk) for trunk in trunks]
     nrn = MockNeuron(trees, rdw, adj_list)
 
@@ -71,6 +73,11 @@ def load_nrn(filename):
 def n_segments(section):
     '''Number of segments in a section'''
     return len(section.value) - 1
+
+
+def path_length(section):
+    '''Path length from section to root'''
+    return sum(mm.path_distance(s.value) for s in iupstream(section))
 
 
 def do_new_stuff(filename):
@@ -84,6 +91,16 @@ def do_new_stuff(filename):
     print 'number of sections:', n_sec
     print 'number of segments:', n_seg
     print 'tota neurite length:', sum(sec_len)
+
+
+def get_path_lengths_new(nrn):
+    '''Use new stuff to get path length of leaf neurites'''
+    return np.array([path_length(s) for s in i_chain2(nrn.neurites)])
+
+
+def get_path_lengths_old(nrn):
+    '''old school'''
+    return ezy.get('section_path_distances', nrn)
 
 
 def do_old_stuff(filename):
