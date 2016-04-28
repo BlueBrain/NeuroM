@@ -33,6 +33,7 @@ from collections import defaultdict
 from collections import namedtuple
 import numpy as np
 from neurom.io.hdf5 import H5
+from neurom.core import NeuriteType
 from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
@@ -75,7 +76,14 @@ class SecDataWrapper(object):
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
 
-def make_tree(rdw, root_node=0):
+def set_neurite_type(tree):
+    '''Calculate and set the neurite type of a tree'''
+    tree_types = tuple(NeuriteType)
+    types = np.array([node.value[0][COLS.TYPE] for node in ipreorder(tree)])
+    tree.type = tree_types[int(np.median(types))]
+
+
+def make_tree(rdw, root_node=0, post_action=None):
     '''Build a section tree'''
     _sec = rdw.sections
     head_node = Tree(_sec[root_node])
@@ -92,13 +100,17 @@ def make_tree(rdw, root_node=0):
         sec = n.value
         n.value = rdw.data_block[sec[SEC.START]: sec[SEC.END]]
 
+    if post_action is not None:
+        post_action(head_node)
+
     return head_node
 
 
-def load_neuron(filename):
+def load_neuron(filename, tree_action=set_neurite_type):
     '''Build section trees from an h5 file'''
     rdw = H5.read(filename, remove_duplicates=False, wrapper=SecDataWrapper)
-    trees = [make_tree(rdw, trunk) for trunk in rdw.neurite_trunks()]
+    trees = [make_tree(rdw, trunk, tree_action)
+             for trunk in rdw.neurite_trunks()]
     soma = make_soma(rdw.soma_points())
     return Neuron(soma, trees, rdw)
 

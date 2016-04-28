@@ -36,6 +36,7 @@ from neurom.core import section_neuron as sn
 from neurom.core.tree import i_chain2
 from neurom.io.utils import load_neuron
 from neurom.features import get
+from neurom.analysis import morphtree as mt
 
 
 
@@ -43,8 +44,10 @@ _PWD = os.path.dirname(os.path.abspath(__file__))
 _DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 
 SEC_NRN = sn.load_neuron(_DATA_PATH)
-REF_NRN = load_neuron(_DATA_PATH)
+REF_NRN = load_neuron(_DATA_PATH, mt.set_tree_type)
 
+REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
+                     NeuriteType.basal_dendrite, NeuriteType.axon]
 
 def _close(a, b):
     nt.assert_equal(len(a), len(b))
@@ -54,6 +57,14 @@ def _close(a, b):
 def _equal(a, b):
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
+
+
+def test_neurite_type():
+
+    neurite_types = [n0.type for n0 in SEC_NRN.neurites]
+    nt.assert_equal(neurite_types, REF_NEURITE_TYPES)
+    nt.assert_equal(neurite_types, [n1.type for n1 in REF_NRN.neurites])
+
 
 
 def test_get_n_sections():
