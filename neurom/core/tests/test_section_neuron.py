@@ -84,14 +84,12 @@ def test_get_segment_lengths():
     nt.assert_true(False)
 
 
-@nt.nottest
 def test_get_soma_radius():
-    nt.assert_true(False)
+    nt.assert_equal(SEC_NRN.soma.radius, get('soma_radii', REF_NRN)[0])
 
 
-@nt.nottest
 def test_get_soma_surface_area():
-    nt.assert_true(False)
+    nt.assert_equal(sn.soma_surface_area(SEC_NRN), get('soma_surface_areas', REF_NRN)[0])
 
 
 @nt.nottest

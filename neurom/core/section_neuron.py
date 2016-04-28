@@ -28,13 +28,16 @@
 
 '''Section tree module'''
 
+import math
 from collections import defaultdict
 from collections import namedtuple
 import numpy as np
 from neurom.io.hdf5 import H5
 from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
+from neurom.core.dataformat import COLS
 from neurom.core.tree import i_chain2, iupstream
+from neurom.core.neuron import make_soma
 from neurom.analysis import morphmath as mm
 
 
@@ -43,7 +46,7 @@ class SEC(object):
     (START, END, TYPE, ID, PID) = xrange(5)
 
 
-Neuron = namedtuple('Neuron', 'neurites, data_block')
+Neuron = namedtuple('Neuron', 'soma, neurites, data_block')
 
 
 class SecDataWrapper(object):
@@ -65,6 +68,11 @@ class SecDataWrapper(object):
         return [ss[SEC.ID] for ss in sec
                 if sec[ss[SEC.PID]][SEC.TYPE] == POINT_TYPE.SOMA and
                 ss[SEC.TYPE] != POINT_TYPE.SOMA]
+
+    def soma_points(self):
+        '''Get the soma points'''
+        db = self.data_block
+        return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
 
 def make_tree(rdw, root_node=0):
@@ -91,7 +99,17 @@ def load_neuron(filename):
     '''Build section trees from an h5 file'''
     rdw = H5.read(filename, remove_duplicates=False, wrapper=SecDataWrapper)
     trees = [make_tree(rdw, trunk) for trunk in rdw.neurite_trunks()]
-    return Neuron(trees, rdw)
+    soma = make_soma(rdw.soma_points())
+    return Neuron(soma, trees, rdw)
+
+
+def soma_surface_area(nrn):
+    '''Get the surface area of a neuron's soma.
+
+    Note:
+        The surface area is calculated by assuming the soma is spherical.
+    '''
+    return 4 * math.pi * nrn.soma.radius ** 2
 
 
 def n_segments(nrn):
