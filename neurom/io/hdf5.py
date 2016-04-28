@@ -68,7 +68,7 @@ class H5(object):
     (GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
 
     @staticmethod
-    def read(filename, remove_duplicates=True):
+    def read(filename, remove_duplicates=True, wrapper=RawDataWrapper):
         '''Read a file and return a tuple of data, format.
 
         * Tries to guess the format and the H5 version.
@@ -90,16 +90,16 @@ class H5(object):
 
         h5file.close()
 
-        if remove_duplicates:
-            data = H5.unpack_data(*H5.remove_duplicate_points(points, groups))
-        else:
-            data = H5.unpack_data(points, groups)
+        data, sec = H5.unpack_data(points, groups, remove_duplicates)
 
-        return RawDataWrapper(data, version)
+        return wrapper(data, version, sec)
 
     @staticmethod
-    def unpack_data(points, groups):
+    def unpack_data(points, groups, remove_duplicates):
         '''Unpack data from h5 data groups into internal format'''
+
+        if remove_duplicates:
+            points, groups = H5.remove_duplicate_points(points, groups)
 
         n_points = len(points)
         group_ids = groups[:, H5.GPFIRST]
@@ -108,12 +108,15 @@ class H5(object):
         pid_map = np.zeros(n_points)
         #  point ID -> type map
         typ_map = np.zeros(n_points)
+        # sections (start, end, type, id, parent_id)
+        sections = [0] * len(group_ids)
 
         for i, (j, k) in enumerate(izip_longest(group_ids,
                                                 group_ids[1:],
                                                 fillvalue=n_points)):
             j = int(j)
             k = int(k)
+            sections[i] = (j, k, groups[i][H5.GTYPE], i, groups[i][H5.GPID])
             typ_map[j: k] = groups[i][H5.GTYPE]
             # parent is last point in previous group
             pid_map[j] = group_ids[groups[i][H5.GPID] + 1] - 1
@@ -127,7 +130,7 @@ class H5(object):
         db[:, COLS.P] = pid_map
         db[:, COLS.TYPE] = typ_map
 
-        return db
+        return db, sections
 
     @staticmethod
     def remove_duplicate_points(points, groups):

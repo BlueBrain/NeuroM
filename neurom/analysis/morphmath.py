@@ -30,7 +30,6 @@
 import math
 from itertools import combinations
 import numpy as np
-from itertools import islice, izip
 from neurom.core.dataformat import COLS
 
 
@@ -217,7 +216,9 @@ def path_distance(points):
     """
     Compute the path distance from given set of points
     """
-    return sum(point_dist(p[0], p[1]) for p in izip(points, islice(points, 1, None)))
+    vecs = np.diff(points, axis=0)[:, :3]
+    d2 = [np.dot(p, p) for p in vecs]
+    return np.sum(np.sqrt(d2))
 
 
 def segment_length(seg):
