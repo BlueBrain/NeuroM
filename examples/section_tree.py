@@ -98,6 +98,26 @@ def get_path_lengths_new(nrn):
     return np.array([path_length(s) for s in i_chain2(nrn.neurites)])
 
 
+def get_path_lengths_new2(nrn):
+    '''Less naive path length calculation
+
+    Calculates and stores the section lengths in one pass,
+    then queries the lengths in the path length iterations.
+    This avoids repeatedly calculating the lengths of the
+    same sections.
+    '''
+    dist = {}
+
+    for s in i_chain2(nrn.neurites):
+        dist[s] = mm.path_distance(s.value)
+
+    def pl2(sec):
+        '''Calculate the path length using cahced section lengths'''
+        return sum(dist[s] for s in iupstream(sec))
+
+    return np.array([pl2(s) for s in i_chain2(nrn.neurites)])
+
+
 def get_path_lengths_old(nrn):
     '''old school'''
     return ezy.get('section_path_distances', nrn)
