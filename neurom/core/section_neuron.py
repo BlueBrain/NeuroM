@@ -33,7 +33,7 @@ from collections import defaultdict
 from collections import namedtuple
 import numpy as np
 from neurom.io.hdf5 import H5
-from neurom.core import NeuriteType
+from neurom.core.types import NeuriteType
 from neurom.core.tree import Tree, ipreorder, ibifurcation_point
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import POINT_TYPE
