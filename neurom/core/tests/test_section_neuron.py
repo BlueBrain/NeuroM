@@ -33,7 +33,7 @@ import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
 from neurom.core import section_neuron as sn
-from neurom.core.tree import i_chain2
+from neurom.core.tree import i_chain2, ibifurcation_point
 from neurom.io.utils import load_neuron
 from neurom.features import get
 from neurom.analysis import morphtree as mt
@@ -49,12 +49,16 @@ REF_NRN = load_neuron(_DATA_PATH, mt.set_tree_type)
 REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
                      NeuriteType.basal_dendrite, NeuriteType.axon]
 
-def _close(a, b):
+def _close(a, b, debug=False):
+    if debug:
+        print 'a: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b))
 
 
-def _equal(a, b):
+def _equal(a, b, debug=False):
+    if debug:
+        print 'a: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 
@@ -66,33 +70,59 @@ def test_neurite_type():
     nt.assert_equal(neurite_types, [n1.type for n1 in REF_NRN.neurites])
 
 
-
 def test_get_n_sections():
     nt.assert_equal(sn.n_sections(SEC_NRN), get('number_of_sections', REF_NRN)[0])
+    for t in NeuriteType:
+        nt.assert_equal(sn.n_sections(SEC_NRN, neurite_type=t),
+                        get('number_of_sections', REF_NRN, neurite_type=t)[0])
+
+
+def test_get_n_sections_per_neurite():
+    _equal(sn.get_n_sections_per_neurite(SEC_NRN),
+           get('number_of_sections_per_neurite', REF_NRN))
+
+    for t in NeuriteType:
+        _equal(sn.get_n_sections_per_neurite(SEC_NRN, neurite_type=t),
+               get('number_of_sections_per_neurite', REF_NRN, neurite_type=t))
 
 
 def test_get_n_segments():
     nt.assert_equal(sn.n_segments(SEC_NRN), get('number_of_segments', REF_NRN)[0])
+    for t in NeuriteType:
+        nt.assert_equal(sn.n_segments(SEC_NRN, neurite_type=t),
+                        get('number_of_segments', REF_NRN, neurite_type=t)[0])
 
 
 def test_get_number_of_neurites():
     nt.assert_equal(sn.n_neurites(SEC_NRN), get('number_of_neurites', REF_NRN)[0])
+    for t in NeuriteType:
+        nt.assert_equal(sn.n_neurites(SEC_NRN, neurite_type=t),
+                        get('number_of_neurites', REF_NRN, neurite_type=t)[0])
 
 
 def test_get_section_lengths():
     _close(sn.get_section_lengths(SEC_NRN), get('section_lengths', REF_NRN))
+    for t in NeuriteType:
+        _close(sn.get_section_lengths(SEC_NRN, neurite_type=t),
+               get('section_lengths', REF_NRN, neurite_type=t))
 
 
 def test_get_section_path_distances():
     _close(sn.get_path_lengths(SEC_NRN), get('section_path_distances', REF_NRN))
+    for t in NeuriteType:
+        _close(sn.get_path_lengths(SEC_NRN, neurite_type=t),
+               get('section_path_distances', REF_NRN, neurite_type=t))
 
-    pl = [sn.path_length(s) for s in i_chain2(SEC_NRN.neurites)]
+    pl = [sn.section_path_length(s) for s in i_chain2(SEC_NRN.neurites)]
     _close(pl, get('section_path_distances', REF_NRN))
 
 
 @nt.nottest
 def test_get_segment_lengths():
-    nt.assert_true(False)
+    _equal(sn.get_segment_lengths(SEC_NRN), get('segment_lengths', REF_NRN))
+    for t in NeuriteType:
+        _equal(sn.get_segment_lengths(SEC_NRN, neurite_type=t),
+               get('segment_lengths', REF_NRN, neurite_type=t))
 
 
 def test_get_soma_radius():
@@ -103,16 +133,52 @@ def test_get_soma_surface_area():
     nt.assert_equal(sn.soma_surface_area(SEC_NRN), get('soma_surface_areas', REF_NRN)[0])
 
 
-@nt.nottest
 def test_get_local_bifurcation_angles():
-    nt.assert_true(False)
+    _close(sn.get_local_bifurcation_angles(SEC_NRN),
+           get('local_bifurcation_angles', REF_NRN))
+
+    for t in NeuriteType:
+        _close(sn.get_local_bifurcation_angles(SEC_NRN, neurite_type=t),
+               get('local_bifurcation_angles', REF_NRN, neurite_type=t))
+
+    ba = [sn.local_bifurcation_angle(b)
+          for b in i_chain2(SEC_NRN.neurites, iterator_type=ibifurcation_point)]
+
+    _close(ba, get('local_bifurcation_angles', REF_NRN))
 
 
-@nt.nottest
 def test_get_remote_bifurcation_angles():
-    nt.assert_true(False)
+    _close(sn.get_remote_bifurcation_angles(SEC_NRN),
+           get('remote_bifurcation_angles', REF_NRN))
+
+    for t in NeuriteType:
+        _close(sn.get_remote_bifurcation_angles(SEC_NRN, neurite_type=t),
+               get('remote_bifurcation_angles', REF_NRN, neurite_type=t))
+
+    ba = [sn.remote_bifurcation_angle(b)
+          for b in i_chain2(SEC_NRN.neurites, iterator_type=ibifurcation_point)]
+
+    _close(ba, get('remote_bifurcation_angles', REF_NRN))
 
 
-@nt.nottest
 def test_get_section_radial_distances():
-    nt.assert_true(False)
+    _close(sn.get_section_radial_distances(SEC_NRN),
+           get('section_radial_distances', REF_NRN))
+
+    for t in NeuriteType:
+        _close(sn.get_section_radial_distances(SEC_NRN, neurite_type=t),
+               get('section_radial_distances', REF_NRN, neurite_type=t))
+
+
+def test_get_trunk_origin_radii():
+    _equal(sn.get_trunk_origin_radii(SEC_NRN), get('trunk_origin_radii', REF_NRN))
+    for t in NeuriteType:
+        _equal(sn.get_trunk_origin_radii(SEC_NRN, neurite_type=t),
+               get('trunk_origin_radii', REF_NRN, neurite_type=t))
+
+
+def test_get_trunk_section_lengths():
+    _equal(sn.get_trunk_section_lengths(SEC_NRN), get('trunk_section_lengths', REF_NRN))
+    for t in NeuriteType:
+        _equal(sn.get_trunk_section_lengths(SEC_NRN, neurite_type=t),
+               get('trunk_section_lengths', REF_NRN, neurite_type=t))

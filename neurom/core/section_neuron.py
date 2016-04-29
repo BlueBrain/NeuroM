@@ -34,7 +34,8 @@ from collections import namedtuple
 import numpy as np
 from neurom.io.hdf5 import H5
 from neurom.core import NeuriteType
-from neurom.core.tree import Tree, ipreorder
+from neurom.core.tree import Tree, ipreorder, ibifurcation_point
+from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.tree import i_chain2, iupstream
@@ -124,32 +125,30 @@ def soma_surface_area(nrn):
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
-def n_segments(nrn):
+def n_segments(nrn, neurite_type=NeuriteType.all):
     '''Number of segments in a section'''
-    return sum(len(s.value) - 1 for s in i_chain2(nrn.neurites))
+    return sum(len(s.value) - 1
+               for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
 
 
-def n_sections(nrn):
+def n_sections(nrn, neurite_type=NeuriteType.all):
     '''Number of sections in a neuron'''
-    return sum(1 for _ in i_chain2(nrn.neurites))
+    return sum(1 for _ in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
 
 
-def n_neurites(nrn):
+def n_neurites(nrn, neurite_type=NeuriteType.all):
     '''Number of neurites in a neuron'''
-    return len(nrn.neurites)
+    is_ntype = is_type(neurite_type)
+    return sum(1 for n in nrn.neurites if is_ntype(n))
 
 
-def path_length(section):
-    '''Path length from section to root'''
-    return sum(mm.path_distance(s.value) for s in iupstream(section))
-
-
-def get_section_lengths(nrn):
+def get_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''section lengths'''
-    return np.array([mm.path_distance(s.value) for s in i_chain2(nrn.neurites)])
+    return [mm.path_distance(s.value)
+            for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
 
 
-def get_path_lengths(nrn):
+def get_path_lengths(nrn, neurite_type=NeuriteType.all):
     '''Less naive path length calculation
 
     Calculates and stores the section lengths in one pass,
@@ -159,11 +158,113 @@ def get_path_lengths(nrn):
     '''
     dist = {}
 
-    for s in i_chain2(nrn.neurites):
+    for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)):
         dist[s] = mm.path_distance(s.value)
 
     def pl2(sec):
         '''Calculate the path length using cahced section lengths'''
         return sum(dist[s] for s in iupstream(sec))
 
-    return np.array([pl2(s) for s in i_chain2(nrn.neurites)])
+    return [pl2(s) for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+
+
+def get_local_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all local bifurcation angles'''
+    return [local_bifurcation_angle(b)
+            for b in i_chain2(nrn.neurites,
+                              iterator_type=ibifurcation_point,
+                              tree_filter=is_type(neurite_type))]
+
+
+def get_remote_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all remote bifurcation angles'''
+    return [remote_bifurcation_angle(b)
+            for b in i_chain2(nrn.neurites,
+                              iterator_type=ibifurcation_point,
+                              tree_filter=is_type(neurite_type))]
+
+
+def get_section_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
+    '''Get a list of all remote bifurcation angles'''
+    tree_filter = is_type(neurite_type)
+    dist = []
+    for n in nrn.neurites:
+        if tree_filter(n):
+            origin = n.value[0] if origin is None else origin
+            dist.extend([section_radial_distance(s, origin) for s in ipreorder(n)])
+
+    return dist
+
+
+def get_trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of the lengths of trunk sections of neurites in a neuron'''
+    tree_filter = is_type(neurite_type)
+    return [mm.path_distance(s.value) for s in nrn.neurites if tree_filter(s)]
+
+
+def get_trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of the lengths of trunk sections of neurites in a neuron'''
+    tree_filter = is_type(neurite_type)
+    return [s.value[0][COLS.R] for s in nrn.neurites if tree_filter(s)]
+
+
+def get_n_sections_per_neurite(nrn, neurite_type=NeuriteType.all):
+    '''Get the number of sections per neurite in a neuron'''
+    tree_filter = is_type(neurite_type)
+    return [sum(1 for _ in ipreorder(n)) for n in nrn.neurites if tree_filter(n)]
+
+
+def section_path_length(section):
+    '''Path length from section to root'''
+    return sum(mm.path_distance(s.value) for s in iupstream(section))
+
+
+def section_radial_distance(section, origin):
+    '''Return the radial distances of a tree section to a given origin point
+
+    The radial distance is the euclidian distance between the
+    end-point point of the section and the origin point in question.
+
+    Parameters:
+        section: neurite section object
+        origin: point to which distances are measured. It must have at least 3\
+            components. The first 3 components are (x, y, z).
+    '''
+    return mm.point_dist(section.value[-1], origin)
+
+
+def local_bifurcation_angle(bif_point):
+    '''Return the opening angle between two out-going sections
+    in a bifurcation point
+
+    The bifurcation angle is defined as the angle between the first non-zero
+    length segments of a bifurcation point.
+    '''
+    def skip_0_length(sec):
+        '''Return the first point with non-zero distance to first point'''
+        p0 = sec[0]
+        cur = sec[1]
+        for i, p in enumerate(sec[1:]):
+            if not np.all(p[:COLS.R] == p0[:COLS.R]):
+                cur = sec[i + 1]
+                break
+
+        return cur
+
+    ch = (skip_0_length(bif_point.children[0].value),
+          skip_0_length(bif_point.children[1].value))
+
+    return mm.angle_3points(bif_point.value[-1], ch[0], ch[1])
+
+
+def remote_bifurcation_angle(bif_point):
+    '''Return the opening angle between two out-going sections
+    in a bifurcation point
+
+    The angle is defined as between the bofircation point and the
+    last points in the out-going sections.
+
+    '''
+    return mm.angle_3points(bif_point.value[-1],
+                            bif_point.children[0].value[-1],
+                            bif_point.children[1].value[-1])
