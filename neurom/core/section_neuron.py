@@ -29,7 +29,6 @@
 '''Section tree module'''
 
 import math
-from collections import defaultdict
 from collections import namedtuple
 import numpy as np
 from neurom.io.hdf5 import H5
@@ -59,10 +58,6 @@ class SecDataWrapper(object):
         self.data_block = data_block
         self.fmt = fmt
         self.sections = sections
-        self.adj_list = defaultdict(list)
-
-        for sec in self.sections:
-            self.adj_list[sec[SEC.PID]].append(sec[SEC.ID])
 
     def neurite_trunks(self):
         '''Get the section IDs of the intitial neurite sections'''
@@ -84,27 +79,22 @@ def set_neurite_type(tree):
     tree.type = tree_types[int(np.median(types))]
 
 
-def make_tree(rdw, root_node=0, post_action=None):
+def make_tree(rdw, start_node=0, post_action=None):
     '''Build a section tree'''
-    _sec = rdw.sections
-    head_node = Tree(_sec[root_node])
-    children = [head_node]
-    while children:
-        cur_node = children.pop()
-        for c in rdw.adj_list[cur_node.value[SEC.ID]]:
-            child = Tree(_sec[c])
-            cur_node.add_child(child)
-            children.append(child)
+    # One pass over sections to build nodes
+    nodes = [Tree(rdw.data_block[sec[SEC.START]: sec[SEC.END]])
+             for sec in rdw.sections[start_node:]]
 
-    # set the data in each node to a slice of the raw data block
-    for n in ipreorder(head_node):
-        sec = n.value
-        n.value = rdw.data_block[sec[SEC.START]: sec[SEC.END]]
+    # One pass over nodes to connect children to parents
+    for i in xrange(len(nodes)):
+        parent_id = rdw.sections[i + start_node][SEC.PID] - start_node
+        if parent_id >= 0:
+            nodes[parent_id].add_child(nodes[i])
 
     if post_action is not None:
-        post_action(head_node)
+        post_action(nodes[0])
 
-    return head_node
+    return nodes[0]
 
 
 def load_neuron(filename, tree_action=set_neurite_type):
