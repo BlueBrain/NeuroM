@@ -203,6 +203,22 @@ def test_segment_radial_distances():
     nt.assert_true(np.all(rad_dists == ref_segs))
 
 
+def test_segment_radial_distances_origin():
+    origin = (-100, -200, -300)
+
+    ref_segs = []
+    ref_segs2 = []
+    for t in NEURON.neurites:
+        ref_segs.extend(ll for ll in iter_neurites(t, seg.radial_dist(t.value)))
+        ref_segs2.extend(ll for ll in iter_neurites(t, seg.radial_dist(origin)))
+
+    rad_dists = get_feat('segment_radial_distances', NEURON)
+    rad_dists2 = get_feat('segment_radial_distances', NEURON, origin=origin)
+    nt.assert_true(np.all(rad_dists == ref_segs))
+    nt.assert_true(np.all(rad_dists2 == ref_segs2))
+    nt.assert_true(np.all(rad_dists2 != ref_segs))
+
+
 def test_section_radial_distances_endpoint():
     ref_sec_rad_dist_start = []
     for t in NEURON.neurites:

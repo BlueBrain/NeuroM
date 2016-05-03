@@ -139,7 +139,7 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=Neurite
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
 
 
-def segment_radial_distances(neurites, neurite_type=NeuriteType.all):
+def segment_radial_distances(neurites, origin=None, neurite_type=NeuriteType.all):
     '''Get an iterable containing section radial distances to origin of\
         all neurites of a given type
 
@@ -161,7 +161,7 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all):
         Parameters:
             tree: tree object
         '''
-        pos = tree.value
+        pos = tree.value if origin is None else origin
         return _tr.imap_val(lambda s: _mm.segment_radial_dist(s, pos), _tr.isegment(tree))
 
     def f(n):
