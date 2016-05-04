@@ -43,14 +43,14 @@ import os
 @memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
-    return rdw.get_ids(lambda r: r[COLS.TYPE] == POINT_TYPE.SOMA)
+    return rdw.get_soma_rows()[:, COLS.ID].tolist()
 
 
 @memoize
 def get_initial_neurite_segment_ids(rdw):
     '''Returns a list of IDs of initial neurite tree segments
 
-    These are defined as non-soma points whose perent is a soma point.
+    These are defined as non-soma points whose parent is a soma point.
     '''
     l = list(itertools.chain.from_iterable([rdw.get_children(s) for s in get_soma_ids(rdw)]))
     return [i for i in l if rdw.get_row(i)[COLS.TYPE] != POINT_TYPE.SOMA]
@@ -92,8 +92,7 @@ def make_neuron(raw_data, tree_action=None):
         SomaError if no soma points in raw_data or points incompatible with soma.
         IDSequenceError if filename contains invalid ID sequence
     '''
-    _soma = make_soma([raw_data.get_row(s_id)
-                       for s_id in get_soma_ids(raw_data)])
+    _soma = make_soma(raw_data.get_soma_rows())
     _trees = [make_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_neurite_segment_ids(raw_data)]
 
@@ -152,9 +151,9 @@ def get_morph_files(directory):
     '''Get a list of all morphology files in a directory
 
     Returns:
-        list with all files with extensions '.swc' or '.h5' (case insensitive)
+        list with all files with extensions '.swc' , 'h5' or '.asc' (case insensitive)
     '''
     lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
     return [m for m in lsdir
             if os.path.isfile(m) and
-            os.path.splitext(m)[1].lower() in ('.swc', '.h5')]
+            os.path.splitext(m)[1].lower() in ('.swc', '.h5', '.asc')]

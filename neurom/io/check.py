@@ -40,7 +40,7 @@ def has_sequential_ids(raw_data):
     with their predecessor)
     '''
     ids = raw_data.get_col(COLS.ID)
-    steps = [int(j) for (i, j) in zip(ids, ids[1:]) if int(j - i) != 1]
+    steps = ids[np.where(np.diff(ids) != 1)[0] + 1].astype(int)
     return len(steps) == 0, steps
 
 
@@ -65,11 +65,9 @@ def is_single_tree(raw_data):
     Note:
         This assumes no_missing_parents passed.
     '''
-    dblock = raw_data.data_block
-    bad_ids = [int(dblock[i][COLS.ID]) for i in xrange(1, len(dblock))
-               if dblock[i][COLS.P] == -1]
-
-    return len(bad_ids) == 0, bad_ids
+    db = raw_data.data_block
+    bad_ids = db[db[:, COLS.P] == -1][1:, COLS.ID]
+    return len(bad_ids) == 0, bad_ids.tolist()
 
 
 def has_increasing_ids(raw_data):
@@ -79,7 +77,7 @@ def has_increasing_ids(raw_data):
     with their predecessor)
     '''
     ids = raw_data.get_col(COLS.ID)
-    steps = [int(j) for (i, j) in zip(ids, ids[1:]) if i >= j]
+    steps = ids[np.where(np.diff(ids) <= 0)[0] + 1].astype(int)
     return len(steps) == 0, steps
 
 

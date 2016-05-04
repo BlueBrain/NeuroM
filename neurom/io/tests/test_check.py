@@ -65,7 +65,39 @@ def test_has_sequential_ids_bad_data():
 
     ok, ids = io.check.has_sequential_ids(io.load_data(f))
     nt.ok_(not ok)
-    nt.ok_(ids == [6, 217, 428, 639])
+    #print 'XXX', ids
+    nt.assert_items_equal(ids, [6, 217, 428, 639])
+
+def test_has_increasing_ids_good_data():
+
+    files = [os.path.join(SWC_PATH, f)
+             for f in ['Neuron.swc',
+                       'Single_apical_no_soma.swc',
+                       'Single_apical.swc',
+                       'Single_basal.swc',
+                       'Single_axon.swc',
+                       'Neuron_zero_radius.swc',
+                       'sequential_trunk_off_0_16pt.swc',
+                       'sequential_trunk_off_1_16pt.swc',
+                       'sequential_trunk_off_42_16pt.swc',
+                       'Neuron_no_missing_ids_no_zero_segs.swc']
+             ]
+
+    for f in files:
+        ok, ids = io.check.has_increasing_ids(io.load_data(f))
+        nt.ok_(ok)
+        nt.ok_(len(ids) == 0)
+
+
+
+def test_has_increasing_ids_bad_data():
+
+    f = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
+
+    ok, ids = io.check.has_increasing_ids(io.load_data(f))
+    print 'XXX', ids
+    nt.ok_(not ok)
+    nt.assert_items_equal(ids, [6, 12])
 
 
 def test_is_single_tree_bad_data():

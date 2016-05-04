@@ -30,9 +30,11 @@
 
 from functools import wraps
 from functools import partial
+from neurom.core import tree as _tr
 from neurom.core.types import NeuriteType
 from neurom.core.neuron import Neuron
 from neurom.analysis import morphtree as _mt
+from neurom.analysis import morphmath as _mm
 from neurom.core.types import tree_type_checker as _ttc
 from neurom import segments as _seg
 from neurom import sections as _sec
@@ -86,7 +88,6 @@ number_of_sections = count(feature_getter(_sec.identity))
 segment_lengths = feature_getter(_seg.length)
 number_of_segments = count(feature_getter(_seg.identity))
 segment_taper_rates = feature_getter(_seg.taper_rate)
-
 segment_radii = feature_getter(_seg.radius)
 segment_x_coordinates = feature_getter(_seg.x_coordinate)
 segment_y_coordinates = feature_getter(_seg.y_coordinate)
@@ -136,6 +137,39 @@ def section_path_distances(neurites, use_start_point=False, neurite_type=Neurite
     magic_iter = (_sec.start_point_path_length if use_start_point
                   else _sec.end_point_path_length)
     return iter_neurites(neurites, magic_iter, _ttc(neurite_type))
+
+
+def segment_radial_distances(neurites, origin=None, neurite_type=NeuriteType.all):
+    '''Get an iterable containing section radial distances to origin of\
+        all neurites of a given type
+
+    Parameters:
+        origin: Point wrt which radial dirtance is calulated\
+            (default tree root)
+        use_start_point: if true, use the section's first point,\
+            otherwise use the end-point (default False)
+        neurite_type: Type of neurites to be considered (default all)
+
+    '''
+
+    def i_segment_radial_dist(tree):
+        '''Return an iterator of radial distances of tree segments
+
+        The radial distance is the euclidian distance between the either the
+        middle point of the segment and the first node of the tree.
+
+        Parameters:
+            tree: tree object
+        '''
+        pos = tree.value if origin is None else origin
+        return _tr.imap_val(lambda s: _mm.segment_radial_dist(s, pos), _tr.isegment(tree))
+
+    def f(n):
+        '''neurite identity function'''
+        return n
+
+    f.iter_type = i_segment_radial_dist
+    return iter_neurites(neurites, f, _ttc(neurite_type))
 
 
 def section_radial_distances(neurites, origin=None, use_start_point=False,

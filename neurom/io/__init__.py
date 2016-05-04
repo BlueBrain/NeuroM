@@ -30,3 +30,5 @@
 
 from .readers import load_data
 from . import check
+from ..core.dataformat import COLS
+from ..core.dataformat import ROOT_ID
