@@ -51,7 +51,7 @@ Morphology file data consistency checks
     ....
 
 
-Basic ``eyz.Neuron`` usage
+Basic ``ezy.Neuron`` usage
 **************************
 
 - Load a neuron and obtain some information from it:
