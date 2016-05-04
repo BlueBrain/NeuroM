@@ -153,7 +153,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
             continue
         elif isinstance(row[0], (str, unicode)):
             if 4 == len(row):
-                yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]),
+                yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]) / 2.,
                        _type, offset, parent)
                 parent = offset
                 offset += 1
