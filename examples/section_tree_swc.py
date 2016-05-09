@@ -71,8 +71,10 @@ def add_sections(data_wrapper):
     return data_wrapper
 
 
-def make_tree(data_wrapper, start_node=0, post_action=None):
+def make_trees(data_wrapper, post_action=None):
     '''Build a section tree'''
+    trunks = neurite_trunks(data_wrapper)
+    start_node = min(trunks)
     # One pass over sections to build nodes
     nodes = [Tree(np.array(data_wrapper.data_block[sec.ids]))
              for sec in data_wrapper.sections[start_node:]]
@@ -83,24 +85,25 @@ def make_tree(data_wrapper, start_node=0, post_action=None):
         if parent_id >= 0:
             nodes[parent_id].add_child(nodes[i])
 
-    if post_action is not None:
-        post_action(nodes[0])
+    head_nodes = [nodes[i - start_node] for i in trunks]
 
-    return nodes[0]
+    for t in head_nodes:
+        # if any neurite trunk starting points are soma,
+        # remove them
+        if t.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
+            t.value = t.value[1:]
+
+        if post_action is not None:
+            post_action(t)
+
+    return head_nodes
 
 
 def load_neuron(filename, tree_action=sn.set_neurite_type):
     '''Build section trees from an h5 file'''
     data_wrapper = swc.SWC.read(filename)
     add_sections(data_wrapper)
-    trunks = neurite_trunks(data_wrapper)
-    trees = [make_tree(data_wrapper, trunk, tree_action)
-             for trunk in trunks]
-    # if any neurite trunk starting points are soma,
-    # remove them
-    for t in trees:
-        if t.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
-            t.value = t.value[1:]
+    trees = make_trees(data_wrapper, tree_action)
     soma = sn.make_soma(soma_points(data_wrapper))
     return sn.Neuron(soma, trees, data_wrapper)
 
@@ -109,14 +112,20 @@ def do_new_stuff(filename):
     '''Use the section trees to get some basic stats'''
     _n = load_neuron(filename)
 
-    n_sec = sn.n_sections(_n)
-    n_seg = sn.n_segments(_n)
-    sec_len = sn.get_section_lengths(_n)
+    for nt in (sn.NeuriteType.axon,
+               sn.NeuriteType.basal_dendrite,
+               sn.NeuriteType.apical_dendrite,
+               sn.NeuriteType.all):
+        print '\nNeuriteType:', nt
+        n_sec = sn.n_sections(_n, nt)
+        n_seg = sn.n_segments(_n, nt)
+        sec_len = sn.get_section_lengths(_n, nt)
 
-    print 'number of sections:', n_sec
-    print 'number of segments:', n_seg
-    print 'total neurite length:', sum(sec_len)
-    print 'neurite types:'
+        print 'number of sections:', n_sec
+        print 'number of segments:', n_seg
+        print 'total neurite length:', sum(sec_len)
+
+    print '\nneurite types:'
     for n in _n.neurites:
         print n.type
 
@@ -124,14 +133,21 @@ def do_new_stuff(filename):
 def do_old_stuff(filename):
     '''Use point tree to get some basic stats'''
     _n = ezy.load_neuron(filename)
-    n_sec = ezy.get('number_of_sections', _n)[0]
-    n_seg = ezy.get('number_of_segments', _n)[0]
-    sec_len = ezy.get('section_lengths', _n)
 
-    print 'number of sections:', n_sec
-    print 'number of segments:', n_seg
-    print 'total neurite length:', sum(sec_len)
-    print 'neurite types:'
+    for nt in (sn.NeuriteType.axon,
+               sn.NeuriteType.basal_dendrite,
+               sn.NeuriteType.apical_dendrite,
+               sn.NeuriteType.all):
+        print '\nNeuriteType:', nt
+        n_sec = ezy.get('number_of_sections', _n, neurite_type=nt)[0]
+        n_seg = ezy.get('number_of_segments', _n, neurite_type=nt)[0]
+        sec_len = ezy.get('section_lengths', _n, neurite_type=nt)
+
+        print 'number of sections:', n_sec
+        print 'number of segments:', n_seg
+        print 'total neurite length:', sum(sec_len)
+
+    print '\nneurite types:'
     for n in _n.neurites:
         print n.type
 
