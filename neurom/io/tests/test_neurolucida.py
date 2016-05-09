@@ -200,9 +200,14 @@ MORPH_ASC = textwrap.dedent(
  (3 -6 0 2)
  (3 -8 0 2)
  (3 -10 0 2)
- ((0 -10 0 2)
+ (
+    (3 -10 0 2)
+    (0 -10 0 2)
+    (-3 -10 0 2)
  |
-  (6 -10 0 2)
+    (3 -10 0 2)
+    (6 -10 0 2)
+    (9 -10 0 2)
  )
 )
 ''')
@@ -213,11 +218,11 @@ def test_read():
         os.close(fd)
         with open(temp_file, 'w') as fd:
             fd.write(MORPH_ASC)
-        rdw = nasc.NeurolucidaASC.read(temp_file)
+        rdw = nasc.NeurolucidaASC.read(temp_file, remove_duplicates=False)
         raw_data = rdw.data_block
 
-        eq_(raw_data.shape, (15, 7))
-        ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 15)))  # correct ID
+        eq_(raw_data.shape, (19, 7))
+        ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 19)))  # correct ID
         # 3 is ID of end of the soma, 2 sections attach to this
         ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
     finally:
@@ -228,3 +233,4 @@ def test_load_neurolucida_ascii():
     f = os.path.join(NEUROLUCIDA_PATH, 'sample.asc')
     ascii = io.load_data(f)
     ok_(isinstance(ascii, RawDataWrapper))
+    ok_(len(ascii.data_block) == 18)
