@@ -79,8 +79,10 @@ def set_neurite_type(tree):
     tree.type = tree_types[int(np.median(types))]
 
 
-def make_tree(rdw, start_node=0, post_action=None):
+def make_trees(rdw, post_action=None):
     '''Build a section tree'''
+    trunks = rdw.neurite_trunks()
+    start_node = min(trunks)
     # One pass over sections to build nodes
     nodes = [Tree(rdw.data_block[sec[SEC.START]: sec[SEC.END]])
              for sec in rdw.sections[start_node:]]
@@ -91,17 +93,19 @@ def make_tree(rdw, start_node=0, post_action=None):
         if parent_id >= 0:
             nodes[parent_id].add_child(nodes[i])
 
-    if post_action is not None:
-        post_action(nodes[0])
+    head_nodes = [nodes[i - start_node] for i in trunks]
 
-    return nodes[0]
+    if post_action is not None:
+        for n in head_nodes:
+            post_action(n)
+
+    return head_nodes
 
 
 def load_neuron(filename, tree_action=set_neurite_type):
     '''Build section trees from an h5 file'''
     rdw = H5.read(filename, remove_duplicates=False, wrapper=SecDataWrapper)
-    trees = [make_tree(rdw, trunk, tree_action)
-             for trunk in rdw.neurite_trunks()]
+    trees = make_trees(rdw, tree_action)
     soma = make_soma(rdw.soma_points())
     return Neuron(soma, trees, rdw)
 
