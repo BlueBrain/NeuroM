@@ -1,26 +1,6 @@
 '''Example showing how to extract section information from SWC block'''
 from neurom import ezy
-from neurom.io import swc
 from neurom.core import section_neuron as sn
-from neurom.core.dataformat import COLS
-from neurom.core.dataformat import POINT_TYPE
-
-
-def remove_soma_initial_point(tree, post_action=sn.set_neurite_type):
-    '''Remove tree's initial point if soma and apply post_action'''
-    if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
-        tree.value = tree.value[1:]
-
-    if post_action is not None:
-        post_action(tree)
-
-
-def load_neuron(filename, tree_action=remove_soma_initial_point):
-    '''Build section trees from an swc file'''
-    rdw = swc.SWC.read(filename, sn.SecDataWrapper)
-    trees = sn.make_trees(rdw, tree_action)
-    soma = sn.make_soma(rdw.soma_points())
-    return sn.Neuron(soma, trees, rdw)
 
 
 def do_new_stuff(filename):
@@ -65,6 +45,7 @@ def do_old_stuff(filename):
     print '\nneurite types:'
     for n in _n.neurites:
         print n.type
+
 
 if __name__ == '__main__':
 
