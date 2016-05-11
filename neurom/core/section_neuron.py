@@ -284,20 +284,14 @@ def extract_sections(data_block):
     for i, r in enumerate(data_block):
         id_map[int(r[COLS.ID])] = i
 
-    # parent-children adjacency list
-    adj_list = defaultdict(list)
+    # number of children per point
+    n_children = defaultdict(int)
     for row in data_block:
-        adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
+        n_children[int(row[COLS.P])] += 1
 
-    def _section_end_points():
-        '''Get IDs of the end points of all sections'''
-        end_points = [int(i) for i in
-                      set(data_block[:, COLS.ID]) - set(adj_list.keys())]
-        end_points = set(id_map[p] for p in end_points)
-        fork_points = [i for i, l in adj_list.iteritems() if len(l) > 1]
-        fork_points = set(id_map[p] for p in fork_points)
-
-        return fork_points | end_points
+    # end points have either no children or more than one
+    sec_end_pts = set(i for i, row in enumerate(data_block)
+                      if n_children[row[COLS.ID]] != 1)
 
     _sections = [Section()]
     curr_section = _sections[-1]
@@ -309,7 +303,7 @@ def extract_sections(data_block):
             curr_section.ids.append(id_map[int(row[COLS.P])])
             curr_section.ntype = int(row[COLS.TYPE])
         curr_section.ids.append(row_id)
-        if row_id in _section_end_points():
+        if row_id in sec_end_pts:
             parent_section[curr_section.ids[-1]] = len(_sections) - 1
             _sections.append(Section())
             curr_section = _sections[-1]
