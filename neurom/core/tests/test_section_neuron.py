@@ -41,9 +41,11 @@ from neurom.analysis import morphtree as mt
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
+SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
 H5V1_DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1')
 H5V2_DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v2')
 MORPH_FILENAME = 'Neuron.h5'
+SWC_MORPH_FILENAME = 'Neuron.swc'
 
 # Arbitrarily use h5 v1 as reference always
 REF_NRN = load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME),
@@ -71,11 +73,14 @@ class SectionTreeBase(object):
 
     def setUp(self):
         self.ref_nrn = REF_NRN
+        self.ref_types = REF_NEURITE_TYPES
+
+
 
     def test_neurite_type(self):
 
         neurite_types = [n0.type for n0 in self.sec_nrn.neurites]
-        nt.assert_equal(neurite_types, REF_NEURITE_TYPES)
+        nt.assert_equal(neurite_types, self.ref_types)
         nt.assert_equal(neurite_types, [n1.type for n1 in self.ref_nrn.neurites])
 
     def test_get_n_sections(self):
@@ -191,3 +196,12 @@ class TestH5V2(SectionTreeBase):
     def setUp(self):
         super(TestH5V2, self).setUp()
         self.sec_nrn = sn.load_neuron(os.path.join(H5V2_DATA_PATH, MORPH_FILENAME))
+
+
+class TestSWC(SectionTreeBase):
+
+    def setUp(self):
+        self.ref_nrn = load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME),
+                                   mt.set_tree_type)
+        self.sec_nrn = sn.load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME))
+        self.ref_types = [n.type for n in self.ref_nrn.neurites]

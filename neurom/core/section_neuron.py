@@ -29,9 +29,11 @@
 '''Section tree module'''
 
 import math
-from collections import namedtuple
+import os
+from collections import namedtuple, defaultdict
 import numpy as np
 from neurom.io.hdf5 import H5
+from neurom.io.swc import SWC
 from neurom.core.types import NeuriteType
 from neurom.core.tree import Tree, ipreorder, ibifurcation_point
 from neurom.core.types import tree_type_checker as is_type
@@ -42,29 +44,24 @@ from neurom.core.neuron import make_soma
 from neurom.analysis import morphmath as mm
 
 
-class SEC(object):
-    '''Enum class with section content indices'''
-    (START, END, TYPE, ID, PID) = xrange(5)
-
-
 Neuron = namedtuple('Neuron', 'soma, neurites, data_block')
 
 
 class SecDataWrapper(object):
     '''Class holding a raw data block and section information'''
 
-    def __init__(self, data_block, fmt, sections):
+    def __init__(self, data_block, fmt, sections=None):
         '''Section Data Wrapper'''
         self.data_block = data_block
         self.fmt = fmt
-        self.sections = sections
+        self.sections = sections if sections is not None else extract_sections(data_block)
 
     def neurite_trunks(self):
         '''Get the section IDs of the intitial neurite sections'''
         sec = self.sections
-        return [ss[SEC.ID] for ss in sec
-                if sec[ss[SEC.PID]][SEC.TYPE] == POINT_TYPE.SOMA and
-                ss[SEC.TYPE] != POINT_TYPE.SOMA]
+        return [i for i, ss in enumerate(sec)
+                if ss.pid > -1 and (sec[ss.pid].ntype == POINT_TYPE.SOMA and
+                                    ss.ntype != POINT_TYPE.SOMA)]
 
     def soma_points(self):
         '''Get the soma points'''
@@ -84,12 +81,11 @@ def make_trees(rdw, post_action=None):
     trunks = rdw.neurite_trunks()
     start_node = min(trunks)
     # One pass over sections to build nodes
-    nodes = [Tree(rdw.data_block[sec[SEC.START]: sec[SEC.END]])
-             for sec in rdw.sections[start_node:]]
+    nodes = [Tree(rdw.data_block[sec.ids]) for sec in rdw.sections[start_node:]]
 
     # One pass over nodes to connect children to parents
     for i in xrange(len(nodes)):
-        parent_id = rdw.sections[i + start_node][SEC.PID] - start_node
+        parent_id = rdw.sections[i + start_node].pid - start_node
         if parent_id >= 0:
             nodes[parent_id].add_child(nodes[i])
 
@@ -103,9 +99,18 @@ def make_trees(rdw, post_action=None):
 
 
 def load_neuron(filename, tree_action=set_neurite_type):
-    '''Build section trees from an h5 file'''
-    rdw = H5.read(filename, remove_duplicates=False, wrapper=SecDataWrapper)
-    trees = make_trees(rdw, tree_action)
+    '''Build section trees from an h5 or swc file'''
+    _READERS = {
+        'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
+        'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
+    }
+    _NEURITE_ACTION = {
+        'swc': lambda t: remove_soma_initial_point(t, tree_action),
+        'h5': tree_action
+    }
+    ext = os.path.splitext(filename)[1][1:]
+    rdw = _READERS[ext.lower()](filename)
+    trees = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
     soma = make_soma(rdw.soma_points())
     return Neuron(soma, trees, rdw)
 
@@ -262,3 +267,59 @@ def remote_bifurcation_angle(bif_point):
     return mm.angle_3points(bif_point.value[-1],
                             bif_point.children[0].value[-1],
                             bif_point.children[1].value[-1])
+
+
+def extract_sections(data_block):
+    '''Make a list of sections from an SWC-style data wrapper block'''
+
+    class Section(object):
+        '''sections ((ids), type, parent_id)'''
+        def __init__(self, ids=None, ntype=0, pid=-1):
+            self.ids = [] if ids is None else ids
+            self.ntype = ntype
+            self.pid = pid
+
+    # get SWC ID to array position map
+    id_map = {-1: -1}
+    for i, r in enumerate(data_block):
+        id_map[int(r[COLS.ID])] = i
+
+    # number of children per point
+    n_children = defaultdict(int)
+    for row in data_block:
+        n_children[int(row[COLS.P])] += 1
+
+    # end points have either no children or more than one
+    sec_end_pts = set(i for i, row in enumerate(data_block)
+                      if n_children[row[COLS.ID]] != 1)
+
+    _sections = [Section()]
+    curr_section = _sections[-1]
+    parent_section = {-1: -1}
+
+    for row in data_block:
+        row_id = id_map[int(row[COLS.ID])]
+        if len(curr_section.ids) == 0:
+            curr_section.ids.append(id_map[int(row[COLS.P])])
+            curr_section.ntype = int(row[COLS.TYPE])
+        curr_section.ids.append(row_id)
+        if row_id in sec_end_pts:
+            parent_section[curr_section.ids[-1]] = len(_sections) - 1
+            _sections.append(Section())
+            curr_section = _sections[-1]
+
+    # get the section parent ID from the id of the first point.
+    for sec in _sections:
+        if sec.ids:
+            sec.pid = parent_section[sec.ids[0]]
+
+    return [s for s in _sections if s.ids]
+
+
+def remove_soma_initial_point(tree, post_action=None):
+    '''Remove tree's initial point if soma and apply post_action'''
+    if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
+        tree.value = tree.value[1:]
+
+    if post_action is not None:
+        post_action(tree)

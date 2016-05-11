@@ -40,9 +40,10 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
+from collections import namedtuple
+from itertools import izip_longest
 import h5py
 import numpy as np
-from itertools import izip_longest
 from ..core.dataformat import COLS
 from .datawrapper import RawDataWrapper
 
@@ -66,6 +67,8 @@ class H5(object):
 
     (PX, PY, PZ, PD) = xrange(4)  # points
     (GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
+
+    Section = namedtuple('Section', 'ids, ntype, pid')
 
     @staticmethod
     def read(filename, remove_duplicates=True, wrapper=RawDataWrapper):
@@ -108,7 +111,7 @@ class H5(object):
         pid_map = np.zeros(n_points)
         #  point ID -> type map
         typ_map = np.zeros(n_points)
-        # sections (start, end, type, id, parent_id)
+        # sections (ids, type, parent_id)
         sections = [0] * len(group_ids)
 
         for i, (j, k) in enumerate(izip_longest(group_ids,
@@ -116,7 +119,7 @@ class H5(object):
                                                 fillvalue=n_points)):
             j = int(j)
             k = int(k)
-            sections[i] = (j, k, groups[i][H5.GTYPE], i, groups[i][H5.GPID])
+            sections[i] = H5.Section(slice(j, k), groups[i][H5.GTYPE], groups[i][H5.GPID])
             typ_map[j: k] = groups[i][H5.GTYPE]
             # parent is last point in previous group
             pid_map[j] = group_ids[groups[i][H5.GPID] + 1] - 1

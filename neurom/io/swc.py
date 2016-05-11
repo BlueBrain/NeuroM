@@ -44,24 +44,6 @@ from ..core.dataformat import ROOT_ID
 from .datawrapper import RawDataWrapper
 
 
-class SWC(object):
-    '''Read SWC files and unpack into internal raw data block
-
-    Input row format: [ID, TYPE, X, Y, Z, R, PARENT_ID]
-    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
-    '''
-    (ID, TYPE, X, Y, Z, R, P) = xrange(7)
-
-    @staticmethod
-    def read(filename):
-        '''Read an SWC file and return a tuple of data, format.'''
-        data = np.loadtxt(filename)
-        if len(np.shape(data)) == 1:
-            data = np.reshape(data, (1, -1))
-        data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
-        return SWCRawDataWrapper(data, 'SWC')
-
-
 class SWCRawDataWrapper(RawDataWrapper):
     '''Specialization of RawDataWrapper for SWC data
 
@@ -71,7 +53,7 @@ class SWCRawDataWrapper(RawDataWrapper):
     Index validity is checked and mappings performed before
     delegating to base class methods.
     '''
-    def __init__(self, raw_data, fmt):
+    def __init__(self, raw_data, fmt, _=None):
         super(SWCRawDataWrapper, self).__init__(raw_data, fmt)
 
         self._id_map = {}
@@ -110,3 +92,21 @@ class SWCRawDataWrapper(RawDataWrapper):
         '''Get row from idx'''
         idx = self._get_idx(idx)
         return super(SWCRawDataWrapper, self).get_row(idx)
+
+
+class SWC(object):
+    '''Read SWC files and unpack into internal raw data block
+
+    Input row format: [ID, TYPE, X, Y, Z, R, PARENT_ID]
+    Internal row format: [X, Y, Z, R, TYPE, ID, PARENT_ID]
+    '''
+    (ID, TYPE, X, Y, Z, R, P) = xrange(7)
+
+    @staticmethod
+    def read(filename, wrapper=SWCRawDataWrapper):
+        '''Read an SWC file and return a tuple of data, format.'''
+        data = np.loadtxt(filename)
+        if len(np.shape(data)) == 1:
+            data = np.reshape(data, (1, -1))
+        data = data[:, [SWC.X, SWC.Y, SWC.Z, SWC.R, SWC.TYPE, SWC.ID, SWC.P]]
+        return wrapper(data, 'SWC', None)
