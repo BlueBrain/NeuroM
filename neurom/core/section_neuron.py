@@ -69,22 +69,21 @@ class SecDataWrapper(object):
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
 
-def set_neurite_type(tree):
-    '''Calculate and set the neurite type of a tree'''
-    tree_types = tuple(NeuriteType)
-    types = np.array([node.value[0][COLS.TYPE] for node in ipreorder(tree)])
-    tree.type = tree_types[int(np.median(types))]
+_TREE_TYPES = tuple(NeuriteType)
 
 
 def make_trees(rdw, post_action=None):
-    '''Build a section tree'''
+    '''Build section trees from a raw data wrapper'''
     trunks = rdw.neurite_trunks()
     start_node = min(trunks)
+
     # One pass over sections to build nodes
     nodes = [Tree(rdw.data_block[sec.ids]) for sec in rdw.sections[start_node:]]
 
-    # One pass over nodes to connect children to parents
+    # One pass over nodes to set the neurite type
+    # and connect children to parents
     for i in xrange(len(nodes)):
+        nodes[i].type = _TREE_TYPES[rdw.sections[i + start_node].ntype]
         parent_id = rdw.sections[i + start_node].pid - start_node
         if parent_id >= 0:
             nodes[parent_id].add_child(nodes[i])
@@ -98,15 +97,15 @@ def make_trees(rdw, post_action=None):
     return head_nodes
 
 
-def load_neuron(filename, tree_action=set_neurite_type):
+def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     _READERS = {
         'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
         'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
     }
     _NEURITE_ACTION = {
-        'swc': lambda t: remove_soma_initial_point(t, tree_action),
-        'h5': tree_action
+        'swc': remove_soma_initial_point,
+        'h5': None
     }
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
@@ -316,10 +315,7 @@ def extract_sections(data_block):
     return [s for s in _sections if s.ids]
 
 
-def remove_soma_initial_point(tree, post_action=None):
-    '''Remove tree's initial point if soma and apply post_action'''
+def remove_soma_initial_point(tree):
+    '''Remove tree's initial point if soma'''
     if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
         tree.value = tree.value[1:]
-
-    if post_action is not None:
-        post_action(tree)
