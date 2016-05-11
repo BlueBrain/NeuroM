@@ -97,15 +97,15 @@ def make_trees(rdw, post_action=None):
     return head_nodes
 
 
-def load_neuron(filename, tree_action=None):
+def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     _READERS = {
         'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
         'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
     }
     _NEURITE_ACTION = {
-        'swc': lambda t: remove_soma_initial_point(t, tree_action),
-        'h5': tree_action
+        'swc': remove_soma_initial_point,
+        'h5': None
     }
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
@@ -315,10 +315,7 @@ def extract_sections(data_block):
     return [s for s in _sections if s.ids]
 
 
-def remove_soma_initial_point(tree, post_action=None):
-    '''Remove tree's initial point if soma and apply post_action'''
+def remove_soma_initial_point(tree):
+    '''Remove tree's initial point if soma'''
     if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
         tree.value = tree.value[1:]
-
-    if post_action is not None:
-        post_action(tree)
