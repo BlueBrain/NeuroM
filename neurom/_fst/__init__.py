@@ -28,6 +28,37 @@
 
 ''' NeuroM, lightweight and fast '''
 
+import numpy as _np
 from .io import load_neuron
 from . import mm
 from ..core.types import NeuriteType
+
+
+NEURITEFEATURES = {
+    'section_lengths': mm.section_lengths,
+    'section_path_distances': mm.path_lengths,
+    'number_of_sections': lambda *args, **kwargs: [mm.n_sections(*args, **kwargs)],
+    'number_of_sections_per_neurite': mm.n_sections_per_neurite,
+    'number_of_neurites': lambda *args, **kwargs: [mm.n_neurites(*args, **kwargs)],
+    'section_radial_distances': mm.section_radial_distances,
+    'local_bifurcation_angles': mm.local_bifurcation_angles,
+    'remote_bifurcation_angles': mm.remote_bifurcation_angles,
+    'number_of_segments': lambda *args, **kwargs: [mm.n_segments(*args, **kwargs)],
+    'trunk_origin_radii': mm.trunk_origin_radii,
+    'trunk_section_lengths': mm.trunk_section_lengths,
+}
+
+NEURONFEATURES = {
+    'soma_radii': mm.soma_radii,
+    'soma_surface_areas': mm.soma_surface_areas,
+}
+
+
+def get(feature, *args, **kwargs):
+    '''Neuron feature getter helper
+
+    Returns features as a 1D numpy array.
+    '''
+    feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
+               else NEURONFEATURES[feature])
+    return _np.array(feature(*args, **kwargs))

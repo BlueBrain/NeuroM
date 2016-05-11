@@ -47,6 +47,30 @@ def soma_surface_area(nrn):
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
+def soma_surface_areas(nrn_pop):
+    '''Get the surface areas of the somata in a population of neurons
+
+    Note:
+        The surface area is calculated by assuming the soma is spherical.
+    Note:
+        If a single neuron is passed, a single element list with the surface
+        area of its soma member is returned.
+    '''
+    nrns = nrn_pop.neurons if hasattr(nrn_pop, 'neurons') else [nrn_pop]
+    return [soma_surface_area(n) for n in nrns]
+
+
+def soma_radii(nrn_pop):
+    ''' Get the radii of the somata of a population of neurons
+
+    Note:
+        If a single neuron is passed, a single element list with the
+        radius of its soma member is returned.
+    '''
+    nrns = nrn_pop.neurons if hasattr(nrn_pop, 'neurons') else [nrn_pop]
+    return [n.soma.radius for n in nrns]
+
+
 def n_segments(nrn, neurite_type=NeuriteType.all):
     '''Number of segments in a section'''
     return sum(len(s.value) - 1
