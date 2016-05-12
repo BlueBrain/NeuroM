@@ -47,14 +47,14 @@ NRN_PATHS = [DATA_PATH] * 10
 
 def _close(a, b, debug=False):
     if debug:
-        print 'a: %s\nb:%s\n' % (a, b)
+        print '\na: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b))
 
 
 def _equal(a, b, debug=False):
     if debug:
-        print 'a: %s\nb:%s\n' % (a, b)
+        print '\na: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 
@@ -106,9 +106,8 @@ class TestSectionTree(object):
     def test_get_section_path_distances(self):
         self._check_neurite_feature('section_path_distances')
 
-    @nt.nottest
     def test_get_segment_lengths(self):
-        self._check_neurite_feature('segment_lengths')
+        self._check_neurite_feature('segment_lengths', debug=False)
 
     def test_get_local_bifurcation_angles(self):
         self._check_neurite_feature('local_bifurcation_angles')
@@ -118,6 +117,9 @@ class TestSectionTree(object):
 
     def test_get_section_radial_distances(self):
         self._check_neurite_feature('section_radial_distances')
+
+    def test_get_segment_radial_distances(self):
+        self._check_neurite_feature('segment_radial_distances', debug=False)
 
     def test_get_trunk_origin_radii(self):
         self._check_neurite_feature('trunk_origin_radii')
@@ -130,3 +132,6 @@ class TestSectionTree(object):
 
     def test_get_partition(self):
         self._check_neurite_feature('partition')
+
+    def test_get_total_length(self):
+        self._check_neurite_feature('total_length')

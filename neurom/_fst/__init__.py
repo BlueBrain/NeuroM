@@ -35,8 +35,9 @@ from ..core.types import NeuriteType
 
 
 NEURITEFEATURES = {
+    'total_length': lambda *args, **kwargs: [sum(mm.section_lengths(*args, **kwargs))],
     'section_lengths': mm.section_lengths,
-    'section_path_distances': mm.path_lengths,
+    'section_path_distances': mm.section_path_lengths,
     'number_of_sections': lambda *args, **kwargs: [mm.n_sections(*args, **kwargs)],
     'number_of_sections_per_neurite': mm.n_sections_per_neurite,
     'number_of_neurites': lambda *args, **kwargs: [mm.n_neurites(*args, **kwargs)],
@@ -48,6 +49,8 @@ NEURITEFEATURES = {
     'number_of_segments': lambda *args, **kwargs: [mm.n_segments(*args, **kwargs)],
     'trunk_origin_radii': mm.trunk_origin_radii,
     'trunk_section_lengths': mm.trunk_section_lengths,
+    'segment_lengths': mm.segment_lengths,
+    'segment_radial_distances': mm.segment_radial_distances,
 }
 
 NEURONFEATURES = {
