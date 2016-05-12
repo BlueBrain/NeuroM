@@ -67,15 +67,21 @@ class TestSectionTree(object):
         self.fst_pop = Population([_fst.load_neuron(f) for f in NRN_PATHS])
         self.ref_types = [t.type for t in self.ref_pop.neurites]
 
-    def _check_neuron_feature(self, ftr):
-        _close(_fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop))
+    def _check_neuron_feature(self, ftr, debug=False):
+        _close(_fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop), debug)
 
-    def _check_neurite_feature(self, ftr):
-        self._check_neuron_feature(ftr)
+    def _check_neurite_feature(self, ftr, debug=False):
+        self._check_neuron_feature(ftr, debug)
 
         for t in NeuriteType:
             _close(_fst.get(ftr, self.fst_pop, neurite_type=t),
-                   get(ftr, self.ref_pop, neurite_type=t))
+                   get(ftr, self.ref_pop, neurite_type=t), debug)
+
+    def test_get_soma_radius(self):
+        self._check_neuron_feature('soma_radii')
+
+    def test_get_soma_surface_area(self):
+        self._check_neuron_feature('soma_surface_areas')
 
     def test_neurite_type(self):
         neurite_types = [n0.type for n0 in self.fst_pop.neurites]
@@ -104,12 +110,6 @@ class TestSectionTree(object):
     def test_get_segment_lengths(self):
         self._check_neurite_feature('segment_lengths')
 
-    def test_get_soma_radius(self):
-        self._check_neuron_feature('soma_radii')
-
-    def test_get_soma_surface_area(self):
-        self._check_neuron_feature('soma_surface_areas')
-
     def test_get_local_bifurcation_angles(self):
         self._check_neurite_feature('local_bifurcation_angles')
 
@@ -124,3 +124,9 @@ class TestSectionTree(object):
 
     def test_get_trunk_section_lengths(self):
         self._check_neurite_feature('trunk_section_lengths')
+
+    def test_get_section_branch_orders(self):
+        self._check_neurite_feature('section_branch_orders')
+
+    def test_get_partition(self):
+        self._check_neurite_feature('partition')
