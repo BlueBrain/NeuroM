@@ -99,7 +99,7 @@ def section_branch_orders(nrn, neurite_type=NeuriteType.all):
             for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
 
 
-def path_lengths(nrn, neurite_type=NeuriteType.all):
+def section_path_lengths(nrn, neurite_type=NeuriteType.all):
     '''Less naive path length calculation
 
     Calculates and stores the section lengths in one pass,
@@ -117,6 +117,34 @@ def path_lengths(nrn, neurite_type=NeuriteType.all):
         return sum(dist[s] for s in iupstream(sec))
 
     return [pl2(s) for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+
+
+def segment_lengths(nrn, neurite_type=NeuriteType.all):
+    '''Lengths of the segments in a neuron's neurites'''
+    def _seg_len(sec):
+        '''list of segment lengths of a section'''
+        vecs = np.diff(sec.value, axis=0)[:, :3]
+        return np.sqrt([np.dot(p, p) for p in vecs])
+
+    return [s for ss in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))
+            for s in _seg_len(ss)]
+
+
+def segment_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
+    '''Lengths of the segments in a neuron's neurites'''
+    def _seg_rd(sec, pos):
+        '''list of radial distances of all segments of a section'''
+        mid_pts = np.divide(np.add(sec.value[:-1], sec.value[1:])[:, :3], 2.0)
+        return np.sqrt([mm.point_dist2(p, pos) for p in mid_pts])
+
+    tree_filter = is_type(neurite_type)
+    dist = []
+    for n in nrn.neurites:
+        if tree_filter(n):
+            origin = n.value[0] if origin is None else origin
+            dist.extend([s for ss in ipreorder(n) for s in _seg_rd(ss, origin)])
+
+    return dist
 
 
 def local_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
