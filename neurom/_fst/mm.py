@@ -32,9 +32,8 @@ import math
 import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.core.tree import ipreorder, ibifurcation_point
+from neurom.core.tree import ipreorder, ibifurcation_point, iupstream, i_chain2
 from neurom.core.dataformat import COLS
-from neurom.core.tree import i_chain2, iupstream
 from neurom.analysis import morphmath as mm
 
 
@@ -94,6 +93,12 @@ def section_lengths(nrn, neurite_type=NeuriteType.all):
             for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
 
 
+def section_branch_orders(nrn, neurite_type=NeuriteType.all):
+    '''section lengths'''
+    return [branch_order(s)
+            for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+
+
 def path_lengths(nrn, neurite_type=NeuriteType.all):
     '''Less naive path length calculation
 
@@ -125,6 +130,14 @@ def local_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
 def remote_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all remote bifurcation angles'''
     return [remote_bifurcation_angle(b)
+            for b in i_chain2(nrn.neurites,
+                              iterator_type=ibifurcation_point,
+                              tree_filter=is_type(neurite_type))]
+
+
+def bifurcation_partitions(nrn, neurite_type=NeuriteType.all):
+    '''Partition at neuron's bifurcation points'''
+    return [bifurcation_partition(b)
             for b in i_chain2(nrn.neurites,
                               iterator_type=ibifurcation_point,
                               tree_filter=is_type(neurite_type))]
@@ -163,6 +176,17 @@ def n_sections_per_neurite(nrn, neurite_type=NeuriteType.all):
 def section_path_length(section):
     '''Path length from section to root'''
     return sum(mm.path_distance(s.value) for s in iupstream(section))
+
+
+def branch_order(section):
+    '''Branching order of a tree section
+
+    The branching order is defined as the depth of the tree section.
+
+    Note:
+        The first level has branch order 1.
+    '''
+    return sum(1 for _ in iupstream(section)) - 1
 
 
 def section_radial_distance(section, origin):
@@ -214,3 +238,10 @@ def remote_bifurcation_angle(bif_point):
     return mm.angle_3points(bif_point.value[-1],
                             bif_point.children[0].value[-1],
                             bif_point.children[1].value[-1])
+
+
+def bifurcation_partition(bif_point):
+    '''Calculate the partition at a bifurcation point'''
+    n = float(sum(1 for _ in ipreorder(bif_point.children[0])))
+    m = float(sum(1 for _ in ipreorder(bif_point.children[1])))
+    return max(n, m) / min(n, m)
