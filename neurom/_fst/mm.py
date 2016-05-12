@@ -273,3 +273,19 @@ def bifurcation_partition(bif_point):
     n = float(sum(1 for _ in ipreorder(bif_point.children[0])))
     m = float(sum(1 for _ in ipreorder(bif_point.children[1])))
     return max(n, m) / min(n, m)
+
+
+def principal_direction_extents(nrn, neurite_type=NeuriteType.all, direction=0):
+    '''Principal direction extent of neurites in neurons'''
+    def _pde(neurite):
+        '''Get the PDE of a single neurite'''
+        # Get the X, Y,Z coordinates of the points in each section
+        # TODO: figure out if duplicate points at section boundaries matter
+        points = np.array([s.value[:, : COLS.R] for s in ipreorder(neurite)])
+        shape = points.shape
+        # re-shape into array of points
+        points.shape = (shape[0] * shape[1], shape[-1])
+        return mm.principal_direction_extent(points)[direction]
+
+    tree_filter = is_type(neurite_type)
+    return [_pde(n) for n in nrn.neurites if tree_filter(n)]
