@@ -45,15 +45,18 @@ DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 NRN_PATHS = [DATA_PATH] * 10
 
 
-def _close(a, b, debug=False):
+def _close(a, b, debug, rtol, atol):
     if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
         print '\na: %s\nb:%s\n' % (a, b)
+        print '\na - b:%s\n' % (a - b)
     nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
+    nt.assert_true(np.allclose(a, b, rtol=rtol, atol=atol))
 
 
 def _equal(a, b, debug=False):
     if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
         print '\na: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
@@ -67,15 +70,16 @@ class TestSectionTree(object):
         self.fst_pop = Population([_fst.load_neuron(f) for f in NRN_PATHS])
         self.ref_types = [t.type for t in self.ref_pop.neurites]
 
-    def _check_neuron_feature(self, ftr, debug=False):
-        _close(_fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop), debug)
+    def _check_neuron_feature(self, ftr, debug=False, rtol=1e-05, atol=1e-08):
+        _close(_fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop),
+               debug, rtol, atol)
 
-    def _check_neurite_feature(self, ftr, debug=False):
-        self._check_neuron_feature(ftr, debug)
+    def _check_neurite_feature(self, ftr, debug=False, rtol=1e-05, atol=1e-08):
+        self._check_neuron_feature(ftr, debug, rtol, atol)
 
         for t in NeuriteType:
             _close(_fst.get(ftr, self.fst_pop, neurite_type=t),
-                   get(ftr, self.ref_pop, neurite_type=t), debug)
+                   get(ftr, self.ref_pop, neurite_type=t), debug, rtol, atol)
 
     def test_get_soma_radius(self):
         self._check_neuron_feature('soma_radii')
@@ -135,3 +139,6 @@ class TestSectionTree(object):
 
     def test_get_total_length(self):
         self._check_neurite_feature('total_length')
+
+    def test_get_principal_direction_extents(self):
+        self._check_neurite_feature('principal_direction_extents', debug=False)

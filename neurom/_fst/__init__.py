@@ -51,6 +51,7 @@ NEURITEFEATURES = {
     'trunk_section_lengths': mm.trunk_section_lengths,
     'segment_lengths': mm.segment_lengths,
     'segment_radial_distances': mm.segment_radial_distances,
+    'principal_direction_extents': mm.principal_direction_extents
 }
 
 NEURONFEATURES = {
