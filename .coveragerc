@@ -1,0 +1,8 @@
+[run]
+include =
+    neurom/*
+omit =
+    # omit anything in a tests directory anywhere
+    */tests/*
+    # omit the version file
+    neurom/version.py
