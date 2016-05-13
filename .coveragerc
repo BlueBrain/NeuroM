@@ -1,4 +1,6 @@
 [run]
+source = neurom
+
 include =
     # _fst module is ignored by default so add it here
     neurom/_fst/*
