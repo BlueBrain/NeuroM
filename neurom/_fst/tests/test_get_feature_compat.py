@@ -141,7 +141,4 @@ class TestSectionTree(object):
         self._check_neurite_feature('total_length')
 
     def test_get_principal_direction_extents(self):
-        # TODO: The absolute tolerance is quite large. Investigate whether
-        # the discrepancies are acceptable. Note that this is a compatibility
-        # test, but the reference may not be rigurously tested.
-        self._check_neurite_feature('principal_direction_extents', rtol=1e-5, atol=1e-1)
+        self._check_neurite_feature('principal_direction_extents', debug=False)

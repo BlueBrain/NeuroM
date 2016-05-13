@@ -280,11 +280,14 @@ def principal_direction_extents(nrn, neurite_type=NeuriteType.all, direction=0):
     def _pde(neurite):
         '''Get the PDE of a single neurite'''
         # Get the X, Y,Z coordinates of the points in each section
-        # TODO: figure out if duplicate points at section boundaries matter
-        points = np.array([s.value[:, : COLS.R] for s in ipreorder(neurite)])
+        # except for the first one, which is duplicated in section-section
+        # boundaries
+        points = np.array([s.value[1:, : COLS.R] for s in ipreorder(neurite)])
         shape = points.shape
         # re-shape into array of points
         points.shape = (shape[0] * shape[1], shape[-1])
+        # Add the very first point, which is not a duplicate
+        points = np.append(points, [neurite.value[0][: COLS.R]], axis=0)
         return mm.principal_direction_extent(points)[direction]
 
     tree_filter = is_type(neurite_type)
