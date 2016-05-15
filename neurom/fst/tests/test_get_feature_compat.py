@@ -26,14 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.features.get and neurom._fst features compatibility'''
+'''Test neurom.features.get and neurom.fst features compatibility'''
 
 import os
 import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
-from neurom import _fst
+from neurom import fst
 from neurom.core.tree import i_chain2, ibifurcation_point
 from neurom.io.utils import load_neuron
 from neurom.features import get
@@ -67,18 +67,18 @@ class TestSectionTree(object):
 
     def setUp(self):
         self.ref_pop = Population([load_neuron(f, mt.set_tree_type) for f in NRN_PATHS])
-        self.fst_pop = Population([_fst.load_neuron(f) for f in NRN_PATHS])
+        self.fst_pop = Population([fst.load_neuron(f) for f in NRN_PATHS])
         self.ref_types = [t.type for t in self.ref_pop.neurites]
 
     def _check_neuron_feature(self, ftr, debug=False, rtol=1e-05, atol=1e-08):
-        _close(_fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop),
+        _close(fst.get(ftr, self.fst_pop), get(ftr, self.ref_pop),
                debug, rtol, atol)
 
     def _check_neurite_feature(self, ftr, debug=False, rtol=1e-05, atol=1e-08):
         self._check_neuron_feature(ftr, debug, rtol, atol)
 
         for t in NeuriteType:
-            _close(_fst.get(ftr, self.fst_pop, neurite_type=t),
+            _close(fst.get(ftr, self.fst_pop, neurite_type=t),
                    get(ftr, self.ref_pop, neurite_type=t), debug, rtol, atol)
 
     def test_get_soma_radius(self):

@@ -1,17 +1,18 @@
 '''Build a section tree'''
+# pylint: disable=protected-access
 
 import sys
-from neurom import _fst
+from neurom import fst
 from neurom import ezy
 
 
 def do_new_stuff(filename):
     '''Use the section trees to get some basic stats'''
-    _n = _fst.load_neuron(filename)
+    _n = fst.load_neuron(filename)
 
-    n_sec = _fst.mm.n_sections(_n)
-    n_seg = _fst.mm.n_segments(_n)
-    sec_len = _fst.mm.section_lengths(_n)
+    n_sec = fst._mm.n_sections(_n)
+    n_seg = fst._mm.n_segments(_n)
+    sec_len = fst._mm.section_lengths(_n)
 
     print 'number of sections:', n_sec
     print 'number of segments:', n_seg
