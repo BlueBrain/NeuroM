@@ -29,34 +29,34 @@
 ''' NeuroM, lightweight and fast '''
 
 import numpy as _np
-from .io import load_neuron
-from . import mm
+from ._io import load_neuron
+from . import _mm
 from ..core.types import NeuriteType
 
 
 NEURITEFEATURES = {
-    'total_length': lambda *args, **kwargs: [sum(mm.section_lengths(*args, **kwargs))],
-    'section_lengths': mm.section_lengths,
-    'section_path_distances': mm.section_path_lengths,
-    'number_of_sections': lambda *args, **kwargs: [mm.n_sections(*args, **kwargs)],
-    'number_of_sections_per_neurite': mm.n_sections_per_neurite,
-    'number_of_neurites': lambda *args, **kwargs: [mm.n_neurites(*args, **kwargs)],
-    'section_branch_orders': mm.section_branch_orders,
-    'section_radial_distances': mm.section_radial_distances,
-    'local_bifurcation_angles': mm.local_bifurcation_angles,
-    'remote_bifurcation_angles': mm.remote_bifurcation_angles,
-    'partition': mm.bifurcation_partitions,
-    'number_of_segments': lambda *args, **kwargs: [mm.n_segments(*args, **kwargs)],
-    'trunk_origin_radii': mm.trunk_origin_radii,
-    'trunk_section_lengths': mm.trunk_section_lengths,
-    'segment_lengths': mm.segment_lengths,
-    'segment_radial_distances': mm.segment_radial_distances,
-    'principal_direction_extents': mm.principal_direction_extents
+    'total_length': lambda *args, **kwargs: [sum(_mm.section_lengths(*args, **kwargs))],
+    'section_lengths': _mm.section_lengths,
+    'section_path_distances': _mm.section_path_lengths,
+    'number_of_sections': lambda *args, **kwargs: [_mm.n_sections(*args, **kwargs)],
+    'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
+    'number_of_neurites': lambda *args, **kwargs: [_mm.n_neurites(*args, **kwargs)],
+    'section_branch_orders': _mm.section_branch_orders,
+    'section_radial_distances': _mm.section_radial_distances,
+    'local_bifurcation_angles': _mm.local_bifurcation_angles,
+    'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
+    'partition': _mm.bifurcation_partitions,
+    'number_of_segments': lambda *args, **kwargs: [_mm.n_segments(*args, **kwargs)],
+    'trunk_origin_radii': _mm.trunk_origin_radii,
+    'trunk_section_lengths': _mm.trunk_section_lengths,
+    'segment_lengths': _mm.segment_lengths,
+    'segment_radial_distances': _mm.segment_radial_distances,
+    'principal_direction_extents': _mm.principal_direction_extents
 }
 
 NEURONFEATURES = {
-    'soma_radii': mm.soma_radii,
-    'soma_surface_areas': mm.soma_surface_areas,
+    'soma_radii': _mm.soma_radii,
+    'soma_surface_areas': _mm.soma_surface_areas,
 }
 
 
