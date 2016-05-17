@@ -33,6 +33,7 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.core.tree import Tree
 from neurom.core.neuron import Neuron, make_soma
+from neurom.core.population import Population
 from neurom.exceptions import IDSequenceError, MultipleTrees, MissingParentError
 from . import load_data
 from . import check
@@ -157,3 +158,45 @@ def get_morph_files(directory):
     return [m for m in lsdir
             if os.path.isfile(m) and
             os.path.splitext(m)[1].lower() in ('.swc', '.h5', '.asc')]
+
+
+def load_neurons(neurons, neuron_loader=load_neuron):
+    '''Create a list of Neuron objects from each morphology file in directory\
+        or from a list or tuple of file names
+
+    Parameters:
+        neurons: directory path or list of neuron file paths
+
+    Returns:
+        list of Neuron objects
+    '''
+    if isinstance(neurons, list) or isinstance(neurons, tuple):
+        return [neuron_loader(f) for f in neurons]
+    elif isinstance(neurons, str):
+        return [neuron_loader(f) for f in get_morph_files(neurons)]
+
+
+def load_population(neurons, name=None, neuron_loader=load_neurons,
+                    population_class=Population):
+    '''Create a population object from all morphologies in a directory\
+        of from morphologies in a list of file names
+
+    Parameters:
+        neurons: directory path or list of neuron file paths
+        population_class: class representing populations
+        name (str): optional name of population. By default 'Population' or\
+            filepath basename depending on whether neurons is list or\
+            directory path respectively.
+
+    Returns:
+        neuron population object
+
+    '''
+    pop = population_class(neuron_loader(neurons))
+    if isinstance(neurons, list) or isinstance(neurons, tuple):
+        name = name if name is not None else 'Population'
+    elif isinstance(neurons, str):
+        name = name if name is not None else os.path.basename(neurons)
+
+    pop.name = name
+    return pop
