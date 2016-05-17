@@ -30,7 +30,7 @@
 
 import os
 from collections import namedtuple, defaultdict
-from functools import partial
+from functools import partial, update_wrapper
 from neurom.io.hdf5 import H5
 from neurom.io.swc import SWC
 from neurom.core.types import NeuriteType
@@ -113,8 +113,12 @@ def load_neuron(filename):
 
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
+update_wrapper(load_neurons, _iout.load_neurons)
+
+
 load_population = partial(_iout.load_population, neuron_loader=load_neurons,
                           population_class=Population)
+update_wrapper(load_population, _iout.load_population)
 
 
 def extract_sections(data_block):

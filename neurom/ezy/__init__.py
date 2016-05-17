@@ -57,7 +57,7 @@ Examples:
 
 '''
 import os
-from functools import partial
+from functools import partial, update_wrapper
 from .neuron import Neuron
 from .population import Population
 from .neuron import NeuriteType
@@ -79,5 +79,9 @@ def load_neuron(filename):
 
 
 load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron)
+update_wrapper(load_neurons, _io.load_neurons)
+
+
 load_population = partial(_io.load_population, neuron_loader=load_neurons,
                           population_class=Population)
+update_wrapper(load_population, _io.load_population)
