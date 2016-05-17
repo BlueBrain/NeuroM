@@ -30,6 +30,7 @@
 
 import os
 from collections import namedtuple, defaultdict
+from functools import partial
 from neurom.io.hdf5 import H5
 from neurom.io.swc import SWC
 from neurom.core.types import NeuriteType
@@ -37,6 +38,8 @@ from neurom.core.tree import Tree
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.neuron import make_soma
+from neurom.core.population import Population
+from neurom.io import utils as _iout
 
 
 Neuron = namedtuple('Neuron', 'soma, neurites, data_block')
@@ -107,6 +110,11 @@ def load_neuron(filename):
     trees = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
     soma = make_soma(rdw.soma_points())
     return Neuron(soma, trees, rdw)
+
+
+load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
+load_population = partial(_iout.load_population, neuron_loader=load_neurons,
+                          population_class=Population)
 
 
 def extract_sections(data_block):

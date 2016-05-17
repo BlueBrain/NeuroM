@@ -26,45 +26,53 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM, lightweight and fast '''
+'''Test neurom.fst._io module loaders'''
 
-import numpy as _np
-from ._io import load_neuron, load_neurons, load_population
-from . import _mm
-from ..core.types import NeuriteType
+from nose import tools as nt
+import os
+from neurom.fst import _io
 
-
-NEURITEFEATURES = {
-    'total_length': lambda *args, **kwargs: [sum(_mm.section_lengths(*args, **kwargs))],
-    'section_lengths': _mm.section_lengths,
-    'section_path_distances': _mm.section_path_lengths,
-    'number_of_sections': lambda *args, **kwargs: [_mm.n_sections(*args, **kwargs)],
-    'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
-    'number_of_neurites': lambda *args, **kwargs: [_mm.n_neurites(*args, **kwargs)],
-    'section_branch_orders': _mm.section_branch_orders,
-    'section_radial_distances': _mm.section_radial_distances,
-    'local_bifurcation_angles': _mm.local_bifurcation_angles,
-    'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
-    'partition': _mm.bifurcation_partitions,
-    'number_of_segments': lambda *args, **kwargs: [_mm.n_segments(*args, **kwargs)],
-    'trunk_origin_radii': _mm.trunk_origin_radii,
-    'trunk_section_lengths': _mm.trunk_section_lengths,
-    'segment_lengths': _mm.segment_lengths,
-    'segment_radial_distances': _mm.segment_radial_distances,
-    'principal_direction_extents': _mm.principal_direction_extents
-}
-
-NEURONFEATURES = {
-    'soma_radii': _mm.soma_radii,
-    'soma_surface_areas': _mm.soma_surface_areas,
-}
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
+FILENAMES = [os.path.join(DATA_PATH, f)
+             for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
 
-def get(feature, *args, **kwargs):
-    '''Neuron feature getter helper
+def test_load_neuron():
 
-    Returns features as a 1D numpy array.
-    '''
-    feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
-               else NEURONFEATURES[feature])
-    return _np.array(feature(*args, **kwargs))
+    nrn = _io.load_neuron(FILENAMES[0])
+    nt.assert_true(isinstance(nrn, _io.Neuron))
+
+
+def test_load_neurons_directory():
+
+    nrns = _io.load_neurons(DATA_PATH)
+    nt.assert_equal(len(nrns), 5)
+    for nrn in nrns:
+        nt.assert_true(isinstance(nrn, _io.Neuron))
+
+
+def test_load_neurons_filenames():
+
+    nrns = _io.load_neurons(FILENAMES)
+    nt.assert_equal(len(nrns), 3)
+    for nrn in nrns:
+        nt.assert_true(isinstance(nrn, _io.Neuron))
+
+
+def test_load_population_directory():
+
+    pop = _io.load_population(DATA_PATH)
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(pop.name, 'valid_set')
+
+    pop = _io.load_population(DATA_PATH, 'test123')
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(pop.name, 'test123')
+
+
+def test_load_population_filenames():
+
+    pop = _io.load_population(FILENAMES, 'test123')
+    nt.assert_equal(len(pop.neurons), 3)
+    nt.assert_equal(pop.name, 'test123')

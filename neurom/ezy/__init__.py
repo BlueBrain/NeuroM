@@ -57,6 +57,7 @@ Examples:
 
 '''
 import os
+from functools import partial
 from .neuron import Neuron
 from .population import Population
 from .neuron import NeuriteType
@@ -65,7 +66,7 @@ from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d
 from ..io.utils import get_morph_files
 from ..features import get
-from ..io.utils import load_neuron as _load
+from ..io import utils as _io
 from ..analysis.morphtree import set_tree_type as _set_tt
 
 
@@ -74,44 +75,9 @@ TreeType = NeuriteType  # For backwards compatibility
 
 def load_neuron(filename):
     '''Load a Neuron from a file'''
-    return Neuron(_load(filename, _set_tt))
+    return Neuron(_io.load_neuron(filename, _set_tt))
 
 
-def load_neurons(neurons):
-    '''Create a list of Neuron objects from each morphology file in directory\
-        or from a list or tuple of file names
-
-    Parameters:
-        neurons: directory path or list of neuron file paths
-
-    Returns:
-        list of Neuron objects
-    '''
-    if isinstance(neurons, list) or isinstance(neurons, tuple):
-        return [load_neuron(f) for f in neurons]
-    elif isinstance(neurons, str):
-        return [load_neuron(f) for f in get_morph_files(neurons)]
-
-
-def load_population(neurons, name=None):
-    '''Create a population object from all morphologies in a directory\
-        of from morphologies in a list of file names
-
-    Parameters:
-        neurons: directory path or list of neuron file paths
-        name (str): optional name of population. By default 'Population' or\
-            filepath basename depending on whether neurons is list or\
-            directory path respectively.
-
-    Returns:
-        neuron Population object
-
-    '''
-    pop = Population(load_neurons(neurons))
-    if isinstance(neurons, list) or isinstance(neurons, tuple):
-        name = name if name is not None else 'Population'
-    elif isinstance(neurons, str):
-        name = name if name is not None else os.path.basename(neurons)
-
-    pop.name = name
-    return pop
+load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron)
+load_population = partial(_io.load_population, neuron_loader=load_neurons,
+                          population_class=Population)
