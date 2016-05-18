@@ -31,7 +31,7 @@ from neurom.io.utils import make_neuron
 from neurom.io.utils import load_neuron
 from neurom import io
 from neurom.view import view
-from neurom.analysis.morphtree import find_tree_type
+from neurom.analysis.morphtree import set_tree_type
 import os
 import numpy as np
 import pylab as plt
@@ -42,7 +42,7 @@ DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
 data = io.load_data(SWC_PATH + 'Neuron.swc')
-neuron0 = make_neuron(data, find_tree_type)
+neuron0 = make_neuron(data, set_tree_type)
 soma0 = neuron0.soma
 
 
