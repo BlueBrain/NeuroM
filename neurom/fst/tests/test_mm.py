@@ -33,11 +33,22 @@ import os
 import numpy as np
 from neurom import fst
 from neurom.fst import _mm
+from neurom.io import utils as io_utils
+from neurom.core import tree as tr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 
 NRN = fst.load_neuron(DATA_PATH)
+NRN_OLD = io_utils.load_neuron(DATA_PATH)
+
+
+def _equal(a, b, debug=False):
+    if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
+        print '\na: %s\nb:%s\n' % (a, b)
+    nt.assert_equal(len(a), len(b))
+    nt.assert_true(np.alltrue(a == b))
 
 
 def test_bounding_box():
@@ -51,3 +62,15 @@ def test_bounding_box():
 
     bboxes = [_mm.bounding_box(n) for n in NRN.neurites]
     nt.assert_true(np.allclose(bboxes, ref_bboxes))
+
+def test_iter_segments():
+    def seg_fun(seg):
+        return seg[1][:4] - seg[0][:4]
+
+    def seg_fun2(seg):
+        return seg[1].value[:4] - seg[0].value[:4]
+
+    a = np.array([seg_fun(s) for s in _mm.iter_segments(NRN)])
+    b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
+
+    _equal(a, b, debug=False)

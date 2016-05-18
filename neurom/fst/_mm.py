@@ -29,6 +29,7 @@
 '''Fast morphometrics module'''
 
 import math
+from itertools import izip, chain
 import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
@@ -126,7 +127,8 @@ def segment_lengths(nrn, neurite_type=NeuriteType.all):
         vecs = np.diff(sec.value, axis=0)[:, :3]
         return np.sqrt([np.dot(p, p) for p in vecs])
 
-    return [s for ss in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))
+    tree_filter = is_type(neurite_type)
+    return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
             for s in _seg_len(ss)]
 
 
@@ -311,3 +313,16 @@ def bounding_box(section_tree):
         max_xyz = np.maximum(np.amax(p.value[:, :COLS.R], axis=0), max_xyz)
 
     return np.array([min_xyz, max_xyz])
+
+
+def iter_segments(nrn, neurite_type=NeuriteType.all):
+    '''Return an iterator to the segments in a neuron or neuron population
+
+    Note:
+        This is a convenience function provideded for generic access to
+        neuron segments. It may have a performance overhead WRT custom
+        made segment analysis functions that leverage numpy.
+    '''
+    tree_filter = is_type(neurite_type)
+    return chain(s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+                 for s in izip(ss.value[:-1], ss.value[1:]))
