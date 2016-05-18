@@ -295,11 +295,12 @@ def principal_direction_extents(nrn, neurite_type=NeuriteType.all, direction=0):
 
 
 def bounding_box(section_tree):
-    """
+    """Calculate the 3-dimensional bounding box of a neurite tree
+
     Returns:
-        The boundaries of a section tree in three dimensions:
+        numpy array with the boundaries of a section tree in three dimensions:
             [[xmin, ymin, zmin],
-            [xmax, ymax, zmax]]
+             [xmax, ymax, zmax]]
     """
 
     min_xyz, max_xyz = (np.array([np.inf, np.inf, np.inf]),
