@@ -31,21 +31,26 @@
 from itertools import imap, izip
 from neurom import segments as seg
 from neurom import iter_neurites
-from neurom.core.tree import ipreorder
+from neurom.core.tree import ipreorder, Tree
 from neurom.analysis.morphtree import get_bounding_box
 from neurom.analysis.morphtree import find_tree_type
-from neurom.fst import _mm
+from neurom import fst
 
 
-def is_new_style(tree):
-    '''Determine whether a tree is new or old style'''
-    return len(tree.value.shape) == 2
+def is_new_style(obj):
+    '''Determine whether a neuron or tree is new or old style'''
+    if isinstance(obj, fst.Neuron):
+        return True
+    elif isinstance(obj, Tree):
+        return len(obj.value.shape) == 2
+    else:
+        return False
 
 
 def bounding_box(tree):
     '''Get a tree's X,Y,Z bounding box'''
     if is_new_style(tree):
-        return _mm.bounding_box(tree)
+        return fst._mm.bounding_box(tree)  # pylint: disable=protected-access
     else:
         return get_bounding_box(tree)
 

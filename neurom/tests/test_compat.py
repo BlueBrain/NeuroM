@@ -62,10 +62,13 @@ def _equal(a, b, debug=False):
 
 def test_is_new_style_true():
     nt.assert_true(_compat.is_new_style(NRN1.neurites[0]))
+    nt.assert_true(_compat.is_new_style(NRN1))
 
 
 def test_is_new_style_false():
     nt.assert_false(_compat.is_new_style(NRN0.neurites[0]))
+    nt.assert_false(_compat.is_new_style(NRN0))
+    nt.assert_false(_compat.is_new_style([1,2,3]))
 
 
 def test_bounding_box():
