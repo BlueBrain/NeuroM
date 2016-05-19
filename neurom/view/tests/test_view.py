@@ -36,6 +36,7 @@ import os
 import numpy as np
 import pylab as plt
 from neurom.core.tree import Tree
+from neurom.fst import load_neuron as load_fst_neuron
 
 
 DATA_PATH = './test_data'
@@ -44,6 +45,8 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 data = io.load_data(SWC_PATH + 'Neuron.swc')
 neuron0 = make_neuron(data, set_tree_type)
 soma0 = neuron0.soma
+
+fst_neuron = load_fst_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
 
 def test_tree():
@@ -124,6 +127,16 @@ def test_neuron3d_no_neurites():
 def test_dendrogram():
     fig, ax = view.dendrogram(neuron0)
     nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
+
+
+@nt.raises(NotImplementedError)
+def test_dendrogram_fst_neuron_raises():
+    view.dendrogram(fst_neuron)
+
+
+@nt.raises(NotImplementedError)
+def test_dendrogram_tree_fst_neuron_raises():
+    view.dendrogram(fst_neuron.neurites[0])
 
 
 def test_one_point_branch_with_diameter():

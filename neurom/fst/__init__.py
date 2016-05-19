@@ -29,7 +29,7 @@
 ''' NeuroM, lightweight and fast '''
 
 import numpy as _np
-from ._io import load_neuron, load_neurons, load_population
+from ._io import load_neuron, load_neurons, load_population, Neuron
 from . import _mm
 from ..core.types import NeuriteType
 
