@@ -182,7 +182,7 @@ def _extract_section(section, remove_duplicates=False):
     Returns a numpy array with the row format:
         [X, Y, Z, R, TYPE, ID, PARENT_ID]
 
-    Note: PARENT_ID starts at -1
+    Note: PARENT_ID starts at -1 for soma and 0 for neurites
     '''
     # try and detect type
     _type = WANTED_SECTIONS.get(section[0][0], None)
@@ -195,8 +195,9 @@ def _extract_section(section, remove_duplicates=False):
             return None
         start = 2
 
+    parent = -1 if _type == POINT_TYPE.SOMA else 0
     subsection_iter = _flatten_subsection(section[start:], _type, offset=0,
-                                          parent=-1, remove_duplicates=remove_duplicates)
+                                          parent=parent, remove_duplicates=remove_duplicates)
 
     ret = np.array([row for row in subsection_iter])
     return ret
@@ -240,7 +241,7 @@ def _sections_to_raw_data(sections, remove_duplicates=False):
 class NeurolucidaASC(object):
     '''Reader for Neurolucida ASCII files'''
     @staticmethod
-    def read(morph_file, remove_duplicates=True):
+    def read(morph_file, remove_duplicates=True, wrapper=RawDataWrapper):
         '''return a 'raw_data' np.array with the full neuron, and the format of the file
         suitable to be wrapped by RawDataWrapper
         '''
@@ -249,4 +250,4 @@ class NeurolucidaASC(object):
         with open(morph_file) as morph_fd:
             sections = _parse_sections(morph_fd)
         raw_data = _sections_to_raw_data(sections, remove_duplicates)
-        return RawDataWrapper(raw_data, 'Beta Neurolucida ASCII')
+        return wrapper(raw_data, 'Beta Neurolucida ASCII')
