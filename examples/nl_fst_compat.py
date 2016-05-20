@@ -33,8 +33,8 @@
 import numpy as np
 from neurom import fst
 
-nrn_h5 = fst.load_neuron('C050600B1.h5')
-nrn_asc = fst.load_neuron('C050600B1.asc')
+nrn_h5 = fst.load_neuron('test_data/h5/v1/bio_neuron-000.h5')
+nrn_asc = fst.load_neuron('test_data/neurolucida/bio_neuron-000.asc')
 
 print 'h5 number of sections: %s' % fst.get('number_of_sections', nrn_h5)[0]
 print 'nl number of sections: %s\n' % fst.get('number_of_sections', nrn_asc)[0]
@@ -42,6 +42,8 @@ print 'h5 number of segments: %s' % fst.get('number_of_segments', nrn_h5)[0]
 print 'nl number of segments: %s\n' % fst.get('number_of_segments', nrn_asc)[0]
 print 'h5 total neurite length: %s' % np.sum(fst.get('section_lengths', nrn_h5))
 print 'nl total neurite length: %s\n' % np.sum(fst.get('section_lengths', nrn_asc))
+print 'h5 principal direction extents: %s' % fst.get('principal_direction_extents', nrn_h5)
+print 'nl principal direction extents: %s' % fst.get('principal_direction_extents', nrn_asc)
 
 print '\nNumber of neurites:'
 for nt in fst.NeuriteType:

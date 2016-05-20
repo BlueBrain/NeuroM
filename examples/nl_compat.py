@@ -31,8 +31,8 @@
 import numpy as np
 from neurom import ezy
 
-nrn_h5 = ezy.load_neuron('C050600B1.h5')
-nrn_asc = ezy.load_neuron('C050600B1.asc')
+nrn_h5 = ezy.load_neuron('test_data/h5/v1/bio_neuron-000.h5')
+nrn_asc = ezy.load_neuron('test_data/neurolucida/bio_neuron-000.asc')
 
 print 'h5 number of sections: %s' % ezy.get('number_of_sections', nrn_h5)[0]
 print 'nl number of sections: %s\n' % ezy.get('number_of_sections', nrn_asc)[0]
