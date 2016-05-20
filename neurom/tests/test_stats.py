@@ -194,7 +194,7 @@ def test_compare_two_wilcoxon():
 def test_compare_two_ttest():
 
     results1 = st.compare_two(distr1, distr1, test=st.StatTests.ttest)
-    nt.ok_(results1.dist==0.0 or np.isnan(results1.dist)) # Hack to take care of inconsistency between scipy versions
+    nt.ok_(results1.dist==1.0 or np.isnan(results1.dist)) # Hack to take care of inconsistency between scipy versions
     nt.ok_(results1.pvalue==0.0 or np.isnan(results1.pvalue)) # Hack to take care of inconsistency between scipy versions
 
     results2 = st.compare_two(distr1, distr2, test=st.StatTests.ttest)
