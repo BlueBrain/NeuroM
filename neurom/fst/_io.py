@@ -33,6 +33,7 @@ from collections import namedtuple, defaultdict
 from functools import partial, update_wrapper
 from neurom.io.hdf5 import H5
 from neurom.io.swc import SWC
+from neurom.io.neurolucida import NeurolucidaASC
 from neurom.core.types import NeuriteType
 from neurom.core.tree import Tree
 from neurom.core.dataformat import POINT_TYPE
@@ -99,11 +100,13 @@ def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     _READERS = {
         'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
-        'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
+        'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper),
+        'asc': lambda f: NeurolucidaASC.read(f, remove_duplicates=True, wrapper=SecDataWrapper)
     }
     _NEURITE_ACTION = {
         'swc': remove_soma_initial_point,
-        'h5': None
+        'h5': None,
+        'asc': None
     }
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
