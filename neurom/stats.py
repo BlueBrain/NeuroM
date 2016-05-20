@@ -44,16 +44,17 @@ class StatTests(Enum):
     '''Enum representing valid statistical tests of scipy'''
     ks = 1
     wilcoxon = 2
+    ttest = 3
 
 
 def get_test(stest):
     '''Returns the correct stat test'''
-    sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon'}
+    sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon', StatTests.ttest: 'ttest_ind'}
 
     if stest in StatTests:
         return sts[stest]
     else:
-        raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon.')
+        raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon, ttest.')
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
@@ -163,7 +164,7 @@ def compare_two(data1, data2, test=StatTests.ks):
         test: Stat_tests\
             Defines the statistical test to be used, based\
             on the scipy available modules.\
-            Accepted tests: ks_2samp, wilcoxon
+            Accepted tests: ks_2samp, wilcoxon, ttest
 
     Returns:
         dist: float\
@@ -191,7 +192,7 @@ def total_score(paired_dats, p=2, test=StatTests.ks):
         test: Stat_tests\
             Defines the statistical test to be used, based\
             on the scipy available modules.\
-            Accepted tests: ks_2samp, wilcoxon
+            Accepted tests: ks_2samp, wilcoxon, ttest
 
     Returns:
         A float corresponding to the p-norm of the distances that have
