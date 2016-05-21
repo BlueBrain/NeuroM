@@ -52,6 +52,15 @@ def _equal(a, b, debug=False):
     nt.assert_true(np.alltrue(a == b))
 
 
+def _close(a, b, debug=False):
+    if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
+        print '\na: %s\nb:%s\n' % (a, b)
+        print '\na - b:%s\n' % (a - b)
+    nt.assert_equal(len(a), len(b))
+    nt.assert_true(np.allclose(a, b))
+
+
 def test_bounding_box():
 
     ref_bboxes = [
@@ -86,4 +95,4 @@ def test_principal_direction_extents():
              346.83281498399697]
 
     p = _mm.principal_direction_extents(nrn)
-    _equal(np.array(p), np.array(p_ref))
+    _close(np.array(p), np.array(p_ref))
