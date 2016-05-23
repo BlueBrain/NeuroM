@@ -10,13 +10,13 @@ before_install:
   - sudo apt-get install -y python-h5py
   - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-matplotlib
-install:
-  - sudo pip install codecov
-  - sudo pip install twine
 script:
   - make -f Makefile test
 after_success:
+  - sudo pip install codecov
   - codecov
+before_deploy:
+  - sudo pip install twine
 deploy:
   provider: pypi
   user: juanchopanza
