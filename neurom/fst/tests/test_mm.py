@@ -37,7 +37,8 @@ from neurom.io import utils as io_utils
 from neurom.core import tree as tr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
+H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
+DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
 NRN = fst.load_neuron(DATA_PATH)
 NRN_OLD = io_utils.load_neuron(DATA_PATH)
@@ -49,6 +50,15 @@ def _equal(a, b, debug=False):
         print '\na: %s\nb:%s\n' % (a, b)
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
+
+
+def _close(a, b, debug=False):
+    if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
+        print '\na: %s\nb:%s\n' % (a, b)
+        print '\na - b:%s\n' % (a - b)
+    nt.assert_equal(len(a), len(b))
+    nt.assert_true(np.allclose(a, b))
 
 
 def test_bounding_box():
@@ -74,3 +84,15 @@ def test_iter_segments():
     b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
 
     _equal(a, b, debug=False)
+
+
+def test_principal_direction_extents():
+    # test with a realistic neuron
+    nrn = fst.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
+
+    p_ref = [1672.9694359427331, 142.43704397865031, 226.45895382204986,
+             415.50612748523838, 429.83008974193206, 165.95410536922873,
+             346.83281498399697]
+
+    p = _mm.principal_direction_extents(nrn)
+    _close(np.array(p), np.array(p_ref))
