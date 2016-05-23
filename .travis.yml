@@ -12,6 +12,7 @@ before_install:
   - sudo apt-get install -y python-matplotlib
 install:
   - sudo pip install codecov
+  - sudo pip install twine
 script:
   - make -f Makefile test
 after_success:
