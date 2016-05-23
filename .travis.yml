@@ -10,6 +10,8 @@ before_install:
   - sudo apt-get install -y python-h5py
   - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-matplotlib
+install:
+  - sudo pip install codecov
 script:
   - make -f Makefile test
 after_success:
