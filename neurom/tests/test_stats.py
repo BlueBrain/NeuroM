@@ -160,17 +160,46 @@ def test_compare_two():
     data_close = np.array([1.02, 1.01, 2.001, 2.0003])
     data_far = np.array([200., 100., 201])
 
-    results1 = st.compare_two(data, data_same)
+    results1 = st.compare_two(data, data_same, test=st.StatTests.ks)
     nt.assert_almost_equal(results1.dist, 0.0)
     nt.assert_almost_equal(results1.pvalue, 1.0)
 
-    results2 = st.compare_two(data, data_close)
+    results2 = st.compare_two(data, data_close, test=st.StatTests.ks)
     nt.assert_almost_equal(results2.dist, 0.5)
     nt.assert_almost_equal(results2.pvalue, 0.5344157, places=5)
 
-    results3 = st.compare_two(data, data_far)
+    results3 = st.compare_two(data, data_far, test=st.StatTests.ks)
     nt.assert_almost_equal(results3.dist, 1.0)
     nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
+
+distr1 = np.ones(100)
+distr2 = 2*np.ones(100)
+
+def test_compare_two_ks():
+
+    results1 = st.compare_two(distr1, distr1, test=st.StatTests.ks)
+    nt.assert_almost_equal(results1.dist, 0.0, places=5)
+    nt.assert_almost_equal(results1.pvalue, 1.0, places=5)
+
+    results2 = st.compare_two(distr1, distr2, test=st.StatTests.ks)
+    nt.assert_almost_equal(results2.dist, 1.0, places=5)
+    nt.assert_almost_equal(results2.pvalue, 0.0, places=5)
+
+def test_compare_two_wilcoxon():
+
+    results2 = st.compare_two(distr1, distr2, test=st.StatTests.wilcoxon)
+    nt.assert_almost_equal(results2.dist, 0.0, places=5)
+    nt.assert_almost_equal(results2.pvalue, 0.0, places=5)
+
+def test_compare_two_ttest():
+
+    results1 = st.compare_two(distr1, distr1, test=st.StatTests.ttest)
+    nt.ok_(np.isnan(results1.dist))
+    nt.ok_(np.isnan(results1.pvalue))
+    results2 = st.compare_two(distr1, distr2, test=st.StatTests.ttest)
+    nt.ok_(np.isinf(results2.dist))
+    nt.assert_almost_equal(results2.pvalue, 0.0, places=5)
+
 
 @nt.raises(TypeError)
 def test_compare_two_error():
