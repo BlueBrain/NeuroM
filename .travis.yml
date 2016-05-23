@@ -8,12 +8,13 @@ virtualenv:
 before_install:
   - sudo apt-get update -qq -y
   - sudo apt-get install -y python-dev
+  - sudo apt-get install -y python-pip
+  - sudo apt-get install -y python-virtualenv
   - sudo apt-get install -y python-numpy
   - sudo apt-get install -y python-h5py
   - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-matplotlib
 install:
-  - pip install --upgrade pip
   - pip install --ignore-installed -r requirements_dev.txt
   - pip install codecov
   - pip install .
