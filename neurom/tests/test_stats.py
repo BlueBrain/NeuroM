@@ -196,7 +196,6 @@ def test_compare_two_ttest():
     results1 = st.compare_two(distr1, distr1, test=st.StatTests.ttest)
     nt.ok_(np.isnan(results1.dist))
     nt.ok_(np.isnan(results1.pvalue))
-
     results2 = st.compare_two(distr1, distr2, test=st.StatTests.ttest)
     nt.ok_(np.isinf(results2.dist))
     nt.assert_almost_equal(results2.pvalue, 0.0, places=5)
