@@ -1,10 +1,6 @@
 sudo: required
 dist: trusty
 language: generic
-python:
-  - 2.7
-virtualenv:
-  system_site_packages: true
 before_install:
   - sudo apt-get update -qq -y
   - sudo apt-get install -y python-dev
@@ -14,9 +10,6 @@ before_install:
   - sudo apt-get install -y python-h5py
   - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-matplotlib
-cache:
-  directories:
-    - $HOME/.cache/pip
 script:
   - make -f Makefile test
 after_success:
