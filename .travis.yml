@@ -14,15 +14,11 @@ before_install:
   - sudo apt-get install -y python-h5py
   - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-matplotlib
-install:
-  - pip install --ignore-installed -r requirements_dev.txt
-  - pip install codecov
-  - pip install .
 cache:
   directories:
     - $HOME/.cache/pip
 script:
-  - make -f Makefile.travis_ci test
+  - make -f Makefile test
 after_success:
   - codecov
 deploy:
