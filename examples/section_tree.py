@@ -67,4 +67,3 @@ if __name__ == '__main__':
 
     do_new_stuff(fname)
     do_old_stuff(fname)
-
