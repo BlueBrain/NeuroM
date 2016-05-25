@@ -101,7 +101,7 @@ def load_neuron(filename):
     _READERS = {
         'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
         'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper),
-        'asc': lambda f: NeurolucidaASC.read(f, remove_duplicates=True, wrapper=SecDataWrapper)
+        'asc': lambda f: NeurolucidaASC.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
     }
     _NEURITE_ACTION = {
         'swc': remove_soma_initial_point,

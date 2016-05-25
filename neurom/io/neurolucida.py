@@ -241,7 +241,7 @@ def _sections_to_raw_data(sections, remove_duplicates=False):
 class NeurolucidaASC(object):
     '''Reader for Neurolucida ASCII files'''
     @staticmethod
-    def read(morph_file, remove_duplicates=True, wrapper=RawDataWrapper):
+    def read(morph_file, remove_duplicates=False, wrapper=RawDataWrapper):
         '''return a 'raw_data' np.array with the full neuron, and the format of the file
         suitable to be wrapped by RawDataWrapper
         '''

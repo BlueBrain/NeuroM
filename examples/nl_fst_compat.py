@@ -33,8 +33,8 @@
 import numpy as np
 from neurom import fst
 
-nrn_h5 = fst.load_neuron('test_data/h5/v1/bio_neuron-000.h5')
-nrn_asc = fst.load_neuron('test_data/neurolucida/bio_neuron-000.asc')
+nrn_h5 = fst.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
+nrn_asc = fst.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
 
 print 'h5 number of sections: %s' % fst.get('number_of_sections', nrn_h5)[0]
 print 'nl number of sections: %s\n' % fst.get('number_of_sections', nrn_asc)[0]
