@@ -42,9 +42,9 @@ def is_monotonic(tree, tol):
     '''Check if tree is monotonic, i.e. if each child has smaller or
         equal diameters from its parent
 
-        Arguments:
-            tree : tree object
-            tol: numerical precision
+    Arguments:
+        tree : tree object
+        tol: numerical precision
     '''
 
     for node in ipreorder(tree):
