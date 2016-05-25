@@ -29,39 +29,47 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of extracting basic statistics'''
-import collections
 import argparse
 import json
 import logging
 import os
 import sys
 
-from functools import partial
-import numpy as np
-
 from neurom.stats import scalar_stats
 from neurom.core.types import NEURITES
-from neurom.ezy import load_neuron, load_neurons
+from neurom import fst
 from neurom.io.utils import get_morph_files
 
 L = logging.getLogger(__name__)
 
 
 NEURITE_STATS = [
-    'get_section_lengths',
-    'get_segment_lengths',
-    'get_local_bifurcation_angles',
-    'get_remote_bifurcation_angles',
-    'get_n_sections_per_neurite',
-    'get_n_sections',
-    'get_n_neurites'
+    'section_lengths',
+    'segment_lengths',
+    'local_bifurcation_angles',
+    'remote_bifurcation_angles',
+    'number_of_sections_per_neurite',
+    'number_of_sections',
+    'number_of_neurites'
 ]
-
 
 NEURON_STATS = [
-    'get_soma_radius',
-    'get_soma_surface_area',
+    'soma_radii',
+    'soma_surface_areas',
 ]
+
+_NAME_MAP = {
+    'number_of_sections_per_neurite': 'n_sections_per_neurite',
+    'number_of_sections': 'n_sections',
+    'number_of_neurites': 'n_neurites',
+    'soma_radii': 'soma_radius',
+    'soma_surface_areas': 'soma_surface_area'
+}
+
+
+def old_name(name):
+    '''Map new feature names to old ones'''
+    return _NAME_MAP.get(name, name)
 
 
 def parse_args():
@@ -83,37 +91,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def _flatten_array(l):
-    '''Flattens an array of any depth.
-    '''
-    if isinstance(l, collections.Iterable):
-        for el in l:
-            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
-                for sub in _flatten_array(el):
-                    yield sub
-            else:
-                yield el
-    else:
-        yield l
-
-
-def pfunc(ns, n=None):
-    ''' Partially fills the arguments of the function that is applied on
-    neurons
-    '''
-    if n is None:
-        return partial(lambda x, ns: getattr(x, ns)(), ns=ns)
-    else:
-        return partial(lambda x, ns, n: getattr(x, ns)(n), ns=ns, n=n)
-
-
-def eval_stats(func, neurons):
+def eval_stats(value):
     ''' Apply the input function on the neuron objects, flatten the array if nested,
     make it a single element array if the result is not iterable and extract the stats
     '''
-
-    value = np.fromiter(_flatten_array(func(nrn) for nrn in neurons), np.float)
-
     stat_functions = ('min', 'max', 'median', 'mean', 'std')
     try:
         value = scalar_stats(value)
@@ -128,14 +109,15 @@ def extract_stats(neurons):
 
     stats = {}
     for ns in NEURITE_STATS:
-        stat_name = ns[4:]
+        stat_name = old_name(ns)
         stats[stat_name] = {}
         for n in NEURITES:
-            stats[stat_name][n.name] = eval_stats(pfunc(ns, n), neurons)
+            stats[stat_name][n.name] = eval_stats(fst.get(ns, neurons, n))
             L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(stats[stat_name][n.name]))
 
     for ns in NEURON_STATS:
-        stats[ns[4:]] = eval_stats(pfunc(ns), neurons)
+        stat_name = old_name(ns)
+        stats[stat_name] = eval_stats(fst.get(ns, neurons))
 
     return stats
 
@@ -150,13 +132,13 @@ if __name__ == '__main__':
     _results = {}
 
     if os.path.isfile(_f):
-        _results[_f] = extract_stats((load_neuron(_f),))
+        _results[_f] = extract_stats(fst.load_neuron(_f))
     elif os.path.isdir(_f):
         if not args.as_population:
             for _p in get_morph_files(_f):
-                _results[_p] = extract_stats((load_neuron(_p),))
+                _results[_p] = extract_stats(fst.load_neuron(_p))
         else:
-            _results[_f] = extract_stats(load_neurons(_f))
+            _results[_f] = extract_stats(fst.load_population(_f))
     else:
         L.error("Invalid data path %s", _f)
         sys.exit(1)
