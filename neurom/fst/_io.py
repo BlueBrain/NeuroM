@@ -74,6 +74,9 @@ _TREE_TYPES = tuple(NeuriteType)
 def make_trees(rdw, post_action=None):
     '''Build section trees from a raw data wrapper'''
     trunks = rdw.neurite_trunks()
+    if len(trunks) == 0:
+        return []
+
     start_node = min(trunks)
 
     # One pass over sections to build nodes
