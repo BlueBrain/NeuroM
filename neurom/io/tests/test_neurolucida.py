@@ -233,4 +233,4 @@ def test_load_neurolucida_ascii():
     f = os.path.join(NEUROLUCIDA_PATH, 'sample.asc')
     ascii = io.load_data(f)
     ok_(isinstance(ascii, RawDataWrapper))
-    ok_(len(ascii.data_block) == 18)
+    eq_(len(ascii.data_block), 18)
