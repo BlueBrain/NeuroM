@@ -32,7 +32,7 @@
    the exponential, normal and uniform distribution, according to the minimum ks distance.
    '''
 
-from neurom import ezy
+from neurom import fst
 from neurom import stats
 import argparse
 import json
@@ -49,7 +49,7 @@ def parse_args():
                         help='Path to morphology data file or directory')
 
     parser.add_argument('feature',
-                        help='Feature available for the ezy.neuron')
+                        help='Feature to be extracted with neurom.fst.get')
 
     return parser.parse_args()
 
@@ -60,18 +60,12 @@ def extract_data(data_path, feature):
        Returns the optimal distribution, corresponding parameters,
        minimun and maximum values.
     '''
-    population = ezy.load_neurons(data_path)
+    population = fst.load_population(data_path)
 
-    feature_data = [getattr(n, 'get_' + feature)() for n in population]
+    feature_data = fst.get(feature, population)
 
-    try:
-        opt_fit = stats.optimal_distribution(feature_data)
-    except ValueError:
-        from itertools import chain
-        feature_data = list(chain(*feature_data))
-        opt_fit = stats.optimal_distribution(feature_data)
+    return stats.optimal_distribution(feature_data)
 
-    return opt_fit
 
 if __name__ == '__main__':
     args = parse_args()
