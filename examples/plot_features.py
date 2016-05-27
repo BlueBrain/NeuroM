@@ -28,8 +28,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Plot a selection of features from a morphology population'''
 
-from neurom import ezy
-from neurom.analysis import morphtree as mt
+from neurom import fst
 from neurom.view import common as view_utils
 from collections import defaultdict
 from collections import namedtuple
@@ -96,35 +95,29 @@ def calc_limits(data, dist=None, padding=0.25):
 
 
 # Neurite types of interest
-NEURITES_ = (ezy.NeuriteType.axon,
-             ezy.NeuriteType.apical_dendrite,
-             ezy.NeuriteType.basal_dendrite,)
+NEURITES_ = (fst.NeuriteType.axon,
+             fst.NeuriteType.apical_dendrite,
+             fst.NeuriteType.basal_dendrite,)
 
-# map feature names to functors that get us arrays of that
-# feature, for a given tree type
-GET_NEURITE_FEATURE = {
-    'trunk_origin_azimuth': lambda nrn, typ: [mt.trunk_origin_azimuth(n, nrn.soma)
-                                              for n in nrn.neurites if n.type == typ],
-    'trunk_origin_elevation': lambda nrn, typ: [mt.trunk_origin_elevation(n, nrn.soma)
-                                                for n in nrn.neurites if n.type == typ],
-    'segment_length': lambda n, typ: n.get_segment_lengths(typ),
-    'section_length': lambda n, typ: n.get_section_lengths(typ),
-}
 
-# For now we use all the features in the map
-FEATURES = GET_NEURITE_FEATURE.keys()
+# Features of interest
+FEATURES = ('segment_lengths',
+            'section_lengths',
+            'section_path_distances',
+            'section_radial_distances',
+            'trunk_origin_radii')
 
 
 def load_neurite_features(filepath):
     '''Unpack relevant data into megadict'''
     stuff = defaultdict(lambda: defaultdict(list))
-    nrns = ezy.load_neurons(filepath)
+    nrns = fst.load_neurons(filepath)
     # unpack data into arrays
     for nrn in nrns:
         for t in NEURITES_:
             for feat in FEATURES:
                 stuff[feat][str(t).split('.')[1]].extend(
-                    GET_NEURITE_FEATURE[feat](nrn, t)
+                    fst.get(feat, nrn, neurite_type=t)
                 )
     return stuff
 
