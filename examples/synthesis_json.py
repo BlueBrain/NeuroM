@@ -35,9 +35,8 @@
    axons: n_neurites
 '''
 
-from neurom import ezy
+from neurom.fst import get, load_neurons, NeuriteType
 from neurom import stats
-from neurom.analysis import morphmath as mm
 from neurom.io.utils import get_morph_files
 import argparse
 from collections import OrderedDict
@@ -45,7 +44,6 @@ from collections import defaultdict
 from collections import namedtuple
 from itertools import chain
 import os
-import numpy as np
 import json
 from json import encoder
 
@@ -56,47 +54,39 @@ Feature = namedtuple('Feature', 'name, limits')
 Component = namedtuple('Component', 'name, features')
 
 
-# Map feature names to data getter functions
+# Map feature names to data getter namer
 FEATURE_MAP = {
-    'radius': lambda n, kwargs: n.get_soma_radius(**kwargs),
-    'number': lambda n, kwargs: n.get_n_neurites(**kwargs),
-    'segment_length': lambda n, kwargs: n.get_segment_lengths(**kwargs),
-    'initial_radius': lambda n, kwargs: n.get_trunk_origin_radii(**kwargs),
-    'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
-                                                                  **kwargs))),
+    'radius': 'soma_radii',
+    'number': 'number_of_neurites',
+    'segment_length': 'segment_lengths',
+    'initial_radius': 'trunk_origin_radii',
+    # 'taper_rate': lambda n, kwargs: np.array(list(n.iter_segments(mm.segment_taper_rate,
+    #                                                              **kwargs))),
 }
 
 # Map component name to filtering parameters where applicable
 PARAM_MAP = {
-    'basal_dendrite': {'neurite_type': ezy.NeuriteType.basal_dendrite},
-    'apical_dendrite': {'neurite_type': ezy.NeuriteType.apical_dendrite},
-    'axon': {'neurite_type': ezy.NeuriteType.axon},
+    'basal_dendrite': {'neurite_type': NeuriteType.basal_dendrite},
+    'apical_dendrite': {'neurite_type': NeuriteType.apical_dendrite},
+    'axon': {'neurite_type': NeuriteType.axon},
     'soma': None
 }
 
 
-def extract_data(files, feature, params=None):
-    '''Loads a list of neurons, extracts feature
+def extract_data(neurons, feature, params=None):
+    '''Extracts feature from a list of neurons
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution and corresponding parameters.
        Normal distribution params (mean, std)
        Exponential distribution params (loc, scale)
        Uniform distribution params (min, range)
     '''
-    neurons = ezy.load_neurons(files)
-
     if params is None:
         params = {}
 
-    feature_data = [FEATURE_MAP[feature](n, params) for n in neurons]
-
-    try:
-        opt_fit = stats.optimal_distribution(feature_data)
-    except ValueError:
-        feature_data = list(chain(*feature_data))
-        opt_fit = stats.optimal_distribution(feature_data)
-
-    return opt_fit
+    feature_data = [get(FEATURE_MAP[feature], n, **params) for n in neurons]
+    feature_data = list(chain(*feature_data))
+    return stats.optimal_distribution(feature_data)
 
 
 def transform_header(mtype_name):
@@ -116,12 +106,13 @@ def transform_package(mtype, files, components):
        features, feature_names, feature_components, feature_min, feature_max
     '''
     data_dict = transform_header(mtype)
+    neurons = load_neurons(files)
 
     for comp in components:
         params = PARAM_MAP[comp.name]
         for feature in comp.features:
             result = stats.fit_results_to_dict(
-                extract_data(files, feature.name, params),
+                extract_data(neurons, feature.name, params),
                 feature.limits.min, feature.limits.max
             )
 
@@ -183,20 +174,26 @@ COMPONENTS = [
     Component('soma',
               [Feature('radius', Limits(None, None))]),
     Component('basal_dendrite',
-              [Feature('number', Limits(0, None)),
-               Feature('segment_length', Limits(0, None)),
-               Feature('initial_radius', Limits(0, None)),
-               Feature('taper_rate', Limits(0, None))]),
+              [
+                  Feature('number', Limits(0, None)),
+                  Feature('segment_length', Limits(0, None)),
+                  Feature('initial_radius', Limits(0, None)),
+                  # Feature('taper_rate', Limits(0, None))
+              ]),
     Component('apical_dendrite',
-              [Feature('number', Limits(0, None)),
-               Feature('segment_length', Limits(0, None)),
-               Feature('initial_radius', Limits(0, None)),
-               Feature('taper_rate', Limits(0, None))]),
+              [
+                  Feature('number', Limits(0, None)),
+                  Feature('segment_length', Limits(0, None)),
+                  Feature('initial_radius', Limits(0, None)),
+                  # Feature('taper_rate', Limits(0, None))
+              ]),
     Component('axon',
-              [Feature('number', Limits(0, None)),
-               Feature('segment_length', Limits(0, None)),
-               Feature('initial_radius', Limits(0, None)),
-               Feature('taper_rate', Limits(0, None))]),
+              [
+                  Feature('number', Limits(0, None)),
+                  Feature('segment_length', Limits(0, None)),
+                  Feature('initial_radius', Limits(0, None)),
+                  # Feature('taper_rate', Limits(0, None))
+              ]),
 ]
 
 

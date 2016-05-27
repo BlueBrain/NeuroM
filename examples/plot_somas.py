@@ -29,7 +29,7 @@
 '''Load and view multiple somas'''
 
 import os
-from neurom import ezy
+from neurom.fst import load_neuron
 import neurom.view.common as common
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,5 +62,5 @@ if __name__ == '__main__':
                                                                 'Soma_translated_2.swc']]
 
     # load from file and plot
-    sms = [ezy.load_neuron(file_nm).soma for file_nm in file_nms]
+    sms = [load_neuron(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)

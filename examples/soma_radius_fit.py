@@ -32,7 +32,7 @@
    for the soma radii of the population (list) of neurons.
    '''
 
-from neurom import ezy
+from neurom import fst
 from neurom import stats as st
 import argparse
 
@@ -54,13 +54,13 @@ def test_multiple_distr(filepath):
        the optimal distribution along with the corresponding parameters.
     '''
     #  load a neuron from an SWC file
-    population = ezy.load_neurons(filepath)
+    population = fst.load_population(filepath)
 
     # Create a list of basic distributions
     distr_to_check = ('norm', 'expon', 'uniform')
 
-    # Get the soma radius of a lis of neurons
-    soma_size = [n.get_soma_radius() for n in population]
+    # Get the soma radii of a population of neurons
+    soma_size = fst.get('soma_radii', population)
 
     # Find the best fit distribution
     return st.optimal_distribution(soma_size, distr_to_check)

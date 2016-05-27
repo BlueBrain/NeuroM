@@ -33,15 +33,23 @@ import os
 from neurom.fst import _io
 
 _path = os.path.dirname(os.path.abspath(__file__))
+DATA_ROOT = os.path.join(_path, '../../../test_data')
 DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
 FILENAMES = [os.path.join(DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
+
 
 
 def test_load_neuron():
 
     nrn = _io.load_neuron(FILENAMES[0])
     nt.assert_true(isinstance(nrn, _io.Neuron))
+
+
+def test_load_neuron_soma_only():
+
+    nrn = _io.load_neuron(os.path.join(DATA_ROOT, 'swc', 'Soma_origin.swc'))
+    nt.eq_(len(nrn.neurites), 0)
 
 
 def test_load_neurons_directory():
