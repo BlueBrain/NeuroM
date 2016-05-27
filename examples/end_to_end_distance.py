@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -29,16 +30,17 @@
 '''Calculate and plot end-to-end distance of neurites.'''
 
 from neurom.analysis import morphmath
-from neurom import ezy
-from neurom.core import tree
+from neurom import fst
+from neurom import _compat
+from neurom.core.tree import ileaf, ipreorder
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def path_end_to_end_distance(path):
-    '''Calculate and return end-to-end-distance of a given path.'''
-    trunk = path.value
-    return max(morphmath.point_dist(l, trunk) for l in tree.val_iter(tree.ileaf(path)))
+def path_end_to_end_distance(neurite):
+    '''Calculate and return end-to-end-distance of a given neurite.'''
+    trunk = neurite.value[0]
+    return max(morphmath.point_dist(l.value[-1], trunk) for l in ileaf(neurite))
 
 
 def mean_end_to_end_dist(neurites):
@@ -56,35 +58,38 @@ def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type
     plt.show()
 
 
-def calculate_and_plot_end_to_end_distance(path):
+def calculate_and_plot_end_to_end_distance(neurite):
     '''Calculate and plot the end-to-end distance vs the number of segments for
-    an increasingly larger part of a given path.
+    an increasingly larger part of a given neurite.
 
     Note that the plots are not very meaningful for bifurcating trees.'''
-    end_to_end_distance = [morphmath.point_dist(segment[1], path.value)
-                           for segment in tree.val_iter(tree.isegment(path))]
-    make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1, end_to_end_distance,
-                                  path.type)
+    def _dist(seg):
+        '''Distance between segmenr end and trunk'''
+        return morphmath.point_dist(seg[1], neurite.value[0])
+
+    end_to_end_distance = _compat.map_segments(neurite, _dist)
+    make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1,
+                                  end_to_end_distance, neurite.type)
 
 
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron_3_random_walker_branches.swc'
-    nrn = ezy.load_neuron(filename)
+    nrn = fst.load_neuron(filename)
 
     # print mean end-to-end distance per neurite type
     print('Mean end-to-end distance for axons: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.NeuriteType.axon))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == fst.NeuriteType.axon))
     print('Mean end-to-end distance for basal dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == ezy.NeuriteType.basal_dendrite))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == fst.NeuriteType.basal_dendrite))
     print('Mean end-to-end distance for apical dendrites: ',
           mean_end_to_end_dist(n for n in nrn.neurites
-                               if n.type == ezy.NeuriteType.apical_dendrite))
+                               if n.type == fst.NeuriteType.apical_dendrite))
 
     print 'End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):'
     for nrte in nrn.neurites:
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)
-        print(sum(1 for _ in tree.isegment(nrte)),
+        print(sum(len(s.value) - 1 for s in ipreorder(nrte)),
               path_end_to_end_distance(nrte), nrte.type)

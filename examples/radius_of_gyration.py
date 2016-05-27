@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -28,9 +29,10 @@
 
 '''Calculate radius of gyration of neurites.'''
 
-from neurom.analysis import morphmath
-from neurom import ezy
-from neurom.core import tree
+from neurom.analysis import morphmath as mm
+from neurom import fst
+from neurom._compat import map_segments
+from neurom.core.tree import ipreorder
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -38,8 +40,8 @@ import numpy as np
 def segment_centre_of_mass(seg):
     '''Calculate and return centre of mass of a segment.
 
-    Calculated as centre of mass of conical frustum'''
-    h = morphmath.segment_length(seg)
+    C, seg_volalculated as centre of mass of conical frustum'''
+    h = mm.segment_length(seg)
     r0 = seg[0][COLS.R]
     r1 = seg[1][COLS.R]
     num = r0 * r0 + 2 * r0 * r1 + 3 * r1 * r1
@@ -52,10 +54,15 @@ def neurite_centre_of_mass(neurite):
     '''Calculate and return centre of mass of a neurite.'''
     centre_of_mass = np.zeros(3)
     total_volume = 0
-    for segment in tree.val_iter(tree.isegment(neurite)):
-        seg_volume = morphmath.segment_volume(segment)
-        centre_of_mass = centre_of_mass + seg_volume * segment_centre_of_mass(segment)
-        total_volume += seg_volume
+
+    seg_vol = np.array(map_segments(neurite, mm.segment_volume))
+    seg_centre_of_mass = np.array(map_segments(neurite, segment_centre_of_mass))
+
+    # multiply array of scalars with array of arrays
+    # http://stackoverflow.com/questions/5795700/multiply-numpy-array-of-scalars-by-array-of-vectors
+    seg_centre_of_mass = seg_centre_of_mass * seg_vol[:, np.newaxis]
+    centre_of_mass = np.sum(seg_centre_of_mass, axis=0)
+    total_volume = np.sum(seg_vol)
     return centre_of_mass / total_volume
 
 
@@ -71,9 +78,9 @@ def radius_of_gyration(neurite):
     centre_mass = neurite_centre_of_mass(neurite)
     sum_sqr_distance = 0
     N = 0
-    for segment in tree.val_iter(tree.isegment(neurite)):
-        sum_sqr_distance = sum_sqr_distance + distance_sqr(centre_mass, segment)
-        N += 1
+    dist_sqr = map_segments(neurite, lambda s: distance_sqr(centre_mass, s))
+    sum_sqr_distance = np.sum(dist_sqr)
+    N = len(dist_sqr)
     return np.sqrt(sum_sqr_distance / N)
 
 
@@ -85,17 +92,17 @@ def mean_rad_of_gyration(neurites):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron.swc'
-    nrn = ezy.load_neuron(filename)
+    nrn = fst.load_neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
-    print([(sum(1 for _ in tree.isegment(nrte)),
+    print([(sum(len(s.value) - 1 for s in ipreorder(nrte)),
             radius_of_gyration(nrte), nrte.type) for nrte in nrn.neurites])
 
     # print mean radius of gyration per neurite type
     print('Mean radius of gyration for axons: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == ezy.NeuriteType.axon))
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == fst.NeuriteType.axon))
     print('Mean radius of gyration for basal dendrites: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == ezy.NeuriteType.basal_dendrite))
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == fst.NeuriteType.basal_dendrite))
     print('Mean radius of gyration for apical dendrites: ',
           mean_rad_of_gyration(n for n in nrn.neurites
-                               if n.type == ezy.NeuriteType.apical_dendrite))
+                               if n.type == fst.NeuriteType.apical_dendrite))

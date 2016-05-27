@@ -31,12 +31,10 @@
 '''
 import pylab as pl
 from neurom.io.utils import get_morph_files
-from neurom.io.utils import load_trees
 import argparse
 
-from neurom.ezy import Neuron as ezyNeuron
-from neurom.core.neuron import Neuron as coreNeuron, make_soma
-from neurom.exceptions import IDSequenceError
+from neurom import fst
+from neurom.core.neuron import Neuron
 
 
 def parse_args():
@@ -46,11 +44,6 @@ def parse_args():
     parser.add_argument('-d',
                         '--datapath',
                         help='Data directory')
-
-    parser.add_argument('-c',
-                        '--collapsible',
-                        action='store_true',
-                        default=False)
 
     parser.add_argument('-o',
                         '--odir',
@@ -94,8 +87,7 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
             the axes in which the plot is taking place
     '''
 
-    # concatenate the string 'get_' with a feature to generate the respective function's name
-    feature_values = getattr(neuron, 'get_' + feature)()
+    feature_values = fst.get(feature, neuron)
     # generate histogram
     ax.hist(feature_values, bins=bins, cumulative=cumulative, normed=normed)
 
@@ -116,27 +108,18 @@ def plot_feature(feature, cell):
 
 
 if __name__ == '__main__':
-    import numpy as np
     import os
 
     args = parse_args()
-    nrns = []
 
-    for j, neuronFile in enumerate(get_morph_files(args.datapath)):
-        _name = os.path.splitext(os.path.split(neuronFile)[-1])[0]
-        nrn = None
+    for morph_file in get_morph_files(args.datapath):
+        # fst.Neuron is a namedtuple with no "name" field
+        # so we unpack into a core neuron.
+        nrn = Neuron(*fst.load_neuron(morph_file))
+        nrn.name = os.path.splitext(os.path.split(morph_file)[-1])[0]
 
-        try:
-            soma = make_soma([np.array([11, 22, 33, 44, 1, 1, -1]), ])
-            trees = load_trees(neuronFile)
-            cn = coreNeuron(soma, trees, name=_name)
-            nrn = ezyNeuron(cn)
-        except IDSequenceError:
-            pass
-
-        for i, _feature in enumerate(args.features):
-
+        for _feature in args.features:
             f = plot_feature(_feature, nrn)
-            figname = "{0}_{1}_{2}.eps".format(i, j, _name)
+            figname = "{0}_{1}.eps".format(_feature, nrn.name)
             f.savefig(os.path.join(args.odir, figname))
             pl.close(f)
