@@ -32,44 +32,50 @@
    the exponential, normal and uniform distribution, according to the minimum ks distance.
    '''
 
-from neurom import ezy
-from neurom import stats as st
+from itertools import chain
+from neurom import fst
+from neurom import stats
 import argparse
+import json
 
 
 def parse_args():
     '''Parse command line arguments'''
     parser = argparse.ArgumentParser(
         description='Morphology fit distribution extractor',
-        epilog='Note: Prints the optimal distribution and corresponding parameters.')
+        epilog='Note: Outputs json of the optimal distribution \
+                and corresponding parameters.')
 
     parser.add_argument('datapath',
                         help='Path to morphology data file or directory')
 
     parser.add_argument('feature',
-                        help='Feature available for the ezy.neuron')
+                        help='Feature to be extracted with neurom.fst.get')
 
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def extract_data(data_path, feature):
+    '''Loads a list of neurons, extracts feature
+       and transforms the fitted distribution in the correct format.
+       Returns the optimal distribution, corresponding parameters,
+       minimun and maximum values.
+    '''
+    population = fst.load_neurons(data_path)
 
+    feature_data = [fst.get(feature, n) for n in population]
+    feature_data = list(chain(*feature_data))
+
+    return stats.optimal_distribution(feature_data)
+
+
+if __name__ == '__main__':
     args = parse_args()
 
-    data_path = args.datapath
+    d_path = args.datapath
 
-    feature = args.feature
+    feat = args.feature
 
-    population = ezy.load_neurons(data_path)
+    _result = stats.fit_results_to_dict(extract_data(d_path, feat))
 
-    feature_data = [getattr(n, 'get_' + feature)() for n in population]
-
-    try:
-        result = st.optimal_distribution(feature_data)
-    except ValueError:
-        from itertools import chain
-        feature_data = list(chain(*feature_data))
-        result = st.optimal_distribution(feature_data)
-
-    print "Optimal distribution fit for %s is: %s with parameters %s"\
-        % (feature, result.type, result.params)
+    print json.dumps(_result, indent=2, separators=(',', ': '))
