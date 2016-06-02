@@ -30,15 +30,16 @@
 
 Configures logger LOG with a stream handler.
 
+* Logger name exported as LOGGER_NAME
 * Sets up a default stream handler with shor tformat string and level DEBUG.
-
 * Defines short and long format strings FMT_LONG and FMT_LONG respectively.
 '''
 import logging
 import logging.handlers
 
-# root level logger with stream handler.
-LOG = logging.getLogger()
+#  logger with stream handler.
+LOGGER_NAME = 'neurom'
+LOG = logging.getLogger(LOGGER_NAME)
 LOG.setLevel(logging.DEBUG)
 
 FMT_SHORT = logging.Formatter('%(levelname)s: %(message)s')
