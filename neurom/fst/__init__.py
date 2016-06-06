@@ -32,6 +32,7 @@ import numpy as _np
 from ._io import load_neuron, load_neurons, load_population, Neuron
 from . import _mm
 from ..core.types import NeuriteType
+from ..analysis.morphmath import segment_radius as seg_rad
 
 
 NEURITEFEATURES = {
@@ -52,6 +53,7 @@ NEURITEFEATURES = {
     'trunk_origin_radii': _mm.trunk_origin_radii,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
+    'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _mm.iter_segments(nrn, **kwargs)],
     'segment_radial_distances': _mm.segment_radial_distances,
     'principal_direction_extents': _mm.principal_direction_extents
 }
