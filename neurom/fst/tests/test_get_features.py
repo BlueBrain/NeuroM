@@ -50,6 +50,9 @@ NEURITES = (NeuriteType.axon,
             NeuriteType.all)
 
 
+def _stats(seq):
+    return np.min(seq), np.max(seq), np.sum(seq), np.mean(seq)
+
 def test_number_of_sections_pop():
 
     feat = 'number_of_sections'
@@ -202,3 +205,61 @@ def test_total_length_nrn():
 
     nt.ok_(np.allclose(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                        [418.32610997]))
+
+
+def test_segment_radii_pop():
+
+    feat = 'segment_radii'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
+                       (0.079999998211860657,
+                        1.2150000333786011,
+                        1301.9191725363567,
+                        0.20222416473071708)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.all)),
+                       (0.079999998211860657,
+                        1.2150000333786011,
+                        1301.9191725363567,
+                        0.20222416473071708)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.13142434507608414,
+                        1.0343990325927734,
+                        123.41135908663273,
+                        0.58767313850777492)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.079999998211860657,
+                        1.2150000333786011,
+                        547.43900821779164,
+                        0.42078324997524336)))
+
+
+def test_segment_radii_nrn():
+
+    feat = 'segment_radii'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN)),
+                       (0.12087134271860123,
+                        1.0343990325927734,
+                        507.01994501426816,
+                        0.60359517263603357)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.all)),
+                       (0.12087134271860123,
+                        1.0343990325927734,
+                        507.01994501426816,
+                        0.60359517263603357)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.13142434507608414,
+                        1.0343990325927734,
+                        123.41135908663273,
+                        0.58767313850777492)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.14712842553853989,
+                        1.0215770602226257,
+                        256.71241207793355,
+                        0.61122002875698467)))

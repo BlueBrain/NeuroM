@@ -116,6 +116,9 @@ class TestSectionTree(object):
     def test_get_segment_lengths(self):
         self._check_neurite_feature('segment_lengths', debug=False)
 
+    def test_get_segment_radii(self):
+        self._check_neurite_feature('segment_radii', debug=False)
+
     def test_get_local_bifurcation_angles(self):
         self._check_neurite_feature('local_bifurcation_angles')
 
