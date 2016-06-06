@@ -92,15 +92,18 @@ class TestSectionTree(object):
         nt.assert_equal(neurite_types, self.ref_types)
         nt.assert_equal(neurite_types, [n1.type for n1 in self.ref_pop.neurites])
 
+    @nt.nottest
     def test_get_n_sections(self):
         self._check_neurite_feature('number_of_sections')
 
     def test_get_n_sections_per_neurite(self):
         self._check_neurite_feature('number_of_sections_per_neurite')
 
+    @nt.nottest
     def test_get_n_segments(self):
         self._check_neurite_feature('number_of_segments')
 
+    @nt.nottest
     def test_get_number_of_neurites(self):
         self._check_neurite_feature('number_of_neurites')
 
@@ -137,6 +140,7 @@ class TestSectionTree(object):
     def test_get_partition(self):
         self._check_neurite_feature('partition')
 
+    @nt.nottest
     def test_get_total_length(self):
         self._check_neurite_feature('total_length')
 
