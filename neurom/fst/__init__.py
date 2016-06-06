@@ -35,18 +35,20 @@ from ..core.types import NeuriteType
 
 
 NEURITEFEATURES = {
-    'total_length': lambda *args, **kwargs: [sum(_mm.section_lengths(*args, **kwargs))],
+    'total_length': lambda nrn, **kwargs: _as_neurons(lambda n, **kw:
+                                                      sum(_mm.section_lengths(n, **kw)),
+                                                      nrn, **kwargs),
     'section_lengths': _mm.section_lengths,
     'section_path_distances': _mm.section_path_lengths,
-    'number_of_sections': lambda *args, **kwargs: [_mm.n_sections(*args, **kwargs)],
+    'number_of_sections': lambda nrn, **kwargs: _as_neurons(_mm.n_sections, nrn, **kwargs),
     'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
-    'number_of_neurites': lambda *args, **kwargs: [_mm.n_neurites(*args, **kwargs)],
+    'number_of_neurites': lambda nrn, **kwargs: _as_neurons(_mm.n_neurites, nrn, **kwargs),
     'section_branch_orders': _mm.section_branch_orders,
     'section_radial_distances': _mm.section_radial_distances,
     'local_bifurcation_angles': _mm.local_bifurcation_angles,
     'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
     'partition': _mm.bifurcation_partitions,
-    'number_of_segments': lambda *args, **kwargs: [_mm.n_segments(*args, **kwargs)],
+    'number_of_segments': lambda nrn, **kwargs: _as_neurons(_mm.n_segments, nrn, **kwargs),
     'trunk_origin_radii': _mm.trunk_origin_radii,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
@@ -58,6 +60,12 @@ NEURONFEATURES = {
     'soma_radii': _mm.soma_radii,
     'soma_surface_areas': _mm.soma_surface_areas,
 }
+
+
+def _as_neurons(fun, nrns, **kwargs):
+    '''Get features per neuron'''
+    nrns = nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+    return [fun(n, **kwargs) for n in nrns]
 
 
 def get(feature, *args, **kwargs):
