@@ -51,38 +51,38 @@ Morphology file data consistency checks
     ....
 
 
-Basic ``ezy.Neuron`` usage
-**************************
+Basic ``fst`` usage
+*******************
 
 - Load a neuron and obtain some information from it:
 
 .. code-block:: python
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
-    >>> apical_seg_lengths = ezy.get('segment_lengths', nrn, ezy.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = ezy.get('section_lengths', nrn, ezy.NeuriteType.axon)
+    >>> from neurom import fst
+    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
 
 - Visualize a neuronal morphology:
 
 .. code-block:: python
 
-    >>> # Initialize nrn as above
+    >>> from neurom import ezy
     >>> fig, ax = ezy.view(nrn)
     >>> fig.show()
 
 
-Basic ``ezy`` examples script
-*****************************
+Basic feature extraction examples script
+****************************************
 
 These basic examples illustrate the type of morphometrics that can be easily obtained
-from the ``ezy`` module, without the need for any other ``neurom`` modules or tools.
+from the ``fst`` module, without the need for any other ``neurom`` modules or tools.
 
 The idea here is to pre-package the most common analyses so that users can obtain the
 morphometrics with a very minimal knowledge of ``python`` and ``neurom``.
 
-.. literalinclude:: ../../examples/ezy.py
+.. literalinclude:: ../../examples/get_features.py
     :lines: 30-
 
 
