@@ -153,6 +153,6 @@ Examples
 
 .. code-block:: python
 
-    >>> from neurom import ezy
+    >>> #initialize nrn as above
     >>> fig, ax = ezy.view(nrn)
     >>> fig.show()
