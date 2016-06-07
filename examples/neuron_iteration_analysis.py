@@ -27,10 +27,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Advanced easy analysis examples
+'''Advanced analysis examples
 
-These examples highlight more advanced neurom.ezy.Neuron
-morphometrics functionality.
+These examples highlight more advanced neurom
+morphometrics functionality using iterators.
 
 '''
 
@@ -40,8 +40,9 @@ from neurom import sections as sec
 from neurom import bifurcations as bif
 from neurom import points as pts
 from neurom import iter_neurites
-from neurom import ezy
-from neurom.core.types import tree_type_checker
+from neurom.io.utils import load_neuron
+from neurom.analysis.morphtree import set_tree_type
+from neurom.core.types import tree_type_checker, NeuriteType, NEURITES
 from neurom.analysis import morphtree as mt
 import numpy as np
 
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     filename = 'test_data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
-    nrn = ezy.load_neuron(filename)
+    nrn = load_neuron(filename, set_tree_type)
 
     # Some examples of what can be done using iteration
     # instead of pre-packaged functions that return lists.
@@ -94,7 +95,7 @@ if __name__ == '__main__':
           np.mean(list(iter_neurites(nrn, seg.radius))))
 
     # get stats for the segment taper rate, for different types of neurite
-    for ttype in ezy.NEURITE_TYPES:
+    for ttype in NEURITES:
         ttt = ttype
         seg_taper_rate = list(iter_neurites(nrn, seg.taper_rate, tree_type_checker(ttt)))
         print('Segment taper rate (', ttype,
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
           sum(1 for _ in iter_neurites(nrn, bif.identity,
-                                       tree_type_checker(ezy.NeuriteType.apical_dendrite))))
+                                       tree_type_checker(NeuriteType.apical_dendrite))))
 
     # Maximum branch order
     # We create a custom branch_order section_function
