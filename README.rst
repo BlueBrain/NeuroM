@@ -153,6 +153,6 @@ Examples
 
 .. code-block:: python
 
-    >>> #initialize nrn as above
+    >>> # Initialize nrn as above
     >>> fig, ax = ezy.view(nrn)
     >>> fig.show()
