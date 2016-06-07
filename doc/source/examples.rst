@@ -73,8 +73,8 @@ Basic ``fst`` usage
     >>> fig.show()
 
 
-Basic feature extraction examples script
-****************************************
+Basic feature extraction example
+********************************
 
 These basic examples illustrate the type of morphometrics that can be easily obtained
 from the ``fst`` module, without the need for any other ``neurom`` modules or tools.
@@ -86,11 +86,11 @@ morphometrics with a very minimal knowledge of ``python`` and ``neurom``.
     :lines: 30-
 
 
-Advanced ``ezy`` examples script
-********************************
+Advanced iterator-based feature extraction example
+**************************************************
 
-These slightly more complex examples illustrate what can be done with the ``ezy``
-module in combination with various generic iterators and simple morphometric functions.
+These slightly more complex examples illustrate what can be done with the ``neurom``
+module's various generic iterators and simple morphometric functions.
 
 The idea here is that there is a great deal of flexibility to build new analyses based
 on some limited number of orthogonal iterator and morphometric components that can
@@ -101,5 +101,5 @@ All of the examples in the previous sections can be implemented
 in a similar way to those presented here.
 
 
-.. literalinclude:: ../../examples/ezy_advanced.py
+.. literalinclude:: ../../examples/neuron_iteration_analysis.py
     :lines: 30-
