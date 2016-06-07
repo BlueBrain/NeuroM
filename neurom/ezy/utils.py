@@ -27,49 +27,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Population Class with basic analysis and plotting capabilities'''
+'''Neuron helper functions'''
 
+
+from itertools import product
 from neurom.core.types import NeuriteType
-from neurom.core.population import Population as CorePopulation
+from neurom.analysis.morphtree import compare_trees
 
 
-class Population(CorePopulation):
-    '''Population Class
-
-    Arguments:
-        neurons: list of neurons (core or ezy)
+def _compare_neurites(nrn_a, nrn_b, neurite_type, comp_function=compare_trees):
     '''
+    Find the identical pair of neurites of determined type if existent.
 
-    def __init__(self, neurons):
-        super(Population, self).__init__(neurons)
+    Returns:
+        False if pair does not exist or not identical. True otherwise.
+    '''
+    neurites1 = [neu for neu in nrn_a.neurites if neu.type == neurite_type]
 
-    def iter_somata(self):
-        '''
-        Iterate over the neuron somata
+    neurites2 = [neu for neu in nrn_b.neurites if neu.type == neurite_type]
 
-            Returns:
-                Iterator of neuron somata
-        '''
-        return iter(self.somata)
+    if len(neurites1) == len(neurites2):
+        return True if len(neurites1) == 0 and len(neurites2) == 0 else \
+               len(neurites1) - sum(1 for neu1, neu2 in
+                                    product(neurites1, neurites2)
+                                    if comp_function(neu1, neu2)) == 0
+    else:
+        return False
 
-    def get_n_neurites(self, neurite_type=NeuriteType.all):
-        '''Get the number of neurites of a given type in a population'''
-        return sum(nrn.get_n_neurites(neurite_type=neurite_type) for nrn in self.iter_neurons())
 
-    def iter_neurites(self):
-        '''
-        Iterate over the neurites
-
-            Returns:
-                Iterator of neurite tree iterators
-        '''
-        return iter(self.neurites)
-
-    def iter_neurons(self):
-        '''
-        Iterate over the neurons in the population
-
-            Returns:
-                Iterator of neurons
-        '''
-        return iter(self.neurons)
+def neurons_eq(nrn_a, nrn_b):
+    '''Compare two neurons for equality'''
+    return False if not isinstance(nrn_a, type(nrn_b)) else \
+           all(_compare_neurites(nrn_a, nrn_b, ttype) for ttype in
+               [NeuriteType.axon, NeuriteType.basal_dendrite,
+                NeuriteType.apical_dendrite, NeuriteType.undefined])

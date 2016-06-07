@@ -27,4 +27,4 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """ neurom version """
-VERSION = "0.0.19.dev0"
+VERSION = "1.0.0.dev0"

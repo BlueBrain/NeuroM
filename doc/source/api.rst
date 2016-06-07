@@ -51,7 +51,6 @@ API Documentation
    neurom.analysis.morphmath
    neurom.analysis.morphtree
    neurom.ezy
-   neurom.ezy.neuron
-   neurom.ezy.population
+   neurom.fst
    neurom.exceptions
    neurom.stats
