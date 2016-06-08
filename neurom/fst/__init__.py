@@ -56,9 +56,14 @@ Examples:
 import numpy as _np
 from ._io import load_neuron, load_neurons, Neuron
 from . import _mm
+from ..utils import deprecated
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..analysis.morphmath import segment_radius as seg_rad
+
+
+load_population = deprecated('Use load_neurons instead.',
+                             fun_name='load_population')(load_neurons)
 
 
 NEURITEFEATURES = {

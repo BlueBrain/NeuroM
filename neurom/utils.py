@@ -53,7 +53,7 @@ def memoize(fun):
     return memoizer
 
 
-def deprecated(msg=""):
+def deprecated(msg="", fun_name=None):
     '''Issue a deprecation warning for a function'''
     def _deprecated(fun):
         '''Issue a deprecation warning for a function'''
@@ -61,7 +61,8 @@ def deprecated(msg=""):
         def _wrapper(*args, **kwargs):
             '''Issue deprecation warning and forward arguments to fun'''
             warnings.simplefilter('always', DeprecationWarning)
-            warnings.warn('Call to deprecated function %s. %s' % (fun.__name__, msg),
+            name = fun_name if fun_name is not None else fun.__name__
+            warnings.warn('Call to deprecated function %s. %s' % (name, msg),
                           category=DeprecationWarning, stacklevel=2)
             warnings.simplefilter('default', DeprecationWarning)
             return fun(*args, **kwargs)

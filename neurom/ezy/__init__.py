@@ -79,4 +79,5 @@ load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron,
                        population_class=Population)
 update_wrapper(load_neurons, _io.load_neurons)
 
-load_population = deprecated('Use load_neurons instead.')(load_neurons)
+load_population = deprecated('Use load_neurons instead.',
+                             fun_name='load_population')(load_neurons)
