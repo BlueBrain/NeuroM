@@ -37,8 +37,10 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> apical_seg_lengths = nrn.get_segment_lengths(ezy.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = nrn.get_section_lengths(ezy.NeuriteType.axon)
+    >>> apical_seg_lengths = ezy.get('segment_lengths', \
+                                     nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = ezy.get('section_lengths', \
+                                   nrn, neurite_type=ezy.NeuriteType.axon)
 
     View it in 2D and 3D
 
@@ -53,15 +55,14 @@ Examples:
     >>> import numpy as np  # For mean value calculation
     >>> nrns = ezy.load_neurons('some/data/directory')
     >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean([n for n in nrn.get_section_lengths()])
+    ...     print 'mean section length', np.mean(ezy.get('section_lengths', nrn))
 
 '''
 import os
 from functools import partial, update_wrapper
-from .neuron import Neuron
-from .population import Population
-from .neuron import NeuriteType
-from ..core.types import NEURITES as NEURITE_TYPES
+from ..core.neuron import Neuron
+from ..core.population import Population
+from ..core.types import NeuriteType, NEURITES as NEURITE_TYPES
 from ..view.view import neuron as view
 from ..view.view import neuron3d as view3d
 from ..io.utils import get_morph_files
@@ -72,12 +73,7 @@ from ..analysis.morphtree import set_tree_type as _set_tt
 
 TreeType = NeuriteType  # For backwards compatibility
 
-
-def load_neuron(filename):
-    '''Load a Neuron from a file'''
-    return Neuron(_io.load_neuron(filename, _set_tt))
-
-
+load_neuron = partial(_io.load_neuron, tree_action=_set_tt)
 load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron)
 update_wrapper(load_neurons, _io.load_neurons)
 

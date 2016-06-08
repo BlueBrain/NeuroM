@@ -26,7 +26,32 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM, lightweight and fast '''
+''' NeuroM, lightweight and fast
+
+Examples:
+
+    Load a neuron
+
+    >>> from neurom import fst
+    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
+
+    Obtain some morphometrics
+
+    >>> apical_seg_lengths = fst.get('segment_lengths', \
+                                     nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = fst.get('section_lengths', \
+                                   nrn, neurite_type=fst.NeuriteType.axon)
+
+    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
+    and returns a list of neurons
+
+    >>> import numpy as np  # For mean value calculation
+    >>> nrns = fst.load_neurons('some/data/directory')
+    >>> for nrn in nrns:
+    ...     print 'mean section length', np.mean(fst.get('section_lengths', nrn))
+
+
+'''
 
 import numpy as _np
 from ._io import load_neuron, load_neurons, load_population, Neuron
