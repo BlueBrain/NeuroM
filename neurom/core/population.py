@@ -33,15 +33,25 @@ from itertools import chain
 
 
 class Population(object):
-    '''Neuron Population Class'''
+    '''Neuron Population Class
+
+    Features:
+        - flattened collection of neurites.
+        - collection of somas, neurons.
+        - iterable-like iteration over neurons.
+    '''
     def __init__(self, neurons, name='Population'):
-        '''Construct a Population
+        '''Construct a neuron population
 
         Arguments:
-            neurons: iterable of neuron objects (core or ezy) .
+            neurons: iterable of neuron objects.
             name: Optional name for this Population.
         '''
-        self.neurons = neurons
-        self.somata = [neu.soma for neu in neurons]
-        self.neurites = list(chain.from_iterable((neu.neurites for neu in neurons)))
+        self.neurons = tuple(neurons)
+        self.somata = tuple(neu.soma for neu in neurons)
+        self.neurites = tuple(chain.from_iterable((neu.neurites for neu in neurons)))
         self.name = name
+
+    def __iter__(self):
+        '''Iterator to populations's neurons'''
+        return iter(self.neurons)
