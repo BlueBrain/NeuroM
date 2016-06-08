@@ -54,7 +54,7 @@ Examples:
 '''
 
 import numpy as _np
-from ._io import load_neuron, load_neurons, load_population, Neuron
+from ._io import load_neuron, load_neurons, Neuron
 from . import _mm
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES

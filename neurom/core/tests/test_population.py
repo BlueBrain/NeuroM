@@ -66,3 +66,12 @@ def test_neurons():
 def test_iterate_neurons():
     for a, b in zip(NEURONS, POP):
         nt.assert_true(a is b)
+
+
+def test_len():
+    nt.assert_equal(len(POP), len(NEURONS))
+
+
+def test_getitem():
+    for i in xrange(len(NEURONS)):
+        nt.assert_true(POP[i] is NEURONS[i])

@@ -69,15 +69,14 @@ from ..io.utils import get_morph_files
 from ..features import get
 from ..io import utils as _io
 from ..analysis.morphtree import set_tree_type as _set_tt
+from ..utils import deprecated
 
 
 TreeType = NeuriteType  # For backwards compatibility
 
 load_neuron = partial(_io.load_neuron, tree_action=_set_tt)
-load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron)
+load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron,
+                       population_class=Population)
 update_wrapper(load_neurons, _io.load_neurons)
 
-
-load_population = partial(_io.load_population, neuron_loader=load_neurons,
-                          population_class=Population)
-update_wrapper(load_population, _io.load_population)
+load_population = deprecated('Use load_neurons instead.')(load_neurons)

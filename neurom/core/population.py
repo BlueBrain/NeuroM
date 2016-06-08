@@ -55,3 +55,11 @@ class Population(object):
     def __iter__(self):
         '''Iterator to populations's neurons'''
         return iter(self.neurons)
+
+    def __len__(self):
+        '''Length of neuron collection'''
+        return len(self.neurons)
+
+    def __getitem__(self, idx):
+        '''Get neuron at index idx'''
+        return self.neurons[idx]

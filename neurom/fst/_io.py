@@ -39,7 +39,6 @@ from neurom.core.tree import Tree
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.neuron import make_soma
-from neurom.core.population import Population
 from neurom.io import utils as _iout
 
 
@@ -121,11 +120,6 @@ def load_neuron(filename):
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
 update_wrapper(load_neurons, _iout.load_neurons)
-
-
-load_population = partial(_iout.load_population, neuron_loader=load_neurons,
-                          population_class=Population)
-update_wrapper(load_population, _iout.load_population)
 
 
 def extract_sections(data_block):
