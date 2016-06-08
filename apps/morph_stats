@@ -138,7 +138,7 @@ if __name__ == '__main__':
             for _p in get_morph_files(_f):
                 _results[_p] = extract_stats(fst.load_neuron(_p))
         else:
-            _results[_f] = extract_stats(fst.load_population(_f))
+            _results[_f] = extract_stats(fst.load_neurons(_f))
     else:
         L.error("Invalid data path %s", _f)
         sys.exit(1)

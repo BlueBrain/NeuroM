@@ -64,35 +64,26 @@ def test_load_neuron_soma_only():
 
 def test_load_neurons_directory():
 
-    nrns = _io.load_neurons(DATA_PATH)
-    nt.assert_equal(len(nrns), 5)
-    for nrn in nrns:
+    pop = _io.load_neurons(DATA_PATH)
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(pop.name, 'valid_set')
+    for nrn in pop:
+        nt.assert_true(isinstance(nrn, _io.Neuron))
+
+
+def test_load_neurons_directory_name():
+    pop = _io.load_neurons(DATA_PATH, 'test123')
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(pop.name, 'test123')
+    for nrn in pop:
         nt.assert_true(isinstance(nrn, _io.Neuron))
 
 
 def test_load_neurons_filenames():
 
-    nrns = _io.load_neurons(FILENAMES)
-    nt.assert_equal(len(nrns), 3)
-    for nrn, name in zip(nrns, NRN_NAMES):
-        nt.assert_true(isinstance(nrn, _io.Neuron))
-        nt.assert_equal(nrn.name, name)
-
-
-def test_load_population_directory():
-
-    pop = _io.load_population(DATA_PATH)
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(pop.name, 'valid_set')
-
-    pop = _io.load_population(DATA_PATH, 'test123')
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(pop.name, 'test123')
-
-
-def test_load_population_filenames():
-
-    pop = _io.load_population(FILENAMES, 'test123')
+    pop = _io.load_neurons(FILENAMES, 'test123')
     nt.assert_equal(len(pop.neurons), 3)
     nt.assert_equal(pop.name, 'test123')
     for nrn, name in zip(pop.neurons, NRN_NAMES):
