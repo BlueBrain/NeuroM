@@ -107,7 +107,7 @@ class Population(object):
         '''Construct a Population
 
         Arguments:
-            neurons: iterable of neuron objects (core or ezy) .
+            neurons: iterable of neuron objects.
             name: Optional name for this Population.
         '''
         self.neurons = neurons

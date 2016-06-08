@@ -31,6 +31,7 @@
 from neurom import utils as nu
 from nose import tools as nt
 import random
+import warnings
 
 
 def test_memoize_caches_args():
@@ -60,3 +61,15 @@ def test_memoize_does_not_cache_kwargs():
 
     for i in xrange(100):
         nt.assert_equal(dummy(42, y=43), i + 1)
+
+
+def test_deprecated():
+
+    @nu.deprecated('Hello')
+    def dummy():
+        pass
+
+    with warnings.catch_warnings(record=True) as s:
+        dummy()
+        nt.ok_(len(s) > 0)
+        nt.eq_(s[0].message[0], 'Call to deprecated function dummy. Hello')

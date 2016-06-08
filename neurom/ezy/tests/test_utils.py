@@ -26,48 +26,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.ezy.Population'''
+'''Test neurom.ezy.utils'''
 
 import os
-from nose import tools as nt
-from itertools import izip
-from neurom.ezy import load_population
-from neurom.ezy.population import Population
+from copy import deepcopy
+from neurom import ezy
+from neurom.ezy import utils as ezy_utils
+from collections import namedtuple
 from neurom.core.types import NeuriteType
+from nose import tools as nt
+
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
-VALID_DIR = os.path.join(DATA_PATH, 'valid_set')
-
-def test_construct_population():
-    pop = load_population(VALID_DIR)
-    nt.ok_(pop is not None)
+MORPH_FILE = os.path.join(DATA_PATH, 'swc', 'Neuron.swc')
+NEURON = ezy.load_neuron(MORPH_FILE)
 
 
-class TestEzyPopulation(object):
-
-    def setUp(self):
-        self.directory = VALID_DIR
-        self.pop = load_population(VALID_DIR)
-        self.n_somata = len(self.pop.somata)
-
-    def test_iter_somata(self):
-        sm_it = self.pop.iter_somata()
-        for soma in self.pop.somata:
-            nt.assert_almost_equal(sm_it.next().radius, soma.radius)
-
-    def test_get_n_neurites(self):
-        nrts_all = sum(len(neuron.neurites) for neuron in self.pop.neurons)
-        nt.assert_equal(nrts_all, self.pop.get_n_neurites())
-
-        nrts_axons = sum(nrn.get_n_neurites(neurite_type=NeuriteType.axon) for nrn in self.pop.neurons)
-        nt.assert_equal(nrts_axons, self.pop.get_n_neurites(neurite_type=NeuriteType.axon))
+def test_eq():
+    other = ezy.load_neuron(MORPH_FILE)
+    nt.assert_true(ezy_utils.neurons_eq(NEURON, other))
 
 
-    def test_iter_neurites(self):
-        nrts_it = self.pop.iter_neurites()
-        nt.assert_equal(len(self.pop.neurites), len(list(nrts_it)))
+def test_compare_neurites():
 
-    def test_iter_neurons(self):
-        nrns_it = self.pop.iter_neurons()
-        nt.assert_equal(len(self.pop.neurons), len(list(nrns_it)))
+    fake_neuron = namedtuple('Neuron', 'neurites')
+    fake_neuron.neurites = []
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, fake_neuron, NeuriteType.axon))
+    nt.assert_true(fake_neuron, fake_neuron)
+
+    neuron2 = deepcopy(NEURON)
+
+    n_types = set([n.type for n in NEURON.neurites])
+
+    for n_type in n_types:
+        nt.assert_true(ezy_utils._compare_neurites(NEURON, neuron2, n_type))
+
+    neuron2.neurites[1].children[0].value[1] += 0.01
+
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, neuron2, neuron2.neurites[1].type))

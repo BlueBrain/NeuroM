@@ -41,7 +41,7 @@ NRN2 = load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc'))
 NRN3 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc'))
 
 NEURONS = [NRN1, NRN2, NRN3]
-TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
+TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 POP = Population(NEURONS, name='foo')
 
 def test_population():
