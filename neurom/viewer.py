@@ -76,6 +76,7 @@ def draw(obj, mode='2d', **kwargs):
     Parameters:
         obj: morphology object to be drawn (neuron, tree, soma).
         mode (Optional[str]): drawing mode ('2d', '3d', 'dendrogram'). Defaults to '2d'.
+        **kwargs: keyword arguments for underlying neurom.view.view functions.
 
     Raises:
         InvalidDrawModeError if mode is not valid
