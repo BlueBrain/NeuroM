@@ -63,15 +63,16 @@ Basic ``fst`` usage
     >>> apical_seg_lengths = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
     >>> axon_sec_lengths = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
-
 - Visualize a neuronal morphology:
 
 .. code-block:: python
 
-    >>> from neurom import ezy
-    >>> fig, ax = ezy.view(nrn)
+    >>> # Initialize nrn as above
+    >>> from neurom import viewer
+    >>> fig, ax = viewer.draw(nrn)
     >>> fig.show()
-
+    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d'
+    >>> fig.show()
 
 Basic feature extraction example
 ********************************

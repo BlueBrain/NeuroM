@@ -154,5 +154,8 @@ Examples
 .. code-block:: python
 
     >>> # Initialize nrn as above
-    >>> fig, ax = ezy.view(nrn)
+    >>> from neurom import viewer
+    >>> fig, ax = viewer.draw(nrn)
+    >>> fig.show()
+    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
     >>> fig.show()
