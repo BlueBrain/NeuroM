@@ -1,6 +1,7 @@
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
+
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,40 +27,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Neuron Population Classes and Functions
-'''
-
-from itertools import chain
+'''Neuron helper functions'''
 
 
-class Population(object):
-    '''Neuron Population Class
+from itertools import product
+from neurom.core.types import NeuriteType
+from neurom.analysis.morphtree import compare_trees
 
-    Features:
-        - flattened collection of neurites.
-        - collection of somas, neurons.
-        - iterable-like iteration over neurons.
+
+def _compare_neurites(nrn_a, nrn_b, neurite_type, comp_function=compare_trees):
     '''
-    def __init__(self, neurons, name='Population'):
-        '''Construct a neuron population
+    Find the identical pair of neurites of determined type if existent.
 
-        Arguments:
-            neurons: iterable of neuron objects.
-            name: Optional name for this Population.
-        '''
-        self.neurons = tuple(neurons)
-        self.somata = tuple(neu.soma for neu in neurons)
-        self.neurites = tuple(chain.from_iterable((neu.neurites for neu in neurons)))
-        self.name = name
+    Returns:
+        False if pair does not exist or not identical. True otherwise.
+    '''
+    neurites1 = [neu for neu in nrn_a.neurites if neu.type == neurite_type]
 
-    def __iter__(self):
-        '''Iterator to populations's neurons'''
-        return iter(self.neurons)
+    neurites2 = [neu for neu in nrn_b.neurites if neu.type == neurite_type]
 
-    def __len__(self):
-        '''Length of neuron collection'''
-        return len(self.neurons)
+    if len(neurites1) == len(neurites2):
+        return True if len(neurites1) == 0 and len(neurites2) == 0 else \
+               len(neurites1) - sum(1 for neu1, neu2 in
+                                    product(neurites1, neurites2)
+                                    if comp_function(neu1, neu2)) == 0
+    else:
+        return False
 
-    def __getitem__(self, idx):
-        '''Get neuron at index idx'''
-        return self.neurons[idx]
+
+def neurons_eq(nrn_a, nrn_b):
+    '''Compare two neurons for equality'''
+    return False if not isinstance(nrn_a, type(nrn_b)) else \
+           all(_compare_neurites(nrn_a, nrn_b, ttype) for ttype in
+               [NeuriteType.axon, NeuriteType.basal_dendrite,
+                NeuriteType.apical_dendrite, NeuriteType.undefined])

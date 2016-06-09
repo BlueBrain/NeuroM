@@ -39,11 +39,10 @@ from neurom.core.tree import Tree
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.neuron import make_soma
-from neurom.core.population import Population
 from neurom.io import utils as _iout
 
 
-Neuron = namedtuple('Neuron', 'soma, neurites, data_block')
+Neuron = namedtuple('Neuron', 'soma, neurites, data_block, name')
 
 
 class SecDataWrapper(object):
@@ -115,16 +114,12 @@ def load_neuron(filename):
     rdw = _READERS[ext.lower()](filename)
     trees = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
     soma = make_soma(rdw.soma_points())
-    return Neuron(soma, trees, rdw)
+    name = os.path.splitext(os.path.basename(filename))[0]
+    return Neuron(soma, trees, rdw, name)
 
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
 update_wrapper(load_neurons, _iout.load_neurons)
-
-
-load_population = partial(_iout.load_population, neuron_loader=load_neurons,
-                          population_class=Population)
-update_wrapper(load_population, _iout.load_population)
 
 
 def extract_sections(data_block):

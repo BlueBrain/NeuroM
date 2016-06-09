@@ -41,18 +41,37 @@ NRN2 = load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc'))
 NRN3 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc'))
 
 NEURONS = [NRN1, NRN2, NRN3]
-TOT_NEURITES = sum(N.get_n_neurites() for N in NEURONS)
+TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
+POP = Population(NEURONS, name='foo')
 
 def test_population():
-	pop = Population(NEURONS, name='foo')
 
-	nt.assert_equal(len(pop.neurons), 3)
-	nt.ok_(pop.neurons[0].name, 'Neuron')
-	nt.ok_(pop.neurons[1].name, 'Single_basal')
-	nt.ok_(pop.neurons[2].name, 'Neuron_small_radius')
+    nt.assert_equal(len(POP.neurons), 3)
+    nt.ok_(POP.neurons[0].name, 'Neuron')
+    nt.ok_(POP.neurons[1].name, 'Single_basal')
+    nt.ok_(POP.neurons[2].name, 'Neuron_small_radius')
 
-	nt.assert_equal(len(pop.somata), 3)
+    nt.assert_equal(len(POP.somata), 3)
 
-	nt.assert_equal(len(pop.neurites),TOT_NEURITES)
+    nt.assert_equal(len(POP.neurites), TOT_NEURITES)
 
-	nt.assert_equal(pop.name, 'foo')
+    nt.assert_equal(POP.name, 'foo')
+
+
+def test_neurons():
+    for i, n in enumerate(NEURONS):
+        nt.assert_true(n is POP.neurons[i])
+
+
+def test_iterate_neurons():
+    for a, b in zip(NEURONS, POP):
+        nt.assert_true(a is b)
+
+
+def test_len():
+    nt.assert_equal(len(POP), len(NEURONS))
+
+
+def test_getitem():
+    for i in xrange(len(NEURONS)):
+        nt.assert_true(POP[i] is NEURONS[i])

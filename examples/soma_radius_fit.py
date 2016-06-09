@@ -54,7 +54,7 @@ def test_multiple_distr(filepath):
        the optimal distribution along with the corresponding parameters.
     '''
     #  load a neuron from an SWC file
-    population = fst.load_population(filepath)
+    population = fst.load_neurons(filepath)
 
     # Create a list of basic distributions
     distr_to_check = ('norm', 'expon', 'uniform')

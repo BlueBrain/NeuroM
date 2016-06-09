@@ -26,48 +26,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.ezy.Population'''
+'''NeuroM default logger.
 
-import os
-from nose import tools as nt
-from itertools import izip
-from neurom.ezy import load_population
-from neurom.ezy.population import Population
-from neurom.core.types import NeuriteType
+Configures logger LOG with a stream handler.
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-VALID_DIR = os.path.join(DATA_PATH, 'valid_set')
+* Logger name exported as LOGGER_NAME
+* Sets up a default stream handler with shor tformat string and level DEBUG.
+* Defines short and long format strings FMT_LONG and FMT_LONG respectively.
+'''
+import logging
+import logging.handlers
 
-def test_construct_population():
-    pop = load_population(VALID_DIR)
-    nt.ok_(pop is not None)
+#  logger with stream handler.
+LOGGER_NAME = 'neurom'
+LOG = logging.getLogger(LOGGER_NAME)
+LOG.setLevel(logging.DEBUG)
 
+FMT_SHORT = logging.Formatter('%(levelname)s: %(message)s')
+FMT_LONG = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-class TestEzyPopulation(object):
-
-    def setUp(self):
-        self.directory = VALID_DIR
-        self.pop = load_population(VALID_DIR)
-        self.n_somata = len(self.pop.somata)
-
-    def test_iter_somata(self):
-        sm_it = self.pop.iter_somata()
-        for soma in self.pop.somata:
-            nt.assert_almost_equal(sm_it.next().radius, soma.radius)
-
-    def test_get_n_neurites(self):
-        nrts_all = sum(len(neuron.neurites) for neuron in self.pop.neurons)
-        nt.assert_equal(nrts_all, self.pop.get_n_neurites())
-
-        nrts_axons = sum(nrn.get_n_neurites(neurite_type=NeuriteType.axon) for nrn in self.pop.neurons)
-        nt.assert_equal(nrts_axons, self.pop.get_n_neurites(neurite_type=NeuriteType.axon))
-
-
-    def test_iter_neurites(self):
-        nrts_it = self.pop.iter_neurites()
-        nt.assert_equal(len(self.pop.neurites), len(list(nrts_it)))
-
-    def test_iter_neurons(self):
-        nrns_it = self.pop.iter_neurons()
-        nt.assert_equal(len(self.pop.neurons), len(list(nrns_it)))
+sh = logging.StreamHandler()
+sh.setLevel(logging.INFO)
+sh.setFormatter(FMT_SHORT)
+LOG.addHandler(sh)

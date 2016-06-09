@@ -29,15 +29,15 @@
 
 '''Easy analysis examples
 
-These examples highlight most of the pre-packaged neurom.ezy.Neuron
+These examples highlight most of the pre-packaged neurom.fst.get
 morphometrics functionality.
 
 '''
 
 from __future__ import print_function
 from pprint import pprint
-from neurom import ezy
 import numpy as np
+from neurom import fst
 
 
 def stats(data):
@@ -65,12 +65,12 @@ if __name__ == '__main__':
     filename = 'test_data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
-    nrn = ezy.load_neuron(filename)
+    nrn = fst.load_neuron(filename)
 
     # Get some soma information
     # Soma radius and surface area
-    print("Soma radius", ezy.get('soma_radii', nrn)[0])
-    print("Soma surface area", ezy.get('soma_surface_areas', nrn)[0])
+    print("Soma radius", fst.get('soma_radii', nrn)[0])
+    print("Soma surface area", fst.get('soma_surface_areas', nrn)[0])
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
@@ -81,76 +81,74 @@ if __name__ == '__main__':
     # to warm up...
 
     # number of neurites
-    print('Number of neurites (all):', ezy.get('number_of_neurites', nrn)[0])
+    print('Number of neurites (all):', fst.get('number_of_neurites', nrn)[0])
     print('Number of neurites (axons):',
-          ezy.get('number_of_neurites', nrn, ezy.NeuriteType.axon)[0])
+          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.axon)[0])
     print('Number of neurites (apical dendrites):',
-          ezy.get('number_of_neurites', nrn, ezy.NeuriteType.apical_dendrite)[0])
+          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.apical_dendrite)[0])
     print('Number of neurites (basal dendrites):',
-          ezy.get('number_of_neurites', nrn, ezy.NeuriteType.basal_dendrite)[0])
+          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.basal_dendrite)[0])
 
     # number of sections
     print('Number of sections:',
-          ezy.get('number_of_sections', nrn)[0])
+          fst.get('number_of_sections', nrn)[0])
     print('Number of sections (axons):',
-          ezy.get('number_of_sections', nrn, ezy.NeuriteType.axon)[0])
+          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.axon)[0])
     print('Number of sections (apical dendrites):',
-          ezy.get('number_of_sections', nrn, ezy.NeuriteType.apical_dendrite)[0])
+          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.apical_dendrite)[0])
     print('Number of sections (basal dendrites):',
-          ezy.get('number_of_sections', nrn, ezy.NeuriteType.basal_dendrite)[0])
+          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.basal_dendrite)[0])
 
     # number of sections per neurite
     print('Number of sections per neurite:',
-          ezy.get('number_of_sections_per_neurite', nrn))
+          fst.get('number_of_sections_per_neurite', nrn))
     print('Number of sections per neurite (axons):',
-          ezy.get('number_of_sections_per_neurite', nrn, ezy.NeuriteType.axon))
+          fst.get('number_of_sections_per_neurite', nrn, neurite_type=fst.NeuriteType.axon))
     print('Number of sections per neurite (apical dendrites):',
-          ezy.get('number_of_sections_per_neurite', nrn, ezy.NeuriteType.apical_dendrite))
+          fst.get('number_of_sections_per_neurite',
+                  nrn, neurite_type=fst.NeuriteType.apical_dendrite))
     print('Number of sections per neurite (basal dendrites):',
-          ezy.get('number_of_sections_per_neurite', nrn, ezy.NeuriteType.apical_dendrite))
+          fst.get('number_of_sections_per_neurite',
+                  nrn, neurite_type=fst.NeuriteType.apical_dendrite))
 
     # OK, this is getting repetitive, so lets loop over valid neurite types.
     # The following methods return arrays of measurements. We will gather some
     # summary statistics for each and print them.
 
     # Section lengths for all and different types of neurite
-    for ttype in ezy.NEURITE_TYPES:
-        sec_len = ezy.get('section_lengths', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        sec_len = fst.get('section_lengths', nrn, neurite_type=ttype)
         print('Section lengths (', ttype, '):', sep='')
         pprint_stats(sec_len)
 
     # Segment lengths for all and different types of neurite
-    for ttype in ezy.NEURITE_TYPES:
-        seg_len = ezy.get('segment_lengths', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        seg_len = fst.get('segment_lengths', nrn, neurite_type=ttype)
         print('Segment lengths (', ttype, '):', sep='')
         pprint_stats(seg_len)
 
     # Section radial distances for all and different types of neurite
     # Careful! Here we need to pass tree type as a named argument
-    for ttype in ezy.NEURITE_TYPES:
-        sec_rad_dist = ezy.get('section_radial_distances', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        sec_rad_dist = fst.get('section_radial_distances', nrn, neurite_type=ttype)
         print('Section radial distance (', ttype, '):', sep='')
         pprint_stats(sec_rad_dist)
 
     # Section path distances for all and different types of neurite
     # Careful! Here we need to pass tree type as a named argument
-    for ttype in ezy.NEURITE_TYPES:
-        sec_path_dist = ezy.get('section_path_distances', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        sec_path_dist = fst.get('section_path_distances', nrn, neurite_type=ttype)
         print('Section path distance (', ttype, '):', sep='')
         pprint_stats(sec_path_dist)
 
     # Local bifurcation angles for all and different types of neurite
-    for ttype in ezy.NEURITE_TYPES:
-        local_bifangles = ezy.get('local_bifurcation_angles', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        local_bifangles = fst.get('local_bifurcation_angles', nrn, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(local_bifangles)
 
     # Remote bifurcation angles for all and different types of neurite
-    for ttype in ezy.NEURITE_TYPES:
-        rem_bifangles = ezy.get('remote_bifurcation_angles', nrn, neurite_type=ttype)
+    for ttype in fst.NEURITE_TYPES:
+        rem_bifangles = fst.get('remote_bifurcation_angles', nrn, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(rem_bifangles)
-
-    # Neuron's bounding box
-    print('Bounding box ((min x, y, z), (max x, y, z))',
-          nrn.bounding_box())

@@ -31,6 +31,7 @@ Neuroludica
 '''
 
 import logging
+import warnings
 
 import numpy as np
 
@@ -245,8 +246,14 @@ class NeurolucidaASC(object):
         '''return a 'raw_data' np.array with the full neuron, and the format of the file
         suitable to be wrapped by RawDataWrapper
         '''
-        L.warning('This is an experimental reader. There are no guarantees regarding ability to '
-                  'parse Neurolucida .asc files or correctness of output.')
+
+        msg = ('This is an experimental reader. '
+               'There are no guarantees regarding ability to parse '
+               'Neurolucida .asc files or correctness of output.')
+
+        warnings.warn(msg)
+        L.warning(msg)
+
         with open(morph_file) as morph_fd:
             sections = _parse_sections(morph_fd)
         raw_data = _sections_to_raw_data(sections, remove_duplicates)

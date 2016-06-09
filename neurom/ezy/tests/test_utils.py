@@ -1,7 +1,6 @@
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
-
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,49 +26,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Population Class with basic analysis and plotting capabilities'''
+'''Test neurom.ezy.utils'''
 
+import os
+from copy import deepcopy
+from neurom import ezy
+from neurom.ezy import utils as ezy_utils
+from collections import namedtuple
 from neurom.core.types import NeuriteType
-from neurom.core.population import Population as CorePopulation
+from nose import tools as nt
 
 
-class Population(CorePopulation):
-    '''Population Class
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+MORPH_FILE = os.path.join(DATA_PATH, 'swc', 'Neuron.swc')
+NEURON = ezy.load_neuron(MORPH_FILE)
 
-    Arguments:
-        neurons: list of neurons (core or ezy)
-    '''
 
-    def __init__(self, neurons):
-        super(Population, self).__init__(neurons)
+def test_eq():
+    other = ezy.load_neuron(MORPH_FILE)
+    nt.assert_true(ezy_utils.neurons_eq(NEURON, other))
 
-    def iter_somata(self):
-        '''
-        Iterate over the neuron somata
 
-            Returns:
-                Iterator of neuron somata
-        '''
-        return iter(self.somata)
+def test_compare_neurites():
 
-    def get_n_neurites(self, neurite_type=NeuriteType.all):
-        '''Get the number of neurites of a given type in a population'''
-        return sum(nrn.get_n_neurites(neurite_type=neurite_type) for nrn in self.iter_neurons())
+    fake_neuron = namedtuple('Neuron', 'neurites')
+    fake_neuron.neurites = []
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, fake_neuron, NeuriteType.axon))
+    nt.assert_true(fake_neuron, fake_neuron)
 
-    def iter_neurites(self):
-        '''
-        Iterate over the neurites
+    neuron2 = deepcopy(NEURON)
 
-            Returns:
-                Iterator of neurite tree iterators
-        '''
-        return iter(self.neurites)
+    n_types = set([n.type for n in NEURON.neurites])
 
-    def iter_neurons(self):
-        '''
-        Iterate over the neurons in the population
+    for n_type in n_types:
+        nt.assert_true(ezy_utils._compare_neurites(NEURON, neuron2, n_type))
 
-            Returns:
-                Iterator of neurons
-        '''
-        return iter(self.neurons)
+    neuron2.neurites[1].children[0].value[1] += 0.01
+
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, neuron2, neuron2.neurites[1].type))

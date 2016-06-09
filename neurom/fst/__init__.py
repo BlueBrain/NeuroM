@@ -26,30 +26,65 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM, lightweight and fast '''
+''' NeuroM, lightweight and fast
+
+Examples:
+
+    Load a neuron
+
+    >>> from neurom import fst
+    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
+
+    Obtain some morphometrics
+
+    >>> apical_seg_lengths = fst.get('segment_lengths', \
+                                     nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = fst.get('section_lengths', \
+                                   nrn, neurite_type=fst.NeuriteType.axon)
+
+    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
+    and returns a list of neurons
+
+    >>> import numpy as np  # For mean value calculation
+    >>> nrns = fst.load_neurons('some/data/directory')
+    >>> for nrn in nrns:
+    ...     print 'mean section length', np.mean(fst.get('section_lengths', nrn))
+
+
+'''
 
 import numpy as _np
-from ._io import load_neuron, load_neurons, load_population, Neuron
+from ._io import load_neuron, load_neurons, Neuron
 from . import _mm
+from ..utils import deprecated
 from ..core.types import NeuriteType
+from ..core.types import NEURITES as NEURITE_TYPES
+from ..analysis.morphmath import segment_radius as seg_rad
+
+
+load_population = deprecated('Use load_neurons instead.',
+                             fun_name='load_population')(load_neurons)
 
 
 NEURITEFEATURES = {
-    'total_length': lambda *args, **kwargs: [sum(_mm.section_lengths(*args, **kwargs))],
+    'total_length': lambda nrn, **kwargs: _as_neurons(lambda n, **kw:
+                                                      sum(_mm.section_lengths(n, **kw)),
+                                                      nrn, **kwargs),
     'section_lengths': _mm.section_lengths,
     'section_path_distances': _mm.section_path_lengths,
-    'number_of_sections': lambda *args, **kwargs: [_mm.n_sections(*args, **kwargs)],
+    'number_of_sections': lambda nrn, **kwargs: _as_neurons(_mm.n_sections, nrn, **kwargs),
     'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
-    'number_of_neurites': lambda *args, **kwargs: [_mm.n_neurites(*args, **kwargs)],
+    'number_of_neurites': lambda nrn, **kwargs: _as_neurons(_mm.n_neurites, nrn, **kwargs),
     'section_branch_orders': _mm.section_branch_orders,
     'section_radial_distances': _mm.section_radial_distances,
     'local_bifurcation_angles': _mm.local_bifurcation_angles,
     'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
     'partition': _mm.bifurcation_partitions,
-    'number_of_segments': lambda *args, **kwargs: [_mm.n_segments(*args, **kwargs)],
+    'number_of_segments': lambda nrn, **kwargs: _as_neurons(_mm.n_segments, nrn, **kwargs),
     'trunk_origin_radii': _mm.trunk_origin_radii,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
+    'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _mm.iter_segments(nrn, **kwargs)],
     'segment_radial_distances': _mm.segment_radial_distances,
     'principal_direction_extents': _mm.principal_direction_extents
 }
@@ -58,6 +93,12 @@ NEURONFEATURES = {
     'soma_radii': _mm.soma_radii,
     'soma_surface_areas': _mm.soma_surface_areas,
 }
+
+
+def _as_neurons(fun, nrns, **kwargs):
+    '''Get features per neuron'''
+    nrns = nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+    return [fun(n, **kwargs) for n in nrns]
 
 
 def get(feature, *args, **kwargs):

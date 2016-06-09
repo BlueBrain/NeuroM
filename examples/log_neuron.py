@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -31,8 +32,8 @@
 An example of how to build an object representing a neuron from an SWC file
 '''
 import logging
-import logging.handlers
 from itertools import imap
+from neurom import log
 from neurom.io.readers import load_data
 from neurom.io.utils import make_tree
 from neurom.io.utils import make_neuron
@@ -43,15 +44,8 @@ from neurom.core import neuron
 from neurom.core.dataformat import COLS
 from neurom.core.point import as_point
 
-# root level logger. This would be a top level application logger.
-LOG = logging.getLogger()
-LOG.setLevel(logging.DEBUG)
-fmt_long = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-fmt_short = logging.Formatter('%(levelname)s: %(message)s')
-sh = logging.StreamHandler()
-sh.setLevel(logging.INFO)
-sh.setFormatter(fmt_short)
-LOG.addHandler(sh)
+
+LOG = log.LOG
 
 
 def file_handler(logfile, level=logging.WARNING, fmt=None):
@@ -62,7 +56,9 @@ def file_handler(logfile, level=logging.WARNING, fmt=None):
         fh.setFormatter(fmt)
     return fh
 
-LOG.addHandler(file_handler('neurons.log', level=logging.DEBUG, fmt=fmt_long))
+LOG.addHandler(file_handler('neurons.log',
+                            level=logging.DEBUG,
+                            fmt=log.FMT_LONG))
 
 
 def point_iter(iterator):

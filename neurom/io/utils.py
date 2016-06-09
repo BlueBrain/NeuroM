@@ -160,24 +160,9 @@ def get_morph_files(directory):
             os.path.splitext(m)[1].lower() in ('.swc', '.h5', '.asc')]
 
 
-def load_neurons(neurons, neuron_loader=load_neuron):
-    '''Create a list of Neuron objects from each morphology file in directory\
-        or from a list or tuple of file names
-
-    Parameters:
-        neurons: directory path or list of neuron file paths
-
-    Returns:
-        list of Neuron objects
-    '''
-    if isinstance(neurons, list) or isinstance(neurons, tuple):
-        return [neuron_loader(f) for f in neurons]
-    elif isinstance(neurons, str):
-        return [neuron_loader(f) for f in get_morph_files(neurons)]
-
-
-def load_population(neurons, name=None, neuron_loader=load_neurons,
-                    population_class=Population):
+def load_neurons(neurons, name=None,
+                 neuron_loader=load_neuron,
+                 population_class=Population):
     '''Create a population object from all morphologies in a directory\
         of from morphologies in a list of file names
 
@@ -192,11 +177,12 @@ def load_population(neurons, name=None, neuron_loader=load_neurons,
         neuron population object
 
     '''
-    pop = population_class(neuron_loader(neurons))
     if isinstance(neurons, list) or isinstance(neurons, tuple):
+        files = neurons
         name = name if name is not None else 'Population'
     elif isinstance(neurons, str):
+        files = get_morph_files(neurons)
         name = name if name is not None else os.path.basename(neurons)
 
-    pop.name = name
+    pop = population_class([neuron_loader(f) for f in files], name=name)
     return pop
