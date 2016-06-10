@@ -225,6 +225,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
 
     The azimuth is defined as Angle between x-axis and the vector
     defined by (initial tree point - soma center) on the x-z plane.
+
     The range of the azimuth angle [-pi, pi] radians
     '''
     tree_filter = is_type(neurite_type)
@@ -242,9 +243,11 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
 def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all the trunk origin elevations of a neuron or population
 
-    The elevation is defined as Angle between x-axis and the vector
-    defined by (initial tree point - soma center) on the x-z plane.
-    The range of the elevation angle [-pi, pi] radians
+    The elevation is defined as the angle between x-axis and the
+    vector defined by (initial tree point - soma center)
+    on the x-y half-plane.
+
+    The range of the elevation angle [-pi/2, pi/2] radians
     '''
     tree_filter = is_type(neurite_type)
     nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
