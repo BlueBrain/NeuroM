@@ -96,6 +96,17 @@ class TestDendrogram(object):
         nt.assert_true(np.allclose(self.dtr._rectangles.shape, (230, 4, 2)))
         nt.assert_false(np.all(self.dtr._rectangles == 0.))
 
+    def test_generate_soma(self):
+
+        vrec = self.dnrn.soma
+        trec = np.array([[-0.17071068, -0.34142136], [-0.17071068,  0.        ],
+                         [ 0.17071068,  0.        ], [ 0.17071068, -0.34142136]])
+        nt.assert_true(np.allclose(vrec, trec))
+
+        vrec = self.dtr.soma
+
+        nt.assert_true(vrec == None)
+
     def test_generate_neuron(self):
 
         total = 0
