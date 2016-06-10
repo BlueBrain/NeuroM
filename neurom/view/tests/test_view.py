@@ -128,16 +128,8 @@ def test_dendrogram():
     fig, ax = view.dendrogram(neuron0)
     nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
 
-
-@nt.raises(NotImplementedError)
-def test_dendrogram_fst_neuron_raises():
-    view.dendrogram(fst_neuron)
-
-
-@nt.raises(NotImplementedError)
-def test_dendrogram_tree_fst_neuron_raises():
-    view.dendrogram(fst_neuron.neurites[0])
-
+    fig, ax = view.dendrogram(fst_neuron)
+    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
 
 def test_one_point_branch_with_diameter():
     test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
@@ -146,6 +138,7 @@ def test_one_point_branch_with_diameter():
         nt.ok_(True)
     except:
         nt.ok_(False)
+
 
 def test_one_point_branch_without_diameter():
     test_tree = Tree(np.array([1., 1., 1., 0.5, 2, 1, 0]))
