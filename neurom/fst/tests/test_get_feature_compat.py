@@ -34,8 +34,8 @@ from nose import tools as nt
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
 from neurom import fst
-from neurom.core.tree import i_chain2, ibifurcation_point
 from neurom.io.utils import load_neuron
+from neurom.core.dataformat import COLS
 from neurom.features import get
 from neurom.analysis import morphtree as mt
 
@@ -45,7 +45,7 @@ DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 NRN_PATHS = [DATA_PATH] * 10
 
 
-def _close(a, b, debug, rtol, atol):
+def _close(a, b, debug=False, rtol=1e-05, atol=1e-08):
     if debug:
         print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
         print '\na: %s\nb:%s\n' % (a, b)
@@ -107,6 +107,10 @@ class TestSectionTree(object):
     def test_get_number_of_neurites(self):
         self._check_neurite_feature('number_of_neurites')
 
+    @nt.nottest
+    def test_get_number_of_bifurcations(self):
+        self._check_neurite_feature('number_of_bifurcations')
+
     def test_get_section_lengths(self):
         self._check_neurite_feature('section_lengths')
 
@@ -119,6 +123,23 @@ class TestSectionTree(object):
     def test_get_segment_radii(self):
         self._check_neurite_feature('segment_radii', debug=False)
 
+    def test_get_segment_radial_distances(self):
+        self._check_neurite_feature('segment_radial_distances', debug=False)
+
+    def test_get_segment_taper_rates(self):
+        self._check_neurite_feature('segment_taper_rates', debug=False)
+
+    def test_get_segment_midpoint(self):
+
+        for ntyp in fst.NEURITE_TYPES:
+            pts = fst.get('segment_midpoints', self.fst_pop, neurite_type=ntyp)
+            ref_xyz = (get('segment_x_coordinates', self.ref_pop, neurite_type=ntyp),
+                       get('segment_y_coordinates', self.ref_pop, neurite_type=ntyp),
+                       get('segment_z_coordinates', self.ref_pop, neurite_type=ntyp))
+
+            for i in xrange(3):
+                _equal(pts[:, i], ref_xyz[i])
+
     def test_get_local_bifurcation_angles(self):
         self._check_neurite_feature('local_bifurcation_angles')
 
@@ -127,9 +148,6 @@ class TestSectionTree(object):
 
     def test_get_section_radial_distances(self):
         self._check_neurite_feature('section_radial_distances')
-
-    def test_get_segment_radial_distances(self):
-        self._check_neurite_feature('segment_radial_distances', debug=False)
 
     def test_get_trunk_origin_radii(self):
         self._check_neurite_feature('trunk_origin_radii')
@@ -143,9 +161,18 @@ class TestSectionTree(object):
     def test_get_partition(self):
         self._check_neurite_feature('partition')
 
+    def test_get_section_areas(self):
+        self._check_neurite_feature('section_areas')
+
+    def test_get_section_volumes(self):
+        self._check_neurite_feature('section_volumes')
+
     @nt.nottest
     def test_get_total_length(self):
         self._check_neurite_feature('total_length')
+
+    def test_get_total_length_per_neurite(self):
+        self._check_neurite_feature('total_length_per_neurite')
 
     def test_get_principal_direction_extents(self):
         self._check_neurite_feature('principal_direction_extents', debug=False)

@@ -88,10 +88,22 @@ def n_neurites(nrn, neurite_type=NeuriteType.all):
     return sum(1 for n in nrn.neurites if is_ntype(n))
 
 
+def n_bifurcation_points(nrn, neurite_type=NeuriteType.all):
+    '''Number of bifurcation points in a neuron or population'''
+    return sum(1 for _ in i_chain2(nrn.neurites,
+                                   iterator_type=ibifurcation_point,
+                                   tree_filter=is_type(neurite_type)))
+
+
+def map_sections(fun, nrn, neurite_type=NeuriteType.all):
+    '''Map fun to all the sections in the neurites of nrn'''
+    return list(fun(s.value)
+                for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
+
+
 def section_lengths(nrn, neurite_type=NeuriteType.all):
     '''section lengths'''
-    return [mm.path_distance(s.value)
-            for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+    return map_sections(mm.path_distance, nrn, neurite_type)
 
 
 def section_branch_orders(nrn, neurite_type=NeuriteType.all):
@@ -130,6 +142,17 @@ def segment_lengths(nrn, neurite_type=NeuriteType.all):
     tree_filter = is_type(neurite_type)
     return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
             for s in _seg_len(ss)]
+
+
+def segment_midpoints(nrn, neurite_type=NeuriteType.all):
+    '''Return a list of segment mid-points'''
+    def _seg_midpoint(sec):
+        '''Return the mid-points of segments in a section'''
+        return np.divide(np.add(sec.value[:-1], sec.value[1:])[:, :3], 2.0)
+
+    tree_filter = is_type(neurite_type)
+    return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+            for s in _seg_midpoint(ss)]
 
 
 def segment_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
@@ -203,9 +226,31 @@ def n_sections_per_neurite(nrn, neurite_type=NeuriteType.all):
     return [sum(1 for _ in ipreorder(n)) for n in nrn.neurites if tree_filter(n)]
 
 
+def total_length_per_neurite(nrn, neurite_type=NeuriteType.all):
+    '''Get the number of sections per neurite in a neuron'''
+    tree_filter = is_type(neurite_type)
+    return list(sum(mm.section_length(s.value) for s in ipreorder(n))
+                for n in nrn.neurites if tree_filter(n))
+
+
 def section_path_length(section):
     '''Path length from section to root'''
     return sum(mm.path_distance(s.value) for s in iupstream(section))
+
+
+def map_sum_segments(fun, section):
+    '''Map function to segments in section and sum the result'''
+    return sum(fun(s) for s in izip(section[:-1], section[1:]))
+
+
+def section_volume(section):
+    '''Volume of a section'''
+    return map_sum_segments(mm.segment_volume, section)
+
+
+def section_area(section):
+    '''Surface area of a section'''
+    return map_sum_segments(mm.segment_area, section)
 
 
 def branch_order(section):
