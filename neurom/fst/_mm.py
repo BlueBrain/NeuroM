@@ -220,6 +220,49 @@ def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     return [s.value[0][COLS.R] for s in nrn.neurites if tree_filter(s)]
 
 
+def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all the trunk origin azimuths of a neuron or population
+
+    The azimuth is defined as Angle between x-axis and the vector
+    defined by (initial tree point - soma center) on the x-z plane.
+    The range of the azimuth angle [-pi, pi] radians
+    '''
+    tree_filter = is_type(neurite_type)
+    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+
+    def _azimuth(section, soma):
+        '''Azimuth of a section'''
+        vector = mm.vector(section[0], soma.center)
+        return np.arctan2(vector[COLS.Z], vector[COLS.X])
+
+    return [_azimuth(s.value, n.soma)
+            for n in nrns for s in n.neurites if tree_filter(s)]
+
+
+def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all the trunk origin elevations of a neuron or population
+
+    The elevation is defined as Angle between x-axis and the vector
+    defined by (initial tree point - soma center) on the x-z plane.
+    The range of the elevation angle [-pi, pi] radians
+    '''
+    tree_filter = is_type(neurite_type)
+    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+
+    def _elevation(section, soma):
+        '''Elevation of a section'''
+        vector = mm.vector(section[0], soma.center)
+        norm_vector = np.linalg.norm(vector)
+
+        if norm_vector >= np.finfo(type(norm_vector)).eps:
+            return np.arcsin(vector[COLS.Y] / norm_vector)
+        else:
+            raise ValueError("Norm of vector between soma center and section is almost zero.")
+
+    return [_elevation(s.value, n.soma)
+            for n in nrns for s in n.neurites if tree_filter(s)]
+
+
 def n_sections_per_neurite(nrn, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a neuron'''
     tree_filter = is_type(neurite_type)

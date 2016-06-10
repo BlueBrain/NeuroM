@@ -92,6 +92,8 @@ NEURITEFEATURES = {
     'partition': _mm.bifurcation_partitions,
     'number_of_segments': partial(_as_neurons, _mm.n_segments),
     'trunk_origin_radii': _mm.trunk_origin_radii,
+    'trunk_origin_azimuths': _mm.trunk_origin_azimuths,
+    'trunk_origin_elevations': _mm.trunk_origin_elevations,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
     'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _mm.iter_segments(nrn, **kwargs)],

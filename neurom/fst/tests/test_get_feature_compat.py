@@ -155,6 +155,13 @@ class TestSectionTree(object):
     def test_get_trunk_section_lengths(self):
         self._check_neurite_feature('trunk_section_lengths')
 
+    def test_trunk_origin_azimuths(self):
+        self._check_neurite_feature('trunk_origin_azimuths')
+
+    @nt.nottest
+    def test_trunk_origin_elevations(self):
+        self._check_neurite_feature('trunk_origin_elevations')
+
     def test_get_section_branch_orders(self):
         self._check_neurite_feature('section_branch_orders')
 
