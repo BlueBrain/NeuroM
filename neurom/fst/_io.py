@@ -31,7 +31,6 @@
 import os
 from collections import namedtuple, defaultdict
 from functools import partial, update_wrapper
-from neurom.io.hdf5 import H5
 from neurom.io.swc import SWC
 from neurom.io.neurolucida import NeurolucidaASC
 from neurom.core.types import NeuriteType
@@ -100,16 +99,6 @@ def make_trees(rdw, post_action=None):
 
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
-    _READERS = {
-        'swc': lambda f: SWC.read(f, wrapper=SecDataWrapper),
-        'h5': lambda f: H5.read(f, remove_duplicates=False, wrapper=SecDataWrapper),
-        'asc': lambda f: NeurolucidaASC.read(f, remove_duplicates=False, wrapper=SecDataWrapper)
-    }
-    _NEURITE_ACTION = {
-        'swc': remove_soma_initial_point,
-        'h5': None,
-        'asc': None
-    }
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
     trees = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
@@ -169,7 +158,26 @@ def extract_sections(data_block):
     return [s for s in _sections if s.ids]
 
 
-def remove_soma_initial_point(tree):
+def _remove_soma_initial_point(tree):
     '''Remove tree's initial point if soma'''
     if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
         tree.value = tree.value[1:]
+
+
+def _load_h5():
+    '''Delay loading of h5py until it is needed'''
+    from neurom.io.hdf5 import H5
+    return partial(H5.read, remove_duplicates=False, wrapper=SecDataWrapper)
+
+
+_READERS = {
+    'swc': partial(SWC.read, wrapper=SecDataWrapper),
+    'h5': _load_h5(),
+    'asc': partial(NeurolucidaASC.read, remove_duplicates=False, wrapper=SecDataWrapper)
+}
+
+_NEURITE_ACTION = {
+    'swc': _remove_soma_initial_point,
+    'h5': None,
+    'asc': None
+}
