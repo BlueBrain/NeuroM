@@ -37,10 +37,8 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> apical_seg_lengths = fst.get('segment_lengths', \
-                                     nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = fst.get('section_lengths', \
-                                   nrn, neurite_type=fst.NeuriteType.axon)
+    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> ax_sec_leng = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
     Load neurons from a directory. This loads all SWC or HDF5 files it finds\
     and returns a list of neurons
