@@ -27,7 +27,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Tools to visualize neuron morphologies '''
+'''Tools to visualize neuron morphological objects
+
+Examples:
+
+    >>> from neurom import viewer
+    >>> nrn = ... # load a neuron
+    >>> viewer.draw(nrn)                    # 2d plot
+    >>> viewer.draw(nrn, mode='3d')         # 3d plot
+    >>> viewer.draw(nrn.neurites[0])        # 2d plot of neurite tree
+    >>> viewer.draw(nrn, mode='dendrogram') # dendrogram plot
+
+'''
 
 from .view.view import neuron as draw_neuron
 from .view.view import neuron3d as draw_neuron3d
