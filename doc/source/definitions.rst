@@ -126,7 +126,7 @@ Neurite tree
 ------------
 
 There are two alternative representations of a neurite tree.
-A neurite may consist of a tree structure with a either set of :ref:`points<point-label>`
+A neurite may consist of a tree structure with either a :ref:`points<point-label>`
 or a :ref:`section<section-label>` in each vertex or node. The different representations
 are accessible via the :py:mod:`ezy<neurom.ezy>` and :py:mod:`fst<neurom.fst>` modules
 respectively.
