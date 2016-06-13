@@ -164,15 +164,15 @@ def _remove_soma_initial_point(tree):
         tree.value = tree.value[1:]
 
 
-def _load_h5():
+def _load_h5(filename):
     '''Delay loading of h5py until it is needed'''
     from neurom.io.hdf5 import H5
-    return partial(H5.read, remove_duplicates=False, wrapper=SecDataWrapper)
+    return H5.read(filename, remove_duplicates=False, wrapper=SecDataWrapper)
 
 
 _READERS = {
     'swc': partial(SWC.read, wrapper=SecDataWrapper),
-    'h5': _load_h5(),
+    'h5': _load_h5,
     'asc': partial(NeurolucidaASC.read, remove_duplicates=False, wrapper=SecDataWrapper)
 }
 
