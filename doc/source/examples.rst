@@ -71,7 +71,7 @@ Basic ``fst`` usage
     >>> from neurom import viewer
     >>> fig, ax = viewer.draw(nrn)
     >>> fig.show()
-    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d'
+    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendgrogram'
     >>> fig.show()
 
 Basic feature extraction example
