@@ -32,7 +32,6 @@ NeuroM morphology definitions
 These are ``NeuroM`` specific working definitions of various components of
 neuron morpholigies.
 
-This is to be based on `Basic Definitions to be used in NeuroM <https://bbpteam.epfl.ch/project/spaces/display/BBPSUBSIM/Basic+Definitions+to+be+used+in+NeuroM>`_
 
 .. _point-label:
 
@@ -59,6 +58,32 @@ and to check its semantic validity.
 .. todo::
     Point types may need to be restricted to align SWC with H5. This is dependent on
     future H5 specs.
+
+
+.. _segment-label:
+
+Segment
+-------
+
+A segment consists of two consecutive :ref:`points<point-label>` belonging to
+the same :ref:`neurite<tree-label>` and :ref:`section<section-label>`.
+
+
+.. _section-label:
+
+Section
+-------
+
+A section is a series of two or more :ref:`points<point-label>` whose first and last
+element are any of the following combinations:
+
+* root node, forking point
+* forking point, forking point
+* forking point, end point
+* root node, end point
+
+The first point of a section is a duplicate of the last point of its parent section,
+unless the latter is a soma section.
 
 
 .. _soma-label:
@@ -100,16 +125,17 @@ See also
 Neurite tree
 ------------
 
-A neurite consists of a tree structure with a set of :ref:`points<point-label>` in each
-vertex or node. The tree structure implies the following:
+There are two alternative representations of a neurite tree.
+A neurite may consist of a tree structure with either a :ref:`points<point-label>`
+or a :ref:`section<section-label>` in each vertex or node. The different representations
+are accessible via the :py:mod:`ezy<neurom.ezy>` and :py:mod:`fst<neurom.fst>` modules
+respectively.
+
+The tree structure implies the following:
 
 * A node can only have one parent.
 * A node can have an arbitrary number of children.
 * No loops are present in the structure.
-
-.. todo::
-    Should neurite trees be restricted to being binary trees? If so, no more
-    than two children per node would be allowed.
 
 Different type of points are allowed in the same tree as long as same conventions
 are followed
@@ -119,8 +145,9 @@ are followed
     tree need to be well defined
 
 In ``NeuroM`` neurite trees are implemented using the recursive structure 
-:py:class:`neurom.core.tree.Tree`, with each node holding a reference to a
-:ref:`morphology point<point-label>`.
+:py:class:`neurom.core.tree.Tree`, with each node holding a reference to either a
+single :ref:`morphology point<point-label>`, or an array of :ref:`points<point-label>`
+representing a `section<section-label>`.
 
 Neuron
 ------
