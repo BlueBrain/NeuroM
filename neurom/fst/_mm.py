@@ -88,10 +88,22 @@ def n_neurites(nrn, neurite_type=NeuriteType.all):
     return sum(1 for n in nrn.neurites if is_ntype(n))
 
 
+def n_bifurcation_points(nrn, neurite_type=NeuriteType.all):
+    '''Number of bifurcation points in a neuron or population'''
+    return sum(1 for _ in i_chain2(nrn.neurites,
+                                   iterator_type=ibifurcation_point,
+                                   tree_filter=is_type(neurite_type)))
+
+
+def map_sections(fun, nrn, neurite_type=NeuriteType.all):
+    '''Map fun to all the sections in the neurites of nrn'''
+    return list(fun(s.value)
+                for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
+
+
 def section_lengths(nrn, neurite_type=NeuriteType.all):
     '''section lengths'''
-    return [mm.path_distance(s.value)
-            for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+    return map_sections(mm.path_distance, nrn, neurite_type)
 
 
 def section_branch_orders(nrn, neurite_type=NeuriteType.all):
@@ -130,6 +142,17 @@ def segment_lengths(nrn, neurite_type=NeuriteType.all):
     tree_filter = is_type(neurite_type)
     return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
             for s in _seg_len(ss)]
+
+
+def segment_midpoints(nrn, neurite_type=NeuriteType.all):
+    '''Return a list of segment mid-points'''
+    def _seg_midpoint(sec):
+        '''Return the mid-points of segments in a section'''
+        return np.divide(np.add(sec.value[:-1], sec.value[1:])[:, :3], 2.0)
+
+    tree_filter = is_type(neurite_type)
+    return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+            for s in _seg_midpoint(ss)]
 
 
 def segment_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
@@ -197,15 +220,83 @@ def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     return [s.value[0][COLS.R] for s in nrn.neurites if tree_filter(s)]
 
 
+def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all the trunk origin azimuths of a neuron or population
+
+    The azimuth is defined as Angle between x-axis and the vector
+    defined by (initial tree point - soma center) on the x-z plane.
+
+    The range of the azimuth angle [-pi, pi] radians
+    '''
+    tree_filter = is_type(neurite_type)
+    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+
+    def _azimuth(section, soma):
+        '''Azimuth of a section'''
+        vector = mm.vector(section[0], soma.center)
+        return np.arctan2(vector[COLS.Z], vector[COLS.X])
+
+    return [_azimuth(s.value, n.soma)
+            for n in nrns for s in n.neurites if tree_filter(s)]
+
+
+def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
+    '''Get a list of all the trunk origin elevations of a neuron or population
+
+    The elevation is defined as the angle between x-axis and the
+    vector defined by (initial tree point - soma center)
+    on the x-y half-plane.
+
+    The range of the elevation angle [-pi/2, pi/2] radians
+    '''
+    tree_filter = is_type(neurite_type)
+    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+
+    def _elevation(section, soma):
+        '''Elevation of a section'''
+        vector = mm.vector(section[0], soma.center)
+        norm_vector = np.linalg.norm(vector)
+
+        if norm_vector >= np.finfo(type(norm_vector)).eps:
+            return np.arcsin(vector[COLS.Y] / norm_vector)
+        else:
+            raise ValueError("Norm of vector between soma center and section is almost zero.")
+
+    return [_elevation(s.value, n.soma)
+            for n in nrns for s in n.neurites if tree_filter(s)]
+
+
 def n_sections_per_neurite(nrn, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a neuron'''
     tree_filter = is_type(neurite_type)
     return [sum(1 for _ in ipreorder(n)) for n in nrn.neurites if tree_filter(n)]
 
 
+def total_length_per_neurite(nrn, neurite_type=NeuriteType.all):
+    '''Get the number of sections per neurite in a neuron'''
+    tree_filter = is_type(neurite_type)
+    return list(sum(mm.section_length(s.value) for s in ipreorder(n))
+                for n in nrn.neurites if tree_filter(n))
+
+
 def section_path_length(section):
     '''Path length from section to root'''
     return sum(mm.path_distance(s.value) for s in iupstream(section))
+
+
+def map_sum_segments(fun, section):
+    '''Map function to segments in section and sum the result'''
+    return sum(fun(s) for s in izip(section[:-1], section[1:]))
+
+
+def section_volume(section):
+    '''Volume of a section'''
+    return map_sum_segments(mm.segment_volume, section)
+
+
+def section_area(section):
+    '''Surface area of a section'''
+    return map_sum_segments(mm.segment_area, section)
 
 
 def branch_order(section):
