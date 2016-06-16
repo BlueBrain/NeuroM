@@ -33,6 +33,7 @@ import os
 import numpy as np
 from neurom import fst
 from neurom.fst import _mm
+from neurom.analysis import morphmath as mmth
 from neurom.io import utils as io_utils
 from neurom.core import tree as tr
 from neurom.core.neuron import make_soma
@@ -86,6 +87,25 @@ def test_iter_segments():
     b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
 
     _equal(a, b, debug=False)
+
+
+def test_section_tortuosity():
+
+    sec_a = [
+        (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
+    ]
+
+    sec_b = [
+        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
+    ]
+
+    nt.eq_(_mm.section_tortuosity(sec_a), 1.0)
+    nt.eq_(_mm.section_tortuosity(sec_b), 4.0 / 2.0)
+
+    for s in _mm.i_chain2(NRN.neurites):
+        s = s.value
+        nt.eq_(_mm.section_tortuosity(s),
+               mmth.section_length(s) / mmth.point_dist(s[0], s[-1]))
 
 
 def test_principal_direction_extents():

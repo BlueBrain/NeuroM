@@ -101,11 +101,6 @@ def map_sections(fun, nrn, neurite_type=NeuriteType.all):
                 for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
 
 
-def section_lengths(nrn, neurite_type=NeuriteType.all):
-    '''section lengths'''
-    return map_sections(mm.path_distance, nrn, neurite_type)
-
-
 def section_branch_orders(nrn, neurite_type=NeuriteType.all):
     '''section lengths'''
     return [branch_order(s)
@@ -123,7 +118,7 @@ def section_path_lengths(nrn, neurite_type=NeuriteType.all):
     dist = {}
 
     for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)):
-        dist[s] = mm.path_distance(s.value)
+        dist[s] = mm.section_length(s.value)
 
     def pl2(sec):
         '''Calculate the path length using cahced section lengths'''
@@ -211,7 +206,7 @@ def section_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''Get a list of the lengths of trunk sections of neurites in a neuron'''
     tree_filter = is_type(neurite_type)
-    return [mm.path_distance(s.value) for s in nrn.neurites if tree_filter(s)]
+    return [mm.section_length(s.value) for s in nrn.neurites if tree_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
@@ -281,7 +276,7 @@ def total_length_per_neurite(nrn, neurite_type=NeuriteType.all):
 
 def section_path_length(section):
     '''Path length from section to root'''
-    return sum(mm.path_distance(s.value) for s in iupstream(section))
+    return sum(mm.section_length(s.value) for s in iupstream(section))
 
 
 def map_sum_segments(fun, section):
@@ -297,6 +292,17 @@ def section_volume(section):
 def section_area(section):
     '''Surface area of a section'''
     return map_sum_segments(mm.segment_area, section)
+
+
+def section_tortuosity(section):
+    '''Tortuosity of a section
+
+    The tortuosity is defined as the ratio of the path length of a section
+    and the euclidian distnce between its end points.
+
+    The path length is the sum of distances between consecutive points.
+    '''
+    return mm.section_length(section) / mm.point_dist(section[-1], section[0])
 
 
 def branch_order(section):
