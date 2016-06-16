@@ -31,6 +31,7 @@
 from nose import tools as nt
 import os
 from neurom.fst import _io
+from neurom.fst import get
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_ROOT = os.path.join(_path, '../../../test_data')
@@ -89,3 +90,24 @@ def test_load_neurons_filenames():
     for nrn, name in zip(pop.neurons, NRN_NAMES):
         nt.assert_true(isinstance(nrn, _io.Neuron))
         nt.assert_equal(nrn.name, name)
+
+SWC_PATH = os.path.join(DATA_ROOT, 'swc', 'ordering')
+SWC_ORD_REF = _io.load_neuron(os.path.join(SWC_PATH, 'sample.swc'))
+
+
+def test_load_neuron_mixed_tree_swc():
+    nrn_mix =  _io.load_neuron(os.path.join(SWC_PATH, 'sample_mixed_tree_sections.swc'))
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', SWC_ORD_REF))
+
+
+# TODO: fix swc reader to cope with this
+@nt.nottest
+def test_load_neuron_section_order_break_swc():
+    nrn_mix =  _io.load_neuron(os.path.join(SWC_PATH, 'sample_disordered.swc'))
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', SWC_ORD_REF))
+
+
