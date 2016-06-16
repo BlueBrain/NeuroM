@@ -109,12 +109,6 @@ class SectionTreeBase(object):
             nt.assert_equal(fst._mm.n_neurites(self.sec_nrn, neurite_type=t),
                             get('number_of_neurites', self.ref_nrn, neurite_type=t)[0])
 
-    def test_get_section_lengths(self):
-        _close(fst._mm.section_lengths(self.sec_nrn), get('section_lengths', self.ref_nrn))
-        for t in NeuriteType:
-            _close(fst._mm.section_lengths(self.sec_nrn, neurite_type=t),
-                   get('section_lengths', self.ref_nrn, neurite_type=t))
-
     def test_get_section_path_distances(self):
         _close(fst._mm.section_path_lengths(self.sec_nrn), get('section_path_distances', self.ref_nrn))
         for t in NeuriteType:

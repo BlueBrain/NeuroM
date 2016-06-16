@@ -3,6 +3,7 @@
 
 import sys
 from neurom import fst
+from neurom.analysis.morphmath import section_length
 
 
 def do_stuff(filename):
@@ -19,7 +20,7 @@ def do_stuff(filename):
         print '\nNeuriteType:', nt
         n_sec = fst._mm.n_sections(_n, nt)
         n_seg = fst._mm.n_segments(_n, nt)
-        sec_len = fst._mm.section_lengths(_n, nt)
+        sec_len = fst._mm.map_sections(section_length, _n, nt)
 
         print 'number of sections:', n_sec
         print 'number of segments:', n_seg

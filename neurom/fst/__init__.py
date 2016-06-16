@@ -73,11 +73,12 @@ def _as_neurons(fun, nrns, **kwargs):
 
 
 NEURITEFEATURES = {
-    'total_length': partial(_as_neurons, lambda n, **kw: sum(_mm.section_lengths(n, **kw))),
+    'total_length': partial(_as_neurons, lambda n, **kw: sum(_mm.map_sections(sec_len, n, **kw))),
     'total_length_per_neurite': _mm.total_length_per_neurite,
     'section_lengths': partial(_mm.map_sections, sec_len),
     'section_volumes': partial(_mm.map_sections, _mm.section_volume),
     'section_areas': partial(_mm.map_sections, _mm.section_area),
+    'section_tortuosity': partial(_mm.map_sections, _mm.section_tortuosity),
     'section_path_distances': _mm.section_path_lengths,
     'number_of_sections': partial(_as_neurons, _mm.n_sections),
     'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
