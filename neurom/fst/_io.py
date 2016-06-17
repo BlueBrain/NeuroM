@@ -111,6 +111,30 @@ load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
 update_wrapper(load_neurons, _iout.load_neurons)
 
 
+def _merge_sections(sec_a, sec_b):
+    '''Merge two sections
+
+    Merges sec_a into sec_b and sets sec_b attributes to default
+    '''
+    sec_b.ids = sec_a.ids + sec_b.ids[1:]
+    sec_b.ntype = sec_a.ntype
+    sec_b.pid = sec_a.pid
+    sec_a.ids = []
+    sec_a.pid = -1
+
+
+def _section_end_points(data_block):
+    '''Get the section end-points '''
+    # number of children per point
+    n_children = defaultdict(int)
+    for row in data_block:
+        n_children[int(row[COLS.P])] += 1
+
+    # end points have either no children or more than one
+    return set(i for i, row in enumerate(data_block)
+               if n_children[row[COLS.ID]] != 1)
+
+
 def extract_sections(data_block):
     '''Make a list of sections from an SWC-style data wrapper block'''
 
@@ -126,14 +150,11 @@ def extract_sections(data_block):
     for i, r in enumerate(data_block):
         id_map[int(r[COLS.ID])] = i
 
-    # number of children per point
-    n_children = defaultdict(int)
-    for row in data_block:
-        n_children[int(row[COLS.P])] += 1
-
     # end points have either no children or more than one
-    sec_end_pts = set(i for i, row in enumerate(data_block)
-                      if n_children[row[COLS.ID]] != 1)
+    sec_end_pts = _section_end_points(data_block)
+
+    # arfificial discontinuity section IDs
+    _gap_sections = set()
 
     _sections = [Section()]
     curr_section = _sections[-1]
@@ -141,21 +162,39 @@ def extract_sections(data_block):
 
     for row in data_block:
         row_id = id_map[int(row[COLS.ID])]
+        parent_id = id_map[int(row[COLS.P])]
         if len(curr_section.ids) == 0:
-            curr_section.ids.append(id_map[int(row[COLS.P])])
+            # first in section point is parent.
+            curr_section.ids.append(parent_id)
             curr_section.ntype = int(row[COLS.TYPE])
-        curr_section.ids.append(row_id)
+        gap = parent_id != curr_section.ids[-1]
+        # If parent is not the previous point, create
+        # a section end-point. Else add the point
+        # to this section
+        if gap:
+            sec_end_pts.add(row_id)
+        else:
+            curr_section.ids.append(row_id)
+
         if row_id in sec_end_pts:
             parent_section[curr_section.ids[-1]] = len(_sections) - 1
             _sections.append(Section())
             curr_section = _sections[-1]
+            # Parent-child discontinuity sectin
+            if gap:
+                curr_section.ids.extend((parent_id, row_id))
+                curr_section.ntype = int(row[COLS.TYPE])
+                _gap_sections.add(len(_sections) - 2)
 
-    # get the section parent ID from the id of the first point.
     for sec in _sections:
+        # get the section parent ID from the id of the first point.
         if sec.ids:
             sec.pid = parent_section[sec.ids[0]]
+        # join gap sections and "disable" first half
+        if sec.pid in _gap_sections:
+            _merge_sections(_sections[sec.pid], sec)
 
-    return [s for s in _sections if s.ids]
+    return _sections
 
 
 def _remove_soma_initial_point(tree):
