@@ -109,3 +109,11 @@ def test_load_neuron_section_order_break_swc():
                           get('number_of_sections_per_neurite', SWC_ORD_REF))
 
 
+H5_PATH = os.path.join(DATA_ROOT, 'h5', 'v1', 'ordering')
+H5_ORD_REF = _io.load_neuron(os.path.join(H5_PATH, 'sample.h5'))
+
+def test_load_neuron_mixed_tree_h5():
+    nrn_mix =  _io.load_neuron(os.path.join(H5_PATH, 'sample_mixed_tree_sections.h5'))
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', H5_ORD_REF))
