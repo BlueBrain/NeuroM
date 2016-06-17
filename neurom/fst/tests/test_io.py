@@ -98,14 +98,27 @@ SWC_ORD_REF = _io.load_neuron(os.path.join(SWC_PATH, 'sample.swc'))
 def test_load_neuron_mixed_tree_swc():
     nrn_mix =  _io.load_neuron(os.path.join(SWC_PATH, 'sample_mixed_tree_sections.swc'))
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                           get('number_of_sections_per_neurite', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('number_of_segments', nrn_mix),
+                          get('number_of_segments', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('total_length', nrn_mix),
+                          get('total_length', SWC_ORD_REF))
 
 
 def test_load_neuron_section_order_break_swc():
     nrn_mix =  _io.load_neuron(os.path.join(SWC_PATH, 'sample_disordered.swc'))
+
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                           get('number_of_sections_per_neurite', SWC_ORD_REF))
 
+    nt.assert_items_equal(get('number_of_segments', nrn_mix),
+                          get('number_of_segments', SWC_ORD_REF))
 
+    nt.assert_items_equal(get('total_length', nrn_mix),
+                          get('total_length', SWC_ORD_REF))
