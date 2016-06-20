@@ -59,59 +59,34 @@ NeuroM documentation is built and hosted on `readthedocs <https://readthedocs.or
 * `latest snapshot <http://neurom.readthedocs.org/en/latest/>`_
 * `latest release <http://neurom.readthedocs.org/en/stable/>`_
 
-Dependencies
-============
-
-The build-time and runtime dependencies of NeuroM are:
-
-* numpy
-* scipy
-* matplotlib
-* h5py (optional, required for reading HDF5 files)
-* enum34 (pip install takes care of this)
-* pyyaml (pip install takes care of this)
-
 Installation
 ============
 
 It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
-``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_:
-
-NeuroM installation
--------------------
-
-The following assumes ``virtualenv`` named ``nrm`` with access to the dependencies has been set up
-and activated.
-We will see two ways to install ``NeuroM``
+``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_. The following
+assumes ``virtualenv`` named ``nrm`` with access to the dependencies has been set up and
+activated. We will see three ways to install ``NeuroM``
 
 #. From the Python Package Index
 #. From the git repository
 #. From source (for NeuroM developers)
 
-Install package from Python Package Index
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+From Python Package Index
+-------------------------
 
 .. code-block:: bash
 
     (nrm)$ pip install neurom
 
-Install package from git
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install the latest version:
+From git repository
+-------------------
 
 .. code-block:: bash
 
     (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
 
-Install a particular release:
-
-.. code-block:: bash
-
-    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@neurom-v0.0.1
-
-Install from source
-^^^^^^^^^^^^^^^^^^^
+From source
+-----------
 
 Clone the repository and install it:
 
@@ -120,8 +95,9 @@ Clone the repository and install it:
     (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
     (nrm)$ pip install -e ./NeuroM
 
-This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means changes you make to the source code are seen by the installation.
-To install in read-only mode, omit the ``-e``.
+This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means changes
+made to the source code are seen by the installation. To install in read-only mode, omit
+the ``-e``.
 
 Examples
 ========
@@ -150,10 +126,10 @@ Examples
 
 .. code-block:: python
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
-    >>> apical_seg_lengths = ezy.get('segment_lengths', nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = ezy.get('section_lengths', nrn, neurite_type=ezy.NeuriteType.axon)
+    >>> from neurom import fst
+    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> axon_sec_lengths = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
 
 - Visualize a neuronal morphology:
@@ -166,3 +142,16 @@ Examples
     >>> fig.show()
     >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
     >>> fig.show()
+
+
+Dependencies
+============
+
+The build-time and runtime dependencies of NeuroM are:
+
+* `numpy <http://www.numpy.org/>`_
+* `h5py <http://www.h5py.org/>`_
+* `scipy <http://www.scipy.org/>`_
+* `matplotlib <http://www.matplotlib.org/>`_
+* `enum34 <https://pypi.python.org/pypi/enum34/>`_
+* `pyyaml <http://www.pyyaml.org/>`_

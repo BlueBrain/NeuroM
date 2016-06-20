@@ -30,10 +30,67 @@ Installation
 ============
 
 It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
-``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_:
+``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_. For details on
+how to set it up, see :ref:`venv-label`
+
+Once the :ref:`virtualenv is set up<venv-label>` is set up and the
+:ref:`pre-installed dependencies<pre-dep-label>` are taken care of,
+there are three ways to install ``NeuroM``
+
+#. From the official Python Package Index server (PyPI)
+#. From the git repository
+#. From source (for NeuroM developers)
+
+Install from the official PyPI server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install the latest release:
+
+.. code-block:: bash
+
+    (nrm)$ pip install neurom
+
+Install a specific version:
+
+.. code-block:: bash
+
+    (nrm)$ pip install neurom==1.2.3
+
+Install from git
+^^^^^^^^^^^^^^^^
+
+Install a particular release:
+
+.. code-block:: bash
+
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@v0.1.0
+
+Install the latest version:
+
+.. code-block:: bash
+
+    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
+
+
+Install from source
+^^^^^^^^^^^^^^^^^^^
+
+Clone the repository and install it:
+
+.. code-block:: bash
+
+    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
+    (nrm)$ pip install -e ./NeuroM
+
+This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means
+that changes made to the source code after the installation procedure are seen by the
+installed package. To install in read-only mode, omit the ``-e``.
+
+
+.. _venv-label:
 
 Virtualenv setup
-----------------
+^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -66,56 +123,3 @@ you have activated the ``virtualenv``.
     started *with the virtualenv activated*. That gives access to the ``neurom``
     installation.
 
-NeuroM installation
--------------------
-
-Once the ``virtualenv`` is set up, there are three ways to install ``NeuroM``
-
-#. From the official Python Package Index server (PyPI)
-#. From the git repository
-#. From source (for NeuroM developers)
-
-Install from the official PyPI server
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Install the latest release:
-
-.. code-block:: bash
-
-    (nrm)$ pip install neurom
-
-Install a specific version:
-
-.. code-block:: bash
-
-    (nrm)$ pip install neurom==1.2.3
-
-Install from git
-^^^^^^^^^^^^^^^^
-
-Install a particular release:
-
-.. code-block:: bash
-
-    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git@neurom-v0.0.8
-
-Install the latest version:
-
-.. code-block:: bash
-
-    (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
-
-
-Install from source
-^^^^^^^^^^^^^^^^^^^
-
-Clone the repository and install it:
-
-.. code-block:: bash
-
-    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
-    (nrm)$ pip install -e ./NeuroM
-
-This installs ``NeuroM`` into your ``virtualenv`` in "editable" mode. That means
-that changes made to the source code after the installation procedure are seen by the
-installed package. To install in read-only mode, omit the ``-e``.

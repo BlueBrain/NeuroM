@@ -51,8 +51,8 @@ Morphology file data consistency checks
     ....
 
 
-Fast analysis: the :py:mod:`neuron.fst<neurom.fst>` module
-**********************************************************
+Fast analysis with the :py:mod:`neurom.fst` module
+**************************************************
 
 Here we load a neuron and obtain some information from it:
 
@@ -64,8 +64,8 @@ Here we load a neuron and obtain some information from it:
     >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
 
-Morphology visualization: the :py:mod:`neurom.viewer<neurom.viewer>` module
-***************************************************************************
+Morphology visualization with the :py:mod:`neurom.viewer` module
+****************************************************************
 
 Here we visualize a neuronal morphology:
 
