@@ -37,10 +37,8 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> apical_seg_lengths = ezy.get('segment_lengths', \
-                                     nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = ezy.get('section_lengths', \
-                                   nrn, neurite_type=ezy.NeuriteType.axon)
+    >>> ap_seg_len = ezy.get('segment_lengths', nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
+    >>> ax_sec_len = ezy.get('section_lengths', nrn, neurite_type=ezy.NeuriteType.axon)
 
     View it in 2D and 3D
 

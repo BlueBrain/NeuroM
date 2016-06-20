@@ -51,27 +51,33 @@ Morphology file data consistency checks
     ....
 
 
-Basic ``fst`` usage
-*******************
+Fast analysis: the :py:mod:`neuron.fst<neurom.fst>` module
+**********************************************************
 
-- Load a neuron and obtain some information from it:
+Here we load a neuron and obtain some information from it:
 
 .. code-block:: python
 
     >>> from neurom import fst
     >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
-    >>> apical_seg_lengths = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
+    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
 
-- Visualize a neuronal morphology:
+Morphology visualization: the :py:mod:`neurom.viewer<neurom.viewer>` module
+***************************************************************************
+
+Here we visualize a neuronal morphology:
+
 
 .. code-block:: python
 
-    >>> from neurom import ezy
-    >>> fig, ax = ezy.view(nrn)
+    >>> # Initialize nrn as above
+    >>> from neurom import viewer
+    >>> fig, ax = viewer.draw(nrn)
     >>> fig.show()
-
+    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
+    >>> fig.show()
 
 Basic feature extraction example
 ********************************

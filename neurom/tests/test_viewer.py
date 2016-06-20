@@ -26,5 +26,70 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" neurom version """
-VERSION = "0.1.0"
+from nose import tools as nt
+from neurom.io.utils import load_neuron
+from neurom.fst import load_neuron as load_fst_neuron
+from neurom import viewer
+from neurom.analysis.morphtree import set_tree_type
+import os
+
+
+class Dummy(object):
+    pass
+
+
+_PWD = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
+MORPH_FILENAME = os.path.join(DATA_PATH, 'Neuron.swc')
+
+fst_nrn = load_fst_neuron(MORPH_FILENAME)
+nrn = load_neuron(MORPH_FILENAME, set_tree_type)
+
+
+def test_draw_neuron():
+    viewer.draw(nrn)
+    viewer.draw(fst_nrn)
+
+
+def test_draw_neuron3d():
+    viewer.draw(nrn, mode='3d')
+    viewer.draw(fst_nrn, mode='3d')
+
+
+def test_draw_tree():
+    viewer.draw(nrn.neurites[0])
+    viewer.draw(fst_nrn.neurites[0])
+
+
+def test_draw_tree3d():
+    viewer.draw(nrn.neurites[0], mode='3d')
+    viewer.draw(fst_nrn.neurites[0], mode='3d')
+
+
+def test_draw_soma():
+    viewer.draw(nrn.soma)
+    viewer.draw(fst_nrn.soma)
+
+
+def test_draw_soma3d():
+    viewer.draw(nrn.soma, mode='3d')
+    viewer.draw(fst_nrn.soma, mode='3d')
+
+
+def test_draw_dendrogram():
+    viewer.draw(nrn, mode='dendrogram')
+
+
+@nt.raises(viewer.InvalidDrawModeError)
+def test_invalid_draw_mode_raises():
+    viewer.draw(nrn, mode='4d')
+
+
+@nt.raises(viewer.NotDrawableError)
+def test_invalid_object_raises():
+    viewer.draw(Dummy())
+
+
+@nt.raises(viewer.NotDrawableError)
+def test_invalid_combo_raises():
+    viewer.draw(nrn.soma, mode='dendrogram')

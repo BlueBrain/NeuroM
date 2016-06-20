@@ -33,8 +33,11 @@ import os
 import numpy as np
 from neurom import fst
 from neurom.fst import _mm
+from neurom.analysis import morphmath as mmth
 from neurom.io import utils as io_utils
 from neurom.core import tree as tr
+from neurom.core.neuron import make_soma
+from neurom.core.population import Population
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -86,6 +89,25 @@ def test_iter_segments():
     _equal(a, b, debug=False)
 
 
+def test_section_tortuosity():
+
+    sec_a = [
+        (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
+    ]
+
+    sec_b = [
+        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
+    ]
+
+    nt.eq_(_mm.section_tortuosity(sec_a), 1.0)
+    nt.eq_(_mm.section_tortuosity(sec_b), 4.0 / 2.0)
+
+    for s in _mm.i_chain2(NRN.neurites):
+        s = s.value
+        nt.eq_(_mm.section_tortuosity(s),
+               mmth.section_length(s) / mmth.point_dist(s[0], s[-1]))
+
+
 def test_principal_direction_extents():
     # test with a realistic neuron
     nrn = fst.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
@@ -96,3 +118,49 @@ def test_principal_direction_extents():
 
     p = _mm.principal_direction_extents(nrn)
     _close(np.array(p), np.array(p_ref))
+
+
+def test_trunk_origin_elevations():
+    class Mock(object):
+        pass
+
+    n0 = Mock()
+    n1 = Mock()
+
+    s = make_soma([[0, 0, 0, 4]])
+    t0 = tr.Tree(((1, 0, 0, 2), (2, 1, 1, 2)))
+    t0.type = fst.NeuriteType.basal_dendrite
+    t1 = tr.Tree(((0, 1, 0, 2), (1, 2, 1, 2)))
+    t1.type = fst.NeuriteType.basal_dendrite
+    n0.neurites = [t0, t1]
+    n0.soma = s
+
+    t2 = tr.Tree(((0, -1, 0, 2), (-1, -2, -1, 2)))
+    t2.type = fst.NeuriteType.basal_dendrite
+    n1.neurites = [t2]
+    n1.soma = s
+
+    pop = Population([n0, n1])
+    nt.assert_items_equal(_mm.trunk_origin_elevations(pop),
+                          [0.0, np.pi/2., -np.pi/2.])
+
+    nt.assert_items_equal(
+        _mm.trunk_origin_elevations(pop, neurite_type=fst.NeuriteType.basal_dendrite),
+        [0.0, np.pi/2., -np.pi/2.]
+    )
+
+    nt.eq_(
+        len(_mm.trunk_origin_elevations(pop,
+                                        neurite_type=fst.NeuriteType.axon)),
+        0
+    )
+
+    nt.eq_(
+        len(_mm.trunk_origin_elevations(pop,
+                                        neurite_type=fst.NeuriteType.apical_dendrite)),
+        0
+    )
+
+@nt.raises(Exception)
+def test_trunk_elevation_zero_norm_vector_raises():
+    _mm.trunk_origin_elevations(NRN)

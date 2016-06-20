@@ -44,6 +44,7 @@ API Documentation
    neurom.io.utils
    neurom.io.swc
    neurom.io.hdf5
+   neurom.viewer
    neurom.view
    neurom.view.common
    neurom.view.view

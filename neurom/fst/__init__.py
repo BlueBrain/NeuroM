@@ -37,10 +37,8 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> apical_seg_lengths = fst.get('segment_lengths', \
-                                     nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = fst.get('section_lengths', \
-                                   nrn, neurite_type=fst.NeuriteType.axon)
+    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
+    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
 
     Load neurons from a directory. This loads all SWC or HDF5 files it finds\
     and returns a list of neurons
@@ -54,37 +52,53 @@ Examples:
 '''
 
 import numpy as _np
+from functools import partial
 from ._io import load_neuron, load_neurons, Neuron
 from . import _mm
 from ..utils import deprecated
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..analysis.morphmath import segment_radius as seg_rad
-
+from ..analysis.morphmath import segment_taper_rate as seg_taper
+from ..analysis.morphmath import section_length as sec_len
 
 load_population = deprecated('Use load_neurons instead.',
                              fun_name='load_population')(load_neurons)
 
 
+def _as_neurons(fun, nrns, **kwargs):
+    '''Get features per neuron'''
+    nrns = nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+    return list(fun(n, **kwargs) for n in nrns)
+
+
 NEURITEFEATURES = {
-    'total_length': lambda nrn, **kwargs: _as_neurons(lambda n, **kw:
-                                                      sum(_mm.section_lengths(n, **kw)),
-                                                      nrn, **kwargs),
-    'section_lengths': _mm.section_lengths,
+    'total_length': partial(_as_neurons, lambda n, **kw: sum(_mm.map_sections(sec_len, n, **kw))),
+    'total_length_per_neurite': _mm.total_length_per_neurite,
+    'section_lengths': partial(_mm.map_sections, sec_len),
+    'section_volumes': partial(_mm.map_sections, _mm.section_volume),
+    'section_areas': partial(_mm.map_sections, _mm.section_area),
+    'section_tortuosity': partial(_mm.map_sections, _mm.section_tortuosity),
     'section_path_distances': _mm.section_path_lengths,
-    'number_of_sections': lambda nrn, **kwargs: _as_neurons(_mm.n_sections, nrn, **kwargs),
+    'number_of_sections': partial(_as_neurons, _mm.n_sections),
     'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
-    'number_of_neurites': lambda nrn, **kwargs: _as_neurons(_mm.n_neurites, nrn, **kwargs),
+    'number_of_neurites': partial(_as_neurons, _mm.n_neurites),
+    'number_of_bifurcations': partial(_as_neurons, _mm.n_bifurcation_points),
     'section_branch_orders': _mm.section_branch_orders,
     'section_radial_distances': _mm.section_radial_distances,
     'local_bifurcation_angles': _mm.local_bifurcation_angles,
     'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
     'partition': _mm.bifurcation_partitions,
-    'number_of_segments': lambda nrn, **kwargs: _as_neurons(_mm.n_segments, nrn, **kwargs),
+    'number_of_segments': partial(_as_neurons, _mm.n_segments),
     'trunk_origin_radii': _mm.trunk_origin_radii,
+    'trunk_origin_azimuths': _mm.trunk_origin_azimuths,
+    'trunk_origin_elevations': _mm.trunk_origin_elevations,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
     'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _mm.iter_segments(nrn, **kwargs)],
+    'segment_midpoints': _mm.segment_midpoints,
+    'segment_taper_rates': lambda nrn, **kwargs: [seg_taper(s)
+                                                  for s in _mm.iter_segments(nrn, **kwargs)],
     'segment_radial_distances': _mm.segment_radial_distances,
     'principal_direction_extents': _mm.principal_direction_extents
 }
@@ -93,12 +107,6 @@ NEURONFEATURES = {
     'soma_radii': _mm.soma_radii,
     'soma_surface_areas': _mm.soma_surface_areas,
 }
-
-
-def _as_neurons(fun, nrns, **kwargs):
-    '''Get features per neuron'''
-    nrns = nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
-    return [fun(n, **kwargs) for n in nrns]
 
 
 def get(feature, *args, **kwargs):

@@ -47,6 +47,7 @@ NEURITEFEATURES = {
     'local_bifurcation_angles': _impl.local_bifurcation_angles,
     'remote_bifurcation_angles': _impl.remote_bifurcation_angles,
     'bifurcation_number': _impl.bifurcation_number,
+    'number_of_bifurcations': _impl.bifurcation_number,
     'segment_lengths': _impl.segment_lengths,
     'number_of_segments': _impl.number_of_segments,
     'segment_taper_rates': _impl.segment_taper_rates,
