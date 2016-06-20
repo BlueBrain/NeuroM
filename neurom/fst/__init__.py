@@ -64,14 +64,13 @@ from ..analysis.morphmath import segment_taper_rate as seg_taper
 from ..analysis.morphmath import section_length as sec_len
 
 
-def _iseg(nrn, neurite_type=None):
+def _iseg(nrn, neurite_type=NeuriteType.all):
     '''Build a tree type filter from a neurite type and forward to functon
 
     TODO:
         This should be a decorator
     '''
-    tree_filter = None if neurite_type is None else _is_type(neurite_type)
-    return _mm.iter_segments(nrn, tree_filter=tree_filter)
+    return _mm.iter_segments(nrn, tree_filter=_is_type(neurite_type))
 
 
 load_population = deprecated('Use load_neurons instead.',
