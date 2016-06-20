@@ -29,11 +29,11 @@
 '''Fast morphometrics module'''
 
 import math
-from itertools import izip, chain
+from itertools import imap, izip, chain
 import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.core.tree import ipreorder, ibifurcation_point, iupstream, i_chain2
+from neurom.core.tree import ipreorder, ibifurcation_point, iupstream
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
 
@@ -74,12 +74,12 @@ def soma_radii(nrn_pop):
 def n_segments(nrn, neurite_type=NeuriteType.all):
     '''Number of segments in a section'''
     return sum(len(s.value) - 1
-               for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
+               for s in iter_sections(nrn, tree_filter=is_type(neurite_type)))
 
 
 def n_sections(nrn, neurite_type=NeuriteType.all):
     '''Number of sections in a neuron'''
-    return sum(1 for _ in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
+    return sum(1 for _ in iter_sections(nrn, tree_filter=is_type(neurite_type)))
 
 
 def n_neurites(nrn, neurite_type=NeuriteType.all):
@@ -90,21 +90,21 @@ def n_neurites(nrn, neurite_type=NeuriteType.all):
 
 def n_bifurcation_points(nrn, neurite_type=NeuriteType.all):
     '''Number of bifurcation points in a neuron or population'''
-    return sum(1 for _ in i_chain2(nrn.neurites,
-                                   iterator_type=ibifurcation_point,
-                                   tree_filter=is_type(neurite_type)))
+    return sum(1 for _ in iter_sections(nrn,
+                                        iterator_type=ibifurcation_point,
+                                        tree_filter=is_type(neurite_type)))
 
 
 def map_sections(fun, nrn, neurite_type=NeuriteType.all):
     '''Map fun to all the sections in the neurites of nrn'''
     return list(fun(s.value)
-                for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)))
+                for s in iter_sections(nrn, tree_filter=is_type(neurite_type)))
 
 
 def section_branch_orders(nrn, neurite_type=NeuriteType.all):
     '''section lengths'''
     return [branch_order(s)
-            for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+            for s in iter_sections(nrn, tree_filter=is_type(neurite_type))]
 
 
 def section_path_lengths(nrn, neurite_type=NeuriteType.all):
@@ -117,14 +117,14 @@ def section_path_lengths(nrn, neurite_type=NeuriteType.all):
     '''
     dist = {}
 
-    for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type)):
+    for s in iter_sections(nrn, tree_filter=is_type(neurite_type)):
         dist[s] = mm.section_length(s.value)
 
     def pl2(sec):
         '''Calculate the path length using cahced section lengths'''
         return sum(dist[s] for s in iupstream(sec))
 
-    return [pl2(s) for s in i_chain2(nrn.neurites, tree_filter=is_type(neurite_type))]
+    return [pl2(s) for s in iter_sections(nrn, tree_filter=is_type(neurite_type))]
 
 
 def segment_lengths(nrn, neurite_type=NeuriteType.all):
@@ -135,7 +135,7 @@ def segment_lengths(nrn, neurite_type=NeuriteType.all):
         return np.sqrt([np.dot(p, p) for p in vecs])
 
     tree_filter = is_type(neurite_type)
-    return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+    return [s for ss in iter_sections(nrn, tree_filter=tree_filter)
             for s in _seg_len(ss)]
 
 
@@ -146,7 +146,7 @@ def segment_midpoints(nrn, neurite_type=NeuriteType.all):
         return np.divide(np.add(sec.value[:-1], sec.value[1:])[:, :3], 2.0)
 
     tree_filter = is_type(neurite_type)
-    return [s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+    return [s for ss in iter_sections(nrn, tree_filter=tree_filter)
             for s in _seg_midpoint(ss)]
 
 
@@ -170,25 +170,25 @@ def segment_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
 def local_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all local bifurcation angles'''
     return [local_bifurcation_angle(b)
-            for b in i_chain2(nrn.neurites,
-                              iterator_type=ibifurcation_point,
-                              tree_filter=is_type(neurite_type))]
+            for b in iter_sections(nrn,
+                                   iterator_type=ibifurcation_point,
+                                   tree_filter=is_type(neurite_type))]
 
 
 def remote_bifurcation_angles(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all remote bifurcation angles'''
     return [remote_bifurcation_angle(b)
-            for b in i_chain2(nrn.neurites,
-                              iterator_type=ibifurcation_point,
-                              tree_filter=is_type(neurite_type))]
+            for b in iter_sections(nrn,
+                                   iterator_type=ibifurcation_point,
+                                   tree_filter=is_type(neurite_type))]
 
 
 def bifurcation_partitions(nrn, neurite_type=NeuriteType.all):
     '''Partition at neuron's bifurcation points'''
     return [bifurcation_partition(b)
-            for b in i_chain2(nrn.neurites,
-                              iterator_type=ibifurcation_point,
-                              tree_filter=is_type(neurite_type))]
+            for b in iter_sections(nrn,
+                                   iterator_type=ibifurcation_point,
+                                   tree_filter=is_type(neurite_type))]
 
 
 def section_radial_distances(nrn, neurite_type=NeuriteType.all, origin=None):
@@ -410,7 +410,7 @@ def bounding_box(section_tree):
     return np.array([min_xyz, max_xyz])
 
 
-def iter_segments(nrn, neurite_type=NeuriteType.all):
+def iter_segments(nrn, tree_filter=None):
     '''Return an iterator to the segments in a neuron or neuron population
 
     Note:
@@ -418,6 +418,19 @@ def iter_segments(nrn, neurite_type=NeuriteType.all):
         neuron segments. It may have a performance overhead WRT custom
         made segment analysis functions that leverage numpy.
     '''
-    tree_filter = is_type(neurite_type)
-    return chain(s for ss in i_chain2(nrn.neurites, tree_filter=tree_filter)
+    return chain(s for ss in iter_sections(nrn, tree_filter=tree_filter)
                  for s in izip(ss.value[:-1], ss.value[1:]))
+
+
+def iter_sections(nrn, iterator_type=ipreorder, tree_filter=None):
+    '''Returns an iterator to the sections in a neuron or neuron population
+
+    Parameters:
+        nrn: neuron or neuron population
+        iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
+        tree_filter: optional top level filter on properties of neurite tree objects.
+    '''
+    nrt = (nrn.neurites if tree_filter is None
+           else filter(tree_filter, nrn.neurites))
+
+    return chain.from_iterable(imap(iterator_type, nrt))

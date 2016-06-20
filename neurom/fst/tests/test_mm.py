@@ -102,7 +102,7 @@ def test_section_tortuosity():
     nt.eq_(_mm.section_tortuosity(sec_a), 1.0)
     nt.eq_(_mm.section_tortuosity(sec_b), 4.0 / 2.0)
 
-    for s in _mm.i_chain2(NRN.neurites):
+    for s in _mm.iter_sections(NRN):
         s = s.value
         nt.eq_(_mm.section_tortuosity(s),
                mmth.section_length(s) / mmth.point_dist(s[0], s[-1]))

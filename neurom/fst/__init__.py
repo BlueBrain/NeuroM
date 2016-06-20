@@ -58,9 +58,21 @@ from . import _mm
 from ..utils import deprecated
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
+from ..core.types import tree_type_checker as _is_type
 from ..analysis.morphmath import segment_radius as seg_rad
 from ..analysis.morphmath import segment_taper_rate as seg_taper
 from ..analysis.morphmath import section_length as sec_len
+
+
+def _iseg(nrn, neurite_type=None):
+    '''Build a tree type filter from a neurite type and forward to functon
+
+    TODO:
+        This should be a decorator
+    '''
+    tree_filter = None if neurite_type is None else _is_type(neurite_type)
+    return _mm.iter_segments(nrn, tree_filter=tree_filter)
+
 
 load_population = deprecated('Use load_neurons instead.',
                              fun_name='load_population')(load_neurons)
@@ -95,10 +107,10 @@ NEURITEFEATURES = {
     'trunk_origin_elevations': _mm.trunk_origin_elevations,
     'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
-    'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _mm.iter_segments(nrn, **kwargs)],
+    'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _iseg(nrn, **kwargs)],
     'segment_midpoints': _mm.segment_midpoints,
     'segment_taper_rates': lambda nrn, **kwargs: [seg_taper(s)
-                                                  for s in _mm.iter_segments(nrn, **kwargs)],
+                                                  for s in _iseg(nrn, **kwargs)],
     'segment_radial_distances': _mm.segment_radial_distances,
     'principal_direction_extents': _mm.principal_direction_extents
 }
