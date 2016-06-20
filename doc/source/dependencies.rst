@@ -26,31 +26,46 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+
 Dependencies
 ============
 
-Build-time and runtime
-^^^^^^^^^^^^^^^^^^^^^^
+Build and runtime
+-----------------
+
+.. _pre-dep-label:
+
+Pre-installed dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is recommended that these be installed into
+your system before attempting to install ``NeuroM``. These are not installed
+automatically.
 
 * `numpy <http://www.numpy.org/>`_
 * `h5py <http://www.h5py.org/>`_
 * `scipy <http://www.scipy.org/>`_
 * `matplotlib <http://www.matplotlib.org/>`_
-* `enum34 <https://pypi.python.org/pypi/enum34/>`_
 
-It is highly recommended that all except ``enum34`` be installed into your system
-before attempting to install ``NeuroM``. The ``NeuroM`` package installation
-takes care of installing ``enum34``.
+Automatically installed dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+These dependencies are installed automatically when installing with ``pip``:
+
+* `enum34 <https://pypi.python.org/pypi/enum34/>`_
+* `pyyaml <http://www.pyyaml.org/>`_
+
 
 Installing and building
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
 
 * `pip <https://pip.pypa.io/en/stable/>`_
 * `virtualenv <https://virtualenv.pypa.io/en/stable/>`_
 * `GNU Make <https://www.gnu.org/software/make/>`_
 
 Testing and documentation
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 These dependencies are not needed for installing and running ``NeuroM``,
 but are useful for those who want to contribute to its development.
