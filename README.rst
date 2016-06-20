@@ -67,26 +67,23 @@ It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to instal
 assumes ``virtualenv`` named ``nrm`` with access to the dependencies has been set up and
 activated. We will see three ways to install ``NeuroM``
 
-#. From the Python Package Index
-#. From the git repository
-#. From source (for NeuroM developers)
 
-From Python Package Index
--------------------------
+1. From the Python Package Index
+--------------------------------
 
 .. code-block:: bash
 
     (nrm)$ pip install neurom
 
-From git repository
--------------------
+2. From git repository
+----------------------
 
 .. code-block:: bash
 
     (nrm)$ pip install git+https://github.com/BlueBrain/NeuroM.git
 
-From source
------------
+3. From source
+--------------
 
 Clone the repository and install it:
 
