@@ -95,8 +95,6 @@ def test_section_tortuosity_pop():
 
     feat = 'section_tortuosity'
 
-    print 'XXX', _stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite))
-
     nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
                        (1.0,
                         4.6571118550276704,
