@@ -400,6 +400,7 @@ def plot_style(fig, ax, **kwargs):
         fig = save_plot(fig=ax, **kwargs)
 
     if not show_plot:
+        print 'YAAAAAAAY'
         plt.close()
         return (None, None)
     else:
