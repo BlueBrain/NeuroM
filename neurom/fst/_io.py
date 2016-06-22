@@ -41,7 +41,7 @@ from neurom.core.neuron import make_soma
 from neurom.io import utils as _iout
 
 
-Neuron = namedtuple('Neuron', 'soma, neurites, data_block, name')
+Neuron = namedtuple('Neuron', 'soma, neurites, sections, data_block, name')
 
 
 class SecDataWrapper(object):
@@ -73,38 +73,40 @@ def make_trees(rdw, post_action=None):
     '''Build section trees from a raw data wrapper'''
     trunks = rdw.neurite_trunks()
     if len(trunks) == 0:
-        return []
+        return [], []
 
     start_node = min(trunks)
 
     # One pass over sections to build nodes
-    nodes = [Tree(rdw.data_block[sec.ids]) for sec in rdw.sections[start_node:]]
+    nodes = tuple(Tree(rdw.data_block[sec.ids]) for sec in rdw.sections)
 
     # One pass over nodes to set the neurite type
     # and connect children to parents
-    for i in xrange(len(nodes)):
-        nodes[i].type = _TREE_TYPES[rdw.sections[i + start_node].ntype]
-        parent_id = rdw.sections[i + start_node].pid - start_node
-        if parent_id >= 0:
-            nodes[parent_id].add_child(nodes[i])
+    for i, node in enumerate(nodes):
+        node.type = _TREE_TYPES[rdw.sections[i].ntype]
+        node.section_id = i
+        parent_id = rdw.sections[i].pid
+        # only connect neurites
+        if parent_id >= start_node:
+            nodes[parent_id].add_child(node)
 
-    head_nodes = [nodes[i - start_node] for i in trunks]
+    head_nodes = tuple(nodes[i] for i in trunks)
 
     if post_action is not None:
         for n in head_nodes:
             post_action(n)
 
-    return head_nodes
+    return head_nodes, nodes
 
 
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
-    trees = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
+    trees, sections = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
     soma = make_soma(rdw.soma_points())
     name = os.path.splitext(os.path.basename(filename))[0]
-    return Neuron(soma, trees, rdw, name)
+    return Neuron(soma, trees, sections, rdw, name)
 
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)

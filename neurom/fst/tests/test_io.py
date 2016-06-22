@@ -31,6 +31,7 @@
 from nose import tools as nt
 import os
 from neurom.fst import _io
+from neurom.fst import _mm
 from neurom.fst import get
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -54,6 +55,25 @@ def test_neuron_name():
     for fn, nn in zip(FILENAMES, NRN_NAMES):
         nrn = _io.load_neuron(fn)
         nt.eq_(nrn.name, nn)
+
+
+def test_neurom_sections():
+    nrn = _io.load_neuron(FILENAMES[0])
+
+    # check section IDs
+    for i, sec in enumerate(nrn.sections):
+        nt.eq_(i, sec.section_id)
+
+    all_nodes = set(nrn.sections)
+    neurite_nodes = set(_mm.iter_nodes(nrn.neurites))
+
+    # check no duplicates
+    nt.assert_true(len(all_nodes) == len(nrn.sections))
+
+    # check all neurite tree nodes are
+    # in sections attribute
+    nt.assert_true(len(set(nrn.sections) - neurite_nodes) > 0)
+
 
 
 def test_load_neuron_soma_only():
