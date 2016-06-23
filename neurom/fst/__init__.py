@@ -59,6 +59,7 @@ from ..utils import deprecated
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.types import tree_type_checker as _is_type
+from ..core.tree import Tree
 from ..analysis.morphmath import segment_radius as seg_rad
 from ..analysis.morphmath import segment_taper_rate as seg_taper
 from ..analysis.morphmath import section_length as sec_len
@@ -101,10 +102,6 @@ NEURITEFEATURES = {
     'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
     'partition': _mm.bifurcation_partitions,
     'number_of_segments': partial(_as_neurons, _mm.n_segments),
-    'trunk_origin_radii': _mm.trunk_origin_radii,
-    'trunk_origin_azimuths': _mm.trunk_origin_azimuths,
-    'trunk_origin_elevations': _mm.trunk_origin_elevations,
-    'trunk_section_lengths': _mm.trunk_section_lengths,
     'segment_lengths': _mm.segment_lengths,
     'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _iseg(nrn, **kwargs)],
     'segment_midpoints': _mm.segment_midpoints,
@@ -117,14 +114,35 @@ NEURITEFEATURES = {
 NEURONFEATURES = {
     'soma_radii': _mm.soma_radii,
     'soma_surface_areas': _mm.soma_surface_areas,
+    'trunk_origin_radii': _mm.trunk_origin_radii,
+    'trunk_origin_azimuths': _mm.trunk_origin_azimuths,
+    'trunk_origin_elevations': _mm.trunk_origin_elevations,
+    'trunk_section_lengths': _mm.trunk_section_lengths,
 }
 
 
-def get(feature, *args, **kwargs):
-    '''Neuron feature getter helper
+def get(feature, obj, **kwargs):
+    '''Obtain a feature from a set of morphology objects
 
-    Returns features as a 1D numpy array.
+    Parameters:
+        feature (string): feature to extract.
+        obj: a neuron, population or neurite tree.
+        **kwargs: parameters to forward to underlying worker functions.
+
+    Returns:
+        features as a 1D or 2D numpy array.
     '''
+
     feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
                else NEURONFEATURES[feature])
-    return _np.array(feature(*args, **kwargs))
+
+    return _np.array(feature(obj, **kwargs))
+
+
+_SEP = '\n\t- '
+_get_doc = ('\nNeurite features (neurite, neuron, neuron population):%s%s'
+            '\nNeuron features (neuron, neuron population):%s%s'
+            % (_SEP, _SEP.join(sorted(NEURITEFEATURES)),
+               _SEP, _SEP.join(sorted(NEURONFEATURES))))
+
+get.__doc__ += _get_doc  # pylint: disable=no-member
