@@ -128,8 +128,8 @@ Neurite tree
 There are two alternative representations of a neurite tree.
 A neurite may consist of a tree structure with either a :ref:`points<point-label>`
 or a :ref:`section<section-label>` in each vertex or node. The different representations
-are accessible via the :py:mod:`ezy<neurom.ezy>` and :py:mod:`fst<neurom.fst>` modules
-respectively.
+are accessible via the :py:mod:`ezy<neurom.ezy>` (deprecated) and :py:mod:`fst<neurom.fst>`
+modules respectively.
 
 The tree structure implies the following:
 
@@ -144,10 +144,10 @@ are followed
     The conventions governing the types of points in a neurite
     tree need to be well defined
 
-In ``NeuroM`` neurite trees are implemented using the recursive structure 
+In :py:mod:`NeuroM<neurom>` neurite trees are implemented using the recursive structure 
 :py:class:`neurom.core.tree.Tree`, with each node holding a reference to either a
 single :ref:`morphology point<point-label>`, or an array of :ref:`points<point-label>`
-representing a `section<section-label>`.
+representing a :ref:`section<section-label>`.
 
 Neuron
 ------
@@ -162,4 +162,3 @@ The trees that are expected to be present depend on the type of cell:
 
 .. seealso::
     :py:class:`neurom.core.neuron.Neuron`
-    :py:class:`neurom.ezy.Neuron`

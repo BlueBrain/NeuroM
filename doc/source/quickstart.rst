@@ -26,14 +26,14 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-NeuroM Quick-Start Tutorial
-***************************
+NeuroM Quick-Start
+******************
 
 .. toctree::
    :maxdepth: 2
 
-   dependencies
    install
    quick
    examples
+   dependencies
 

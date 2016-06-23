@@ -43,7 +43,6 @@ Contents
    :maxdepth: 2
 
    quickstart
-   tour
    definitions
    api
    developer

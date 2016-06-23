@@ -31,7 +31,9 @@
 from nose import tools as nt
 import os
 from neurom.fst import _io
+from neurom.fst import _mm
 from neurom.fst import get
+from neurom.core.tree import ipreorder
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_ROOT = os.path.join(_path, '../../../test_data')
@@ -42,11 +44,12 @@ FILENAMES = [os.path.join(DATA_PATH, f)
 NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
 
 
+
 def test_load_neuron():
 
     nrn = _io.load_neuron(FILENAMES[0])
-    nt.assert_true(isinstance(nrn, _io.Neuron))
-    nt.assert_equal(nrn.name, 'Neuron')
+    nt.assert_true(isinstance(NRN, _io.Neuron))
+    nt.assert_equal(NRN.name, 'Neuron')
 
 
 def test_neuron_name():
@@ -54,6 +57,34 @@ def test_neuron_name():
     for fn, nn in zip(FILENAMES, NRN_NAMES):
         nrn = _io.load_neuron(fn)
         nt.eq_(nrn.name, nn)
+
+
+NRN = _io.load_neuron(FILENAMES[0])
+
+
+def test_neuron_section_ids():
+
+    # check section IDs
+    for i, sec in enumerate(NRN.sections):
+        nt.eq_(i, sec.section_id)
+
+def test_neuron_sections():
+    all_nodes = set(NRN.sections)
+    neurite_nodes = set(_mm.iter_nodes(NRN.neurites))
+
+    # check no duplicates
+    nt.assert_true(len(all_nodes) == len(NRN.sections))
+
+    # check all neurite tree nodes are
+    # in sections attribute
+    nt.assert_true(len(set(NRN.sections) - neurite_nodes) > 0)
+
+
+def test_neuron_sections_are_connected():
+    # check traversal by counting number of sections un trees
+    for nrt in NRN.neurites:
+        nt.assert_equal(sum(1 for _ in ipreorder(nrt)),
+                        sum(1 for _ in ipreorder(NRN.sections[nrt.section_id])))
 
 
 def test_load_neuron_soma_only():
