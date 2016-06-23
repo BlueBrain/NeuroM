@@ -122,7 +122,7 @@ NEURONFEATURES = {
 
 
 def get(feature, obj, **kwargs):
-    '''Neuron feature getter helper
+    '''Obtain a feature from a set of morphology objects
 
     Parameters:
         feature (string): feature to extract.
@@ -137,3 +137,12 @@ def get(feature, obj, **kwargs):
                else NEURONFEATURES[feature])
 
     return _np.array(feature(obj, **kwargs))
+
+
+_SEP = '\n\t- '
+_get_doc = ('\nNeurite features (neurite, neuron, neuron population):%s%s'
+            '\nNeuron features (neuron, neuron population):%s%s'
+            % (_SEP, _SEP.join(sorted(NEURITEFEATURES)),
+               _SEP, _SEP.join(sorted(NEURONFEATURES))))
+
+get.__doc__ += _get_doc  # pylint: disable=no-member
