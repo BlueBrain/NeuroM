@@ -112,7 +112,7 @@ def extract_stats(neurons):
         stat_name = old_name(ns)
         stats[stat_name] = {}
         for n in NEURITES:
-            stats[stat_name][n.name] = eval_stats(fst.get(ns, neurons, n))
+            stats[stat_name][n.name] = eval_stats(fst.get(ns, neurons, neurite_type=n))
             L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(stats[stat_name][n.name]))
 
     for ns in NEURON_STATS:

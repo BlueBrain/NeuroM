@@ -125,6 +125,7 @@ def get(feature, obj, **kwargs):
     '''Neuron feature getter helper
 
     Parameters:
+        feature (string): feature to extract.
         obj: a neuron, population or neurite tree.
         **kwargs: parameters to forward to underlying worker functions.
 
