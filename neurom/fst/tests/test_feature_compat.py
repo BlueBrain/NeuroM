@@ -84,12 +84,18 @@ class SectionTreeBase(object):
         nt.assert_equal(neurite_types, [n1.type for n1 in self.ref_nrn.neurites])
 
     def test_get_n_sections(self):
+        nt.assert_equal(fst._mm.n_sections(self.sec_nrn.neurites[0]),
+                        get('number_of_sections', self.ref_nrn.neurites[0])[0])
+
         nt.assert_equal(fst._mm.n_sections(self.sec_nrn), get('number_of_sections', self.ref_nrn)[0])
         for t in NeuriteType:
             nt.assert_equal(fst._mm.n_sections(self.sec_nrn, neurite_type=t),
                             get('number_of_sections', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_n_sections_per_neurite(self):
+        _equal(fst._mm.n_sections_per_neurite(self.sec_nrn.neurites[0]),
+               get('number_of_sections_per_neurite', self.ref_nrn.neurites[0]))
+
         _equal(fst._mm.n_sections_per_neurite(self.sec_nrn),
                get('number_of_sections_per_neurite', self.ref_nrn))
 
@@ -98,18 +104,27 @@ class SectionTreeBase(object):
                    get('number_of_sections_per_neurite', self.ref_nrn, neurite_type=t))
 
     def test_get_n_segments(self):
+        nt.assert_equal(fst._mm.n_segments(self.sec_nrn.neurites[0]),
+                        get('number_of_segments', self.ref_nrn.neurites[0])[0])
+
         nt.assert_equal(fst._mm.n_segments(self.sec_nrn), get('number_of_segments', self.ref_nrn)[0])
         for t in NeuriteType:
             nt.assert_equal(fst._mm.n_segments(self.sec_nrn, neurite_type=t),
                             get('number_of_segments', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_number_of_neurites(self):
+        nt.assert_equal(fst._mm.n_neurites(self.sec_nrn.neurites[0]),
+                        get('number_of_neurites', self.ref_nrn.neurites[0])[0])
+
         nt.assert_equal(fst._mm.n_neurites(self.sec_nrn), get('number_of_neurites', self.ref_nrn)[0])
         for t in NeuriteType:
             nt.assert_equal(fst._mm.n_neurites(self.sec_nrn, neurite_type=t),
                             get('number_of_neurites', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_section_path_distances(self):
+        _close(fst._mm.section_path_lengths(self.sec_nrn.neurites[0]),
+               get('section_path_distances', self.ref_nrn.neurites[0]))
+
         _close(fst._mm.section_path_lengths(self.sec_nrn), get('section_path_distances', self.ref_nrn))
         for t in NeuriteType:
             _close(fst._mm.section_path_lengths(self.sec_nrn, neurite_type=t),
@@ -120,6 +135,9 @@ class SectionTreeBase(object):
 
     @nt.nottest
     def test_get_segment_lengths(self):
+        _equal(fst._mm.segment_lengths(self.sec_nrn.neurites[0]),
+               get('segment_lengths', self.ref_nrn.neurites[0]))
+
         _equal(fst._mm.segment_lengths(self.sec_nrn), get('segment_lengths', self.ref_nrn))
         for t in NeuriteType:
             _equal(fst._mm.segment_lengths(self.sec_nrn, neurite_type=t),
@@ -132,6 +150,9 @@ class SectionTreeBase(object):
         nt.assert_equal(fst._mm.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
+        _close(fst._mm.local_bifurcation_angles(self.sec_nrn.neurites[0]),
+               get('local_bifurcation_angles', self.ref_nrn.neurites[0]))
+
         _close(fst._mm.local_bifurcation_angles(self.sec_nrn),
                get('local_bifurcation_angles', self.ref_nrn))
 
@@ -145,6 +166,9 @@ class SectionTreeBase(object):
         _close(ba, get('local_bifurcation_angles', self.ref_nrn))
 
     def test_get_remote_bifurcation_angles(self):
+        _close(fst._mm.remote_bifurcation_angles(self.sec_nrn.neurites[0]),
+               get('remote_bifurcation_angles', self.ref_nrn.neurites[0]))
+
         _close(fst._mm.remote_bifurcation_angles(self.sec_nrn),
                get('remote_bifurcation_angles', self.ref_nrn))
 
@@ -158,6 +182,9 @@ class SectionTreeBase(object):
         _close(ba, get('remote_bifurcation_angles', self.ref_nrn))
 
     def test_get_section_radial_distances(self):
+        _close(fst._mm.section_radial_distances(self.sec_nrn.neurites[0]),
+               get('section_radial_distances', self.ref_nrn.neurites[0]))
+
         _close(fst._mm.section_radial_distances(self.sec_nrn),
                get('section_radial_distances', self.ref_nrn))
 

@@ -335,3 +335,11 @@ def test_segment_radii_nrn():
                         1.0215770602226257,
                         256.71241207793355,
                         0.61122002875698467)))
+
+
+def test_neurite_features_accept_single_tree():
+
+    features = fst.NEURITEFEATURES.keys()
+
+    for f in features:
+        fst.get(f, NRN.neurites[0])
