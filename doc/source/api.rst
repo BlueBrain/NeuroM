@@ -32,6 +32,8 @@ API Documentation
 .. autosummary::
    :toctree: _neurom_build
 
+   neurom
+   neurom.viewer
    neurom.core
    neurom.core.types
    neurom.core.tree
@@ -44,7 +46,6 @@ API Documentation
    neurom.io.utils
    neurom.io.swc
    neurom.io.hdf5
-   neurom.viewer
    neurom.view
    neurom.view.common
    neurom.view.view
