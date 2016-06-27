@@ -37,11 +37,7 @@ from pip.req import parse_requirements
 from optparse import Option
 
 
-def get_version():
-    '''Get the package version from package version module'''
-    version_path = os.path.join('neurom', 'version.py')
-    execfile(version_path)
-    return locals()['VERSION']
+VERSION = "0.1.1.dev0"
 
 
 def parse_reqs(reqs_file):
@@ -82,7 +78,7 @@ config = {
     'author': 'BBP Algorithm Development Team',
     'url': 'http://https://github.com/BlueBrain/NeuroM',
     'author_email': 'juan.palacios@epfl.ch, lida.kanari@epfl.ch',
-    'version': get_version(),
+    'version': VERSION,
     'install_requires': REQS,
     'extras_require': EXTRA_REQS,
     'packages': find_packages(),
