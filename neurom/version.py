@@ -27,4 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """ neurom version """
-VERSION = "0.1.1.dev0"
+from pkg_resources import get_distribution, DistributionNotFound
+
+try:
+    VERSION = get_distribution('neurom').version  # pylint: disable=no-member
+except DistributionNotFound:  # pragma: no cover
+    VERSION = 'neurom-local'

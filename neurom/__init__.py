@@ -26,7 +26,38 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM '''
+''' NeuroM top level module
+
+Examples:
+
+    Load a neuron
+
+    >>> import neurom as nm
+    >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
+
+    Obtain some morphometrics
+
+    >>> ap_seg_len = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
+    >>> ax_sec_len = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
+
+    Load neurons from a directory. This loads all SWC, HDF5 or NeuroLucida .asc\
+    files it finds and returns a list of neurons
+
+    >>> import numpy as np  # For mean value calculation
+    >>> nrns = nm.load_neurons('some/data/directory')
+    >>> for nrn in nrns:
+    ...     print 'mean section length', np.mean(nm.get('section_lengths', nrn))
+
+
+'''
 
 from .version import VERSION as __version__
 from .core import iter_neurites
+from .fst import load_neuron, load_neurons, NeuriteType, get, NEURITE_TYPES
+
+
+APICAL_DENDRITE = NeuriteType.apical_dendrite
+BASAL_DENDRITE = NeuriteType.basal_dendrite
+AXON = NeuriteType.axon
+SOMA = NeuriteType.soma
+ANY_NEURITE = NeuriteType.all
