@@ -35,7 +35,13 @@ from setuptools import find_packages
 import pip
 from pip.req import parse_requirements
 from optparse import Option
-from neurom.version import VERSION
+
+
+def get_version():
+    '''Get the package version from package version module'''
+    version_path = os.path.join('neurom', 'version.py')
+    execfile(version_path)
+    return locals()['VERSION']
 
 
 def parse_reqs(reqs_file):
@@ -76,7 +82,7 @@ config = {
     'author': 'BBP Algorithm Development Team',
     'url': 'http://https://github.com/BlueBrain/NeuroM',
     'author_email': 'juan.palacios@epfl.ch, lida.kanari@epfl.ch',
-    'version': VERSION,
+    'version': get_version(),
     'install_requires': REQS,
     'extras_require': EXTRA_REQS,
     'packages': find_packages(),
