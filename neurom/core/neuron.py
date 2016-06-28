@@ -74,6 +74,11 @@ class BaseSoma(object):
         '''Iterator to soma contents'''
         return iter(self._points)
 
+    @property
+    def points(self):
+        '''Get the set of (x, y, z, r) points this soma'''
+        return self._points[:, 0:4]
+
 
 class SomaSinglePoint(BaseSoma):
     '''
@@ -126,7 +131,7 @@ class SomaSimpleContour(BaseSoma):
     def center(self):
         '''Obtain the center from the average of all points'''
         points = np.array(self._points)
-        return list(np.mean(points[:, :COLS.R], axis=0))
+        return np.mean(points[:, :COLS.R], axis=0)
 
     def __str__(self):
         return 'SomaSimpleContour(%s) <center: %s, radius: %s>' % \

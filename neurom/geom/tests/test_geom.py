@@ -26,16 +26,43 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Geometrical Operations for NeuroM '''
-
+import os
 import numpy as np
+import neurom as nm
+from neurom import geom
+
+from nose import tools as nt
+
+_PWD = os.path.dirname(os.path.abspath(__file__))
+SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
+NRN = nm.load_neuron(os.path.join(SWC_DATA_PATH, 'Neuron.swc'))
 
 
-def bounding_box(obj):
-    '''Get the (x, y, z) bounding box of an object containing points
+class PointObj(object):
+    pass
 
-    Returns:
-        2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
-    '''
-    return np.array([np.min(obj.points[:, 0:3], axis=0),
-                     np.max(obj.points[:, 0:3], axis=0)])
+
+def test_bounding_box():
+
+    pts = np.array([[-1, -2, -3, -999],
+                    [1, 2, 3, 1000],
+                    [-100, 5, 33, 42],
+                    [42, 55, 12, -3]])
+
+    obj = PointObj()
+    obj.points = pts
+
+    nt.assert_true(np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]]))
+
+
+def test_bounding_box_neuron():
+
+    ref = np.array([[-40.32853516, -57.600172  , 0.],
+                    [ 64.74726272, 48.51626225, 54.20408797]])
+
+    nt.assert_true(np.allclose(geom.bounding_box(NRN), ref))
+
+
+def test_bounding_box_soma():
+    ref = np.array([[0., 0., 0.], [0.1, 0.2, 0.]])
+    nt.assert_true(np.allclose(geom.bounding_box(NRN.soma), ref))
