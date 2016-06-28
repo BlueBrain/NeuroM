@@ -11,7 +11,8 @@ from neurom.fst import load_neuron
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 NEURON = load_neuron(DATA_PATH)
-TREE = NEURON.neurites[0]
+NEURITE = NEURON.neurites[0]
+TREE = NEURITE.root_node
 
 OLD_OFFS = [1.2, -1.2]
 NEW_OFFS = [2.3, -2.3]
@@ -19,7 +20,7 @@ SPACING = (40., 0.)
 
 def test_n_rectangles_tree():
 
-    nt.assert_equal(dm._n_rectangles(TREE), 230)
+    nt.assert_equal(dm._n_rectangles(NEURITE), 230)
 
 
 def test_n_rectangles_neuron():
@@ -81,7 +82,7 @@ class TestDendrogram(object):
 
     def setUp(self):
 
-        self.dtr = dm.Dendrogram(TREE)
+        self.dtr = dm.Dendrogram(NEURITE)
         self.dnrn = dm.Dendrogram(NEURON)
 
         self.dtr.generate()

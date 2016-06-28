@@ -31,15 +31,16 @@
 from itertools import imap, izip
 from neurom import segments as seg
 from neurom import iter_neurites
-from neurom.core.tree import ipreorder, Tree
+from neurom.core.tree import Tree
 from neurom.analysis.morphtree import get_bounding_box
 from neurom.analysis.morphtree import find_tree_type
 from neurom import fst
+from neurom import geom
 
 
 def is_new_style(obj):
-    '''Determine whether a neuron or tree is new or old style'''
-    if isinstance(obj, fst.Neuron):
+    '''Determine whether a neuron or neurite is new or old style'''
+    if isinstance(obj, (fst.Neuron, fst.Neurite)):
         return True
     elif isinstance(obj, Tree):
         return len(obj.value.shape) == 2
@@ -47,30 +48,30 @@ def is_new_style(obj):
         return False
 
 
-def bounding_box(tree):
-    '''Get a tree's X,Y,Z bounding box'''
-    if is_new_style(tree):
-        return fst._mm.bounding_box(tree)  # pylint: disable=protected-access
+def bounding_box(neurite):
+    '''Get a neurite's X,Y,Z bounding box'''
+    if is_new_style(neurite):
+        return geom.bounding_box(neurite)
     else:
-        return get_bounding_box(tree)
+        return get_bounding_box(neurite)
 
 
-def neurite_type(tree):
+def neurite_type(neurite):
     '''Get the neurite type of a neurite tree'''
-    if is_new_style(tree):
-        return tree.type
+    if is_new_style(neurite):
+        return neurite.type
     else:
-        return find_tree_type(tree)
+        return find_tree_type(neurite)
 
 
-def map_segments(tree, fun):
+def map_segments(neurite, fun):
     '''map a function to the segments in a tree'''
     def _segfun(sec):
         '''map a segment function to the segments in section sec'''
         return imap(fun, izip(sec.value[:-1], sec.value[1:]))
 
-    if is_new_style(tree):
-        return [s for ss in ipreorder(tree) for s in _segfun(ss)]
+    if is_new_style(neurite):
+        return [s for ss in neurite.iter_nodes() for s in _segfun(ss)]
     else:
         fun = seg.segment_function(as_tree=False)(fun)
-        return list(iter_neurites(tree, fun))
+        return list(iter_neurites(neurite, fun))

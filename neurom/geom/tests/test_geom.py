@@ -29,6 +29,7 @@
 import os
 import numpy as np
 import neurom as nm
+from neurom import fst
 from neurom import geom
 
 from nose import tools as nt
@@ -66,3 +67,9 @@ def test_bounding_box_neuron():
 def test_bounding_box_soma():
     ref = np.array([[0., 0., 0.], [0.1, 0.2, 0.]])
     nt.assert_true(np.allclose(geom.bounding_box(NRN.soma), ref))
+
+
+def test_bounding_box_neurite():
+    nrt = NRN.neurites[0]
+    ref = np.array([[-33.25305769, -57.600172, 0.], [0., 0., 49.70137991]])
+    nt.assert_true(np.allclose(geom.bounding_box(nrt), ref))

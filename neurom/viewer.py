@@ -48,8 +48,8 @@ from .view.view import soma as draw_soma
 from .view.view import soma3d as draw_soma3d
 from .view.view import dendrogram as draw_dendrogram
 from .core.neuron import Neuron, BaseSoma
-from .fst._io import Neuron as FstNeuron
-from .core.tree import Tree
+from .fst import Neuron as FstNeuron
+from .fst import Neurite, Tree
 
 
 MODES = ('2d', '3d', 'dendrogram')
@@ -111,7 +111,7 @@ def draw(obj, mode='2d', **kwargs):
 
     if isinstance(obj, (Neuron, FstNeuron)):
         tag = 'neuron'
-    elif isinstance(obj, Tree):
+    elif isinstance(obj, (Tree, Neurite)):
         tag = 'tree'
     elif isinstance(obj, BaseSoma):
         tag = 'soma'
