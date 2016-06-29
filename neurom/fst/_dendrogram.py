@@ -31,6 +31,7 @@
 from neurom.core.tree import Tree, ipreorder
 from neurom.analysis.morphtree import n_terminations
 from neurom.core.dataformat import COLS
+from neurom.fst import Neurite
 
 import numpy as np
 import sys
@@ -41,7 +42,7 @@ def _max_recursion_depth(obj):
     '''
     neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
 
-    return max(sum(1 for _ in ipreorder(neu)) for neu in neurites)
+    return max(sum(1 for _ in neu.iter_nodes()) for neu in neurites)
 
 
 def _total_rectangles(tree):
@@ -50,7 +51,8 @@ def _total_rectangles(tree):
     for the dendrogram. There is a vertical line for each segment
     and two horizontal line at each branching point
     '''
-    return sum(len(sec.children) + sec.value.shape[0] - 1 for sec in ipreorder(tree))
+    return sum(len(sec.children) + sec.value.shape[0] - 1
+               for sec in tree.iter_nodes())
 
 
 def _n_rectangles(obj):
@@ -126,7 +128,7 @@ class Dendrogram(object):
         self._show_diameters = show_diameters
 
         # input object, tree, or neuron
-        self._obj = obj
+        self._obj = Neurite(obj) if isinstance(obj, Tree) else obj
 
         # counter/index for the storage of the rectangles.
         # it is updated recursively
@@ -169,12 +171,12 @@ class Dendrogram(object):
         max_depth = old_depth if old_depth > self._max_rec_depth else self._max_rec_depth
         sys.setrecursionlimit(max_depth)
 
-        if isinstance(self._obj, Tree):
+        if isinstance(self._obj, Neurite):
 
-            max_diameter = _max_diameter(self._obj)
+            max_diameter = _max_diameter(self._obj.root_node)
 
             dummy_section = Tree(None)
-            dummy_section.add_child(self._obj)
+            dummy_section.add_child(self._obj.root_node)
             self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
 
             self._groups.append((0., self._n))
@@ -185,6 +187,7 @@ class Dendrogram(object):
 
             for neurite in self._obj.neurites:
 
+                neurite = neurite.root_node
                 max_diameter = _max_diameter(neurite)
                 dummy_section = Tree(None)
 

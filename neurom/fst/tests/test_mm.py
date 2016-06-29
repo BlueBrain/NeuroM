@@ -64,18 +64,6 @@ def _close(a, b, debug=False):
     nt.assert_true(np.allclose(a, b))
 
 
-def test_bounding_box():
-
-    ref_bboxes = [
-        [[0.0, -52.79933167, 0.], [64.74726105, 0, 54.2040863]],
-        [[-40.32853699, 0., 0.], [0.,45.98951721, 51.6414299 ]],
-        [[0., 0., 0.], [64.24953461, 48.51626205, 50.51401901]],
-        [[-33.25305939, -57.60017014, 0.], [0., 0., 49.70138168]]
-    ]
-
-    bboxes = [_mm.bounding_box(n) for n in NRN.neurites]
-    nt.assert_true(np.allclose(bboxes, ref_bboxes))
-
 def test_iter_segments():
     def seg_fun(seg):
         return seg[1][:4] - seg[0][:4]
@@ -131,12 +119,12 @@ def test_trunk_origin_elevations():
     t0.type = fst.NeuriteType.basal_dendrite
     t1 = tr.Tree(((0, 1, 0, 2), (1, 2, 1, 2)))
     t1.type = fst.NeuriteType.basal_dendrite
-    n0.neurites = [t0, t1]
+    n0.neurites = [fst.Neurite(t0), fst.Neurite(t1)]
     n0.soma = s
 
     t2 = tr.Tree(((0, -1, 0, 2), (-1, -2, -1, 2)))
     t2.type = fst.NeuriteType.basal_dendrite
-    n1.neurites = [t2]
+    n1.neurites = [fst.Neurite(t2)]
     n1.soma = s
 
     pop = Population([n0, n1])

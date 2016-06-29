@@ -83,8 +83,9 @@ def test_neuron_sections():
 def test_neuron_sections_are_connected():
     # check traversal by counting number of sections un trees
     for nrt in NRN.neurites:
-        nt.assert_equal(sum(1 for _ in ipreorder(nrt)),
-                        sum(1 for _ in ipreorder(NRN.sections[nrt.section_id])))
+        root_node = nrt.root_node
+        nt.assert_equal(sum(1 for _ in ipreorder(root_node)),
+                        sum(1 for _ in ipreorder(NRN.sections[root_node.section_id])))
 
 
 def test_load_neuron_soma_only():

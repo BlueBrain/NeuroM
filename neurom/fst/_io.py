@@ -31,17 +31,43 @@
 import os
 from collections import namedtuple, defaultdict
 from functools import partial, update_wrapper
+import numpy as np
 from neurom.io.swc import SWC
 from neurom.io.neurolucida import NeurolucidaASC
 from neurom.core.types import NeuriteType
-from neurom.core.tree import Tree
+from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.neuron import make_soma
 from neurom.io import utils as _iout
 
 
-Neuron = namedtuple('Neuron', 'soma, neurites, sections, data_block, name')
+Neuron = namedtuple('Neuron', 'soma, neurites, sections, points, data_block, name')
+
+
+class Neurite(object):
+    '''Class representing a neurite tree'''
+    def __init__(self, root_node):
+        self.root_node = root_node
+        self.type = root_node.type
+        self._points = None
+
+    @property
+    def points(self):
+        '''Return all the points in this neurite'''
+        if self._points is None:
+            # add all points in a section except the first one, which is a
+            # duplicate
+            _pts = [v for s in ipreorder(self.root_node) for v in s.value[1:, :4]]
+            # except for the very first point, which is not a duplicate
+            _pts.insert(0, self.root_node.value[0][:4])
+            self._points = np.array(_pts)
+
+        return self._points
+
+    def iter_nodes(self):
+        '''unordered iteration over section nodes'''
+        return ipreorder(self.root_node)
 
 
 class SecDataWrapper(object):
@@ -69,8 +95,8 @@ class SecDataWrapper(object):
 _TREE_TYPES = tuple(NeuriteType)
 
 
-def make_trees(rdw, post_action=None):
-    '''Build section trees from a raw data wrapper'''
+def make_neurites(rdw, post_action=None):
+    '''Build neurite trees from a raw data wrapper'''
     trunks = rdw.neurite_trunks()
     if len(trunks) == 0:
         return [], []
@@ -90,23 +116,28 @@ def make_trees(rdw, post_action=None):
         if parent_id >= start_node:
             nodes[parent_id].add_child(node)
 
-    head_nodes = tuple(nodes[i] for i in trunks)
+    neurites = tuple(Neurite(nodes[i]) for i in trunks)
 
     if post_action is not None:
-        for n in head_nodes:
-            post_action(n)
+        for n in neurites:
+            post_action(n.root_node)
 
-    return head_nodes, nodes
+    return neurites, nodes
 
 
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     ext = os.path.splitext(filename)[1][1:]
     rdw = _READERS[ext.lower()](filename)
-    trees, sections = make_trees(rdw, _NEURITE_ACTION[ext.lower()])
+    neurites, sections = make_neurites(rdw, _NEURITE_ACTION[ext.lower()])
     soma = make_soma(rdw.soma_points())
     name = os.path.splitext(os.path.basename(filename))[0]
-    return Neuron(soma, trees, sections, rdw, name)
+    return Neuron(soma=soma,
+                  neurites=neurites,
+                  sections=sections,
+                  points=rdw.data_block[:, 0:4],
+                  data_block=rdw,
+                  name=name)
 
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)

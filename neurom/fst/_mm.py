@@ -32,22 +32,22 @@ import math
 import functools
 from itertools import imap, izip, chain
 import numpy as np
-from neurom.core.tree import Tree
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.tree import ipreorder, ibifurcation_point, iupstream
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
+from . import Neurite
 
 
 def neurite_fun(fun):
-    '''Wrapper to extract the neurites of the first parameter'''
+    '''Wrapper to extract the neurite trees from the first parameter'''
     @functools.wraps(fun)
     def _neurites(obj, **kwargs):
         '''Extract neurites from obj and forward to wrapped function'''
         if hasattr(obj, 'neurites'):
             obj = obj.neurites
-        elif isinstance(obj, Tree):
+        elif isinstance(obj, Neurite):
             obj = (obj,)
         return fun(obj, **kwargs)
 
@@ -184,8 +184,8 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     dist = []
     for n in neurites:
         if tree_filter(n):
-            origin = n.value[0] if origin is None else origin
-            dist.extend([s for ss in ipreorder(n) for s in _seg_rd(ss, origin)])
+            origin = n.root_node.value[0] if origin is None else origin
+            dist.extend([s for ss in n.iter_nodes() for s in _seg_rd(ss, origin)])
 
     return dist
 
@@ -224,8 +224,8 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     dist = []
     for n in neurites:
         if tree_filter(n):
-            origin = n.value[0] if origin is None else origin
-            dist.extend([section_radial_distance(s, origin) for s in ipreorder(n)])
+            origin = n.root_node.value[0] if origin is None else origin
+            dist.extend([section_radial_distance(s, origin) for s in n.iter_nodes()])
 
     return dist
 
@@ -233,13 +233,13 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''list of lengths of trunk sections of neurites in a neuron'''
     tree_filter = is_type(neurite_type)
-    return [mm.section_length(s.value) for s in nrn.neurites if tree_filter(s)]
+    return [mm.section_length(s.root_node.value) for s in nrn.neurites if tree_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     ''' list of lengths of trunk sections of neurites in a neuron'''
     tree_filter = is_type(neurite_type)
-    return [s.value[0][COLS.R] for s in nrn.neurites if tree_filter(s)]
+    return [s.root_node.value[0][COLS.R] for s in nrn.neurites if tree_filter(s)]
 
 
 def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
@@ -258,7 +258,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
         vector = mm.vector(section[0], soma.center)
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
-    return [_azimuth(s.value, n.soma)
+    return [_azimuth(s.root_node.value, n.soma)
             for n in nrns for s in n.neurites if tree_filter(s)]
 
 
@@ -284,7 +284,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
         else:
             raise ValueError("Norm of vector between soma center and section is almost zero.")
 
-    return [_elevation(s.value, n.soma)
+    return [_elevation(s.root_node.value, n.soma)
             for n in nrns for s in n.neurites if tree_filter(s)]
 
 
@@ -292,14 +292,14 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 def n_sections_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a collection of neurites'''
     tree_filter = is_type(neurite_type)
-    return [sum(1 for _ in ipreorder(n)) for n in neurites if tree_filter(n)]
+    return [sum(1 for _ in n.iter_nodes()) for n in neurites if tree_filter(n)]
 
 
 @neurite_fun
 def total_length_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a collection'''
     tree_filter = is_type(neurite_type)
-    return list(sum(mm.section_length(s.value) for s in ipreorder(n))
+    return list(sum(mm.section_length(s.value) for s in n.iter_nodes())
                 for n in neurites if tree_filter(n))
 
 
@@ -409,35 +409,11 @@ def principal_direction_extents(neurites, neurite_type=NeuriteType.all, directio
     def _pde(neurite):
         '''Get the PDE of a single neurite'''
         # Get the X, Y,Z coordinates of the points in each section
-        # except for the first one, which is duplicated in section-section
-        # boundaries
-        points = [v for s in ipreorder(neurite) for v in s.value[1:, :COLS.R]]
-        # Add the very first point, which is not a duplicate
-        points.append(neurite.value[0][: COLS.R])
-        points = np.array(points)
+        points = neurite.points[:, :3]
         return mm.principal_direction_extent(points)[direction]
 
     tree_filter = is_type(neurite_type)
     return [_pde(n) for n in neurites if tree_filter(n)]
-
-
-def bounding_box(section_tree):
-    """Calculate the 3-dimensional bounding box of a neurite tree
-
-    Returns:
-        numpy array with the boundaries of a section tree in three dimensions:
-            [[xmin, ymin, zmin],
-             [xmax, ymax, zmax]]
-    """
-
-    min_xyz, max_xyz = (np.array([np.inf, np.inf, np.inf]),
-                        np.array([np.NINF, np.NINF, np.NINF]))
-
-    for p in ipreorder(section_tree):
-        min_xyz = np.minimum(np.amin(p.value[:, :COLS.R], axis=0), min_xyz)
-        max_xyz = np.maximum(np.amax(p.value[:, :COLS.R], axis=0), max_xyz)
-
-    return np.array([min_xyz, max_xyz])
 
 
 def iter_segments(neurites, tree_filter=None):
@@ -462,6 +438,8 @@ def iter_nodes(trees, iterator_type=ipreorder, tree_filter=None):
     '''
     trees = (trees if tree_filter is None
              else filter(tree_filter, trees))
+
+    trees = (t.root_node if isinstance(t, Neurite) else t for t in trees)
 
     return chain.from_iterable(imap(iterator_type, trees))
 

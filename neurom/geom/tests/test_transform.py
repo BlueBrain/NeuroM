@@ -48,7 +48,7 @@ T8 = T7.add_child(Tree(np.array([4.0, 5.0, 0.0, 0.75, 1, 1, 2])))
 T9 = T6.add_child(Tree(np.array([0.0, 5.0, 3.0, 0.75, 1, 1, 2])))
 T10 = T9.add_child(Tree(np.array([0.0, 6.0, 3.0, 0.75, 1, 1, 2])))
 
-SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))   
+SOMA = make_soma(np.array([[0., 0., 0., 1., 1., 1., -1.]]))
 NEURON = Neuron(SOMA, [TREE])
 TREE = NEURON.neurites[0]
 
