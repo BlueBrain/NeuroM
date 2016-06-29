@@ -51,6 +51,8 @@ def is_new_style(obj):
 def bounding_box(neurite):
     '''Get a neurite's X,Y,Z bounding box'''
     if is_new_style(neurite):
+        if isinstance(neurite, Tree):
+            neurite = fst.Neurite(neurite)
         return geom.bounding_box(neurite)
     else:
         return get_bounding_box(neurite)
@@ -71,6 +73,8 @@ def map_segments(neurite, fun):
         return imap(fun, izip(sec.value[:-1], sec.value[1:]))
 
     if is_new_style(neurite):
+        if isinstance(neurite, Tree):
+            neurite = fst.Neurite(neurite)
         return [s for ss in neurite.iter_nodes() for s in _segfun(ss)]
     else:
         fun = seg.segment_function(as_tree=False)(fun)
