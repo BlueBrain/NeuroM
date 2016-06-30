@@ -29,9 +29,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.io.readers import load_data
 from neurom.io import check as io_chk
 from neurom.io.utils import get_morph_files
+from neurom.fst._io import load_data
 import argparse
 import os
 import sys

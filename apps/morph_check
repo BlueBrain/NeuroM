@@ -29,7 +29,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.io.utils import load_neuron, get_morph_files
+from neurom.io.utils import get_morph_files
+from neurom import load_neuron
 from neurom.check import ok as chk_ok
 from neurom.check import morphology as morph_chk
 from neurom.exceptions import SomaError, IDSequenceError, MultipleTrees, MissingParentError
