@@ -27,8 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from neurom.core.tree import ipreorder
-from neurom.io.utils import load_neuron
+from neurom import load_neuron
+from neurom.fst import _io as io
 from neurom.check import morphology as check_morph
 from neurom.core.dataformat import COLS
 from nose import tools as nt
@@ -50,16 +50,18 @@ def _load_neuron(name):
 
 def _make_monotonic(neuron):
     for neurite in neuron.neurites:
-        for node in ipreorder(neurite):
+        for node in neurite.iter_nodes():
+            sec = node.value
             if node.parent is not None:
-                node.value[COLS.R] = node.parent.value[COLS.R] / 2.
+                sec[0][COLS.R] = node.parent.value[-1][COLS.R] / 2.
+            for point_id in xrange(len(sec) - 1):
+                sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 
 
 def _make_flat(neuron):
     for neurite in neuron.neurites:
-        for node in ipreorder(neurite):
-            if node.parent is not None:
-                node.value[COLS.Z] = 0.
+        neurite.points[:, COLS.Z] = 0.
+
 
 NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
                                           'Neuron_2_branch.h5',
@@ -75,6 +77,18 @@ NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
 
 def _pick(files):
     return [NEURONS[f] for f in files]
+
+
+def test_has_soma_good_data():
+    dw = io.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nt.ok_(check_morph.has_valid_soma(dw))
+    dw = io.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
+    nt.ok_(check_morph.has_valid_soma(dw))
+
+
+def test_has_soma_bad_data():
+    dw = io.load_data(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
+    nt.ok_(not check_morph.has_valid_soma(dw))
 
 
 def test_has_axon_good_data():
