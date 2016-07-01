@@ -92,6 +92,16 @@ def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     return types.count(NeuriteType.basal_dendrite) >= min_number
 
 
+def has_nonzero_soma_radius(neuron, threshold=0.0):
+    '''Check if soma radius not above threshold
+
+    Arguments:
+        neuron: Neuron object whose soma will be tested
+        threshold: value above which the soma radius is considered to be non-zero
+    '''
+    return neuron.soma.radius > threshold
+
+
 def get_flat_neurites(neuron, tol=0.1, method='ratio'):
     '''Check if a neuron has neurites that are flat within a tolerance
 

@@ -42,4 +42,4 @@ def ok(result):
     try:
         return len(result) == 0
     except TypeError:
-        return result is True
+        return bool(result)

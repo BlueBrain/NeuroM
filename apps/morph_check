@@ -63,6 +63,7 @@ Default errors checked for
 ------------------
 * No soma
 * Disconnected points
+* Zero radius soma
 * No axon
 * No apical dendrite
 * No basal dendrite
@@ -72,6 +73,7 @@ Default errors checked for
 
 Default values for options
 --------------
+* has_nonzero_soma_radius 0.0
 * nonzero_neurite_radii: 0.007
 * nonzero_segment_lengths: 0.01
 * nonzero_section_lengths: 0.01
@@ -222,13 +224,15 @@ def check_files(files, config):
 
 
 # Default check configuration parameters
-CONFIG = {'neuron_checks': ['has_basal_dendrite',
+CONFIG = {'neuron_checks': ['has_nonzero_soma_radius',
+                            'has_basal_dendrite',
                             'has_axon',
                             'has_apical_dendrite',
                             'nonzero_segment_lengths',
                             'nonzero_section_lengths',
                             'nonzero_neurite_radii'],
-          'options': {"nonzero_neurite_radii": 0.007,
+          'options': {'has_nonzero_soma_radius': 0.0,
+                      "nonzero_neurite_radii": 0.007,
                       "nonzero_segment_lengths": 0.01,
                       "nonzero_section_lengths": 0.01},
           'color': False}
