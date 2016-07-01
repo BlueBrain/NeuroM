@@ -31,12 +31,19 @@ import numpy as np
 from nose import tools as nt
 
 
+def _eq(a, b):
+    '''Return a different type of bool'''
+    return np.bool_(a == b)
+
+
 def test_true_is_ok():
     nt.assert_true(ok(True))
+    nt.assert_true(ok(_eq(1, 1)))
 
 
 def test_false_is_not_ok():
     nt.assert_true(not ok(False))
+    nt.assert_true(not ok(_eq(1, 2)))
 
 
 def test_empty_list_is_ok():
@@ -85,10 +92,3 @@ def test_set_is_not_ok():
 
 def test_string_is_not_ok():
     nt.assert_false(ok("123"))
-
-
-def test_anything_is_not_ok():
-    class Foo(object):
-        pass
-    nt.assert_false(ok(Foo()))
-    nt.assert_false(ok(123))
