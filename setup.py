@@ -35,7 +35,9 @@ from setuptools import find_packages
 import pip
 from pip.req import parse_requirements
 from optparse import Option
-from neurom.version import VERSION
+
+
+VERSION = "0.1.1.dev0"
 
 
 def parse_reqs(reqs_file):

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,56 +27,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Old-style new-style neurite compatibility hacks'''
+'''Get sections and segments by ID'''
 
-from itertools import imap, izip
-from neurom import segments as seg
-from neurom import iter_neurites
-from neurom.core.tree import Tree
-from neurom.analysis.morphtree import get_bounding_box
-from neurom.analysis.morphtree import find_tree_type
-from neurom import fst
-from neurom import geom
+import neurom as nm
+from neurom.analysis import morphmath as mm
+from neurom.core.dataformat import COLS
 
 
-def is_new_style(obj):
-    '''Determine whether a neuron or neurite is new or old style'''
-    if isinstance(obj, (fst.Neuron, fst.Neurite)):
-        return True
-    elif isinstance(obj, Tree):
-        return len(obj.value.shape) == 2
-    else:
-        return False
+def get_segment(neuron, section_id, segment_id):
+    '''Get a segment given a section and segment id
+
+    Returns:
+        array of two [x, y, z, r] points defining segment
+    '''
+    sec = neuron.sections[section_id]
+    return sec.value[segment_id:segment_id + 2][:, 0:4]
 
 
-def bounding_box(neurite):
-    '''Get a neurite's X,Y,Z bounding box'''
-    if is_new_style(neurite):
-        if isinstance(neurite, Tree):
-            neurite = fst.Neurite(neurite)
-        return geom.bounding_box(neurite)
-    else:
-        return get_bounding_box(neurite)
+if __name__ == '__main__':
 
+    nrn = nm.load_neuron('test_data/h5/v1/Neuron.h5')
 
-def neurite_type(neurite):
-    '''Get the neurite type of a neurite tree'''
-    if is_new_style(neurite):
-        return neurite.type
-    else:
-        return find_tree_type(neurite)
-
-
-def map_segments(neurite, fun):
-    '''map a function to the segments in a tree'''
-    def _segfun(sec):
-        '''map a segment function to the segments in section sec'''
-        return imap(fun, izip(sec.value[:-1], sec.value[1:]))
-
-    if is_new_style(neurite):
-        if isinstance(neurite, Tree):
-            neurite = fst.Neurite(neurite)
-        return [s for ss in neurite.iter_nodes() for s in _segfun(ss)]
-    else:
-        fun = seg.segment_function(as_tree=False)(fun)
-        return list(iter_neurites(neurite, fun))
+    seg = get_segment(nrn, 3, 2)
+    print 'Segment:\n', seg
+    print 'Mid-point (x, y, z):\n', mm.linear_interpolate(seg[0], seg[1], 0.5)
+    print 'Mid-point R:\n', mm.interpolate_radius(seg[0][COLS.R], seg[1][COLS.R], 0.5)

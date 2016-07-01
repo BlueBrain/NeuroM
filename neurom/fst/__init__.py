@@ -53,9 +53,10 @@ Examples:
 
 import numpy as _np
 from functools import partial
-from ._io import load_neuron, load_neurons, Neuron
+from ._io import load_neuron, load_neurons, Neuron, Neurite
 from . import _mm
 from ..utils import deprecated
+from ..core.population import Population
 from ..core.types import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.types import tree_type_checker as _is_type

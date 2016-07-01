@@ -31,67 +31,61 @@ Python module of NeuroM to check neuronal trees.
 '''
 
 import numpy as np
-from neurom.core.tree import ipreorder, isection
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
-from neurom.analysis.morphtree import principal_direction_extent
-from neurom.core.point import COLS
+from neurom.analysis.morphmath import principal_direction_extent
 
 
-def is_monotonic(tree, tol):
-    '''Check if tree is monotonic, i.e. if each child has smaller or
+def is_monotonic(neurite, tol):
+    '''Check if neurite tree is monotonic, i.e. if each child has smaller or
         equal diameters from its parent
 
     Arguments:
-        tree : tree object
+        neurite : tree object
         tol: numerical precision
     '''
 
-    for node in ipreorder(tree):
-
+    for node in neurite.iter_nodes():
+        # check that points in section satisfy monotonicity
+        sec = node.value
+        for point_id in xrange(len(sec) - 1):
+            if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
+                return False
+        # Check that section boundary points satisfy monotonicity
         if node.parent is not None:
-
-            if node.value[COLS.R] > node.parent.value[COLS.R] + tol:
-
+            if sec[0][COLS.R] > node.parent.value[-1][COLS.R] + tol:
                 return False
 
     return True
 
 
-def is_flat(tree, tol, method='tolerance'):
+def is_flat(neurite, tol, method='tolerance'):
     '''Check if neurite is flat using the given method
 
-        Input
+    Input:
+        neurite : the neurite tree object
+        tol : tolerance
+        method : the method of flatness estimation. 'tolerance'
+        returns true if any extent of the tree
+        is smaller than the given tolerance
+        'ratio' returns true if the ratio of the smallest directions
+        is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
 
-            tree : the tree object
-
-            tol : tolerance
-
-            method : the method of flatness estimation.
-            'tolerance' returns true if any extent of the tree
-            is smaller than the given tolerance
-            'ratio' returns true if the ratio of the smallest directions
-            is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
-
-        Returns
-
+    Returns:
             True if it is flat
 
     '''
 
-    ext = principal_direction_extent(tree)
+    ext = principal_direction_extent(neurite.points[:, :3])
 
     if method == 'ratio':
-
         sorted_ext = np.sort(ext)
         return sorted_ext[0] / sorted_ext[1] < float(tol)
-
     else:
-
         return any(ext < float(tol))
 
 
-def is_back_tracking(tree):
+def is_back_tracking(neurite):
     ''' zigzag
     '''
     def paired(n):
@@ -103,12 +97,12 @@ def is_back_tracking(tree):
         ''' Returns the first three values of the tree that
         correspond to the x, y, z coordinates
         '''
-        return node.value[:COLS.R]
+        return node[:COLS.R]
 
     def max_radius(seg):
         ''' Returns maximum radius from the two segment endpoints
         '''
-        return max(seg[0].value[COLS.R], seg[1].value[COLS.R])
+        return max(seg[0][COLS.R], seg[1][COLS.R])
 
     def is_not_zero_seg(seg):
         ''' Returns True if segment has zero length
@@ -166,7 +160,7 @@ def is_back_tracking(tree):
                is_seg_projection_within_other(seg, other)
 
     # filter out single segment sections
-    for segments in (paired(nodes) for nodes in isection(tree) if len(nodes) > 2):
+    for segments in (paired(node.value) for node in neurite.iter_nodes() if len(node.value) > 2):
         # filter out zero length segments
         for i, seg in enumerate(filter(is_not_zero_seg, segments[1:])):
             # check if the end point of the segment lies within the previous

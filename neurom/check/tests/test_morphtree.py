@@ -26,11 +26,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neurom.check import morphtree
-from neurom.ezy import load_neuron
+from neurom import load_neuron
+from neurom.fst import Neurite, NeuriteType
 from neurom.check import morphtree as mt
 from neurom.core.dataformat import COLS
-from neurom.core.tree import Tree, ipreorder, val_iter
+from neurom.core.tree import Tree
 from nose import tools as nt
 import numpy as np
 import os
@@ -39,85 +39,126 @@ _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
-def _generate_tree(mode):
 
-	def fake_tree(prev_radius, mode):
+def _generate_neurite(mode):
 
-		if mode == 0:
-			radius = prev_radius/2.
-		elif mode == 1:
-			radius = prev_radius
-		else:
-			radius = prev_radius * 2.
+    def new_radius(prev_radius, mode):
+        if mode == 0:
+            return prev_radius/2.
+        elif mode == 1:
+            return prev_radius
+        else:
+            return prev_radius * 2.
 
-		return Tree(np.array([0., 0., 0., radius, 0., 0.]))
+    def fake_tree(init_radius, mode):
 
-	radius = 1.
+        radius = init_radius
 
-	tree = fake_tree(radius, mode)
-	tree.add_child(fake_tree(tree.value[COLS.R], mode))
-	tree.add_child(fake_tree(tree.value[COLS.R], mode))
-	tree.children[0].add_child(fake_tree(tree.children[0].value[COLS.R], mode))
-	tree.children[1].add_child(fake_tree(tree.children[1].value[COLS.R], mode))
+        sec = []
+        for _ in xrange(5):
+            sec.append([0, 0, 0, radius, 0, 0])
+            radius = new_radius(radius, mode)
 
-	return tree
+        return Tree(np.array(sec))
+
+    radius = 1.
+
+    tree = fake_tree(radius, mode)
+    tree.add_child(fake_tree(tree.value[-1][COLS.R], mode))
+    tree.add_child(fake_tree(tree.value[-1][COLS.R], mode))
+    tree.type = NeuriteType.undefined
+
+    return Neurite(tree)
+
+
+def _genetate_tree_non_monotonic_section_boundary():
+
+    tree = Tree(np.array([[0, 0, 0, 1.0, 0, 0],
+                          [0, 0, 0, 0.75, 0, 0],
+                          [0, 0, 0, 0.5, 0, 0],
+                          [0, 0, 0, 0.25, 0, 0]]))
+
+    ch0 = Tree(np.array([[0, 0, 0, 0.375, 0, 0],
+                         [0, 0, 0, 0.125, 0, 0],
+                         [0, 0, 0, 0.0625, 0, 0]]))
+
+    tree.add_child(ch0)
+    tree.type = NeuriteType.undefined
+    return Neurite(tree)
+
 
 def _generate_back_track_tree(n, dev):
-	t = Tree(np.array([0., 0., 0., 0.2, 1., 0., 0.]))
-	t.add_child(Tree(np.array([0., 1., 0., 0.15, 1., 0., 0.])))
-	t.children[0].add_child(Tree(np.array([0., 2., 0., 0.14, 1., 0., 0.])))
-	t.children[0].children[0].add_child(Tree(np.array([1., 3., 0., 0.15, 1., 0., 0.])))
-	t.children[0].children[0].add_child(Tree(np.array([1., -3., 0., 0.15, 1., 0., 0.])))
-	t.children[0].children[0].children[0].add_child(Tree(np.array([2., 4., 0., 0.11, 1., 0., 0.])))
-	t.children[0].children[0].children[1].add_child(Tree(np.array([2., -4., 0., 0.12, 1., 0., 0.])))
-	t.children[0].children[0].children[1].children[0].add_child(Tree(tuple(val_iter(ipreorder(t)))[n] + np.array([dev[0],dev[1],dev[2], 0.11, 1.,0.,0.])))
-	t.children[0].children[0].children[1].children[0].children[0].add_child(Tree(np.array([3., -5., 0., 0.1, 1., 0., 0.])))
-	t.children[0].children[0].children[1].children[0].children[0].children[0].add_child(Tree(np.array([4.,-6., 0., 0.1, 1., 0., 0.])))
-	return t
+
+    tree = Tree(np.array([[0., 0., 0., 0.2, 1., 0., 0.],
+                          [0., 1., 0., 0.15, 1., 0., 0.],
+                          [0., 2., 0., 0.14, 1., 0., 0.]]))
+
+    ch0 = Tree(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
+                         [1., 3., 0., 0.15, 1., 0., 0.],
+                         [2., 4., 0., 0.11, 1., 0., 0.]]))
+
+    ch1 = Tree(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
+                         [1., -3., 0., 0.15, 1., 0., 0.],
+                         [2., -4., 0., 0.12, 1., 0., 0.],
+                         [dev[0], dev[1], dev[2], 0.11, 1., 0., 0.],
+                         [3., -5., 0., 0.1, 1., 0., 0.],
+                         [4., -6., 0., 0.1, 1., 0., 0.]]))
+
+    tree.add_child(ch0)
+    tree.add_child(ch1)
+    tree.children[1].value[3] += tree.children[n].value[1]
+    tree.type = NeuriteType.undefined
+
+    return Neurite(tree)
 
 
 def test_is_monotonic():
 
-	# tree with decreasing radii
-	decr_diams = _generate_tree(0)
+    # tree with decreasing radii
+    decr_diams = _generate_neurite(0)
+    nt.assert_true(mt.is_monotonic(decr_diams, 1e-6))
 
-	# tree with equal radii
-	equl_diams = _generate_tree(1)
+    # tree with equal radii
+    equl_diams = _generate_neurite(1)
+    nt.assert_true(mt.is_monotonic(equl_diams, 1e-6))
 
-	# tree with increasing radii
-	incr_diams = _generate_tree(2)
+    # tree with increasing radii
+    incr_diams = _generate_neurite(2)
+    nt.assert_false(mt.is_monotonic(incr_diams, 1e-6))
 
-	nt.assert_true(mt.is_monotonic(decr_diams, 1e-6))
-	nt.assert_true(mt.is_monotonic(equl_diams, 1e-6))
-	nt.assert_false(mt.is_monotonic(incr_diams, 1e-6))
+    # Tree with larger child initial point
+    bad_child = _genetate_tree_non_monotonic_section_boundary()
+    nt.assert_false(mt.is_monotonic(bad_child, 1e-6))
+
 
 def test_is_flat():
 
-	neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
+    neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
 
-	nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
-	nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
+    nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
+    nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
+
 
 def test_is_back_tracking():
 
-	# case 1: a back-track falls directly on a previous node
-	t = _generate_back_track_tree(5, (0., 0., 0.))
-	nt.assert_true(mt.is_back_tracking(t))
+    # case 1: a back-track falls directly on a previous node
+    t = _generate_back_track_tree(1, (0., 0., 0.))
+    nt.assert_true(mt.is_back_tracking(t))
 
-	# case 2: a zigzag is close to another segment
-	t = _generate_back_track_tree(5, (0.1, -0.1, 0.02))
-	nt.assert_true(mt.is_back_tracking(t))
+    # case 2: a zigzag is close to another segment
+    t = _generate_back_track_tree(1, (0.1, -0.1, 0.02))
+    nt.assert_true(mt.is_back_tracking(t))
 
-	# case 3: a zigzag is close to another segment 2
-	t = _generate_back_track_tree(5, (-0.2, 0.04, 0.144))
-	nt.assert_true(mt.is_back_tracking(t))
+    # case 3: a zigzag is close to another segment 2
+    t = _generate_back_track_tree(1, (-0.2, 0.04, 0.144))
+    nt.assert_true(mt.is_back_tracking(t))
 
-	# case 4: a zigzag far from civilization
-	t = _generate_back_track_tree(5, (10., -10., 10.))
-	nt.assert_false(mt.is_back_tracking(t))
+    # case 4: a zigzag far from civilization
+    t = _generate_back_track_tree(1, (10., -10., 10.))
+    nt.assert_false(mt.is_back_tracking(t))
 
-	# case 5: a zigzag on another section
-	# currently zigzag is defined on the same section
-	# thus this test should not be true
-	t = _generate_back_track_tree(3, (-0.2, 0.04, 0.144))
-	nt.assert_false(mt.is_back_tracking(t))
+    # case 5: a zigzag on another section
+    # currently zigzag is defined on the same section
+    # thus this test should not be true
+    t = _generate_back_track_tree(0, (-0.2, 0.04, 0.144))
+    nt.assert_false(mt.is_back_tracking(t))

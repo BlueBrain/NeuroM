@@ -123,10 +123,10 @@ Examples
 
 .. code-block:: python
 
-    >>> from neurom import fst
-    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
-    >>> apical_seg_lengths = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> axon_sec_lengths = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
+    >>> import neurom as nm
+    >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
+    >>> apical_seg_lengths = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
+    >>> axon_sec_lengths = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
 
 
 - Visualize a neuronal morphology:

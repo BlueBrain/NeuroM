@@ -76,16 +76,21 @@ def test_bounding_box():
     ref_bbox = [[0.0, -52.79933167, 0.], [64.74726105, 0, 54.2040863]]
     bbox0 = _compat.bounding_box(NRN0.neurites[0])
     bbox1 = _compat.bounding_box(NRN1.neurites[0])
+    bbox2 = _compat.bounding_box(NRN1.neurites[0].root_node)
     _close(bbox0, ref_bbox)
     _close(bbox1, ref_bbox)
+    _close(bbox2, ref_bbox)
     _equal(bbox0, bbox1)
+    _equal(bbox1, bbox2)
 
 
 def test_map_segments():
     rad0 = _compat.map_segments(NRN0.neurites[0], segrad)
     rad1 = _compat.map_segments(NRN1.neurites[0], segrad)
+    rad2 = _compat.map_segments(NRN1.neurites[0].root_node, segrad)
     nt.assert_equal(len(rad0), 210)
     _equal(rad0, rad1)
+    _equal(rad1, rad2)
 
 
 def test_neurite_type():

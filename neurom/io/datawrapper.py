@@ -108,8 +108,8 @@ class RawDataWrapper(object):
         '''Get the list of ids for rows satisfying an optional row predicate'''
         return list(r[COLS.ID] for r in self.iter_row(None, pred))
 
-    def get_soma_rows(self):
-        '''Get the IDs of all soma points'''
+    def soma_points(self):
+        '''Get all the soma points'''
         db = self.data_block
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 

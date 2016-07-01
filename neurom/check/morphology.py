@@ -31,19 +31,31 @@ Python module of NeuroM to check neurons.
 '''
 
 from neurom.core.types import NeuriteType
-from neurom.core.tree import ipreorder
-from neurom.core.tree import isegment
-from neurom.core.tree import isection
-from neurom.core.tree import val_iter
+from neurom.core.neuron import make_soma
 from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
-from neurom.analysis.morphtree import find_tree_type
 from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
-from itertools import chain
+from neurom.exceptions import SomaError
+from neurom.io import check as io_check
+from neurom.fst import _mm as fst_mm
 
 
-def has_axon(neuron, treefun=find_tree_type):
+def _read_neurite_type(neurite):
+    '''Simply read the stored neurite type'''
+    return neurite.type
+
+
+def has_valid_soma(data_wrapper):
+    '''Check if a data block has a valid soma'''
+    try:
+        make_soma(data_wrapper.soma_points())
+        return True
+    except SomaError:
+        return False
+
+
+def has_axon(neuron, treefun=_read_neurite_type):
     '''Check if a neuron has an axon
 
     Arguments:
@@ -54,7 +66,7 @@ def has_axon(neuron, treefun=find_tree_type):
     return NeuriteType.axon in [treefun(n) for n in neuron.neurites]
 
 
-def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
+def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     '''Check if a neuron has apical dendrites
 
     Arguments:
@@ -67,7 +79,7 @@ def has_apical_dendrite(neuron, min_number=1, treefun=find_tree_type):
     return types.count(NeuriteType.apical_dendrite) >= min_number
 
 
-def has_basal_dendrite(neuron, min_number=1, treefun=find_tree_type):
+def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     '''Check if a neuron has basal dendrites
 
     Arguments:
@@ -146,10 +158,9 @@ def nonzero_segment_lengths(neuron, threshold=0.0):
         threshold: value above which a segment length is considered to be non-zero
     Return: list of (first_id, second_id) of zero length segments
     '''
-    l = [[s for s in val_iter(isegment(t))
-          if segment_length(s) <= threshold]
-         for t in neuron.neurites]
-    return [(i[0][COLS.ID], i[1][COLS.ID]) for i in chain(*l)]
+    l = [s for s in fst_mm.iter_segments(neuron.neurites)
+         if segment_length(s) <= threshold]
+    return [(i[0][COLS.ID], i[1][COLS.ID]) for i in l]
 
 
 def nonzero_section_lengths(neuron, threshold=0.0):
@@ -160,10 +171,9 @@ def nonzero_section_lengths(neuron, threshold=0.0):
         threshold: value above which a section length is considered to be non-zero
     Return: list of ids of first point in bad sections
     '''
-    l = [[s for s in val_iter(isection(t))
-          if section_length(s) <= threshold]
-         for t in neuron.neurites]
-    return [i[0][COLS.ID] for i in chain(*l)]
+    l = [s for s in fst_mm.iter_sections(neuron.neurites)
+         if section_length(s) <= threshold]
+    return [i[0][COLS.ID] for i in l]
 
 
 def nonzero_neurite_radii(neuron, threshold=0.0):
@@ -174,7 +184,5 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
         threshold: value above which a radius is considered to be non-zero
     Return: list of IDs of zero-radius points
     '''
-
-    ids = [[i[COLS.ID] for i in val_iter(ipreorder(t))
-            if i[COLS.R] <= threshold] for t in neuron.neurites]
-    return [i for i in chain(*ids)]
+    return io_check.has_all_finite_radius_neurites(neuron.data_block,
+                                                   threshold)[1]

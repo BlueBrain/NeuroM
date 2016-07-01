@@ -51,17 +51,17 @@ Morphology file data consistency checks
     ....
 
 
-Fast analysis with the :py:mod:`neurom.fst` module
-**************************************************
+Fast analysis with :py:mod:`neurom`
+***********************************
 
 Here we load a neuron and obtain some information from it:
 
 .. code-block:: python
 
-    >>> from neurom import fst
-    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
-    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
+    >>> import neurom as nm
+    >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
+    >>> ap_seg_len = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
+    >>> ax_sec_len = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
 
 
 Morphology visualization with the :py:mod:`neurom.viewer` module
@@ -83,7 +83,8 @@ Basic feature extraction example
 ********************************
 
 These basic examples illustrate the type of morphometrics that can be easily obtained
-from the ``fst`` module, without the need for any other ``neurom`` modules or tools.
+directly from the ``neurom`` module, without the need for any other ``neurom``
+sub-modules or tools.
 
 The idea here is to pre-package the most common analyses so that users can obtain the
 morphometrics with a very minimal knowledge of ``python`` and ``neurom``.

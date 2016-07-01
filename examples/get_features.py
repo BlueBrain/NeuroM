@@ -29,7 +29,7 @@
 
 '''Easy analysis examples
 
-These examples highlight most of the pre-packaged neurom.fst.get
+These examples highlight most of the pre-packaged neurom.nm.get
 morphometrics functionality.
 
 '''
@@ -37,7 +37,7 @@ morphometrics functionality.
 from __future__ import print_function
 from pprint import pprint
 import numpy as np
-from neurom import fst
+import neurom as nm
 
 
 def stats(data):
@@ -65,12 +65,12 @@ if __name__ == '__main__':
     filename = 'test_data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
-    nrn = fst.load_neuron(filename)
+    nrn = nm.load_neuron(filename)
 
     # Get some soma information
     # Soma radius and surface area
-    print("Soma radius", fst.get('soma_radii', nrn)[0])
-    print("Soma surface area", fst.get('soma_surface_areas', nrn)[0])
+    print("Soma radius", nm.get('soma_radii', nrn)[0])
+    print("Soma surface area", nm.get('soma_surface_areas', nrn)[0])
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
@@ -81,74 +81,74 @@ if __name__ == '__main__':
     # to warm up...
 
     # number of neurites
-    print('Number of neurites (all):', fst.get('number_of_neurites', nrn)[0])
+    print('Number of neurites (all):', nm.get('number_of_neurites', nrn)[0])
     print('Number of neurites (axons):',
-          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.axon)[0])
+          nm.get('number_of_neurites', nrn, neurite_type=nm.NeuriteType.axon)[0])
     print('Number of neurites (apical dendrites):',
-          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_neurites', nrn, neurite_type=nm.NeuriteType.apical_dendrite)[0])
     print('Number of neurites (basal dendrites):',
-          fst.get('number_of_neurites', nrn, neurite_type=fst.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_neurites', nrn, neurite_type=nm.NeuriteType.basal_dendrite)[0])
 
     # number of sections
     print('Number of sections:',
-          fst.get('number_of_sections', nrn)[0])
+          nm.get('number_of_sections', nrn)[0])
     print('Number of sections (axons):',
-          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.axon)[0])
+          nm.get('number_of_sections', nrn, neurite_type=nm.NeuriteType.axon)[0])
     print('Number of sections (apical dendrites):',
-          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_sections', nrn, neurite_type=nm.NeuriteType.apical_dendrite)[0])
     print('Number of sections (basal dendrites):',
-          fst.get('number_of_sections', nrn, neurite_type=fst.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_sections', nrn, neurite_type=nm.NeuriteType.basal_dendrite)[0])
 
     # number of sections per neurite
     print('Number of sections per neurite:',
-          fst.get('number_of_sections_per_neurite', nrn))
+          nm.get('number_of_sections_per_neurite', nrn))
     print('Number of sections per neurite (axons):',
-          fst.get('number_of_sections_per_neurite', nrn, neurite_type=fst.NeuriteType.axon))
+          nm.get('number_of_sections_per_neurite', nrn, neurite_type=nm.NeuriteType.axon))
     print('Number of sections per neurite (apical dendrites):',
-          fst.get('number_of_sections_per_neurite',
-                  nrn, neurite_type=fst.NeuriteType.apical_dendrite))
+          nm.get('number_of_sections_per_neurite',
+                 nrn, neurite_type=nm.NeuriteType.apical_dendrite))
     print('Number of sections per neurite (basal dendrites):',
-          fst.get('number_of_sections_per_neurite',
-                  nrn, neurite_type=fst.NeuriteType.apical_dendrite))
+          nm.get('number_of_sections_per_neurite',
+                 nrn, neurite_type=nm.NeuriteType.apical_dendrite))
 
     # OK, this is getting repetitive, so lets loop over valid neurite types.
     # The following methods return arrays of measurements. We will gather some
     # summary statistics for each and print them.
 
     # Section lengths for all and different types of neurite
-    for ttype in fst.NEURITE_TYPES:
-        sec_len = fst.get('section_lengths', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        sec_len = nm.get('section_lengths', nrn, neurite_type=ttype)
         print('Section lengths (', ttype, '):', sep='')
         pprint_stats(sec_len)
 
     # Segment lengths for all and different types of neurite
-    for ttype in fst.NEURITE_TYPES:
-        seg_len = fst.get('segment_lengths', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        seg_len = nm.get('segment_lengths', nrn, neurite_type=ttype)
         print('Segment lengths (', ttype, '):', sep='')
         pprint_stats(seg_len)
 
     # Section radial distances for all and different types of neurite
     # Careful! Here we need to pass tree type as a named argument
-    for ttype in fst.NEURITE_TYPES:
-        sec_rad_dist = fst.get('section_radial_distances', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        sec_rad_dist = nm.get('section_radial_distances', nrn, neurite_type=ttype)
         print('Section radial distance (', ttype, '):', sep='')
         pprint_stats(sec_rad_dist)
 
     # Section path distances for all and different types of neurite
     # Careful! Here we need to pass tree type as a named argument
-    for ttype in fst.NEURITE_TYPES:
-        sec_path_dist = fst.get('section_path_distances', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        sec_path_dist = nm.get('section_path_distances', nrn, neurite_type=ttype)
         print('Section path distance (', ttype, '):', sep='')
         pprint_stats(sec_path_dist)
 
     # Local bifurcation angles for all and different types of neurite
-    for ttype in fst.NEURITE_TYPES:
-        local_bifangles = fst.get('local_bifurcation_angles', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        local_bifangles = nm.get('local_bifurcation_angles', nrn, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(local_bifangles)
 
     # Remote bifurcation angles for all and different types of neurite
-    for ttype in fst.NEURITE_TYPES:
-        rem_bifangles = fst.get('remote_bifurcation_angles', nrn, neurite_type=ttype)
+    for ttype in nm.NEURITE_TYPES:
+        rem_bifangles = nm.get('remote_bifurcation_angles', nrn, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(rem_bifangles)
