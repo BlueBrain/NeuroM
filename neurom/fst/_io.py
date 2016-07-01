@@ -125,13 +125,23 @@ def make_neurites(rdw, post_action=None):
     return neurites, nodes
 
 
+def _clear_ext(ext):
+    '''Remove extension separation and make lowercase'''
+    return ext.split(os.path.extsep)[-1].lower()
+
+
+def load_data(filename):
+    '''Unpack data into a raw data wrapper'''
+    ext = os.path.splitext(filename)[1]
+    return _READERS[_clear_ext(ext)](filename)
+
+
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
-    ext = os.path.splitext(filename)[1][1:]
-    rdw = _READERS[ext.lower()](filename)
-    neurites, sections = make_neurites(rdw, _NEURITE_ACTION[ext.lower()])
+    rdw = load_data(filename)
+    name, ext = os.path.splitext(os.path.basename(filename))
+    neurites, sections = make_neurites(rdw, _NEURITE_ACTION[_clear_ext(ext)])
     soma = make_soma(rdw.soma_points())
-    name = os.path.splitext(os.path.basename(filename))[0]
     return Neuron(soma=soma,
                   neurites=neurites,
                   sections=sections,

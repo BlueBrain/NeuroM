@@ -44,7 +44,7 @@ import os
 @memoize
 def get_soma_ids(rdw):
     '''Returns a list of IDs of points that are somas'''
-    return rdw.get_soma_rows()[:, COLS.ID].tolist()
+    return rdw.soma_points()[:, COLS.ID].tolist()
 
 
 @memoize
@@ -93,11 +93,13 @@ def make_neuron(raw_data, tree_action=None):
         SomaError if no soma points in raw_data or points incompatible with soma.
         IDSequenceError if filename contains invalid ID sequence
     '''
-    _soma = make_soma(raw_data.get_soma_rows())
+    _soma = make_soma(raw_data.soma_points())
     _trees = [make_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_neurite_segment_ids(raw_data)]
 
-    return Neuron(_soma, _trees)
+    nrn = Neuron(_soma, _trees)
+    nrn.data_block = raw_data
+    return nrn
 
 
 def load_neuron(filename, tree_action=None):
