@@ -87,16 +87,9 @@ def is_flat(neurite, tol, method='tolerance'):
 
 
 def is_back_tracking(neurite):
-    ''' Check if a neurite process backtracks to a previous node. As back-tracking is taking place
+    ''' Check if a neurite process backtracks to a previous node. Back-tracking takes place
     when a daughter of a branching process goes back and either overlaps with a previous point, or
-    lies inside the cylindrical volume of the latter. This takes place in the lifetime of a single
-    section and does not account for long backtracks where a tree might come back to itself.
-
-    The algorithm checks if each segment in a section overlaps with all the previous ones. This
-    is achieved by calculating the projection from the center of a segment to the endpoint of a pre
-    vious one and by extension its complement, which has to be smaller that the sum of the radii
-    of the segments combined with the norm of the projection being smaller than half of the segment
-    length (distance is calculated from the center of the segment).
+    lies inside the cylindrical volume of the latter.
 
     Returns:
         True Under the following scenaria:
