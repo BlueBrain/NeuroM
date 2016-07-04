@@ -570,9 +570,9 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
-neuron.__doc__ += DEFAULT_PARAMS
-tree.__doc__ += DEFAULT_PARAMS
-soma.__doc__ += DEFAULT_PARAMS
-neuron3d.__doc__ += DEFAULT_PARAMS
-tree3d.__doc__ += DEFAULT_PARAMS
-soma3d.__doc__ += DEFAULT_PARAMS
+neuron.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+neuron3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member

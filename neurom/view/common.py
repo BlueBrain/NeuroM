@@ -673,4 +673,4 @@ def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
 
     return fig, ax
 
-plot_style.__doc__ += PLOT_STYLE_PARAMS
+plot_style.__doc__ += PLOT_STYLE_PARAMS # pylint: disable=no-member
