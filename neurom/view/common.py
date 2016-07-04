@@ -51,124 +51,99 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
               NeuriteType.soma: 'black',
               NeuriteType.undefined: 'green'}
 
-PLOT_STYLE_PARAMS = '''        pretitle (str):\
-            String to include before the general title of the figure.\
-            Default value is None.
-        posttitle (str):\
-            String to include after the general title of the figure.\
-            Default value is None.
-        title (str):\
-            The title for the figure\
+PLOT_STYLE_PARAMS = '''        pretitle (Optional[str]): String to include before the\
+            general title of the figure. Default value is None.
+        posttitle (Optional[str[): String to include after the\
+            general title of the figure. Default value is None.
+        prefile (Optional[str]): String to include before the\
+            general filename of the figure. Default value is None.
+        postfile (Optional[str]): String to include after the\
+            general filename of the figure. Default value is None.
+        title (Optional[str]): \
+            Set the title for the figure. \
+            If "" no title will be added. \
             Default value is "Figure".
-        title_fontsize (int):\
-            Defines the size of the title's font.\
+        title_fontsize (Optional[int]): \
+            Defines the size of the title's font. \
             Default value is 14.
-        title_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as title arguments.\
+        title_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as title arguments. \
             Default value is None.
-        xlabel (str):\
-            The xlabel for the figure\
+        xlabel (Optional[str]): \
+            The xlabel for the figure. \
+            For no_xlabel set to ''. \
             Default value is "X".
-        ylabel (str):\
-            The ylabel for the figure\
+        ylabel (Optional[str]): \
+            The xlabel for the figure. \
+            For no_ylabel set to ''. \
             Default value is "Y".
-        zlabel (str):\
-            The zlabel for the figure\
-            Default value is "Y".
-        no_xlabel (bool):\
-            Defines the presence of the xlabel in the figure.\
-            If True the xlabel will be set to an empty string "".\
-            Default value is False.
-        no_ylabel (bool):\
-            Defines the presence of the ylabel in the figure.\
-            If True the ylabel will be set to an empty string "".\
-            Default value is False.
-        no_zlabel (bool):\
-            Defines the presence of the ylabel in the figure.\
-            If True the zlabel will be set to an empty string "".\
-            Default value is False.
-        label_fontsize (int):\
-            Defines the size of the labels' font.\
+        zlabel (Optional[str]): \
+            The zlabel for the figure. \
+            For no_zlabel set to ''. \
+            Default value is "Z".
+        label_fontsize (Optional[int]): \
+            Defines the size of the labels' font. \
             Default value is 14.
-        xlabel_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as xlabel arguments.\
+        xlabel_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as xlabel arguments. \
             Default value is None.
-        ylabel_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as ylabel arguments.\
+        ylabel_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as ylabel arguments. \
             Default value is None.
-        zlabel_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as zlabel arguments.\
+        zlabel_arg (Optional[dict]): \
+            Defines the arguments that will be passsed, \
+            into matplotlib as zlabel arguments. \
             Default value is None.
-        no_xticks (bool):\
-            Defines the presence of x ticks in the figure.\
-            If True the ticks will be empty.\
-            Default value is False.
-        no_yticks (bool):\
-            Defines the presence of y ticks in the figure.\
-            If True the ticks will be empty.\
-            Default value is False.
-        xticks: list of ticks\
-            Defines the values of x ticks in the figure.\
+        xticks (Optional[list of ticks]): \
+            Defines the values of x ticks in the figure. \
+            If None the xticks will not be modified. \
+            For no_xticks set to []. \
             Default value is None.
-        yticks : list of ticks\
-            Defines the values of y ticks in the figure.\
+        yticks (Optional[list of ticks]): \
+            Defines the values of y ticks in the figure. \
+            If None the yticks will not be modified. \
+            For no_yticks set to []. \
             Default value is None.
-        tick_fontsize (int):\
-            Defines the size of the ticks' font.\
+        zticks (Optional[list of ticks]): \
+            Defines the values of z ticks in the figure. \
+            If None the zticks will not be modified. \
+            For no_zticks set to []. \
+            Default value is None.
+        tick_fontsize (Optional[int]): \
+            Defines the size of the ticks' font. \
             Default value is 12.
-        xticks_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as xticks arguments.\
+        xticks_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as xticks arguments. \
             Default value is None.
-        yticks_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as yticks arguments.\
+        yticks_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as yticks arguments. \
             Default value is None.
-        no_xlim (bool):\
-            Defines the presence of plot x-limits in the figure.\
-            Default value is False.
-        no_ylim (bool):\
-            Defines the presence of plot y-limits in the figure.\
-            Default value is False.
-        xlim: list of two floats\
-            Defines the min and the max values in x-axis.\
+        zticks_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as zticks arguments. \
+            Default value is None.
+        xlim (Optional[list of two floats]): \
+            Defines the min and the max values in x-axis. \
             Default in None
-        ylim: list of two floats\
-            Defines the min and the max values in y-axis.\
+        ylim (Optional[list of two floats]): \
+            Defines the min and the max values in y-axis. \
             Default in None
-        no_legend (bool):\
-            Defines the presence of a legend in the figure.\
-            If True the legend will not be included in the Figure.\
+        zlim (Optional[list of two floats]): \
+            Defines the min and the max values in z-axis. \
+            Default in None
+        no_legend (Optional[boolean]): \
+            Defines the presence of a legend in the figure. \
+            If True the legend will not be included in the Figure. \
             Default value is True.
-        legend_arg (dict):\
-            Defines the arguments that will be passsed\
-            into matplotlib as legend arguments.\
+        legend_arg (Optional[dict]): \
+            Defines the arguments that will be passsed \
+            into matplotlib as legend arguments. \
             Default value is None.
-        prefile (str):\
-            String to include before the general filename of the figure.\
-            Default is None.
-        postfile (str):\
-            String to include after the general filename of the figure.\
-            Default is None.
-        output_path (str):\
-            String to define the path to the output directory.\
-            Default value is './'
-        output_name (str):\
-            String to define the name of the output figure.\
-            Default value is 'Figure'
-        output_format (str):\
-            String to define the format of the output figure.\
-            Default value is 'png'
-        dpi (int):\
-            Define the DPI (Dots per Inch) of the figure.\
-            Default value is 300.
-        transparent (bool):\
-            If True the saved figure will have a transparent background.\
-            Default value is False.
         show_plot (bool):\
             If True the figure is displayed.\
             Default value is True.
@@ -177,6 +152,21 @@ PLOT_STYLE_PARAMS = '''        pretitle (str):\
             Default value is False.
         tight (bool):\
             If True the set layout of matplotlib will be activated.\
+            Default value is False.
+        output_path (str):\
+            String to define the path to the output directory.\
+            Default value is './'
+        output_name (str):\
+            String to define the name of the output figure.\
+            Default value is 'Figure'
+        output_format (Optional[str]):\
+            String to define the format of the output figure.\
+            Default value is 'png'
+        dpi (Optional[int]):\
+            Define the DPI (Dots per Inch) of the figure.\
+            Default value is 300.
+        transparent (Optional(bool):\
+            If True the saved figure will have a transparent background.\
             Default value is False.
 
     Returns:
@@ -606,42 +596,28 @@ def plot_limits(fig, ax, **kwargs):
     Parameters:
         fig: matplotlib figure
         ax: matplotlib axes
-        no_xlim (Optional[boolean]): \
-            Defines the presence of plot x-limits in the figure. \
-            Default value is False.
-        no_ylim (Optional[boolean]): \
-            Defines the presence of plot y-limits in the figure. \
-            Default value is False.
-        no_zlim (Optional[boolean]): \
-            Defines the presence of plot z-limits in the figure. \
-            Default value is False.
         xlim (Optional[list of two floats]): \
             Defines the min and the max values in x-axis. \
-            Default in None
+            To use default limits select None.
         ylim (Optional[list of two floats]): \
             Defines the min and the max values in y-axis. \
-            Default in None
+            To use default limits select None.
         zlim (Optional[list of two floats]): \
             Defines the min and the max values in z-axis. \
-            Default in None
-
+            To use default limits select None.
 
     Returns:
         Matplotlib figure, axes
     """
     # Definition of limit options
-    no_xlim = kwargs.get('no_xlim', False)
-    no_ylim = kwargs.get('no_ylim', False)
-    no_zlim = kwargs.get('no_zlim', False)
     xlim = kwargs.get('xlim', None)
     ylim = kwargs.get('ylim', None)
     zlim = kwargs.get('zlim', None)
 
-    if not no_xlim:
-        ax.set_xlim(xlim)
-    if not no_ylim:
-        ax.set_ylim(ylim)
-    if hasattr(ax, 'zaxis') and not no_zlim:
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+
+    if hasattr(ax, 'zaxis'):
         ax.set_zlim(zlim)
 
     return fig, ax
