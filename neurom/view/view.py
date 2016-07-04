@@ -39,24 +39,7 @@ from neurom.io import COLS
 from neurom import _compat
 from neurom.analysis.morphmath import segment_radius
 
-DEFAULT_PARAMS = '''            linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
+DEFAULT_PARAMS = '''        new_fig: boolean \
             Defines if the tree will be plotted \
             in the current figure (False) \
             or in a new figure (True) \
@@ -66,6 +49,24 @@ DEFAULT_PARAMS = '''            linewidth: float \
             For any other value a matplotlib subplot \
             will be generated. \
             Default value is False.
+        treecolor: str or None \
+            Defines the color of the tree. \
+            If None the default values will be used, \
+            depending on the type of tree: \
+            Basal dendrite: "red" \
+            Axon : "blue" \
+            Apical dendrite: "purple" \
+            Undefined tree: "black" \
+            Default value is None.
+        linewidth: float \
+            Defines the linewidth of the tree, \
+            if diameter is set to False. \
+            Default value is 1.2.
+        alpha: float \
+            Defines throughe transparency of the tree. \
+            0.0 transparent through 1.0 opaque. \
+            Default value is 0.8.
+
 ''' + common.PLOT_STYLE_PARAMS
 
 
