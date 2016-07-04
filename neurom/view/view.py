@@ -345,6 +345,8 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
                                              np.max(v) + get_default('white_space', **kwargs)])
 
     kwargs['final'] = True
+    kwargs['title'] = nrn.name
+
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
@@ -603,6 +605,8 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                              np.max(d) + get_default('white_space', **kwargs)])
 
     kwargs['final'] = True
+    kwargs['title'] = nrn.name
+
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
