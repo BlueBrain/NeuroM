@@ -39,6 +39,36 @@ from neurom.io import COLS
 from neurom import _compat
 from neurom.analysis.morphmath import segment_radius
 
+DEFAULT_PARAMS = '''        new_fig: boolean \
+            Defines if the tree will be plotted \
+            in the current figure (False) \
+            or in a new figure (True) \
+            Default value is True.
+        subplot: matplotlib subplot value or False \
+            If False the default subplot 111 will be used. \
+            For any other value a matplotlib subplot \
+            will be generated. \
+            Default value is False.
+        treecolor: str or None \
+            Defines the color of the tree. \
+            If None the default values will be used, \
+            depending on the type of tree: \
+            Basal dendrite: "red" \
+            Axon : "blue" \
+            Apical dendrite: "purple" \
+            Undefined tree: "black" \
+            Default value is None.
+        linewidth: float \
+            Defines the linewidth of the tree, \
+            if diameter is set to False. \
+            Default value is 1.2.
+        alpha: float \
+            Defines throughe transparency of the tree. \
+            0.0 transparent through 1.0 opaque. \
+            Default value is 0.8.
+
+''' + common.PLOT_STYLE_PARAMS
+
 
 def get_default(variable, **kwargs):
     '''
@@ -66,33 +96,6 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -102,18 +105,10 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
         white_space: float \
             Defines the white space around \
             the boundary box of the morphology. \
             Default value is 1.
-
-    Returns:
-        A 2D matplotlib figure with a tree view, at the selected plane.
     '''
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
         return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
@@ -180,36 +175,6 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the soma. \
-            Soma: black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
-
-    Returns:
-        A 2D matplotlib figure with a soma view, at the selected plane.
     '''
     treecolor = kwargs.get('treecolor', None)
     outline = kwargs.get('outline', True)
@@ -261,33 +226,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -297,14 +235,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
-
-    Returns:
-        A 3D matplotlib figure with a tree view, at the selected plane.
     '''
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
         return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
@@ -356,37 +286,9 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     If the tree contains one single point the plot will be empty \
     since no segments can be constructed.
 
-
     Parameters:
         tr: Tree \
         neurom.Tree object
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean \
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -400,9 +302,6 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
             Defines the white space around \
             the boundary box of the morphology. \
             Default value is 1.
-
-    Returns:
-        A 3D matplotlib figure with a tree view.
     '''
     from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
@@ -469,27 +368,6 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
     Parameters:
         soma: Soma \
         neurom.Soma object
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the soma. \
-            Soma : "black". \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-
-    Returns:
-        A 3D matplotlib figure with a soma view.
     '''
     treecolor = kwargs.get('treecolor', None)
 
@@ -524,33 +402,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     Parameters:
         neuron: Neuron \
         neurom.Neuron object
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -560,9 +411,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-
-    Returns:
-        A 3D matplotlib figure with a neuron view.
     '''
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
@@ -681,23 +529,6 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
         show_diameters : boolean \
             Determines if node diameters will \
             be show or not.
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
         new_fig: boolean \
             Defines if the tree will be plotted \
             in the current figure (False) \
@@ -738,3 +569,10 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     kwargs['no_legend'] = False
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
+
+neuron.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+neuron3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
