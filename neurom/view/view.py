@@ -39,6 +39,36 @@ from neurom.io import COLS
 from neurom import _compat
 from neurom.analysis.morphmath import segment_radius
 
+DEFAULT_PARAMS = '''        new_fig: boolean \
+            Defines if the tree will be plotted \
+            in the current figure (False) \
+            or in a new figure (True) \
+            Default value is True.
+        subplot: matplotlib subplot value or False \
+            If False the default subplot 111 will be used. \
+            For any other value a matplotlib subplot \
+            will be generated. \
+            Default value is False.
+        treecolor: str or None \
+            Defines the color of the tree. \
+            If None the default values will be used, \
+            depending on the type of tree: \
+            Basal dendrite: "red" \
+            Axon : "blue" \
+            Apical dendrite: "purple" \
+            Undefined tree: "black" \
+            Default value is None.
+        linewidth: float \
+            Defines the linewidth of the tree, \
+            if diameter is set to False. \
+            Default value is 1.2.
+        alpha: float \
+            Defines throughe transparency of the tree. \
+            0.0 transparent through 1.0 opaque. \
+            Default value is 0.8.
+
+''' + common.PLOT_STYLE_PARAMS
+
 
 def get_default(variable, **kwargs):
     '''
@@ -66,33 +96,6 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -102,18 +105,10 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
         white_space: float \
             Defines the white space around \
             the boundary box of the morphology. \
             Default value is 1.
-
-    Returns:
-        A 2D matplotlib figure with a tree view, at the selected plane.
     '''
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
         return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
@@ -123,6 +118,8 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     # Data needed for the viewer: x,y,z,r
     bounding_box = _compat.bounding_box(tr)
+
+    white_space = get_default('white_space', **kwargs)
 
     def _seg_2d(seg):
         '''2d coordinates needed for the plotting of a segment'''
@@ -159,13 +156,13 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
     kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][getattr(COLS, plane[0].capitalize())] -
-                                         get_default('white_space', **kwargs),
+                                         white_space,
                                          bounding_box[1][getattr(COLS, plane[0].capitalize())] +
-                                         get_default('white_space', **kwargs)])
+                                         white_space])
     kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][getattr(COLS, plane[1].capitalize())] -
-                                         get_default('white_space', **kwargs),
+                                         white_space,
                                          bounding_box[1][getattr(COLS, plane[1].capitalize())] +
-                                         get_default('white_space', **kwargs)])
+                                         white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -180,36 +177,6 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the soma. \
-            Soma: black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
-
-    Returns:
-        A 2D matplotlib figure with a soma view, at the selected plane.
     '''
     treecolor = kwargs.get('treecolor', None)
     outline = kwargs.get('outline', True)
@@ -261,33 +228,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         plane: str \
             Accepted values: Any pair of of xyz \
             Default value is 'xy'.treecolor
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -297,14 +237,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-        limits: list or boolean \
-            List of type: [[xmin, ymin, zmin], [xmax, ymax, zmax]] \
-            If False the figure will not be scaled. \
-            If True the figure will be scaled according to tree limits. \
-            Default value is False.
-
-    Returns:
-        A 3D matplotlib figure with a tree view, at the selected plane.
     '''
     if plane not in ('xy', 'yx', 'xz', 'zx', 'yz', 'zy'):
         return None, 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.'
@@ -317,9 +249,11 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     kwargs['final'] = False
 
+    white_space = get_default('white_space', **kwargs)
+
     soma(nrn.soma, plane=plane, **kwargs)
 
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['title'] = kwargs.get('title', nrn.name)
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
 
@@ -335,16 +269,17 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
                   bounding_box[1][getattr(COLS, plane[1].capitalize())]])
 
-        tree(temp_tree, plane=plane, **kwargs)
+        tree(temp_tree, plane=plane, xlim=None, ylim=None, **kwargs)
 
     if h:
-        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                             np.max(h) + get_default('white_space', **kwargs)])
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - white_space,
+                                             np.max(h) + white_space])
     if v:
-        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                             np.max(v) + get_default('white_space', **kwargs)])
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - white_space,
+                                             np.max(v) + white_space])
 
     kwargs['final'] = True
+
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
@@ -354,37 +289,9 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     If the tree contains one single point the plot will be empty \
     since no segments can be constructed.
 
-
     Parameters:
         tr: Tree \
         neurom.Tree object
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean \
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -398,9 +305,6 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
             Defines the white space around \
             the boundary box of the morphology. \
             Default value is 1.
-
-    Returns:
-        A 3D matplotlib figure with a tree view.
     '''
     from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
@@ -450,6 +354,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['xlabel'] = kwargs.get('xlabel', 'X')
     kwargs['ylabel'] = kwargs.get('ylabel', 'Y')
     kwargs['zlabel'] = kwargs.get('zlabel', 'Z')
+
     kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][0] - get_default('white_space', **kwargs),
                                          bounding_box[1][0] + get_default('white_space', **kwargs)])
     kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][1] - get_default('white_space', **kwargs),
@@ -467,27 +372,6 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
     Parameters:
         soma: Soma \
         neurom.Soma object
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the soma. \
-            Soma : "black". \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-
-    Returns:
-        A 3D matplotlib figure with a soma view.
     '''
     treecolor = kwargs.get('treecolor', None)
 
@@ -522,33 +406,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     Parameters:
         neuron: Neuron \
         neurom.Neuron object
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
         diameter: boolean
             If True the diameter, scaled with diameter_scale factor, \
             will define the width of the tree lines. \
@@ -558,51 +415,49 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
             Defines the scale factor that will be multiplied \
             with the diameter to define the width of the tree line. \
             Default value is 1.
-
-    Returns:
-        A 3D matplotlib figure with a neuron view.
     '''
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
                                 subplot=subplot, params={'projection': '3d'})
 
+    white_space = get_default('white_space', **kwargs)
+
     kwargs['new_fig'] = False
     kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['title'] = kwargs.get('title', nrn.name)
 
     kwargs['final'] = False
 
     soma3d(nrn.soma, **kwargs)
 
-    h = []
-    v = []
-    d = []
+    boundaries = [[], [], []]
 
     for temp_tree in nrn.neurites:
 
         bounding_box = _compat.bounding_box(temp_tree)
 
-        h.append([bounding_box[0][getattr(COLS, 'X')],
-                  bounding_box[1][getattr(COLS, 'X')]])
-        v.append([bounding_box[0][getattr(COLS, 'Y')],
-                  bounding_box[1][getattr(COLS, 'Y')]])
-        d.append([bounding_box[0][getattr(COLS, 'Z')],
-                  bounding_box[1][getattr(COLS, 'Z')]])
+        boundaries[0].append([bounding_box[0][getattr(COLS, 'X')],
+                              bounding_box[1][getattr(COLS, 'X')]])
+        boundaries[1].append([bounding_box[0][getattr(COLS, 'Y')],
+                              bounding_box[1][getattr(COLS, 'Y')]])
+        boundaries[2].append([bounding_box[0][getattr(COLS, 'Z')],
+                              bounding_box[1][getattr(COLS, 'Z')]])
 
-        tree3d(temp_tree, **kwargs)
+        tree3d(temp_tree, xlim=None, ylim=None, zlim=None, **kwargs)
 
-    if h:
-        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                             np.max(h) + get_default('white_space', **kwargs)])
-    if v:
-        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                             np.max(v) + get_default('white_space', **kwargs)])
-    if d:
-        kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
-                                             np.max(d) + get_default('white_space', **kwargs)])
+    if len(boundaries[0]) > 0:
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(boundaries[0]) - white_space,
+                                             np.max(boundaries[0]) + white_space])
+    if len(boundaries[1]) > 0:
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(boundaries[1]) - white_space,
+                                             np.max(boundaries[1]) + white_space])
+    if len(boundaries[2]) > 0:
+        kwargs['zlim'] = kwargs.get('zlim', [np.min(boundaries[2]) - white_space,
+                                             np.max(boundaries[2]) + white_space])
 
     kwargs['final'] = True
+
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
@@ -677,23 +532,6 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
         show_diameters : boolean \
             Determines if node diameters will \
             be show or not.
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
         new_fig: boolean \
             Defines if the tree will be plotted \
             in the current figure (False) \
@@ -734,3 +572,10 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     kwargs['no_legend'] = False
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
+
+neuron.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+neuron3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+tree3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+soma3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member

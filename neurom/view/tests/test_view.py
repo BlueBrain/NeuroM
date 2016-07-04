@@ -84,6 +84,7 @@ def test_neuron():
     fig, ax = view.neuron(neuron0)
     nt.ok_(np.allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179)) )
     nt.ok_(np.allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001)) )
+    nt.ok_(ax.get_title() == neuron0.name)
     fig, ax = view.neuron(neuron0, plane='wrong')
     nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
     plt.close('all')
@@ -112,6 +113,7 @@ def test_neuron3d():
     nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
     nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
     nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
+    nt.ok_(ax.get_title() == neuron0.name)
 
 
 def test_neuron_no_neurites():
