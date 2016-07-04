@@ -151,6 +151,38 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not check_morph.has_basal_dendrite(n))
 
 
+def test_has_nonzero_soma_radius():
+
+    nrn = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn))
+
+
+def test_has_nonzero_soma_radius_bad_data():
+
+    nrn = load_neuron(os.path.join(SWC_PATH, 'Single_basal.swc'))
+    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn))
+
+
+def test_has_nonzero_soma_radius_threshold():
+
+    class Dummy(object):
+        pass
+
+    nrn = Dummy()
+    nrn.soma = Dummy()
+    nrn.soma.radius = 1.5
+
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn))
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 0.25))
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 0.75))
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 1.25))
+    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 1.499))
+    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 1.5))
+    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 1.75))
+    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 2.5))
+
+
+
 def test_get_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
