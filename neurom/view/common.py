@@ -173,7 +173,7 @@ PLOT_STYLE_PARAMS = '''        pretitle (Optional[str]): String to include befor
             according to matplotlib default options. \
             For equal aspect ratio select 'equal'. \
             For normal aspect ration select 'auto'. \
-            Default value is set to 'auto'.
+            Default value is set to 'equal'.
 
     Returns:
         Matplotlib figure, matplotlib axes'''
@@ -363,7 +363,7 @@ def plot_style(fig, ax, **kwargs):
     no_axes = kwargs.get('no_axes', False)
     show_plot = kwargs.get('show_plot', True)
     tight = kwargs.get('tight', False)
-    aspect_ratio = kwargs.get('aspect_ratio', 'auto')
+    aspect_ratio = kwargs.get('aspect_ratio', 'equal')
 
     final = kwargs.get('final', True)
 
