@@ -168,6 +168,12 @@ PLOT_STYLE_PARAMS = '''        pretitle (Optional[str]): String to include befor
         transparent (Optional(bool):\
             If True the saved figure will have a transparent background.\
             Default value is False.
+        aspect_ratio (Optional(str):\
+            Defines the aspect ratio of the figure, \
+            according to matplotlib default options. \
+            For equal aspect ratio select 'equal'. \
+            For normal aspect ration select 'auto'. \
+            Default value is set to 'equal'.
 
     Returns:
         Matplotlib figure, matplotlib axes'''
@@ -357,6 +363,7 @@ def plot_style(fig, ax, **kwargs):
     no_axes = kwargs.get('no_axes', False)
     show_plot = kwargs.get('show_plot', True)
     tight = kwargs.get('tight', False)
+    aspect_ratio = kwargs.get('aspect_ratio', 'equal')
 
     final = kwargs.get('final', True)
 
@@ -379,6 +386,8 @@ def plot_style(fig, ax, **kwargs):
         ax.set_frame_on(False)
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
+
+    ax.set_aspect(aspect_ratio)
 
     if tight:
         fig.set_tight_layout(True)
