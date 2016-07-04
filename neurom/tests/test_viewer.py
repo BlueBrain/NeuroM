@@ -32,7 +32,7 @@ from neurom.fst import load_neuron as load_fst_neuron
 from neurom import viewer
 from neurom.analysis.morphtree import set_tree_type
 import os
-from matplotlib import pylab as plt
+from matplotlib import pyplot as plt
 
 
 class Dummy(object):
