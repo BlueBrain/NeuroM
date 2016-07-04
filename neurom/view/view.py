@@ -119,6 +119,8 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     # Data needed for the viewer: x,y,z,r
     bounding_box = _compat.bounding_box(tr)
 
+    white_space = get_default('white_space', **kwargs)
+
     def _seg_2d(seg):
         '''2d coordinates needed for the plotting of a segment'''
         horz = getattr(COLS, plane[0].capitalize())
@@ -154,13 +156,13 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
     kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][getattr(COLS, plane[0].capitalize())] -
-                                         get_default('white_space', **kwargs),
+                                         white_space,
                                          bounding_box[1][getattr(COLS, plane[0].capitalize())] +
-                                         get_default('white_space', **kwargs)])
+                                         white_space])
     kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][getattr(COLS, plane[1].capitalize())] -
-                                         get_default('white_space', **kwargs),
+                                         white_space,
                                          bounding_box[1][getattr(COLS, plane[1].capitalize())] +
-                                         get_default('white_space', **kwargs)])
+                                         white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -247,9 +249,11 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     kwargs['final'] = False
 
+    white_space = get_default('white_space', **kwargs)
+
     soma(nrn.soma, plane=plane, **kwargs)
 
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['title'] = kwargs.get('title', nrn.name)
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
 
@@ -265,17 +269,16 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
                   bounding_box[1][getattr(COLS, plane[1].capitalize())]])
 
-        tree(temp_tree, plane=plane, **kwargs)
+        tree(temp_tree, plane=plane, xlim=None, ylim=None, **kwargs)
 
     if h:
-        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                             np.max(h) + get_default('white_space', **kwargs)])
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - white_space,
+                                             np.max(h) + white_space])
     if v:
-        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                             np.max(v) + get_default('white_space', **kwargs)])
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - white_space,
+                                             np.max(v) + white_space])
 
     kwargs['final'] = True
-    kwargs['title'] = nrn.name
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -351,6 +354,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['xlabel'] = kwargs.get('xlabel', 'X')
     kwargs['ylabel'] = kwargs.get('ylabel', 'Y')
     kwargs['zlabel'] = kwargs.get('zlabel', 'Z')
+
     kwargs['xlim'] = kwargs.get('xlim', [bounding_box[0][0] - get_default('white_space', **kwargs),
                                          bounding_box[1][0] + get_default('white_space', **kwargs)])
     kwargs['ylim'] = kwargs.get('ylim', [bounding_box[0][1] - get_default('white_space', **kwargs),
@@ -416,44 +420,43 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
                                 subplot=subplot, params={'projection': '3d'})
 
+    white_space = get_default('white_space', **kwargs)
+
     kwargs['new_fig'] = False
     kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
-    kwargs['title'] = kwargs.get('title', 'Neuron view')
+    kwargs['title'] = kwargs.get('title', nrn.name)
 
     kwargs['final'] = False
 
     soma3d(nrn.soma, **kwargs)
 
-    h = []
-    v = []
-    d = []
+    boundaries = [[], [], []]
 
     for temp_tree in nrn.neurites:
 
         bounding_box = _compat.bounding_box(temp_tree)
 
-        h.append([bounding_box[0][getattr(COLS, 'X')],
-                  bounding_box[1][getattr(COLS, 'X')]])
-        v.append([bounding_box[0][getattr(COLS, 'Y')],
-                  bounding_box[1][getattr(COLS, 'Y')]])
-        d.append([bounding_box[0][getattr(COLS, 'Z')],
-                  bounding_box[1][getattr(COLS, 'Z')]])
+        boundaries[0].append([bounding_box[0][getattr(COLS, 'X')],
+                              bounding_box[1][getattr(COLS, 'X')]])
+        boundaries[1].append([bounding_box[0][getattr(COLS, 'Y')],
+                              bounding_box[1][getattr(COLS, 'Y')]])
+        boundaries[2].append([bounding_box[0][getattr(COLS, 'Z')],
+                              bounding_box[1][getattr(COLS, 'Z')]])
 
-        tree3d(temp_tree, **kwargs)
+        tree3d(temp_tree, xlim=None, ylim=None, zlim=None, **kwargs)
 
-    if h:
-        kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - get_default('white_space', **kwargs),
-                                             np.max(h) + get_default('white_space', **kwargs)])
-    if v:
-        kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - get_default('white_space', **kwargs),
-                                             np.max(v) + get_default('white_space', **kwargs)])
-    if d:
-        kwargs['zlim'] = kwargs.get('zlim', [np.min(d) - get_default('white_space', **kwargs),
-                                             np.max(d) + get_default('white_space', **kwargs)])
+    if len(boundaries[0]) > 0:
+        kwargs['xlim'] = kwargs.get('xlim', [np.min(boundaries[0]) - white_space,
+                                             np.max(boundaries[0]) + white_space])
+    if len(boundaries[1]) > 0:
+        kwargs['ylim'] = kwargs.get('ylim', [np.min(boundaries[1]) - white_space,
+                                             np.max(boundaries[1]) + white_space])
+    if len(boundaries[2]) > 0:
+        kwargs['zlim'] = kwargs.get('zlim', [np.min(boundaries[2]) - white_space,
+                                             np.max(boundaries[2]) + white_space])
 
     kwargs['final'] = True
-    kwargs['title'] = nrn.name
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
