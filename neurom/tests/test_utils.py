@@ -65,7 +65,7 @@ def test_memoize_does_not_cache_kwargs():
 
 def test_deprecated():
 
-    @nu.deprecated('Hello')
+    @nu.deprecated(msg='Hello')
     def dummy():
         pass
 

@@ -53,7 +53,7 @@ def memoize(fun):
     return memoizer
 
 
-def deprecated(msg="", fun_name=None):
+def deprecated(fun_name=None, msg=""):
     '''Issue a deprecation warning for a function'''
     def _deprecated(fun):
         '''Issue a deprecation warning for a function'''
