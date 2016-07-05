@@ -80,6 +80,7 @@ def test_draw_soma():
 def test_draw_soma3d():
     viewer.draw(nrn.soma, mode='3d')
     viewer.draw(fst_nrn.soma, mode='3d')
+    plt.close('all')
 
 
 def test_draw_dendrogram():
