@@ -75,7 +75,7 @@ def _iseg(nrn, neurite_type=NeuriteType.all):
     return _mm.iter_segments(nrn, tree_filter=_is_type(neurite_type))
 
 
-load_population = deprecated('Use load_neurons instead.',
+load_population = deprecated(msg='Use load_neurons instead.',
                              fun_name='load_population')(load_neurons)
 
 

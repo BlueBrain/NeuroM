@@ -61,8 +61,8 @@ from functools import partial, update_wrapper
 from ..core.neuron import Neuron
 from ..core.population import Population
 from ..core.types import NeuriteType, NEURITES as NEURITE_TYPES
-from ..view.view import neuron as view
-from ..view.view import neuron3d as view3d
+from ..view.view import neuron as _view
+from ..view.view import neuron3d as _view3d
 from ..io.utils import get_morph_files
 from ..features import get
 from ..io import utils as _io
@@ -72,10 +72,23 @@ from ..utils import deprecated
 
 TreeType = NeuriteType  # For backwards compatibility
 
-load_neuron = partial(_io.load_neuron, tree_action=_set_tt)
-load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron,
-                       population_class=Population)
-update_wrapper(load_neurons, _io.load_neurons)
+_load_neuron = partial(_io.load_neuron, tree_action=_set_tt)
+update_wrapper(_load_neuron, _io.load_neurons)
+load_neuron = deprecated(fun_name='%s.load_neuron' % __name__,
+                         msg='Use neurom.load_neuron instead.')(_load_neuron)
 
-load_population = deprecated('Use load_neurons instead.',
-                             fun_name='load_population')(load_neurons)
+
+_load_neurons = partial(_io.load_neurons, neuron_loader=_load_neuron,
+                        population_class=Population)
+update_wrapper(_load_neurons, _io.load_neurons)
+load_neurons = deprecated(fun_name='%s.load_neurons' % __name__,
+                          msg='Use neurom.load_neurons instead.')(_load_neurons)
+
+load_population = deprecated(msg='Use neurom.load_neurons instead.',
+                             fun_name='%s.load_population' % __name__)(load_neurons)
+
+view = deprecated(msg='Use neurom.viewer.draw instead.',
+                  fun_name='%s.view' % __name__)(_view)
+
+view3d = deprecated(msg='Use neurom.viewer.draw instead.',
+                    fun_name='%s.view3d' % __name__)(_view)
