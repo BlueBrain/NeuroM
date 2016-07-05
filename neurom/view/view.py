@@ -256,8 +256,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs['title'] = kwargs.get('title', nrn.name)
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-    kwargs['xlim'] = kwargs.get('xlim', None)
-    kwargs['ylim'] = kwargs.get('ylim', None)
 
     h = []
     v = []
@@ -428,9 +426,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
     kwargs['title'] = kwargs.get('title', nrn.name)
-    kwargs['xlim'] = kwargs.get('xlim', None)
-    kwargs['ylim'] = kwargs.get('ylim', None)
-    kwargs['zlim'] = kwargs.get('zlim', None)
 
     kwargs['final'] = False
 
