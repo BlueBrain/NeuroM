@@ -31,6 +31,7 @@ Python module of NeuroM to check neuronal trees.
 '''
 
 import numpy as np
+from itertools import ifilter
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
 from neurom.analysis.morphmath import principal_direction_extent
@@ -86,12 +87,19 @@ def is_flat(neurite, tol, method='tolerance'):
 
 
 def is_back_tracking(neurite):
-    ''' zigzag
+    ''' Check if a neurite process backtracks to a previous node. Back-tracking takes place
+    when a daughter of a branching process goes back and either overlaps with a previous point, or
+    lies inside the cylindrical volume of the latter.
+
+    Returns:
+        True Under the following scenaria:
+            1. A segment endpoint falls back and overlaps with a previous segment's point
+            2. The geometry of a segment overlaps with a previous one in the section
     '''
-    def paired(n):
+    def pair(segs):
         ''' Pairs the input list into triplets
         '''
-        return zip(n, n[1:], n[2:])
+        return zip(segs, segs[1:])
 
     def coords(node):
         ''' Returns the first three values of the tree that
@@ -109,63 +117,72 @@ def is_back_tracking(neurite):
         '''
         return not np.allclose(coords(seg[0]), coords(seg[1]))
 
-    def is_in_the_same_verse(seg, other):
+    def is_in_the_same_verse(seg1, seg2):
         ''' Checks if the vectors face the same direction. This
         is true if their dot product is greater than zero.
         '''
-        return np.dot(coords(other[1]) - coords(other[0]),
-                      coords(seg[1]) - coords(seg[0])) > 0.
+        v1 = coords(seg2[1]) - coords(seg2[0])
+        v2 = coords(seg1[1]) - coords(seg1[0])
+        return np.dot(v1, v2) >= 0
 
-    def is_seg_within_seg_radius(dist, seg, other):
+    def is_seg2_within_seg1_radius(dist, seg1, seg2):
         ''' Checks whether the orthogonal distance from the point at the end of
-        a segment to the other's segment body is smaller than the sum of their radii
+        seg1 to seg2 segment body is smaller than the sum of their radii
         '''
-        return dist <= max_radius(seg) + max_radius(other)
+        return dist <= max_radius(seg1) + max_radius(seg2)
 
-    def is_seg_projection_within_other(seg, other):
+    def is_seg1_overlapping_with_seg2(seg1, seg2):
         '''Checks if a segment is in proximity of another one upstream
         '''
-        s1 = coords(other[0])
-        s2 = coords(other[1])
+        # get the coordinates of seg2 (from the origin)
+        s1 = coords(seg2[0])
+        s2 = coords(seg2[1])
 
-        # center of the other segment
+        # vector of the center of seg2 (from the origin)
         C = 0.5 * (s1 + s2)
 
-        # endpoint of the current segment
-        P = coords(seg[1])
+        # endpoint of seg1 (from the origin)
+        P = coords(seg1[1])
 
-        # vector from C to P
+        # vector from the center C of seg2 to the endpoint P of seg1
         CP = P - C
 
-        # projection of CP upon the other segment vector
-        prj = mm.vector_projection(CP, s2 - s1)
+        # vector of seg2
+        S1S2 = s2 - s1
+
+        # projection of CP upon seg2
+        prj = mm.vector_projection(CP, S1S2)
 
         # check if the distance of the orthogonal complement of CP projection on S1S2
-        # is smaller than the sum of the radii. If not exit early.
-        if not is_seg_within_seg_radius(np.linalg.norm(CP - prj), seg, other):
+        # (vertical distance from P to seg2) is smaller than the sum of the radii. (overlap)
+        # If not exit early, because there is no way that backtracking can feasible
+        if not is_seg2_within_seg1_radius(np.linalg.norm(CP - prj), seg1, seg2):
             return False
 
-        length = np.linalg.norm(s2 - s1)
-        # projection lies within the length of the cylinder
-        # check if the distance between the center of other segment
-        # and the projection of the end point of the current one
-        # is smaller than half of the others length plus a 5% tolerance
-        return np.linalg.norm(prj) < 0.55 * length
+        # projection lies within the length of the cylinder. Check if the distance between
+        # the center C of seg2 and the projection of the end point of seg1, P is smaller than
+        # half of the others length plus a 5% tolerance
+        return np.linalg.norm(prj) < 0.55 * np.linalg.norm(S1S2)
 
-    def is_inside_cylinder(seg, other):
-        ''' Checks if a point approximately lies within a cylindrical
-        volume
+    def is_inside_cylinder(seg1, seg2):
+        ''' Checks if seg2 approximately lies within a cylindrical volume of seg1.
+        Two conditions must be satisfied:
+            1. The two segments are not facing the same direction  (seg2 comes back to seg1)
+            2. seg2 is overlaping with seg1
         '''
-        return not is_in_the_same_verse(seg, other) and \
-               is_seg_projection_within_other(seg, other)
+        return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    for segments in (paired(node.value) for node in neurite.iter_nodes() if len(node.value) > 2):
-        # filter out zero length segments
-        for i, seg in enumerate(filter(is_not_zero_seg, segments[1:])):
-            # check if the end point of the segment lies within the previous
-            # ones in the current section
-            if any(is_inside_cylinder(seg, other) for other in segments[:i + 1]):
-                return True
+    for snode in ifilter(lambda snode: snode.value.shape[0] > 2, neurite.iter_nodes()):
 
+        # group each section's points intro triplets
+        segment_pairs = filter(is_not_zero_seg, pair(snode.value))
+
+        # filter out zero length segments
+        for i, seg1 in enumerate(segment_pairs[1:]):
+            # check if the end point of the segment lies within the previous
+            # ones in the current sectionmake
+            for seg2 in segment_pairs[0: i + 1]:
+                if is_inside_cylinder(seg1, seg2):
+                    return True
     return False
