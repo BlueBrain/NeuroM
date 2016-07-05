@@ -32,6 +32,7 @@ from neurom.fst import load_neuron as load_fst_neuron
 from neurom import viewer
 from neurom.analysis.morphtree import set_tree_type
 import os
+from matplotlib import pyplot as plt
 
 
 class Dummy(object):
@@ -49,35 +50,42 @@ nrn = load_neuron(MORPH_FILENAME, set_tree_type)
 def test_draw_neuron():
     viewer.draw(nrn)
     viewer.draw(fst_nrn)
+    plt.close('all')
 
 
 def test_draw_neuron3d():
     viewer.draw(nrn, mode='3d')
     viewer.draw(fst_nrn, mode='3d')
+    plt.close('all')
 
 
 def test_draw_tree():
     viewer.draw(nrn.neurites[0])
     viewer.draw(fst_nrn.neurites[0])
+    plt.close('all')
 
 
 def test_draw_tree3d():
     viewer.draw(nrn.neurites[0], mode='3d')
     viewer.draw(fst_nrn.neurites[0], mode='3d')
+    plt.close('all')
 
 
 def test_draw_soma():
     viewer.draw(nrn.soma)
     viewer.draw(fst_nrn.soma)
+    plt.close('all')
 
 
 def test_draw_soma3d():
     viewer.draw(nrn.soma, mode='3d')
     viewer.draw(fst_nrn.soma, mode='3d')
+    plt.close('all')
 
 
 def test_draw_dendrogram():
     viewer.draw(nrn, mode='dendrogram')
+    plt.close('all')
 
 
 @nt.raises(viewer.InvalidDrawModeError)
