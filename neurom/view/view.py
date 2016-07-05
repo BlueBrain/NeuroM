@@ -256,6 +256,8 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs['title'] = kwargs.get('title', nrn.name)
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs['xlim'] = kwargs.get('xlim', None)
+    kwargs['ylim'] = kwargs.get('ylim', None)
 
     h = []
     v = []
@@ -269,7 +271,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         v.append([bounding_box[0][getattr(COLS, plane[1].capitalize())],
                   bounding_box[1][getattr(COLS, plane[1].capitalize())]])
 
-        tree(temp_tree, plane=plane, xlim=None, ylim=None, **kwargs)
+        tree(temp_tree, plane=plane, **kwargs)
 
     if h:
         kwargs['xlim'] = kwargs.get('xlim', [np.min(h) - white_space,
@@ -426,6 +428,9 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
     kwargs['title'] = kwargs.get('title', nrn.name)
+    kwargs['xlim'] = kwargs.get('xlim', None)
+    kwargs['ylim'] = kwargs.get('ylim', None)
+    kwargs['zlim'] = kwargs.get('zlim', None)
 
     kwargs['final'] = False
 
@@ -444,7 +449,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
         boundaries[2].append([bounding_box[0][getattr(COLS, 'Z')],
                               bounding_box[1][getattr(COLS, 'Z')]])
 
-        tree3d(temp_tree, xlim=None, ylim=None, zlim=None, **kwargs)
+        tree3d(temp_tree, **kwargs)
 
     if len(boundaries[0]) > 0:
         kwargs['xlim'] = kwargs.get('xlim', [np.min(boundaries[0]) - white_space,
