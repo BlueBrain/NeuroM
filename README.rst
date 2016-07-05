@@ -152,3 +152,16 @@ The build-time and runtime dependencies of NeuroM are:
 * `matplotlib <http://www.matplotlib.org/>`_
 * `enum34 <https://pypi.python.org/pypi/enum34/>`_
 * `pyyaml <http://www.pyyaml.org/>`_
+
+
+Reporting issues
+================
+
+Issues should be reported to the
+`NeuroM github repository issue tracker <https://github.com/BlueBrain/NeuroM/issues>`_.
+The ability and speed with which issues can be resolved depends on how complete and
+succinct the report is. For this reason, it is recommended that reports be accompanied
+with a minimal but self-contained code sample that reproduces the issue, the observed and
+expected output, and if possible, the commit ID of the version used. If reporting a
+regression, the commit ID of the change that introduced the problem is also extremely valuable
+information.
