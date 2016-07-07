@@ -112,8 +112,7 @@ def translate(obj, t):
     Translate object of supported type.
 
     Parameters :
-        obj : object with one of the following types:
-             'NeuriteType', 'Neuron', 'fst.Neuron'
+        obj : object to be translated. Must implement a transform method.
 
     Returns:
         copy of the object with the applied translation
@@ -130,7 +129,8 @@ def rotate(obj, axis, angle, origin=None):
     Rotation around unit vector following the right hand rule
 
     Parameters:
-        obj : obj to be rotated (e.g. tree, neuron)
+        obj : obj to be rotated (e.g. neurite, neuron).
+            Must implement a transform method.
         axis : unit vector for the axis of rotation
         angle : rotation angle in rads
 
