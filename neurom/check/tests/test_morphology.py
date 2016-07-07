@@ -59,8 +59,8 @@ def _make_monotonic(neuron):
 
 
 def _make_flat(neuron):
-    for neurite in neuron.neurites:
-        neurite.points[:, COLS.Z] = 0.
+    for s in neuron.sections:
+        s.value[:, COLS.Z] = 0.;
 
 
 NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
@@ -263,7 +263,7 @@ def test_nonzero_neurite_radii_threshold():
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
     ids = check_morph.nonzero_neurite_radii(nrn)
-    nt.ok_(ids == [194, 210, 246, 304, 493])
+    nt.assert_equal(ids, [194, 210, 246, 304, 493])
 
 
 def test_nonzero_segment_lengths_good_data():

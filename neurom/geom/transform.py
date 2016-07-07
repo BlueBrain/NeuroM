@@ -26,13 +26,123 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Transformation functions for tree objects'''
+'''Transformation functions for morphology objects'''
 
 import numpy as np
-from neurom.core.tree import Tree
-from neurom.core.neuron import Neuron
-from neurom.core.tree import make_copy, ipreorder, val_iter
-from neurom.core.dataformat import COLS
+
+
+_TRANSFDOC = '''
+
+    The transformation can be applied to [x, y, z] points via a call operator
+    with the following properties:
+
+    Parameters:
+        points: 2D numpy array of points, where the 3 columns
+            are the x, y, z coordinates respectively
+
+    Returns:
+        2D numpy array of transformed points
+'''
+
+
+class Transform3D(object):
+    '''Class representing a generic 3D transformation'''
+    __doc__ += _TRANSFDOC
+
+    def __call__(self, points):
+        '''Apply a 3D transformation to a set of points'''
+        raise NotImplementedError
+
+
+class Translation(Transform3D):
+    '''class representing a 3D translation'''
+    __doc__ += _TRANSFDOC
+
+    def __init__(self, translation):
+        '''
+        Parameters:
+            translation: 3-vector of x, y, z
+        '''
+        self._trans = np.array(translation)
+
+    def __call__(self, points):
+        '''Apply a 3D translation to a set of points'''
+        return points + self._trans
+
+
+class Rotation(Transform3D):
+    '''Class representing a 3D rotation'''
+    __doc__ += _TRANSFDOC
+
+    def __init__(self, dcm):
+        '''
+        Parameters:
+            cdm: a 3x3 direction cosine matrix
+        '''
+        self._dcm = np.array(dcm)
+
+    def __call__(self, points):
+        '''Apply a 3D rotation to a set of points'''
+        return np.dot(self._dcm, np.array(points).T).T
+
+
+class PivotRotation(Rotation):
+    '''Class representing a 3D rotation about a pivot point'''
+    __doc__ += _TRANSFDOC
+
+    def __init__(self, dcm, pivot=None):
+        '''
+        Parameters:
+            cdm: a 3x3 direction cosine matrix
+            pivot: a 3-vector specifying the origin of rotation
+        '''
+        super(PivotRotation, self).__init__(dcm)
+        self._origin = np.zeros(3) if pivot is None else np.array(pivot)
+
+    def __call__(self, points):
+        '''Apply a 3D pivoted rotation to a set of points'''
+        points = points - self._origin
+        points = np.dot(self._dcm, np.array(points).T).T
+        points += self._origin
+        return points
+
+
+def translate(obj, t):
+    '''
+    Translate object of supported type.
+
+    Parameters :
+        obj : object to be translated. Must implement a transform method.
+
+    Returns:
+        copy of the object with the applied translation
+    '''
+
+    try:
+        return obj.transform(Translation(t))
+    except AttributeError:
+        raise NotImplementedError
+
+
+def rotate(obj, axis, angle, origin=None):
+    '''
+    Rotation around unit vector following the right hand rule
+
+    Parameters:
+        obj : obj to be rotated (e.g. neurite, neuron).
+            Must implement a transform method.
+        axis : unit vector for the axis of rotation
+        angle : rotation angle in rads
+
+    Returns:
+        A copy of the object with the applied translation.
+    '''
+    R = _rodrigues_to_dcm(axis, angle)
+
+    try:
+        return obj.transform(PivotRotation(R, origin))
+    except AttributeError:
+        raise NotImplementedError
 
 
 def _sin(x):
@@ -40,7 +150,7 @@ def _sin(x):
     return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
 
 
-def _rodriguesToRotationMatrix(axis, angle):
+def _rodrigues_to_dcm(axis, angle):
     '''
     Generates transformation matrix from unit vector
     and rotation angle. The rotation is applied in the direction
@@ -81,145 +191,3 @@ def _rodriguesToRotationMatrix(axis, angle):
     R[2, 2] = cs + uzz * cs1
 
     return R
-
-
-def translate(obj, t):
-    '''
-    Translate object of supported type.
-
-    Input :
-
-        obj : object with one of the following types:
-             'NeuriteType', 'Neuron', 'ezyNeuron'
-
-    Returns: copy of the object with the applied translation
-    '''
-    if isinstance(obj, Tree):
-
-        res_tree = make_copy(obj)
-        _affineTransformTree(res_tree, np.identity(3), t)
-        return res_tree
-
-    elif isinstance(obj, Neuron):
-
-        res_nrn = obj.copy()
-        _affineTransformNeuron(res_nrn, np.identity(3), t)
-        return res_nrn
-
-
-def rotate(obj, axis, angle, origin=None):
-    '''
-    Rotation around unit vector following the right hand rule
-
-    Input:
-
-        obj : obj to be rotated (e.g. tree, neuron)
-        axis : unit vector for the axis of rotation
-        angle : rotation angle in rads
-
-    Returns:
-
-        A copy of the object with the applied translation.
-    '''
-    R = _rodriguesToRotationMatrix(axis, angle)
-
-    if isinstance(obj, Tree):
-
-        res_tree = make_copy(obj)
-        _affineTransformTree(res_tree, R, np.zeros(3), origin)
-        return res_tree
-
-    elif isinstance(obj, Neuron):
-
-        res_nrn = obj.copy()
-        _affineTransformNeuron(res_nrn, R, np.zeros(3), origin)
-        return res_nrn
-
-
-def _affineTransformPoint(p, A, t, origin=None):
-    '''
-    Apply an affine transform on an iterable with x, y, z as its
-    first elements.
-    Input:
-
-        A : 3x3 transformation matrix
-        t : 3x1 translation array
-        point : iterable of the form (x, y, z, ....)
-        origin : the point with respect of which the rotation is applied.
-    '''
-
-    px, py, pz = p[:COLS.R]
-
-    if origin is not None:
-
-        px -= origin[0]
-        py -= origin[1]
-        pz -= origin[2]
-
-    x = A[0, 0] * px + A[0, 1] * py + A[0, 2] * pz + t[0]
-    y = A[1, 0] * px + A[1, 1] * py + A[1, 2] * pz + t[1]
-    z = A[2, 0] * px + A[2, 1] * py + A[2, 2] * pz + t[2]
-
-    if origin is not None:
-
-        x += origin[0]
-        y += origin[1]
-        z += origin[2]
-
-    p[COLS.X] = x
-    p[COLS.Y] = y
-    p[COLS.Z] = z
-
-
-def _affineTransformTree(tree, A, t, origin=None):
-    '''
-    Apply an affine transform on your tree by applying a linear
-    transform A (e.g. rotation) and a non-linear transform t (translation)
-
-    Input:
-
-        A : 3x3 transformation matrix
-        t : 3x1 translation array
-        tree : tree object
-        origin : the point with respect of which the rotation is applied. If
-                 None then the x,y,z of the root node is assumed to be the
-                 origin.
-    '''
-    # if no origin is specified, the position from the root node
-    # becomes the origin
-    if origin is None:
-
-        origin = tree.value[:COLS.R]
-
-    for value in val_iter(ipreorder(tree)):
-
-        _affineTransformPoint(value, A, t, origin)
-
-
-def _affineTransformNeuron(nrn, A, t, origin=None):
-    '''
-    Apply an affine transform on a neuron object by applying a linear
-    transform A (e.g. rotation) and a non-linear transform t (translation)
-
-    Input:
-
-        A : 3x3 transformation matrix
-        t : 3x1 translation array
-        neuron : neuron object
-        origin : the point with respect of which the rotation is applied. If
-                 None then the x,y,z of the root node is assumed to be the
-                 origin.
-    '''
-    # if no origin is specified, the position of the soma center
-    # is assumed as the origin
-    if origin is None:
-
-        origin = nrn.soma.center
-
-    for point in nrn.soma.iter():
-
-        _affineTransformPoint(point, A, t, origin=origin)
-
-    for neurite in nrn.neurites:
-
-        _affineTransformTree(neurite, A, t, origin=origin)

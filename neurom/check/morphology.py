@@ -37,7 +37,6 @@ from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
 from neurom.exceptions import SomaError
-from neurom.io import check as io_check
 from neurom.fst import _mm as fst_mm
 
 
@@ -194,5 +193,12 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
         threshold: value above which a radius is considered to be non-zero
     Return: list of IDs of zero-radius points
     '''
-    return io_check.has_all_finite_radius_neurites(neuron.data_block,
-                                                   threshold)[1]
+    bad_ids = []
+    seen_ids = set()
+    for s in fst_mm.iter_sections(neuron):
+        for p in s:
+            if p[COLS.R] <= threshold and p[COLS.ID] not in seen_ids:
+                seen_ids.add(p[COLS.ID])
+                bad_ids.append(p[COLS.ID])
+
+    return bad_ids
