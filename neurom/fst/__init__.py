@@ -52,8 +52,9 @@ Examples:
 '''
 
 import numpy as _np
-from functools import partial
-from ._io import load_neuron, load_neurons, Neuron, Neurite
+from functools import partial, update_wrapper
+from ._io import load_neuron, load_neurons
+from ._core import Neuron, Neurite
 from . import _mm
 from ..utils import deprecated
 from ..core.population import Population

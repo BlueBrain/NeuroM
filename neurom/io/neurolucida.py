@@ -257,4 +257,4 @@ class NeurolucidaASC(object):
         with open(morph_file) as morph_fd:
             sections = _parse_sections(morph_fd)
         raw_data = _sections_to_raw_data(sections, remove_duplicates)
-        return wrapper(raw_data, 'Beta Neurolucida ASCII')
+        return wrapper(raw_data, 'NL-ASCII')

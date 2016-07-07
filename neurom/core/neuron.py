@@ -30,7 +30,6 @@
 from neurom.analysis.morphmath import average_points_dist
 import neurom.core.tree as tr
 from neurom.core.dataformat import COLS
-from neurom.core.tree import make_copy
 from copy import deepcopy
 from neurom.exceptions import SomaError
 import numpy as np
@@ -208,6 +207,4 @@ class Neuron(object):
     def copy(self):
         '''Return a copy of the Neuron object.
         '''
-        return Neuron(deepcopy(self.soma),
-                      [make_copy(neu) for neu in self.neurites],
-                      self.name)
+        return deepcopy(self)

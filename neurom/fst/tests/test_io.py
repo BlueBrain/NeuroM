@@ -47,7 +47,7 @@ NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
 
 def test_load_neuron():
 
-    nrn = _io.load_neuron(FILENAMES[0])
+    nrn = _io.load_neuron(FILENAMES[0],)
     nt.assert_true(isinstance(NRN, _io.Neuron))
     nt.assert_equal(NRN.name, 'Neuron')
 

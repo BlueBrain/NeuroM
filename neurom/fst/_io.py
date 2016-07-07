@@ -29,45 +29,14 @@
 '''Fast neuron IO module'''
 
 import os
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from functools import partial, update_wrapper
-import numpy as np
 from neurom.io.swc import SWC
 from neurom.io.neurolucida import NeurolucidaASC
-from neurom.core.types import NeuriteType
-from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
-from neurom.core.neuron import make_soma
 from neurom.io import utils as _iout
-
-
-Neuron = namedtuple('Neuron', 'soma, neurites, sections, points, data_block, name')
-
-
-class Neurite(object):
-    '''Class representing a neurite tree'''
-    def __init__(self, root_node):
-        self.root_node = root_node
-        self.type = root_node.type
-        self._points = None
-
-    @property
-    def points(self):
-        '''Return all the points in this neurite'''
-        if self._points is None:
-            # add all points in a section except the first one, which is a
-            # duplicate
-            _pts = [v for s in ipreorder(self.root_node) for v in s.value[1:, :4]]
-            # except for the very first point, which is not a duplicate
-            _pts.insert(0, self.root_node.value[0][:4])
-            self._points = np.array(_pts)
-
-        return self._points
-
-    def iter_nodes(self):
-        '''unordered iteration over section nodes'''
-        return ipreorder(self.root_node)
+from ._core import Neuron
 
 
 class SecDataWrapper(object):
@@ -92,39 +61,6 @@ class SecDataWrapper(object):
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
 
-_TREE_TYPES = tuple(NeuriteType)
-
-
-def make_neurites(rdw, post_action=None):
-    '''Build neurite trees from a raw data wrapper'''
-    trunks = rdw.neurite_trunks()
-    if len(trunks) == 0:
-        return [], []
-
-    start_node = min(trunks)
-
-    # One pass over sections to build nodes
-    nodes = tuple(Tree(rdw.data_block[sec.ids]) for sec in rdw.sections)
-
-    # One pass over nodes to set the neurite type
-    # and connect children to parents
-    for i, node in enumerate(nodes):
-        node.type = _TREE_TYPES[rdw.sections[i].ntype]
-        node.section_id = i
-        parent_id = rdw.sections[i].pid
-        # only connect neurites
-        if parent_id >= start_node:
-            nodes[parent_id].add_child(node)
-
-    neurites = tuple(Neurite(nodes[i]) for i in trunks)
-
-    if post_action is not None:
-        for n in neurites:
-            post_action(n.root_node)
-
-    return neurites, nodes
-
-
 def _clear_ext(ext):
     '''Remove extension separation and make lowercase'''
     return ext.split(os.path.extsep)[-1].lower()
@@ -139,15 +75,8 @@ def load_data(filename):
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     rdw = load_data(filename)
-    name, ext = os.path.splitext(os.path.basename(filename))
-    neurites, sections = make_neurites(rdw, _NEURITE_ACTION[_clear_ext(ext)])
-    soma = make_soma(rdw.soma_points())
-    return Neuron(soma=soma,
-                  neurites=neurites,
-                  sections=sections,
-                  points=rdw.data_block[:, 0:4],
-                  data_block=rdw,
-                  name=name)
+    name = os.path.splitext(os.path.basename(filename))[0]
+    return Neuron(rdw, name)
 
 
 load_neurons = partial(_iout.load_neurons, neuron_loader=load_neuron)
@@ -240,12 +169,6 @@ def extract_sections(data_block):
     return _sections
 
 
-def _remove_soma_initial_point(tree):
-    '''Remove tree's initial point if soma'''
-    if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
-        tree.value = tree.value[1:]
-
-
 def _load_h5(filename):
     '''Delay loading of h5py until it is needed'''
     from neurom.io.hdf5 import H5
@@ -256,10 +179,4 @@ _READERS = {
     'swc': partial(SWC.read, wrapper=SecDataWrapper),
     'h5': _load_h5,
     'asc': partial(NeurolucidaASC.read, remove_duplicates=False, wrapper=SecDataWrapper)
-}
-
-_NEURITE_ACTION = {
-    'swc': _remove_soma_initial_point,
-    'h5': None,
-    'asc': None
 }
