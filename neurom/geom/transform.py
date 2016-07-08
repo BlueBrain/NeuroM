@@ -113,6 +113,7 @@ def translate(obj, t):
 
     Parameters :
         obj : object to be translated. Must implement a transform method.
+        t: translation 3-vector
 
     Returns:
         copy of the object with the applied translation

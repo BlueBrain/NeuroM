@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from copy import deepcopy
 from neurom import load_neuron
 from neurom.fst import _io as io
 from neurom.check import morphology as check_morph
@@ -59,8 +60,14 @@ def _make_monotonic(neuron):
 
 
 def _make_flat(neuron):
-    for s in neuron.sections:
-        s.value[:, COLS.Z] = 0.;
+
+    class Flattenizer(object):
+        def __call__(self, points):
+            points = deepcopy(points)
+            points[:, COLS.Z] = 0.;
+            return points
+
+    return neuron.transform(Flattenizer())
 
 
 NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
@@ -190,7 +197,7 @@ def test_get_flat_neurites():
     nt.assert_equal(len(check_morph.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
     nt.assert_equal(len(check_morph.get_flat_neurites(n, 0.1, method='ratio')), 0)
 
-    _make_flat(n)
+    n = _make_flat(n)
 
     nt.assert_equal(len(check_morph.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
     nt.assert_equal(len(check_morph.get_flat_neurites(n, 0.1, method='ratio')), 4)
@@ -203,7 +210,7 @@ def test_has_no_flat_neurites():
     nt.assert_true(check_morph.has_no_flat_neurites(n, 1e-6, method='tolerance'))
     nt.assert_true(check_morph.has_no_flat_neurites(n, 0.1, method='ratio'))
 
-    _make_flat(n)
+    n = _make_flat(n)
 
     nt.assert_false(check_morph.has_no_flat_neurites(n, 1e-6, method='tolerance'))
     nt.assert_false(check_morph.has_no_flat_neurites(n, 0.1, method='ratio'))

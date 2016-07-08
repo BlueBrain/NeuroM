@@ -29,6 +29,7 @@
 ''' Geometrical Operations for NeuroM '''
 
 import numpy as np
+from .transform import translate, rotate
 
 
 def bounding_box(obj):
