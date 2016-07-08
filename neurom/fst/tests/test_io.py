@@ -31,7 +31,7 @@
 from nose import tools as nt
 import os
 from neurom.fst import _io
-from neurom.fst import _mm
+from neurom.fst import _neuritefunc as _nf
 from neurom.fst import get
 from neurom.core.tree import ipreorder
 
@@ -70,7 +70,7 @@ def test_neuron_section_ids():
 
 def test_neuron_sections():
     all_nodes = set(NRN.sections)
-    neurite_nodes = set(_mm.iter_nodes(NRN.neurites))
+    neurite_nodes = set(_nf.iter_nodes(NRN.neurites))
 
     # check no duplicates
     nt.assert_true(len(all_nodes) == len(NRN.sections))

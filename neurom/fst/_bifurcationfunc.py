@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -27,31 +26,53 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Compatibility between NL and H5 files'''
-# pylint: disable=protected-access
+'''Bifurcation point functions'''
 
 import numpy as np
-import neurom as nm
-from neurom.fst import _neuritefunc as _nf
+from neurom.analysis import morphmath as mm
+from neurom.core.tree import ipreorder
+from neurom.core.dataformat import COLS
 
-nrn_h5 = nm.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
-nrn_asc = nm.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
 
-print 'h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0]
-print 'nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0]
-print 'h5 number of segments: %s' % nm.get('number_of_segments', nrn_h5)[0]
-print 'nl number of segments: %s\n' % nm.get('number_of_segments', nrn_asc)[0]
-print 'h5 total neurite length: %s' % np.sum(nm.get('section_lengths', nrn_h5))
-print 'nl total neurite length: %s\n' % np.sum(nm.get('section_lengths', nrn_asc))
-print 'h5 principal direction extents: %s' % nm.get('principal_direction_extents', nrn_h5)
-print 'nl principal direction extents: %s' % nm.get('principal_direction_extents', nrn_asc)
+def local_bifurcation_angle(bif_point):
+    '''Return the opening angle between two out-going sections
+    in a bifurcation point
 
-print '\nNumber of neurites:'
-for nt in nm.NeuriteType:
-    print nt, _nf.n_neurites(nrn_h5, neurite_type=nt),\
-        _nf.n_neurites(nrn_asc, neurite_type=nt)
+    The bifurcation angle is defined as the angle between the first non-zero
+    length segments of a bifurcation point.
+    '''
+    def skip_0_length(sec):
+        '''Return the first point with non-zero distance to first point'''
+        p0 = sec[0]
+        cur = sec[1]
+        for i, p in enumerate(sec[1:]):
+            if not np.all(p[:COLS.R] == p0[:COLS.R]):
+                cur = sec[i + 1]
+                break
 
-print '\nNumber of segments:'
-for nt in nm.NeuriteType:
-    print nt, _nf.n_segments(nrn_h5, neurite_type=nt),\
-        _nf.n_segments(nrn_asc, neurite_type=nt)
+        return cur
+
+    ch = (skip_0_length(bif_point.children[0].value),
+          skip_0_length(bif_point.children[1].value))
+
+    return mm.angle_3points(bif_point.value[-1], ch[0], ch[1])
+
+
+def remote_bifurcation_angle(bif_point):
+    '''Return the opening angle between two out-going sections
+    in a bifurcation point
+
+    The angle is defined as between the bofircation point and the
+    last points in the out-going sections.
+
+    '''
+    return mm.angle_3points(bif_point.value[-1],
+                            bif_point.children[0].value[-1],
+                            bif_point.children[1].value[-1])
+
+
+def bifurcation_partition(bif_point):
+    '''Calculate the partition at a bifurcation point'''
+    n = float(sum(1 for _ in ipreorder(bif_point.children[0])))
+    m = float(sum(1 for _ in ipreorder(bif_point.children[1])))
+    return max(n, m) / min(n, m)

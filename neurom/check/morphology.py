@@ -38,6 +38,7 @@ from neurom.analysis.morphmath import segment_length
 from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
 from neurom.exceptions import SomaError
 from neurom.fst import _mm as fst_mm
+from neurom.fst import _neuritefunc as _nf
 
 
 def _read_neurite_type(neurite):
@@ -180,7 +181,7 @@ def nonzero_section_lengths(neuron, threshold=0.0):
         threshold: value above which a section length is considered to be non-zero
     Return: list of ids of first point in bad sections
     '''
-    l = [s for s in fst_mm.iter_sections(neuron.neurites)
+    l = [s for s in _nf.iter_sections(neuron.neurites)
          if section_length(s) <= threshold]
     return [i[0][COLS.ID] for i in l]
 
@@ -195,7 +196,7 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
     '''
     bad_ids = []
     seen_ids = set()
-    for s in fst_mm.iter_sections(neuron):
+    for s in _nf.iter_sections(neuron):
         for p in s:
             if p[COLS.R] <= threshold and p[COLS.ID] not in seen_ids:
                 seen_ids.add(p[COLS.ID])
