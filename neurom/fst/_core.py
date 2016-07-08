@@ -47,14 +47,15 @@ class Neurite(object):
     @property
     def points(self):
         '''Return unordered array with all the points in this neurite'''
-        # add all points in a section except the first one, which is a
-        # duplicate
-        _pts = [v for s in ipreorder(self.root_node) for v in s.value[1:, :4]]
-        # except for the very first point, which is not a duplicate
-        _pts.insert(0, self.root_node.value[0][:4])
-        _points = np.array(_pts)
+        if self._points is None:
+            # add all points in a section except the first one, which is a
+            # duplicate
+            _pts = [v for s in ipreorder(self.root_node) for v in s.value[1:, :4]]
+            # except for the very first point, which is not a duplicate
+            _pts.insert(0, self.root_node.value[0][:4])
+            self._points = np.array(_pts)
 
-        return _points
+        return self._points
 
     def transform(self, trans):
         '''Return a copy of this neurite with a 3D transformation applied'''
@@ -80,14 +81,18 @@ class Neuron(object):
         self.neurites, self.sections = make_neurites(self._data)
         self.soma = make_soma(self._data.soma_points())
         self.name = name
+        self._points = None
 
     @property
     def points(self):
         '''Return unordered array with all the points in this neuron'''
-        _points = self.soma.points.tolist()
-        for n in self.neurites:
-            _points.extend(n.points.tolist())
-        return np.array(_points)
+        if self._points is None:
+            _points = self.soma.points.tolist()
+            for n in self.neurites:
+                _points.extend(n.points.tolist())
+            self._points = np.array(_points)
+
+        return self._points
 
     def transform(self, trans):
         '''Return a copy of this neuron with a 3D transformation applied'''
