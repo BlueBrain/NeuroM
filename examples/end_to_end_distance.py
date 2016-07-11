@@ -39,8 +39,9 @@ import matplotlib.pyplot as plt
 
 def path_end_to_end_distance(neurite):
     '''Calculate and return end-to-end-distance of a given neurite.'''
-    trunk = neurite.value[0]
-    return max(morphmath.point_dist(l.value[-1], trunk) for l in ileaf(neurite))
+    trunk = neurite.root_node.points[0]
+    return max(morphmath.point_dist(l.points[-1], trunk)
+               for l in ileaf(neurite.root_node))
 
 
 def mean_end_to_end_dist(neurites):
@@ -65,7 +66,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
     Note that the plots are not very meaningful for bifurcating trees.'''
     def _dist(seg):
         '''Distance between segmenr end and trunk'''
-        return morphmath.point_dist(seg[1], neurite.value[0])
+        return morphmath.point_dist(seg[1], neurite.root_node.points[0])
 
     end_to_end_distance = _compat.map_segments(neurite, _dist)
     make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1,
@@ -91,5 +92,5 @@ if __name__ == '__main__':
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)
-        print(sum(len(s.value) - 1 for s in ipreorder(nrte)),
+        print(sum(len(s.points) - 1 for s in ipreorder(nrte.root_node)),
               path_end_to_end_distance(nrte), nrte.type)

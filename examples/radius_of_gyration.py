@@ -32,7 +32,6 @@
 from neurom.analysis import morphmath as mm
 from neurom import fst
 from neurom._compat import map_segments
-from neurom.core.tree import ipreorder
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -95,7 +94,7 @@ if __name__ == '__main__':
     nrn = fst.load_neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
-    print([(sum(len(s.value) - 1 for s in ipreorder(nrte)),
+    print([(sum(len(s.points) - 1 for s in nrte.iter_sections()),
             radius_of_gyration(nrte), nrte.type) for nrte in nrn.neurites])
 
     # print mean radius of gyration per neurite type
