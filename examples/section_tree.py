@@ -2,7 +2,8 @@
 # pylint: disable=protected-access
 
 import sys
-from neurom import fst
+import neurom as nm
+from neurom.fst import _neuritefunc as _nf
 from neurom.analysis.morphmath import section_length
 
 
@@ -11,16 +12,16 @@ def do_stuff(filename):
 
     print '\nfst module'
 
-    _n = fst.load_neuron(filename)
+    _n = nm.load_neuron(filename)
 
-    for nt in (fst.NeuriteType.axon,
-               fst.NeuriteType.basal_dendrite,
-               fst.NeuriteType.apical_dendrite,
-               fst.NeuriteType.all):
+    for nt in (nm.NeuriteType.axon,
+               nm.NeuriteType.basal_dendrite,
+               nm.NeuriteType.apical_dendrite,
+               nm.NeuriteType.all):
         print '\nNeuriteType:', nt
-        n_sec = fst._mm.n_sections(_n, nt)
-        n_seg = fst._mm.n_segments(_n, nt)
-        sec_len = fst._mm.map_sections(section_length, _n, nt)
+        n_sec = _nf.n_sections(_n, nt)
+        n_seg = _nf.n_segments(_n, nt)
+        sec_len = _nf.map_sections(section_length, _n, nt)
 
         print 'number of sections:', n_sec
         print 'number of segments:', n_seg

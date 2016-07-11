@@ -56,6 +56,8 @@ from functools import partial, update_wrapper
 from ._io import load_neuron, load_neurons
 from ._core import Neuron, Neurite
 from . import _mm
+from . import _neuritefunc as _nf
+from . import _sectionfunc as _sf
 from ..utils import deprecated
 from ..core.population import Population
 from ..core.types import NeuriteType
@@ -73,7 +75,7 @@ def _iseg(nrn, neurite_type=NeuriteType.all):
     TODO:
         This should be a decorator
     '''
-    return _mm.iter_segments(nrn, tree_filter=_is_type(neurite_type))
+    return _mm.iter_segments(nrn, neurite_filter=_is_type(neurite_type))
 
 
 load_population = deprecated(msg='Use load_neurons instead.',
@@ -87,30 +89,30 @@ def _as_neurons(fun, nrns, **kwargs):
 
 
 NEURITEFEATURES = {
-    'total_length': partial(_as_neurons, lambda n, **kw: sum(_mm.map_sections(sec_len, n, **kw))),
-    'total_length_per_neurite': _mm.total_length_per_neurite,
-    'section_lengths': partial(_mm.map_sections, sec_len),
-    'section_volumes': partial(_mm.map_sections, _mm.section_volume),
-    'section_areas': partial(_mm.map_sections, _mm.section_area),
-    'section_tortuosity': partial(_mm.map_sections, _mm.section_tortuosity),
-    'section_path_distances': _mm.section_path_lengths,
-    'number_of_sections': partial(_as_neurons, _mm.n_sections),
-    'number_of_sections_per_neurite': _mm.n_sections_per_neurite,
-    'number_of_neurites': partial(_as_neurons, _mm.n_neurites),
-    'number_of_bifurcations': partial(_as_neurons, _mm.n_bifurcation_points),
-    'section_branch_orders': _mm.section_branch_orders,
-    'section_radial_distances': _mm.section_radial_distances,
-    'local_bifurcation_angles': _mm.local_bifurcation_angles,
-    'remote_bifurcation_angles': _mm.remote_bifurcation_angles,
-    'partition': _mm.bifurcation_partitions,
-    'number_of_segments': partial(_as_neurons, _mm.n_segments),
-    'segment_lengths': _mm.segment_lengths,
+    'total_length': partial(_as_neurons, lambda n, **kw: sum(_nf.map_sections(sec_len, n, **kw))),
+    'total_length_per_neurite': _nf.total_length_per_neurite,
+    'section_lengths': partial(_nf.map_sections, sec_len),
+    'section_volumes': partial(_nf.map_sections, _sf.section_volume),
+    'section_areas': partial(_nf.map_sections, _sf.section_area),
+    'section_tortuosity': partial(_nf.map_sections, _sf.section_tortuosity),
+    'section_path_distances': _nf.section_path_lengths,
+    'number_of_sections': partial(_as_neurons, _nf.n_sections),
+    'number_of_sections_per_neurite': _nf.n_sections_per_neurite,
+    'number_of_neurites': partial(_as_neurons, _nf.n_neurites),
+    'number_of_bifurcations': partial(_as_neurons, _nf.n_bifurcation_points),
+    'section_branch_orders': _nf.section_branch_orders,
+    'section_radial_distances': _nf.section_radial_distances,
+    'local_bifurcation_angles': _nf.local_bifurcation_angles,
+    'remote_bifurcation_angles': _nf.remote_bifurcation_angles,
+    'partition': _nf.bifurcation_partitions,
+    'number_of_segments': partial(_as_neurons, _nf.n_segments),
+    'segment_lengths': _nf.segment_lengths,
     'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _iseg(nrn, **kwargs)],
-    'segment_midpoints': _mm.segment_midpoints,
+    'segment_midpoints': _nf.segment_midpoints,
     'segment_taper_rates': lambda nrn, **kwargs: [seg_taper(s)
                                                   for s in _iseg(nrn, **kwargs)],
-    'segment_radial_distances': _mm.segment_radial_distances,
-    'principal_direction_extents': _mm.principal_direction_extents
+    'segment_radial_distances': _nf.segment_radial_distances,
+    'principal_direction_extents': _nf.principal_direction_extents
 }
 
 NEURONFEATURES = {

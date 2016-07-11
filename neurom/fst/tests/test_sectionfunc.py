@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -27,31 +26,56 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Compatibility between NL and H5 files'''
-# pylint: disable=protected-access
+'''Test neurom._sectionfunc functionality'''
 
+from nose import tools as nt
+import os
 import numpy as np
-import neurom as nm
+from neurom import fst
+from neurom.fst import _sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
+from neurom.fst import _mm
+from neurom.analysis import morphmath as mmth
+from neurom.io import utils as io_utils
 
-nrn_h5 = nm.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
-nrn_asc = nm.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
+_PWD = os.path.dirname(os.path.abspath(__file__))
+H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
+DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
-print 'h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0]
-print 'nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0]
-print 'h5 number of segments: %s' % nm.get('number_of_segments', nrn_h5)[0]
-print 'nl number of segments: %s\n' % nm.get('number_of_segments', nrn_asc)[0]
-print 'h5 total neurite length: %s' % np.sum(nm.get('section_lengths', nrn_h5))
-print 'nl total neurite length: %s\n' % np.sum(nm.get('section_lengths', nrn_asc))
-print 'h5 principal direction extents: %s' % nm.get('principal_direction_extents', nrn_h5)
-print 'nl principal direction extents: %s' % nm.get('principal_direction_extents', nrn_asc)
+NRN = fst.load_neuron(DATA_PATH)
+NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
-print '\nNumber of neurites:'
-for nt in nm.NeuriteType:
-    print nt, _nf.n_neurites(nrn_h5, neurite_type=nt),\
-        _nf.n_neurites(nrn_asc, neurite_type=nt)
 
-print '\nNumber of segments:'
-for nt in nm.NeuriteType:
-    print nt, _nf.n_segments(nrn_h5, neurite_type=nt),\
-        _nf.n_segments(nrn_asc, neurite_type=nt)
+def _equal(a, b, debug=False):
+    if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
+        print '\na: %s\nb:%s\n' % (a, b)
+    nt.assert_equal(len(a), len(b))
+    nt.assert_true(np.alltrue(a == b))
+
+
+def _close(a, b, debug=False):
+    if debug:
+        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
+        print '\na: %s\nb:%s\n' % (a, b)
+        print '\na - b:%s\n' % (a - b)
+    nt.assert_equal(len(a), len(b))
+    nt.assert_true(np.allclose(a, b))
+
+
+def test_section_tortuosity():
+
+    sec_a = [
+        (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
+    ]
+
+    sec_b = [
+        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
+    ]
+
+    nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
+    nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
+
+    for s in _nf.iter_sections(NRN):
+        nt.eq_(_sf.section_tortuosity(s),
+               mmth.section_length(s) / mmth.point_dist(s[0], s[-1]))
