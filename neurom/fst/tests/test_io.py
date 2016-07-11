@@ -70,7 +70,7 @@ def test_neuron_section_ids():
 
 def test_neuron_sections():
     all_nodes = set(NRN.sections)
-    neurite_nodes = set(_nf.iter_nodes(NRN.neurites))
+    neurite_nodes = set(_nf.iter_sections(NRN.neurites))
 
     # check no duplicates
     nt.assert_true(len(all_nodes) == len(NRN.sections))

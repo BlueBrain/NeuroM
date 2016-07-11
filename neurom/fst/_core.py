@@ -31,10 +31,22 @@
 from copy import deepcopy
 import numpy as np
 from neurom.core.types import NeuriteType
-from neurom.core.tree import Tree, ipreorder
+from neurom.core.tree import BaseTree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 from neurom.core.neuron import make_soma
+
+
+class Section(BaseTree):
+    '''Class representing a neurite section'''
+    def __init__(self, points, section_id=None):
+        super(Section, self).__init__()
+        self.id = section_id
+        self.points = points
+
+    def __str__(self):
+        return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
+            (self.id, self.points, self.parent, len(self.children))
 
 
 class Neurite(object):
@@ -50,9 +62,9 @@ class Neurite(object):
         if self._points is None:
             # add all points in a section except the first one, which is a
             # duplicate
-            _pts = [v for s in ipreorder(self.root_node) for v in s.value[1:, :4]]
+            _pts = [v for s in ipreorder(self.root_node) for v in s.points[1:, :4]]
             # except for the very first point, which is not a duplicate
-            _pts.insert(0, self.root_node.value[0][:4])
+            _pts.insert(0, self.root_node.points[0][:4])
             self._points = np.array(_pts)
 
         return self._points
@@ -60,14 +72,14 @@ class Neurite(object):
     def transform(self, trans):
         '''Return a copy of this neurite with a 3D transformation applied'''
         clone = deepcopy(self)
-        for n in clone.iter_nodes():
-            n.value[:, 0:3] = trans(n.value[:, 0:3])
+        for n in clone.iter_sections():
+            n.points[:, 0:3] = trans(n.points[:, 0:3])
 
         return clone
 
-    def iter_nodes(self):
-        '''unordered iteration over section nodes'''
-        return ipreorder(self.root_node)
+    def iter_sections(self, order=ipreorder):
+        '''iteration over section nodes'''
+        return order(self.root_node)
 
     def __deepcopy__(self, memo):
         '''Deep copy of neurite object'''
@@ -120,7 +132,8 @@ def make_neurites(rdw):
     start_node = min(trunks)
 
     # One pass over sections to build nodes
-    nodes = tuple(Tree(rdw.data_block[sec.ids]) for sec in rdw.sections)
+    nodes = tuple(Section(section_id=i, points=rdw.data_block[sec.ids])
+                  for i, sec in enumerate(rdw.sections))
 
     # One pass over nodes to set the neurite type
     # and connect children to parents
@@ -143,8 +156,8 @@ def make_neurites(rdw):
 
 def _remove_soma_initial_point(tree):
     '''Remove tree's initial point if soma'''
-    if tree.value[0][COLS.TYPE] == POINT_TYPE.SOMA:
-        tree.value = tree.value[1:]
+    if tree.points[0][COLS.TYPE] == POINT_TYPE.SOMA:
+        tree.points = tree.points[1:]
 
 
 _TREE_TYPES = tuple(NeuriteType)

@@ -85,14 +85,14 @@ def test_trunk_origin_elevations():
     n1 = Mock()
 
     s = make_soma([[0, 0, 0, 4]])
-    t0 = tr.Tree(((1, 0, 0, 2), (2, 1, 1, 2)))
+    t0 = fst.Section(((1, 0, 0, 2), (2, 1, 1, 2)))
     t0.type = fst.NeuriteType.basal_dendrite
-    t1 = tr.Tree(((0, 1, 0, 2), (1, 2, 1, 2)))
+    t1 = fst.Section(((0, 1, 0, 2), (1, 2, 1, 2)))
     t1.type = fst.NeuriteType.basal_dendrite
     n0.neurites = [fst.Neurite(t0), fst.Neurite(t1)]
     n0.soma = s
 
-    t2 = tr.Tree(((0, -1, 0, 2), (-1, -2, -1, 2)))
+    t2 = fst.Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
     t2.type = fst.NeuriteType.basal_dendrite
     n1.neurites = [fst.Neurite(t2)]
     n1.soma = s

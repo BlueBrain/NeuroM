@@ -58,21 +58,6 @@ def neurite_fun(fun):
 
 @neurite_fun
 def iter_sections(neurites, iterator_type=ipreorder, neurite_filter=None):
-    '''Returns an iterator to the sections in a collection of neurites
-
-    Parameters:
-        neurites: collection of neurites
-        iterator_type: order of the iteration (ipreorder, ipostorder, iupstream)
-        neurite_filter: optional top level filter on properties of neurite tree objects.
-    '''
-    def node_val(node):
-        '''Extract value from a tree node'''
-        return node.value
-
-    return imap(node_val, iter_nodes(neurites, iterator_type, neurite_filter))
-
-
-def iter_nodes(neurites, iterator_type=ipreorder, neurite_filter=None):
     '''Returns an iterator to the nodes in a iterable of neurite objects
 
     Parameters:
@@ -90,14 +75,14 @@ def iter_nodes(neurites, iterator_type=ipreorder, neurite_filter=None):
 
 def n_segments(neurites, neurite_type=NeuriteType.all):
     '''Number of segments in a collection of neurites'''
-    return sum(len(s) - 1
+    return sum(len(s.points) - 1
                for s in iter_sections(neurites, neurite_filter=is_type(neurite_type)))
 
 
 @neurite_fun
 def n_sections(neurites, neurite_type=NeuriteType.all):
     '''Number of sections in a collection of neurites'''
-    return sum(1 for _ in iter_nodes(neurites, neurite_filter=is_type(neurite_type)))
+    return sum(1 for _ in iter_sections(neurites, neurite_filter=is_type(neurite_type)))
 
 
 @neurite_fun
@@ -110,9 +95,9 @@ def n_neurites(neurites, neurite_type=NeuriteType.all):
 @neurite_fun
 def n_bifurcation_points(neurites, neurite_type=NeuriteType.all):
     '''Number of bifurcation points in a collection of neurites'''
-    return sum(1 for _ in iter_nodes(neurites,
-                                     iterator_type=ibifurcation_point,
-                                     neurite_filter=is_type(neurite_type)))
+    return sum(1 for _ in iter_sections(neurites,
+                                        iterator_type=ibifurcation_point,
+                                        neurite_filter=is_type(neurite_type)))
 
 
 def map_sections(fun, neurites, neurite_type=NeuriteType.all):
@@ -125,7 +110,7 @@ def map_sections(fun, neurites, neurite_type=NeuriteType.all):
 def section_branch_orders(neurites, neurite_type=NeuriteType.all):
     '''section branch orders in a collection of neurites'''
     return [branch_order(s)
-            for s in iter_nodes(neurites, neurite_filter=is_type(neurite_type))]
+            for s in iter_sections(neurites, neurite_filter=is_type(neurite_type))]
 
 
 @neurite_fun
@@ -140,21 +125,21 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
     dist = {}
     neurite_filter = is_type(neurite_type)
 
-    for s in iter_nodes(neurites, neurite_filter=neurite_filter):
-        dist[s] = mm.section_length(s.value)
+    for s in iter_sections(neurites, neurite_filter=neurite_filter):
+        dist[s] = mm.section_length(s.points)
 
     def pl2(node):
         '''Calculate the path length using cached section lengths'''
         return sum(dist[n] for n in iupstream(node))
 
-    return [pl2(n) for n in iter_nodes(neurites, neurite_filter=neurite_filter)]
+    return [pl2(n) for n in iter_sections(neurites, neurite_filter=neurite_filter)]
 
 
 def segment_lengths(neurites, neurite_type=NeuriteType.all):
     '''Lengths of the segments in a collection of neurites'''
     def _seg_len(sec):
         '''list of segment lengths of a section'''
-        vecs = np.diff(sec, axis=0)[:, :3]
+        vecs = np.diff(sec.points, axis=0)[:, :3]
         return np.sqrt([np.dot(p, p) for p in vecs])
 
     neurite_filter = is_type(neurite_type)
@@ -166,7 +151,8 @@ def segment_midpoints(neurites, neurite_type=NeuriteType.all):
     '''Return a list of segment mid-points in a collection of neurites'''
     def _seg_midpoint(sec):
         '''Return the mid-points of segments in a section'''
-        return np.divide(np.add(sec[:-1], sec[1:])[:, :3], 2.0)
+        pts = sec.points
+        return np.divide(np.add(pts[:-1], pts[1:])[:, :3], 2.0)
 
     neurite_filter = is_type(neurite_type)
     return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
@@ -178,15 +164,15 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     '''Lengths of the segments in a collection of neurites'''
     def _seg_rd(sec, pos):
         '''list of radial distances of all segments of a section'''
-        mid_pts = np.divide(np.add(sec.value[:-1], sec.value[1:])[:, :3], 2.0)
+        mid_pts = np.divide(np.add(sec.points[:-1], sec.points[1:])[:, :3], 2.0)
         return np.sqrt([mm.point_dist2(p, pos) for p in mid_pts])
 
     neurite_filter = is_type(neurite_type)
     dist = []
     for n in neurites:
         if neurite_filter(n):
-            origin = n.root_node.value[0] if origin is None else origin
-            dist.extend([s for ss in n.iter_nodes() for s in _seg_rd(ss, origin)])
+            origin = n.root_node.points[0] if origin is None else origin
+            dist.extend([s for ss in n.iter_sections() for s in _seg_rd(ss, origin)])
 
     return dist
 
@@ -195,27 +181,27 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 def local_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of local bifurcation angles in a collection of neurites'''
     return [local_bifurcation_angle(b)
-            for b in iter_nodes(neurites,
-                                iterator_type=ibifurcation_point,
-                                neurite_filter=is_type(neurite_type))]
+            for b in iter_sections(neurites,
+                                   iterator_type=ibifurcation_point,
+                                   neurite_filter=is_type(neurite_type))]
 
 
 @neurite_fun
 def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of remote bifurcation angles in a collection of neurites'''
     return [remote_bifurcation_angle(b)
-            for b in iter_nodes(neurites,
-                                iterator_type=ibifurcation_point,
-                                neurite_filter=is_type(neurite_type))]
+            for b in iter_sections(neurites,
+                                   iterator_type=ibifurcation_point,
+                                   neurite_filter=is_type(neurite_type))]
 
 
 @neurite_fun
 def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
     '''Partition at bifurcation points of a collection of neurites'''
     return [bifurcation_partition(b)
-            for b in iter_nodes(neurites,
-                                iterator_type=ibifurcation_point,
-                                neurite_filter=is_type(neurite_type))]
+            for b in iter_sections(neurites,
+                                   iterator_type=ibifurcation_point,
+                                   neurite_filter=is_type(neurite_type))]
 
 
 @neurite_fun
@@ -225,8 +211,8 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     dist = []
     for n in neurites:
         if neurite_filter(n):
-            origin = n.root_node.value[0] if origin is None else origin
-            dist.extend([section_radial_distance(s, origin) for s in n.iter_nodes()])
+            origin = n.root_node.points[0] if origin is None else origin
+            dist.extend([section_radial_distance(s, origin) for s in n.iter_sections()])
 
     return dist
 
@@ -235,14 +221,14 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 def n_sections_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a collection of neurites'''
     neurite_filter = is_type(neurite_type)
-    return [sum(1 for _ in n.iter_nodes()) for n in neurites if neurite_filter(n)]
+    return [sum(1 for _ in n.iter_sections()) for n in neurites if neurite_filter(n)]
 
 
 @neurite_fun
 def total_length_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the number of sections per neurite in a collection'''
     neurite_filter = is_type(neurite_type)
-    return list(sum(mm.section_length(s.value) for s in n.iter_nodes())
+    return list(sum(mm.section_length(s.points) for s in n.iter_sections())
                 for n in neurites if neurite_filter(n))
 
 

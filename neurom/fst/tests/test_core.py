@@ -51,13 +51,18 @@ def test_neuron_name():
     nt.eq_(nrn.name, '12af3rg')
 
 
+def test_section_str():
+    s = _core.Section('foo')
+    nt.assert_true(isinstance(str(s), str))
+
+
 def _check_cloned_neurites(a, b):
 
     nt.assert_true(a is not b)
     nt.assert_true(a.root_node is not b.root_node)
     nt.assert_equal(a.type, b.type)
-    for aa, bb in zip(a.iter_nodes(), b.iter_nodes()):
-        nt.assert_true(np.all(aa.value == bb.value))
+    for aa, bb in zip(a.iter_sections(), b.iter_sections()):
+        nt.assert_true(np.all(aa.points == bb.points))
 
 
 def test_neuron_deepcopy():

@@ -27,10 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neurom import load_neuron
-from neurom.fst import Neurite, NeuriteType
+from neurom.fst import Neurite, NeuriteType, Section
 from neurom.check import morphtree as mt
 from neurom.core.dataformat import COLS
-from neurom.core.tree import Tree
 from nose import tools as nt
 import numpy as np
 import os
@@ -59,13 +58,13 @@ def _generate_neurite(mode):
             sec.append([0, 0, 0, radius, 0, 0])
             radius = new_radius(radius, mode)
 
-        return Tree(np.array(sec))
+        return Section(np.array(sec))
 
     radius = 1.
 
     tree = fake_tree(radius, mode)
-    tree.add_child(fake_tree(tree.value[-1][COLS.R], mode))
-    tree.add_child(fake_tree(tree.value[-1][COLS.R], mode))
+    tree.add_child(fake_tree(tree.points[-1][COLS.R], mode))
+    tree.add_child(fake_tree(tree.points[-1][COLS.R], mode))
     tree.type = NeuriteType.undefined
 
     return Neurite(tree)
@@ -73,14 +72,14 @@ def _generate_neurite(mode):
 
 def _genetate_tree_non_monotonic_section_boundary():
 
-    tree = Tree(np.array([[0, 0, 0, 1.0, 0, 0],
-                          [0, 0, 0, 0.75, 0, 0],
-                          [0, 0, 0, 0.5, 0, 0],
-                          [0, 0, 0, 0.25, 0, 0]]))
+    tree = Section(np.array([[0, 0, 0, 1.0, 0, 0],
+                             [0, 0, 0, 0.75, 0, 0],
+                             [0, 0, 0, 0.5, 0, 0],
+                             [0, 0, 0, 0.25, 0, 0]]))
 
-    ch0 = Tree(np.array([[0, 0, 0, 0.375, 0, 0],
-                         [0, 0, 0, 0.125, 0, 0],
-                         [0, 0, 0, 0.0625, 0, 0]]))
+    ch0 = Section(np.array([[0, 0, 0, 0.375, 0, 0],
+                            [0, 0, 0, 0.125, 0, 0],
+                            [0, 0, 0, 0.0625, 0, 0]]))
 
     tree.add_child(ch0)
     tree.type = NeuriteType.undefined
@@ -89,24 +88,24 @@ def _genetate_tree_non_monotonic_section_boundary():
 
 def _generate_back_track_tree(n, dev):
 
-    tree = Tree(np.array([[0., 0., 0., 0.2, 1., 0., 0.],
-                          [0., 1., 0., 0.15, 1., 0., 0.],
-                          [0., 2., 0., 0.14, 1., 0., 0.]]))
+    tree = Section(np.array([[0., 0., 0., 0.2, 1., 0., 0.],
+                             [0., 1., 0., 0.15, 1., 0., 0.],
+                             [0., 2., 0., 0.14, 1., 0., 0.]]))
 
-    ch0 = Tree(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
-                         [1., 3., 0., 0.15, 1., 0., 0.],
-                         [2., 4., 0., 0.11, 1., 0., 0.]]))
+    ch0 = Section(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
+                            [1., 3., 0., 0.15, 1., 0., 0.],
+                            [2., 4., 0., 0.11, 1., 0., 0.]]))
 
-    ch1 = Tree(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
-                         [1., -3., 0., 0.15, 1., 0., 0.],
-                         [2., -4., 0., 0.12, 1., 0., 0.],
-                         [dev[0], dev[1], dev[2], 0.11, 1., 0., 0.],
-                         [3., -5., 0., 0.1, 1., 0., 0.],
-                         [4., -6., 0., 0.1, 1., 0., 0.]]))
+    ch1 = Section(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
+                            [1., -3., 0., 0.15, 1., 0., 0.],
+                            [2., -4., 0., 0.12, 1., 0., 0.],
+                            [dev[0], dev[1], dev[2], 0.11, 1., 0., 0.],
+                            [3., -5., 0., 0.1, 1., 0., 0.],
+                            [4., -6., 0., 0.1, 1., 0., 0.]]))
 
     tree.add_child(ch0)
     tree.add_child(ch1)
-    tree.children[1].value[3] += tree.children[n].value[1]
+    tree.children[1].points[3] += tree.children[n].points[1]
     tree.type = NeuriteType.undefined
 
     return Neurite(tree)

@@ -52,10 +52,10 @@ def local_bifurcation_angle(bif_point):
 
         return cur
 
-    ch = (skip_0_length(bif_point.children[0].value),
-          skip_0_length(bif_point.children[1].value))
+    ch = (skip_0_length(bif_point.children[0].points),
+          skip_0_length(bif_point.children[1].points))
 
-    return mm.angle_3points(bif_point.value[-1], ch[0], ch[1])
+    return mm.angle_3points(bif_point.points[-1], ch[0], ch[1])
 
 
 def remote_bifurcation_angle(bif_point):
@@ -66,9 +66,9 @@ def remote_bifurcation_angle(bif_point):
     last points in the out-going sections.
 
     '''
-    return mm.angle_3points(bif_point.value[-1],
-                            bif_point.children[0].value[-1],
-                            bif_point.children[1].value[-1])
+    return mm.angle_3points(bif_point.points[-1],
+                            bif_point.children[0].points[-1],
+                            bif_point.children[1].points[-1])
 
 
 def bifurcation_partition(bif_point):
