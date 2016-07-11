@@ -28,7 +28,7 @@
 
 '''Neurite functions'''
 
-import functools
+from functools import wraps, partial
 from itertools import imap, chain
 import numpy as np
 from neurom.core.tree import (ipreorder,
@@ -48,7 +48,7 @@ from ._bifurcationfunc import (local_bifurcation_angle,
 
 def neurite_fun(fun):
     '''Wrapper to extract the neurite trees from the first parameter'''
-    @functools.wraps(fun)
+    @wraps(fun)
     def _neurites(obj, **kwargs):
         '''Extract neurites from obj and forward to wrapped function'''
         if hasattr(obj, 'neurites'):
@@ -84,12 +84,6 @@ def n_segments(neurites, neurite_type=NeuriteType.all):
 
 
 @neurite_fun
-def n_sections(neurites, neurite_type=NeuriteType.all):
-    '''Number of sections in a collection of neurites'''
-    return sum(1 for _ in iter_sections(neurites, neurite_filter=is_type(neurite_type)))
-
-
-@neurite_fun
 def n_neurites(neurites, neurite_type=NeuriteType.all):
     '''Number of neurites in a collection of neurites'''
     is_ntype = is_type(neurite_type)
@@ -97,27 +91,16 @@ def n_neurites(neurites, neurite_type=NeuriteType.all):
 
 
 @neurite_fun
-def n_bifurcation_points(neurites, neurite_type=NeuriteType.all):
-    '''Number of bifurcation points in a collection of neurites'''
+def n_sections(neurites, iterator_type=ipreorder, neurite_type=NeuriteType.all):
+    '''Number of sections in a collection of neurites'''
     return sum(1 for _ in iter_sections(neurites,
-                                        iterator_type=ibifurcation_point,
+                                        iterator_type=iterator_type,
                                         neurite_filter=is_type(neurite_type)))
 
 
-@neurite_fun
-def n_forking_points(neurites, neurite_type=NeuriteType.all):
-    '''Number of forking points in a collection of neurites'''
-    return sum(1 for _ in iter_sections(neurites,
-                                        iterator_type=iforking_point,
-                                        neurite_filter=is_type(neurite_type)))
-
-
-@neurite_fun
-def n_leaves(neurites, neurite_type=NeuriteType.all):
-    '''Number of leaves in a collection of neurites'''
-    return sum(1 for _ in iter_sections(neurites,
-                                        iterator_type=ileaf,
-                                        neurite_filter=is_type(neurite_type)))
+n_bifurcation_points = partial(n_sections, iterator_type=ibifurcation_point)
+n_forking_points = partial(n_sections, iterator_type=iforking_point)
+n_leaves = partial(n_sections, iterator_type=ileaf)
 
 
 def map_sections(fun, neurites, neurite_type=NeuriteType.all):
