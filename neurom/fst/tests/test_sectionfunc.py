@@ -35,6 +35,7 @@ from neurom import fst
 from neurom.fst import _sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst import _mm
+from neurom.fst import Section
 from neurom.analysis import morphmath as mmth
 from neurom.io import utils as io_utils
 
@@ -65,17 +66,18 @@ def _close(a, b, debug=False):
 
 def test_section_tortuosity():
 
-    sec_a = [
+    sec_a = Section([
         (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
-    ]
+    ])
 
-    sec_b = [
+    sec_b = Section([
         (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
-    ]
+    ])
 
     nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
     nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
 
     for s in _nf.iter_sections(NRN):
         nt.eq_(_sf.section_tortuosity(s),
-               mmth.section_length(s) / mmth.point_dist(s[0], s[-1]))
+               mmth.section_length(s.points) / mmth.point_dist(s.points[0],
+                                                               s.points[-1]))

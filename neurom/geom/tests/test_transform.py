@@ -228,7 +228,7 @@ def _check_fst_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
     for sa, sb in izip(_nf.iter_sections(nrts_a),
                        _nf.iter_sections(nrts_b)):
-        nt.assert_true(np.allclose((sb[:, 0:3] - sa[:, 0:3]), t))
+        nt.assert_true(np.allclose((sb.points[:, 0:3] - sa.points[:, 0:3]), t))
 
 
 def test_translate_fst_neuron_swc():
@@ -296,7 +296,8 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
     for sa, sb in izip(_nf.iter_sections(nrt_a),
                        _nf.iter_sections(nrt_b)):
-        nt.assert_true(np.allclose(sb[:, 0:3], _apply_rot(sa[:, 0:3], rot_mat)))
+        nt.assert_true(np.allclose(sb.points[:, 0:3],
+                                   _apply_rot(sa.points[:, 0:3], rot_mat)))
 
 
 def test_rotate_neuron_swc():

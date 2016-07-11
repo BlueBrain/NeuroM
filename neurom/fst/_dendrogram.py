@@ -42,7 +42,7 @@ def _max_recursion_depth(obj):
     '''
     neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
 
-    return max(sum(1 for _ in neu.iter_nodes()) for neu in neurites)
+    return max(sum(1 for _ in neu.iter_sections()) for neu in neurites)
 
 
 def _total_rectangles(tree):
@@ -51,8 +51,8 @@ def _total_rectangles(tree):
     for the dendrogram. There is a vertical line for each segment
     and two horizontal line at each branching point
     '''
-    return sum(len(sec.children) + sec.value.shape[0] - 1
-               for sec in tree.iter_nodes())
+    return sum(len(sec.children) + sec.points.shape[0] - 1
+               for sec in tree.iter_sections())
 
 
 def _n_rectangles(obj):
@@ -113,7 +113,7 @@ def _update_offsets(start_x, spacing, terminations, offsets, length):
 def _max_diameter(tree):
     '''Find max diameter in tree
     '''
-    return 2. * max(max(node.value[:, COLS.R]) for node in ipreorder(tree))
+    return 2. * max(max(node.points[:, COLS.R]) for node in ipreorder(tree))
 
 
 class Dendrogram(object):
@@ -218,7 +218,7 @@ class Dendrogram(object):
 
         for child in current_section.children:
 
-            segments = child.value
+            segments = child.points
 
             # number of leaves in child
             terminations = n_terminations(child)

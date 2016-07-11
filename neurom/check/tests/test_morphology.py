@@ -51,10 +51,10 @@ def _load_neuron(name):
 
 def _make_monotonic(neuron):
     for neurite in neuron.neurites:
-        for node in neurite.iter_nodes():
-            sec = node.value
+        for node in neurite.iter_sections():
+            sec = node.points
             if node.parent is not None:
-                sec[0][COLS.R] = node.parent.value[-1][COLS.R] / 2.
+                sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
             for point_id in xrange(len(sec) - 1):
                 sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 

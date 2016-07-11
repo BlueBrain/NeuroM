@@ -66,11 +66,11 @@ def test_neuron_section_ids():
 
     # check section IDs
     for i, sec in enumerate(NRN.sections):
-        nt.eq_(i, sec.section_id)
+        nt.eq_(i, sec.id)
 
 def test_neuron_sections():
     all_nodes = set(NRN.sections)
-    neurite_nodes = set(_nf.iter_nodes(NRN.neurites))
+    neurite_nodes = set(_nf.iter_sections(NRN.neurites))
 
     # check no duplicates
     nt.assert_true(len(all_nodes) == len(NRN.sections))
@@ -85,7 +85,7 @@ def test_neuron_sections_are_connected():
     for nrt in NRN.neurites:
         root_node = nrt.root_node
         nt.assert_equal(sum(1 for _ in ipreorder(root_node)),
-                        sum(1 for _ in ipreorder(NRN.sections[root_node.section_id])))
+                        sum(1 for _ in ipreorder(NRN.sections[root_node.id])))
 
 
 def test_load_neuron_soma_only():

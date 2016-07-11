@@ -31,28 +31,34 @@ from itertools import chain, imap, ifilter, repeat
 from collections import deque
 
 
-class Tree(object):
-    '''
-    Simple tree class. This is a recursive data structure, with each tree
-    holding a value and a list of children trees. Every node is a tree.
-    '''
-    def __init__(self, value):
-        self.value = value
+class BaseTree(object):
+    '''Simple recursive tree class'''
+    def __init__(self):
         self.parent = None
         self.children = list()
-
-    def __str__(self):
-        return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
-            (self.value, self.parent, len(self.children))
 
     def add_child(self, tree):
         '''Add a child to the list of this tree's children
 
         This tree becomes the added tree's parent
         '''
-        self.children.append(tree)
         tree.parent = self
+        self.children.append(tree)
         return tree
+
+
+class Tree(BaseTree):
+    '''
+    Simple tree class. This is a recursive data structure, with each tree
+    holding a value and a list of children trees. Every node is a tree.
+    '''
+    def __init__(self, value):
+        super(Tree, self).__init__()
+        self.value = value
+
+    def __str__(self):
+        return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
+            (self.value, self.parent, len(self.children))
 
 
 def is_forking_point(tree):

@@ -181,8 +181,8 @@ def nonzero_section_lengths(neuron, threshold=0.0):
         threshold: value above which a section length is considered to be non-zero
     Return: list of ids of first point in bad sections
     '''
-    l = [s for s in _nf.iter_sections(neuron.neurites)
-         if section_length(s) <= threshold]
+    l = [s.points for s in _nf.iter_sections(neuron.neurites)
+         if section_length(s.points) <= threshold]
     return [i[0][COLS.ID] for i in l]
 
 
@@ -197,7 +197,7 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
     bad_ids = []
     seen_ids = set()
     for s in _nf.iter_sections(neuron):
-        for p in s:
+        for p in s.points:
             if p[COLS.R] <= threshold and p[COLS.ID] not in seen_ids:
                 seen_ids.add(p[COLS.ID])
                 bad_ids.append(p[COLS.ID])

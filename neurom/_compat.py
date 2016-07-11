@@ -40,7 +40,7 @@ from neurom import geom
 
 def is_new_style(obj):
     '''Determine whether a neuron or neurite is new or old style'''
-    if isinstance(obj, (fst.Neuron, fst.Neurite)):
+    if isinstance(obj, (fst.Neuron, fst.Neurite, fst.Section)):
         return True
     elif isinstance(obj, Tree):
         return len(obj.value.shape) == 2
@@ -51,7 +51,7 @@ def is_new_style(obj):
 def bounding_box(neurite):
     '''Get a neurite's X,Y,Z bounding box'''
     if is_new_style(neurite):
-        if isinstance(neurite, Tree):
+        if isinstance(neurite, fst.Section):
             neurite = fst.Neurite(neurite)
         return geom.bounding_box(neurite)
     else:
@@ -70,12 +70,12 @@ def map_segments(neurite, fun):
     '''map a function to the segments in a tree'''
     def _segfun(sec):
         '''map a segment function to the segments in section sec'''
-        return imap(fun, izip(sec.value[:-1], sec.value[1:]))
+        return imap(fun, izip(sec.points[:-1], sec.points[1:]))
 
     if is_new_style(neurite):
-        if isinstance(neurite, Tree):
+        if isinstance(neurite, fst.Section):
             neurite = fst.Neurite(neurite)
-        return [s for ss in neurite.iter_nodes() for s in _segfun(ss)]
+        return [s for ss in neurite.iter_sections() for s in _segfun(ss)]
     else:
         fun = seg.segment_function(as_tree=False)(fun)
         return list(iter_neurites(neurite, fun))

@@ -46,15 +46,15 @@ def is_monotonic(neurite, tol):
         tol: numerical precision
     '''
 
-    for node in neurite.iter_nodes():
+    for node in neurite.iter_sections():
         # check that points in section satisfy monotonicity
-        sec = node.value
+        sec = node.points
         for point_id in xrange(len(sec) - 1):
             if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
                 return False
         # Check that section boundary points satisfy monotonicity
         if node.parent is not None:
-            if sec[0][COLS.R] > node.parent.value[-1][COLS.R] + tol:
+            if sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol:
                 return False
 
     return True
@@ -173,10 +173,10 @@ def is_back_tracking(neurite):
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    for snode in ifilter(lambda snode: snode.value.shape[0] > 2, neurite.iter_nodes()):
+    for snode in ifilter(lambda snode: snode.points.shape[0] > 2, neurite.iter_sections()):
 
         # group each section's points intro triplets
-        segment_pairs = filter(is_not_zero_seg, pair(snode.value))
+        segment_pairs = filter(is_not_zero_seg, pair(snode.points))
 
         # filter out zero length segments
         for i, seg1 in enumerate(segment_pairs[1:]):

@@ -29,18 +29,30 @@
 '''Section functions and functional tools'''
 
 from itertools import izip
+from functools import wraps
 from neurom.core.tree import iupstream
 from neurom.analysis import morphmath as mm
 
 
+def section_fun(fun):
+    '''Wrapper to extract points from section argument'''
+    @wraps(fun)
+    def _secfun(sec, **kwargs):
+        '''Get points and forward to fun'''
+        return fun(sec.points, **kwargs)
+
+    return _secfun
+
+
 def map_sum_segments(fun, section):
     '''Map function to segments in section and sum the result'''
-    return sum(fun(s) for s in izip(section[:-1], section[1:]))
+    pts = section.points
+    return sum(fun(s) for s in izip(pts[:-1], pts[1:]))
 
 
 def section_path_length(section):
     '''Path length from section to root'''
-    return sum(mm.section_length(s.value) for s in iupstream(section))
+    return sum(mm.section_length(s.points) for s in iupstream(section))
 
 
 def section_volume(section):
@@ -61,7 +73,8 @@ def section_tortuosity(section):
 
     The path length is the sum of distances between consecutive points.
     '''
-    return mm.section_length(section) / mm.point_dist(section[-1], section[0])
+    pts = section.points
+    return mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
 def branch_order(section):
@@ -86,4 +99,4 @@ def section_radial_distance(section, origin):
         origin: point to which distances are measured. It must have at least 3\
             components. The first 3 components are (x, y, z).
     '''
-    return mm.point_dist(section.value[-1], origin)
+    return mm.point_dist(section.points[-1], origin)

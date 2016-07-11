@@ -54,7 +54,7 @@ Examples:
 import numpy as _np
 from functools import partial, update_wrapper
 from ._io import load_neuron, load_neurons
-from ._core import Neuron, Neurite
+from ._core import Neuron, Neurite, Section
 from . import _mm
 from . import _neuritefunc as _nf
 from . import _sectionfunc as _sf
@@ -67,6 +67,9 @@ from ..core.tree import Tree
 from ..analysis.morphmath import segment_radius as seg_rad
 from ..analysis.morphmath import segment_taper_rate as seg_taper
 from ..analysis.morphmath import section_length as sec_len
+
+
+sec_len = _sf.section_fun(sec_len)
 
 
 def _iseg(nrn, neurite_type=NeuriteType.all):

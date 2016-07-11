@@ -74,13 +74,13 @@ def soma_radii(nrn_pop):
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''list of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
-    return [mm.section_length(s.root_node.value) for s in nrn.neurites if neurite_filter(s)]
+    return [mm.section_length(s.root_node.points) for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     ''' list of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
-    return [s.root_node.value[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
+    return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
@@ -99,7 +99,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
         vector = mm.vector(section[0], soma.center)
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
-    return [_azimuth(s.root_node.value, n.soma)
+    return [_azimuth(s.root_node.points, n.soma)
             for n in nrns for s in n.neurites if neurite_filter(s)]
 
 
@@ -125,7 +125,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
         else:
             raise ValueError("Norm of vector between soma center and section is almost zero.")
 
-    return [_elevation(s.root_node.value, n.soma)
+    return [_elevation(s.root_node.points, n.soma)
             for n in nrns for s in n.neurites if neurite_filter(s)]
 
 
@@ -138,4 +138,4 @@ def iter_segments(neurites, neurite_filter=None):
         made segment analysis functions that leverage numpy.
     '''
     return chain(s for ss in _nf.iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in izip(ss[:-1], ss[1:]))
+                 for s in izip(ss.points[:-1], ss.points[1:]))
