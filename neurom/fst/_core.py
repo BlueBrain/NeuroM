@@ -139,7 +139,6 @@ def make_neurites(rdw):
     # and connect children to parents
     for i, node in enumerate(nodes):
         node.type = _TREE_TYPES[rdw.sections[i].ntype]
-        node.section_id = i
         parent_id = rdw.sections[i].pid
         # only connect neurites
         if parent_id >= start_node:
