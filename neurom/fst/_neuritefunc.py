@@ -31,7 +31,11 @@
 import functools
 from itertools import imap, chain
 import numpy as np
-from neurom.core.tree import ipreorder, ibifurcation_point, iupstream
+from neurom.core.tree import (ipreorder,
+                              ibifurcation_point,
+                              iforking_point,
+                              iupstream,
+                              ileaf)
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
 from neurom.analysis import morphmath as mm
@@ -97,6 +101,22 @@ def n_bifurcation_points(neurites, neurite_type=NeuriteType.all):
     '''Number of bifurcation points in a collection of neurites'''
     return sum(1 for _ in iter_sections(neurites,
                                         iterator_type=ibifurcation_point,
+                                        neurite_filter=is_type(neurite_type)))
+
+
+@neurite_fun
+def n_forking_points(neurites, neurite_type=NeuriteType.all):
+    '''Number of forking points in a collection of neurites'''
+    return sum(1 for _ in iter_sections(neurites,
+                                        iterator_type=iforking_point,
+                                        neurite_filter=is_type(neurite_type)))
+
+
+@neurite_fun
+def n_leaves(neurites, neurite_type=NeuriteType.all):
+    '''Number of leaves in a collection of neurites'''
+    return sum(1 for _ in iter_sections(neurites,
+                                        iterator_type=ileaf,
                                         neurite_filter=is_type(neurite_type)))
 
 

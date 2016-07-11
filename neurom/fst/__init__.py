@@ -103,6 +103,8 @@ NEURITEFEATURES = {
     'number_of_sections_per_neurite': _nf.n_sections_per_neurite,
     'number_of_neurites': partial(_as_neurons, _nf.n_neurites),
     'number_of_bifurcations': partial(_as_neurons, _nf.n_bifurcation_points),
+    'number_of_forking_points': partial(_as_neurons, _nf.n_forking_points),
+    'number_of_terminations': partial(_as_neurons, _nf.n_leaves),
     'section_branch_orders': _nf.section_branch_orders,
     'section_radial_distances': _nf.section_radial_distances,
     'local_bifurcation_angles': _nf.local_bifurcation_angles,

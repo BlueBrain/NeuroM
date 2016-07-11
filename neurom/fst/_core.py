@@ -53,7 +53,7 @@ class Neurite(object):
     '''Class representing a neurite tree'''
     def __init__(self, root_node):
         self.root_node = root_node
-        self.type = root_node.type
+        self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
         self._points = None
 
     @property
