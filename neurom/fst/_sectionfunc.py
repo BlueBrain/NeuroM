@@ -100,3 +100,10 @@ def section_radial_distance(section, origin):
             components. The first 3 components are (x, y, z).
     '''
     return mm.point_dist(section.points[-1], origin)
+
+
+def section_meander_angles(section):
+    '''Inter-segment opening angles in a section'''
+    p = section.points
+    return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
+            for i in xrange(2, len(p))]

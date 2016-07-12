@@ -30,6 +30,7 @@
 
 from nose import tools as nt
 import os
+import math
 import numpy as np
 from neurom import fst
 from neurom.fst import _sectionfunc as _sf
@@ -81,3 +82,39 @@ def test_section_tortuosity():
         nt.eq_(_sf.section_tortuosity(s),
                mmth.section_length(s.points) / mmth.point_dist(s.points[0],
                                                                s.points[-1]))
+
+
+def test_section_meander_angles():
+
+    s0 = Section(np.array([[0, 0, 0],
+                           [1, 0, 0],
+                           [2, 0, 0],
+                           [3, 0, 0],
+                           [4, 0, 0]]))
+
+    nt.assert_equal(_sf.section_meander_angles(s0),
+                    [math.pi, math.pi, math.pi])
+
+    s1 = Section(np.array([[0, 0, 0],
+                           [1, 0, 0],
+                           [1, 1, 0],
+                           [2, 1, 0],
+                           [2, 2, 0]]))
+
+    nt.assert_equal(_sf.section_meander_angles(s1),
+                    [math.pi / 2, math.pi / 2, math.pi / 2])
+
+    s2 = Section(np.array([[0, 0, 0],
+                           [0, 0, 1],
+                           [0, 0, 2],
+                           [0, 0, 0]]))
+
+    nt.assert_equal(_sf.section_meander_angles(s2),
+                    [math.pi, 0.])
+
+
+def test_section_meander_angles_single_segment():
+
+    s = Section(np.array([[0, 0, 0], [1, 1, 1]]))
+
+    nt.assert_equal(len(_sf.section_meander_angles(s)), 0)

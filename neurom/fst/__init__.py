@@ -53,6 +53,7 @@ Examples:
 
 import numpy as _np
 from functools import partial, update_wrapper
+from itertools import chain
 from ._io import load_neuron, load_neurons
 from ._core import Neuron, Neurite, Section
 from . import _mm
@@ -117,6 +118,8 @@ NEURITEFEATURES = {
     'segment_taper_rates': lambda nrn, **kwargs: [seg_taper(s)
                                                   for s in _iseg(nrn, **kwargs)],
     'segment_radial_distances': _nf.segment_radial_distances,
+    'segment_meander_angles': lambda nrn, **kwargs: list(chain.from_iterable(_nf.map_sections(
+        _sf.section_meander_angles, nrn, **kwargs))),
     'principal_direction_extents': _nf.principal_direction_extents
 }
 
