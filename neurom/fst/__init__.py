@@ -50,7 +50,7 @@ Examples:
 
     Iterate over all the sections in a neuron
 
-    >>> for s in fst.iter_sections(nrn): print p[0][:3]
+    >>> for s in fst.iter_sections(nrn): print s.points[0][:3]
 
 '''
 
