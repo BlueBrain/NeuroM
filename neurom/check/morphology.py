@@ -30,6 +30,7 @@
 Python module of NeuroM to check neurons.
 '''
 
+from itertools import izip
 from neurom.core.types import NeuriteType
 from neurom.core.neuron import make_soma
 from neurom.core.dataformat import COLS
@@ -165,11 +166,16 @@ def nonzero_segment_lengths(neuron, threshold=0.0):
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a segment length is considered to be non-zero
-    Return: list of (first_id, second_id) of zero length segments
+    Return: list of (section_id, segment_id) of zero length segments
     '''
-    l = [s for s in _nf.iter_segments(neuron.neurites)
-         if segment_length(s) <= threshold]
-    return [(i[0][COLS.ID], i[1][COLS.ID]) for i in l]
+    bad_ids = []
+    for sec in _nf.iter_sections(neuron):
+        p = sec.points
+        for i, s in enumerate(izip(p[:-1], p[1:])):
+            if segment_length(s) <= threshold:
+                bad_ids.append((sec.id, i))
+
+    return bad_ids
 
 
 def nonzero_section_lengths(neuron, threshold=0.0):
@@ -178,11 +184,10 @@ def nonzero_section_lengths(neuron, threshold=0.0):
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a section length is considered to be non-zero
-    Return: list of ids of first point in bad sections
+    Return: list of ids bad sections
     '''
-    l = [s.points for s in _nf.iter_sections(neuron.neurites)
-         if section_length(s.points) <= threshold]
-    return [i[0][COLS.ID] for i in l]
+    return [s.id for s in _nf.iter_sections(neuron.neurites)
+            if section_length(s.points) <= threshold]
 
 
 def nonzero_neurite_radii(neuron, threshold=0.0):
@@ -191,14 +196,15 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a radius is considered to be non-zero
-    Return: list of IDs of zero-radius points
+    Return: list of (section ID, point ID) pairs of zero-radius points
     '''
     bad_ids = []
     seen_ids = set()
     for s in _nf.iter_sections(neuron):
-        for p in s.points:
-            if p[COLS.R] <= threshold and p[COLS.ID] not in seen_ids:
-                seen_ids.add(p[COLS.ID])
-                bad_ids.append(p[COLS.ID])
+        for i, p in enumerate(s.points):
+            info = (s.id, i)
+            if p[COLS.R] <= threshold and info not in seen_ids:
+                seen_ids.add(info)
+                bad_ids.append(info)
 
     return bad_ids

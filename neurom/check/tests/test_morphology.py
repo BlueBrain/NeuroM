@@ -264,13 +264,16 @@ def test_nonzero_neurite_radii_threshold():
     nt.ok_(len(ids) == 0)
 
     ids = check_morph.nonzero_neurite_radii(nrn, threshold=0.25)
-    nt.assert_equal(len(ids), 118)
+    nt.assert_equal(len(ids), 122)
 
 
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
     ids = check_morph.nonzero_neurite_radii(nrn)
-    nt.assert_equal(ids, [194, 210, 246, 304, 493])
+    nt.assert_equal(ids, [(21, 10), (22, 0),
+                          (23, 0), (23, 6),
+                          (27, 1), (32, 9),
+                          (51, 7)])
 
 
 def test_nonzero_segment_lengths_good_data():
@@ -286,15 +289,15 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    bad_segs = [[(4, 5), (215, 216),
-                 (426, 427), (637, 638)],
-                [(4, 5)],
-                [(4, 5)],
-                [(4, 5)]]
+    bad_ids = [[(3, 0), (24, 0), (45, 0), (66, 0)],
+               [(3, 0)],
+               [(3, 0)],
+               [(3, 0)],
+               [(3, 0)]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = check_morph.nonzero_segment_lengths(nrn)
-        nt.assert_equal(ids, bad_segs[i])
+        nt.assert_equal(ids, bad_ids[i])
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -304,9 +307,8 @@ def test_nonzero_segment_lengths_threshold():
     nt.assert_equal(len(ids), 0)
 
     ids = check_morph.nonzero_segment_lengths(nrn, threshold=0.25)
-    nt.assert_equal(ids, [(4, 5), (215, 216), (374, 375), (426, 427),
-                          (533, 534), (608, 609), (637, 638), (711, 712),
-                          (773, 774)])
+    nt.assert_equal(ids, [(3, 0), (24, 0), (39, 9), (45, 0),
+                          (55, 7), (63, 2), (66, 0), (73, 4), (79, 6)])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -325,7 +327,7 @@ def test_nonzero_section_lengths_bad_data():
     nrn = NEURONS['Neuron_zero_length_sections.swc']
 
     ids = check_morph.nonzero_section_lengths(nrn)
-    nt.assert_equal(ids, [134])
+    nt.assert_equal(ids, [16])
 
 
 def test_nonzero_section_lengths_threshold():
