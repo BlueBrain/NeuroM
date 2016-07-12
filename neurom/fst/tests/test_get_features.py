@@ -29,6 +29,7 @@
 '''Test neurom.fst.get features'''
 
 import os
+import math
 import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
@@ -411,6 +412,67 @@ def test_segment_radii_nrn():
                         1.0215770602226257,
                         256.71241207793355,
                         0.61122002875698467)))
+
+
+def test_segment_meander_angles_pop():
+
+    feat = 'segment_meander_angles'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
+                       (0.0, 3.1415926535897931, 14629.770789918985, 2.3943978379572806)
+                       ))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.all)),
+                       (0.0, 3.1415926535897931, 14629.770789918985, 2.3943978379572806)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.0, 3.0939261437163492, 459.69065942334726, 2.4322257112346417)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.0, 3.1415926535897931, 2922.0804310513245, 2.40500447000109)))
+
+
+def test_segment_meander_angles_nrn():
+
+    feat = 'segment_meander_angles'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN)),
+                       (0.0, 3.129961675751181, 1834.1448983646428, 2.4261175904294219)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.all)),
+                       (0.0, 3.129961675751181, 1834.1448983646428, 2.4261175904294219)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.0, 3.0939261437163492, 459.69065942334726, 2.4322257112346417)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.0, 3.129961675751181, 922.17770626981144, 2.4396235615603477)))
+
+
+def test_segment_meander_angles_single_section():
+
+    class Mock(object):
+        pass
+
+    feat = 'segment_meander_angles'
+
+    sec = fst.Section(np.array([[0, 0, 0],
+                                [1, 0, 0],
+                                [1, 1, 0],
+                                [2, 1, 0],
+                                [2, 2, 0]]))
+
+    nrt = fst.Neurite(sec)
+    nrn = Mock()
+    nrn.neurites = [nrt]
+    nrn.soma = None
+    pop = fst.Population([nrn])
+
+    ref = [math.pi / 2, math.pi / 2, math.pi / 2]
+
+    nt.assert_equal(ref, fst.get(feat, nrt).tolist())
+    nt.assert_equal(ref, fst.get(feat, nrn).tolist())
+    nt.assert_equal(ref, fst.get(feat, pop).tolist())
 
 
 def test_neurite_features_accept_single_tree():
