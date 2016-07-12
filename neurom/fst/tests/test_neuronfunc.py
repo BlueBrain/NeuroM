@@ -26,16 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._mm functionality'''
+'''Test neurom._neuronfunc functionality'''
 
 from nose import tools as nt
 import os
 import numpy as np
 from neurom import fst
-from neurom.fst import _mm
-from neurom.analysis import morphmath as mmth
+from neurom.fst import _neuronfunc as _nf
 from neurom.io import utils as io_utils
-from neurom.core import tree as tr
 from neurom.core.neuron import make_soma
 from neurom.core.population import Population
 
@@ -64,19 +62,6 @@ def _close(a, b, debug=False):
     nt.assert_true(np.allclose(a, b))
 
 
-def test_iter_segments():
-    def seg_fun(seg):
-        return seg[1][:4] - seg[0][:4]
-
-    def seg_fun2(seg):
-        return seg[1].value[:4] - seg[0].value[:4]
-
-    a = np.array([seg_fun(s) for s in _mm.iter_segments(NRN)])
-    b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
-
-    _equal(a, b, debug=False)
-
-
 def test_trunk_origin_elevations():
     class Mock(object):
         pass
@@ -98,26 +83,26 @@ def test_trunk_origin_elevations():
     n1.soma = s
 
     pop = Population([n0, n1])
-    nt.assert_items_equal(_mm.trunk_origin_elevations(pop),
+    nt.assert_items_equal(_nf.trunk_origin_elevations(pop),
                           [0.0, np.pi/2., -np.pi/2.])
 
     nt.assert_items_equal(
-        _mm.trunk_origin_elevations(pop, neurite_type=fst.NeuriteType.basal_dendrite),
+        _nf.trunk_origin_elevations(pop, neurite_type=fst.NeuriteType.basal_dendrite),
         [0.0, np.pi/2., -np.pi/2.]
     )
 
     nt.eq_(
-        len(_mm.trunk_origin_elevations(pop,
+        len(_nf.trunk_origin_elevations(pop,
                                         neurite_type=fst.NeuriteType.axon)),
         0
     )
 
     nt.eq_(
-        len(_mm.trunk_origin_elevations(pop,
+        len(_nf.trunk_origin_elevations(pop,
                                         neurite_type=fst.NeuriteType.apical_dendrite)),
         0
     )
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _mm.trunk_origin_elevations(NRN)
+    _nf.trunk_origin_elevations(NRN)

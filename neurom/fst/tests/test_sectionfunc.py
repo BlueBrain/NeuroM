@@ -35,7 +35,6 @@ import numpy as np
 from neurom import fst
 from neurom.fst import _sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
-from neurom.fst import _mm
 from neurom.fst import Section
 from neurom.analysis import morphmath as mmth
 from neurom.io import utils as io_utils

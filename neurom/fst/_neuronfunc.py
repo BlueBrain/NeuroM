@@ -26,16 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Fast morphometrics module'''
+'''Morphometrics functions for neurons or neuron populations'''
 
 import math
-from itertools import izip, chain
 import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.analysis import morphmath as mm
-from . import _neuritefunc as _nf
 
 
 def soma_surface_area(nrn):
@@ -127,15 +125,3 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
     return [_elevation(s.root_node.points, n.soma)
             for n in nrns for s in n.neurites if neurite_filter(s)]
-
-
-def iter_segments(neurites, neurite_filter=None):
-    '''Return an iterator to the segments in a collection of neurites
-
-    Note:
-        This is a convenience function provideded for generic access to
-        neuron segments. It may have a performance overhead WRT custom
-        made segment analysis functions that leverage numpy.
-    '''
-    return chain(s for ss in _nf.iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in izip(ss.points[:-1], ss.points[1:]))
