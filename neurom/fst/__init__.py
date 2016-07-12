@@ -48,6 +48,9 @@ Examples:
     >>> for nrn in nrns:
     ...     print 'mean section length', np.mean(fst.get('section_lengths', nrn))
 
+    Iterate over all the sections in a neuron
+
+    >>> for s in fst.iter_sections(nrn): print p[0][:3]
 
 '''
 
@@ -57,6 +60,8 @@ from itertools import chain
 from ._io import load_neuron, load_neurons
 from ._core import Neuron, Neurite, Section
 from . import _neuritefunc as _nrt
+from ._neuritefunc import iter_sections
+from ._neuritefunc import iter_segments
 from . import _neuronfunc as _nrn
 from . import _sectionfunc as _sec
 from ..utils import deprecated

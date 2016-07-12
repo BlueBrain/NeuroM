@@ -65,7 +65,7 @@ def iter_sections(neurites, iterator_type=ipreorder, neurite_filter=None):
     '''Returns an iterator to the nodes in a iterable of neurite objects
 
     Parameters:
-        neurites: iterable containing neurite objects
+        neurites: neuron, population, neurite, or iterable containing neurite objects
         iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
         neurite_filter: optional top level filter on properties of neurite neurite objects.
     '''
@@ -79,6 +79,10 @@ def iter_sections(neurites, iterator_type=ipreorder, neurite_filter=None):
 
 def iter_segments(neurites, neurite_filter=None):
     '''Return an iterator to the segments in a collection of neurites
+
+    Parameters:
+        neurites: neuron, population, neurite, or iterable containing neurite objects
+        neurite_filter: optional top level filter on properties of neurite neurite objects.
 
     Note:
         This is a convenience function provideded for generic access to
