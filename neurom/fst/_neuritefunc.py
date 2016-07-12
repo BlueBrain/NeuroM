@@ -29,7 +29,7 @@
 '''Neurite functions'''
 
 from functools import wraps, partial
-from itertools import imap, chain
+from itertools import imap, chain, izip
 import numpy as np
 from neurom.core.tree import (ipreorder,
                               ibifurcation_point,
@@ -75,6 +75,18 @@ def iter_sections(neurites, iterator_type=ipreorder, neurite_filter=None):
     trees = (t.root_node if isinstance(t, Neurite) else t for t in neurites)
 
     return chain.from_iterable(imap(iterator_type, trees))
+
+
+def iter_segments(neurites, neurite_filter=None):
+    '''Return an iterator to the segments in a collection of neurites
+
+    Note:
+        This is a convenience function provideded for generic access to
+        neuron segments. It may have a performance overhead WRT custom
+        made segment analysis functions that leverage numpy.
+    '''
+    return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
+                 for s in izip(ss.points[:-1], ss.points[1:]))
 
 
 def n_segments(neurites, neurite_type=NeuriteType.all):

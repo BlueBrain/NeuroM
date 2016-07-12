@@ -26,19 +26,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._mm functionality'''
+'''Test neurom._neuritefunc functionality'''
 
 from nose import tools as nt
 import os
 import numpy as np
 from neurom import fst
-from neurom.fst import _mm
 from neurom.fst import _neuritefunc as _nf
-from neurom.analysis import morphmath as mmth
 from neurom.io import utils as io_utils
 from neurom.core import tree as tr
-from neurom.core.neuron import make_soma
-from neurom.core.population import Population
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -72,7 +68,7 @@ def test_iter_segments():
     def seg_fun2(seg):
         return seg[1].value[:4] - seg[0].value[:4]
 
-    a = np.array([seg_fun(s) for s in _mm.iter_segments(NRN)])
+    a = np.array([seg_fun(s) for s in _nf.iter_segments(NRN)])
     b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
 
     _equal(a, b, debug=False)

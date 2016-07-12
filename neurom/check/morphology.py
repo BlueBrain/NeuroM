@@ -37,7 +37,6 @@ from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
 from neurom.exceptions import SomaError
-from neurom.fst import _mm as fst_mm
 from neurom.fst import _neuritefunc as _nf
 
 
@@ -168,7 +167,7 @@ def nonzero_segment_lengths(neuron, threshold=0.0):
         threshold: value above which a segment length is considered to be non-zero
     Return: list of (first_id, second_id) of zero length segments
     '''
-    l = [s for s in fst_mm.iter_segments(neuron.neurites)
+    l = [s for s in _nf.iter_segments(neuron.neurites)
          if segment_length(s) <= threshold]
     return [(i[0][COLS.ID], i[1][COLS.ID]) for i in l]
 
