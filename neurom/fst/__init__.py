@@ -63,7 +63,7 @@ from . import _neuritefunc as _nrt
 from ._neuritefunc import iter_sections
 from ._neuritefunc import iter_segments
 from . import _neuronfunc as _nrn
-from . import _sectionfunc as _sec
+from . import sectionfunc as _sec
 from ..utils import deprecated
 from ..core.population import Population
 from ..core.types import NeuriteType

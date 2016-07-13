@@ -35,15 +35,13 @@ morphometrics functionality using iterators.
 '''
 
 from __future__ import print_function
-from neurom import segments as seg
-from neurom import sections as sec
-from neurom import bifurcations as bif
-from neurom import points as pts
-from neurom import iter_neurites
-from neurom.io.utils import load_neuron
-from neurom.analysis.morphtree import set_tree_type
-from neurom.core.types import tree_type_checker, NeuriteType, NEURITES
-from neurom.analysis import morphtree as mt
+from neurom.core.dataformat import COLS
+import neurom as nm
+from neurom import geom
+from neurom.fst import iter_sections, iter_segments, sectionfunc
+from neurom.core.tree import ibifurcation_point
+from neurom.core.types import tree_type_checker, NEURITES
+from neurom.analysis import morphmath as mm
 import numpy as np
 
 
@@ -52,52 +50,74 @@ if __name__ == '__main__':
     filename = 'test_data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
-    nrn = load_neuron(filename, set_tree_type)
+    nrn = nm.load_neuron(filename)
 
     # Some examples of what can be done using iteration
     # instead of pre-packaged functions that return lists.
     # The iterations give us a lot of flexibility: we can map
     # any function that takes a segment or section.
 
-    # Get length of all neurites in cell by iterating over sections,
+    # Get of all neurites in cell by iterating over sections,
     # and summing the section lengths
-    print('Total neurite length:',
-          sum(iter_neurites(nrn, sec.end_point_path_length)))
+    def sec_len(sec):
+        '''Return the length of a section'''
+        return mm.section_length(sec.points)
+
+    print('Total neurite length (sections):',
+          sum(sec_len(s) for s in iter_sections(nrn)))
 
     # Get length of all neurites in cell by iterating over segments,
     # and summing the segment lengths.
     # This should yield the same result as iterating over sections.
-    print('Total neurite length:',
-          sum(iter_neurites(nrn, seg.length)))
+    print('Total neurite length (segments):',
+          sum(mm.segment_length(s) for s in iter_segments(nrn)))
 
     # get volume of all neurites in cell by summing over segment
     # volumes
     print('Total neurite volume:',
-          sum(iter_neurites(nrn, seg.volume)))
+          sum(mm.segment_volume(s) for s in iter_segments(nrn)))
 
     # get area of all neurites in cell by summing over segment
     # areas
     print('Total neurite surface area:',
-          sum(iter_neurites(nrn, seg.area)))
+          sum(mm.segment_area(s) for s in iter_segments(nrn)))
 
-    # get total number of points in cell.
+    # get total number of neurite points in cell.
     # iter_neurites needs a mapping function, so we pass the identity.
-    print('Total number of points:',
-          sum(1 for _ in iter_neurites(nrn, pts.identity)))
+    def n_points(sec):
+        '''number of points in a section'''
+        n = len(sec.points)
+        # Non-root sections have duplicate first point
+        return n if sec.parent is None else n - 1
 
-    # get mean radius of points in cell.
+    print('Total number of points:',
+          sum(n_points(s) for s in iter_sections(nrn)))
+
+    # get mean radius of neurite points in cell.
     # p[COLS.R] yields the radius for point p.
+    # Note: this includes duplicated points at beginning of
+    # non-trunk sections
     print('Mean radius of points:',
-          np.mean([r for r in iter_neurites(nrn, pts.radius)]))
+          np.mean([s.points[:, COLS.R] for s in iter_sections(nrn)]))
+
+    # get mean radius of neurite points in cell.
+    # p[COLS.R] yields the radius for point p.
+    # Note: this includes duplicated points at beginning of
+    # non-trunk sections
+    pts = [p[COLS.R] for s in nrn.sections[1:] for p in s.points]
+    print('Mean radius of points:',
+          np.mean(pts))
 
     # get mean radius of segments
     print('Mean radius of segments:',
-          np.mean(list(iter_neurites(nrn, seg.radius))))
+          np.mean(list(mm.segment_radius(s) for s in iter_segments(nrn))))
 
     # get stats for the segment taper rate, for different types of neurite
     for ttype in NEURITES:
         ttt = ttype
-        seg_taper_rate = list(iter_neurites(nrn, seg.taper_rate, tree_type_checker(ttt)))
+        seg_taper_rate = [mm.segment_taper_rate(s)
+                          for s in iter_segments(nrn, neurite_filter=tree_type_checker(ttt))]
+
         print('Segment taper rate (', ttype,
               '):\n  mean=', np.mean(seg_taper_rate),
               ', std=', np.std(seg_taper_rate),
@@ -106,24 +126,20 @@ if __name__ == '__main__':
               sep='')
 
     # Number of bifurcation points.
-    print('Number of bifurcation points:', bif.count(nrn))
+    print('Number of bifurcation points:',
+          sum(1 for _ in iter_sections(nrn,
+                                       iterator_type=ibifurcation_point)))
 
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
-          sum(1 for _ in iter_neurites(nrn, bif.identity,
-                                       tree_type_checker(NeuriteType.apical_dendrite))))
+          sum(1 for _ in iter_sections(nrn,
+                                       iterator_type=ibifurcation_point,
+                                       neurite_filter=tree_type_checker(nm.APICAL_DENDRITE))))
 
     # Maximum branch order
-    # We create a custom branch_order section_function
-    # and use the generalized iteration method
-    @sec.section_function(as_tree=True)
-    def branch_order(s):
-        '''Get the branch order of a section'''
-        return mt.branch_order(s)
-
     print('Maximum branch order:',
-          max(bo for bo in iter_neurites(nrn, branch_order)))
+          max(sectionfunc.branch_order(s) for s in iter_sections(nrn)))
 
     # Neuron's bounding box
-    print('Bounding box ((min x, y, z), (max x, y, z))',
-          nrn.bounding_box())
+    # Note: does not account for soma radius
+    print('Bounding box ((min x, y, z), (max x, y, z))', geom.bounding_box(nrn))

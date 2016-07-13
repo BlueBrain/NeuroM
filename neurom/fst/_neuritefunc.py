@@ -40,7 +40,7 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
 from neurom.analysis import morphmath as mm
 from . import Neurite
-from ._sectionfunc import branch_order, section_radial_distance
+from .sectionfunc import branch_order, section_radial_distance
 from ._bifurcationfunc import (local_bifurcation_angle,
                                remote_bifurcation_angle,
                                bifurcation_partition)

@@ -35,7 +35,7 @@ from neurom.core.types import NeuriteType
 from neurom import fst
 from neurom.fst import _neuronfunc as _nrn
 from neurom.fst import _neuritefunc as _nrt
-from neurom.fst import _sectionfunc as _sec
+from neurom.fst import sectionfunc as _sec
 from neurom.fst import _bifurcationfunc as _bf
 from neurom.core.tree import i_chain2, ibifurcation_point
 from neurom.io.utils import load_neuron
