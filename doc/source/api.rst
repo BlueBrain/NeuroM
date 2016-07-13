@@ -53,5 +53,6 @@ API Documentation
    neurom.analysis.morphmath
    neurom.analysis.morphtree
    neurom.fst
+   neurom.fst.sectionfunc
    neurom.exceptions
    neurom.stats

@@ -26,14 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._sectionfunc functionality'''
+'''Test neurom.sectionfunc functionality'''
 
 from nose import tools as nt
 import os
 import math
 import numpy as np
 from neurom import fst
-from neurom.fst import _sectionfunc as _sf
+from neurom.fst import sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst import Section
 from neurom.analysis import morphmath as mmth
