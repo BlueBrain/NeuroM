@@ -48,7 +48,10 @@ A point is a vector of numbers **[X, Y, Z, R, TYPE, ID, PID]** where the compone
 
 Typically only the first four or five components are of interest to morphology analysis.
 The rest are used to construct the soma and hierarchical tree structures of the neuron,
-and to check its semantic validity. 
+and to check its semantic validity.
+
+In ``NeuroM`` a point is represented as an iterable of floating point numbers, usually
+a ``numpy`` array.
 
 .. note::
     For most of what follows, it suffices to consider a
@@ -66,7 +69,10 @@ Segment
 -------
 
 A segment consists of two consecutive :ref:`points<point-label>` belonging to
-the same :ref:`neurite<tree-label>` and :ref:`section<section-label>`.
+the same :ref:`neurite<neurite-label>` and :ref:`section<section-label>`.
+
+In ``NeuroM`` a segment is represented as a length 2 tuple or numpy array of
+`points<point-label>`.
 
 
 .. _section-label:
@@ -74,8 +80,8 @@ the same :ref:`neurite<tree-label>` and :ref:`section<section-label>`.
 Section
 -------
 
-A section is a series of two or more :ref:`points<point-label>` whose first and last
-element are any of the following combinations:
+A section is a tree node containing a series of two or more :ref:`points<point-label>`
+whose first and last element are any of the following combinations:
 
 * root node, forking point
 * forking point, forking point
@@ -85,13 +91,24 @@ element are any of the following combinations:
 The first point of a section is a duplicate of the last point of its parent section,
 unless the latter is a soma section.
 
+In ``NeuroM``, a section is represented by class :py:class:`Section<neurom.fst.Section>`.
+This pseudocode shows the relevant parts of the section class:
+
+.. code-block:: python
+
+    section = {
+        section_id,
+        points,
+        parent,
+        children
+    }
 
 .. _soma-label:
 
 Soma
 ----
 
-A soma can be represented by one, three or more :ref:`points<point-label>`. 
+A soma can be represented by one, three or more :ref:`points<point-label>`.
 The soma is classified based on
 the number of points it contains thus:
 
@@ -106,7 +123,8 @@ the number of points it contains thus:
 .. todo::
     Expand list if and when specifications require new types of soma.
 
-The soma interface exports a center and radius. These can be calculated in different
+The soma is represented by classes derived from :py:class:`BaseSoma<neurom.core.neuron.BaseSoma>`.
+The interface exports a center and radius. These can be calculated in different
 ways, but the default is to use the center and radius for type A and the mean center
 and radius for types B and C.
 
@@ -120,45 +138,45 @@ See also
 .. seealso:: :py:class:`neurom.core.neuron.SOMA_TYPE`
 
 
-.. _tree-label:
+.. _neurite-label:
 
 Neurite tree
 ------------
 
-There are two alternative representations of a neurite tree.
-A neurite may consist of a tree structure with either a :ref:`points<point-label>`
-or a :ref:`section<section-label>` in each vertex or node. The different representations
-are accessible via the :py:mod:`ezy<neurom.ezy>` (deprecated) and :py:mod:`fst<neurom.fst>`
-modules respectively.
-
-The tree structure implies the following:
+A neurite is essentially a tree of :ref:`sections<section-label>`. The tree structure
+implies the following:
 
 * A node can only have one parent.
 * A node can have an arbitrary number of children.
 * No loops are present in the structure.
 
-Different type of points are allowed in the same tree as long as same conventions
-are followed
+Neurites are represented by the class :py:class:`Neurite<neurom.fst.Neurite>`, which contains
+the root node of the aforementioned tree as well as some helper functions to aid iteration
+over sections and collection of points.
 
-.. todo::
-    The conventions governing the types of points in a neurite
-    tree need to be well defined
+In :py:mod:`NeuroM<neurom>` neurite trees are implemented using the recursive structure
+:py:class:`neurom.fst.Section`, :ref:`described above<section-label>`.
 
-In :py:mod:`NeuroM<neurom>` neurite trees are implemented using the recursive structure 
-:py:class:`neurom.core.tree.Tree`, with each node holding a reference to either a
-single :ref:`morphology point<point-label>`, or an array of :ref:`points<point-label>`
-representing a :ref:`section<section-label>`.
 
 Neuron
 ------
 
-A neuron structure consists of a single :ref:`soma<soma-label>` and a collection of 
-:ref:`trees<tree-label>`.
+A neuron structure consists of a single :ref:`soma<soma-label>` and a collection of
+:ref:`neurites<neurite-label>`.
 
 The trees that are expected to be present depend on the type of cell:
 
 * Interneuron (IN): basal dendrite, axon
 * Pyramidal cell (PC): basal dendrite, apical dendrite, axon
 
-.. seealso::
-    :py:class:`neurom.core.neuron.Neuron`
+Neurons are represented by the class :py:class:`Neuron<neurom.fst.Neuron>`. This is more
+or less what it looks like:
+
+.. code-block:: python
+
+    neuron = {
+        soma,
+        neurites,
+        points,
+        name
+    }
