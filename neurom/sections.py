@@ -35,7 +35,10 @@ from neurom.core import tree as tr
 from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 import neurom.analysis.morphtree as mt
+from neurom.utils import deprecated_module
 
+
+deprecated_module(__name__)
 
 iter_type = tr.isection
 

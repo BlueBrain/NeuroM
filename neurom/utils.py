@@ -70,3 +70,12 @@ def deprecated(fun_name=None, msg=""):
         return _wrapper
 
     return _deprecated
+
+
+def deprecated_module(mod_name, msg=""):
+    '''Issue a deprecation warning for a module'''
+
+    warnings.simplefilter('always', DeprecationWarning)
+    warnings.warn('Module %s is deprecated. %s' % (mod_name, msg),
+                  category=DeprecationWarning, stacklevel=2)
+    warnings.simplefilter('default', DeprecationWarning)
