@@ -53,6 +53,13 @@ def memoize(fun):
     return memoizer
 
 
+def _warn_deprecated(msg):
+    '''Issue a deprecation warning'''
+    warnings.simplefilter('always', DeprecationWarning)
+    warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
+    warnings.simplefilter('default', DeprecationWarning)
+
+
 def deprecated(fun_name=None, msg=""):
     '''Issue a deprecation warning for a function'''
     def _deprecated(fun):
@@ -60,11 +67,8 @@ def deprecated(fun_name=None, msg=""):
         @functools.wraps(fun)
         def _wrapper(*args, **kwargs):
             '''Issue deprecation warning and forward arguments to fun'''
-            warnings.simplefilter('always', DeprecationWarning)
             name = fun_name if fun_name is not None else fun.__name__
-            warnings.warn('Call to deprecated function %s. %s' % (name, msg),
-                          category=DeprecationWarning, stacklevel=2)
-            warnings.simplefilter('default', DeprecationWarning)
+            _warn_deprecated('Call to deprecated function %s. %s' % (name, msg))
             return fun(*args, **kwargs)
 
         return _wrapper
@@ -74,8 +78,4 @@ def deprecated(fun_name=None, msg=""):
 
 def deprecated_module(mod_name, msg=""):
     '''Issue a deprecation warning for a module'''
-
-    warnings.simplefilter('always', DeprecationWarning)
-    warnings.warn('Module %s is deprecated. %s' % (mod_name, msg),
-                  category=DeprecationWarning, stacklevel=2)
-    warnings.simplefilter('default', DeprecationWarning)
+    _warn_deprecated('Module %s is deprecated. %s' % (mod_name, msg))
