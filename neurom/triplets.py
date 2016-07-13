@@ -33,7 +33,10 @@ import functools
 from neurom.core import tree as tr
 from neurom import iter_neurites
 from neurom.analysis import morphmath as mm
+from neurom.utils import deprecated_module
 
+
+deprecated_module(__name__)
 
 iter_type = tr.itriplet
 

@@ -33,7 +33,9 @@ import functools
 from neurom.core import tree as tr
 from neurom import iter_neurites
 from neurom.core.dataformat import COLS
+from neurom.utils import deprecated_module
 
+deprecated_module(__name__)
 
 iter_type = tr.ipreorder
 

@@ -67,8 +67,10 @@ from ..io.utils import get_morph_files
 from ..features import get
 from ..io import utils as _io
 from ..analysis.morphtree import set_tree_type as _set_tt
-from ..utils import deprecated
+from ..utils import deprecated, deprecated_module
 
+
+deprecated_module(__name__)
 
 TreeType = NeuriteType  # For backwards compatibility
 
