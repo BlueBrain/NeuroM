@@ -19,9 +19,9 @@ before_deploy:
   - sudo pip install twine
 deploy:
   provider: pypi
-  user: juanchopanza
+  user: bbp.opensource
   password:
-    secure: fLcTXIjrPUhYsmXFshtzfO/V/QWQprxJ68KA9fxayzmpLHoqX6C0sl7PAmPosXempMCBqntjJ4k7IDGyOdaBx+igmHcylqFcmiFSgeFYjOTqcMCLsBEaqFIutqoMTPT+/OiM6YDJFxNTwuO41uI5i4lE1pKV9XZqKh/pmJYluNQ=
+    secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
   on:
     tags: true
     branch: master
