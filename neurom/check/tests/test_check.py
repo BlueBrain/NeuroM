@@ -26,69 +26,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neurom.check import ok
-import numpy as np
+from collections import namedtuple
+from neurom.check import ok, check_wrapper
 from nose import tools as nt
 
 
-def _eq(a, b):
-    '''Return a different type of bool'''
-    return np.bool_(a == b)
+MockResult = namedtuple('MockResult', 'status')
 
 
-def test_true_is_ok():
-    nt.assert_true(ok(True))
-    nt.assert_true(ok(_eq(1, 1)))
+def test_ok_true_is_ok():
+    nt.assert_true(ok(MockResult(True)))
 
 
-def test_false_is_not_ok():
-    nt.assert_true(not ok(False))
-    nt.assert_true(not ok(_eq(1, 2)))
+def test_ok_false_is_not_ok():
+    nt.assert_true(not ok(MockResult(False)))
 
 
-def test_empty_list_is_ok():
-    nt.assert_true(ok([]))
+def test_check_wrapper_title():
+    class Mock(object):
+        pass
 
+    def mock_fun():
+        return Mock()
 
-def test_empty_dict_is_ok():
-    nt.assert_true(ok({}))
-
-
-def test_empty_tuple_is_ok():
-    nt.assert_true(ok(tuple()))
-
-
-def test_empty_set_is_ok():
-    nt.assert_true(ok(set()))
-
-
-def test_empty_string_is_ok():
-    nt.assert_true(ok(""))
-
-
-def test_empty_ndarray_is_ok():
-    nt.assert_true(ok(np.array([])))
-
-
-def test_list_is_not_ok():
-    nt.assert_false(ok([1,2,3]))
-
-
-def test_dict_is_not_ok():
-    nt.assert_false(ok({1:1, 2:2, 3:3}))
-
-
-def test_tuple_is_not_ok():
-    nt.assert_false(ok((1,2,3)))
-
-
-def test_ndarray_is_not_ok():
-    nt.assert_false(ok(np.array([1,2,3])))
-
-
-def test_set_is_not_ok():
-    nt.assert_false(ok({1,2,3}))
-
-
-def test_string_is_not_ok():
-    nt.assert_false(ok("123"))
+    f = check_wrapper(mock_fun)
+    nt.assert_equal(f().title, "Mock fun")

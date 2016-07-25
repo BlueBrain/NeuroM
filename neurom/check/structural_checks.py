@@ -28,23 +28,27 @@
 
 '''Module with consistency/validity checks for raw data  blocks'''
 import numpy as np
+from neurom.check import CheckResult
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
+from neurom.core.neuron import make_soma
+from neurom.fst._core import make_neurites
+from neurom.exceptions import SomaError
 
 
-def has_sequential_ids(raw_data):
+def has_sequential_ids(data_wrapper):
     '''Check that IDs are increasing and consecutive
 
     returns tuple (bool, list of IDs that are not consecutive
     with their predecessor)
     '''
-    db = raw_data.data_block
+    db = data_wrapper.data_block
     ids = db[:, COLS.ID]
     steps = ids[np.where(np.diff(ids) != 1)[0] + 1].astype(int)
-    return len(steps) == 0, steps
+    return CheckResult(len(steps) == 0, steps)
 
 
-def no_missing_parents(raw_data):
+def no_missing_parents(data_wrapper):
     '''Check that all points have existing parents
     Point's parent ID must exist and parent must be declared
     before child.
@@ -52,12 +56,12 @@ def no_missing_parents(raw_data):
     Returns:
         tuple (bool, list of IDs that have no parent)
     '''
-    db = raw_data.data_block
+    db = data_wrapper.data_block
     ids = np.setdiff1d(db[:, COLS.P], db[:, COLS.ID])[1:]
-    return len(ids) == 0, ids.astype(np.int) + 1
+    return CheckResult(len(ids) == 0, ids.astype(np.int) + 1)
 
 
-def is_single_tree(raw_data):
+def is_single_tree(data_wrapper):
     '''Check that data forms a single tree
 
     Only the first point has ID of -1.
@@ -65,38 +69,53 @@ def is_single_tree(raw_data):
     Note:
         This assumes no_missing_parents passed.
     '''
-    db = raw_data.data_block
+    db = data_wrapper.data_block
     bad_ids = db[db[:, COLS.P] == -1][1:, COLS.ID]
-    return len(bad_ids) == 0, bad_ids.tolist()
+    return CheckResult(len(bad_ids) == 0, bad_ids.tolist())
 
 
-def has_increasing_ids(raw_data):
+def has_increasing_ids(data_wrapper):
     '''Check that IDs are increasing
 
     returns tuple (bool, list of IDs that are inconsistent
     with their predecessor)
     '''
-    db = raw_data.data_block
+    db = data_wrapper.data_block
     ids = db[:, COLS.ID]
     steps = ids[np.where(np.diff(ids) <= 0)[0] + 1].astype(int)
-    return len(steps) == 0, steps
+    return CheckResult(len(steps) == 0, steps)
 
 
-def has_soma_points(raw_data):
+def has_soma_points(data_wrapper):
     '''Checks if the TYPE column of raw data block has
     an element of type soma'''
-    db = raw_data.data_block
-    return POINT_TYPE.SOMA in db[:, COLS.TYPE]
+    db = data_wrapper.data_block
+    return CheckResult(POINT_TYPE.SOMA in db[:, COLS.TYPE], None)
 
 
-def has_all_finite_radius_neurites(raw_data, threshold=0.0):
+def has_all_finite_radius_neurites(data_wrapper, threshold=0.0):
     '''Check that all points with neurite type have a finite radius
 
     return: tuple of (bool, [IDs of neurite points with zero radius])
     '''
-    db = raw_data.data_block
+    db = data_wrapper.data_block
     neurite_ids = np.in1d(db[:, COLS.TYPE], POINT_TYPE.NEURITES)
     zero_radius_ids = db[:, COLS.R] <= threshold
     bad_pts = np.array(db[neurite_ids & zero_radius_ids][:, COLS.ID],
                        dtype=int).tolist()
-    return len(bad_pts) == 0, bad_pts
+    return CheckResult(len(bad_pts) == 0, bad_pts)
+
+
+def has_valid_soma(data_wrapper):
+    '''Check if a data block has a valid soma'''
+    try:
+        make_soma(data_wrapper.soma_points())
+        return CheckResult(True)
+    except SomaError:
+        return CheckResult(False)
+
+
+def has_valid_neurites(data_wrapper):
+    '''Check if any neurites can be reconstructed from data block'''
+    n, _ = make_neurites(data_wrapper)
+    return CheckResult(len(n) > 0)

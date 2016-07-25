@@ -70,15 +70,14 @@ plots of neurites, somata and neurons. It also has a dendrogram neurom plotting 
 .. seealso::
     The :py:mod:`neurom.viewer` documentation for more details and examples.
 
-Data checking applications
---------------------------
+Data checking application
+-------------------------
 
-There are two user-friendly data checking applications. ``raw_data_check`` checks for basic 
-consistency
-of raw data, and ``morph_check`` applies some further semantic checks to the data in order to
+The ``morph_check`` application applies some structural and semantic 
+checks to morphology data files in order to
 determine whether it is suitable to construct a neuron structure and whether certain
-defects within the structure are detected. Both can be invoked from the command line, and
-take as main argument the path to either a single file or a directory of morphology files.
+defects within the structure are detected. It can be invoked from the command line, and
+takes as main argument the path to either a single file or a directory of morphology files.
 
 For example,
 
@@ -86,20 +85,59 @@ For example,
 
     $ morph_check test_data/swc/Neuron.swc # single file
     INFO: ========================================
-    INFO: Check file test_data/swc/Neuron.swc...
-    INFO:                     Has valid soma? PASS
-    INFO:               All points connected? PASS
-    INFO:                 Has basal dendrite? PASS
-    INFO:                           Has axon? PASS
-    INFO:                Has apical dendrite? PASS
-    INFO:            Nonzero segment lengths? PASS
-    INFO:            Nonzero section lengths? PASS
-    INFO:              Nonzero neurite radii? PASS
-    INFO:                       Check result: PASS
+    INFO: File: test_data/swc/Neuron.swc
+    INFO:                      Is single tree PASS
+    INFO:                     Has soma points PASS
+    INFO:                  No missing parents PASS
+    INFO:                  Has sequential ids PASS
+    INFO:                  Has increasing ids PASS
+    INFO:                      Has valid soma PASS
+    INFO:                  Has valid neurites PASS
+    INFO:                  Has basal dendrite PASS
+    INFO:                            Has axon PASS
+    INFO:                 Has apical dendrite PASS
+    INFO:     Has all nonzero segment lengths PASS
+    INFO:     Has all nonzero section lengths PASS
+    INFO:       Has all nonzero neurite radii PASS
+    INFO:             Has nonzero soma radius PASS
+    INFO:                                 ALL PASS
     INFO: ========================================
 
     $ morph_check test_data/swc # all files in directory
     # loops over all morphology files found in test_data/swc
+
+The application also produces a summary json file, which can be useful when
+processing more than one file:
+
+.. code-block:: javascript
+
+    {
+        "files": {
+            "test_data/swc/Neuron.swc": {
+                "Is single tree": true,
+                "Has soma points": true,
+                "No missing parents": true,
+                "Has sequential ids": true,
+                "Has increasing ids": true,
+                "Has valid soma": true,
+                "Has valid neurites": true,
+                "Has basal dendrite": true,
+                "Has axon": true,
+                "Has apical dendrite": true,
+                "Has all nonzero segment lengths": true,
+                "Has all nonzero section lengths": true,
+                "Has all nonzero neurite radii": true,
+                "Has nonzero soma radius": true,
+                "ALL": true
+            }
+        },
+        "STATUS": "PASS"
+    }
+
+
+The tests run are in submodules of :py:mod:`neurom.check`, particularly :py:mod:`structural_checks<neurom.check.structural_checks>`, :py:mod:`neurite_checks<neurom.check.neurite_checks>` and
+:py:mod:`soma_checks<neurom.check.soma_checks>`.
+
 
 For more information, use the help option:
 
@@ -107,7 +145,3 @@ For more information, use the help option:
 
     $ morph_check --help
     ....
-
-    $ raw_data_check --help
-    ....
-

@@ -34,6 +34,14 @@ API Documentation
 
    neurom
    neurom.viewer
+   neurom.fst
+   neurom.fst.sectionfunc
+   neurom.exceptions
+   neurom.stats
+   neurom.check
+   neurom.check.structural_checks
+   neurom.check.neurite_checks
+   neurom.check.soma_checks
    neurom.core
    neurom.core.types
    neurom.core.tree
@@ -42,7 +50,6 @@ API Documentation
    neurom.core.dataformat
    neurom.io
    neurom.io.readers
-   neurom.io.check
    neurom.io.utils
    neurom.io.swc
    neurom.io.hdf5
@@ -52,7 +59,3 @@ API Documentation
    neurom.analysis
    neurom.analysis.morphmath
    neurom.analysis.morphtree
-   neurom.fst
-   neurom.fst.sectionfunc
-   neurom.exceptions
-   neurom.stats

@@ -86,12 +86,21 @@ class Neurite(object):
         return Neurite(deepcopy(self.root_node, memo))
 
 
-class Neuron(object):
+class BaseNeuron(object):
+    '''Class representing a simple neuron'''
+    def __init__(self, soma=None, neurites=None, sections=None):
+        self.soma = soma
+        self.neurites = neurites
+        self.sections = sections
+
+
+class Neuron(BaseNeuron):
     '''Class representing a neuron'''
     def __init__(self, data_wrapper, name='Neuron'):
         self._data = data_wrapper
-        self.neurites, self.sections = make_neurites(self._data)
-        self.soma = make_soma(self._data.soma_points())
+        neurites, sections = make_neurites(self._data)
+        soma = make_soma(self._data.soma_points())
+        super(Neuron, self).__init__(soma, neurites, sections)
         self.name = name
         self._points = None
 

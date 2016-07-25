@@ -36,7 +36,7 @@ from neurom.core.neuron import Neuron, make_soma
 from neurom.core.population import Population
 from neurom.exceptions import IDSequenceError, MultipleTrees, MissingParentError
 from . import load_data
-from . import check
+from neurom.check import structural_checks as check
 from neurom.utils import memoize
 import os
 
@@ -115,11 +115,11 @@ def load_neuron(filename, tree_action=None):
     """
 
     data = load_data(filename)
-    if not check.has_increasing_ids(data)[0]:
+    if not check.has_increasing_ids(data):
         raise IDSequenceError('Invald ID sequence found in raw data')
-    if not check.is_single_tree(data)[0]:
+    if not check.is_single_tree(data):
         raise MultipleTrees('Multiple trees detected')
-    if not check.no_missing_parents(data)[0]:
+    if not check.no_missing_parents(data):
         raise MissingParentError('Missing parents detected')
 
     nrn = make_neuron(data, tree_action)
@@ -141,7 +141,7 @@ def load_trees(filename, tree_action=None):
     """
     data = load_data(filename)
 
-    if not check.has_increasing_ids(data)[0]:
+    if not check.has_increasing_ids(data):
         raise IDSequenceError('Invald ID sequence found in raw data')
 
     _ids = get_initial_neurite_segment_ids(data)

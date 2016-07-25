@@ -28,6 +28,7 @@
 
 import os
 from neurom import io
+from neurom.check import structural_checks as chk
 from neurom.fst import _io as fst_io
 from nose import tools as nt
 
@@ -59,9 +60,9 @@ class TestIOCheck(object):
                  ]
 
         for f in files:
-            ok, ids = io.check.has_sequential_ids(self.load_data(f))
+            ok = chk.has_sequential_ids(self.load_data(f))
             nt.ok_(ok)
-            nt.ok_(len(ids) == 0)
+            nt.ok_(len(ok.info) == 0)
 
 
 
@@ -69,9 +70,9 @@ class TestIOCheck(object):
 
         f = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
 
-        ok, ids = io.check.has_sequential_ids(self.load_data(f))
+        ok = chk.has_sequential_ids(self.load_data(f))
         nt.ok_(not ok)
-        nt.assert_items_equal(ids, [6, 217, 428, 639])
+        nt.assert_items_equal(ok.info, [6, 217, 428, 639])
 
     def test_has_increasing_ids_good_data(self):
 
@@ -89,55 +90,54 @@ class TestIOCheck(object):
                  ]
 
         for f in files:
-            ok, ids = io.check.has_increasing_ids(self.load_data(f))
+            ok = chk.has_increasing_ids(self.load_data(f))
             nt.ok_(ok)
-            nt.ok_(len(ids) == 0)
-
+            nt.ok_(len(ok.info) == 0)
 
 
     def test_has_increasing_ids_bad_data(self):
 
         f = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
-        ok, ids = io.check.has_increasing_ids(self.load_data(f))
+        ok = chk.has_increasing_ids(self.load_data(f))
         nt.ok_(not ok)
-        nt.assert_items_equal(ids, [6, 12])
+        nt.assert_items_equal(ok.info, [6, 12])
 
 
     def test_is_single_tree_bad_data(self):
 
         f = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
 
-        ok, ids = io.check.is_single_tree(self.load_data(f))
+        ok = chk.is_single_tree(self.load_data(f))
         nt.ok_(not ok)
-        nt.eq_(ids, [6, 217, 428, 639])
+        nt.eq_(ok.info, [6, 217, 428, 639])
 
 
     def test_is_single_tree_good_data(self):
 
         f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-        ok, ids = io.check.is_single_tree(self.load_data(f))
+        ok = chk.is_single_tree(self.load_data(f))
         nt.ok_(ok)
-        nt.eq_(len(ids), 0)
+        nt.eq_(len(ok.info), 0)
 
 
     def test_has_no_missing_parents_bad_data(self):
 
         f = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
-        ok, ids = io.check.no_missing_parents(self.load_data(f))
+        ok = chk.no_missing_parents(self.load_data(f))
         nt.ok_(not ok)
-        nt.eq_(list(ids), [6, 217, 428, 639])
+        nt.eq_(list(ok.info), [6, 217, 428, 639])
 
 
     def test_has_no_missing_parents_good_data(self):
 
         f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-        ok, ids = io.check.no_missing_parents(self.load_data(f))
+        ok = chk.no_missing_parents(self.load_data(f))
         nt.ok_(ok)
-        nt.eq_(len(ids), 0)
+        nt.eq_(len(ok.info), 0)
 
 
     def test_has_soma_points_good_data(self):
@@ -150,13 +150,25 @@ class TestIOCheck(object):
         files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
         for f in files:
-            nt.ok_(io.check.has_soma_points(self.load_data(f)))
+            nt.ok_(chk.has_soma_points(self.load_data(f)))
 
 
     def test_has_soma_points_bad_data(self):
         f = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-        nt.ok_(not io.check.has_soma_points(self.load_data(f)))
+        nt.ok_(not chk.has_soma_points(self.load_data(f)))
 
+
+
+    def test_has_valid_soma_good_data(self):
+        dw = self.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
+        nt.ok_(chk.has_valid_soma(dw))
+        dw = self.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
+        nt.ok_(chk.has_valid_soma(dw))
+
+
+    def test_has_valid_soma_bad_data(self):
+        dw = self.load_data(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
+        nt.ok_(not chk.has_valid_soma(dw))
 
     def test_has_finite_radius_neurites_good_data(self):
         files = [os.path.join(SWC_PATH, f)
@@ -168,16 +180,16 @@ class TestIOCheck(object):
         files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
         for f in files:
-            ok, ids = io.check.has_all_finite_radius_neurites(self.load_data(f))
+            ok = chk.has_all_finite_radius_neurites(self.load_data(f))
             nt.ok_(ok)
-            nt.ok_(len(ids) == 0)
+            nt.ok_(len(ok.info) == 0)
 
 
     def test_has_finite_radius_neurites_bad_data(self):
         f = os.path.join(SWC_PATH, 'Neuron_zero_radius.swc')
-        ok, ids = io.check.has_all_finite_radius_neurites(self.load_data(f))
+        ok = chk.has_all_finite_radius_neurites(self.load_data(f))
         nt.ok_(not ok)
-        nt.ok_(ids == [194, 210, 246, 304, 493])
+        nt.ok_(ok.info == [194, 210, 246, 304, 493])
 
 
 
@@ -197,3 +209,13 @@ class TestIOCheckFST(TestIOCheck):
             return super(TestIOCheckFST, self).test_has_sequential_ids_bad_data()
         except Exception:
             return False
+
+    def test_has_valid_neurites_good_data(self):
+        dw = self.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
+        nt.ok_(chk.has_valid_neurites(dw))
+        dw = self.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
+        nt.ok_(chk.has_valid_neurites(dw))
+
+    def test_has_valid_neurites_bad_data(self):
+        dw = self.load_data(os.path.join(SWC_PATH, 'Soma_origin.swc'))
+        nt.ok_(not chk.has_valid_neurites(dw))

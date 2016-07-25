@@ -30,7 +30,7 @@ import os
 from copy import deepcopy
 from neurom import load_neuron
 from neurom.fst import _io as io
-from neurom.check import morphology as check_morph
+from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
@@ -86,18 +86,6 @@ def _pick(files):
     return [NEURONS[f] for f in files]
 
 
-def test_has_soma_good_data():
-    dw = io.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
-    nt.ok_(check_morph.has_valid_soma(dw))
-    dw = io.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
-    nt.ok_(check_morph.has_valid_soma(dw))
-
-
-def test_has_soma_bad_data():
-    dw = io.load_data(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
-    nt.ok_(not check_morph.has_valid_soma(dw))
-
-
 def test_has_axon_good_data():
     files = ['Neuron.swc',
              'Neuron_small_radius.swc',
@@ -105,7 +93,7 @@ def test_has_axon_good_data():
              'Neuron.h5',
              ]
     for n in _pick(files):
-        nt.ok_(check_morph.has_axon(n))
+        nt.ok_(nrn_chk.has_axon(n))
 
 
 def test_has_axon_bad_data():
@@ -114,7 +102,7 @@ def test_has_axon_bad_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(not check_morph.has_axon(n))
+        nt.ok_(not nrn_chk.has_axon(n))
 
 
 def test_has_apical_dendrite_good_data():
@@ -125,7 +113,7 @@ def test_has_apical_dendrite_good_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(check_morph.has_apical_dendrite(n))
+        nt.ok_(nrn_chk.has_apical_dendrite(n))
 
 
 def test_has_apical_dendrite_bad_data():
@@ -134,7 +122,7 @@ def test_has_apical_dendrite_bad_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(not check_morph.has_apical_dendrite(n))
+        nt.ok_(not nrn_chk.has_apical_dendrite(n))
 
 
 def test_has_basal_dendrite_good_data():
@@ -146,7 +134,7 @@ def test_has_basal_dendrite_good_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(check_morph.has_basal_dendrite(n))
+        nt.ok_(nrn_chk.has_basal_dendrite(n))
 
 
 def test_has_basal_dendrite_bad_data():
@@ -155,93 +143,61 @@ def test_has_basal_dendrite_bad_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(not check_morph.has_basal_dendrite(n))
-
-
-def test_has_nonzero_soma_radius():
-
-    nrn = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn))
-
-
-def test_has_nonzero_soma_radius_bad_data():
-
-    nrn = load_neuron(os.path.join(SWC_PATH, 'Single_basal.swc'))
-    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn))
-
-
-def test_has_nonzero_soma_radius_threshold():
-
-    class Dummy(object):
-        pass
-
-    nrn = Dummy()
-    nrn.soma = Dummy()
-    nrn.soma.radius = 1.5
-
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn))
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 0.25))
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 0.75))
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 1.25))
-    nt.assert_true(check_morph.has_nonzero_soma_radius(nrn, 1.499))
-    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 1.5))
-    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 1.75))
-    nt.assert_false(check_morph.has_nonzero_soma_radius(nrn, 2.5))
-
+        nt.ok_(not nrn_chk.has_basal_dendrite(n))
 
 
 def test_get_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_equal(len(check_morph.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
-    nt.assert_equal(len(check_morph.get_flat_neurites(n, 0.1, method='ratio')), 0)
+    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
+    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 0.1, method='ratio')), 0)
 
     n = _make_flat(n)
 
-    nt.assert_equal(len(check_morph.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
-    nt.assert_equal(len(check_morph.get_flat_neurites(n, 0.1, method='ratio')), 4)
+    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
+    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 0.1, method='ratio')), 4)
 
 
 def test_has_no_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_true(check_morph.has_no_flat_neurites(n, 1e-6, method='tolerance'))
-    nt.assert_true(check_morph.has_no_flat_neurites(n, 0.1, method='ratio'))
+    nt.assert_true(nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance'))
+    nt.assert_true(nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio'))
 
     n = _make_flat(n)
 
-    nt.assert_false(check_morph.has_no_flat_neurites(n, 1e-6, method='tolerance'))
-    nt.assert_false(check_morph.has_no_flat_neurites(n, 0.1, method='ratio'))
+    nt.assert_false(nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance'))
+    nt.assert_false(nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio'))
 
 
 def test_has_all_monotonic_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_false(check_morph.has_all_monotonic_neurites(n))
+    nt.assert_false(nrn_chk.has_all_monotonic_neurites(n))
 
     _make_monotonic(n)
 
-    nt.assert_true(check_morph.has_all_monotonic_neurites(n))
+    nt.assert_true(nrn_chk.has_all_monotonic_neurites(n))
 
 
 def test_get_nonmonotonic_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_equal(len(check_morph.get_nonmonotonic_neurites(n)), 4)
+    nt.assert_equal(len(nrn_chk.get_nonmonotonic_neurites(n)), 4)
 
     _make_monotonic(n)
 
-    nt.assert_equal(len(check_morph.get_nonmonotonic_neurites(n)), 0)
+    nt.assert_equal(len(nrn_chk.get_nonmonotonic_neurites(n)), 0)
 
 
 def test_get_back_tracking_neurites():
 
     _, n = _load_neuron('Neuron.swc')
-    nt.assert_equal(len(check_morph.get_back_tracking_neurites(n)), 4)
+    nt.assert_equal(len(nrn_chk.get_back_tracking_neurites(n)), 4)
 
 
 def test_nonzero_neurite_radii_good_data():
@@ -253,33 +209,34 @@ def test_nonzero_neurite_radii_good_data():
              ]
 
     for n in _pick(files):
-        ids = check_morph.nonzero_neurite_radii(n)
-        nt.ok_(len(ids) == 0)
+        ids = nrn_chk.has_all_nonzero_neurite_radii(n)
+        nt.ok_(len(ids.info) == 0)
 
 
-def test_nonzero_neurite_radii_threshold():
+def test_has_all_nonzero_neurite_radii_threshold():
     nrn = NEURONS['Neuron.swc']
 
-    ids = check_morph.nonzero_neurite_radii(nrn)
-    nt.ok_(len(ids) == 0)
+    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
+    nt.ok_(ids.status)
 
-    ids = check_morph.nonzero_neurite_radii(nrn, threshold=0.25)
-    nt.assert_equal(len(ids), 122)
+    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.25)
+    nt.assert_equal(len(ids.info), 122)
 
 
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
-    ids = check_morph.nonzero_neurite_radii(nrn)
-    nt.assert_equal(ids, [(21, 10), (22, 0),
-                          (23, 0), (23, 6),
-                          (27, 1), (32, 9),
-                          (51, 7)])
+    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
+    nt.assert_equal(ids.info, [(21, 10), (22, 0),
+                               (23, 0), (23, 6),
+                               (27, 1), (32, 9),
+                               (51, 7)])
 
 
 def test_nonzero_segment_lengths_good_data():
     nrn = NEURONS['Neuron.swc']
-    ids = check_morph.nonzero_segment_lengths(nrn)
-    nt.ok_(len(ids) == 0)
+    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+    nt.ok_(ids.status)
+    nt.ok_(len(ids.info) == 0)
 
 
 def test_nonzero_segment_lengths_bad_data():
@@ -296,19 +253,20 @@ def test_nonzero_segment_lengths_bad_data():
                [(3, 0)]]
 
     for i, nrn in enumerate(_pick(files)):
-        ids = check_morph.nonzero_segment_lengths(nrn)
-        nt.assert_equal(ids, bad_ids[i])
+        ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+        nt.assert_equal(ids.info, bad_ids[i])
 
 
 def test_nonzero_segment_lengths_threshold():
     nrn = NEURONS['Neuron.swc']
 
-    ids = check_morph.nonzero_segment_lengths(nrn)
-    nt.assert_equal(len(ids), 0)
+    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+    nt.ok_(ids.status)
+    nt.assert_equal(len(ids.info), 0)
 
-    ids = check_morph.nonzero_segment_lengths(nrn, threshold=0.25)
-    nt.assert_equal(ids, [(3, 0), (24, 0), (39, 9), (45, 0),
-                          (55, 7), (63, 2), (66, 0), (73, 4), (79, 6)])
+    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
+    nt.assert_equal(ids.info, [(3, 0), (24, 0), (39, 9), (45, 0),
+                               (55, 7), (63, 2), (66, 0), (73, 4), (79, 6)])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -319,22 +277,57 @@ def test_nonzero_section_lengths_good_data():
              ]
 
     for i, nrn in enumerate(_pick(files)):
-        ids = check_morph.nonzero_section_lengths(nrn)
-        nt.ok_(len(ids) == 0)
+        ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+        nt.ok_(ids.status)
+        nt.ok_(len(ids.info) == 0)
 
 
 def test_nonzero_section_lengths_bad_data():
     nrn = NEURONS['Neuron_zero_length_sections.swc']
 
-    ids = check_morph.nonzero_section_lengths(nrn)
-    nt.assert_equal(ids, [16])
+    ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+    nt.ok_(not ids.status)
+    nt.assert_equal(ids.info, [16])
 
 
 def test_nonzero_section_lengths_threshold():
     nrn = NEURONS['Neuron.swc']
 
-    ids = check_morph.nonzero_section_lengths(nrn)
-    nt.ok_(len(ids) == 0)
+    ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+    nt.ok_(ids.status)
+    nt.ok_(len(ids.info) == 0)
 
-    ids = check_morph.nonzero_section_lengths(nrn, threshold=15.)
-    nt.assert_equal(len(ids), 84)
+    ids = nrn_chk.has_all_nonzero_section_lengths(nrn, threshold=15.)
+    nt.ok_(not ids.status)
+    nt.assert_equal(len(ids.info), 84)
+
+
+def test_has_nonzero_soma_radius():
+
+    nrn = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
+
+
+def test_has_nonzero_soma_radius_bad_data():
+
+    nrn = load_neuron(os.path.join(SWC_PATH, 'Single_basal.swc'))
+    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
+
+
+def test_has_nonzero_soma_radius_threshold():
+
+    class Dummy(object):
+        pass
+
+    nrn = Dummy()
+    nrn.soma = Dummy()
+    nrn.soma.radius = 1.5
+
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 0.25))
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 0.75))
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 1.25))
+    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 1.499))
+    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.5))
+    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.75))
+    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 2.5))
