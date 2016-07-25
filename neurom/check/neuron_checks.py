@@ -26,33 +26,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''
-Python module of NeuroM to check neurons.
+'''NeuroM neuron checking functions.
+
+Contains functions for checking validity of neuron neurites and somata.
+Tests assumes neurites and/or soma have been succesfully built where applicable,
+i.e. soma- and neurite-related structural tests pass.
 '''
 
 from itertools import izip
 from neurom.core.types import NeuriteType
-from neurom.core.neuron import make_soma
 from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
 from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
-from neurom.exceptions import SomaError
 from neurom.fst import _neuritefunc as _nf
+from neurom.check import CheckResult
 
 
 def _read_neurite_type(neurite):
     '''Simply read the stored neurite type'''
     return neurite.type
-
-
-def has_valid_soma(data_wrapper):
-    '''Check if a data block has a valid soma'''
-    try:
-        make_soma(data_wrapper.soma_points())
-        return True
-    except SomaError:
-        return False
 
 
 def has_axon(neuron, treefun=_read_neurite_type):
@@ -63,7 +56,7 @@ def has_axon(neuron, treefun=_read_neurite_type):
         treefun: Optional function to calculate the tree type of
         neuron's neurites
     '''
-    return NeuriteType.axon in [treefun(n) for n in neuron.neurites]
+    return CheckResult(NeuriteType.axon in [treefun(n) for n in neuron.neurites])
 
 
 def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
@@ -76,7 +69,7 @@ def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
         neurites
     '''
     types = [treefun(n) for n in neuron.neurites]
-    return types.count(NeuriteType.apical_dendrite) >= min_number
+    return CheckResult(types.count(NeuriteType.apical_dendrite) >= min_number)
 
 
 def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
@@ -89,17 +82,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
         neurites
     '''
     types = [treefun(n) for n in neuron.neurites]
-    return types.count(NeuriteType.basal_dendrite) >= min_number
-
-
-def has_nonzero_soma_radius(neuron, threshold=0.0):
-    '''Check if soma radius not above threshold
-
-    Arguments:
-        neuron: Neuron object whose soma will be tested
-        threshold: value above which the soma radius is considered to be non-zero
-    '''
-    return neuron.soma.radius > threshold
+    return CheckResult(types.count(NeuriteType.basal_dendrite) >= min_number)
 
 
 def get_flat_neurites(neuron, tol=0.1, method='ratio'):
@@ -125,7 +108,7 @@ def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
         tol : the tolerance or the ratio
         method : way of determining flatness, 'tolerance', 'ratio'
     '''
-    return len(get_flat_neurites(neuron, tol, method)) == 0
+    return CheckResult(len(get_flat_neurites(neuron, tol, method)) == 0)
 
 
 def get_nonmonotonic_neurites(neuron, tol=1e-6):
@@ -148,7 +131,7 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
         neuron : The neuron object to test
         tol : the tolerance for testing monotonicity
     '''
-    return len(get_nonmonotonic_neurites(neuron, tol)) == 0
+    return CheckResult(len(get_nonmonotonic_neurites(neuron, tol)) == 0)
 
 
 def get_back_tracking_neurites(neuron):
@@ -160,13 +143,15 @@ def get_back_tracking_neurites(neuron):
     return [n for n in neuron.neurites if is_back_tracking(n)]
 
 
-def nonzero_segment_lengths(neuron, threshold=0.0):
+def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
     '''Check presence of neuron segments with length not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a segment length is considered to be non-zero
-    Return: list of (section_id, segment_id) of zero length segments
+
+    Return:
+        status and list of (section_id, segment_id) of zero length segments
     '''
     bad_ids = []
     for sec in _nf.iter_sections(neuron):
@@ -175,28 +160,33 @@ def nonzero_segment_lengths(neuron, threshold=0.0):
             if segment_length(s) <= threshold:
                 bad_ids.append((sec.id, i))
 
-    return bad_ids
+    return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def nonzero_section_lengths(neuron, threshold=0.0):
+def has_all_nonzero_section_lengths(neuron, threshold=0.0):
     '''Check presence of neuron sections with length not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a section length is considered to be non-zero
-    Return: list of ids bad sections
+
+    Return:
+        status and list of ids bad sections
     '''
-    return [s.id for s in _nf.iter_sections(neuron.neurites)
-            if section_length(s.points) <= threshold]
+    bad_ids = [s.id for s in _nf.iter_sections(neuron.neurites)
+               if section_length(s.points) <= threshold]
+
+    return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def nonzero_neurite_radii(neuron, threshold=0.0):
+def has_all_nonzero_neurite_radii(neuron, threshold=0.0):
     '''Check presence of neurite points with radius not above threshold
 
     Arguments:
         neuron: Neuron object whose segments will be tested
         threshold: value above which a radius is considered to be non-zero
-    Return: list of (section ID, point ID) pairs of zero-radius points
+    Return:
+        status and list of (section ID, point ID) pairs of zero-radius points
     '''
     bad_ids = []
     seen_ids = set()
@@ -207,4 +197,14 @@ def nonzero_neurite_radii(neuron, threshold=0.0):
                 seen_ids.add(info)
                 bad_ids.append(info)
 
-    return bad_ids
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_nonzero_soma_radius(neuron, threshold=0.0):
+    '''Check if soma radius not above threshold
+
+    Arguments:
+        neuron: Neuron object whose soma will be tested
+        threshold: value above which the soma radius is considered to be non-zero
+    '''
+    return CheckResult(neuron.soma.radius > threshold)

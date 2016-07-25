@@ -29,17 +29,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.io.utils import get_morph_files
-from neurom import load_neuron
-from neurom.check import ok as chk_ok
-from neurom.check import morphology as morph_chk
-from neurom.exceptions import SomaError, IDSequenceError, MultipleTrees, MissingParentError
-from collections import OrderedDict
+from neurom.check.runner import CheckRunner
 import argparse
-import functools
 import logging
 import yaml
-import os
 import sys
 import json
 
@@ -56,13 +49,34 @@ Description
 Performs checks on reconstructed morphologies from data contained in
 morphology files.
 
-Files are unloaded into neuron objects before testing. This means they must
-have a soma and no format errors.
+The tests are performed in two steps:
+
+1. Files are loaded into an intermediary "raw data" format. If this fails, the
+tests for that particular file are aborted. Reasons for failure can include
+structural issues that are too difficult to recover from.
+
+2. Structural tests are carried out. Failure in some of these may make further
+tests fail.
+
+3. A neuron object is built from the data loaded in 1. Failure at this stage
+results in further tests for this particular file being aborted.
+
+4. Soma and neurite tests are performed.
+
+It is very likely that a failure in the structural tests will make the neurite
+and soma tests fail. Furthermore, inability to build a soma typically results
+in an inability to build neurites. Failure to build a soma or neurites results
+in an early faulure for a given morphology file.
 
 Default errors checked for
-------------------
-* No soma
-* Disconnected points
+--------------------------
+* Not a single tree structure
+* No soma points detectes
+* Missing parents
+* IDs not in increasing order
+* IDs not sequential
+* No soma could be reconstructed
+* No neurites could be reconstructed
 * Zero radius soma
 * No axon
 * No apical dendrite
@@ -74,9 +88,9 @@ Default errors checked for
 Default values for options
 --------------
 * has_nonzero_soma_radius 0.0
-* nonzero_neurite_radii: 0.007
-* nonzero_segment_lengths: 0.01
-* nonzero_section_lengths: 0.01
+* has_all_nonzero_neurite_radii: 0.007
+* has_all_nonzero_segment_lengths: 0.01
+* has_all_nonzero_section_lengths: 0.01
 
 Examples
 --------
@@ -130,115 +144,38 @@ def parse_args():
     return parser.parse_args()
 
 
-def log_msg(msg, ok, color=False):
-    '''Helper to log message to the right level'''
-    if color:
-        CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
-    else:
-        CGREEN = CRED = CEND = ''
-
-    LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
-
-    L.log(LOG_LEVELS[ok],
-          '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
-
-
-def check_file(f, config):
-    '''Run tests on a morphology file'''
-
-    L.info('File: %s', f)
-    if 'color' in config:
-        _log_msg = functools.partial(log_msg, color=config['color'])
-
-    summary = OrderedDict()
-
-    try:
-        nrn = load_neuron(f)
-        summary['Has valid soma'] = True
-        summary['All points connected'] = True
-    except SomaError:
-        summary['Has valid soma'] = False
-        L.error('No valid soma detected... Aborting')
-        return False, None
-    except (MissingParentError, MultipleTrees) as e:
-        summary['All points connected'] = False
-        L.error(e.message)
-        return False, None
-
-    result = True
-
-    for check in config['neuron_checks']:
-
-        if check in config['options']:
-            fargs = config['options'][check]
-            if isinstance(fargs, list):
-                out = getattr(morph_chk, check)(nrn, *fargs)
-            else:
-                out = getattr(morph_chk, check)(nrn, fargs)
-        else:
-            out = getattr(morph_chk, check)(nrn)
-
-        ok = chk_ok(out)
-        msg = check.replace('_', ' ').capitalize()
-        summary[msg] = ok
-
-        try:
-            if len(out) > 0:
-                L.debug('%s: %d failing ids detected: %s', msg, len(out), out)
-        except TypeError:
-            pass
-
-        result &= ok
-
-    summary['ALL'] = result
-
-    for m, s in summary.iteritems():
-        _log_msg(m, s)
-
-    return result, {f: summary}
-
-
-def check_files(files, config):
-    '''Test a bunch of files'''
-
-    SEPARATOR = '=' * 40
-    summary = {}
-    res = True
-
-    for _f in files:
-        L.info(SEPARATOR)
-        try:
-            status, summ = check_file(_f, config)
-            res &= status
-            summary.update(summ)
-        except IDSequenceError as e:
-            L.error('ID ERROR in file %s: %s', _f, e.message)
-        except StandardError as e:
-            L.error('Could not read file %s: %s', _f, e.message)
-
-    L.info(SEPARATOR)
-
-    status = 'PASS' if res else 'FAIL'
-
-    return {'files': summary, 'STATUS': status}
-
-
 # Default check configuration parameters
-CONFIG = {'neuron_checks': ['has_nonzero_soma_radius',
-                            'has_basal_dendrite',
-                            'has_axon',
-                            'has_apical_dendrite',
-                            'nonzero_segment_lengths',
-                            'nonzero_section_lengths',
-                            'nonzero_neurite_radii'],
-          'options': {'has_nonzero_soma_radius': 0.0,
-                      "nonzero_neurite_radii": 0.007,
-                      "nonzero_segment_lengths": 0.01,
-                      "nonzero_section_lengths": 0.01},
-          'color': False}
+CONFIG = {
+    'checks': {
+        'structural_checks': [
+            'is_single_tree',
+            'has_soma_points',
+            'has_sequential_ids',
+            'has_increasing_ids',
+            'has_valid_soma',
+            'has_valid_neurites'
+        ],
+        'neuron_checks': [
+            'has_basal_dendrite',
+            'has_axon',
+            'has_apical_dendrite',
+            'has_all_nonzero_segment_lengths',
+            'has_all_nonzero_section_lengths',
+            'has_all_nonzero_neurite_radii',
+            'has_nonzero_soma_radius'
+        ]
+    },
+    'options': {
+        'has_nonzero_soma_radius': 0.0,
+        "has_all_nonzero_neurite_radii": 0.007,
+        "has_all_nonzero_segment_lengths": 0.01,
+        "has_all_nonzero_section_lengths": 0.01
+    },
+    'color': False
+}
 
 
-def run_checks(args):
+def main(args):
     '''Run all the checks'''
     _setup_logging(args.debug, args.log_file)
 
@@ -253,25 +190,15 @@ def run_checks(args):
         # set default checks
         _config = CONFIG
 
-    if os.path.isfile(args.datapath):
-        _files = [args.datapath]
-    elif os.path.isdir(args.datapath):
-        L.info('Checking files in directory %s', args.datapath)
-        _files = get_morph_files(args.datapath)
-    else:
-        L.error('Invalid data path %s', args.datapath)
-        sys.exit(1)
-
-    summary_ = check_files(_files, _config)
+    checker = CheckRunner(_config)
+    summary = checker.run(args.datapath)
 
     with open(args.output_file, 'w') as json_output:
-        json.dump(summary_, json_output, indent=4)
+        json.dump(summary, json_output, indent=4)
 
-    return 0 if summary_['STATUS'] == 'PASS' else 1
+    return 0 if summary['STATUS'] == 'PASS' else 1
 
 
 if __name__ == '__main__':
 
-    _args = parse_args()
-    exit_status = run_checks(_args)
-    sys.exit(exit_status)
+    sys.exit(main(parse_args()))

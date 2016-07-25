@@ -28,18 +28,34 @@
 
 ''' Basic tools to check neuronal morphologies. '''
 
+from functools import wraps
+
+
+def check_wrapper(fun):
+    '''Wrapp a checking function'''
+    @wraps(fun)
+    def _wrapper(*args, **kwargs):
+        '''Sets the title property of the result of ijviking a checker'''
+        title = fun.__name__.replace('_', ' ').capitalize()
+        result = fun(*args, **kwargs)
+        result.title = title
+        return result
+
+    return _wrapper
+
+
+class CheckResult(object):
+    '''Class representing a check result'''
+    def __init__(self, status, info=None, title=None):
+        self.status = bool(status)
+        self.info = info
+        self.title = title
+
+    def __nonzero__(self):
+        '''boolean conversion method'''
+        return self.status
+
 
 def ok(result):
-    '''Boolean test result
-
-    Return a boolean pass status for a test result. Some tests
-    return iterables of failures. A non empty iterable result is
-    a failure.
-
-    Returns: True if result is True or an empty iterable,\
-    False otherwise.
-    '''
-    try:
-        return len(result) == 0
-    except TypeError:
-        return bool(result)
+    '''Return a boolean pass status for a test result.'''
+    return result.status
