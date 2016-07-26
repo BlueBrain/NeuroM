@@ -26,34 +26,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Quick and easy neuron morphology analysis tools
+''' Deprecated module for quick and easy neuron morphology analysis tools
+
+Note:
+    This module is deprecated. Do not use it for anything.
 
 Examples:
 
     Load a neuron
 
-    >>> from neurom import ezy
-    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
+    >>> from neurom import _ezy
+    >>> nrn = _ezy.load_neuron('some/data/path/morph_file.swc')
 
     Obtain some morphometrics
 
-    >>> ap_seg_len = ezy.get('segment_lengths', nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
-    >>> ax_sec_len = ezy.get('section_lengths', nrn, neurite_type=ezy.NeuriteType.axon)
+    >>> ap_seg_len = _ezy.get('segment_lengths', nrn, neurite_type=_ezy.NeuriteType.apical_dendrite)
+    >>> ax_sec_len = _ezy.get('section_lengths', nrn, neurite_type=_ezy.NeuriteType.axon)
 
     View it in 2D and 3D
 
-    >>> fig2d, ax2d = ezy.view(nrn)
+    >>> fig2d, ax2d = _ezy.view(nrn)
     >>> fig2d.show()
-    >>> fig3d, ax3d = ezy.view3d(nrn)
+    >>> fig3d, ax3d = _ezy.view3d(nrn)
     >>> fig3d.show()
 
     Load neurons from a directory. This loads all SWC or HDF5 files it finds\
     and returns a list of neurons
 
     >>> import numpy as np  # For mean value calculation
-    >>> nrns = ezy.load_neurons('some/data/directory')
+    >>> nrns = _ezy.load_neurons('some/data/directory')
     >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean(ezy.get('section_lengths', nrn))
+    ...     print 'mean section length', np.mean(_ezy.get('section_lengths', nrn))
 
 '''
 import os

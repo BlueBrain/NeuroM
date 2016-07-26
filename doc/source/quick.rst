@@ -32,8 +32,7 @@ Quick and easy analysis
 The :py:mod:`neurom.fst` module
 -------------------------------
 
-The :py:mod:`neurom.fst` replaces the deprecated :py:mod:`neurom.ezy` module and 
-brings together various neurom components and helper functions
+The :py:mod:`neurom.fst` brings together various neurom components and helper functions
 to simplify loading neuron morphologies from files into ``neurom`` data structures and
 obtaining morphometrics, either from single or multiple neurons.
 The functionality is limited, but it is hoped that it will suffice for most analyses. 

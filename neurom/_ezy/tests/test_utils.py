@@ -26,46 +26,42 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.ezy module'''
+'''Test neurom._ezy.utils'''
 
-from nose import tools as nt
 import os
-from neurom import ezy
+from copy import deepcopy
+from neurom import _ezy
+from neurom._ezy import utils as ezy_utils
+from collections import namedtuple
+from neurom.core.types import NeuriteType
+from nose import tools as nt
+
 
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
-FILENAMES = [os.path.join(DATA_PATH, f)
-             for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
-
-def test_load_neurons_directory():
-
-    nrns = ezy.load_neurons(DATA_PATH)
-    nt.assert_equal(len(nrns), 5)
-    for nrn in nrns:
-        nt.assert_true(isinstance(nrn, ezy.Neuron))
+DATA_PATH = os.path.join(_path, '../../../test_data')
+MORPH_FILE = os.path.join(DATA_PATH, 'swc', 'Neuron.swc')
+NEURON = _ezy.load_neuron(MORPH_FILE)
 
 
-def test_load_neurons_filenames():
-
-    nrns = ezy.load_neurons(FILENAMES)
-    nt.assert_equal(len(nrns), 3)
-    for nrn in nrns:
-        nt.assert_true(isinstance(nrn, ezy.Neuron))
+def test_eq():
+    other = _ezy.load_neuron(MORPH_FILE)
+    nt.assert_true(ezy_utils.neurons_eq(NEURON, other))
 
 
-def test_load_population_directory():
+def test_compare_neurites():
 
-    pop = ezy.load_population(DATA_PATH)
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(pop.name, 'valid_set')
+    fake_neuron = namedtuple('Neuron', 'neurites')
+    fake_neuron.neurites = []
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, fake_neuron, NeuriteType.axon))
+    nt.assert_true(fake_neuron, fake_neuron)
 
-    pop = ezy.load_population(DATA_PATH, 'test123')
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(pop.name, 'test123')
+    neuron2 = deepcopy(NEURON)
 
+    n_types = set([n.type for n in NEURON.neurites])
 
-def test_load_population_filenames():
+    for n_type in n_types:
+        nt.assert_true(ezy_utils._compare_neurites(NEURON, neuron2, n_type))
 
-    pop = ezy.load_population(FILENAMES, 'test123')
-    nt.assert_equal(len(pop.neurons), 3)
-    nt.assert_equal(pop.name, 'test123')
+    neuron2.neurites[1].children[0].value[1] += 0.01
+
+    nt.assert_false(ezy_utils._compare_neurites(NEURON, neuron2, neuron2.neurites[1].type))

@@ -1,5 +1,6 @@
 import os
 import math
+from functools import partial
 from nose import tools as nt
 import numpy as np
 from neurom.core.tree import Tree
@@ -9,9 +10,11 @@ import neurom.sections as sec
 import neurom.segments as seg
 import neurom.bifurcations as bifs
 from neurom import iter_neurites
-from neurom.ezy import load_neuron
+from neurom.io.utils import load_neuron as _load
+from neurom.analysis.morphtree import set_tree_type as _set_tt
 from neurom.features import get as get_feat
 
+load_neuron = partial(_load, tree_action=_set_tt)
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')

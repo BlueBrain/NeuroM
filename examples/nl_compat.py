@@ -28,19 +28,26 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Compatibility between NL and H5 files'''
+from functools import partial
 import numpy as np
-from neurom import ezy
+from neurom.io.utils import load_neuron as _load
+from neurom.analysis.morphtree import set_tree_type as _set_tt
+from neurom.features import get
+from neurom import log  # pylint: disable=unused-import
 
-nrn_h5 = ezy.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
-nrn_asc = ezy.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
 
-print 'h5 number of sections: %s' % ezy.get('number_of_sections', nrn_h5)[0]
-print 'nl number of sections: %s\n' % ezy.get('number_of_sections', nrn_asc)[0]
-print 'h5 number of segments: %s' % ezy.get('number_of_segments', nrn_h5)[0]
-print 'nl number of segments: %s\n' % ezy.get('number_of_segments', nrn_asc)[0]
-print 'h5 total neurite surface area: %s' % np.sum(ezy.get('section_areas', nrn_h5))
-print 'nl total neurite surface area: %s\n' % np.sum(ezy.get('section_areas', nrn_asc))
-print 'h5 total neurite volume: %s' % np.sum(ezy.get('section_volumes', nrn_h5))
-print 'nl total neurite volume: %s\n' % np.sum(ezy.get('section_volumes', nrn_asc))
-print 'h5 total neurite length: %s' % np.sum(ezy.get('section_lengths', nrn_h5))
-print 'nl total neurite length: %s\n' % np.sum(ezy.get('section_lengths', nrn_asc))
+load_neuron = partial(_load, tree_action=_set_tt)
+
+nrn_h5 = load_neuron('test_data/h5/v1/bio_neuron-001.h5')
+nrn_asc = load_neuron('test_data/neurolucida/bio_neuron-001.asc')
+
+print 'h5 number of sections: %s' % get('number_of_sections', nrn_h5)[0]
+print 'nl number of sections: %s\n' % get('number_of_sections', nrn_asc)[0]
+print 'h5 number of segments: %s' % get('number_of_segments', nrn_h5)[0]
+print 'nl number of segments: %s\n' % get('number_of_segments', nrn_asc)[0]
+print 'h5 total neurite surface area: %s' % np.sum(get('section_areas', nrn_h5))
+print 'nl total neurite surface area: %s\n' % np.sum(get('section_areas', nrn_asc))
+print 'h5 total neurite volume: %s' % np.sum(get('section_volumes', nrn_h5))
+print 'nl total neurite volume: %s\n' % np.sum(get('section_volumes', nrn_asc))
+print 'h5 total neurite length: %s' % np.sum(get('section_lengths', nrn_h5))
+print 'nl total neurite length: %s\n' % np.sum(get('section_lengths', nrn_asc))
