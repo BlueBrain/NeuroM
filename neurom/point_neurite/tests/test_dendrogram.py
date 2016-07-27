@@ -1,17 +1,19 @@
 
 import numpy as np
 from nose import tools as nt
-from neurom.core.tree import Tree
-from neurom.core.neuron import Neuron, make_soma
+from neurom.point_neurite.point_tree import PointTree
+from neurom.point_neurite.core import Neuron
+from neurom.core.soma import make_soma
 from neurom.core.types import NeuriteType
-from neurom.analysis.morphtree import set_tree_type
-import neurom.analysis.dendrogram as dm
+from neurom.point_neurite.treefunc import set_tree_type
+import neurom.point_neurite.dendrogram as dm
 
-TREE = Tree(np.array([0., 0., 0., 10., 4., 0., 0.]))
-TREE.add_child(Tree(np.array([3., 3., 3., 9., 4., 0., 0.])))
 
-TREE.children[0].add_child(Tree(np.array([10., 10., 10., 5., 4., 0., 0.])))
-TREE.children[0].add_child(Tree(np.array([-10., -10., -10., 7., 4., 0., 0.])))
+TREE = PointTree(np.array([0., 0., 0., 10., 4., 0., 0.]))
+TREE.add_child(PointTree(np.array([3., 3., 3., 9., 4., 0., 0.])))
+
+TREE.children[0].add_child(PointTree(np.array([10., 10., 10., 5., 4., 0., 0.])))
+TREE.children[0].add_child(PointTree(np.array([-10., -10., -10., 7., 4., 0., 0.])))
 
 set_tree_type(TREE)
 

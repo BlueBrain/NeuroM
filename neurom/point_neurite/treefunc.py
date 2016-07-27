@@ -33,11 +33,12 @@ different iteration modes.
 '''
 from itertools import izip, product
 from neurom.core import tree as tr
-from neurom.core.types import NeuriteType
 from neurom.core.tree import ipreorder
+from neurom.point_neurite.point_tree import val_iter
+import neurom.point_neurite.point_tree as ptr
+from neurom.core.types import NeuriteType
 import neurom.analysis.morphmath as mm
 from neurom.core.dataformat import COLS
-from neurom.core.tree import val_iter
 import numpy as np
 
 
@@ -104,7 +105,7 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''
     pos = tree.value if pos is None else pos
     sec_idx = 0 if use_start_point else -1
-    return tr.imap_val(lambda s: mm.point_dist(s[sec_idx], pos), tr.isection(tree))
+    return ptr.imap_val(lambda s: mm.point_dist(s[sec_idx], pos), ptr.isection(tree))
 
 
 def find_tree_type(tree):
@@ -148,14 +149,14 @@ def n_sections(tree):
     """
     Return number of sections in tree
     """
-    return sum(1 for _ in tr.isection(tree))
+    return sum(1 for _ in ptr.isection(tree))
 
 
 def n_segments(tree):
     """
     Return number of segments in tree
     """
-    return sum(1 for _ in tr.isegment(tree))
+    return sum(1 for _ in ptr.isegment(tree))
 
 
 def n_bifurcations(tree):
@@ -184,7 +185,7 @@ def trunk_section_length(tree):
         Length of first section of tree or 0 if single point tree
     '''
     try:
-        _it = tr.imap_val(mm.section_length, tr.isection(tree))
+        _it = ptr.imap_val(mm.section_length, ptr.isection(tree))
         return _it.next()
     except StopIteration:
         return 0.0
@@ -305,8 +306,8 @@ def compare_trees(tree1, tree2):
 
             is_equal = True
 
-            for node1, node2 in izip(tr.val_iter(tr.iupstream(leaf1)),
-                                     tr.val_iter(tr.iupstream(leaf2))):
+            for node1, node2 in izip(ptr.val_iter(tr.iupstream(leaf1)),
+                                     ptr.val_iter(tr.iupstream(leaf2))):
 
                 if any(node1[0:5] != node2[0:5]):
 

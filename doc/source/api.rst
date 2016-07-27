@@ -46,10 +46,10 @@ API Documentation
    neurom.core.types
    neurom.core.tree
    neurom.core.neuron
+   neurom.core.soma
    neurom.core.point
    neurom.core.dataformat
    neurom.io
-   neurom.io.readers
    neurom.io.utils
    neurom.io.swc
    neurom.io.hdf5

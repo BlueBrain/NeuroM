@@ -28,7 +28,7 @@
 
 '''Example for generating density plots'''
 
-from neurom.features import get as get_feat
+from neurom.point_neurite.features import get as get_feat
 import pylab as plt
 from neurom.view import common
 from neurom.view import view

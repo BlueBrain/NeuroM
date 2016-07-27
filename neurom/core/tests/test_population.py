@@ -28,15 +28,11 @@
 
 import os
 from os.path import join as joinp
-from functools import partial
 
 from nose import tools as nt
 from neurom.core.population import Population
-from neurom.core.neuron import Neuron
-from neurom.io.utils import load_neuron as _load
-from neurom.analysis.morphtree import set_tree_type as _set_tt
+from neurom import load_neuron
 
-load_neuron = partial(_load, tree_action=_set_tt)
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
 

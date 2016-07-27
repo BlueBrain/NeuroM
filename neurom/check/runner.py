@@ -35,7 +35,7 @@ from importlib import import_module
 import os
 import logging
 from neurom.io.utils import get_morph_files
-from neurom.fst import _io as fst_io
+from neurom.io import load_data
 from neurom.fst import _core as fst_core
 from neurom.check import check_wrapper
 
@@ -125,7 +125,7 @@ class CheckRunner(object):
         result = True
 
         try:
-            data = fst_io.load_data(f)
+            data = load_data(f)
             result &= self._check_loop(data, 'structural_checks')
             nrn = fst_core.Neuron(data)
             result &= self._check_loop(nrn, 'neuron_checks')

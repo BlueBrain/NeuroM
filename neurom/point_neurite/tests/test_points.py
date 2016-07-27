@@ -27,76 +27,63 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from nose import tools as nt
-from neurom import load_neuron
-from neurom import viewer
-from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
-import os
-from matplotlib import pyplot as plt
+from neurom import io
+from neurom.point_neurite.point_tree import PointTree
+from neurom.point_neurite.io.utils import make_neuron
+from neurom.point_neurite import points as pts
+from neurom import iter_neurites
 
 
-class Dummy(object):
+class MockNeuron(object):
     pass
 
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
-MORPH_FILENAME = os.path.join(DATA_PATH, 'Neuron.swc')
+def _make_tree():
+    '''This tree has 3 branching points'''
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 2.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 3.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 4.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 5.0, 1, 1, 2]))
+    T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 6.0, 1, 1, 2]))
+    T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 7.0, 1, 1, 2]))
+    return T
 
-nrn = load_neuron(MORPH_FILENAME)
-pt_nrn = load_pt_neuron(MORPH_FILENAME)
+TREE = _make_tree()
+TREES = [TREE, TREE, TREE]
+NEURON = MockNeuron()
+NEURON.neurites = [TREE]
+POPULATION = MockNeuron()
+POPULATION.neurites = [TREE, TREE, TREE]
 
+def _check_radius0(obj):
 
-def test_draw_neuron():
-    viewer.draw(pt_nrn)
-    viewer.draw(nrn)
-    plt.close('all')
-
-
-def test_draw_neuron3d():
-    viewer.draw(pt_nrn, mode='3d')
-    viewer.draw(nrn, mode='3d')
-    plt.close('all')
-
-
-def test_draw_tree():
-    viewer.draw(pt_nrn.neurites[0])
-    viewer.draw(nrn.neurites[0])
-    plt.close('all')
-
-
-def test_draw_tree3d():
-    viewer.draw(pt_nrn.neurites[0], mode='3d')
-    viewer.draw(nrn.neurites[0], mode='3d')
-    plt.close('all')
+    radii = [r for r in iter_neurites(obj, pts.radius)]
+    nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7])
 
 
-def test_draw_soma():
-    viewer.draw(pt_nrn.soma)
-    viewer.draw(nrn.soma)
-    plt.close('all')
+def _check_radius1(obj):
+
+    radii = [r for r in iter_neurites(obj, pts.radius)]
+    nt.eq_(radii, [1, 2, 3, 4, 5, 6, 7,
+                   1, 2, 3, 4, 5, 6, 7,
+                   1, 2, 3, 4, 5, 6, 7])
 
 
-def test_draw_soma3d():
-    viewer.draw(pt_nrn.soma, mode='3d')
-    viewer.draw(nrn.soma, mode='3d')
-    plt.close('all')
+def _check_count(obj, n):
+    nt.eq_(pts.count(obj), n)
 
 
-def test_draw_dendrogram():
-    viewer.draw(pt_nrn, mode='dendrogram')
-    plt.close('all')
+def test_radius():
+    _check_radius0(NEURON)
+    _check_radius0(TREE)
+    _check_radius1(TREES)
+    _check_radius1(POPULATION)
 
 
-@nt.raises(viewer.InvalidDrawModeError)
-def test_invalid_draw_mode_raises():
-    viewer.draw(pt_nrn, mode='4d')
-
-
-@nt.raises(viewer.NotDrawableError)
-def test_invalid_object_raises():
-    viewer.draw(Dummy())
-
-
-@nt.raises(viewer.NotDrawableError)
-def test_invalid_combo_raises():
-    viewer.draw(pt_nrn.soma, mode='dendrogram')
+def test_count():
+    _check_count(TREE, 7)
+    _check_count(NEURON, 7)
+    _check_count(POPULATION, 21)
+    _check_count(TREES, 21)

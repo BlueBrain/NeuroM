@@ -26,51 +26,70 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology data loading and access
-
-Data is unpacked into a 2-dimensional raw data block:
-
-    [X, Y, Z, R, TYPE, ID, PARENT_ID]
-
-There is one such row per measured point.
-
-Functions to umpack the data and a higher level wrapper are provided. See
-
-* load_data
-'''
+from nose import tools as nt
 import os
+from neurom.point_neurite import io
+from neurom.point_neurite.io.utils import make_neuron
+from neurom.point_neurite.point_tree import PointTree
+from neurom.point_neurite import triplets as trip
+from neurom import iter_neurites
+
+import math
 
 
-def load_data(filename):
-    '''Unpack filename and return a RawDataWrapper object containing the data
+class MockNeuron(object):
+    pass
 
-    Determines format from extension. Currently supported:
 
-        * SWC (case-insensitive extension ".swc")
-        * H5 v1 and v2 (case-insensitive extension ".h5"). Attempts to
-          determine the version from the contents of the file
-        * Neurolucida ASCII (case-insensitive extension ".asc")
-    '''
+DATA_PATH = './test_data'
+SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 
-    def read_h5(filename):
-        '''Lazy loading of HDF5 reader'''
-        from .hdf5 import H5
-        return H5.read(filename)
+data    = io.load_data(SWC_PATH + 'Neuron.swc')
+neuron0 = make_neuron(data)
+tree0   = neuron0.neurites[0]
 
-    def read_swc(filename):
-        '''Lazy loading of SWC reader'''
-        from .swc import SWC
-        return SWC.read(filename)
 
-    def read_neurolucida(filename):
-        '''Lazy loading of Neurolucida ASCII reader'''
-        from .neurolucida import NeurolucidaASC
-        return NeurolucidaASC.read(filename)
+def _make_simple_tree():
+    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(PointTree([2.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(PointTree([2.0, 6.0, 0.0, 1.0, 1, 1, 1]))
 
-    _READERS = {
-        'swc': read_swc,
-        'h5': read_h5,
-        'asc': read_neurolucida,
-    }
-    extension = os.path.splitext(filename)[1][1:]
-    return _READERS[extension.lower()](filename)
+    T5 = T.add_child(PointTree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(PointTree([2.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(PointTree([6.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+
+    return T
+
+
+SIMPLE_TREE = _make_simple_tree()
+SIMPLE_NEURON = MockNeuron()
+SIMPLE_NEURON.neurites = [SIMPLE_TREE]
+
+
+def _check_meander_angles(obj):
+
+    angles = [a for a in iter_neurites(obj, trip.meander_angle)]
+
+    nt.eq_(angles,
+           [math.pi / 2, math.pi / 2, math.pi / 2, math.pi])
+
+
+def _check_count(obj, n):
+    nt.eq_(trip.count(obj), n)
+
+
+def test_meander_angles():
+    _check_meander_angles(SIMPLE_TREE)
+    _check_meander_angles(SIMPLE_NEURON)
+
+
+def test_count():
+    _check_count(SIMPLE_NEURON, 4)
+    _check_count(SIMPLE_TREE, 4)
+
+    neuron_b = MockNeuron()
+    neuron_b.neurites = [SIMPLE_TREE, SIMPLE_TREE, SIMPLE_TREE]
+
+    _check_count(neuron_b, 12)

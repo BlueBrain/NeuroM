@@ -31,13 +31,14 @@
 from copy import deepcopy
 import numpy as np
 from neurom.core.types import NeuriteType
-from neurom.core.tree import BaseTree, ipreorder
+from neurom.core.tree import Tree, ipreorder
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
-from neurom.core.neuron import make_soma
+from neurom.core.soma import make_soma
+from neurom.core.neuron import BaseNeuron
 
 
-class Section(BaseTree):
+class Section(Tree):
     '''Class representing a neurite section'''
     def __init__(self, points, section_id=None):
         super(Section, self).__init__()
@@ -84,14 +85,6 @@ class Neurite(object):
     def __deepcopy__(self, memo):
         '''Deep copy of neurite object'''
         return Neurite(deepcopy(self.root_node, memo))
-
-
-class BaseNeuron(object):
-    '''Class representing a simple neuron'''
-    def __init__(self, soma=None, neurites=None, sections=None):
-        self.soma = soma
-        self.neurites = neurites
-        self.sections = sections
 
 
 class Neuron(BaseNeuron):

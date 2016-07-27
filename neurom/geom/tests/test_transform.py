@@ -28,14 +28,13 @@
 
 import math
 import neurom.geom.transform as gtr
-from neurom.core.dataformat import COLS
-from neurom.core.tree import val_iter, ipreorder
 from neurom import fst
 from neurom.fst import _neuritefunc as _nf
 from nose import tools as nt
 from itertools import izip
 import numpy as np
 import os
+
 
 TEST_UVEC =  np.array([ 0.01856633,  0.37132666,  0.92831665])
 
@@ -68,12 +67,6 @@ def _Rz(angle):
     return np.array([[cs, -sn, 0.],
                      [sn, cs, 0.],
                      [0., 0., 1.]])
-
-
-def _evaluate(tr1, tr2, comp_func):
-
-    for v1, v2 in izip(val_iter(ipreorder(tr1)), val_iter(ipreorder(tr2))):
-        nt.assert_true(comp_func(v1[:COLS.R], v2[:COLS.R]))
 
 
 @nt.raises(NotImplementedError)

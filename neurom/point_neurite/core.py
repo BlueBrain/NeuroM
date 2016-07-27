@@ -26,57 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Basic functions and iterators for neuron neurite triplet morphometrics
-
-'''
-import functools
-from neurom.core import tree as tr
-from neurom import iter_neurites
-from neurom.analysis import morphmath as mm
-from neurom.utils import deprecated_module
+'''Neuron classes and functions'''
+from neurom.core.neuron import BaseNeuron
 
 
-deprecated_module(__name__)
+class Neuron(BaseNeuron):
+    '''Toy neuron class for testing ideas'''
+    def __init__(self, soma, neurites, name='Neuron'):
+        '''Construct a Neuron
 
-iter_type = tr.itriplet
-
-
-def triplet_function(as_tree=False):
-    '''Decorate a triples function such that it can be used in neurite iteration
-
-    Parameters:
-        as_tree: specifies whether the function argument is a\
-            triplet of trees or elements
-    '''
-    def _triplet_function(fun):
-        '''Decorate a function with an iteration type member'''
-        @functools.wraps(fun)
-        def _wrapper(triplet):
-            '''Simply pass arguments to wrapped function'''
-            if not as_tree:
-                triplet = (triplet[0].value, triplet[1].value, triplet[2].value)
-            return fun(triplet)
-
-        _wrapper.iter_type = tr.itriplet
-        return _wrapper
-
-    return _triplet_function
-
-
-@triplet_function(as_tree=True)
-def identity(triplet):
-    '''Hack to bind iteration type to do-nothing function'''
-    return triplet
-
-
-@triplet_function(as_tree=False)
-def meander_angle(triplet):
-    '''Return the angle between a triplet of consecutive points'''
-    return mm.angle_3points(triplet[1], triplet[0], triplet[2])
-
-
-def count(neuron):
-    """
-    Return number of triplets in neuron or population
-    """
-    return sum(1 for _ in iter_neurites(neuron, identity))
+        Arguments:
+            soma: soma object
+            neurites: iterable of neurite tree structures.
+            name: Optional name for this Neuron.
+        '''
+        super(Neuron, self).__init__(soma=soma, neurites=neurites)
+        self.name = name

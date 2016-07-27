@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.features.get and neurom.fst features compatibility'''
+'''Test neurom._point_neurite.features.get and neurom.fst features compatibility'''
 
 import os
 import numpy as np
@@ -34,10 +34,9 @@ from nose import tools as nt
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
 from neurom import fst
-from neurom.io.utils import load_neuron
-from neurom.core.dataformat import COLS
-from neurom.features import get
-from neurom.analysis import morphtree as mt
+from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.features import get
+from neurom.point_neurite import treefunc as mt
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

@@ -32,9 +32,7 @@
 import pylab as pl
 from neurom.io.utils import get_morph_files
 import argparse
-
-from neurom import fst
-from neurom.core.neuron import Neuron
+import neurom as nm
 
 
 def parse_args():
@@ -87,7 +85,7 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
             the axes in which the plot is taking place
     '''
 
-    feature_values = fst.get(feature, neuron)
+    feature_values = nm.get(feature, neuron)
     # generate histogram
     ax.hist(feature_values, bins=bins, cumulative=cumulative, normed=normed)
 
@@ -113,10 +111,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     for morph_file in get_morph_files(args.datapath):
-        # fst.Neuron is a namedtuple with no "name" field
-        # so we unpack into a core neuron.
-        nrn = Neuron(*fst.load_neuron(morph_file))
-        nrn.name = os.path.splitext(os.path.split(morph_file)[-1])[0]
+        nrn = nm.load_neuron(morph_file)
 
         for _feature in args.features:
             f = plot_feature(_feature, nrn)

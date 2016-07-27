@@ -33,7 +33,7 @@ import numpy as np
 from nose import tools as nt
 import os
 from neurom.fst import _core
-from neurom.fst import _io
+from neurom import io as _io
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_ROOT = os.path.join(_path, '../../../test_data')

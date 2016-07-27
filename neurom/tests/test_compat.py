@@ -29,7 +29,7 @@
 import os
 import numpy as np
 from nose import tools as nt
-from neurom.io.utils import load_neuron
+from neurom.point_neurite.io.utils import load_neuron
 from neurom.core.types import NeuriteType
 from neurom import fst
 from neurom import _compat

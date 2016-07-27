@@ -29,11 +29,10 @@
 '''Old-style new-style neurite compatibility hacks'''
 
 from itertools import imap, izip
-from neurom import segments as seg
+from neurom.point_neurite import segments as seg
+from neurom.point_neurite.point_tree import PointTree
 from neurom import iter_neurites
-from neurom.core.tree import Tree
-from neurom.analysis.morphtree import get_bounding_box
-from neurom.analysis.morphtree import find_tree_type
+from neurom.point_neurite.treefunc import find_tree_type, get_bounding_box
 from neurom import fst
 from neurom import geom
 
@@ -42,7 +41,7 @@ def is_new_style(obj):
     '''Determine whether a neuron or neurite is new or old style'''
     if isinstance(obj, (fst.Neuron, fst.Neurite, fst.Section)):
         return True
-    elif isinstance(obj, Tree):
+    elif isinstance(obj, PointTree):
         return len(obj.value.shape) == 2
     else:
         return False

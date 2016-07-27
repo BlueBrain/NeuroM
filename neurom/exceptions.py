@@ -34,21 +34,26 @@ class NeuroMError(StandardError):
     pass
 
 
+class RawDataError(NeuroMError):
+    '''Exception class for raw data errors'''
+    pass
+
+
 class SomaError(NeuroMError):
     '''Exception for soma construction errors'''
     pass
 
 
-class IDSequenceError(NeuroMError):
+class IDSequenceError(RawDataError):
     '''Exception for raw data with illegal point ID sequence'''
     pass
 
 
-class MultipleTrees(NeuroMError):
+class MultipleTrees(RawDataError):
     '''Exception for raw data with multiple trees'''
     pass
 
 
-class MissingParentError(NeuroMError):
+class MissingParentError(RawDataError):
     '''Exception for raw data with missing parent IDs'''
     pass

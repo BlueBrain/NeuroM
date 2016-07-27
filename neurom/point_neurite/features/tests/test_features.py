@@ -3,21 +3,21 @@ import math
 from functools import partial
 from nose import tools as nt
 import numpy as np
-from neurom.core.tree import Tree
-from neurom.core.neuron import make_soma
+from neurom.point_neurite.point_tree import PointTree
+from neurom.core.soma import make_soma
 from neurom.core.types import NeuriteType
-import neurom.sections as sec
-import neurom.segments as seg
-import neurom.bifurcations as bifs
+import neurom.point_neurite.sections as sec
+import neurom.point_neurite.segments as seg
+import neurom.point_neurite.bifurcations as bifs
+from neurom.point_neurite.features import get as get_feat
 from neurom import iter_neurites
-from neurom.io.utils import load_neuron as _load
-from neurom.analysis.morphtree import set_tree_type as _set_tt
-from neurom.features import get as get_feat
+from neurom.point_neurite.io.utils import load_neuron as _load
+from neurom.point_neurite.treefunc import set_tree_type as _set_tt
 
 load_neuron = partial(_load, tree_action=_set_tt)
 
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
+DATA_PATH = os.path.join(_path, '../../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 NEURON_PATH = os.path.join(SWC_PATH, 'Neuron.swc')
@@ -344,10 +344,10 @@ def test_principal_directions_extents():
                        [9., 0., 0.],
                        [10., 0., 0.]])
 
-    tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
-    tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
-    tree.children[0].add_child(Tree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
-    tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
+    tree = PointTree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
+    tree.add_child(PointTree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
+    tree.children[0].add_child(PointTree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
+    tree.children[0].add_child(PointTree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
 
     neurites = [tree, tree, tree]
     extents0 = get_feat('principal_direction_extents', neurites, direction='first')
@@ -371,14 +371,14 @@ def test_trunk_origin_elevations():
     n1 = MockNeuron()
 
     s = make_soma([[0, 0, 0, 4]])
-    t0 = Tree((1, 0, 0, 2))
+    t0 = PointTree((1, 0, 0, 2))
     t0.type = NeuriteType.basal_dendrite
-    t1 = Tree((0, 1, 0, 2))
+    t1 = PointTree((0, 1, 0, 2))
     t1.type = NeuriteType.basal_dendrite
     n0.neurites = [t0, t1]
     n0.soma = s
 
-    t2 = Tree((0, -1, 0, 2))
+    t2 = PointTree((0, -1, 0, 2))
     t2.type = NeuriteType.basal_dendrite
     n1.neurites = [t2]
     n1.soma = s
@@ -396,7 +396,7 @@ def test_trunk_origin_azimuths():
     n4 = MockNeuron()
     n5 = MockNeuron()
 
-    t = Tree((0, 0, 0, 2))
+    t = PointTree((0, 0, 0, 2))
     t.type = NeuriteType.basal_dendrite
     n0.neurites = [t]
     n1.neurites = [t]

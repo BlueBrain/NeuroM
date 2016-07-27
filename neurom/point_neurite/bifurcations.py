@@ -31,9 +31,10 @@
 '''
 import functools
 from neurom.core import tree as tr
+from . import point_tree as ptr
+from . import treefunc as mt
 from neurom import iter_neurites
 from neurom.analysis import morphmath as mm
-from neurom.analysis import morphtree as mt
 from neurom.utils import deprecated_module
 
 
@@ -76,7 +77,7 @@ def identity(bifurcation_point):
 @bifurcation_point_function(as_tree=True)
 def remote_angle(bifurcation_point):
     '''Calculate the remote bifurcation angle'''
-    end_points = tuple(p for p in tr.i_branch_end_points(bifurcation_point))
+    end_points = tuple(p for p in ptr.i_branch_end_points(bifurcation_point))
     return mm.angle_3points(bifurcation_point.value,
                             end_points[0].value,
                             end_points[1].value)

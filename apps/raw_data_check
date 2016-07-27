@@ -31,7 +31,7 @@
 '''Examples of basic data checks'''
 from neurom.check import structural_checks as st_chk
 from neurom.io.utils import get_morph_files
-from neurom.fst._io import load_data
+from neurom.io import load_data
 import argparse
 import os
 import sys

@@ -26,106 +26,116 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology HDF5 data loading
+'''Fast neuron IO module'''
 
-Data is unpacked into a 2-dimensional raw data block:
-
-    [X, Y, Z, R, TYPE, ID, PARENT_ID]
-
-
-HDF5.V1 Input row format:
-            points: [X, Y, Z, D] (ID is position)
-            groups: [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
-
-There is one such row per measured point.
-
-'''
-from itertools import ifilter
 from collections import defaultdict
-from ..core.dataformat import COLS
-from ..core.point import as_point
-from ..core.dataformat import POINT_TYPE
+from neurom.core.dataformat import POINT_TYPE
+from neurom.core.dataformat import COLS
 
 
-class RawDataWrapper(object):
-    '''Class holding an array of data and an offset to the first element
-    and giving basic access to its elements
+class SecDataWrapper(object):
+    '''Class holding a raw data block and section information'''
 
-    The array contains rows with
-        [X, Y, Z, R, TYPE, ID, PID]
-
-    where the elements are
-
-    * X, Y, Z: X, Y, Z coordinates of point
-    * R: Radius of node at that point
-    * TYPE: Type of neuronal segment.
-    * ID: Identifier for a point. Non-negative, increases by one for each row.
-    * PID: ID of parent point
-    '''
-    def __init__(self, raw_data, fmt, sections=None):
-        self.data_block = raw_data
+    def __init__(self, data_block, fmt, sections=None):
+        '''Section Data Wrapper'''
+        self.data_block = data_block
         self.fmt = fmt
-        self.sections = sections
-        self.adj_list = defaultdict(list)
+        self.sections = sections if sections is not None else _extract_sections(data_block)
 
-        # this loop takes all the time in the world
-        for row in self.data_block:
-            self.adj_list[int(row[COLS.P])].append(int(row[COLS.ID]))
-
-    def get_children(self, idx):
-        ''' get list of ids of children of parent with id idx
-
-        Returns empty list if no parent with id idx
-        '''
-        return self.adj_list[idx]
-
-    def get_parent(self, idx):
-        '''get the parent of element with id idx'''
-        return int(self.data_block[idx][COLS.P])
-
-    def get_point(self, idx):
-        '''Get point data for element idx'''
-        return as_point(self.data_block[idx])
-
-    def get_row(self, idx):
-        '''Get row from idx'''
-        return self.data_block[idx]
-
-    def get_col(self, col_id):
-        '''Get column from ID'''
-        return self.data_block[:, col_id]
-
-    def get_end_points(self):
-        ''' get the end points of the tree
-
-        End points have no children so are not in the
-        adjacency list.
-        '''
-        return [int(i) for i in
-                set(self.get_col(COLS.ID)) - set(self.adj_list.keys())]
-
-    def get_ids(self, pred=None):
-        '''Get the list of ids for rows satisfying an optional row predicate'''
-        return list(r[COLS.ID] for r in self.iter_row(None, pred))
+    def neurite_trunks(self):
+        '''Get the section IDs of the intitial neurite sections'''
+        sec = self.sections
+        return [i for i, ss in enumerate(sec)
+                if ss.pid > -1 and (sec[ss.pid].ntype == POINT_TYPE.SOMA and
+                                    ss.ntype != POINT_TYPE.SOMA)]
 
     def soma_points(self):
-        '''Get all the soma points'''
+        '''Get the soma points'''
         db = self.data_block
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
-    def get_fork_points(self):
-        '''Get list of point ids for points with more than one child'''
-        return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
 
-    def iter_row(self, start_id=None, pred=None):
-        '''Get an row iterator to a starting at start_id and satisfying a
-        row predicate pred.
-        '''
-        if start_id is None:
-            start_id = 0
+def _merge_sections(sec_a, sec_b):
+    '''Merge two sections
 
-        if start_id < 0 or start_id >= self.data_block.shape[0]:
-            raise LookupError('Invalid id: {0}'.format(start_id))
+    Merges sec_a into sec_b and sets sec_b attributes to default
+    '''
+    sec_b.ids = sec_a.ids + sec_b.ids[1:]
+    sec_b.ntype = sec_a.ntype
+    sec_b.pid = sec_a.pid
+    sec_a.ids = []
+    sec_a.pid = -1
 
-        irow = iter(self.data_block[start_id:])
-        return irow if pred is None else ifilter(pred, irow)
+
+def _section_end_points(data_block):
+    '''Get the section end-points '''
+    # number of children per point
+    n_children = defaultdict(int)
+    for row in data_block:
+        n_children[int(row[COLS.P])] += 1
+
+    # end points have either no children or more than one
+    return set(i for i, row in enumerate(data_block)
+               if n_children[row[COLS.ID]] != 1)
+
+
+def _extract_sections(data_block):
+    '''Make a list of sections from an SWC-style data wrapper block'''
+
+    class Section(object):
+        '''sections ((ids), type, parent_id)'''
+        def __init__(self, ids=None, ntype=0, pid=-1):
+            self.ids = [] if ids is None else ids
+            self.ntype = ntype
+            self.pid = pid
+
+    # get SWC ID to array position map
+    id_map = {-1: -1}
+    for i, r in enumerate(data_block):
+        id_map[int(r[COLS.ID])] = i
+
+    # end points have either no children or more than one
+    sec_end_pts = _section_end_points(data_block)
+
+    # arfificial discontinuity section IDs
+    _gap_sections = set()
+
+    _sections = [Section()]
+    curr_section = _sections[-1]
+    parent_section = {-1: -1}
+
+    for row in data_block:
+        row_id = id_map[int(row[COLS.ID])]
+        parent_id = id_map[int(row[COLS.P])]
+        if len(curr_section.ids) == 0:
+            # first in section point is parent.
+            curr_section.ids.append(parent_id)
+            curr_section.ntype = int(row[COLS.TYPE])
+        gap = parent_id != curr_section.ids[-1]
+        # If parent is not the previous point, create
+        # a section end-point. Else add the point
+        # to this section
+        if gap:
+            sec_end_pts.add(row_id)
+        else:
+            curr_section.ids.append(row_id)
+
+        if row_id in sec_end_pts:
+            parent_section[curr_section.ids[-1]] = len(_sections) - 1
+            _sections.append(Section())
+            curr_section = _sections[-1]
+            # Parent-child discontinuity sectin
+            if gap:
+                curr_section.ids.extend((parent_id, row_id))
+                curr_section.ntype = int(row[COLS.TYPE])
+                _gap_sections.add(len(_sections) - 2)
+
+    for sec in _sections:
+        # get the section parent ID from the id of the first point.
+        if sec.ids:
+            sec.pid = parent_section[sec.ids[0]]
+        # join gap sections and "disable" first half
+        if sec.pid in _gap_sections:
+            _merge_sections(_sections[sec.pid], sec)
+
+    return _sections

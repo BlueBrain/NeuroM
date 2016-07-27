@@ -27,9 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from neurom import io
 from neurom.check import structural_checks as chk
-from neurom.fst import _io as fst_io
+from neurom.point_neurite import io as pt_io
+from neurom import io
 from nose import tools as nt
 
 
@@ -42,7 +42,7 @@ H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 class TestIOCheck(object):
 
     def setup(self):
-        self.load_data = io.load_data
+        self.load_data = pt_io.load_data
 
     def test_has_sequential_ids_good_data(self):
 
@@ -196,7 +196,7 @@ class TestIOCheck(object):
 class TestIOCheckFST(TestIOCheck):
 
     def setup(self):
-        self.load_data = fst_io.load_data
+        self.load_data = io.load_data
 
     def test_has_no_missing_parents_bad_data(self):
         try:

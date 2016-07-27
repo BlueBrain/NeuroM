@@ -30,7 +30,7 @@
 
 '''
 import functools
-from neurom.core import tree as tr
+from . import point_tree as tr
 from neurom.core.dataformat import COLS
 from neurom import iter_neurites
 import neurom.analysis.morphmath as mm

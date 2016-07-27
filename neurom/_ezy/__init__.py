@@ -59,17 +59,16 @@ Examples:
     ...     print 'mean section length', np.mean(_ezy.get('section_lengths', nrn))
 
 '''
-import os
 from functools import partial, update_wrapper
-from ..core.neuron import Neuron
+from ..point_neurite.core import Neuron
 from ..core.population import Population
 from ..core.types import NeuriteType, NEURITES as NEURITE_TYPES
 from ..view.view import neuron as _view
 from ..view.view import neuron3d as _view3d
 from ..io.utils import get_morph_files
-from ..features import get
+from ..point_neurite.features import get
+from ..point_neurite.io.utils import load_neuron
 from ..io import utils as _io
-from ..analysis.morphtree import set_tree_type as _set_tt
 from ..utils import deprecated, deprecated_module
 
 
@@ -77,13 +76,8 @@ deprecated_module(__name__)
 
 TreeType = NeuriteType  # For backwards compatibility
 
-_load_neuron = partial(_io.load_neuron, tree_action=_set_tt)
-update_wrapper(_load_neuron, _io.load_neurons)
-load_neuron = deprecated(fun_name='%s.load_neuron' % __name__,
-                         msg='Use neurom.load_neuron instead.')(_load_neuron)
 
-
-_load_neurons = partial(_io.load_neurons, neuron_loader=_load_neuron,
+_load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron,
                         population_class=Population)
 update_wrapper(_load_neurons, _io.load_neurons)
 load_neurons = deprecated(fun_name='%s.load_neurons' % __name__,
