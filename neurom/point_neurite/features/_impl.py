@@ -30,20 +30,18 @@
 
 from functools import wraps
 from functools import partial
-from neurom.core import tree as _tr
+from .. import point_tree as _tr
 from neurom.core.types import NeuriteType
-from neurom.core.neuron import Neuron
-from neurom.analysis import morphtree as _mt
+from neurom.point_neurite.core import Neuron
+from neurom.point_neurite import treefunc as _mt
 from neurom.analysis import morphmath as _mm
 from neurom.core.types import tree_type_checker as _ttc
-from neurom import segments as _seg
-from neurom import sections as _sec
-from neurom.core.tree import isection
-from neurom import bifurcations as _bifs
-from neurom import points as _pts
+from neurom.point_neurite import segments as _seg
+from neurom.point_neurite import sections as _sec
+from neurom.point_neurite import bifurcations as _bifs
+from neurom.point_neurite import points as _pts
 from neurom import iter_neurites
 from neurom.analysis.morphmath import sphere_area
-from neurom.analysis.morphtree import trunk_origin_elevation, trunk_origin_azimuth
 
 
 def feature_getter(mapfun):
@@ -101,7 +99,7 @@ partition = feature_getter(_bifs.partition)
 
 def total_length_per_neurite(neurons, neurite_type=NeuriteType.all):
     '''Get an iterable with the total length of a neurite for a given neurite type'''
-    return (sum(_sec.length(ss) for ss in isection(n))
+    return (sum(_sec.length(ss) for ss in _tr.isection(n))
             for n in iter_neurites(neurons, filt=_ttc(neurite_type)))
 
 total_length = sum_feature(total_length_per_neurite)
@@ -262,7 +260,7 @@ def trunk_origin_azimuths(neurons, neurite_type=NeuriteType.all):
     for nrn in neurons:
         for neu in nrn.neurites:
             if _ttc(neurite_type)(neu):
-                yield trunk_origin_azimuth(neu, nrn.soma)
+                yield _mt.trunk_origin_azimuth(neu, nrn.soma)
 
 
 @as_neuron_list
@@ -272,4 +270,4 @@ def trunk_origin_elevations(neurons, neurite_type=NeuriteType.all):
     for nrn in neurons:
         for neu in nrn.neurites:
             if _ttc(neurite_type)(neu):
-                yield trunk_origin_elevation(neu, nrn.soma)
+                yield _mt.trunk_origin_elevation(neu, nrn.soma)

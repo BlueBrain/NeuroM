@@ -27,15 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from functools import partial
 import numpy as np
 import h5py
+from neurom.point_neurite.io.datawrapper import RawDataWrapper
 from neurom.io import hdf5, swc
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
 
+h5_read = partial(hdf5.read, data_wrapper=RawDataWrapper, remove_duplicates=True)
+swc_read = partial(swc.read, data_wrapper=RawDataWrapper)
+
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
+DATA_PATH = os.path.join(_path, '../../../../test_data')
 H5_PATH = os.path.join(DATA_PATH, 'h5')
 H5V1_PATH = os.path.join(H5_PATH, 'v1')
 H5V2_PATH = os.path.join(H5_PATH, 'v2')
@@ -61,16 +66,50 @@ def test_unpack_h5():
 
 
 def test_consistency_between_v1_v2():
-    v1_data = hdf5.read(os.path.join(H5V1_PATH, 'Neuron.h5'))
-    v2_data = hdf5.read(os.path.join(H5V2_PATH, 'Neuron.h5'))
-    nt.ok_(np.allclose(v1_data.data_block, v2_data.data_block))
+    v1_data = h5_read(os.path.join(H5V1_PATH, 'Neuron.h5'))
+    v2_data = h5_read(os.path.join(H5V2_PATH, 'Neuron.h5'))
+    nt.ok_(np.allclose(v1_data.data_block, v1_data.data_block))
+    nt.ok_(v1_data.adj_list == v2_data.adj_list)
 
 
 def test_consistency_between_h5_swc():
-    h5_data = hdf5.read(os.path.join(H5V1_PATH, 'Neuron.h5'), remove_duplicates=True)
-    swc_data = swc.read(os.path.join(SWC_PATH, 'Neuron.swc'))
+    h5_data = h5_read(os.path.join(H5V1_PATH, 'Neuron.h5'))
+    swc_data = swc_read(os.path.join(SWC_PATH, 'Neuron.swc'))
     nt.ok_(np.allclose(h5_data.data_block.shape, swc_data.data_block.shape))
+    nt.ok_(len(h5_data.get_fork_points()) == len(swc_data.get_fork_points()))
+    nt.ok_(len(h5_data.get_end_points()) == len(swc_data.get_end_points()))
 
+
+def test_removed_duplicates():
+    v1_data = h5_read(os.path.join(H5V1_PATH, 'Neuron.h5'))
+    v2_data = h5_read(os.path.join(H5V2_PATH, 'Neuron.h5'))
+
+    for i in v1_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(not np.allclose(v1_data.get_row(i)[0:4],
+                                   v1_data.get_row(ch)[0:4]))
+    for i in v2_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(not np.allclose(v1_data.get_row(i)[0:4],
+                                   v1_data.get_row(ch)[0:4]))
+
+
+def test_dont_remove_duplicates():
+
+    v1_data = h5_read(
+        os.path.join(H5V1_PATH, 'Neuron.h5'), remove_duplicates=False)
+    v2_data = h5_read(
+        os.path.join(H5V2_PATH, 'Neuron.h5'), remove_duplicates=False)
+
+    for i in v1_data.get_fork_points()[1:]:
+        for ch in v1_data.get_children(i):
+            nt.ok_(np.allclose(v1_data.get_row(i)[0:4],
+                               v1_data.get_row(ch)[0:4]))
+
+    for i in v2_data.get_fork_points()[1:]:
+        for ch in v2_data.get_children(i):
+            nt.ok_(np.allclose(v2_data.get_row(i)[0:4],
+                               v2_data.get_row(ch)[0:4]))
 
 class DataWrapper_Neuron(object):
     '''Base class for H5 tests'''
@@ -98,16 +137,45 @@ class DataWrapper_Neuron(object):
                     704, 724, 744, 764, 784, 804, 824]
 
     def test_n_rows(self):
-        nt.assert_equal(self.rows, 927)
+        nt.assert_equal(self.rows, 847)
 
     def test_first_id_0(self):
         nt.ok_(self.first_id == 0)
+
+    def test_fork_points(self):
+        nt.assert_equal(len(self.data.get_fork_points()), 41)
+        nt.assert_equal(self.data.get_fork_points(),
+                        DataWrapper_Neuron.fork_pts)
+
+    def test_get_endpoints(self):
+        nt.assert_equal(self.data.get_end_points(),
+                        DataWrapper_Neuron.end_pts)
+
+    def test_end_points_have_no_children(self):
+        for p in DataWrapper_Neuron.end_pts:
+            nt.ok_(len(self.data.get_children(p)) == 0)
+
+    def test_fork_point_parents(self):
+        fpar = [self.data.get_parent(i) for i in self.data.get_fork_points()]
+        nt.assert_equal(fpar, DataWrapper_Neuron.fork_parents)
+
+    def test_end_point_parents(self):
+        epar = [self.data.get_parent(i) for i in self.data.get_end_points()]
+        nt.assert_equal(epar, DataWrapper_Neuron.end_parents)
+
+    @nt.raises(LookupError)
+    def test_iter_row_low_id_raises(self):
+        self.data.iter_row(-1)
+
+    @nt.raises(LookupError)
+    def test_iter_row_high_id_raises(self):
+        self.data.iter_row(self.rows + self.first_id)
 
 
 class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
     '''Test HDF5 v1 reading'''
     def setup(self):
-        self.data = hdf5.read(os.path.join(H5V1_PATH, 'Neuron.h5'))
+        self.data = h5_read(os.path.join(H5V1_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
 
@@ -115,7 +183,7 @@ class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 class TestRawDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
     '''Test HDF5 v2 reading'''
     def setup(self):
-        self.data = hdf5.read(os.path.join(H5V2_PATH, 'Neuron.h5'))
+        self.data = h5_read(os.path.join(H5V2_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
 
@@ -149,6 +217,32 @@ class DataWrapper_Neuron_with_duplicates(object):
     def test_first_id_0(self):
         nt.ok_(self.first_id == 0)
 
+    def test_fork_points(self):
+        nt.assert_equal(len(self.data.get_fork_points()), 41)
+        nt.assert_equal(self.data.get_fork_points(),
+                        DataWrapper_Neuron_with_duplicates.fork_pts)
+
+    def test_get_endpoints(self):
+        print 'test_here', self.data.get_end_points()
+        nt.assert_equal(self.data.get_end_points(),
+                        DataWrapper_Neuron_with_duplicates.end_pts)
+
+    def test_end_points_have_no_children(self):
+        for p in DataWrapper_Neuron_with_duplicates.end_pts:
+            nt.ok_(len(self.data.get_children(p)) == 0)
+
+    def test_fork_point_parents(self):
+        fpar = [self.data.get_parent(i) for i in self.data.get_fork_points()]
+        nt.assert_equal(fpar, DataWrapper_Neuron_with_duplicates.fork_parents)
+
     def test_end_point_parents(self):
         epar = [self.data.get_parent(i) for i in self.data.get_end_points()]
         nt.assert_equal(epar, DataWrapper_Neuron_with_duplicates.end_parents)
+
+    @nt.raises(LookupError)
+    def test_iter_row_low_id_raises(self):
+        self.data.iter_row(-1)
+
+    @nt.raises(LookupError)
+    def test_iter_row_high_id_raises(self):
+        self.data.iter_row(self.rows + self.first_id)

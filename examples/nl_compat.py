@@ -28,15 +28,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Compatibility between NL and H5 files'''
-from functools import partial
 import numpy as np
-from neurom.io.utils import load_neuron as _load
-from neurom.analysis.morphtree import set_tree_type as _set_tt
-from neurom.features import get
+from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.features import get
 from neurom import log  # pylint: disable=unused-import
 
-
-load_neuron = partial(_load, tree_action=_set_tt)
 
 nrn_h5 = load_neuron('test_data/h5/v1/bio_neuron-001.h5')
 nrn_asc = load_neuron('test_data/neurolucida/bio_neuron-001.asc')

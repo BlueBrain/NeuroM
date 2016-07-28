@@ -31,10 +31,10 @@
 '''
 from itertools import izip
 from functools import wraps
-from neurom.core import tree as tr
 from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
-import neurom.analysis.morphtree as mt
+from . import point_tree as tr
+from . import treefunc as mt
 from neurom.utils import deprecated_module
 
 

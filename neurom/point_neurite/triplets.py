@@ -26,32 +26,57 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Build sections from a tree
-
-Sections are defined as points between forking points,
-between the root node and forking points, or between
-forking points and end-points
+'''Basic functions and iterators for neuron neurite triplet morphometrics
 
 '''
-
-from neurom.core import tree
-
-REF_TREE = tree.Tree(0)
-REF_TREE.add_child(tree.Tree(11))
-REF_TREE.add_child(tree.Tree(12))
-REF_TREE.children[0].add_child(tree.Tree(111))
-REF_TREE.children[0].add_child(tree.Tree(112))
-REF_TREE.children[1].add_child(tree.Tree(121))
-REF_TREE.children[1].add_child(tree.Tree(122))
-REF_TREE.children[1].children[0].add_child(tree.Tree(1211))
-REF_TREE.children[1].children[0].children[0].add_child(tree.Tree(12111))
-REF_TREE.children[1].children[0].children[0].add_child(tree.Tree(12112))
-REF_TREE.children[0].children[0].add_child(tree.Tree(1111))
-REF_TREE.children[0].children[0].children[0].add_child(tree.Tree(11111))
-REF_TREE.children[0].children[0].children[0].add_child(tree.Tree(11112))
+import functools
+from . import point_tree as tr
+from neurom import iter_neurites
+from neurom.analysis import morphmath as mm
+from neurom.utils import deprecated_module
 
 
-if __name__ == '__main__':
+deprecated_module(__name__)
 
-    for s in tree.isection(REF_TREE):
-        print [tt.value for tt in s]
+iter_type = tr.itriplet
+
+
+def triplet_function(as_tree=False):
+    '''Decorate a triples function such that it can be used in neurite iteration
+
+    Parameters:
+        as_tree: specifies whether the function argument is a\
+            triplet of trees or elements
+    '''
+    def _triplet_function(fun):
+        '''Decorate a function with an iteration type member'''
+        @functools.wraps(fun)
+        def _wrapper(triplet):
+            '''Simply pass arguments to wrapped function'''
+            if not as_tree:
+                triplet = (triplet[0].value, triplet[1].value, triplet[2].value)
+            return fun(triplet)
+
+        _wrapper.iter_type = tr.itriplet
+        return _wrapper
+
+    return _triplet_function
+
+
+@triplet_function(as_tree=True)
+def identity(triplet):
+    '''Hack to bind iteration type to do-nothing function'''
+    return triplet
+
+
+@triplet_function(as_tree=False)
+def meander_angle(triplet):
+    '''Return the angle between a triplet of consecutive points'''
+    return mm.angle_3points(triplet[1], triplet[0], triplet[2])
+
+
+def count(neuron):
+    """
+    Return number of triplets in neuron or population
+    """
+    return sum(1 for _ in iter_neurites(neuron, identity))

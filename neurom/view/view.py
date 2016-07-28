@@ -549,7 +549,7 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     if _compat.is_new_style(obj):
         from neurom.fst._dendrogram import Dendrogram
     else:
-        from neurom.analysis.dendrogram import Dendrogram
+        from neurom.point_neurite.dendrogram import Dendrogram
 
     # create dendrogram and generate rectangle collection
     dnd = Dendrogram(obj, show_diameters=show_diameters)

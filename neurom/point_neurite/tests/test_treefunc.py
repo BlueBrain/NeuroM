@@ -27,15 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from nose import tools as nt
-import os
 from copy import deepcopy
-from neurom.core.tree import Tree
+import os
+from neurom.point_neurite import io
+from neurom.point_neurite.point_tree import PointTree
+from neurom.point_neurite.io.utils import make_neuron
 import neurom.core.tree as tr
-import neurom.analysis.morphtree as mtr
+import neurom.point_neurite.point_tree as ptr
+import neurom.point_neurite.treefunc as mtr
 from neurom.core.types import NeuriteType
-from neurom.io.utils import make_neuron
-from neurom.core.neuron import make_soma
-from neurom import io
+from neurom.core.soma import make_soma
 import numpy as np
 
 DATA_PATH = './test_data'
@@ -51,75 +52,75 @@ tree_types = [NeuriteType.axon,
 
 
 # Mock tree holding integers, not points
-MOCK_TREE = Tree(0)
-MOCK_TREE.add_child(Tree(11))
-MOCK_TREE.add_child(Tree(12))
-MOCK_TREE.children[0].add_child(Tree(111))
-MOCK_TREE.children[0].add_child(Tree(112))
-MOCK_TREE.children[1].add_child(Tree(121))
-MOCK_TREE.children[1].add_child(Tree(122))
-MOCK_TREE.children[1].children[0].add_child(Tree(1211))
-MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12111))
-MOCK_TREE.children[1].children[0].children[0].add_child(Tree(12112))
-T1111 = MOCK_TREE.children[0].children[0].add_child(Tree(1111))
-T11111 = T1111.add_child(Tree(11111))
-T11112 = T1111.add_child(Tree(11112))
-T11113 = T1111.add_child(Tree(11113))
+MOCK_TREE = PointTree(0)
+MOCK_TREE.add_child(PointTree(11))
+MOCK_TREE.add_child(PointTree(12))
+MOCK_TREE.children[0].add_child(PointTree(111))
+MOCK_TREE.children[0].add_child(PointTree(112))
+MOCK_TREE.children[1].add_child(PointTree(121))
+MOCK_TREE.children[1].add_child(PointTree(122))
+MOCK_TREE.children[1].children[0].add_child(PointTree(1211))
+MOCK_TREE.children[1].children[0].children[0].add_child(PointTree(12111))
+MOCK_TREE.children[1].children[0].children[0].add_child(PointTree(12112))
+T1111 = MOCK_TREE.children[0].children[0].add_child(PointTree(1111))
+T11111 = T1111.add_child(PointTree(11111))
+T11112 = T1111.add_child(PointTree(11112))
+T11113 = T1111.add_child(PointTree(11113))
 
-REF_TREE3 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
-REF_TREE3.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
-REF_TREE3.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
-REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
-REF_TREE3.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
-REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
-REF_TREE3.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
-REF_TREE3.children[1].children[0].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
+REF_TREE3 = PointTree(np.array([0.,0.,0.,1.,0.,0.,0.]))
+REF_TREE3.add_child(PointTree(np.array([1.,1.,1.,1.,0.,0.,0.])))
+REF_TREE3.add_child(PointTree(np.array([1.,1.,2.,1.,0.,0.,0.])))
+REF_TREE3.children[0].add_child(PointTree(np.array([2.,2.,2.,1.,0.,0.,0.])))
+REF_TREE3.children[0].add_child(PointTree(np.array([2.,2.,3.,1.,0.,0.,0.])))
+REF_TREE3.children[1].add_child(PointTree(np.array([3.,3.,3.,1.,0.,0.,0.])))
+REF_TREE3.children[1].add_child(PointTree(np.array([3.,3.,4.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].add_child(PointTree(np.array([4.,4.,4.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].children[0].add_child(PointTree(np.array([5.,5.,5.,1.,0.,0.,0.])))
+REF_TREE3.children[1].children[0].children[0].add_child(PointTree(np.array([5.,5.,6.,1.,0.,0.,0.])))
 
-REF_TREE4 = Tree(np.array([0.,0.,0.,1.,0.,0.,0.]))
-REF_TREE4.add_child(Tree(np.array([1.,1.,1.,1.,0.,0.,0.])))
-REF_TREE4.add_child(Tree(np.array([1.,1.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,2.,1.,0.,0.,0.])))
-REF_TREE4.children[0].add_child(Tree(np.array([2.,2.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,4.,1.,0.,0.,0.]))) # swapped child addition
-REF_TREE4.children[1].add_child(Tree(np.array([3.,3.,3.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].add_child(Tree(np.array([4.,4.,4.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,5.,1.,0.,0.,0.])))
-REF_TREE4.children[1].children[1].children[0].add_child(Tree(np.array([5.,5.,6.,1.,0.,0.,0.])))
+REF_TREE4 = PointTree(np.array([0.,0.,0.,1.,0.,0.,0.]))
+REF_TREE4.add_child(PointTree(np.array([1.,1.,1.,1.,0.,0.,0.])))
+REF_TREE4.add_child(PointTree(np.array([1.,1.,2.,1.,0.,0.,0.])))
+REF_TREE4.children[0].add_child(PointTree(np.array([2.,2.,2.,1.,0.,0.,0.])))
+REF_TREE4.children[0].add_child(PointTree(np.array([2.,2.,3.,1.,0.,0.,0.])))
+REF_TREE4.children[1].add_child(PointTree(np.array([3.,3.,4.,1.,0.,0.,0.]))) # swapped child addition
+REF_TREE4.children[1].add_child(PointTree(np.array([3.,3.,3.,1.,0.,0.,0.])))
+REF_TREE4.children[1].children[1].add_child(PointTree(np.array([4.,4.,4.,1.,0.,0.,0.])))
+REF_TREE4.children[1].children[1].children[0].add_child(PointTree(np.array([5.,5.,5.,1.,0.,0.,0.])))
+REF_TREE4.children[1].children[1].children[0].add_child(PointTree(np.array([5.,5.,6.,1.,0.,0.,0.])))
 
 REF_TREE5 = deepcopy(REF_TREE3)
-REF_TREE5.add_child(Tree('222222'))
+REF_TREE5.add_child(PointTree('222222'))
 
 
 def _form_neuron_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
     return T
 
 
 def _form_simple_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T2 = T1.add_child(Tree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
-    T3 = T2.add_child(Tree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
-    T4 = T3.add_child(Tree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(PointTree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(PointTree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
+    T4 = T3.add_child(PointTree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
 
-    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T6 = T5.add_child(Tree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
-    T7 = T6.add_child(Tree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
-    T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
+    T5 = T.add_child(PointTree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(PointTree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(PointTree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
+    T8 = T7.add_child(PointTree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
 
     return T
 
@@ -130,20 +131,20 @@ SIMPLE_TREE = _form_simple_tree()
 
 def _form_branching_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
-    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
-    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(PointTree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(PointTree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(PointTree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
 BRANCHING_TREE = _form_branching_tree()
@@ -232,38 +233,38 @@ def test_n_terminations():
 
 
 def test_trunk_origin_radius():
-    t = Tree((0, 0, 0, 42))
-    t.add_child(Tree((1, 0, 0, 4)))
+    t = PointTree((0, 0, 0, 42))
+    t.add_child(PointTree((1, 0, 0, 4)))
     nt.assert_equal(mtr.trunk_origin_radius(t), 42.0)
 
 
 def test_trunk_section_length():
-    t = Tree((0, 0, 0, 42))
-    tt = t.add_child(Tree((10, 0, 0, 4)))
-    tt.add_child(Tree((10, 15, 0, 4)))
+    t = PointTree((0, 0, 0, 42))
+    tt = t.add_child(PointTree((10, 0, 0, 4)))
+    tt.add_child(PointTree((10, 15, 0, 4)))
     nt.assert_almost_equal(mtr.trunk_section_length(t), 25.0)
 
 
 def test_trunk_radius_length_point_tree():
-    t = Tree((0, 0, 0, 42))
+    t = PointTree((0, 0, 0, 42))
     nt.assert_equal(mtr.trunk_section_length(t), 0.0)
 
 
 def test_trunk_origin_direction():
-    t = Tree((1, 0, 0, 2))
+    t = PointTree((1, 0, 0, 2))
     s = make_soma([[0, 0, 0, 4]])
     nt.ok_(np.allclose(mtr.trunk_origin_direction(t, s), np.array([1, 0, 0])))
 
 
 def test_trunk_origin_elevation():
-    t = Tree((1, 0, 0, 2))
+    t = PointTree((1, 0, 0, 2))
     s = make_soma([[0, 0, 0, 4]])
     nt.assert_equal(mtr.trunk_origin_elevation(t, s), 0.0)
-    t = Tree((0, 1, 0, 2))
+    t = PointTree((0, 1, 0, 2))
     nt.assert_equal(mtr.trunk_origin_elevation(t, s),  np.pi/2)
-    t = Tree((0, -1, 0, 2))
+    t = PointTree((0, -1, 0, 2))
     nt.assert_equal(mtr.trunk_origin_elevation(t, s),  -np.pi/2)
-    t = Tree((0, 0, 0, 2))
+    t = PointTree((0, 0, 0, 2))
     try:
         mtr.trunk_origin_elevation(t, s)
         nt.ok_(False)
@@ -272,7 +273,7 @@ def test_trunk_origin_elevation():
 
 
 def test_trunk_origin_azimuth():
-    t = Tree((0, 0, 0, 2))
+    t = PointTree((0, 0, 0, 2))
     s = make_soma([[0, 0, 1, 4]])
     nt.assert_equal(mtr.trunk_origin_azimuth(t, s), -np.pi/2)
     s = make_soma([[0, 0, -1, 4]])
@@ -312,9 +313,9 @@ def test_branch_order():
         (1211, 12112): 3,
         (12, 122): 2
     }
-    for sec in tr.isection(MOCK_TREE):
+    for sec in ptr.isection(MOCK_TREE):
         nt.assert_equal(mtr.branch_order(sec),
-                        branch_order_map[tuple(p for p in tr.val_iter(sec))])
+                        branch_order_map[tuple(p for p in ptr.val_iter(sec))])
 
 
 def test_principal_direction_extent():
@@ -324,10 +325,10 @@ def test_principal_direction_extent():
                         [9., 0., 0.],
                         [10., 0., 0.]])
 
-    tree = Tree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
-    tree.add_child(Tree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
-    tree.children[0].add_child(Tree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
-    tree.children[0].add_child(Tree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
+    tree = PointTree(np.array([points[0][0], points[0][1], points[0][2], 1., 0., 0.]))
+    tree.add_child(PointTree(np.array([points[1][0], points[1][1], points[1][2], 1., 0., 0.])))
+    tree.children[0].add_child(PointTree(np.array([points[2][0], points[2][1], points[2][2], 1., 0., 0.])))
+    tree.children[0].add_child(PointTree(np.array([points[3][0], points[3][1], points[3][2], 1., 0., 0.])))
 
     extent = mtr.principal_direction_extent(tree)
 

@@ -31,10 +31,10 @@
 import numpy as np
 from neurom.core import iter_neurites
 
-from neurom import triplets as tri
-from neurom import segments as seg
-from neurom import bifurcations as bif
-from neurom import sections as sec
+from neurom.point_neurite import triplets as tri
+from neurom.point_neurite import segments as seg
+from neurom.point_neurite import bifurcations as bif
+from neurom.point_neurite import sections as sec
 
 feature_map = {'Meander_angle': tri.meander_angle,
                'Segment_length': seg.length,

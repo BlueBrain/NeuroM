@@ -28,22 +28,21 @@
 
 '''Test neurom.io.utils'''
 import os
-from itertools import izip
-import numpy as np
-from neurom import io
+from neurom.fst import Neuron
+from neurom.fst import _neuritefunc as _nf
+from neurom import get
 from neurom.io import utils
-from neurom import points as pts
-from neurom import iter_neurites
-from neurom.core.dataformat import COLS
-from neurom.core import tree
-from neurom.exceptions import (SomaError, IDSequenceError,
-                               MultipleTrees, MissingParentError)
+from neurom.exceptions import RawDataError, SomaError
+from neurom.core.tree import ipreorder
 from nose import tools as nt
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
+VALID_DATA_PATH = os.path.join(_path, DATA_PATH, 'valid_set')
+
+NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
 
 FILES = [os.path.join(SWC_PATH, f)
          for f in ['Neuron.swc',
@@ -55,6 +54,9 @@ FILES = [os.path.join(SWC_PATH, f)
                    'sequential_trunk_off_1_16pt.swc',
                    'sequential_trunk_off_42_16pt.swc',
                    'Neuron_no_missing_ids_no_zero_segs.swc']]
+
+FILENAMES = [os.path.join(VALID_DATA_PATH, f)
+             for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
@@ -93,146 +95,28 @@ _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
-RAW_DATA = [io.load_data(f) for f in FILES]
-NO_SOMA_RAW_DATA = io.load_data(NO_SOMA_FILE)
+RAW_DATA = [utils.load_data(f) for f in FILES]
+NO_SOMA_RAW_DATA = utils.load_data(NO_SOMA_FILE)
 
 
-class MockNeuron(object):
-    def __init__(self, trees):
-        self.neurites = trees
+def _get_name(filename):
+    return os.path.splitext(os.path.basename(filename))[0]
 
 
-def test_get_soma_ids():
-    for i, d in enumerate(RAW_DATA):
-        nt.ok_(utils.get_soma_ids(d) == SOMA_IDS[i])
+def _mock_load_neuron(filename):
+    class MockNeuron(object):
+        def __init__(self, name):
+            self.soma = 42
+            self.neurites = list()
+            self.name = name
+
+    return MockNeuron(_get_name(filename))
 
 
-def test_get_initial_neurite_segment_ids():
-    for i, d in enumerate(RAW_DATA):
-        nt.ok_(utils.get_initial_neurite_segment_ids(d) == INIT_IDS[i])
-
-
-def _check_trees(trees):
-    for t in trees:
-        nt.ok_(len(list(tree.ileaf(t))) == 11)
-        nt.ok_(len(list(tree.iforking_point(t))) == 10)
-        nt.ok_(len(list(tree.ipreorder(t))) == 211)
-        nt.ok_(len(list(tree.ipostorder(t))) == 211)
-        nt.ok_(len(list(tree.isegment(t))) == 210)
-        leaves = [l for l in tree.ileaf(t)]
-        # path length from each leaf to root node.
-        branch_order = [21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 111]
-        for i, l in enumerate(leaves):
-            nt.ok_(len(list(tree.iupstream(l))) == branch_order[i])
-
-
-def test_make_tree():
-    rd = RAW_DATA[0]
-    seg_ids = utils.get_initial_neurite_segment_ids(rd)
-    trees = [utils.make_tree(rd, seg_id) for seg_id in seg_ids]
-    nt.ok_(len(trees) == len(INIT_IDS[0]))
-    _check_trees(trees)
-
-
-def test_make_tree_postaction():
-    def post_action(t):
-        t.foo = 'bar'
-
-    rd = RAW_DATA[0]
-    seg_ids = utils.get_initial_neurite_segment_ids(rd)
-    trees = [utils.make_tree(rd, root_id=seg_id, post_action=post_action)
-             for seg_id in seg_ids]
-    for t in trees:
-        nt.ok_(hasattr(t, 'foo') and t.foo == 'bar')
-
-
-def test_make_neuron():
-    rd = RAW_DATA[0]
-    nrn = utils.make_neuron(rd)
-    nt.ok_(np.all([s[COLS.ID] for s in nrn.soma.iter()] == SOMA_IDS[0]))
-    _check_trees(nrn.neurites)
-
-
-@nt.raises(SomaError)
-def test_make_neuron_no_soma_raises_SomaError():
-    utils.make_neuron(NO_SOMA_RAW_DATA)
-
-
-def test_make_neuron_post_tree_action():
-    def post_action(t):
-        t.bar = 'foo'
-
-    rd = RAW_DATA[0]
-    nrn = utils.make_neuron(rd, post_action)
-    for t in nrn.neurites:
-        nt.ok_(hasattr(t, 'bar') and t.bar == 'foo')
-
-
-def test_load_neuron():
-    nrn = utils.load_neuron(FILES[0])
-    nt.ok_(nrn.name == FILES[0].strip('.swc').split('/')[-1])
-
-
-def test_load_neuron_deep_neuron():
-    '''make sure that neurons with deep (ie: larger than the python
-       recursion limit can be loaded)
-    '''
-    deep_neuron = os.path.join(DATA_PATH, 'h5/v1/deep_neuron.h5')
-    utils.load_neuron(deep_neuron)
-
-
-def test_load_trees_good_neuron():
-    '''Check trees in good neuron are the same as trees from loaded neuron'''
-    filepath = os.path.join(SWC_PATH, 'Neuron.swc')
-    nrn = utils.load_neuron(filepath)
-    trees = utils.load_trees(filepath)
-    nt.eq_(len(nrn.neurites), 4)
-    nt.eq_(len(nrn.neurites), len(trees))
-
-    nrn2 = MockNeuron(trees)
-
-    @pts.point_function(as_tree=False)
-    def elem(point):
-        return point
-
-    # Check data are the same in tree collection and neuron's neurites
-    for a, b in izip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
-        nt.ok_(np.all(a == b))
-
-
-def test_load_trees_no_soma():
-
-    trees = utils.load_trees(NO_SOMA_FILE)
-    nt.eq_(len(trees), 1)
-
-
-def test_load_trees_postaction():
-
-    def post_action(t):
-        t.foo = 'bar'
-
-    filepath = os.path.join(SWC_PATH, 'Neuron.swc')
-    trees = utils.load_trees(filepath, tree_action=post_action)
-    nt.eq_(len(trees), 4)  # sanity check
-
-    for t in trees:
-        nt.ok_(hasattr(t, 'foo') and t.foo == 'bar')
-
-
-def test_load_neuron_disconnected_components():
-
-    filepath = DISCONNECTED_POINTS_FILE
-    trees = utils.load_trees(filepath)
-    nt.eq_(len(trees), 8)
-
-    # tree ID - number of points map
-    ref_ids_pts = {4: 1, 215: 1, 426: 1, 637: 1, 6: 209, 217: 209, 428: 209, 639: 209}
-
-    ids_pts =  {}
-    for t in trees:
-        ids_pts[t.value[COLS.ID]] = pts.count(t)
-
-    nt.eq_(ref_ids_pts, ids_pts)
+def test_load_neurons():
+    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
+    for i, nrn in enumerate(nrns):
+        nt.assert_equal(nrn.name, _get_name(FILES[i]))
 
 
 def test_get_morph_files():
@@ -245,14 +129,55 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
-@nt.raises(MultipleTrees)
-def test_load_neuron_disconnected_points_raises():
-    utils.load_neuron(DISCONNECTED_POINTS_FILE)
+
+def test_load_neuron():
+
+    nrn = utils.load_neuron(FILENAMES[0])
+    nt.assert_true(isinstance(NRN, Neuron))
+    nt.assert_equal(NRN.name, 'Neuron')
 
 
-@nt.raises(MissingParentError)
-def test_load_neuron_missing_parents_raises():
-    utils.load_neuron(MISSING_PARENTS_FILE)
+def test_neuron_name():
+
+    for fn, nn in zip(FILENAMES, NRN_NAMES):
+        nrn = utils.load_neuron(fn)
+        nt.eq_(nrn.name, nn)
+
+
+NRN = utils.load_neuron(FILENAMES[0])
+
+
+def test_neuron_section_ids():
+
+    # check section IDs
+    for i, sec in enumerate(NRN.sections):
+        nt.eq_(i, sec.id)
+
+def test_neuron_sections():
+    all_nodes = set(NRN.sections)
+    neurite_nodes = set(_nf.iter_sections(NRN.neurites))
+
+    # check no duplicates
+    nt.assert_true(len(all_nodes) == len(NRN.sections))
+
+    # check all neurite tree nodes are
+    # in sections attribute
+    nt.assert_true(len(set(NRN.sections) - neurite_nodes) > 0)
+
+
+def test_neuron_sections_are_connected():
+    # check traversal by counting number of sections un trees
+    for nrt in NRN.neurites:
+        root_node = nrt.root_node
+        nt.assert_equal(sum(1 for _ in ipreorder(root_node)),
+                        sum(1 for _ in ipreorder(NRN.sections[root_node.id])))
+
+
+def test_load_neuron_soma_only():
+
+    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'Soma_origin.swc'))
+    nt.eq_(len(nrn.neurites), 0)
+    nt.assert_equal(nrn.name, 'Soma_origin')
 
 
 @nt.raises(SomaError)
@@ -260,15 +185,92 @@ def test_load_neuron_no_soma_raises_SomaError():
     utils.load_neuron(NO_SOMA_FILE)
 
 
-@nt.raises(IDSequenceError)
+# TODO: decide if we want to check for this in fst.
+@nt.nottest
+@nt.raises(RawDataError)
+def test_load_neuron_disconnected_points_raises():
+    utils.load_neuron(DISCONNECTED_POINTS_FILE)
+
+
+@nt.raises(RawDataError)
+def test_load_neuron_missing_parents_raises():
+    utils.load_neuron(MISSING_PARENTS_FILE)
+
+
+# TODO: decide if we want to check for this in fst.
+@nt.nottest
+@nt.raises(RawDataError)
 def test_load_neuron_invalid_id_sequence_raises():
     utils.load_neuron(INVALID_ID_SEQUENCE_FILE);
 
 
-@nt.raises(IDSequenceError)
-def test_load_trees_invalid_id_sequence_raises():
-    utils.load_trees(INVALID_ID_SEQUENCE_FILE);
+def test_load_neurons_directory():
+
+    pop = utils.load_neurons(VALID_DATA_PATH)
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(pop.name, 'valid_set')
+    for nrn in pop:
+        nt.assert_true(isinstance(nrn, Neuron))
 
 
-def test_load_neuron_no_consecutive_ids_loads():
-    utils.load_neuron(NON_CONSECUTIVE_ID_FILE);
+def test_load_neurons_directory_name():
+    pop = utils.load_neurons(VALID_DATA_PATH, name='test123')
+    nt.assert_equal(len(pop.neurons), 5)
+    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(pop.name, 'test123')
+    for nrn in pop:
+        nt.assert_true(isinstance(nrn, Neuron))
+
+
+def test_load_neurons_filenames():
+
+    pop = utils.load_neurons(FILENAMES, name='test123')
+    nt.assert_equal(len(pop.neurons), 3)
+    nt.assert_equal(pop.name, 'test123')
+    for nrn, name in zip(pop.neurons, NRN_NAMES):
+        nt.assert_true(isinstance(nrn, Neuron))
+        nt.assert_equal(nrn.name, name)
+
+SWC_PATH = os.path.join(DATA_PATH, 'swc', 'ordering')
+SWC_ORD_REF = utils.load_neuron(os.path.join(SWC_PATH, 'sample.swc'))
+
+
+def test_load_neuron_mixed_tree_swc():
+    nrn_mix =  utils.load_neuron(os.path.join(SWC_PATH, 'sample_mixed_tree_sections.swc'))
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('number_of_segments', nrn_mix),
+                          get('number_of_segments', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('total_length', nrn_mix),
+                          get('total_length', SWC_ORD_REF))
+
+
+def test_load_neuron_section_order_break_swc():
+    nrn_mix =  utils.load_neuron(os.path.join(SWC_PATH, 'sample_disordered.swc'))
+
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('number_of_segments', nrn_mix),
+                          get('number_of_segments', SWC_ORD_REF))
+
+    nt.assert_items_equal(get('total_length', nrn_mix),
+                          get('total_length', SWC_ORD_REF))
+
+
+H5_PATH = os.path.join(DATA_PATH, 'h5', 'v1', 'ordering')
+H5_ORD_REF = utils.load_neuron(os.path.join(H5_PATH, 'sample.h5'))
+
+
+def test_load_neuron_mixed_tree_h5():
+    nrn_mix =  utils.load_neuron(os.path.join(H5_PATH, 'sample_mixed_tree_sections.h5'))
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
+    nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+                          get('number_of_sections_per_neurite', H5_ORD_REF))

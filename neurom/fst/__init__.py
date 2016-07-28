@@ -57,7 +57,7 @@ Examples:
 import numpy as _np
 from functools import partial, update_wrapper
 from itertools import chain
-from ._io import load_neuron, load_neurons
+from ..io.utils import load_neuron, load_neurons
 from ._core import Neuron, Neurite, Section
 from . import _neuritefunc as _nrt
 from ._neuritefunc import iter_sections

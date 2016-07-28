@@ -33,8 +33,9 @@ import os
 import numpy as np
 from neurom import fst
 from neurom.fst import _neuritefunc as _nf
-from neurom.io import utils as io_utils
+from neurom.point_neurite.io import utils as io_utils
 from neurom.core import tree as tr
+from neurom.point_neurite import point_tree as ptr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -69,7 +70,7 @@ def test_iter_segments():
         return seg[1].value[:4] - seg[0].value[:4]
 
     a = np.array([seg_fun(s) for s in _nf.iter_segments(NRN)])
-    b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, tr.isegment)])
+    b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, ptr.isegment)])
 
     _equal(a, b, debug=False)
 

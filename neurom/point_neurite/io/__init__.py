@@ -26,71 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from nose import tools as nt
-import os
-from neurom.io.utils import make_neuron
-from neurom import io
-from neurom.core.tree import Tree
-from neurom import triplets as trip
-from neurom import iter_neurites
+''' Deprecated module with point-neurite representation code'''
 
-import math
-from itertools import izip
-
-
-class MockNeuron(object):
-    pass
-
-
-DATA_PATH = './test_data'
-SWC_PATH = os.path.join(DATA_PATH, 'swc/')
-
-data    = io.load_data(SWC_PATH + 'Neuron.swc')
-neuron0 = make_neuron(data)
-tree0   = neuron0.neurites[0]
-
-
-def _make_simple_tree():
-    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T2 = T1.add_child(Tree([2.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T3 = T2.add_child(Tree([2.0, 6.0, 0.0, 1.0, 1, 1, 1]))
-
-    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T6 = T5.add_child(Tree([2.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T7 = T6.add_child(Tree([6.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-
-    return T
-
-
-SIMPLE_TREE = _make_simple_tree()
-SIMPLE_NEURON = MockNeuron()
-SIMPLE_NEURON.neurites = [SIMPLE_TREE]
-
-
-def _check_meander_angles(obj):
-
-    angles = [a for a in iter_neurites(obj, trip.meander_angle)]
-
-    nt.eq_(angles,
-           [math.pi / 2, math.pi / 2, math.pi / 2, math.pi])
-
-
-def _check_count(obj, n):
-    nt.eq_(trip.count(obj), n)
-
-
-def test_meander_angles():
-    _check_meander_angles(SIMPLE_TREE)
-    _check_meander_angles(SIMPLE_NEURON)
-
-
-def test_count():
-    _check_count(SIMPLE_NEURON, 4)
-    _check_count(SIMPLE_TREE, 4)
-
-    neuron_b = MockNeuron()
-    neuron_b.neurites = [SIMPLE_TREE, SIMPLE_TREE, SIMPLE_TREE]
-
-    _check_count(neuron_b, 12)
+from neurom.core.dataformat import COLS
+from neurom.core.dataformat import ROOT_ID
+from neurom.point_neurite.io.utils import load_data, load_neuron, load_neurons

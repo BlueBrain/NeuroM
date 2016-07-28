@@ -29,7 +29,6 @@
 import os
 from copy import deepcopy
 from neurom import load_neuron
-from neurom.fst import _io as io
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from nose import tools as nt

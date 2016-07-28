@@ -28,13 +28,17 @@
 
 '''Dendrogram helper functions and class'''
 
-from neurom.core.tree import Tree, ipreorder
-from neurom.analysis.morphtree import n_terminations
+from neurom.core.tree import Tree, ipreorder, ileaf
 from neurom.core.dataformat import COLS
 from neurom.fst import Neurite
 
 import numpy as np
 import sys
+
+
+def _n_terminations(tree):
+    '''Get the number of terninations in a tree'''
+    return sum(1 for _ in ileaf(tree))
 
 
 def _max_recursion_depth(obj):
@@ -95,7 +99,7 @@ def _spacingx(node, max_dims, xoffset, xspace):
     '''Determine the spacing of the current node depending on the number
        of the leaves of the tree
     '''
-    x_spacing = n_terminations(node) * xspace
+    x_spacing = _n_terminations(node) * xspace
 
     if x_spacing > max_dims[0]:
         max_dims[0] = x_spacing
@@ -175,7 +179,7 @@ class Dendrogram(object):
 
             max_diameter = _max_diameter(self._obj.root_node)
 
-            dummy_section = Tree(None)
+            dummy_section = Tree()
             dummy_section.add_child(self._obj.root_node)
             self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
 
@@ -189,7 +193,7 @@ class Dendrogram(object):
 
                 neurite = neurite.root_node
                 max_diameter = _max_diameter(neurite)
-                dummy_section = Tree(None)
+                dummy_section = Tree()
 
                 dummy_section.add_child(neurite)
                 self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
@@ -221,7 +225,7 @@ class Dendrogram(object):
             segments = child.points
 
             # number of leaves in child
-            terminations = n_terminations(child)
+            terminations = _n_terminations(child)
 
             # segement lengths
             seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.X: COLS.R],

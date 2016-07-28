@@ -32,7 +32,7 @@
 
 from itertools import product
 from neurom.core.types import NeuriteType
-from neurom.analysis.morphtree import compare_trees
+from neurom.point_neurite.treefunc import compare_trees
 
 
 def _compare_neurites(nrn_a, nrn_b, neurite_type, comp_function=compare_trees):

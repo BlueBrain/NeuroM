@@ -28,14 +28,12 @@
 
 from nose import tools as nt
 import os
-from neurom.io.utils import make_neuron
-from neurom import io
-from neurom.core.tree import Tree
-from neurom import bifurcations as bif
+from neurom.point_neurite import io
+from neurom.point_neurite.io.utils import make_neuron
+from neurom.point_neurite.point_tree import PointTree
+from neurom.point_neurite import bifurcations as bif
 from neurom import iter_neurites
-
 import math
-from itertools import izip
 
 
 class MockNeuron(object):
@@ -51,32 +49,32 @@ tree0   = neuron0.neurites[0]
 
 def _make_neuron_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
     return T
 
 
 def _make_simple_tree():
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T2 = T1.add_child(Tree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
-    T3 = T2.add_child(Tree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
-    T4 = T3.add_child(Tree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
+    T2 = T1.add_child(PointTree([0.0, 4.0, 0.0, 1.0, 1, 1, 1]))
+    T3 = T2.add_child(PointTree([0.0, 6.0, 0.0, 1.0, 1, 1, 1]))
+    T4 = T3.add_child(PointTree([0.0, 8.0, 0.0, 1.0, 1, 1, 1]))
 
-    T5 = T.add_child(Tree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T6 = T5.add_child(Tree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
-    T7 = T6.add_child(Tree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
-    T8 = T7.add_child(Tree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
+    T5 = T.add_child(PointTree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
+    T6 = T5.add_child(PointTree([0.0, 0.0, 4.0, 1.0, 1, 1, 1]))
+    T7 = T6.add_child(PointTree([0.0, 0.0, 6.0, 1.0, 1, 1, 1]))
+    T8 = T7.add_child(PointTree([0.0, 0.0, 8.0, 1.0, 1, 1, 1]))
 
     return T
 
@@ -93,43 +91,43 @@ SIMPLE_NEURON.neurites = [SIMPLE_TREE]
 def _make_branching_tree():
     '''This tree has 3 branching points'''
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T4.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6 = T4.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T9.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
-    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
-    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(PointTree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(PointTree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(PointTree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
 
 def _make_branching_tree_zero_length_bif_segments():
     '''This tree has 3 branching points'''
     p = [0.0, 0.0, 0.0, 1.0, 1, 1, 2]
-    T = Tree(p)
-    T1 = T.add_child(Tree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-    T2 = T1.add_child(Tree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-    T3 = T2.add_child(Tree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-    T4 = T3.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5_0 = T4.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T5 = T5_0.add_child(Tree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-    T6_0 = T4.add_child(Tree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T6 = T6_0.add_child(Tree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-    T7 = T5.add_child(Tree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T8 = T7.add_child(Tree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-    T9 = T6.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10_0 = T9.add_child(Tree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-    T10 = T10_0.add_child(Tree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
-    T11 = T9.add_child(Tree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
-    T33 = T3.add_child(Tree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-    T331 = T33.add_child(Tree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
+    T = PointTree(p)
+    T1 = T.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
+    T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
+    T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
+    T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5_0 = T4.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T5 = T5_0.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
+    T6_0 = T4.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T6 = T6_0.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
+    T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
+    T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10_0 = T9.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
+    T10 = T10_0.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
+    T11 = T9.add_child(PointTree([0.0, 6.0, 4.0, 0.75, 1, 1, 2]))
+    T33 = T3.add_child(PointTree([1.0, 5.0, 0.0, 2.0, 1, 1, 2]))
+    T331 = T33.add_child(PointTree([15.0, 15.0, 0.0, 2.0, 1, 1, 2]))
     return T
 
 
@@ -144,15 +142,15 @@ def _make_odd_tree():
     in case of integer division in partition
     '''
     p = [0.0, 0.0, 0.0, 0.0, 0, 0, 0]
-    T = Tree(p)
-    T.add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[1].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[1].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
-    T.children[1].children[0].add_child(Tree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T = PointTree(p)
+    T.add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[0].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[0].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].children[0].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
+    T.children[1].children[0].add_child(PointTree([0.0, 0.0, 0.0, 0.0, 0, 0, 0]))
     return T
 
 

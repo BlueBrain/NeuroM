@@ -47,7 +47,8 @@ from .view.view import tree3d as draw_tree3d
 from .view.view import soma as draw_soma
 from .view.view import soma3d as draw_soma3d
 from .view.view import dendrogram as draw_dendrogram
-from .core.neuron import Neuron, BaseSoma
+from .point_neurite.core import Neuron
+from .core.soma import BaseSoma
 from .fst import Neuron as FstNeuron
 from .fst import Neurite, Tree
 

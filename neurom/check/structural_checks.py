@@ -31,7 +31,7 @@ import numpy as np
 from neurom.check import CheckResult
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import POINT_TYPE
-from neurom.core.neuron import make_soma
+from neurom.core.soma import make_soma
 from neurom.fst._core import make_neurites
 from neurom.exceptions import SomaError
 
