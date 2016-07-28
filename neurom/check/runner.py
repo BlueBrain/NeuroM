@@ -49,8 +49,8 @@ class CheckRunner(object):
         if 'color' not in self._config:
             self._config['color'] = False
         self.summary = OrderedDict()
-        self._check_modules = {k: import_module('neurom.check.%s' % k)
-                               for k in config['checks']}
+        self._check_modules = dict((k, import_module('neurom.check.%s' % k))
+                                   for k in config['checks'])
 
     def run(self, file_path):
         '''Test a bunch of files and return a summary JSON report'''
