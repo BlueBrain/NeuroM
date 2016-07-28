@@ -48,7 +48,8 @@ REF_CONFIG = {
     }
 }
 
-REF_SUMMARY = {
+REF_OUT = {
+    'mean_soma_radius': 0.17071067811865476,
     'axon': {
         'total_section_length': 207.87975220908129,
         'max_section_length': 11.018460736176685,
@@ -61,7 +62,6 @@ REF_SUMMARY = {
         'max_section_branch_order': 10,
         'total_section_volume': 1104.9077419665782
     },
-    'mean_soma_radius': 0.17071067811865476,
     'apical_dendrite': {
         'total_section_length': 214.37304577550353,
         'max_section_length': 11.758281556059444,
@@ -112,6 +112,10 @@ def test_extract_stats_single_neuron():
 
     nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
-    nt.eq_(res, REF_SUMMARY)
+    nt.eq_(res.keys(), REF_OUT.keys())
+    nt.assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
 
-
+    for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
+        nt.eq_(res[k].keys(), REF_OUT[k].keys())
+        for kk in res[k].keys():
+            nt.assert_almost_equal(res[k][kk], REF_OUT[k][kk])
