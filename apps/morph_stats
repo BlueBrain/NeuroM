@@ -34,42 +34,33 @@ import json
 import logging
 import os
 import sys
-
-from neurom.stats import scalar_stats
-from neurom.core.types import NEURITES
-from neurom import fst
+from collections import defaultdict
+import yaml
+import numpy as np
+import neurom as nm
 from neurom.io.utils import get_morph_files
 
 L = logging.getLogger(__name__)
 
 
-NEURITE_STATS = [
-    'section_lengths',
-    'segment_lengths',
-    'local_bifurcation_angles',
-    'remote_bifurcation_angles',
-    'number_of_sections_per_neurite',
-    'number_of_sections',
-    'number_of_neurites'
-]
-
-NEURON_STATS = [
-    'soma_radii',
-    'soma_surface_areas',
-]
-
-_NAME_MAP = {
-    'number_of_sections_per_neurite': 'n_sections_per_neurite',
-    'number_of_sections': 'n_sections',
-    'number_of_neurites': 'n_neurites',
-    'soma_radii': 'soma_radius',
-    'soma_surface_areas': 'soma_surface_area'
+_CONFIG = {
+    'neurite': {
+        'section_lengths': ['max', 'total'],
+        'section_volumes': ['total'],
+        'section_branch_orders': ['max']
+    },
+    'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+    'neuron': {
+        'soma_radii': ['mean']
+    }
 }
 
-
-def old_name(name):
-    '''Map new feature names to old ones'''
-    return _NAME_MAP.get(name, name)
+_NEURITE_MAP = {
+    'AXON': nm.AXON,
+    'BASAL_DENDRITE': nm.BASAL_DENDRITE,
+    'APICAL_DENDRITE': nm.APICAL_DENDRITE,
+    'ALL': nm.ANY_NEURITE
+}
 
 
 def parse_args():
@@ -88,38 +79,78 @@ def parse_args():
                         default=False,
                         help='If enabled the directory is treated as a population')
 
+    parser.add_argument('-C', '--config', help='Configuration File')
+
+    parser.add_argument('-o', '--output', dest='output_file',
+                        help='Summary output file name')
+
     return parser.parse_args()
 
 
-def eval_stats(value):
-    ''' Apply the input function on the neuron objects, flatten the array if nested,
-    make it a single element array if the result is not iterable and extract the stats
+def eval_stats(values, mode):
+    '''Extract a summary statistic from an numpy array of values
+
+    Parameters:
+        values: numpy array of values
+        mode: summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
+
+    Note: fails silently if values is empty
     '''
-    stat_functions = ('min', 'max', 'median', 'mean', 'std')
+    if mode == 'raw':
+        return values.tolist()
+    if mode == 'total':
+        mode = 'sum'
+
     try:
-        value = scalar_stats(value)
+        return getattr(np, mode)(values)
     except ValueError:
-        value = {key: 0. for key in stat_functions}
-
-    return value
+        pass
 
 
-def extract_stats(neurons):
+def _stat_name(feat_name, stat_mode):
+    '''Set stat name based on feature name and stat mode'''
+    if feat_name[-1] == 's':
+        feat_name = feat_name[:-1]
+    if feat_name == 'soma_radii':
+        feat_name = 'soma_radius'
+    if stat_mode == 'raw':
+        return feat_name
+
+    return '%s_%s' % (stat_mode, feat_name)
+
+
+def extract_stats(neurons, config):
     '''Extract stats from neurons'''
 
-    stats = {}
-    for ns in NEURITE_STATS:
-        stat_name = old_name(ns)
-        stats[stat_name] = {}
-        for n in NEURITES:
-            stats[stat_name][n.name] = eval_stats(fst.get(ns, neurons, neurite_type=n))
-            L.debug('Stat: %s, Neurite: %s, Type: %s', ns, n, type(stats[stat_name][n.name]))
+    stats = defaultdict(dict)
+    for ns, modes in config['neurite'].iteritems():
+        for n in config['neurite_type']:
+            n = _NEURITE_MAP[n]
+            for mode in modes:
+                stat_name = _stat_name(ns, mode)
+                stats[n.name][stat_name] = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
+                L.debug('Stat: %s, Neurite: %s, Type: %s',
+                        stat_name, n, type(stats[n.name][stat_name]))
 
-    for ns in NEURON_STATS:
-        stat_name = old_name(ns)
-        stats[stat_name] = eval_stats(fst.get(ns, neurons))
+    for ns, modes in config['neuron'].iteritems():
+        for mode in modes:
+            stat_name = _stat_name(ns, mode)
+            stats[stat_name] = eval_stats(nm.get(ns, neurons), mode)
 
     return stats
+
+
+def _get_config(config):
+    '''Load configuration from file if requested in commandline arge, else use default'''
+    if config:
+        try:
+            with open(config, 'r') as config_file:
+                return yaml.load(config_file)
+        except yaml.scanner.ScannerError as e:
+            L.error('Invalid yaml file : \n %s', str(e))
+            sys.exit(1)
+    else:
+        return _CONFIG
 
 
 if __name__ == '__main__':
@@ -130,17 +161,22 @@ if __name__ == '__main__':
 
     _f = args.datapath
     _results = {}
+    _config = _get_config(args.config)
 
     if os.path.isfile(_f):
-        _results[_f] = extract_stats(fst.load_neuron(_f))
+        _results[_f] = extract_stats(nm.load_neuron(_f), _config)
     elif os.path.isdir(_f):
         if not args.as_population:
             for _p in get_morph_files(_f):
-                _results[_p] = extract_stats(fst.load_neuron(_p))
+                _results[_p] = extract_stats(nm.load_neuron(_p), _config)
         else:
-            _results[_f] = extract_stats(fst.load_neurons(_f))
+            _results[_f] = extract_stats(nm.load_neurons(_f), _config)
     else:
         L.error("Invalid data path %s", _f)
         sys.exit(1)
 
     print json.dumps(_results, indent=2, separators=(',', ':'))
+
+    if args.output_file:
+        with open(args.output_file, 'w') as output_file:
+            json.dump(_results, output_file)
