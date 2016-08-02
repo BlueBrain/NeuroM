@@ -99,22 +99,65 @@ the ``-e``.
 Examples
 ========
 
+- Extract morphometrics from one or many morphology files:
+
+.. code-block:: bash
+
+    $ morph_stats some/path/morph.swc # single file
+    {
+      "some/path/morph.swc":{
+        "axon":{
+          "total_section_length":207.87975220908129,
+          "max_section_length":11.018460736176685,
+          "max_section_branch_order":10,
+          "total_section_volume":276.73857657289523
+        },
+        "all":{
+          "total_section_length":840.68521442251949,
+          "max_section_length":11.758281556059444,
+          "max_section_branch_order":10,
+          "total_section_volume":1104.9077419665782
+        },
+        "mean_soma_radius":0.17071067811865476,
+        "apical_dendrite":{
+          "total_section_length":214.37304577550353,
+          "max_section_length":11.758281556059444,
+          "max_section_branch_order":10,
+          "total_section_volume":271.9412385728449
+        },
+        "basal_dendrite":{
+          "total_section_length":418.43241643793476,
+          "max_section_length":11.652508126101711,
+          "max_section_branch_order":10,
+          "total_section_volume":556.22792682083821
+        }
+      }
+    }
+
+    $ morph_stats some/path # all files in directory
+
 - Perform checks on neuron morphology files:
 
 .. code-block:: bash
 
     (nrm)$ morph_check some/data/path/morph_file.swc # single file
-    INFO: ================================
-    INFO: Check file some/data/path/morph_file.swc...
-    INFO: Has valid soma? PASS
-    INFO: Has Apical Dendrite? PASS
-    INFO: Has Basal Dendrite? PASS
-    INFO: All neurites have non-zero radius? PASS
-    INFO: All segments have non-zero length? PASS
-    INFO: All sections have non-zero length? PASS
-    INFO: Check result: PASS
-    INFO: ================================
-
+    INFO: ========================================
+    INFO: File: some/data/path/morph_file.swc
+    INFO:                      Is single tree PASS
+    INFO:                     Has soma points PASS
+    INFO:                  Has sequential ids PASS
+    INFO:                  Has increasing ids PASS
+    INFO:                      Has valid soma PASS
+    INFO:                  Has valid neurites PASS
+    INFO:                  Has basal dendrite PASS
+    INFO:                            Has axon PASS
+    INFO:                 Has apical dendrite PASS
+    INFO:     Has all nonzero segment lengths PASS
+    INFO:     Has all nonzero section lengths PASS
+    INFO:       Has all nonzero neurite radii PASS
+    INFO:             Has nonzero soma radius PASS
+    INFO:                                 ALL PASS
+    INFO: ========================================
 
     (nrm)$ morph_check some/data/path # all files in directory
     ....

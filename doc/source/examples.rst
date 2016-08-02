@@ -35,17 +35,24 @@ Morphology file data consistency checks
 .. code-block:: bash
 
     (nrm)$ morph_check some/data/path/morph_file.swc # single file
-    INFO: ================================
-    INFO: Check file some/data/path/morph_file.swc...
-    INFO: Has valid soma? PASS
-    INFO: Has Apical Dendrite? PASS
-    INFO: Has Basal Dendrite? PASS
-    INFO: All neurites have non-zero radius? PASS
-    INFO: All segments have non-zero length? PASS
-    INFO: All sections have non-zero length? PASS
-    INFO: Check result: PASS
-    INFO: ================================
-
+    INFO: ========================================
+    INFO: File: some/data/path/morph_file.swc
+    INFO:                      Is single tree PASS
+    INFO:                     Has soma points PASS
+    INFO:                  No missing parents PASS
+    INFO:                  Has sequential ids PASS
+    INFO:                  Has increasing ids PASS
+    INFO:                      Has valid soma PASS
+    INFO:                  Has valid neurites PASS
+    INFO:                  Has basal dendrite PASS
+    INFO:                            Has axon PASS
+    INFO:                 Has apical dendrite PASS
+    INFO:     Has all nonzero segment lengths PASS
+    INFO:     Has all nonzero section lengths PASS
+    INFO:       Has all nonzero neurite radii PASS
+    INFO:             Has nonzero soma radius PASS
+    INFO:                                 ALL PASS
+    INFO: ========================================
 
     (nrm)$ morph_check some/data/path # all files in directory
     ....

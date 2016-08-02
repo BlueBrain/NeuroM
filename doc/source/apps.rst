@@ -26,34 +26,18 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-API Documentation
-=================
+Applications
+************
 
-.. autosummary::
-   :toctree: _neurom_build
+NeuroM ships with configurable command line applications for commonly needed
+functionality. These are convenience tools which leverage ``NeuroM`` library funtionality
+without users having to concern themselves with writing any code beyond simple and optional
+configuration scripts. These commanline tools are installed as executable scripts with
+``NeuroM``. The tools are designed to be used in batch mode, i.e. they do not require any
+user interactivity upon launch, and do not require access to a display.
 
-   neurom
-   neurom.viewer
-   neurom.fst
-   neurom.fst.sectionfunc
-   neurom.exceptions
-   neurom.stats
-   neurom.check
-   neurom.check.structural_checks
-   neurom.check.neuron_checks
-   neurom.core
-   neurom.core.types
-   neurom.core.tree
-   neurom.core.neuron
-   neurom.core.soma
-   neurom.core.point
-   neurom.core.dataformat
-   neurom.io
-   neurom.io.utils
-   neurom.io.swc
-   neurom.io.hdf5
-   neurom.view
-   neurom.view.common
-   neurom.view.view
-   neurom.analysis
-   neurom.analysis.morphmath
+.. toctree::
+   :maxdepth: 2
+
+   morph_check
+   morph_stats

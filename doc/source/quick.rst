@@ -69,10 +69,59 @@ plots of neurites, somata and neurons. It also has a dendrogram neurom plotting 
 .. seealso::
     The :py:mod:`neurom.viewer` documentation for more details and examples.
 
+
+Morphometrics extraction application
+------------------------------------
+
+The :doc:`morph_stats<morph_stats>` application lets you obtain various morphometrics
+quantities from a set of morphology files. It is highly configurable, and gives access
+to all the features avaulable via the :py:func:`neurom.get` function.
+
+For example,
+
+.. code-block:: bash
+
+    $ morph_stats some/path/morph.swc # single file
+    {
+      "some/path/morph.swc":{
+        "axon":{
+          "total_section_length":207.87975220908129,
+          "max_section_length":11.018460736176685,
+          "max_section_branch_order":10,
+          "total_section_volume":276.73857657289523
+        },
+        "all":{
+          "total_section_length":840.68521442251949,
+          "max_section_length":11.758281556059444,
+          "max_section_branch_order":10,
+          "total_section_volume":1104.9077419665782
+        },
+        "mean_soma_radius":0.17071067811865476,
+        "apical_dendrite":{
+          "total_section_length":214.37304577550353,
+          "max_section_length":11.758281556059444,
+          "max_section_branch_order":10,
+          "total_section_volume":271.9412385728449
+        },
+        "basal_dendrite":{
+          "total_section_length":418.43241643793476,
+          "max_section_length":11.652508126101711,
+          "max_section_branch_order":10,
+          "total_section_volume":556.22792682083821
+        }
+      }
+    }
+
+    $ morph_stats some/path # all files in directory
+
+.. seealso::
+    The :doc:`morph_stats documentation page<morph_stats>`
+
+
 Data checking application
 -------------------------
 
-The ``morph_check`` application applies some structural and semantic 
+The :doc:`morph_check<morph_check>` application applies some structural and semantic 
 checks to morphology data files in order to
 determine whether it is suitable to construct a neuron structure and whether certain
 defects within the structure are detected. It can be invoked from the command line, and
@@ -82,7 +131,7 @@ For example,
 
 .. code-block:: bash
 
-    $ morph_check test_data/swc/Neuron.swc # single file
+    $ morph_check some/path/morph.swc # single file
     INFO: ========================================
     INFO: File: test_data/swc/Neuron.swc
     INFO:                      Is single tree PASS
@@ -105,42 +154,5 @@ For example,
     $ morph_check test_data/swc # all files in directory
     # loops over all morphology files found in test_data/swc
 
-The application also produces a summary json file, which can be useful when
-processing more than one file:
-
-.. code-block:: javascript
-
-    {
-        "files": {
-            "test_data/swc/Neuron.swc": {
-                "Is single tree": true,
-                "Has soma points": true,
-                "No missing parents": true,
-                "Has sequential ids": true,
-                "Has increasing ids": true,
-                "Has valid soma": true,
-                "Has valid neurites": true,
-                "Has basal dendrite": true,
-                "Has axon": true,
-                "Has apical dendrite": true,
-                "Has all nonzero segment lengths": true,
-                "Has all nonzero section lengths": true,
-                "Has all nonzero neurite radii": true,
-                "Has nonzero soma radius": true,
-                "ALL": true
-            }
-        },
-        "STATUS": "PASS"
-    }
-
-
-The tests run are in submodules of :py:mod:`neurom.check`, particularly :py:mod:`structural_checks<neurom.check.structural_checks>`, :py:mod:`neurite_checks<neurom.check.neurite_checks>` and
-:py:mod:`soma_checks<neurom.check.soma_checks>`.
-
-
-For more information, use the help option:
-
-.. code-block:: bash
-
-    $ morph_check --help
-    ....
+.. seealso::
+    The :doc:`morph_check documentation page<morph_check>`

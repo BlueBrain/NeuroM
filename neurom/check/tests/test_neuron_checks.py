@@ -145,19 +145,6 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not nrn_chk.has_basal_dendrite(n))
 
 
-def test_get_flat_neurites():
-
-    _, n = _load_neuron('Neuron.swc')
-
-    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
-    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 0.1, method='ratio')), 0)
-
-    n = _make_flat(n)
-
-    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
-    nt.assert_equal(len(nrn_chk.get_flat_neurites(n, 0.1, method='ratio')), 4)
-
-
 def test_has_no_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
@@ -180,23 +167,6 @@ def test_has_all_monotonic_neurites():
     _make_monotonic(n)
 
     nt.assert_true(nrn_chk.has_all_monotonic_neurites(n))
-
-
-def test_get_nonmonotonic_neurites():
-
-    _, n = _load_neuron('Neuron.swc')
-
-    nt.assert_equal(len(nrn_chk.get_nonmonotonic_neurites(n)), 4)
-
-    _make_monotonic(n)
-
-    nt.assert_equal(len(nrn_chk.get_nonmonotonic_neurites(n)), 0)
-
-
-def test_get_back_tracking_neurites():
-
-    _, n = _load_neuron('Neuron.swc')
-    nt.assert_equal(len(nrn_chk.get_back_tracking_neurites(n)), 4)
 
 
 def test_nonzero_neurite_radii_good_data():
