@@ -49,7 +49,7 @@ Description
 Performs checks on reconstructed morphologies from data contained in
 morphology files.
 
-The tests are performed in two steps:
+The tests are performed in four steps:
 
 1. Files are loaded into an intermediary "raw data" format. If this fails, the
 tests for that particular file are aborted. Reasons for failure can include

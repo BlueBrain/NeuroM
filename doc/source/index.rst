@@ -43,6 +43,7 @@ Contents
    :maxdepth: 2
 
    quickstart
+   apps
    definitions
    api
    issue_reporting

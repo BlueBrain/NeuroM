@@ -186,3 +186,40 @@ def is_back_tracking(neurite):
                 if is_inside_cylinder(seg1, seg2):
                     return True
     return False
+
+
+def get_flat_neurites(neuron, tol=0.1, method='ratio'):
+    '''Check if a neuron has neurites that are flat within a tolerance
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance or the ratio
+        method : way of determining flatness, 'tolerance', 'ratio'
+
+    Returns:
+        Bool list corresponding to the flatness check for each neurite
+        in neuron neurites with respect to the given criteria
+    '''
+    return [n for n in neuron.neurites if is_flat(n, tol, method)]
+
+
+def get_nonmonotonic_neurites(neuron, tol=1e-6):
+    '''Get neurites that are not monotonic
+
+    Argument:
+        neuron : The neuron object to test
+        tol : the tolerance for testing monotonicity
+
+    Returns:
+        list of neurites that do not satisfy monotonicity test
+    '''
+    return [n for n in neuron.neurites if not is_monotonic(n, tol)]
+
+
+def get_back_tracking_neurites(neuron):
+    '''Get neurites that have back-tracks. A back-track is the placement of
+    a point near a previous segment during the reconstruction, causing
+    a zigzag jump in the morphology which can cause issues with meshing
+    algorithms.
+    '''
+    return [n for n in neuron.neurites if is_back_tracking(n)]

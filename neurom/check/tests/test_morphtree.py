@@ -33,10 +33,32 @@ from neurom.core.dataformat import COLS
 from nose import tools as nt
 import numpy as np
 import os
+from copy import deepcopy
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
+
+
+def _make_flat(neuron):
+
+    class Flattenizer(object):
+        def __call__(self, points):
+            points = deepcopy(points)
+            points[:, COLS.Z] = 0.;
+            return points
+
+    return neuron.transform(Flattenizer())
+
+
+def _make_monotonic(neuron):
+    for neurite in neuron.neurites:
+        for node in neurite.iter_sections():
+            sec = node.points
+            if node.parent is not None:
+                sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
+            for point_id in xrange(len(sec) - 1):
+                sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 
 
 def _generate_neurite(mode):
@@ -161,3 +183,33 @@ def test_is_back_tracking():
     # thus this test should not be true
     t = _generate_back_track_tree(0, (-0.2, 0.04, 0.144))
     nt.assert_false(mt.is_back_tracking(t))
+
+
+def test_get_flat_neurites():
+
+    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+
+    nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
+    nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 0)
+
+    n = _make_flat(n)
+
+    nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
+    nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 4)
+
+
+def test_get_nonmonotonic_neurites():
+
+    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+
+    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 4)
+
+    _make_monotonic(n)
+
+    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 0)
+
+
+def test_get_back_tracking_neurites():
+
+    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nt.assert_equal(len(mt.get_back_tracking_neurites(n)), 4)

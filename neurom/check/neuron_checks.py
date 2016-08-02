@@ -38,7 +38,7 @@ from neurom.core.types import NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.analysis.morphmath import section_length
 from neurom.analysis.morphmath import segment_length
-from neurom.check.morphtree import is_flat, is_monotonic, is_back_tracking
+from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.fst import _neuritefunc as _nf
 from neurom.check import CheckResult
 
@@ -85,21 +85,6 @@ def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     return CheckResult(types.count(NeuriteType.basal_dendrite) >= min_number)
 
 
-def get_flat_neurites(neuron, tol=0.1, method='ratio'):
-    '''Check if a neuron has neurites that are flat within a tolerance
-
-    Argument:
-        neuron : The neuron object to test
-        tol : the tolerance or the ratio
-        method : way of determining flatness, 'tolerance', 'ratio'
-
-    Returns:
-        Bool list corresponding to the flatness check for each neurite
-        in neuron neurites with respect to the given criteria
-    '''
-    return [n for n in neuron.neurites if is_flat(n, tol, method)]
-
-
 def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
     '''Check that a neuron has no flat neurites
 
@@ -111,19 +96,6 @@ def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
     return CheckResult(len(get_flat_neurites(neuron, tol, method)) == 0)
 
 
-def get_nonmonotonic_neurites(neuron, tol=1e-6):
-    '''Get neurites that are not monotonic
-
-    Argument:
-        neuron : The neuron object to test
-        tol : the tolerance for testing monotonicity
-
-    Returns:
-        list of neurites that do not satisfy monotonicity test
-    '''
-    return [n for n in neuron.neurites if not is_monotonic(n, tol)]
-
-
 def has_all_monotonic_neurites(neuron, tol=1e-6):
     '''Check that a neuron has no neurites that are not monotonic
 
@@ -132,15 +104,6 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
         tol : the tolerance for testing monotonicity
     '''
     return CheckResult(len(get_nonmonotonic_neurites(neuron, tol)) == 0)
-
-
-def get_back_tracking_neurites(neuron):
-    '''Get neurites that have back-tracks. A back-track is the placement of
-    a point near a previous segment during the reconstruction, causing
-    a zigzag jump in the morphology which can cause issues with meshing
-    algorithms.
-    '''
-    return [n for n in neuron.neurites if is_back_tracking(n)]
 
 
 def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
