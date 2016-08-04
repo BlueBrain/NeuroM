@@ -47,9 +47,7 @@ from .view.view import tree3d as draw_tree3d
 from .view.view import soma as draw_soma
 from .view.view import soma3d as draw_soma3d
 from .view.view import dendrogram as draw_dendrogram
-from .point_neurite.core import Neuron
-from .core.soma import BaseSoma
-from .fst import Neuron as FstNeuron
+from .core import Soma, Neuron
 from .fst import Neurite, Tree
 
 
@@ -110,11 +108,11 @@ def draw(obj, mode='2d', **kwargs):
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s', mode)
 
-    if isinstance(obj, (Neuron, FstNeuron)):
+    if isinstance(obj, Neuron):
         tag = 'neuron'
     elif isinstance(obj, (Tree, Neurite)):
         tag = 'tree'
-    elif isinstance(obj, BaseSoma):
+    elif isinstance(obj, Soma):
         tag = 'soma'
     else:
         raise NotDrawableError('draw not implemented for %s', obj.__class__)

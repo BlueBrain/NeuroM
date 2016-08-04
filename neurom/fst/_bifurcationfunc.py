@@ -30,7 +30,6 @@
 
 import numpy as np
 from neurom.analysis import morphmath as mm
-from neurom.core.tree import ipreorder
 from neurom.core.dataformat import COLS
 
 
@@ -73,6 +72,6 @@ def remote_bifurcation_angle(bif_point):
 
 def bifurcation_partition(bif_point):
     '''Calculate the partition at a bifurcation point'''
-    n = float(sum(1 for _ in ipreorder(bif_point.children[0])))
-    m = float(sum(1 for _ in ipreorder(bif_point.children[1])))
+    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return max(n, m) / min(n, m)

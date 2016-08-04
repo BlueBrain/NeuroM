@@ -30,14 +30,14 @@
 
 '''
 import functools
-from neurom.core import tree as tr
+from neurom.core import Tree
 from neurom import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.utils import deprecated_module
 
 deprecated_module(__name__)
 
-iter_type = tr.ipreorder
+iter_type = Tree.ipreorder
 
 
 def point_function(as_tree=False):
@@ -56,7 +56,7 @@ def point_function(as_tree=False):
                 point = point.value
             return fun(point)
 
-        _wrapper.iter_type = tr.ipreorder
+        _wrapper.iter_type = iter_type
         return _wrapper
 
     return _point_function

@@ -28,7 +28,7 @@
 
 '''Dendrogram helper functions and class'''
 
-from neurom.core.tree import Tree, ipreorder, ileaf
+from neurom.core import Tree
 from neurom.core.dataformat import COLS
 from neurom.fst import Neurite
 
@@ -38,7 +38,7 @@ import sys
 
 def _n_terminations(tree):
     '''Get the number of terninations in a tree'''
-    return sum(1 for _ in ileaf(tree))
+    return sum(1 for _ in tree.ileaf())
 
 
 def _max_recursion_depth(obj):
@@ -117,7 +117,7 @@ def _update_offsets(start_x, spacing, terminations, offsets, length):
 def _max_diameter(tree):
     '''Find max diameter in tree
     '''
-    return 2. * max(max(node.points[:, COLS.R]) for node in ipreorder(tree))
+    return 2. * max(max(node.points[:, COLS.R]) for node in tree.ipreorder())
 
 
 class Dendrogram(object):

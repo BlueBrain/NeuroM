@@ -33,7 +33,7 @@ Python module of NeuroM to visualize morphologies
 from itertools import izip
 from . import common
 from . import _compat
-from neurom.core.types import NeuriteType
+from neurom import NeuriteType
 from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.io import COLS

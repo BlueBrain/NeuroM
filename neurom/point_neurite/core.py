@@ -27,10 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Neuron classes and functions'''
-from neurom.core.neuron import BaseNeuron
+from neurom.core import Neuron
 
 
-class Neuron(BaseNeuron):
+class PointNeuron(Neuron):
     '''Toy neuron class for testing ideas'''
     def __init__(self, soma, neurites, name='Neuron'):
         '''Construct a Neuron
@@ -40,5 +40,5 @@ class Neuron(BaseNeuron):
             neurites: iterable of neurite tree structures.
             name: Optional name for this Neuron.
         '''
-        super(Neuron, self).__init__(soma=soma, neurites=neurites)
+        super(PointNeuron, self).__init__(soma=soma, neurites=neurites)
         self.name = name

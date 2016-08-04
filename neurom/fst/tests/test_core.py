@@ -47,7 +47,7 @@ NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
 def test_neuron_name():
 
     d = _io.load_data(FILENAMES[0])
-    nrn = _core.Neuron(d, '12af3rg')
+    nrn = _core.FstNeuron(d, '12af3rg')
     nt.eq_(nrn.name, '12af3rg')
 
 

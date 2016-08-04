@@ -58,7 +58,7 @@ import numpy as _np
 from functools import partial, update_wrapper
 from itertools import chain
 from ..io.utils import load_neuron, load_neurons
-from ._core import Neuron, Neurite, Section
+from ._core import FstNeuron, Neurite, Section
 from . import _neuritefunc as _nrt
 from ._neuritefunc import iter_sections
 from ._neuritefunc import iter_segments
@@ -66,10 +66,10 @@ from . import _neuronfunc as _nrn
 from . import sectionfunc as _sec
 from ..utils import deprecated
 from ..core.population import Population
-from ..core.types import NeuriteType
+from ..core import Tree
+from ..core import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.types import tree_type_checker as _is_type
-from ..core.tree import Tree
 from ..analysis.morphmath import segment_radius as seg_rad
 from ..analysis.morphmath import segment_taper_rate as seg_taper
 from ..analysis.morphmath import section_length as sec_len

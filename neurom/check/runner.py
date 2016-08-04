@@ -127,7 +127,7 @@ class CheckRunner(object):
         try:
             data = load_data(f)
             result &= self._check_loop(data, 'structural_checks')
-            nrn = fst_core.Neuron(data)
+            nrn = fst_core.FstNeuron(data)
             result &= self._check_loop(nrn, 'neuron_checks')
         except StandardError as e:
             L.error('Failed to load data... skipping tests for this file')

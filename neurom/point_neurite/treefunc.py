@@ -32,10 +32,9 @@ These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
 from itertools import izip, product
-from neurom.core import tree as tr
-from neurom.core.tree import ipreorder
-from neurom.point_neurite.point_tree import val_iter
-import neurom.point_neurite.point_tree as ptr
+from neurom.core import Tree as tr
+from neurom.point_neurite.point_tree import val_iter, imap_val
+from neurom.point_neurite.point_tree import PointTree as ptr
 from neurom.core.types import NeuriteType
 import neurom.analysis.morphmath as mm
 from neurom.core.dataformat import COLS
@@ -105,7 +104,7 @@ def i_section_radial_dist(tree, pos=None, use_start_point=False):
     '''
     pos = tree.value if pos is None else pos
     sec_idx = 0 if use_start_point else -1
-    return ptr.imap_val(lambda s: mm.point_dist(s[sec_idx], pos), ptr.isection(tree))
+    return imap_val(lambda s: mm.point_dist(s[sec_idx], pos), ptr.isection(tree))
 
 
 def find_tree_type(tree):
@@ -122,7 +121,7 @@ def find_tree_type(tree):
 
     tree_types = tuple(NeuriteType)
 
-    types = np.array([node.value[COLS.TYPE] for node in tr.ipreorder(tree)])
+    types = np.array([node.value[COLS.TYPE] for node in tree.ipreorder()])
 
     return tree_types[int(np.median(types))]
 
@@ -185,7 +184,7 @@ def trunk_section_length(tree):
         Length of first section of tree or 0 if single point tree
     '''
     try:
-        _it = ptr.imap_val(mm.section_length, ptr.isection(tree))
+        _it = imap_val(mm.section_length, ptr.isection(tree))
         return _it.next()
     except StopIteration:
         return 0.0
@@ -257,7 +256,7 @@ def get_bounding_box(tree):
     min_xyz, max_xyz = (np.array([np.inf, np.inf, np.inf]),
                         np.array([np.NINF, np.NINF, np.NINF]))
 
-    for p in val_iter(tr.ipreorder(tree)):
+    for p in val_iter(tree.ipreorder()):
         min_xyz = np.minimum(p[:COLS.R], min_xyz)
         max_xyz = np.maximum(p[:COLS.R], max_xyz)
 
@@ -278,7 +277,7 @@ def principal_direction_extent(tree):
        eigv : respective eigenvectors of the covariance matrix
     '''
     # extract the x,y,z coordinates of all the points in the tree
-    points = np.array([p.value[COLS.X: COLS.R] for p in ipreorder(tree)])
+    points = np.array([p.value[COLS.X: COLS.R] for p in tree.ipreorder()])
     return mm.principal_direction_extent(points)
 
 
@@ -306,8 +305,8 @@ def compare_trees(tree1, tree2):
 
             is_equal = True
 
-            for node1, node2 in izip(ptr.val_iter(tr.iupstream(leaf1)),
-                                     ptr.val_iter(tr.iupstream(leaf2))):
+            for node1, node2 in izip(val_iter(tr.iupstream(leaf1)),
+                                     val_iter(tr.iupstream(leaf2))):
 
                 if any(node1[0:5] != node2[0:5]):
 

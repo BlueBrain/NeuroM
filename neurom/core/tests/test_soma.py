@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from nose import tools as nt
-from neurom.core import soma
+from neurom.core import _soma
 from neurom.exceptions import SomaError
 import numpy as np
 import math
@@ -81,25 +81,25 @@ INVALID_PTS_2 = [
 
 
 def test_make_Soma_SinglePoint():
-    sm = soma.make_soma(SOMA_SINGLE_PTS)
+    sm = _soma.make_soma(SOMA_SINGLE_PTS)
     nt.ok_('SomaSinglePoint' in str(sm))
-    nt.ok_(isinstance(sm, soma.SomaSinglePoint))
+    nt.ok_(isinstance(sm, _soma.SomaSinglePoint))
     nt.assert_items_equal(sm.center, (11, 22, 33))
     nt.ok_(sm.radius == 44)
 
 
 def test_make_Soma_ThreePoint():
-    sm = soma.make_soma(SOMA_THREEPOINTS_PTS)
+    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS)
     nt.ok_('SomaThreePoint' in str(sm))
-    nt.ok_(isinstance(sm, soma.SomaThreePoint))
+    nt.ok_(isinstance(sm, _soma.SomaThreePoint))
     nt.assert_items_equal(sm.center, (11, 22, 33))
     nt.eq_(sm.radius, 0.0)
 
 
 def check_SomaC(points):
-    sm = soma.make_soma(points)
+    sm = _soma.make_soma(points)
     nt.ok_('SomaSimpleContour' in str(sm))
-    nt.ok_(isinstance(sm, soma.SomaSimpleContour))
+    nt.ok_(isinstance(sm, _soma.SomaSimpleContour))
     np.testing.assert_allclose(sm.center, (0., 0., 0.), atol=1e-16)
     nt.eq_(sm.radius, 1.0)
 
@@ -112,9 +112,9 @@ def test_make_SomaC():
 
 @nt.raises(SomaError)
 def test_invalid_soma_points_0_raises_SomaError():
-    soma.make_soma(INVALID_PTS_0)
+    _soma.make_soma(INVALID_PTS_0)
 
 
 @nt.raises(SomaError)
 def test_invalid_soma_points_2_raises_SomaError():
-    soma.make_soma(INVALID_PTS_2)
+    _soma.make_soma(INVALID_PTS_2)

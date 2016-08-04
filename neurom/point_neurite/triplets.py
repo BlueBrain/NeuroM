@@ -30,7 +30,7 @@
 
 '''
 import functools
-from . import point_tree as tr
+from .point_tree import PointTree
 from neurom import iter_neurites
 from neurom.analysis import morphmath as mm
 from neurom.utils import deprecated_module
@@ -38,7 +38,7 @@ from neurom.utils import deprecated_module
 
 deprecated_module(__name__)
 
-iter_type = tr.itriplet
+iter_type = PointTree.itriplet
 
 
 def triplet_function(as_tree=False):
@@ -57,7 +57,7 @@ def triplet_function(as_tree=False):
                 triplet = (triplet[0].value, triplet[1].value, triplet[2].value)
             return fun(triplet)
 
-        _wrapper.iter_type = tr.itriplet
+        _wrapper.iter_type = iter_type
         return _wrapper
 
     return _triplet_function

@@ -111,16 +111,16 @@ def test_get_initial_neurite_segment_ids():
 
 def _check_trees(trees):
     for t in trees:
-        nt.ok_(len(list(tree.ileaf(t))) == 11)
-        nt.ok_(len(list(tree.iforking_point(t))) == 10)
-        nt.ok_(len(list(tree.ipreorder(t))) == 211)
-        nt.ok_(len(list(tree.ipostorder(t))) == 211)
+        nt.ok_(len(list(t.ileaf())) == 11)
+        nt.ok_(len(list(t.iforking_point())) == 10)
+        nt.ok_(len(list(t.ipreorder())) == 211)
+        nt.ok_(len(list(t.ipostorder())) == 211)
         nt.ok_(len(list(ptree.isegment(t))) == 210)
-        leaves = [l for l in tree.ileaf(t)]
+        leaves = [l for l in t.ileaf()]
         # path length from each leaf to root node.
         branch_order = [21, 31, 41, 51, 61, 71, 81, 91, 101, 111, 111]
         for i, l in enumerate(leaves):
-            nt.ok_(len(list(tree.iupstream(l))) == branch_order[i])
+            nt.ok_(len(list(l.iupstream())) == branch_order[i])
 
 
 def test_make_point_tree():

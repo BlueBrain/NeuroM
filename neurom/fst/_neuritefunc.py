@@ -31,11 +31,7 @@
 from functools import wraps, partial
 from itertools import imap, chain, izip
 import numpy as np
-from neurom.core.tree import (ipreorder,
-                              ibifurcation_point,
-                              iforking_point,
-                              iupstream,
-                              ileaf)
+from neurom.core import Tree
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
 from neurom.analysis import morphmath as mm
@@ -61,7 +57,7 @@ def neurite_fun(fun):
 
 
 @neurite_fun
-def iter_sections(neurites, iterator_type=ipreorder, neurite_filter=None):
+def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
     '''Returns an iterator to the nodes in a iterable of neurite objects
 
     Parameters:
@@ -107,16 +103,16 @@ def n_neurites(neurites, neurite_type=NeuriteType.all):
 
 
 @neurite_fun
-def n_sections(neurites, iterator_type=ipreorder, neurite_type=NeuriteType.all):
+def n_sections(neurites, iterator_type=Tree.ipreorder, neurite_type=NeuriteType.all):
     '''Number of sections in a collection of neurites'''
     return sum(1 for _ in iter_sections(neurites,
                                         iterator_type=iterator_type,
                                         neurite_filter=is_type(neurite_type)))
 
 
-n_bifurcation_points = partial(n_sections, iterator_type=ibifurcation_point)
-n_forking_points = partial(n_sections, iterator_type=iforking_point)
-n_leaves = partial(n_sections, iterator_type=ileaf)
+n_bifurcation_points = partial(n_sections, iterator_type=Tree.ibifurcation_point)
+n_forking_points = partial(n_sections, iterator_type=Tree.iforking_point)
+n_leaves = partial(n_sections, iterator_type=Tree.ileaf)
 
 
 def map_sections(fun, neurites, neurite_type=NeuriteType.all):
@@ -149,7 +145,7 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
 
     def pl2(node):
         '''Calculate the path length using cached section lengths'''
-        return sum(dist[n] for n in iupstream(node))
+        return sum(dist[n] for n in node.iupstream())
 
     return [pl2(n) for n in iter_sections(neurites, neurite_filter=neurite_filter)]
 
@@ -201,7 +197,7 @@ def local_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of local bifurcation angles in a collection of neurites'''
     return [local_bifurcation_angle(b)
             for b in iter_sections(neurites,
-                                   iterator_type=ibifurcation_point,
+                                   iterator_type=Tree.ibifurcation_point,
                                    neurite_filter=is_type(neurite_type))]
 
 
@@ -210,7 +206,7 @@ def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of remote bifurcation angles in a collection of neurites'''
     return [remote_bifurcation_angle(b)
             for b in iter_sections(neurites,
-                                   iterator_type=ibifurcation_point,
+                                   iterator_type=Tree.ibifurcation_point,
                                    neurite_filter=is_type(neurite_type))]
 
 
@@ -219,7 +215,7 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
     '''Partition at bifurcation points of a collection of neurites'''
     return [bifurcation_partition(b)
             for b in iter_sections(neurites,
-                                   iterator_type=ibifurcation_point,
+                                   iterator_type=Tree.ibifurcation_point,
                                    neurite_filter=is_type(neurite_type))]
 
 

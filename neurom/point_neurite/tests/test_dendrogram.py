@@ -3,8 +3,8 @@ import numpy as np
 from nose import tools as nt
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.core import Neuron
-from neurom.core.soma import make_soma
-from neurom.core.types import NeuriteType
+from neurom.core import make_soma
+from neurom.core import NeuriteType
 from neurom.point_neurite.treefunc import set_tree_type
 import neurom.point_neurite.dendrogram as dm
 

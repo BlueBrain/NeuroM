@@ -30,23 +30,27 @@ import sys
 
 import numpy as np
 from nose import tools as nt
-from neurom.core.tree import is_root
-from neurom.core.tree import is_leaf
-from neurom.core.tree import is_forking_point
-from neurom.core.tree import is_bifurcation_point
-from neurom.core.tree import ipreorder
-from neurom.core.tree import ipostorder
-from neurom.core.tree import iupstream
-from neurom.core.tree import iforking_point
-from neurom.core.tree import ibifurcation_point
-from neurom.core.tree import ileaf
+from neurom.core import Tree
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.point_tree import isegment
 from neurom.point_neurite.point_tree import itriplet
 from neurom.point_neurite.point_tree import isection
-from neurom.point_neurite.point_tree import val_iter
 from neurom.point_neurite.point_tree import i_branch_end_points
+from neurom.point_neurite.point_tree import val_iter
 from copy import deepcopy
+
+
+is_root = Tree.is_root
+is_leaf = Tree.is_leaf
+is_bifurcation_point = Tree.is_bifurcation_point
+is_forking_point = Tree.is_forking_point
+ileaf = Tree.ileaf
+iupstream = Tree.iupstream
+ipostorder = Tree.ipostorder
+ipreorder = Tree.ipreorder
+ibifurcation_point = Tree.ibifurcation_point
+iforking_point = Tree.iforking_point
+
 
 REF_TREE = PointTree(0)
 REF_TREE.add_child(PointTree(11))

@@ -30,7 +30,6 @@
 
 from itertools import izip
 from functools import wraps
-from neurom.core.tree import iupstream
 from neurom.analysis import morphmath as mm
 
 
@@ -57,7 +56,7 @@ def map_sum_segments(fun, section):
 
 def section_path_length(section):
     '''Path length from section to root'''
-    return sum(mm.section_length(s.points) for s in iupstream(section))
+    return sum(mm.section_length(s.points) for s in section.iupstream())
 
 
 def section_volume(section):
@@ -90,7 +89,7 @@ def branch_order(section):
     Note:
         The first level has branch order 1.
     '''
-    return sum(1 for _ in iupstream(section)) - 1
+    return sum(1 for _ in section.iupstream()) - 1
 
 
 def section_radial_distance(section, origin):
