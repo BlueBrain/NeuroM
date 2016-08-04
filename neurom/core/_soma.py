@@ -95,7 +95,9 @@ class SomaThreePoint(Soma):
     '''
     Type B: 3point soma
     Represented by 3 points.
-    Reference: http://neuromorpho.org/SomaFormat.html
+
+    Reference:
+        http://neuromorpho.org/SomaFormat.html
         'The first point constitutes the center of the soma.
         An equivalent radius (rs) is computed as the average distance
         of the other two points.'
