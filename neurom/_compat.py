@@ -29,9 +29,11 @@
 '''Old-style new-style neurite compatibility hacks'''
 
 from itertools import imap, izip
+from neurom.fst._dendrogram import Dendrogram
+from neurom import iter_neurites
 from neurom.point_neurite import segments as seg
 from neurom.point_neurite.point_tree import PointTree
-from neurom import iter_neurites
+from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.point_neurite.treefunc import find_tree_type, get_bounding_box
 from neurom import fst
 from neurom import geom
@@ -63,6 +65,11 @@ def neurite_type(neurite):
         return neurite.type
     else:
         return find_tree_type(neurite)
+
+
+def dendrogram_class(obj):
+    '''Return the appropriate Dendrogram class'''
+    return Dendrogram if is_new_style(obj) else PointDendrogram
 
 
 def map_segments(neurite, fun):

@@ -35,56 +35,47 @@ Examples:
 
     Load a neuron
 
-    >>> from neurom import _ezy
-    >>> nrn = _ezy.load_neuron('some/data/path/morph_file.swc')
+    >>> from neurom import ezy
+    >>> nrn = ezy.load_neuron('some/data/path/morph_file.swc')
 
     Obtain some morphometrics
 
-    >>> ap_seg_len = _ezy.get('segment_lengths', nrn, neurite_type=_ezy.NeuriteType.apical_dendrite)
-    >>> ax_sec_len = _ezy.get('section_lengths', nrn, neurite_type=_ezy.NeuriteType.axon)
+    >>> ap_seg_len = ezy.get('segment_lengths', nrn, neurite_type=ezy.NeuriteType.apical_dendrite)
+    >>> ax_sec_len = ezy.get('section_lengths', nrn, neurite_type=ezy.NeuriteType.axon)
 
     View it in 2D and 3D
 
-    >>> fig2d, ax2d = _ezy.view(nrn)
+    >>> fig2d, ax2d = ezy.view(nrn)
     >>> fig2d.show()
-    >>> fig3d, ax3d = _ezy.view3d(nrn)
+    >>> fig3d, ax3d = ezy.view3d(nrn)
     >>> fig3d.show()
 
     Load neurons from a directory. This loads all SWC or HDF5 files it finds\
     and returns a list of neurons
 
     >>> import numpy as np  # For mean value calculation
-    >>> nrns = _ezy.load_neurons('some/data/directory')
+    >>> nrns = ezy.load_neurons('some/data/directory')
     >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean(_ezy.get('section_lengths', nrn))
+    ...     print 'mean section length', np.mean(ezy.get('section_lengths', nrn))
 
 '''
 from functools import partial, update_wrapper
-from ..point_neurite.core import Neuron
-from ..core.population import Population
-from ..core.types import NeuriteType, NEURITES as NEURITE_TYPES
-from ..view.view import neuron as _view
-from ..view.view import neuron3d as _view3d
-from ..io.utils import get_morph_files
-from ..point_neurite.features import get
-from ..point_neurite.io.utils import load_neuron
-from ..io import utils as _io
-from ..utils import deprecated, deprecated_module
+from neurom.point_neurite.core import Neuron
+from neurom.core.population import Population
+from neurom.core.types import NeuriteType, NEURITES as NEURITE_TYPES
+from neurom.view.view import neuron as _view
+from neurom.view.view import neuron3d as _view3d
+from neurom.io.utils import get_morph_files
+from neurom.point_neurite.features import get
+from neurom.point_neurite.io import load_neuron, load_neurons
+from neurom.utils import deprecated, deprecated_module
 
 
 deprecated_module(__name__)
 
 TreeType = NeuriteType  # For backwards compatibility
 
-
-_load_neurons = partial(_io.load_neurons, neuron_loader=load_neuron,
-                        population_class=Population)
-update_wrapper(_load_neurons, _io.load_neurons)
-load_neurons = deprecated(fun_name='%s.load_neurons' % __name__,
-                          msg='Use neurom.load_neurons instead.')(_load_neurons)
-
-load_population = deprecated(msg='Use neurom.load_neurons instead.',
-                             fun_name='%s.load_population' % __name__)(load_neurons)
+load_population = load_neurons
 
 view = deprecated(msg='Use neurom.viewer.draw instead.',
                   fun_name='%s.view' % __name__)(_view)
