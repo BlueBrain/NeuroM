@@ -29,9 +29,9 @@
 
 '''Calculate and plot end-to-end distance of neurites.'''
 
+import neurom as nm
 from neurom.analysis import morphmath
-from neurom import fst
-from neurom import _compat
+from neurom.fst import _neuritefunc as nf
 from neurom.core.tree import ileaf, ipreorder
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,7 +68,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
         '''Distance between segmenr end and trunk'''
         return morphmath.point_dist(seg[1], neurite.root_node.points[0])
 
-    end_to_end_distance = _compat.map_segments(neurite, _dist)
+    end_to_end_distance = [_dist(s) for s in nf.iter_segments(neurite)]
     make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1,
                                   end_to_end_distance, neurite.type)
 
@@ -76,16 +76,16 @@ def calculate_and_plot_end_to_end_distance(neurite):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron_3_random_walker_branches.swc'
-    nrn = fst.load_neuron(filename)
+    nrn = nm.load_neuron(filename)
 
     # print mean end-to-end distance per neurite type
     print('Mean end-to-end distance for axons: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == fst.NeuriteType.axon))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == nm.AXON))
     print('Mean end-to-end distance for basal dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == fst.NeuriteType.basal_dendrite))
+          mean_end_to_end_dist(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE))
     print('Mean end-to-end distance for apical dendrites: ',
           mean_end_to_end_dist(n for n in nrn.neurites
-                               if n.type == fst.NeuriteType.apical_dendrite))
+                               if n.type == nm.APICAL_DENDRITE))
 
     print 'End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):'
     for nrte in nrn.neurites:

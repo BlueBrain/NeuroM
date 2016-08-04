@@ -2,7 +2,7 @@ import os
 import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
-import neurom.fst._dendrogram as dm
+import neurom.view._dendrogram as dm
 from neurom.fst import load_neuron
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

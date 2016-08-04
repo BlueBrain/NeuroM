@@ -28,14 +28,14 @@
 
 '''Old-style new-style neurite compatibility hacks'''
 
-from itertools import imap, izip
-from neurom.fst._dendrogram import Dendrogram
+from neurom.view._dendrogram import Dendrogram
 from neurom import iter_neurites
 from neurom.point_neurite import segments as seg
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.point_neurite.treefunc import find_tree_type, get_bounding_box
 from neurom import fst
+from neurom.fst import sectionfunc as secfun
 from neurom import geom
 
 
@@ -74,14 +74,12 @@ def dendrogram_class(obj):
 
 def map_segments(neurite, fun):
     '''map a function to the segments in a tree'''
-    def _segfun(sec):
-        '''map a segment function to the segments in section sec'''
-        return imap(fun, izip(sec.points[:-1], sec.points[1:]))
 
     if is_new_style(neurite):
         if isinstance(neurite, fst.Section):
             neurite = fst.Neurite(neurite)
-        return [s for ss in neurite.iter_sections() for s in _segfun(ss)]
+        return [s for ss in neurite.iter_sections()
+                for s in secfun.map_segments(fun, ss)]
     else:
         fun = seg.segment_function(as_tree=False)(fun)
         return list(iter_neurites(neurite, fun))
