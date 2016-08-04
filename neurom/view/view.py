@@ -546,10 +546,8 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     Returns:
         A 2D matplotlib figure with a dendrogram view.
     '''
-    if _compat.is_new_style(obj):
-        from neurom.fst._dendrogram import Dendrogram
-    else:
-        from neurom.point_neurite.dendrogram import Dendrogram
+
+    Dendrogram = _compat.dendrogram_class(obj)
 
     # create dendrogram and generate rectangle collection
     dnd = Dendrogram(obj, show_diameters=show_diameters)

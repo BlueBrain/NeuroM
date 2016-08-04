@@ -30,7 +30,9 @@ import os
 import numpy as np
 from nose import tools as nt
 from neurom.view import _compat
+from neurom.fst._dendrogram import Dendrogram
 from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.core.types import NeuriteType
 from neurom import fst
 from neurom.analysis.morphmath import segment_radius as segrad
@@ -69,6 +71,11 @@ def test_is_new_style_false():
     nt.assert_false(_compat.is_new_style(NRN0.neurites[0]))
     nt.assert_false(_compat.is_new_style(NRN0))
     nt.assert_false(_compat.is_new_style([1,2,3]))
+
+
+def test_dendrogram_class():
+    nt.assert_equal(_compat.dendrogram_class(NRN0), PointDendrogram)
+    nt.assert_equal(_compat.dendrogram_class(NRN1), Dendrogram)
 
 
 def test_bounding_box():

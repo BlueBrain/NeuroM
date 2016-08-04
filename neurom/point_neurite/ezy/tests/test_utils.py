@@ -26,25 +26,25 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._ezy.utils'''
+'''Test neurom.ezy.utils'''
 
 import os
 from copy import deepcopy
-from neurom import _ezy
-from neurom._ezy import utils as ezy_utils
+from neurom.point_neurite import ezy
+from neurom.point_neurite.ezy import utils as ezy_utils
 from collections import namedtuple
 from neurom.core.types import NeuriteType
 from nose import tools as nt
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
+DATA_PATH = os.path.join(_path, '../../../../test_data')
 MORPH_FILE = os.path.join(DATA_PATH, 'swc', 'Neuron.swc')
-NEURON = _ezy.load_neuron(MORPH_FILE)
+NEURON = ezy.load_neuron(MORPH_FILE)
 
 
 def test_eq():
-    other = _ezy.load_neuron(MORPH_FILE)
+    other = ezy.load_neuron(MORPH_FILE)
     nt.assert_true(ezy_utils.neurons_eq(NEURON, other))
 
 
