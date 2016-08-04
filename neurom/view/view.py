@@ -31,12 +31,12 @@ Python module of NeuroM to visualize morphologies
 '''
 
 from itertools import izip
-from neurom.view import common
+from . import common
+from . import _compat
 from neurom.core.types import NeuriteType
 from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.io import COLS
-from neurom import _compat
 from neurom.analysis.morphmath import segment_radius
 
 DEFAULT_PARAMS = '''        new_fig: boolean \

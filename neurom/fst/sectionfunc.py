@@ -44,10 +44,15 @@ def section_fun(fun):
     return _secfun
 
 
+def map_segments(fun, section):
+    '''Map a function to segments in a section'''
+    pts = section.points
+    return list(fun(s) for s in izip(pts[:-1], pts[1:]))
+
+
 def map_sum_segments(fun, section):
     '''Map function to segments in section and sum the result'''
-    pts = section.points
-    return sum(fun(s) for s in izip(pts[:-1], pts[1:]))
+    return sum(map_segments(fun, section))
 
 
 def section_path_length(section):

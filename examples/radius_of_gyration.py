@@ -29,9 +29,9 @@
 
 '''Calculate radius of gyration of neurites.'''
 
+import neurom as nm
 from neurom.analysis import morphmath as mm
-from neurom import fst
-from neurom._compat import map_segments
+from neurom.fst import _neuritefunc as nf
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -54,8 +54,8 @@ def neurite_centre_of_mass(neurite):
     centre_of_mass = np.zeros(3)
     total_volume = 0
 
-    seg_vol = np.array(map_segments(neurite, mm.segment_volume))
-    seg_centre_of_mass = np.array(map_segments(neurite, segment_centre_of_mass))
+    seg_vol = np.array(map(mm.segment_volume, nf.iter_segments(neurite)))
+    seg_centre_of_mass = np.array(map(segment_centre_of_mass, nf.iter_segments(neurite)))
 
     # multiply array of scalars with array of arrays
     # http://stackoverflow.com/questions/5795700/multiply-numpy-array-of-scalars-by-array-of-vectors
@@ -77,7 +77,7 @@ def radius_of_gyration(neurite):
     centre_mass = neurite_centre_of_mass(neurite)
     sum_sqr_distance = 0
     N = 0
-    dist_sqr = map_segments(neurite, lambda s: distance_sqr(centre_mass, s))
+    dist_sqr = [distance_sqr(centre_mass, s) for s in nf.iter_segments(neurite)]
     sum_sqr_distance = np.sum(dist_sqr)
     N = len(dist_sqr)
     return np.sqrt(sum_sqr_distance / N)
@@ -91,7 +91,7 @@ def mean_rad_of_gyration(neurites):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'test_data/swc/Neuron.swc'
-    nrn = fst.load_neuron(filename)
+    nrn = nm.load_neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
     print([(sum(len(s.points) - 1 for s in nrte.iter_sections()),
@@ -99,9 +99,9 @@ if __name__ == '__main__':
 
     # print mean radius of gyration per neurite type
     print('Mean radius of gyration for axons: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == fst.NeuriteType.axon))
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.AXON))
     print('Mean radius of gyration for basal dendrites: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == fst.NeuriteType.basal_dendrite))
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE))
     print('Mean radius of gyration for apical dendrites: ',
           mean_rad_of_gyration(n for n in nrn.neurites
-                               if n.type == fst.NeuriteType.apical_dendrite))
+                               if n.type == nm.APICAL_DENDRITE))
