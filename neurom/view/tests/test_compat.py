@@ -30,7 +30,7 @@ import os
 import numpy as np
 from nose import tools as nt
 from neurom.view import _compat
-from neurom.fst._dendrogram import Dendrogram
+from neurom.view._dendrogram import Dendrogram
 from neurom.point_neurite.io.utils import load_neuron
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.core.types import NeuriteType
