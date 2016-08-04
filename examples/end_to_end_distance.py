@@ -32,7 +32,6 @@
 import neurom as nm
 from neurom.analysis import morphmath
 from neurom.fst import _neuritefunc as nf
-from neurom.core.tree import ileaf, ipreorder
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -41,7 +40,7 @@ def path_end_to_end_distance(neurite):
     '''Calculate and return end-to-end-distance of a given neurite.'''
     trunk = neurite.root_node.points[0]
     return max(morphmath.point_dist(l.points[-1], trunk)
-               for l in ileaf(neurite.root_node))
+               for l in neurite.root_node.ileaf())
 
 
 def mean_end_to_end_dist(neurites):
@@ -92,5 +91,5 @@ if __name__ == '__main__':
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)
-        print(sum(len(s.points) - 1 for s in ipreorder(nrte.root_node)),
+        print(sum(len(s.points) - 1 for s in nrte.root_node.ipreorder()),
               path_end_to_end_distance(nrte), nrte.type)

@@ -46,84 +46,74 @@ class Tree(object):
         self.children.append(tree)
         return tree
 
+    def is_forking_point(self):
+        '''Is tree a forking point?'''
+        return len(self.children) > 1
 
-def is_forking_point(tree):
-    '''Is tree a forking point?'''
-    return len(tree.children) > 1
+    def is_bifurcation_point(self):
+        '''Is tree a bifurcation point?'''
+        return len(self.children) == 2
 
+    def is_leaf(self):
+        '''Is tree a leaf?'''
+        return len(self.children) == 0
 
-def is_bifurcation_point(tree):
-    '''Is tree a bifurcation point?'''
-    return len(tree.children) == 2
+    def is_root(self):
+        '''Is tree the root node?'''
+        return self.parent is None
 
-
-def is_leaf(tree):
-    '''Is tree a leaf?'''
-    return len(tree.children) == 0
-
-
-def is_root(tree):
-    '''Is tree the root node?'''
-    return tree.parent is None
-
-
-def ipreorder(tree):
-    '''Depth-first pre-order iteration of tree nodes'''
-    children = deque((tree, ))
-    while children:
-        cur_node = children.pop()
-        children.extend(reversed(cur_node.children))
-        yield cur_node
-
-
-def ipostorder(tree):
-    '''Depth-first post-order iteration of tree nodes'''
-    children = [tree, ]
-    seen = set()
-    while children:
-        cur_node = children[-1]
-        if cur_node not in seen:
-            seen.add(cur_node)
+    def ipreorder(self):
+        '''Depth-first pre-order iteration of tree nodes'''
+        children = deque((self, ))
+        while children:
+            cur_node = children.pop()
             children.extend(reversed(cur_node.children))
-        else:
-            children.pop()
             yield cur_node
 
+    def ipostorder(self):
+        '''Depth-first post-order iteration of tree nodes'''
+        children = [self, ]
+        seen = set()
+        while children:
+            cur_node = children[-1]
+            if cur_node not in seen:
+                seen.add(cur_node)
+                children.extend(reversed(cur_node.children))
+            else:
+                children.pop()
+                yield cur_node
 
-def iupstream(tree):
-    '''Iterate from a tree node to the root nodes'''
-    t = tree
-    while t is not None:
-        yield t
-        t = t.parent
+    def iupstream(self):
+        '''Iterate from a tree node to the root nodes'''
+        t = self
+        while t is not None:
+            yield t
+            t = t.parent
+
+    def ileaf(self):
+        '''Iterator to all leaves of a tree'''
+        return ifilter(Tree.is_leaf, self.ipreorder())
+
+    def iforking_point(self, iter_mode=ipreorder):
+        '''Iterator to forking points. Returns a tree object.
+
+        Parameters:
+            tree: the tree over which to iterate
+            iter_mode: iteration mode. Default: ipreorder.
+        '''
+        return ifilter(Tree.is_forking_point, iter_mode(self))
+
+    def ibifurcation_point(self, iter_mode=ipreorder):
+        '''Iterator to bifurcation points. Returns a tree object.
+
+        Parameters:
+            tree: the tree over which to iterate
+            iter_mode: iteration mode. Default: ipreorder.
+        '''
+        return ifilter(Tree.is_bifurcation_point, iter_mode(self))
 
 
-def ileaf(tree):
-    '''Iterator to all leaves of a tree'''
-    return ifilter(is_leaf, ipreorder(tree))
-
-
-def iforking_point(tree, iter_mode=ipreorder):
-    '''Iterator to forking points. Returns a tree object.
-
-    Parameters:
-        tree: the tree over which to iterate
-        iter_mode: iteration mode. Default: ipreorder.
-    '''
-    return ifilter(is_forking_point, iter_mode(tree))
-
-
-def ibifurcation_point(tree, iter_mode=ipreorder):
-    '''Iterator to bifurcation points. Returns a tree object.
-
-    Parameters:
-        tree: the tree over which to iterate
-        iter_mode: iteration mode. Default: ipreorder.
-    '''
-    return ifilter(is_bifurcation_point, iter_mode(tree))
-
-
-def i_chain2(trees, iterator_type=ipreorder, mapping=None, tree_filter=None):
+def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
     '''Returns a mapped iterator to a collection of trees
 
     Provides access to all the elements of all the trees

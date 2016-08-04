@@ -4,8 +4,8 @@ from functools import partial
 from nose import tools as nt
 import numpy as np
 from neurom.point_neurite.point_tree import PointTree
-from neurom.core.soma import make_soma
-from neurom.core.types import NeuriteType
+from neurom.core import make_soma
+from neurom.core import NeuriteType
 import neurom.point_neurite.sections as sec
 import neurom.point_neurite.segments as seg
 import neurom.point_neurite.bifurcations as bifs

@@ -30,70 +30,20 @@
 
 from copy import deepcopy
 import numpy as np
-from neurom.core.types import NeuriteType
-from neurom.core.tree import Tree, ipreorder
+from neurom.core import NeuriteType
+from neurom.core import make_soma
+from neurom.core import Section, Neurite, Neuron
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
-from neurom.core.soma import make_soma
-from neurom.core.neuron import BaseNeuron
 
 
-class Section(Tree):
-    '''Class representing a neurite section'''
-    def __init__(self, points, section_id=None):
-        super(Section, self).__init__()
-        self.id = section_id
-        self.points = points
-
-    def __str__(self):
-        return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
-            (self.id, self.points, self.parent, len(self.children))
-
-
-class Neurite(object):
-    '''Class representing a neurite tree'''
-    def __init__(self, root_node):
-        self.root_node = root_node
-        self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
-        self._points = None
-
-    @property
-    def points(self):
-        '''Return unordered array with all the points in this neurite'''
-        if self._points is None:
-            # add all points in a section except the first one, which is a
-            # duplicate
-            _pts = [v for s in ipreorder(self.root_node) for v in s.points[1:, :4]]
-            # except for the very first point, which is not a duplicate
-            _pts.insert(0, self.root_node.points[0][:4])
-            self._points = np.array(_pts)
-
-        return self._points
-
-    def transform(self, trans):
-        '''Return a copy of this neurite with a 3D transformation applied'''
-        clone = deepcopy(self)
-        for n in clone.iter_sections():
-            n.points[:, 0:3] = trans(n.points[:, 0:3])
-
-        return clone
-
-    def iter_sections(self, order=ipreorder):
-        '''iteration over section nodes'''
-        return order(self.root_node)
-
-    def __deepcopy__(self, memo):
-        '''Deep copy of neurite object'''
-        return Neurite(deepcopy(self.root_node, memo))
-
-
-class Neuron(BaseNeuron):
+class FstNeuron(Neuron):
     '''Class representing a neuron'''
     def __init__(self, data_wrapper, name='Neuron'):
         self._data = data_wrapper
         neurites, sections = make_neurites(self._data)
         soma = make_soma(self._data.soma_points())
-        super(Neuron, self).__init__(soma, neurites, sections)
+        super(FstNeuron, self).__init__(soma, neurites, sections)
         self.name = name
         self._points = None
 
@@ -112,7 +62,7 @@ class Neuron(BaseNeuron):
         '''Return a copy of this neuron with a 3D transformation applied'''
         _data = deepcopy(self._data)
         _data.data_block[:, 0:3] = trans(_data.data_block[:, 0:3])
-        return Neuron(_data, self.name)
+        return FstNeuron(_data, self.name)
 
     def __deepcopy__(self, memo):
         '''Deep-copy neuron object
@@ -121,7 +71,7 @@ class Neuron(BaseNeuron):
             Efficient copying is performed by deep-copying the internal
             data block and building a neuron from it
         '''
-        return Neuron(deepcopy(self._data, memo), self.name)
+        return FstNeuron(deepcopy(self._data, memo), self.name)
 
 
 def make_neurites(rdw):

@@ -32,7 +32,7 @@ from functools import wraps
 
 
 def check_wrapper(fun):
-    '''Wrapp a checking function'''
+    '''Decorate a checking function'''
     @wraps(fun)
     def _wrapper(*args, **kwargs):
         '''Sets the title property of the result of ijviking a checker'''

@@ -53,7 +53,7 @@ class SOMA_TYPE(object):
                 2: SOMA_TYPE.INVALID}.get(npoints, SOMA_TYPE.SimpleContour)
 
 
-class BaseSoma(object):
+class Soma(object):
     '''Base class for a soma.
 
     Holds a list of raw data rows corresponding to soma points
@@ -77,7 +77,7 @@ class BaseSoma(object):
         return self._points[:, 0:4]
 
 
-class SomaSinglePoint(BaseSoma):
+class SomaSinglePoint(Soma):
     '''
     Type A: 1point soma
     Represented by a single point.
@@ -91,7 +91,7 @@ class SomaSinglePoint(BaseSoma):
             (repr(self._points), self.center, self.radius)
 
 
-class SomaThreePoint(BaseSoma):
+class SomaThreePoint(Soma):
     '''
     Type B: 3point soma
     Represented by 3 points.
@@ -109,7 +109,7 @@ class SomaThreePoint(BaseSoma):
             (repr(self._points), self.center, self.radius)
 
 
-class SomaSimpleContour(BaseSoma):
+class SomaSimpleContour(Soma):
     '''
     Type C: multiple points soma
     Represented by a contour.

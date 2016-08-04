@@ -28,9 +28,8 @@
 
 from nose import tools as nt
 from copy import deepcopy
-from neurom.core.neuron import BaseNeuron
-from neurom.core.soma import make_soma
-from neurom.core.tree import ipreorder
+from neurom.core._neuron import Neuron
+from neurom.core import make_soma
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.point_tree import val_iter
 from itertools import izip
@@ -54,7 +53,7 @@ T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
 def test_deep_copy():
 
     soma = make_soma([[0, 0, 0, 1, 1, 1, -1]])
-    nrn1 = BaseNeuron(soma, [TREE])
+    nrn1 = Neuron(soma, [TREE])
     nrn2 = deepcopy(nrn1)
     check_cloned_neuron(nrn1, nrn2)
 
@@ -76,7 +75,7 @@ def check_cloned_neuron(nrn1, nrn2):
 
         nt.assert_true(isinstance(neu2, type(neu1)))
 
-        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+        for v1, v2 in izip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
 
             nt.assert_true(np.allclose(v1, v2))
 
@@ -98,7 +97,7 @@ def check_cloned_neuron(nrn1, nrn2):
     # neurites
     for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
 
-        for v1, v2 in izip(val_iter(ipreorder(neu1)), val_iter(ipreorder(neu2))):
+        for v1, v2 in izip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
 
             v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
             nt.assert_false(any(v1 == v2))

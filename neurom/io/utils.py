@@ -35,7 +35,7 @@ from neurom.exceptions import RawDataError
 from neurom.io.datawrapper import SecDataWrapper
 from neurom.io import swc
 from neurom.io import neurolucida
-from neurom.fst._core import Neuron
+from neurom.fst._core import FstNeuron
 
 
 def get_morph_files(directory):
@@ -54,7 +54,7 @@ def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     rdw = load_data(filename)
     name = os.path.splitext(os.path.basename(filename))[0]
-    return Neuron(rdw, name)
+    return FstNeuron(rdw, name)
 
 
 def load_neurons(neurons,

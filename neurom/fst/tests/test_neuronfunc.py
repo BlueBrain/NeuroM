@@ -34,7 +34,7 @@ import numpy as np
 from neurom import fst
 from neurom.fst import _neuronfunc as _nf
 from neurom.point_neurite.io import utils as io_utils
-from neurom.core.soma import make_soma
+from neurom.core import make_soma
 from neurom.core.population import Population
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

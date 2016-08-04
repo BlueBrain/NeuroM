@@ -35,9 +35,9 @@ from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import ROOT_ID
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.treefunc import set_tree_type
-from neurom.point_neurite.core import Neuron
+from neurom.point_neurite.core import PointNeuron
 from neurom.point_neurite.io.datawrapper import RawDataWrapper
-from neurom.core.soma import make_soma
+from neurom.core import make_soma
 from neurom.exceptions import IDSequenceError, MultipleTrees, MissingParentError
 from neurom.check import structural_checks as check
 from neurom.utils import memoize
@@ -100,7 +100,7 @@ def make_neuron(raw_data, tree_action=None):
     _trees = [make_point_tree(raw_data, iseg, tree_action)
               for iseg in get_initial_neurite_segment_ids(raw_data)]
 
-    nrn = Neuron(_soma, _trees)
+    nrn = PointNeuron(_soma, _trees)
     nrn.data_block = raw_data
     return nrn
 

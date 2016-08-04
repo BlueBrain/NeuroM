@@ -32,11 +32,11 @@ import os
 from neurom.point_neurite import io
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.io.utils import make_neuron
-import neurom.core.tree as tr
+from neurom.core import Tree as tr
 import neurom.point_neurite.point_tree as ptr
 import neurom.point_neurite.treefunc as mtr
-from neurom.core.types import NeuriteType
-from neurom.core.soma import make_soma
+from neurom.core import NeuriteType
+from neurom.core import make_soma
 import numpy as np
 
 DATA_PATH = './test_data'

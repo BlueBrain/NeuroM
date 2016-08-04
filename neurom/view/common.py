@@ -30,7 +30,7 @@
 Module containing the common functionality
 to be used by view-plot modules.
 """
-from neurom.core.types import NeuriteType
+from neurom import NeuriteType
 import os
 import matplotlib
 

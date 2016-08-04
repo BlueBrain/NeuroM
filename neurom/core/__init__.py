@@ -29,7 +29,10 @@
 ''' Core functionality and data types of NeuroM '''
 
 from .tree import i_chain2 as _chain_neurites
-from .tree import Tree as _Tree
+from .tree import Tree
+from .types import NeuriteType
+from ._soma import Soma, make_soma
+from ._neuron import Section, Neurite, Neuron
 
 
 def iter_neurites(obj, mapfun=None, filt=None):
@@ -48,7 +51,7 @@ def iter_neurites(obj, mapfun=None, filt=None):
 
     '''
     #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = ([obj] if isinstance(obj, _Tree)
+    neurites = ([obj] if isinstance(obj, Tree)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
     iter_type = None if mapfun is None else mapfun.iter_type
 

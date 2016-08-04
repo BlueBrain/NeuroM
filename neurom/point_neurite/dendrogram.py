@@ -28,7 +28,7 @@
 
 '''Dendrogram helper functions and class'''
 
-from neurom.core.tree import Tree, ipreorder
+from neurom.core import Tree
 from neurom.point_neurite.core import Neuron
 from neurom.analysis.morphmath import segment_length
 from neurom.core.dataformat import COLS
@@ -43,7 +43,7 @@ def _max_recursion_depth(obj):
     '''
     neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
 
-    return max(sum(1 for _ in ipreorder(neu)) for neu in neurites)
+    return max(sum(1 for _ in neu.ipreorder()) for neu in neurites)
 
 
 def _total_rectangles(tree):
@@ -57,7 +57,7 @@ def _total_rectangles(tree):
         '''
         return 2 * len(children) if len(children) != 1 else 1
 
-    return sum(f(node.children) for node in ipreorder(tree))
+    return sum(f(node.children) for node in tree.ipreorder())
 
 
 def _n_rectangles(obj):
@@ -128,7 +128,7 @@ def _update_offsets(start_x, spacing, terminations, offsets, length):
 def _max_diameter(tree):
     '''Find max diameter in tree
     '''
-    return 2. * max(node.value[COLS.R] for node in ipreorder(tree))
+    return 2. * max(node.value[COLS.R] for node in tree.ipreorder())
 
 
 class Dendrogram(object):

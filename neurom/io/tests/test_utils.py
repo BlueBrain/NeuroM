@@ -28,12 +28,11 @@
 
 '''Test neurom.io.utils'''
 import os
-from neurom.fst import Neuron
+from neurom.core import Neuron
 from neurom.fst import _neuritefunc as _nf
 from neurom import get
 from neurom.io import utils
 from neurom.exceptions import RawDataError, SomaError
-from neurom.core.tree import ipreorder
 from nose import tools as nt
 
 
@@ -169,8 +168,8 @@ def test_neuron_sections_are_connected():
     # check traversal by counting number of sections un trees
     for nrt in NRN.neurites:
         root_node = nrt.root_node
-        nt.assert_equal(sum(1 for _ in ipreorder(root_node)),
-                        sum(1 for _ in ipreorder(NRN.sections[root_node.id])))
+        nt.assert_equal(sum(1 for _ in root_node.ipreorder()),
+                        sum(1 for _ in NRN.sections[root_node.id].ipreorder()))
 
 
 def test_load_neuron_soma_only():

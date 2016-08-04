@@ -37,7 +37,8 @@ from neurom.fst import _neuronfunc as _nrn
 from neurom.fst import _neuritefunc as _nrt
 from neurom.fst import sectionfunc as _sec
 from neurom.fst import _bifurcationfunc as _bf
-from neurom.core.tree import i_chain2, ibifurcation_point
+from neurom.core import Tree
+from neurom.core.tree import i_chain2
 from neurom.point_neurite.io.utils import load_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
@@ -165,7 +166,7 @@ class SectionTreeBase(object):
                    get('local_bifurcation_angles', self.ref_nrn, neurite_type=t))
 
         ba = [_bf.local_bifurcation_angle(b)
-              for b in i_chain2(self.sec_nrn_trees, iterator_type=ibifurcation_point)]
+              for b in i_chain2(self.sec_nrn_trees, iterator_type=Tree.ibifurcation_point)]
 
         _close(ba, get('local_bifurcation_angles', self.ref_nrn))
 
@@ -181,7 +182,7 @@ class SectionTreeBase(object):
                    get('remote_bifurcation_angles', self.ref_nrn, neurite_type=t))
 
         ba = [_bf.remote_bifurcation_angle(b)
-              for b in i_chain2(self.sec_nrn_trees, iterator_type=ibifurcation_point)]
+              for b in i_chain2(self.sec_nrn_trees, iterator_type=Tree.ibifurcation_point)]
 
         _close(ba, get('remote_bifurcation_angles', self.ref_nrn))
 

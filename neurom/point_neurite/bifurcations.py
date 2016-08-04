@@ -30,7 +30,7 @@
 
 '''
 import functools
-from neurom.core import tree as tr
+from neurom.core import Tree
 from . import point_tree as ptr
 from . import treefunc as mt
 from neurom import iter_neurites
@@ -40,7 +40,7 @@ from neurom.utils import deprecated_module
 
 deprecated_module(__name__)
 
-iter_type = tr.ibifurcation_point
+iter_type = Tree.ibifurcation_point
 
 
 def bifurcation_point_function(as_tree=False):
@@ -59,7 +59,7 @@ def bifurcation_point_function(as_tree=False):
                 bifurcation_point = bifurcation_point.value
             return fun(bifurcation_point)
 
-        _wrapper.iter_type = tr.ibifurcation_point
+        _wrapper.iter_type = iter_type
         return _wrapper
 
     return _bifurcation_point_function

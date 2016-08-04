@@ -41,7 +41,7 @@ from neurom import geom
 
 def is_new_style(obj):
     '''Determine whether a neuron or neurite is new or old style'''
-    if isinstance(obj, (fst.Neuron, fst.Neurite, fst.Section)):
+    if isinstance(obj, (fst.FstNeuron, fst.Neurite, fst.Section)):
         return True
     elif isinstance(obj, PointTree):
         return len(obj.value.shape) == 2

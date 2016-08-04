@@ -27,13 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from neurom.core.tree import (Tree,
-                              ipreorder,
-                              iupstream,
-                              is_forking_point,
-                              is_root,
-                              is_leaf)
-
+from neurom.core import Tree
 from itertools import chain, imap, ifilter, repeat
 
 
@@ -50,87 +44,78 @@ class PointTree(Tree):
         return 'Tree(value=%s) <parent: %s, nchildren: %d>' % \
             (self.value, self.parent, len(self.children))
 
+    def isegment(self, iter_mode=Tree.ipreorder):
+        '''Iterate over segments
 
-def isegment(tree, iter_mode=ipreorder):
-    '''Iterate over segments
+        Segments are parent-child pairs, with the child being the
+        center of the iteration
 
-    Segments are parent-child pairs, with the child being the
-    center of the iteration
-
-    Parameters:
-        tree: the tree over which to iterate
-        iter_mode: iteration mode. Default: ipreorder.
-    '''
-    return imap(lambda t: (t.parent, t),
-                ifilter(lambda t: t.parent is not None, iter_mode(tree)))
-
-
-def isection(tree, iter_mode=ipreorder):
-    '''Iterator to sections of a tree.
-
-    Resolves to a tuple of sub-trees forming a section.
-
-    Parameters:
-        tree: the tree over which to iterate
-        iter_mode: iteration mode. Default: ipreorder.
-    '''
-    def get_section(tree):
-        '''get the upstream section starting from this tree'''
-        ui = iupstream(tree)
-        sec = [ui.next()]
-        for i in ui:
-            sec.append(i)
-            if is_forking_point(i) or is_root(i):
-                break
-        sec.reverse()
-        return tuple(sec)
-
-    def seed_node(n):
-        '''Is this node a good seed for upstream section finding?'''
-        return not is_root(n) and (is_leaf(n) or is_forking_point(n))
-
-    return imap(get_section,
-                ifilter(seed_node, iter_mode(tree)))
-
-
-def itriplet(tree):
-    '''Iterate over triplets
-
-    Post-order iteration yielding tuples with three consecutive sub-trees
-    '''
-    return chain.from_iterable(
-        imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
-             ifilter(lambda n: not is_root(n) and not is_leaf(n),
-                     ipreorder(tree))))
-
-
-def i_branch_end_points(fork_point):
-    '''Iterate over the furthest points in forking sections
-
-    Parameters:
-        fork_point: A tree object which is a forking point
-
-    Returns:
-        An iterator with end-points of the sections forking out\
-            of fork_point
-    '''
-
-    def next_end_point(tree):
-        '''Get the next node of a tree which is a section end-point
+        Parameters:
+            iter_mode: iteration mode. Default: ipreorder.
         '''
-        i = ipreorder(tree)
-        while True:
-            n = i.next()
-            if is_section_end_point(n):
-                break
-        return n
+        return imap(lambda t: (t.parent, t),
+                    ifilter(lambda t: t.parent is not None, iter_mode(self)))
 
-    def is_section_end_point(tree):
-        '''Is this tree a section end point???
+    def isection(self, iter_mode=Tree.ipreorder):
+        '''Iterator to sections of a tree.
+
+        Resolves to a tuple of sub-trees forming a section.
+
+        Parameters:
+            iter_mode: iteration mode. Default: ipreorder.
         '''
-        return (not is_root(tree)) and (is_forking_point(tree) or is_leaf(tree))
+        def get_section(tree):
+            '''get the upstream section starting from this tree'''
+            ui = tree.iupstream()
+            sec = [ui.next()]
+            for i in ui:
+                sec.append(i)
+                if i.is_forking_point() or i.is_root():
+                    break
+            sec.reverse()
+            return tuple(sec)
 
-    return imap(next_end_point, fork_point.children)
+        def seed_node(n):
+            '''Is this node a good seed for upstream section finding?'''
+            return not n.is_root() and (n.is_leaf() or n.is_forking_point())
+
+        return imap(get_section,
+                    ifilter(seed_node, iter_mode(self)))
+
+    def itriplet(self):
+        '''Iterate over triplets
+
+        Post-order iteration yielding tuples with three consecutive sub-trees
+        '''
+        return chain.from_iterable(
+            imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
+                 ifilter(lambda n: not n.is_root() and not n.is_leaf(),
+                         self.ipreorder())))
+
+    def i_branch_end_points(self):
+        '''Iterate over the furthest points in forking sections
+
+        Returns:
+            An iterator with end-points of the sections forking out\
+                of fork_point
+        '''
+
+        def next_end_point(tree):
+            '''Get the next node of a tree which is a section end-point
+            '''
+            i = tree.ipreorder()
+            while True:
+                n = i.next()
+                if is_section_end_point(n):
+                    break
+            return n
+
+        def is_section_end_point(tree):
+            '''Is this tree a section end point???
+            '''
+            return (not tree.is_root()) and (tree.is_forking_point() or tree.is_leaf())
+
+        return imap(next_end_point, self.children)
 
 
 def as_elements(trees):
@@ -152,3 +137,9 @@ def imap_val(f, tree_iterator):
     '''Map function f to value of tree_iterator's target
     '''
     return imap(f, val_iter(tree_iterator))
+
+
+isegment = PointTree.isegment
+isection = PointTree.isection
+itriplet = PointTree.itriplet
+i_branch_end_points = PointTree.i_branch_end_points
