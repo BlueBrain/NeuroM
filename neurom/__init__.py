@@ -61,3 +61,16 @@ BASAL_DENDRITE = NeuriteType.basal_dendrite
 AXON = NeuriteType.axon
 SOMA = NeuriteType.soma
 ANY_NEURITE = NeuriteType.all
+
+__all__ = [
+    'load_neuron',
+    'load_neurons',
+    'get',
+    'iter_neurites',
+    'NeuriteType',
+    'APICAL_DENDRITE',
+    'BASAL_DENDRITE',
+    'AXON',
+    'SOMA',
+    'ANY_NEURITE',
+]
