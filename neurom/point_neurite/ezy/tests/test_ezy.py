@@ -26,46 +26,46 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._ezy module'''
+'''Test neurom.ezy module'''
 
 from nose import tools as nt
 import os
-from neurom import _ezy
+from neurom.point_neurite import ezy
 
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
+DATA_PATH = os.path.join(_path, '../../../../test_data/valid_set')
 FILENAMES = [os.path.join(DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
 def test_load_neurons_directory():
 
-    nrns = _ezy.load_neurons(DATA_PATH)
+    nrns = ezy.load_neurons(DATA_PATH)
     nt.assert_equal(len(nrns), 5)
     for nrn in nrns:
-        nt.assert_true(isinstance(nrn, _ezy.Neuron))
+        nt.assert_true(isinstance(nrn, ezy.Neuron))
 
 
 def test_load_neurons_filenames():
 
-    nrns = _ezy.load_neurons(FILENAMES)
+    nrns = ezy.load_neurons(FILENAMES)
     nt.assert_equal(len(nrns), 3)
     for nrn in nrns:
-        nt.assert_true(isinstance(nrn, _ezy.Neuron))
+        nt.assert_true(isinstance(nrn, ezy.Neuron))
 
 
 def test_load_population_directory():
 
-    pop = _ezy.load_population(DATA_PATH)
+    pop = ezy.load_population(DATA_PATH)
     nt.assert_equal(len(pop.neurons), 5)
     nt.assert_equal(pop.name, 'valid_set')
 
-    pop = _ezy.load_population(DATA_PATH, 'test123')
+    pop = ezy.load_population(DATA_PATH, name='test123')
     nt.assert_equal(len(pop.neurons), 5)
     nt.assert_equal(pop.name, 'test123')
 
 
 def test_load_population_filenames():
 
-    pop = _ezy.load_population(FILENAMES, 'test123')
+    pop = ezy.load_population(FILENAMES, name='test123')
     nt.assert_equal(len(pop.neurons), 3)
     nt.assert_equal(pop.name, 'test123')
