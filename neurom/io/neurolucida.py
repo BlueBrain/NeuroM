@@ -162,13 +162,14 @@ def _flatten_subsection(subsection, _type, offset, parent, remove_duplicates=Fal
         elif isinstance(row[0], list):
             split_parent = offset - 1
             start_offset = 1 if remove_duplicates else 0
-            try:
-                # TODO: do this more efficiently instead of a full list scan for '|'
-                split_index = row.index('|')
-                slices = (slice(start_offset, split_index),
-                          slice(start_offset + split_index + 1, len(row)), )
-            except ValueError:
-                slices = (slice(start_offset, len(row)), )
+
+            slices = []
+            start = 0
+            for i, value in enumerate(row):
+                if '|' == value:
+                    slices.append(slice(start + start_offset, i))
+                    start = i + 1
+            slices.append(slice(start + start_offset, len(row)))
 
             for split_slice in slices:
                 for _row in _flatten_subsection(row[split_slice], _type, offset,
