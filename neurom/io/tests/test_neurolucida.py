@@ -82,30 +82,30 @@ def test__parse_sections():
 def test__flatten_section():
     #[X, Y, Z, R, TYPE, ID, PARENT_ID]
     subsection = [['0', '0', '0', '0'],
-               ['1', '1', '1', '1'],
-               ['2', '2', '2', '2'],
-               ['3', '3', '3', '3'],
-               ['4', '4', '4', '4'],
-               'Generated',
-               ]
+                  ['1', '1', '1', '1'],
+                  ['2', '2', '2', '2'],
+                  ['3', '3', '3', '3'],
+                  ['4', '4', '4', '4'],
+                  'Generated',
+                  ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     #correct parents
     ok_(np.allclose(ret[:, COLS.P], np.arange(-1, 4)))
     ok_(np.allclose(ret[:, COLS.ID], np.arange(0, 5)))
 
     subsection = [['-1', '-1', '-1', '-1'],
-               [['0', '0', '0', '0'],
-                ['1', '1', '1', '1'],
-                ['2', '2', '2', '2'],
-                ['3', '3', '3', '3'],
-                ['4', '4', '4', '4'],
-                '|',
-                ['1', '2', '3', '4'],
-                ['1', '2', '3', '4'],
-                ['1', '2', '3', '4'],
-                ['1', '2', '3', '4'],
-                ['1', '2', '3', '4'], ]
-               ]
+                  [['0', '0', '0', '0'],
+                   ['1', '1', '1', '1'],
+                   ['2', '2', '2', '2'],
+                   ['3', '3', '3', '3'],
+                   ['4', '4', '4', '4'],
+                   '|',
+                   ['1', '2', '3', '4'],
+                   ['1', '2', '3', '4'],
+                   ['1', '2', '3', '4'],
+                   ['1', '2', '3', '4'],
+                   ['1', '2', '3', '4'], ]
+                  ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     #correct parents
     eq_(ret[0, COLS.P], -1.)
@@ -115,11 +115,30 @@ def test__flatten_section():
 
     #Try a non-standard bifurcation, ie: missing '|' separator
     subsection = [['-1', '-1', '-1', '-1'],
-               [['0', '0', '0', '0'],
-                ['1', '1', '1', '1'], ]
-               ]
+                  [['0', '0', '0', '0'],
+                   ['1', '1', '1', '1'], ]
+                  ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     eq_(ret.shape, (3, 7))
+
+    #try multifurcation
+    subsection = [['-1', '-1', '-1', '-1'],
+                  [['0', '0', '0', '0'],
+                   ['1', '1', '1', '1'],
+                   '|',
+                   ['2', '2', '2', '2'],
+                   ['3', '3', '3', '3'],
+                   '|',
+                   ['4', '4', '4', '4'],
+                   ['5', '5', '5', '5'], ]
+                  ]
+    ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
+    #correct parents
+    eq_(ret[0, COLS.P], -1.)
+    eq_(ret[1, COLS.P], 0.0)
+    eq_(ret[3, COLS.P], 0.0)
+    eq_(ret[5, COLS.P], 0.0)
+    ok_(np.allclose(ret[:, COLS.ID], np.arange(0, 7))) #correct ID
 
 
 def test__extract_section():
