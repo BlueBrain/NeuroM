@@ -84,6 +84,7 @@ Default errors checked for
 * Zero radius points
 * Zero length segments
 * Zero length sections
+* Jumps in the Z-direction
 
 Default values for options
 --------------
@@ -91,6 +92,7 @@ Default values for options
 * has_all_nonzero_neurite_radii: 0.007
 * has_all_nonzero_segment_lengths: 0.01
 * has_all_nonzero_section_lengths: 0.01
+* has_no_zjumps: 30 micrometer - distance considered a jump
 
 Examples
 --------
@@ -162,14 +164,16 @@ CONFIG = {
             'has_all_nonzero_segment_lengths',
             'has_all_nonzero_section_lengths',
             'has_all_nonzero_neurite_radii',
-            'has_nonzero_soma_radius'
+            'has_nonzero_soma_radius',
+            'has_no_zjumps',
         ]
     },
     'options': {
         'has_nonzero_soma_radius': 0.0,
         "has_all_nonzero_neurite_radii": 0.007,
         "has_all_nonzero_segment_lengths": 0.01,
-        "has_all_nonzero_section_lengths": 0.01
+        "has_all_nonzero_section_lengths": 0.01,
+        "has_no_zjumps": 30,
     },
     'color': False
 }

@@ -171,3 +171,25 @@ def has_nonzero_soma_radius(neuron, threshold=0.0):
         threshold: value above which the soma radius is considered to be non-zero
     '''
     return CheckResult(neuron.soma.radius > threshold)
+
+
+def has_no_zjumps(neuron, max_z_distance=30.0):
+    '''Check if there are z-jumps (large movements in the Z axis)
+
+    Arguments:
+        neuron: Neuron object whose neurites will be tested
+        max_z_distance: value above which consecutive z-values are
+        considered a jump
+
+    Return:
+        status and list of ids bad sections
+    '''
+    bad_ids = []
+    for s in _nf.iter_sections(neuron):
+        it = izip(s.points, s.points[1:])
+        for i, (p0, p1) in enumerate(it):
+            info = (s.id, i)
+            if max_z_distance < abs(p0[COLS.Z] - p1[COLS.Z]):
+                bad_ids.append(info)
+
+    return CheckResult(len(bad_ids) == 0, bad_ids)
