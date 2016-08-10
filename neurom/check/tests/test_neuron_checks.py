@@ -300,3 +300,9 @@ def test_has_nonzero_soma_radius_threshold():
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.5))
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.75))
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 2.5))
+
+
+def test_has_no_zjumps():
+    _, nrn = _load_neuron('Neuron.h5')
+    nt.ok_(nrn_chk.has_no_zjumps(nrn).status)
+    nt.ok_(not nrn_chk.has_no_zjumps(nrn, 0.5).status)
