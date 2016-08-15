@@ -52,6 +52,11 @@ def test_read_swc_basic():
     check_single_section_random_swc(rdw.data_block, rdw.fmt)
 
 
+def test_ball_and_stick():
+    n = swc.read(os.path.join(SWC_PATH, 'ball_and_stick.swc'))
+    nt.eq_(n.neurite_trunks(), [1, ])
+
+
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
         self.data = swc.read(
