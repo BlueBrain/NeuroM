@@ -283,6 +283,21 @@ def test_has_nonzero_soma_radius_bad_data():
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
 
 
+def test_has_no_fat_ends():
+    _, nrn = _load_neuron('fat_end.swc')
+    nt.ok_(not nrn_chk.has_no_fat_ends(nrn).status)
+
+    # if we only use point, there isn't a 'fat end'
+    # since if the last point is 'x': x < 2*mean([x])
+    nt.ok_(nrn_chk.has_no_fat_ends(nrn, final_point_count=1).status)
+
+    # if the multiple of the mean is large, the end won't be fat
+    nt.ok_(nrn_chk.has_no_fat_ends(nrn, multiple_of_mean=10).status)
+
+    _, nrn = _load_neuron('Single_basal.swc')
+    nt.ok_(nrn_chk.has_no_fat_ends(nrn).status)
+
+
 def test_has_nonzero_soma_radius_threshold():
 
     class Dummy(object):

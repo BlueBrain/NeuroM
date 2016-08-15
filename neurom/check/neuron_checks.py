@@ -32,12 +32,13 @@ Contains functions for checking validity of neuron neurites and somata.
 Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
+import numpy as np
 
 from itertools import izip
+from neurom.core import Tree
 from neurom.core.types import NeuriteType
 from neurom.core.dataformat import COLS
-from neurom.analysis.morphmath import section_length
-from neurom.analysis.morphmath import segment_length
+from neurom.analysis.morphmath import section_length, segment_length
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.fst import _neuritefunc as _nf
 from neurom.check import CheckResult
@@ -194,5 +195,22 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
             info = (s.id, i)
             if max_distance < abs(p0[axis] - p1[axis]):
                 bad_ids.append(info)
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
+    '''Check if leaf points are too large
+
+    Arguments:
+        neuron: Neuron object whose soma will be tested
+        multiple_of_mean(float): how many times larger the final radius
+        has to be compared to the mean of the final points
+        final_point_count(int): how many points to include in the mean
+    '''
+    bad_ids = []
+    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Tree.ileaf):
+        mean_radius = np.mean(leaf.points[-final_point_count:, COLS.R])
+        if mean_radius * multiple_of_mean < leaf.points[-1, COLS.R]:
+            bad_ids.append((leaf.id, len(leaf.points)))
 
     return CheckResult(len(bad_ids) == 0, bad_ids)
