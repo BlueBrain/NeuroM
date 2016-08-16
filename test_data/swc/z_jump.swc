@@ -1,6 +1,5 @@
 # SWC structure:
 # index, type, x, y, z, radius, parent
-#Soma w/ a neurite w/ a fat end: 13 > 2 * (13 + 0.5 + 0.5 + 0.5 + 0.5) / 5
 
 1  1 0 0  0 3.0 -1
 2  3 0 0 -1 13. 1
