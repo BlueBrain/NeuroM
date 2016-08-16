@@ -400,7 +400,7 @@ def plot_style(fig, ax, **kwargs):
         return (None, None)
     else:
         if final:
-            plt.show()
+            plt.show()  # pragma no cover
         return fig, ax
 
 
