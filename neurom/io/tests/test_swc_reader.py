@@ -52,6 +52,11 @@ def test_read_swc_basic():
     check_single_section_random_swc(rdw.data_block, rdw.fmt)
 
 
+def test_read_single_neurite():
+    rdw = swc.read(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    nt.eq_(rdw.neurite_trunks(), [1])
+
+
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
         self.data = swc.read(

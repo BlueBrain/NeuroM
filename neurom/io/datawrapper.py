@@ -29,8 +29,7 @@
 '''Fast neuron IO module'''
 
 from collections import defaultdict
-from neurom.core.dataformat import POINT_TYPE
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 
 
 class SecDataWrapper(object):
@@ -67,16 +66,32 @@ def _merge_sections(sec_a, sec_b):
     sec_a.pid = -1
 
 
-def _section_end_points(data_block):
+def _section_end_points(data_block, id_map):
     '''Get the section end-points '''
+    def _is_soma_neurite_break(idx):
+        '''determine if idx is the index of the first non-soma point'''
+        row = data_block[idx]
+        pid = id_map[int(row[COLS.P])]
+        if row[COLS.P] == ROOT_ID:
+            return False
+
+        return (row[COLS.TYPE] != POINT_TYPE.SOMA and
+                data_block[pid][COLS.TYPE] == POINT_TYPE.SOMA)
+
+    soma_end_pts = set()
+
     # number of children per point
     n_children = defaultdict(int)
-    for row in data_block:
+    for i, row in enumerate(data_block):
         n_children[int(row[COLS.P])] += 1
+        if _is_soma_neurite_break(i):
+            soma_end_pts.add(id_map[int(data_block[i][COLS.P])])
 
     # end points have either no children or more than one
-    return set(i for i, row in enumerate(data_block)
-               if n_children[row[COLS.ID]] != 1)
+    end_pts = set(i for i, row in enumerate(data_block)
+                  if n_children[row[COLS.ID]] != 1)
+
+    return end_pts.union(soma_end_pts)
 
 
 def _extract_sections(data_block):
@@ -95,7 +110,7 @@ def _extract_sections(data_block):
         id_map[int(r[COLS.ID])] = i
 
     # end points have either no children or more than one
-    sec_end_pts = _section_end_points(data_block)
+    sec_end_pts = _section_end_points(data_block, id_map)
 
     # arfificial discontinuity section IDs
     _gap_sections = set()
@@ -124,7 +139,7 @@ def _extract_sections(data_block):
             parent_section[curr_section.ids[-1]] = len(_sections) - 1
             _sections.append(Section())
             curr_section = _sections[-1]
-            # Parent-child discontinuity sectin
+            # Parent-child discontinuity section
             if gap:
                 curr_section.ids.extend((parent_id, row_id))
                 curr_section.ntype = int(row[COLS.TYPE])
