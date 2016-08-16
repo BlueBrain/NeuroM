@@ -68,8 +68,8 @@ and soma tests fail. Furthermore, inability to build a soma typically results
 in an inability to build neurites. Failure to build a soma or neurites results
 in an early faulure for a given morphology file.
 
-Default errors checked for
---------------------------
+Default checked errors
+----------------------
 * Not a single tree structure
 * No soma points detectes
 * Missing parents
@@ -86,11 +86,18 @@ Default errors checked for
 * Zero length sections
 
 Default values for options
---------------
+--------------------------
 * has_nonzero_soma_radius 0.0
 * has_all_nonzero_neurite_radii: 0.007
 * has_all_nonzero_segment_lengths: 0.01
 * has_all_nonzero_section_lengths: 0.01
+
+Available Checks
+----------------
+                    Options
+has_no_jumps:      has_no_jumps - default 30 micrometer
+                                  distance considered a jump
+                   axis - default 'z', which axis to check
 
 Examples
 --------
@@ -153,7 +160,7 @@ CONFIG = {
             'has_sequential_ids',
             'has_increasing_ids',
             'has_valid_soma',
-            'has_valid_neurites'
+            'has_valid_neurites',
         ],
         'neuron_checks': [
             'has_basal_dendrite',
@@ -162,14 +169,14 @@ CONFIG = {
             'has_all_nonzero_segment_lengths',
             'has_all_nonzero_section_lengths',
             'has_all_nonzero_neurite_radii',
-            'has_nonzero_soma_radius'
+            'has_nonzero_soma_radius',
         ]
     },
     'options': {
         'has_nonzero_soma_radius': 0.0,
         "has_all_nonzero_neurite_radii": 0.007,
         "has_all_nonzero_segment_lengths": 0.01,
-        "has_all_nonzero_section_lengths": 0.01
+        "has_all_nonzero_section_lengths": 0.01,
     },
     'color': False
 }
