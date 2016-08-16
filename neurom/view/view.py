@@ -278,8 +278,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         kwargs['ylim'] = kwargs.get('ylim', [np.min(v) - white_space,
                                              np.max(v) + white_space])
 
-    kwargs['final'] = True
-
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
 
@@ -455,8 +453,6 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     if len(boundaries[2]) > 0:
         kwargs['zlim'] = kwargs.get('zlim', [np.min(boundaries[2]) - white_space,
                                              np.max(boundaries[2]) + white_space])
-
-    kwargs['final'] = True
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
