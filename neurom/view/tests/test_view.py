@@ -69,11 +69,7 @@ def test_tree():
 
 def test_soma():
     fig, ax = view.soma(soma0)
-    nt.ok_(np.allclose(ax.get_xlim(), (0.0, 0.12)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (0.0, 0.20)) )
     fig, ax = view.soma(soma0, outline=False)
-    nt.ok_(np.allclose(ax.get_xlim(), (0.0, 1.0)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (0.0, 1.0)) )
     fig, ax = view.soma(soma0, plane='wrong')
     nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
     plt.close('all')
