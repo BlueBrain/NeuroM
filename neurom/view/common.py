@@ -365,7 +365,7 @@ def plot_style(fig, ax, **kwargs):
     tight = kwargs.get('tight', False)
     aspect_ratio = kwargs.get('aspect_ratio', 'equal')
 
-    final = kwargs.get('final', True)
+    final = kwargs.get('final', False)
 
     # Definition of save options
     output_path = kwargs.get('output_path', None)
@@ -400,7 +400,7 @@ def plot_style(fig, ax, **kwargs):
         return (None, None)
     else:
         if final:
-            plt.show()
+            plt.show()  # pragma no cover
         return fig, ax
 
 
