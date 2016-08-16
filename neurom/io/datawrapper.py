@@ -81,7 +81,7 @@ def _section_end_points(data_block):
     endpoints = set(i for i, row in enumerate(data_block)
                     if n_children[row[COLS.ID]] != 1)
 
-    #manually add the 'last' point of the soma
+    # manually add the 'last' point of the soma
     last_soma_idx = np.nonzero(data_block[:, COLS.TYPE] == POINT_TYPE.SOMA)[-1]
     if len(last_soma_idx):
         endpoints.add(int(last_soma_idx[-1]))
@@ -121,13 +121,6 @@ def _extract_sections(data_block):
             curr_section.ids.append(parent_id)
             curr_section.ntype = int(row[COLS.TYPE])
         gap = parent_id != curr_section.ids[-1]
-
-        #if curr_section.ntype != int(row[COLS.TYPE]):
-        #    import ipdb; ipdb.set_trace()  # XXX BREAKPOINT
-        #    curr_section = Section(
-        #        ids=[row_id], ntype=int(row[COLS.TYPE]), pid=parent_id)
-        #    _sections.append(curr_section)
-        #    continue
 
         # If parent is not the previous point, create
         # a section end-point. Else add the point
