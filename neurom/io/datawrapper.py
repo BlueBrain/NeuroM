@@ -75,7 +75,7 @@ def _section_end_points(data_block):
     # number of children per point
     n_children = defaultdict(int)
     for row in data_block:
-            n_children[int(row[COLS.P])] += 1
+        n_children[int(row[COLS.P])] += 1
 
     # end points have either no children or more than one
     endpoints = set(i for i, row in enumerate(data_block)
