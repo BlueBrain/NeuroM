@@ -29,6 +29,9 @@
 '''Fast neuron IO module'''
 
 from collections import defaultdict
+
+import numpy as np
+
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.dataformat import COLS
 
@@ -75,8 +78,14 @@ def _section_end_points(data_block):
         n_children[int(row[COLS.P])] += 1
 
     # end points have either no children or more than one
-    return set(i for i, row in enumerate(data_block)
-               if n_children[row[COLS.ID]] != 1)
+    endpoints = set(i for i, row in enumerate(data_block)
+                    if n_children[row[COLS.ID]] != 1)
+
+    # manually add the 'last' point of the soma
+    last_soma_idx = np.nonzero(data_block[:, COLS.TYPE] == POINT_TYPE.SOMA)[-1]
+    if len(last_soma_idx):
+        endpoints.add(int(last_soma_idx[-1]))
+    return endpoints
 
 
 def _extract_sections(data_block):
@@ -97,7 +106,7 @@ def _extract_sections(data_block):
     # end points have either no children or more than one
     sec_end_pts = _section_end_points(data_block)
 
-    # arfificial discontinuity section IDs
+    # artificial discontinuity section IDs
     _gap_sections = set()
 
     _sections = [Section()]
@@ -112,6 +121,7 @@ def _extract_sections(data_block):
             curr_section.ids.append(parent_id)
             curr_section.ntype = int(row[COLS.TYPE])
         gap = parent_id != curr_section.ids[-1]
+
         # If parent is not the previous point, create
         # a section end-point. Else add the point
         # to this section
@@ -124,7 +134,7 @@ def _extract_sections(data_block):
             parent_section[curr_section.ids[-1]] = len(_sections) - 1
             _sections.append(Section())
             curr_section = _sections[-1]
-            # Parent-child discontinuity sectin
+            # Parent-child discontinuity section
             if gap:
                 curr_section.ids.extend((parent_id, row_id))
                 curr_section.ntype = int(row[COLS.TYPE])
