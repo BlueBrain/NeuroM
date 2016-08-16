@@ -1,0 +1,9 @@
+# A simple neuron consisting of a point soma
+# and a single branch neurite.
+# Topologically, the soma doesn't form a separate section, so this
+# can be used for testing whether the SWC reader treats the soma specially.
+1 1 0 0 0 3.0 -1
+2 3 0 0 2 0.5 1
+3 3 0 0 3 0.5 2
+4 3 0 0 4 0.5 3
+5 3 0 0 5 0.5 4

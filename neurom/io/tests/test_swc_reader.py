@@ -28,7 +28,7 @@
 
 import os
 import numpy as np
-from neurom.io import ROOT_ID, COLS
+from neurom.io import COLS
 from neurom.io import swc
 from nose import tools as nt
 
@@ -50,6 +50,29 @@ def test_read_swc_basic():
                      'random_trunk_off_0_16pt.swc'))
 
     check_single_section_random_swc(rdw.data_block, rdw.fmt)
+
+
+def test_read_single_neurite():
+    rdw = swc.read(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    nt.eq_(rdw.neurite_trunks(), [1])
+    nt.eq_(len(rdw.soma_points()), 1)
+    nt.eq_(len(rdw.sections), 3) # includes one empty section
+
+
+def test_read_split_soma():
+    rdw = swc.read(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
+    nt.eq_(rdw.neurite_trunks(), [1, 3])
+    nt.eq_(len(rdw.soma_points()), 3)
+    nt.eq_(len(rdw.sections), 5) # includes one empty section
+
+    ref_ids = [[-1, 0],
+               [0, 1, 2, 3, 4],
+               [0, 5, 6],
+               [6, 7, 8, 9, 10],
+               []]
+
+    for s, r in zip(rdw.sections, ref_ids):
+        nt.eq_(s.ids, r)
 
 
 class TestRawDataWrapper_SingleSectionRandom(object):
