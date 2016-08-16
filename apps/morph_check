@@ -91,7 +91,6 @@ Default values for options
 * has_all_nonzero_neurite_radii: 0.007
 * has_all_nonzero_segment_lengths: 0.01
 * has_all_nonzero_section_lengths: 0.01
-* has_no_fat_ends: multiple_of_mean=2.0, final_point_count=5
 
 Available Checks
 ----------------
@@ -171,7 +170,6 @@ CONFIG = {
             'has_all_nonzero_section_lengths',
             'has_all_nonzero_neurite_radii',
             'has_nonzero_soma_radius',
-            'has_no_fat_ends',
         ]
     },
     'options': {
@@ -179,7 +177,6 @@ CONFIG = {
         "has_all_nonzero_neurite_radii": 0.007,
         "has_all_nonzero_segment_lengths": 0.01,
         "has_all_nonzero_section_lengths": 0.01,
-        "has_no_fat_ends": [2.0, 5]
     },
     'color': False
 }
