@@ -153,4 +153,7 @@ def _extract_sections(data_block):
         if sec.pid in _gap_sections:
             _merge_sections(_sections[sec.pid], sec)
 
+    # TODO find a way to remove empty sections.
+    # Currently they are required to maintain
+    # tree integrity.
     return _sections

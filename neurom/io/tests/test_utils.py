@@ -252,6 +252,7 @@ def test_load_neuron_mixed_tree_swc():
 def test_load_neuron_section_order_break_swc():
     nrn_mix =  utils.load_neuron(os.path.join(SWC_PATH, 'sample_disordered.swc'))
 
+
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
 
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
