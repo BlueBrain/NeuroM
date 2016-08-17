@@ -33,8 +33,7 @@ import numpy as np
 from neurom.core import NeuriteType
 from neurom.core import make_soma
 from neurom.core import Section, Neurite, Neuron
-from neurom.core.dataformat import POINT_TYPE
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 
 
 class FstNeuron(Neuron):
@@ -81,19 +80,18 @@ def make_neurites(rdw):
     if len(trunks) == 0:
         return [], []
 
-    start_node = min(trunks)
-
     # One pass over sections to build nodes
-    nodes = tuple(Section(section_id=i, points=rdw.data_block[sec.ids])
+    nodes = tuple(Section(section_id=i,
+                          points=rdw.data_block[sec.ids],
+                          section_type=_TREE_TYPES[sec.ntype])
                   for i, sec in enumerate(rdw.sections))
 
-    # One pass over nodes to set the neurite type
-    # and connect children to parents
+    # One pass over nodes to connect children to parents
     for i, node in enumerate(nodes):
-        node.type = _TREE_TYPES[rdw.sections[i].ntype]
         parent_id = rdw.sections[i].pid
+        parent_type = nodes[parent_id].type
         # only connect neurites
-        if parent_id >= start_node:
+        if parent_id != ROOT_ID and parent_type != NeuriteType.soma:
             nodes[parent_id].add_child(node)
 
     neurites = tuple(Neurite(nodes[i]) for i in trunks)

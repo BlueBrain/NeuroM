@@ -112,6 +112,13 @@ def _mock_load_neuron(filename):
     return MockNeuron(_get_name(filename))
 
 
+def _check_neurites_have_no_parent(nrn):
+
+    for n in nrn.neurites:
+        nt.assert_true(n.root_node.parent is None)
+
+
+
 def test_load_neurons():
     nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
@@ -134,6 +141,7 @@ def test_load_neuron():
     nrn = utils.load_neuron(FILENAMES[0])
     nt.assert_true(isinstance(NRN, Neuron))
     nt.assert_equal(NRN.name, 'Neuron')
+    _check_neurites_have_no_parent(nrn)
 
 
 def test_neuron_name():
@@ -148,6 +156,7 @@ def test_load_contour_soma_neuron():
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 8)
     nt.eq_(nrn.soma.radius, 2.125)
+    _check_neurites_have_no_parent(nrn)
 
 
 def test_load_contour_split_soma_neuron():
@@ -155,6 +164,7 @@ def test_load_contour_split_soma_neuron():
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 8)
     nt.eq_(nrn.soma.radius, 2.125)
+    _check_neurites_have_no_parent(nrn)
 
 
 def test_load_contour_split_1st_soma_neuron():
@@ -162,6 +172,7 @@ def test_load_contour_split_1st_soma_neuron():
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 6)
     nt.eq_(nrn.soma.radius, 2.0)
+    _check_neurites_have_no_parent(nrn)
 
 
 NRN = utils.load_neuron(FILENAMES[0])
@@ -172,6 +183,11 @@ def test_neuron_section_ids():
     # check section IDs
     for i, sec in enumerate(NRN.sections):
         nt.eq_(i, sec.id)
+
+def test_neurites_have_no_parent():
+
+    _check_neurites_have_no_parent(NRN)
+
 
 def test_neuron_sections():
     all_nodes = set(NRN.sections)

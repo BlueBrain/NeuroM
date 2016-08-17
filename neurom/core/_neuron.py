@@ -36,10 +36,11 @@ from . import NeuriteType
 
 class Section(Tree):
     '''Class representing a neurite section'''
-    def __init__(self, points, section_id=None):
+    def __init__(self, points, section_id=None, section_type=NeuriteType.undefined):
         super(Section, self).__init__()
         self.id = section_id
         self.points = points
+        self.type = section_type
 
     def __str__(self):
         return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
