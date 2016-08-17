@@ -150,6 +150,13 @@ def test_load_contour_soma_neuron():
     nt.eq_(nrn.soma.radius, 2.125)
 
 
+def test_load_contour_split_soma_neuron():
+    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'contour_split_soma_neuron.swc'))
+    nt.eq_(len(nrn.neurites), 3)
+    nt.eq_(len(nrn.soma.points), 8)
+    nt.eq_(nrn.soma.radius, 2.125)
+
+
 NRN = utils.load_neuron(FILENAMES[0])
 
 

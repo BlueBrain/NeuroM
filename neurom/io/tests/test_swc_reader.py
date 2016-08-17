@@ -93,6 +93,24 @@ def test_read_contour_soma_neuron():
         nt.eq_(s.ids, r)
 
 
+def test_read_contour_split_soma_neuron():
+    rdw = swc.read(os.path.join(SWC_PATH, 'contour_split_soma_neuron.swc'))
+    nt.eq_(rdw.neurite_trunks(), [1, 4, 5])
+    nt.eq_(len(rdw.soma_points()), 8)
+    nt.eq_(len(rdw.sections), 7) # includes one empty section
+
+    ref_ids = [[-1, 0, 1, 2],
+               [2, 3, 4, 5, 6, 7],
+               [2, 8, 9, 10],
+               [10, 11, 12],
+               [10, 13, 14, 15, 16, 17],
+               [12, 18, 19, 20, 21, 22],
+               []]
+
+    for s, r in zip(rdw.sections, ref_ids):
+        nt.eq_(s.ids, r)
+
+
 class TestRawDataWrapper_SingleSectionRandom(object):
     def setup(self):
         self.data = swc.read(
