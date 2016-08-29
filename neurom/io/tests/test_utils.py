@@ -28,7 +28,7 @@
 
 '''Test neurom.io.utils'''
 import os
-from neurom.core import Neuron
+from neurom.core import Neuron, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom import get
 from neurom.io import utils
@@ -173,6 +173,11 @@ def test_load_contour_split_1st_soma_neuron():
     nt.eq_(len(nrn.soma.points), 6)
     nt.eq_(nrn.soma.radius, 2.0)
     _check_neurites_have_no_parent(nrn)
+
+
+@nt.raises(SomaError)
+def test_load_bifurcating_soma_points_raises_SomaError():
+    utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'bifurcating_soma.swc'))
 
 
 NRN = utils.load_neuron(FILENAMES[0])

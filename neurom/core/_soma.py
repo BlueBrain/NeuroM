@@ -60,6 +60,7 @@ class Soma(object):
     and provides iterator access to them.
     '''
     def __init__(self, points):
+
         self._points = points
 
     @property
@@ -137,14 +138,24 @@ class SomaSimpleContour(Soma):
             (repr(self._points), self.center, self.radius)
 
 
-def make_soma(points):
+def make_soma(points, soma_check=None):
     '''Make a soma object from a set of points
 
     Infers the soma type (SomaSinglePoint, SomaThreePoint or SomaSimpleContour) from the points.
 
+    Parameters:
+        points: collection of points forming a soma.
+        soma_check: optional validation function applied to points. Should
+        raise a SomaError if points not valid.
+
     Raises:
-        SomaError if no soma points found or points incompatible with soma.
+        SomaError if no soma points found, points incompatible with soma, or
+        if soma_check(points) fails.
     '''
+
+    if soma_check:
+        soma_check(points)
+
     stype = SOMA_TYPE.get_type(points)
     if stype == SOMA_TYPE.INVALID:
         raise SomaError('Invalid soma points')

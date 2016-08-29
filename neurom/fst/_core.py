@@ -31,7 +31,7 @@
 from copy import deepcopy
 import numpy as np
 from neurom.core import NeuriteType
-from neurom.core import make_soma
+from neurom.core import make_soma, SomaError
 from neurom.core import Section, Neurite, Neuron
 from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 
@@ -41,7 +41,7 @@ class FstNeuron(Neuron):
     def __init__(self, data_wrapper, name='Neuron'):
         self._data = data_wrapper
         neurites, sections = make_neurites(self._data)
-        soma = make_soma(self._data.soma_points())
+        soma = make_soma(self._data.soma_points(), _SOMA_ACTION[self._data.fmt])
         super(FstNeuron, self).__init__(soma, neurites, sections)
         self.name = name
         self._points = None
@@ -109,10 +109,27 @@ def _remove_soma_initial_point(tree):
         tree.points = tree.points[1:]
 
 
+def _check_soma_topology_swc(points):
+    '''check if points form valid soma
+
+    Currently checks if there are bifurcations within the soma.
+    '''
+    parents = tuple(p[COLS.P] for p in points if p[COLS.P] != ROOT_ID)
+    if len(parents) > len(set(parents)):
+        raise SomaError("Bifurcating soma")
+
+
 _TREE_TYPES = tuple(NeuriteType)
 
 _NEURITE_ACTION = {
     'SWC': _remove_soma_initial_point,
+    'H5V1': None,
+    'H5V2': None,
+    'NL-ASCII': None
+}
+
+_SOMA_ACTION = {
+    'SWC': _check_soma_topology_swc,
     'H5V1': None,
     'H5V2': None,
     'NL-ASCII': None

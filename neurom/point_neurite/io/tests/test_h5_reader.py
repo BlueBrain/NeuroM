@@ -77,7 +77,7 @@ def test_consistency_between_h5_swc():
     swc_data = swc_read(os.path.join(SWC_PATH, 'Neuron.swc'))
     nt.ok_(np.allclose(h5_data.data_block.shape, swc_data.data_block.shape))
     nt.ok_(len(h5_data.get_fork_points()) == len(swc_data.get_fork_points()))
-    nt.ok_(len(h5_data.get_end_points()) == len(swc_data.get_end_points()))
+    nt.eq_(len(h5_data.get_end_points()), len(swc_data.get_end_points()))
 
 
 def test_removed_duplicates():
@@ -120,21 +120,42 @@ class DataWrapper_Neuron(object):
                464, 82, 212, 604, 634, 735, 353, 484, 102, 233,
                624, 755, 373, 504, 122, 253]
 
+    end_pts = [2, 776, 394, 525, 143, 656, 274, 23, 796, 414,
+               545, 163, 676, 294, 424, 846, 43, 816, 565, 183, 696,
+               314, 445, 63, 836, 585, 203, 716, 334, 465, 83, 213,
+               605, 736, 354, 635, 485, 103, 234, 625, 756, 374, 505, 123, 254]
+
     end_parents = [0, 774, 392, 523, 141, 654, 272, 21, 794, 412,
                    543, 161, 674, 292, 422, 41, 814, 563, 181, 694,
                    312, 443, 61, 834, 583, 201, 714, 332, 0, 844,
                    463, 81, 211, 603, 633, 734, 352, 483, 101, 232,
                    623, 754, 372, 503, 121, 252]
 
+    end_parents = [1, 775, 393, 524, 142, 655, 273, 22, 795, 413,
+                   544, 162, 675, 293, 423, 845, 42, 815, 564, 182,
+                   695, 313, 444, 62, 835, 584, 202, 715, 333, 464,
+                   82, 212, 604, 735, 353, 634, 484, 102, 233, 624,
+                   755, 373, 504, 122, 253]
+
     fork_pts = [0, 12, 32, 52, 72, 92, 112, 132, 152, 172, 192, 223,
                 243, 263, 283, 303, 323, 343, 363, 383, 403, 434, 454,
                 474, 494, 514, 534, 554, 574, 594, 614, 645, 665, 685,
                 705, 725, 745, 765, 785, 805, 825]
 
+    fork_pts = [0, 13, 33, 53, 73, 93, 113, 133, 153, 173, 193, 224,
+                244, 264, 284, 304, 324, 344, 364, 384, 404, 435, 455,
+                475, 495, 515, 535, 555, 575, 595, 615, 646, 666,
+                686, 706, 726, 746, 766, 786, 806, 826]
+
     fork_parents = [-1, 11, 31, 51, 71, 91, 111, 131, 151, 171, 191, 222,
                     242, 262, 282, 302, 322, 342, 362, 382, 402, 433, 453,
                     473, 493, 513, 533, 553, 573, 593, 613, 644, 664, 684,
                     704, 724, 744, 764, 784, 804, 824]
+
+    fork_parents = [-1, 12, 32, 52, 72, 92, 112, 132, 152, 172, 192, 223,
+                    243, 263, 283, 303, 323, 343, 363, 383, 403, 434, 454,
+                    474, 494, 514, 534, 554, 574, 594, 614, 645, 665, 685,
+                    705, 725, 745, 765, 785, 805, 825]
 
     def test_n_rows(self):
         nt.assert_equal(self.rows, 847)
@@ -153,7 +174,9 @@ class DataWrapper_Neuron(object):
 
     def test_end_points_have_no_children(self):
         for p in DataWrapper_Neuron.end_pts:
-            nt.ok_(len(self.data.get_children(p)) == 0)
+            #if len(self.data.get_children(p)) != 0:
+            #    print 'XXXXXX', p
+            nt.eq_(len(self.data.get_children(p)), 0)
 
     def test_fork_point_parents(self):
         fpar = [self.data.get_parent(i) for i in self.data.get_fork_points()]
