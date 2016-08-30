@@ -99,26 +99,26 @@ def test_section_tortuosity_pop():
     nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
                        (1.0,
                         4.6571118550276704,
-                        440.38275799536723,
-                        1.3426303597419733)))
+                        440.40884450374455,
+                        1.3427098917797089)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.all)),
                        (1.0,
                         4.6571118550276704,
-                        440.38275799536723,
-                        1.3426303597419733)))
+                        440.40884450374455,
+                        1.3427098917797089)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (1.0664894739230972,
+                       (1.0702760052031615,
                         1.5732825321954913,
-                        26.91578775539082,
-                        1.2817041788281343)))
+                        26.919574286670883,
+                        1.2818844898414707)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
                        (1.042614577410971,
                         1.6742599832295344,
-                        106.58157280493162,
-                        1.2393206140108328)))
+                        106.5960839640893,
+                        1.239489348419643)))
 
 
 def test_section_tortuosity_nrn():
@@ -321,19 +321,19 @@ def test_total_length_pop():
     feat = 'total_length'
 
     nt.ok_(np.allclose(fst.get(feat, POP),
-                       [840.47744821, 418.83424432, 13250.82577394]))
+                       [840.68522362, 418.83424432, 13250.82577394]))
 
     nt.ok_(np.allclose(fst.get(feat, POP, neurite_type=NeuriteType.all),
-                       [840.47744821, 418.83424432, 13250.82577394]))
+                       [840.68522362, 418.83424432, 13250.82577394]))
 
     nt.ok_(np.allclose(fst.get(feat, POP, neurite_type=NeuriteType.axon),
-                       [207.81090481, 207.81088342, 11767.15611522]))
+                       [207.8797736, 207.81088342, 11767.15611522]))
 
     nt.ok_(np.allclose(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
-                       [214.34043344, 0, 0]))
+                       [214.37302709, 0, 0]))
 
     nt.ok_(np.allclose(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
-                       [418.32610997, 211.0233609, 1483.66965872]))
+                       [418.43242293, 211.0233609, 1483.66965872]))
 
 
 def test_total_length_nrn():
@@ -341,19 +341,19 @@ def test_total_length_nrn():
     feat = 'total_length'
 
     nt.ok_(np.allclose(fst.get(feat, NRN),
-                       [840.47744821]))
+                       [840.68522362]))
 
     nt.ok_(np.allclose(fst.get(feat, NRN, neurite_type=NeuriteType.all),
-                       [840.47744821]))
+                       [840.68522362]))
 
     nt.ok_(np.allclose(fst.get(feat, NRN, neurite_type=NeuriteType.axon),
-                       [207.81090481]))
+                       [207.8797736]))
 
     nt.ok_(np.allclose(fst.get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
-                       [214.34043344]))
+                       [214.37302709]))
 
     nt.ok_(np.allclose(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
-                       [418.32610997]))
+                       [418.43242293]))
 
 
 def test_segment_radii_pop():
@@ -419,17 +419,17 @@ def test_segment_meander_angles_pop():
     feat = 'segment_meander_angles'
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
-                       (0.0, 3.1415926535897931, 14629.770789918985, 2.3943978379572806)
+                       (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395)
                        ))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.all)),
-                       (0.0, 3.1415926535897931, 14629.770789918985, 2.3943978379572806)))
+                       (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.0, 3.0939261437163492, 459.69065942334726, 2.4322257112346417)))
+                       (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.0, 3.1415926535897931, 2922.0804310513245, 2.40500447000109)))
+                       (0.0, 3.1415926535897931, 2926.2411975307768, 2.4084289691611334)))
 
 
 def test_segment_meander_angles_nrn():
@@ -437,16 +437,16 @@ def test_segment_meander_angles_nrn():
     feat = 'segment_meander_angles'
 
     nt.ok_(np.allclose(_stats(fst.get(feat, NRN)),
-                       (0.0, 3.129961675751181, 1834.1448983646428, 2.4261175904294219)))
+                       (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.all)),
-                       (0.0, 3.129961675751181, 1834.1448983646428, 2.4261175904294219)))
+                       (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.0, 3.0939261437163492, 459.69065942334726, 2.4322257112346417)))
+                       (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884)))
 
     nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.0, 3.129961675751181, 922.17770626981144, 2.4396235615603477)))
+                       (0.47318725279312024, 3.129961675751181, 926.33847274926438, 2.4506308802890593)))
 
 
 def test_segment_meander_angles_single_section():

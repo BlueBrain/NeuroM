@@ -195,10 +195,10 @@ def test_has_all_nonzero_neurite_radii_threshold():
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
     ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
-    nt.assert_equal(ids.info, [(21, 10), (22, 0),
-                               (23, 0), (23, 6),
-                               (27, 1), (32, 9),
-                               (51, 7)])
+    nt.assert_equal(ids.info, [(20, 10), (21, 0),
+                               (22, 0), (22, 6),
+                               (26, 1), (31, 9),
+                               (50, 7)])
 
 
 def test_nonzero_segment_lengths_good_data():
@@ -215,11 +215,11 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    bad_ids = [[(3, 0), (24, 0), (45, 0), (66, 0)],
-               [(3, 0)],
-               [(3, 0)],
-               [(3, 0)],
-               [(3, 0)]]
+    bad_ids = [[(2, 0), (23, 0), (44, 0), (65, 0)],
+               [(2, 0)],
+               [(2, 0)],
+               [(2, 0)],
+               [(2, 0)]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
@@ -234,8 +234,8 @@ def test_nonzero_segment_lengths_threshold():
     nt.assert_equal(len(ids.info), 0)
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
-    nt.assert_equal(ids.info, [(3, 0), (24, 0), (39, 9), (45, 0),
-                               (55, 7), (63, 2), (66, 0), (73, 4), (79, 6)])
+    nt.assert_equal(ids.info, [(2, 0), (23, 0), (38, 9), (44, 0),
+                               (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -256,7 +256,7 @@ def test_nonzero_section_lengths_bad_data():
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
     nt.ok_(not ids.status)
-    nt.assert_equal(ids.info, [16])
+    nt.assert_equal(ids.info, [15])
 
 
 def test_nonzero_section_lengths_threshold():

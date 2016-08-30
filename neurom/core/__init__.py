@@ -31,7 +31,7 @@
 from .tree import i_chain2 as _chain_neurites
 from .tree import Tree
 from .types import NeuriteType
-from ._soma import Soma, make_soma
+from ._soma import Soma, make_soma, SomaError
 from ._neuron import Section, Neurite, Neuron
 
 

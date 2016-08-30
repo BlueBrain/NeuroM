@@ -79,6 +79,14 @@ INVALID_PTS_2 = [
     [11, 22, 33, 44, 2, 1, 1]
 ]
 
+BIFURCATING_SOMA_PTS = [
+    (1, 1, 0, 0, 0, 0.0, -1),
+    (2, 1, 0, 0, 2, 0.0, 1),
+    (3, 1, 0, 0, 3, 0.0, 2),
+    (4, 1, 0, 0, 4, 0.0, 2),
+    (5, 1, 0, 0, 5, 0.0, 4),
+    (6, 1, 0, 0, 6, 0.0, 5),
+]
 
 def test_make_Soma_SinglePoint():
     sm = _soma.make_soma(SOMA_SINGLE_PTS)
