@@ -28,6 +28,7 @@
 
 '''Test neurom.io.utils'''
 import os
+import numpy as np
 from neurom.core import Neuron, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom import get
@@ -316,3 +317,22 @@ def test_load_neuron_mixed_tree_h5():
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                           get('number_of_sections_per_neurite', H5_ORD_REF))
+
+
+def test_load_h5_trunk_points_regression():
+    # regression test for issue encoutnered wile
+    # implementing PR #479, related to H5 unpacking
+    # of files with non-standard soma structure.
+    # See #480.
+    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
+    nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1],
+                       [0., 0. , 0.1, 0.31646374, 4., 4., 3.]))
+
+    nt.ok_(np.allclose(nrn.neurites[1].root_node.points[1],
+                       [0., 0., 0.1, 1.84130445e-01, 3.0, 235., 234.]))
+
+    nt.ok_(np.allclose(nrn.neurites[2].root_node.points[1],
+                       [0., 0., 0.1, 5.62225521e-01, 3., 466, 465]))
+
+    nt.ok_(np.allclose(nrn.neurites[3].root_node.points[1],
+                       [0., 0., 0.1, 7.28555262e-01, 2., 697, 696]))
