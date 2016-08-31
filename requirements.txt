@@ -35,3 +35,4 @@
 # These can be installed with pip if necessary.
 enum34>=1.0.4
 pyyaml>=3.10
+tqdm>=4.8.4
