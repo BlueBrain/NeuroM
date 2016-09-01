@@ -31,7 +31,7 @@
 '''
 from itertools import izip
 from functools import wraps
-from neurom import iter_neurites
+from .core import iter_neurites
 import neurom.analysis.morphmath as mm
 from . import point_tree as tr
 from . import treefunc as mt

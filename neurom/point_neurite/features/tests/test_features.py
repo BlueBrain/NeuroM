@@ -10,7 +10,7 @@ import neurom.point_neurite.sections as sec
 import neurom.point_neurite.segments as seg
 import neurom.point_neurite.bifurcations as bifs
 from neurom.point_neurite.features import get as get_feat
-from neurom import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 from neurom.point_neurite.io.utils import load_neuron as _load
 from neurom.point_neurite.treefunc import set_tree_type as _set_tt
 

@@ -28,6 +28,7 @@
 
 '''Neuron classes and functions'''
 from neurom.core import Neuron
+from neurom.core.tree import i_chain2, Tree
 
 
 class PointNeuron(Neuron):
@@ -42,3 +43,26 @@ class PointNeuron(Neuron):
         '''
         super(PointNeuron, self).__init__(soma=soma, neurites=neurites)
         self.name = name
+
+
+def iter_neurites(obj, mapfun=None, filt=None):
+    '''Iterator to a neurite, neuron or neuron population
+
+    Applies optional neurite filter and element mapping functions.
+
+    Example:
+        Get the lengths of sections in a neuron and a population
+
+        >>> from neurom import sections as sec
+        >>> neuron_lengths = [l for l in iter_neurites(nrn, sec.length)]
+        >>> population_lengths = [l for l in iter_neurites(pop, sec.length)]
+        >>> neurite = nrn.neurites[0]
+        >>> tree_lengths = [l for l in iter_neurites(neurite, sec.length)]
+
+    '''
+    #  TODO: optimize case of single neurite and move code to neurom.core.tree
+    neurites = ([obj] if isinstance(obj, Tree)
+                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    iter_type = None if mapfun is None else mapfun.iter_type
+
+    return i_chain2(neurites, iter_type, mapfun, filt)

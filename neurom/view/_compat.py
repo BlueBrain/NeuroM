@@ -29,7 +29,7 @@
 '''Old-style new-style neurite compatibility hacks'''
 
 from neurom.view._dendrogram import Dendrogram
-from neurom import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 from neurom.point_neurite import segments as seg
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram

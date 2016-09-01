@@ -33,7 +33,7 @@ import numpy as np
 from neurom.core.dataformat import COLS
 from neurom.point_neurite import triplets as trip
 from neurom.point_neurite.io.utils import load_data, make_neuron
-from neurom import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 
 
 # root level logger. This would be a top level application logger.

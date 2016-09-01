@@ -31,7 +31,7 @@
 '''
 import functools
 from neurom.core import Tree
-from neurom import iter_neurites
+from .core import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.utils import deprecated_module
 

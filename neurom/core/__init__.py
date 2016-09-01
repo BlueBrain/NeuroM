@@ -28,7 +28,7 @@
 
 ''' Core functionality and data types of NeuroM '''
 
-from .tree import i_chain2 as _chain_neurites
+from itertools import ifilter, imap
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
@@ -38,21 +38,31 @@ from ._neuron import Section, Neurite, Neuron
 def iter_neurites(obj, mapfun=None, filt=None):
     '''Iterator to a neurite, neuron or neuron population
 
-    Applies optional neurite filter and element mapping functions.
+    Applies optional neurite filter and mapping functions.
 
-    Example:
-        Get the lengths of sections in a neuron and a population
+    Parameters:
+        obj: a neurite, neuron or neuron population.
+        mapfun: optional neurite mappinf function.
+        filt: optional neurite filter function.
 
-        >>> from neurom import sections as sec
-        >>> neuron_lengths = [l for l in iter_neurites(nrn, sec.length)]
-        >>> population_lengths = [l for l in iter_neurites(pop, sec.length)]
-        >>> neurite = nrn.neurites[0]
-        >>> tree_lengths = [l for l in iter_neurites(neurite, sec.length)]
+    Examples:
+
+        Get the number of points in each neurite in a neuron population
+
+        >>> from neurom.core import iter_neurites
+        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
+
+        Get the number of points in each axon in a neuron population
+
+        >>> import neurom as nm
+        >>> from neurom.core import iter_neurites
+        >>> filter = lambda n : n.type == nm.AXON
+        >>> mapping = lambda n : len(n.points)
+        >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
 
     '''
-    #  TODO: optimize case of single neurite and move code to neurom.core.tree
-    neurites = ([obj] if isinstance(obj, Tree)
+    neurites = ((obj,) if isinstance(obj, Neurite)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
-    iter_type = None if mapfun is None else mapfun.iter_type
 
-    return _chain_neurites(neurites, iter_type, mapfun, filt)
+    neurite_iter = iter(neurites) if filt is None else ifilter(filt, neurites)
+    return neurite_iter if mapfun is None else imap(mapfun, neurite_iter)

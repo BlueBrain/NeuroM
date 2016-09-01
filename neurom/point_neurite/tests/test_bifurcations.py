@@ -32,7 +32,7 @@ from neurom.point_neurite import io
 from neurom.point_neurite.io.utils import make_neuron
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite import bifurcations as bif
-from neurom import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 import math
 
 
