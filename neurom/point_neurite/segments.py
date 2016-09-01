@@ -31,8 +31,8 @@
 '''
 import functools
 from . import point_tree as tr
+from .core import iter_neurites
 from neurom.core.dataformat import COLS
-from neurom import iter_neurites
 import neurom.analysis.morphmath as mm
 from neurom.utils import deprecated_module
 

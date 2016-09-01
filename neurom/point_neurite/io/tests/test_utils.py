@@ -34,9 +34,8 @@ from neurom.point_neurite.io import utils
 from neurom.point_neurite import points as pts
 from neurom.point_neurite import point_tree as ptree
 from neurom.point_neurite.io.datawrapper import RawDataWrapper
-from neurom import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 from neurom.core.dataformat import COLS
-from neurom.core import tree
 from neurom.exceptions import (SomaError, IDSequenceError,
                                MultipleTrees, MissingParentError)
 from nose import tools as nt
