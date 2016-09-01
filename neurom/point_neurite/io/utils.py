@@ -181,7 +181,6 @@ def load_data(filename):
         '''Lazy loading of Neurolucida ASCII reader'''
         from neurom.io import neurolucida
         return neurolucida.read(filename,
-                                remove_duplicates=False,
                                 data_wrapper=RawDataWrapper)
 
     _READERS = {

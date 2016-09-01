@@ -113,6 +113,5 @@ _READERS = {
                    data_wrapper=SecDataWrapper),
     'h5': _load_h5,
     'asc': partial(neurolucida.read,
-                   remove_duplicates=False,
                    data_wrapper=SecDataWrapper)
 }
