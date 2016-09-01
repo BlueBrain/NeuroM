@@ -136,7 +136,7 @@ def _parse_sections(morph_fd):
     return sections
 
 
-def _flatten_subsection(subsection, _type, offset, parent, remove_duplicates=False):
+def _flatten_subsection(subsection, _type, offset, parent):
     '''Flatten a subsection from its nested version
 
     Args:
@@ -144,7 +144,6 @@ def _flatten_subsection(subsection, _type, offset, parent, remove_duplicates=Fal
         _type: type of section, ie: AXON, etc
         parent: first element has this as it's parent
         offset: position in the final array of the first element
-        remove_duplicates: remove duplicated points in section-section boundaries
 
     Returns:
         Generator of values corresponding to [X, Y, Z, R, TYPE, ID, PARENT_ID]
@@ -161,7 +160,7 @@ def _flatten_subsection(subsection, _type, offset, parent, remove_duplicates=Fal
                 offset += 1
         elif isinstance(row[0], list):
             split_parent = offset - 1
-            start_offset = 1 if remove_duplicates else 0
+            start_offset = 0
 
             slices = []
             start = 0
@@ -173,12 +172,12 @@ def _flatten_subsection(subsection, _type, offset, parent, remove_duplicates=Fal
 
             for split_slice in slices:
                 for _row in _flatten_subsection(row[split_slice], _type, offset,
-                                                split_parent, remove_duplicates):
+                                                split_parent):
                     offset += 1
                     yield _row
 
 
-def _extract_section(section, remove_duplicates=False):
+def _extract_section(section):
     '''Find top level sections, and get their flat contents, and append them all
 
     Returns a numpy array with the row format:
@@ -199,13 +198,13 @@ def _extract_section(section, remove_duplicates=False):
 
     parent = -1 if _type == POINT_TYPE.SOMA else 0
     subsection_iter = _flatten_subsection(section[start:], _type, offset=0,
-                                          parent=parent, remove_duplicates=remove_duplicates)
+                                          parent=parent)
 
     ret = np.array([row for row in subsection_iter])
     return ret
 
 
-def _sections_to_raw_data(sections, remove_duplicates=False):
+def _sections_to_raw_data(sections):
     '''convert list of sections into the `raw_data` format used in neurom
 
     This finds the soma, and attaches the neurites
@@ -213,7 +212,7 @@ def _sections_to_raw_data(sections, remove_duplicates=False):
     soma = None
     neurites = []
     for section in sections:
-        neurite = _extract_section(section, remove_duplicates)
+        neurite = _extract_section(section)
         if neurite is None:
             continue
         elif neurite[0][COLS.TYPE] == POINT_TYPE.SOMA:
@@ -240,7 +239,7 @@ def _sections_to_raw_data(sections, remove_duplicates=False):
     return ret
 
 
-def read(morph_file, remove_duplicates=False, data_wrapper=SecDataWrapper):
+def read(morph_file, data_wrapper=SecDataWrapper):
     '''return a 'raw_data' np.array with the full neuron, and the format of the file
     suitable to be wrapped by SecDataWrapper
     '''
@@ -254,5 +253,5 @@ def read(morph_file, remove_duplicates=False, data_wrapper=SecDataWrapper):
 
     with open(morph_file) as morph_fd:
         sections = _parse_sections(morph_fd)
-    raw_data = _sections_to_raw_data(sections, remove_duplicates)
+    raw_data = _sections_to_raw_data(sections)
     return data_wrapper(raw_data, 'NL-ASCII')
