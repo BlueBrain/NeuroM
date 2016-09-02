@@ -34,6 +34,11 @@ Supported file formats
 NeuroM currently supports the SWC format, the BBP HDF5 formats, and offers
 experimental support for NeuroLucida .asc files.
 
+.. seealso::
+    :ref:`The morphology definitions page<definitions-label>` for definitions of
+    concepts such as :ref:`point<point-label>`, :ref:`section<section-label>`,
+    :ref:`soma<soma-label>` and :ref:`neurite<neurite-label>` in NeuroM.
+
 .. todo::
     Complete this section with additional NeuroM specific restrictions
     on the formats below.
@@ -73,4 +78,4 @@ geometrical features of a neuron, as well as the neurite type information.
     information. We make no statement as to the correctness of numerical output.
 
 .. todo::
-    Referneces and more information?
+    References and more information?
