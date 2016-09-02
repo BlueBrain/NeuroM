@@ -46,6 +46,7 @@ Contents
    apps
    definitions
    api
+   file_formats
    issue_reporting
    developer
    license
