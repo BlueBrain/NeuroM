@@ -109,16 +109,15 @@ Soma
 ----
 
 A soma can be represented by one, three or more :ref:`points<point-label>`.
-The soma is classified based on
-the number of points it contains thus:
+The soma is classified solely based on the number of points it contains thus:
 
 * Type A: 1 point defining the center and radius.
 * Type B: 3 points. Only the centers of the points are considered.
-  The first point defines the center. The radius is extimated from
+  The first point defines the center. The radius is estimated from
   the mean distance between the center and the two remaining points.
-* Type C: More than three points. Only the centers of the points are considered.
-  The first point defines the center. The radius is
-  estimated from the mean distance between the center and the remaining points.
+* Type C: More than three points. The center is defined as the mean position
+  of all points. The radius is defined as the mean distance of all points to
+  the center.
 
 .. todo::
     Expand list if and when specifications require new types of soma.
