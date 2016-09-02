@@ -26,70 +26,51 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from nose import tools as nt
 import os
-from neurom.point_neurite import io
-from neurom.point_neurite.io.utils import make_neuron
-from neurom.point_neurite.point_tree import PointTree
-from neurom.point_neurite import triplets as trip
-from neurom.point_neurite.core import iter_neurites
+from os.path import join as joinp
 
-import math
+from nose import tools as nt
+import neurom as nm
+from neurom.core.population import Population
+from neurom import load_neuron
+from neurom import core
 
+_path = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = joinp(_path, '../../../test_data')
 
-class MockNeuron(object):
-    pass
+NRN1 = load_neuron(joinp(DATA_PATH, 'swc/Neuron.swc'))
+NRN2 = load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc'))
+NRN3 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc'))
+NRN4 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc'))
 
+NEURONS = [NRN1, NRN2, NRN3, NRN4]
+TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
+POP = Population(NEURONS, name='foo')
 
-DATA_PATH = './test_data'
-SWC_PATH = os.path.join(DATA_PATH, 'swc/')
+def test_iter_neurites_default():
 
-data    = io.load_data(SWC_PATH + 'Neuron.swc')
-neuron0 = make_neuron(data)
-tree0   = neuron0.neurites[0]
+    nt.assert_sequence_equal(POP.neurites,
+                             [n for n in core.iter_neurites(POP)])
 
+def test_iter_neurites_filter():
 
-def _make_simple_tree():
-    p = [0.0, 0.0, 0.0, 1.0, 1, 1, 1]
-    T = PointTree(p)
-    T1 = T.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T2 = T1.add_child(PointTree([2.0, 2.0, 0.0, 1.0, 1, 1, 1]))
-    T3 = T2.add_child(PointTree([2.0, 6.0, 0.0, 1.0, 1, 1, 1]))
-
-    T5 = T.add_child(PointTree([0.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T6 = T5.add_child(PointTree([2.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-    T7 = T6.add_child(PointTree([6.0, 0.0, 2.0, 1.0, 1, 1, 1]))
-
-    return T
+    for ntyp in nm.NEURITE_TYPES:
+        a = [n for n in POP.neurites if n.type == ntyp]
+        b = [n for n in core.iter_neurites(POP, filt=lambda n : n.type == ntyp)]
+        nt.assert_sequence_equal(a, b)
 
 
-SIMPLE_TREE = _make_simple_tree()
-SIMPLE_NEURON = MockNeuron()
-SIMPLE_NEURON.neurites = [SIMPLE_TREE]
+def test_iter_neurites_mapping():
+
+    n = [n for n in core.iter_neurites(POP, mapfun=lambda n : len(n.points))]
+    ref = [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500]
+    nt.assert_sequence_equal(n, ref)
 
 
-def _check_meander_angles(obj):
+def test_iter_neurites_filter_mapping():
+    n = [n for n in core.iter_neurites(POP,
+                                       mapfun=lambda n : len(n.points),
+                                       filt=lambda n : len(n.points) > 250)]
 
-    angles = [a for a in iter_neurites(obj, trip.meander_angle)]
-
-    nt.eq_(angles,
-           [math.pi / 2, math.pi / 2, math.pi / 2, math.pi])
-
-
-def _check_count(obj, n):
-    nt.eq_(trip.count(obj), n)
-
-
-def test_meander_angles():
-    _check_meander_angles(SIMPLE_TREE)
-    _check_meander_angles(SIMPLE_NEURON)
-
-
-def test_count():
-    _check_count(SIMPLE_NEURON, 4)
-    _check_count(SIMPLE_TREE, 4)
-
-    neuron_b = MockNeuron()
-    neuron_b.neurites = [SIMPLE_TREE, SIMPLE_TREE, SIMPLE_TREE]
-
-    _check_count(neuron_b, 12)
+    ref = [500, 500, 500]
+    nt.assert_sequence_equal(n, ref)

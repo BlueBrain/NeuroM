@@ -83,7 +83,6 @@ if __name__ == '__main__':
           sum(mm.segment_area(s) for s in iter_segments(nrn)))
 
     # get total number of neurite points in cell.
-    # iter_neurites needs a mapping function, so we pass the identity.
     def n_points(sec):
         '''number of points in a section'''
         n = len(sec.points)

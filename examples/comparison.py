@@ -29,7 +29,7 @@
 '''Module for the comparison of the morphometrics between two sets of trees.'''
 
 import numpy as np
-from neurom.core import iter_neurites
+from neurom.point_neurite.core import iter_neurites
 
 from neurom.point_neurite import triplets as tri
 from neurom.point_neurite import segments as seg

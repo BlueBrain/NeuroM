@@ -31,6 +31,7 @@
 from functools import wraps
 from functools import partial
 from .. import point_tree as _tr
+from ..core import iter_neurites
 from neurom.core.types import NeuriteType
 from neurom.point_neurite.core import Neuron
 from neurom.point_neurite import treefunc as _mt
@@ -40,7 +41,6 @@ from neurom.point_neurite import segments as _seg
 from neurom.point_neurite import sections as _sec
 from neurom.point_neurite import bifurcations as _bifs
 from neurom.point_neurite import points as _pts
-from neurom import iter_neurites
 from neurom.analysis.morphmath import sphere_area
 
 
