@@ -35,7 +35,7 @@ Examples:
     >>> import neurom as nm
     >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
 
-    Obtain some morphometrics
+    Obtain some morphometrics using the get function
 
     >>> ap_seg_len = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
     >>> ax_sec_len = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
@@ -48,6 +48,13 @@ Examples:
     >>> for nrn in nrns:
     ...     print 'mean section length', np.mean(nm.get('section_lengths', nrn))
 
+    Apply a function to a selection of neurites in a neuron or population.
+    This example gets the number of points in each axon in a neuron population
+
+    >>> import neurom as nm
+    >>> filter = lambda n : n.type == nm.AXON
+    >>> mapping = lambda n : len(n.points)
+    >>> n_points = [n for n in nm.iter_neurites(nrns, mapping, filter)]
 
 '''
 

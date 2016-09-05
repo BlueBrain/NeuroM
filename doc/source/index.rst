@@ -47,8 +47,11 @@ Contents
    definitions
    api
    file_formats
+   install
+   examples
    issue_reporting
    developer
+   dependencies
    license
 
 ----
