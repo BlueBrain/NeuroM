@@ -32,6 +32,7 @@ from neurom.core import Tree
 from neurom.core.dataformat import COLS
 from neurom.fst import Neurite
 
+from copy import deepcopy
 import numpy as np
 import sys
 
@@ -132,7 +133,7 @@ class Dendrogram(object):
         self._show_diameters = show_diameters
 
         # input object, tree, or neuron
-        self._obj = Neurite(obj) if isinstance(obj, Tree) else obj
+        self._obj = deepcopy(Neurite(obj) if isinstance(obj, Tree) else obj)
 
         # counter/index for the storage of the rectangles.
         # it is updated recursively

@@ -3,7 +3,7 @@ import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
 import neurom.view._dendrogram as dm
-from neurom.fst import load_neuron
+from neurom.fst import load_neuron, iter_sections, get
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
@@ -104,6 +104,13 @@ class TestDendrogram(object):
         vrec = self.dtr.soma
 
         nt.assert_true(vrec == None)
+
+    def test_neuron_not_corrupted(self):
+        # Regression for #492: dendrogram was corrupting
+        # neuron used to construct it.
+        # This caused the section path distance calculation
+        # to raise a KeyError exception.
+        get('section_path_distances', NEURON)
 
     def test_generate_neuron(self):
 
