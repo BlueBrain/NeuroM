@@ -46,8 +46,48 @@ experimental support for NeuroLucida .asc files.
 SWC
 ---
 
-The SWC format represents a neuron as a tree of 3D points with additional information.
-More information can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
+The SWC format represents a neuron as a set of trees that are connected to a soma.
+The neuronal morphology is encoded as a rooted tree of 3D points and the corresponding radii.
+More information ---can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
+
+The points of type "1" that represent the soma, have to be in the beginning of the file. 
+
+The soma can be represented in one of the following formats: 
+
+TypeA: One point soma
+---------------------
+
+The soma is represented by its center and a radius that corresponds to the sphere
+that preserves the surface area of the soma. The center of the soma has as parent ID -1 
+and all the initial points of the neuronal trees are connected to the soma. 
+
+TypeB: Three point soma
+------------------------
+
+The soma is represented by three points that correspond to the center of the soma (x, y, z), 
+with parent ID -1, and two diametrically opposite points (x, y-r, z) and (x, y+r, z), where r 
+is the radius of the sphere that  preserves the surface area of the soma. The radii of the soma 
+points are not necessarily meaningful, so they can be set to zero. As such, they should not be 
+taken into account in further calculations. The rest of the soma points are connected to the 
+center of the soma, as well as the first points of all the neuronal trees. 
+
+TypeC: N - points soma
+------------------------
+
+The soma is represented by a set of points. The first point corresponds to the center of the soma 
+and has as parent ID -1. The other points define a contour of the soma in the maximum cross-section 
+of the x-y plane. The radii of the soma points are not necessarily meaningful, so they can be set 
+to zero. As such, they should not be taken into account in further calculations. The radius of the 
+soma is computed from the equivalent sphere that preserves the surface area of the soma. The rest of 
+the soma points are connected to the center of the soma, as well as the first points of all the 
+neuronal trees. 
+
+Tree sections
+-------------
+
+It is not considered a good practice to represent the same section of the tree in different places 
+within a file, but it is not forbidden. However, the parent ID should be smaller that the current ID 
+of a point. 
 
 .. todo::
     Add reference to SWC paper and more semantic constraints.
