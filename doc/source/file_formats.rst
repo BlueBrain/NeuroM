@@ -55,14 +55,14 @@ The points of type "1" that represent the soma, have to be in the beginning of t
 The soma can be represented in one of the following formats: 
 
 TypeA: One point soma
----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The soma is represented by its center and a radius that corresponds to the sphere
 that preserves the surface area of the soma. The center of the soma has as parent ID -1 
 and all the initial points of the neuronal trees are connected to the soma. 
 
 TypeB: Three point soma
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The soma is represented by three points that correspond to the center of the soma (x, y, z), 
 with parent ID -1, and two diametrically opposite points (x, y-r, z) and (x, y+r, z), where r 
@@ -72,7 +72,7 @@ taken into account in further calculations. The rest of the soma points are conn
 center of the soma, as well as the first points of all the neuronal trees. 
 
 TypeC: N - points soma
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The soma is represented by a set of points. The first point corresponds to the center of the soma 
 and has as parent ID -1. The other points define a contour of the soma in the maximum cross-section 
@@ -83,7 +83,7 @@ the soma points are connected to the center of the soma, as well as the first po
 neuronal trees. 
 
 Tree sections
--------------
+^^^^^^^^^^^^^
 
 It is not considered a good practice to represent the same section of the tree in different places 
 within a file, but it is not forbidden. However, the parent ID should be smaller that the current ID 
