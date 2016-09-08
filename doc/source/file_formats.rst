@@ -86,8 +86,8 @@ Tree sections
 ^^^^^^^^^^^^^
 
 It is not considered a good practice to represent the same section of the tree in different places 
-within a file, but it is not forbidden. However, the parent ID should be smaller that the current ID 
-of a point. 
+within a file, but it is not forbidden. The parent ID should always be smaller that the current ID 
+of a point.
 
 .. todo::
     Add reference to SWC paper and more semantic constraints.
