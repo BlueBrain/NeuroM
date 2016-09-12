@@ -50,10 +50,11 @@ The SWC format represents a neuron as a set of trees that are connected to a som
 The neuronal morphology is encoded as a rooted tree of 3D points and the corresponding radii.
 More information can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
 
-The following information about SWC format concern the standard representation as 
-it has been established in the <neuromorpho.org database>. We would like to clarify
-that this file format is not yet supported by NeuroM, but it will be modified 
-to do so, in the future.
+.. note::
+    The following information about SWC format concern the standard representation as 
+    it has been established in the <neuromorpho.org database>. We would like to clarify
+    that this file format is not yet supported by NeuroM, but it will be modified 
+    to do so, in the future.
 
 The points of type "1" that represent the soma, have to be in the beginning of the file. 
 The soma can be represented in one of the following formats: 
