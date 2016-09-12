@@ -36,6 +36,7 @@ from nose import tools as nt
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
+SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
 
 def check_single_section_random_swc(data, fmt):
@@ -76,7 +77,7 @@ def test_read_split_soma():
 
 
 def test_read_contour_soma_neuron():
-    rdw = swc.read(os.path.join(SWC_PATH, 'contour_soma_neuron.swc'))
+    rdw = swc.read(os.path.join(SWC_SOMA_PATH, 'contour_soma_neuron.swc'))
     nt.eq_(rdw.neurite_trunks(), [3, 4, 5])
     nt.eq_(len(rdw.soma_points()), 8)
     nt.eq_(len(rdw.sections), 7) # includes one empty section
@@ -94,7 +95,7 @@ def test_read_contour_soma_neuron():
 
 
 def test_read_contour_split_soma_neuron():
-    rdw = swc.read(os.path.join(SWC_PATH, 'contour_split_soma_neuron.swc'))
+    rdw = swc.read(os.path.join(SWC_SOMA_PATH, 'contour_split_soma_neuron.swc'))
     nt.eq_(rdw.neurite_trunks(), [1, 4, 5])
     nt.eq_(len(rdw.soma_points()), 8)
     nt.eq_(len(rdw.sections), 7) # includes one empty section
@@ -112,7 +113,7 @@ def test_read_contour_split_soma_neuron():
 
 
 def test_read_contour_split_1st_soma_neuron():
-    rdw = swc.read(os.path.join(SWC_PATH, 'contour_split_1st_soma_neuron.swc'))
+    rdw = swc.read(os.path.join(SWC_SOMA_PATH, 'contour_split_1st_soma_neuron.swc'))
     nt.eq_(rdw.neurite_trunks(), [1, 4, 5])
     nt.eq_(len(rdw.soma_points()), 6)
     nt.eq_(len(rdw.sections), 7) # includes one empty section
