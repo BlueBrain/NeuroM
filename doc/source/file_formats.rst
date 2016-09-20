@@ -52,7 +52,7 @@ More information can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
 
 .. note::
     The following information about SWC format concern the standard representation as 
-    it has been established in the <neuromorpho.org database>. We would like to clarify
+    it has been established in the neuromorpho.org database. We would like to clarify
     that this file format is not yet supported by NeuroM, but it will be modified 
     to do so, in the future.
 
