@@ -73,7 +73,7 @@ The soma is represented by three points that correspond to the center of the som
 with parent ID -1, and two diametrically opposite points (x, y-r, z) and (x, y+r, z), where r 
 is the radius of the sphere that  preserves the surface area of the soma. The radii of the soma 
 points are not necessarily meaningful, so they can be set to zero. As such, they should not be 
-taken into account in further calculations. The rest of the soma points are connected to the 
+taken into account in further calculations. The other two of the soma points are connected to the 
 center of the soma, as well as the first points of all the neuronal trees. 
 
 TypeC: N - points soma
