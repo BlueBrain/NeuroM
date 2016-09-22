@@ -36,7 +36,7 @@ import warnings
 import numpy as np
 
 from neurom.core.dataformat import COLS, POINT_TYPE
-from .datawrapper import SecDataWrapper
+from .datawrapper import DataWrapper
 
 
 WANTED_SECTIONS = {
@@ -239,9 +239,9 @@ def _sections_to_raw_data(sections):
     return ret
 
 
-def read(morph_file, data_wrapper=SecDataWrapper):
+def read(morph_file, data_wrapper=DataWrapper):
     '''return a 'raw_data' np.array with the full neuron, and the format of the file
-    suitable to be wrapped by SecDataWrapper
+    suitable to be wrapped by DataWrapper
     '''
 
     msg = ('This is an experimental reader. '

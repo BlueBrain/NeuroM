@@ -76,7 +76,7 @@ class FstNeuron(Neuron):
 def make_neurites(rdw):
     '''Build neurite trees from a raw data wrapper'''
     post_action = _NEURITE_ACTION[rdw.fmt]
-    trunks = rdw.neurite_trunks()
+    trunks = rdw.neurite_root_section_ids()
     if len(trunks) == 0:
         return [], []
 

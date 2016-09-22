@@ -45,7 +45,7 @@ from itertools import izip_longest
 import h5py
 import numpy as np
 from ..core.dataformat import COLS
-from .datawrapper import SecDataWrapper
+from .datawrapper import DataWrapper
 
 
 def get_version(h5file):
@@ -65,7 +65,7 @@ def get_version(h5file):
 Section = namedtuple('Section', 'ids, ntype, pid')
 
 
-def read(filename, remove_duplicates=False, data_wrapper=SecDataWrapper):
+def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
     '''Read a file and return a tuple of data, format.
 
     * Tries to guess the format and the H5 version.

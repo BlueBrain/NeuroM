@@ -36,7 +36,7 @@ from neurom.core.dataformat import ROOT_ID
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.treefunc import set_tree_type
 from neurom.point_neurite.core import PointNeuron
-from neurom.point_neurite.io.datawrapper import RawDataWrapper
+from neurom.point_neurite.io.datawrapper import DataWrapper
 from neurom.core import make_soma
 from neurom.exceptions import IDSequenceError, MultipleTrees, MissingParentError
 from neurom.check import structural_checks as check
@@ -65,7 +65,7 @@ def make_point_tree(rdw, root_id=ROOT_ID, post_action=None):
 
     The tree contains rows of raw data.
     Args:
-        rdw: a RawDataWrapper object.
+        rdw: a DataWrapper object.
         root_id: ID of the root of the tree to be built.
         post_action: optional function to run on the built tree.
     '''
@@ -90,7 +90,7 @@ def make_neuron(raw_data, tree_action=None):
 
     The tree contains rows of raw data.
     Parameters:
-        raw_data: a RawDataWrapper object.
+        raw_data: a DataWrapper object.
         tree_action: optional function to run on the built trees.
     Raises:
         SomaError if no soma points in raw_data or points incompatible with soma.
@@ -154,7 +154,7 @@ def load_trees(filename, tree_action=None):
 
 
 def load_data(filename):
-    '''Unpack filename and return a RawDataWrapper object containing the data
+    '''Unpack filename and return a DataWrapper object containing the data
 
     Determines format from extension. Currently supported:
 
@@ -169,19 +169,19 @@ def load_data(filename):
         from neurom.io import hdf5
         return hdf5.read(filename,
                          remove_duplicates=True,
-                         data_wrapper=RawDataWrapper)
+                         data_wrapper=DataWrapper)
 
     def read_swc(filename):
         '''Lazy loading of SWC reader'''
         from neurom.io import swc
-        from .swc import SWCRawDataWrapper
-        return swc.read(filename, data_wrapper=SWCRawDataWrapper)
+        from .swc import SWCDataWrapper
+        return swc.read(filename, data_wrapper=SWCDataWrapper)
 
     def read_neurolucida(filename):
         '''Lazy loading of Neurolucida ASCII reader'''
         from neurom.io import neurolucida
         return neurolucida.read(filename,
-                                data_wrapper=RawDataWrapper)
+                                data_wrapper=DataWrapper)
 
     _READERS = {
         'swc': read_swc,

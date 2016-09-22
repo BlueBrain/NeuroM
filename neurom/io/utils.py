@@ -32,7 +32,7 @@ import os
 from functools import partial
 from neurom.core.population import Population
 from neurom.exceptions import RawDataError
-from neurom.io.datawrapper import SecDataWrapper
+from neurom.io.datawrapper import DataWrapper
 from neurom.io import swc
 from neurom.io import neurolucida
 from neurom.fst._core import FstNeuron
@@ -105,13 +105,13 @@ def _load_h5(filename):
     from neurom.io import hdf5
     return hdf5.read(filename,
                      remove_duplicates=False,
-                     data_wrapper=SecDataWrapper)
+                     data_wrapper=DataWrapper)
 
 
 _READERS = {
     'swc': partial(swc.read,
-                   data_wrapper=SecDataWrapper),
+                   data_wrapper=DataWrapper),
     'h5': _load_h5,
     'asc': partial(neurolucida.read,
-                   data_wrapper=SecDataWrapper)
+                   data_wrapper=DataWrapper)
 }

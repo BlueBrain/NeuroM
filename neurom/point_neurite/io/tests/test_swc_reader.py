@@ -52,7 +52,7 @@ def test_read_swc_basic():
     check_single_section_random_swc(rdw.data_block, rdw.fmt)
 
 
-class TestRawDataWrapper_SingleSectionRandom(object):
+class TestDataWrapper_SingleSectionRandom(object):
     def setup(self):
         self.data = swc.read(
             os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
