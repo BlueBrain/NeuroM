@@ -47,7 +47,7 @@ from neurom.core.point import as_point
 from neurom.core.dataformat import POINT_TYPE
 
 
-class RawDataWrapper(object):
+class DataWrapper(object):
     '''Class holding an array of data and an offset to the first element
     and giving basic access to its elements
 

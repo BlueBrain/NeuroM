@@ -33,7 +33,7 @@ import numpy as np
 from neurom.point_neurite.io import utils
 from neurom.point_neurite import points as pts
 from neurom.point_neurite import point_tree as ptree
-from neurom.point_neurite.io.datawrapper import RawDataWrapper
+from neurom.point_neurite.io.datawrapper import DataWrapper
 from neurom.point_neurite.core import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.exceptions import (SomaError, IDSequenceError,
@@ -180,7 +180,7 @@ def test_load_neuron_deep_neuron():
 def test_load_neurolucida_ascii():
     f_ = os.path.join(DATA_PATH, 'neurolucida', 'sample.asc')
     ascii = utils.load_data(f_)
-    nt.ok_(isinstance(ascii, RawDataWrapper))
+    nt.ok_(isinstance(ascii, DataWrapper))
     nt.eq_(len(ascii.data_block), 18)
 
 

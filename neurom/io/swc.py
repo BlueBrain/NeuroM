@@ -39,13 +39,13 @@ There is one such row per measured point.
 
 '''
 import numpy as np
-from .datawrapper import SecDataWrapper
+from .datawrapper import DataWrapper
 
 
 (ID, TYPE, X, Y, Z, R, P) = xrange(7)
 
 
-def read(filename, data_wrapper=SecDataWrapper):
+def read(filename, data_wrapper=DataWrapper):
     '''Read an SWC file and return a tuple of data, format.'''
     data = np.loadtxt(filename)
     if len(np.shape(data)) == 1:

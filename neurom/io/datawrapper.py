@@ -32,7 +32,7 @@ from collections import defaultdict
 from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 
 
-class SecDataWrapper(object):
+class DataWrapper(object):
     '''Class holding a raw data block and section information'''
 
     def __init__(self, data_block, fmt, sections=None):
@@ -41,7 +41,7 @@ class SecDataWrapper(object):
         self.fmt = fmt
         self.sections = sections if sections is not None else _extract_sections(data_block)
 
-    def neurite_trunks(self):
+    def neurite_root_section_ids(self):
         '''Get the section IDs of the intitial neurite sections'''
         sec = self.sections
         return [i for i, ss in enumerate(sec)

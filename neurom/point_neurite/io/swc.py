@@ -43,11 +43,11 @@ from neurom.io.swc import read as _read
 import numpy as np
 from neurom.core.dataformat import COLS
 from neurom.core.dataformat import ROOT_ID
-from .datawrapper import RawDataWrapper
+from .datawrapper import DataWrapper
 
 
-class SWCRawDataWrapper(RawDataWrapper):
-    '''Specialization of RawDataWrapper for SWC data
+class SWCDataWrapper(DataWrapper):
+    '''Specialization of DataWrapper for SWC data
 
     SWC data has looser requirements on the point IDs, so
     an ID to array index look-up table must be maintained.
@@ -56,7 +56,7 @@ class SWCRawDataWrapper(RawDataWrapper):
     delegating to base class methods.
     '''
     def __init__(self, raw_data, fmt, _=None):
-        super(SWCRawDataWrapper, self).__init__(raw_data, fmt)
+        super(SWCDataWrapper, self).__init__(raw_data, fmt)
 
         self._id_map = {}
         for i, row in enumerate(self.data_block):
@@ -73,7 +73,7 @@ class SWCRawDataWrapper(RawDataWrapper):
     def get_children(self, idx):
         ''' get list of ids of children of parent with id idx'''
         if idx in self._id_set or idx == ROOT_ID:
-            return super(SWCRawDataWrapper, self).get_children(idx)
+            return super(SWCDataWrapper, self).get_children(idx)
 
         raise LookupError('Invalid id: {0}'.format(idx))
 
@@ -83,17 +83,17 @@ class SWCRawDataWrapper(RawDataWrapper):
             raise LookupError('Invalid id: {0}'.format(idx))
 
         idx = self._get_idx(idx)
-        return super(SWCRawDataWrapper, self).get_parent(idx)
+        return super(SWCDataWrapper, self).get_parent(idx)
 
     def get_point(self, idx):
         '''Get point data for element idx'''
         idx = self._get_idx(idx)
-        return super(SWCRawDataWrapper, self).get_point(idx)
+        return super(SWCDataWrapper, self).get_point(idx)
 
     def get_row(self, idx):
         '''Get row from idx'''
         idx = self._get_idx(idx)
-        return super(SWCRawDataWrapper, self).get_row(idx)
+        return super(SWCDataWrapper, self).get_row(idx)
 
 
-read = partial(_read, data_wrapper=SWCRawDataWrapper)
+read = partial(_read, data_wrapper=SWCDataWrapper)

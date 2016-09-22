@@ -30,14 +30,14 @@ import os
 from functools import partial
 import numpy as np
 import h5py
-from neurom.point_neurite.io.datawrapper import RawDataWrapper
+from neurom.point_neurite.io.datawrapper import DataWrapper
 from neurom.io import hdf5, swc
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
 
-h5_read = partial(hdf5.read, data_wrapper=RawDataWrapper, remove_duplicates=True)
-swc_read = partial(swc.read, data_wrapper=RawDataWrapper)
+h5_read = partial(hdf5.read, data_wrapper=DataWrapper, remove_duplicates=True)
+swc_read = partial(swc.read, data_wrapper=DataWrapper)
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../../test_data')
@@ -195,7 +195,7 @@ class DataWrapper_Neuron(object):
         self.data.iter_row(self.rows + self.first_id)
 
 
-class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
+class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
     '''Test HDF5 v1 reading'''
     def setup(self):
         self.data = h5_read(os.path.join(H5V1_PATH, 'Neuron.h5'))
@@ -203,7 +203,7 @@ class TestRawDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
         self.rows = len(self.data.data_block)
 
 
-class TestRawDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
+class TestDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
     '''Test HDF5 v2 reading'''
     def setup(self):
         self.data = h5_read(os.path.join(H5V2_PATH, 'Neuron.h5'))

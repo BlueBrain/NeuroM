@@ -76,7 +76,7 @@ class FstNeuron(Neuron):
 def make_neurites(rdw):
     '''Build neurite trees from a raw data wrapper'''
     post_action = _NEURITE_ACTION[rdw.fmt]
-    trunks = rdw.neurite_trunks()
+    trunks = rdw.neurite_root_section_ids()
     if len(trunks) == 0:
         return [], []
 
@@ -112,8 +112,12 @@ def _remove_soma_initial_point(tree):
 def _check_soma_topology_swc(points):
     '''check if points form valid soma
 
-    Currently checks if there are bifurcations within the soma.
+    Currently checks if there are bifurcations within a soma
+    with more than three points.
     '''
+    if len(points) == 3:
+        return
+
     parents = tuple(p[COLS.P] for p in points if p[COLS.P] != ROOT_ID)
     if len(parents) > len(set(parents)):
         raise SomaError("Bifurcating soma")

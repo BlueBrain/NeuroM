@@ -91,10 +91,6 @@ INIT_IDS = [[4, 215, 426, 637],
             [4]]
 
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-
 RAW_DATA = [utils.load_data(f) for f in FILES]
 NO_SOMA_RAW_DATA = utils.load_data(NO_SOMA_FILE)
 
@@ -153,7 +149,7 @@ def test_neuron_name():
 
 
 def test_load_contour_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'contour_soma_neuron.swc'))
+    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_soma_neuron.swc'))
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 8)
     nt.eq_(nrn.soma.radius, 2.125)
@@ -161,7 +157,7 @@ def test_load_contour_soma_neuron():
 
 
 def test_load_contour_split_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'contour_split_soma_neuron.swc'))
+    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_split_soma_neuron.swc'))
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 8)
     nt.eq_(nrn.soma.radius, 2.125)
@@ -169,16 +165,24 @@ def test_load_contour_split_soma_neuron():
 
 
 def test_load_contour_split_1st_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'contour_split_1st_soma_neuron.swc'))
+    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_split_1st_soma_neuron.swc'))
     nt.eq_(len(nrn.neurites), 3)
     nt.eq_(len(nrn.soma.points), 6)
     nt.eq_(nrn.soma.radius, 2.0)
     _check_neurites_have_no_parent(nrn)
 
 
+def test_load_neuromorpho_3pt_soma():
+    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
+    nt.eq_(len(nrn.neurites), 4)
+    nt.eq_(len(nrn.soma.points), 3)
+    nt.eq_(nrn.soma.radius, 2)
+    _check_neurites_have_no_parent(nrn)
+
+
 @nt.raises(SomaError)
 def test_load_bifurcating_soma_points_raises_SomaError():
-    utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'bifurcating_soma.swc'))
+    utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'bifurcating_soma.swc'))
 
 
 NRN = utils.load_neuron(FILENAMES[0])
@@ -274,12 +278,12 @@ def test_load_neurons_filenames():
         nt.assert_true(isinstance(nrn, Neuron))
         nt.assert_equal(nrn.name, name)
 
-SWC_PATH = os.path.join(DATA_PATH, 'swc', 'ordering')
-SWC_ORD_REF = utils.load_neuron(os.path.join(SWC_PATH, 'sample.swc'))
+SWC_ORD_PATH = os.path.join(DATA_PATH, 'swc', 'ordering')
+SWC_ORD_REF = utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample.swc'))
 
 
 def test_load_neuron_mixed_tree_swc():
-    nrn_mix =  utils.load_neuron(os.path.join(SWC_PATH, 'sample_mixed_tree_sections.swc'))
+    nrn_mix =  utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
 
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
@@ -293,7 +297,7 @@ def test_load_neuron_mixed_tree_swc():
 
 
 def test_load_neuron_section_order_break_swc():
-    nrn_mix =  utils.load_neuron(os.path.join(SWC_PATH, 'sample_disordered.swc'))
+    nrn_mix =  utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample_disordered.swc'))
 
 
     nt.assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
