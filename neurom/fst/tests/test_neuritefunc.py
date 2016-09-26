@@ -31,17 +31,20 @@
 from nose import tools as nt
 import os
 import numpy as np
+import neurom as nm
 from neurom import fst
 from neurom.fst import _neuritefunc as _nf
 from neurom.point_neurite.io import utils as io_utils
 from neurom.core import tree as tr
+from neurom.core import Population
 from neurom.point_neurite import point_tree as ptr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
+SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 
-NRN = fst.load_neuron(DATA_PATH)
+NRN = nm.load_neuron(DATA_PATH)
 NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 
@@ -77,7 +80,7 @@ def test_iter_segments():
 
 def test_principal_direction_extents():
     # test with a realistic neuron
-    nrn = fst.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
+    nrn = nm.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
 
     p_ref = [1672.9694359427331, 142.43704397865031, 226.45895382204986,
              415.50612748523838, 429.83008974193206, 165.95410536922873,
@@ -128,3 +131,38 @@ def test_n_leaves():
     nt.assert_equal(_nf.n_leaves(fst.Neurite(s5)), 1)
     nt.assert_equal(_nf.n_leaves(fst.Neurite(s6)), 1)
     nt.assert_equal(_nf.n_leaves(fst.Neurite(s7)), 1)
+
+
+def test_section_radial_distances_displaced_neurite():
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+            f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
+
+    pop = Population(nrns)
+
+    rad_dist_nrns = []
+    for nrn in nrns:
+        rad_dist_nrns.extend( nm.get('section_radial_distances', nrn))
+
+    rad_dist_nrns = np.array(rad_dist_nrns)
+
+    rad_dist_pop = nm.get('section_radial_distances', pop)
+
+    nt.ok_(np.alltrue(rad_dist_pop == rad_dist_nrns))
+
+
+
+def test_segment_radial_distances_displaced_neurite():
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+            f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
+
+    pop = Population(nrns)
+
+    rad_dist_nrns = []
+    for nrn in nrns:
+        rad_dist_nrns.extend( nm.get('segment_radial_distances', nrn))
+
+    rad_dist_nrns = np.array(rad_dist_nrns)
+
+    rad_dist_pop = nm.get('segment_radial_distances', pop)
+
+    nt.ok_(np.alltrue(rad_dist_pop == rad_dist_nrns))
