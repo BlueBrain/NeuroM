@@ -33,6 +33,7 @@ from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
 from ._neuron import Section, Neurite, Neuron
+from .population import Population
 
 
 def iter_neurites(obj, mapfun=None, filt=None):

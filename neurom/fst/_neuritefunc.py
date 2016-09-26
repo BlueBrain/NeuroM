@@ -161,8 +161,8 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
-        origin = n.root_node.points[0] if origin is None else origin
-        dist.extend([s for ss in n.iter_sections() for s in _seg_rd(ss, origin)])
+        pos = n.root_node.points[0] if origin is None else origin
+        dist.extend([s for ss in n.iter_sections() for s in _seg_rd(ss, pos)])
 
     return dist
 
@@ -195,8 +195,8 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     '''Remote bifurcation angles in a collection of neurites'''
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
-        origin = n.root_node.points[0] if origin is None else origin
-        dist.extend([section_radial_distance(s, origin) for s in n.iter_sections()])
+        pos = n.root_node.points[0] if origin is None else origin
+        dist.extend([section_radial_distance(s, pos) for s in n.iter_sections()])
 
     return dist
 
