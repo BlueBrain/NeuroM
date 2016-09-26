@@ -148,3 +148,21 @@ def test_section_radial_distances_displaced_neurite():
     rad_dist_pop = nm.get('section_radial_distances', pop)
 
     nt.ok_(np.alltrue(rad_dist_pop == rad_dist_nrns))
+
+
+
+def test_segment_radial_distances_displaced_neurite():
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+            f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
+
+    pop = Population(nrns)
+
+    rad_dist_nrns = []
+    for nrn in nrns:
+        rad_dist_nrns.extend( nm.get('segment_radial_distances', nrn))
+
+    rad_dist_nrns = np.array(rad_dist_nrns)
+
+    rad_dist_pop = nm.get('segment_radial_distances', pop)
+
+    nt.ok_(np.alltrue(rad_dist_pop == rad_dist_nrns))
