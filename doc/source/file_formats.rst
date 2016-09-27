@@ -79,13 +79,12 @@ center of the soma, as well as the first points of all the neuronal trees.
 TypeC: N - points soma
 ^^^^^^^^^^^^^^^^^^^^^^
 
-The soma is represented by a set of points. The first point corresponds to the center of the soma 
-and has as parent ID -1. The other points define a contour of the soma in the maximum cross-section 
-of the x-y plane. The radii of the soma points are not necessarily meaningful, so they can be set 
-to zero. As such, they should not be taken into account in further calculations. The radius of the 
-soma is computed from the equivalent sphere that preserves the surface area of the soma. The rest of 
-the soma points are connected to the center of the soma, as well as the first points of all the 
-neuronal trees. 
+The soma is represented by a set of points. The first point of the soma has as parent ID -1. 
+The other points define a contour of the soma in the maximum cross-section of the x-y plane. 
+The radii of the soma points are not necessarily meaningful, so they can be set to zero. 
+As such, they should not be taken into account in further calculations. The radius of the 
+soma is computed from the equivalent sphere that preserves the surface area of the soma. 
+The first points of all the neuronal trees have as parent one of the soma points.
 
 Tree sections
 ^^^^^^^^^^^^^
