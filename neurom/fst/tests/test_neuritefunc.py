@@ -34,6 +34,7 @@ import numpy as np
 import neurom as nm
 from neurom import fst
 from neurom.fst import _neuritefunc as _nf
+from neurom.fst.sectionfunc import section_volume
 from neurom.point_neurite.io import utils as io_utils
 from neurom.core import tree as tr
 from neurom.core import Population
@@ -166,3 +167,21 @@ def test_segment_radial_distances_displaced_neurite():
     rad_dist_pop = nm.get('segment_radial_distances', pop)
 
     nt.ok_(np.alltrue(rad_dist_pop == rad_dist_nrns))
+
+
+def test_total_volume_per_neurite():
+
+    vol = _nf.total_volume_per_neurite(NRN)
+    nt.eq_(len(vol), 4)
+
+    # calculate the volumes by hand and compare
+    vol2 = []
+
+    for n in NRN.neurites:
+        vol2.append(sum(section_volume(s) for s in n.iter_sections()))
+
+    nt.eq_(vol, vol2)
+
+    # regression test
+    ref_vol = [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024]
+    nt.ok_(np.allclose(vol, ref_vol))
