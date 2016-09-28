@@ -43,6 +43,7 @@ LINT_PYFILES := $(shell find $(FIND_LINT_PY)) $(shell find $(FIND_LINT_APP))
 
 $(VENV):
 	virtualenv --system-site-packages $(VENV)
+	$(VENV_BIN)/python -m pip install --upgrade pip
 	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
 	$(VENV_BIN)/pip install -e .
 
