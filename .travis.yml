@@ -8,8 +8,8 @@ before_install:
   - sudo pip install --upgrade pip
   - sudo apt-get install -y python-virtualenv
   - sudo apt-get install -y python-numpy
+  - sudo apt-get install -y python-scipy
   - sudo apt-get install -y python-h5py
-  - sudo pip install scipy==0.17
   - sudo apt-get install -y python-matplotlib
 script:
   - make -f Makefile test
