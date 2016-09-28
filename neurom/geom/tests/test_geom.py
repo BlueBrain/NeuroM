@@ -73,3 +73,19 @@ def test_bounding_box_neurite():
     nrt = NRN.neurites[0]
     ref = np.array([[-33.25305769, -57.600172, 0.], [0., 0., 49.70137991]])
     nt.assert_true(np.allclose(geom.bounding_box(nrt), ref))
+
+
+def test_convex_hull_points():
+
+    # This leverages scipy ConvexHull and we don't want
+    # to re-test scipy, so simply check that the points are the same.
+    hull = geom.convex_hull(NRN)
+    nt.ok_(np.alltrue(hull.points == NRN.points[:, :3]))
+
+
+def test_convex_hull_volume():
+
+    # This leverages scipy ConvexHull and we don't want
+    # to re-test scipy, so simply regression test the volume
+    hull = geom.convex_hull(NRN)
+    nt.assert_almost_equal(hull.volume, 208641.65, places=3)
