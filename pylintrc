@@ -58,6 +58,10 @@ ignore-docstrings=yes
 [TYPECHECK]
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamically set).
+#ignored-classes=foo.bar
 
-#as of numpy 1.8.0, name resolution seems to be a problem.  Ignore lookups in numpy
-ignored-classes=numpy,numpy.linalg,numpy.random,numpy.testing,scipy.stats
+# List of module names for which member attributes should not be checked
+# (useful for modules/projects where namespaces are manipulated during runtime
+# and thus existing member attributes cannot be deduced by static analysis. It
+# supports qualified module names, as well as Unix pattern matching.
+ignored-modules=numpy,numpy.linalg,numpy.random,numpy.testing,scipy.stats,scipy.spatial

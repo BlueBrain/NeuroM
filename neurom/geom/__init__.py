@@ -29,6 +29,7 @@
 ''' Geometrical Operations for NeuroM '''
 
 import numpy as np
+from scipy.spatial import ConvexHull
 from .transform import translate, rotate
 
 
@@ -40,3 +41,13 @@ def bounding_box(obj):
     '''
     return np.array([np.min(obj.points[:, 0:3], axis=0),
                      np.max(obj.points[:, 0:3], axis=0)])
+
+
+def convex_hull(obj):
+    '''Get the convex hull of an object containing points
+
+    Returns:
+        scipy.spatial.ConvexHull object built from obj.points
+
+    '''
+    return ConvexHull(obj.points[:, :3])
