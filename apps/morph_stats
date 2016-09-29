@@ -58,8 +58,7 @@ _CONFIG = {
 
 def parse_args():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='Morphology statistics extractor',
-                                     epilog='Note: Outputs json')
+    parser = argparse.ArgumentParser(description='Morphology statistics extractor')
 
     parser.add_argument('datapath',
                         help='Path to a morphology data file or a directory')
@@ -75,7 +74,8 @@ def parse_args():
     parser.add_argument('-C', '--config', help='Configuration File')
 
     parser.add_argument('-o', '--output', dest='output_file',
-                        help='Summary output file name')
+                        help=('Summary output file name, if it ends in .json, '
+                              'a json file is created, if .csv, then a csv file'))
 
     return parser.parse_args()
 
@@ -91,6 +91,33 @@ def _get_config(config):
             sys.exit(1)
     else:
         return _CONFIG
+
+
+def _get_header(_results):
+    '''Extracts the headers, using the first value in the dict as the template'''
+    ret = ['name', ]
+    for k, v in _results.values()[0].items():
+        if isinstance(v, dict):
+            for metric in v.keys():
+                ret.append('%s:%s' % (k, metric))
+        else:
+            ret.append(k)
+    return ret
+
+
+def _generate_flattened_dict(headers, _results):
+    '''extract from _results the fields in the headers list'''
+    for name, values in _results.items():
+        row = []
+        for header in headers:
+            if 'name' == header:
+                row.append(name)
+            elif ':' in header:
+                neurite_type, metric = header.split(':')
+                row.append(values[neurite_type][metric])
+            else:
+                row.append(values[header])
+        yield row
 
 
 if __name__ == '__main__':
@@ -115,8 +142,16 @@ if __name__ == '__main__':
         L.error("Invalid data path %s", _f)
         sys.exit(1)
 
-    print json.dumps(_results, indent=2, separators=(',', ':'))
-
-    if args.output_file:
+    if not args.output_file:
+        print json.dumps(_results, indent=2, separators=(',', ':'))
+    elif args.output_file.endswith('.json'):
         with open(args.output_file, 'w') as output_file:
             json.dump(_results, output_file)
+    elif args.output_file.endswith('.csv'):
+        import csv
+        with open(args.output_file, 'wb') as output_file:
+            csvwriter = csv.writer(output_file)
+            header = _get_header(_results)
+            csvwriter.writerow(header)
+            for line in _generate_flattened_dict(header, dict(_results)):
+                csvwriter.writerow(line)
