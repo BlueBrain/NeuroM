@@ -93,10 +93,10 @@ def _get_config(config):
         return _CONFIG
 
 
-def _get_header(_results):
+def _get_header(results):
     '''Extracts the headers, using the first value in the dict as the template'''
     ret = ['name', ]
-    for k, v in _results.values()[0].items():
+    for k, v in results.values()[0].items():
         if isinstance(v, dict):
             for metric in v.keys():
                 ret.append('%s:%s' % (k, metric))
@@ -105,12 +105,12 @@ def _get_header(_results):
     return ret
 
 
-def _generate_flattened_dict(headers, _results):
-    '''extract from _results the fields in the headers list'''
-    for name, values in _results.items():
+def _generate_flattened_dict(headers, results):
+    '''extract from results the fields in the headers list'''
+    for name, values in results.items():
         row = []
         for header in headers:
-            if 'name' == header:
+            if header == 'name':
                 row.append(name)
             elif ':' in header:
                 neurite_type, metric = header.split(':')
@@ -120,12 +120,8 @@ def _generate_flattened_dict(headers, _results):
         yield row
 
 
-if __name__ == '__main__':
-    args = parse_args()
-    logging.basicConfig(level=(logging.WARNING,
-                               logging.INFO,
-                               logging.DEBUG)[min(args.verbose, 2)])
-
+def main(args):
+    '''main function'''
     _f = args.datapath
     _results = {}
     _config = _get_config(args.config)
@@ -155,3 +151,11 @@ if __name__ == '__main__':
             csvwriter.writerow(header)
             for line in _generate_flattened_dict(header, dict(_results)):
                 csvwriter.writerow(line)
+
+
+if __name__ == '__main__':
+    _args = parse_args()
+    logging.basicConfig(level=(logging.WARNING,
+                               logging.INFO,
+                               logging.DEBUG)[min(_args.verbose, 2)])
+    main(_args)
