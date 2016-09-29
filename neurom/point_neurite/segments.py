@@ -33,7 +33,7 @@ import functools
 from . import point_tree as tr
 from .core import iter_neurites
 from neurom.core.dataformat import COLS
-import neurom.analysis.morphmath as mm
+import neurom.morphmath as mm
 from neurom.utils import deprecated_module
 
 

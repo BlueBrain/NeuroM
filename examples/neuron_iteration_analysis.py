@@ -41,7 +41,7 @@ from neurom import geom
 from neurom.fst import iter_sections, iter_segments, sectionfunc
 from neurom.core import Tree
 from neurom.core.types import tree_type_checker, NEURITES
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 import numpy as np
 
 

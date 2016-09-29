@@ -70,9 +70,9 @@ from ..core import Tree
 from ..core import NeuriteType
 from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.types import tree_type_checker as _is_type
-from ..analysis.morphmath import segment_radius as seg_rad
-from ..analysis.morphmath import segment_taper_rate as seg_taper
-from ..analysis.morphmath import section_length as sec_len
+from ..morphmath import segment_radius as seg_rad
+from ..morphmath import segment_taper_rate as seg_taper
+from ..morphmath import section_length as sec_len
 
 
 sec_len = _sec.section_fun(sec_len)

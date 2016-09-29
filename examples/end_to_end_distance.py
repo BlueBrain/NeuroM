@@ -30,7 +30,7 @@
 '''Calculate and plot end-to-end distance of neurites.'''
 
 import neurom as nm
-from neurom.analysis import morphmath
+from neurom import morphmath
 from neurom.fst import _neuritefunc as nf
 import numpy as np
 import matplotlib.pyplot as plt

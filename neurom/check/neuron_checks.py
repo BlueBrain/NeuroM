@@ -38,7 +38,7 @@ from itertools import izip
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
 from neurom.core.dataformat import COLS
-from neurom.analysis.morphmath import section_length, segment_length
+from neurom.morphmath import section_length, segment_length
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.fst import _neuritefunc as _nf
 from neurom.check import CheckResult

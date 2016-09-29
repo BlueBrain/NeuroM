@@ -28,12 +28,11 @@
 
 from nose import tools as nt
 from neurom.core.point import Point
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
 import numpy as np
-import math
 
 
 np.random.seed(0)

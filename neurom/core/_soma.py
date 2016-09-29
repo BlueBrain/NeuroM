@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Soma classes and functions'''
-from neurom.analysis.morphmath import average_points_dist
+from neurom.morphmath import average_points_dist
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
 import numpy as np

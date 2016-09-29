@@ -30,7 +30,7 @@
 
 from neurom.core import Tree
 from neurom.point_neurite.core import Neuron
-from neurom.analysis.morphmath import segment_length
+from neurom.morphmath import segment_length
 from neurom.core.dataformat import COLS
 from .treefunc import n_terminations
 

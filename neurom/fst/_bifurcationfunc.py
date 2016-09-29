@@ -29,7 +29,7 @@
 '''Bifurcation point functions'''
 
 import numpy as np
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 
 

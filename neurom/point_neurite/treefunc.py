@@ -36,7 +36,7 @@ from neurom.core import Tree as tr
 from neurom.point_neurite.point_tree import val_iter, imap_val
 from neurom.point_neurite.point_tree import PointTree as ptr
 from neurom.core.types import NeuriteType
-import neurom.analysis.morphmath as mm
+import neurom.morphmath as mm
 from neurom.core.dataformat import COLS
 import numpy as np
 
