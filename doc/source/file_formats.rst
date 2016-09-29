@@ -52,22 +52,23 @@ More information can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
 
 .. note::
     The following information about SWC format concern the standard representation as 
-    it has been established in the neuromorpho.org database. We would like to clarify
-    that this file format is not yet supported by NeuroM, but it will be modified 
-    to do so, in the future.
+    it has been established in the neuromorpho.org database.
+    This file format is not yet supported by NeuroM, but it may be modified 
+    to do so in the future. Currently, NeuroM does not enforce all the semantic restrictions
+    for the different soma representations, and is therefore more permissive.
 
 The points of type "1" that represent the soma, have to be in the beginning of the file. 
 The soma can be represented in one of the following formats: 
 
 TypeA: One point soma
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 The soma is represented by its center and a radius that corresponds to the sphere
 that preserves the surface area of the soma. The center of the soma has as parent ID -1 
 and all the initial points of the neuronal trees are connected to the soma. 
 
 TypeB: Three point soma
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The soma is represented by three points that correspond to the center of the soma (x, y, z), 
 with parent ID -1, and two diametrically opposite points (x, y-r, z) and (x, y+r, z), where r 

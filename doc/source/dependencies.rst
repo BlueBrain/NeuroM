@@ -36,22 +36,17 @@ Build and runtime
 
 .. _pre-dep-label:
 
-Pre-installed dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-It is recommended that these be installed into
-your system before attempting to install ``NeuroM``. These are not installed
-automatically.
+When installed using ``pip``, ``NeuroM`` will take care of installing unmet dependencies.
+However, for best performance, it may be preferable to pre-install a the following
+subset into your system before installing ``NeuroM``. These typically have installation
+packages available for must common Linux distributions and Mac OSX:
 
 * `numpy <http://www.numpy.org/>`_
 * `h5py <http://www.h5py.org/>`_
 * `scipy <http://www.scipy.org/>`_
 * `matplotlib <http://www.matplotlib.org/>`_
 
-Automatically installed dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-These dependencies are installed automatically when installing with ``pip``:
+These remaining dependencies are lightweight and can be left to the automatic installation:
 
 * `enum34 <https://pypi.python.org/pypi/enum34/>`_
 * `pyyaml <http://www.pyyaml.org/>`_
@@ -62,7 +57,6 @@ Installing and building
 
 * `pip <https://pip.pypa.io/en/stable/>`_
 * `virtualenv <https://virtualenv.pypa.io/en/stable/>`_
-* `GNU Make <https://www.gnu.org/software/make/>`_
 
 Testing and documentation
 -------------------------
@@ -70,6 +64,7 @@ Testing and documentation
 These dependencies are not needed for installing and running ``NeuroM``,
 but are useful for those who want to contribute to its development.
 
+* `GNU Make <https://www.gnu.org/software/make/>`_
 * `nose <https://nose.readthedocs.org/en/latest/>`_
 * `coverage <https://coverage.readthedocs.org/en/latest/>`_
 * `sphinx <http://sphinx-doc.org/>`_

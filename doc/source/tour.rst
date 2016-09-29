@@ -1,5 +1,5 @@
-A Tour of NeuroM
-****************
+A Tour of NeuroM (obsolete)
+***************************
 
 This is a more in-depth guide to ``NeuroM``. It will consist of explanations of the
 overall design philosophy and the main components. The target audience consists of
@@ -148,7 +148,7 @@ lengths together:
 .. code:: python
 
     from neurom.core.tree import isegment, val_iter
-    from neurom.analysis.morpmath import segment_length
+    from neurom.morpmath import segment_length
     tree = trees[0]
     tree_length = sum(segment_length(s) for s in val_iter(isegment(tree)))
 
@@ -162,7 +162,7 @@ along:
 .. code:: python
 
     from neurom.core.tree import isegment, ileaf, iupstream, val_iter
-    from neurom.analysis.morphmath import segment_length
+    from neurom.morphmath import segment_length
     # for demonstration purposes, get the first leaf we find:
     tree = tree[0]
     first_leaf = ileaf(tree).next()
@@ -189,7 +189,7 @@ words, it applies ``val_iter`` internally:
 .. code:: python
 
     from neurom.core.tree import isegment, ileaf, iupstream, imap_val
-    from neurom.analysis.morphmath import segment_length
+    from neurom.morphmath import segment_length
 
     first_leaf = ... # get a leaf of the tree (see previous example)
 
@@ -202,7 +202,7 @@ root. But if that is all you care about, NeuroM has a packaged function for it:
 
 .. code:: python
 
-    from neurom.analysis.morphtree import path_length
+    from neurom.morphtree import path_length
     ...
     # assume leaf is a leaf node obtained by means that are irrelevant to this example
     path_len = path_length(leaf)

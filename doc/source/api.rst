@@ -56,6 +56,7 @@ for developers of NeuroM itself.
 .. autosummary::
    :toctree: _neurom_build
 
+   neurom.morphmath
    neurom.fst
    neurom.fst.sectionfunc
    neurom.check.structural_checks
@@ -72,5 +73,3 @@ for developers of NeuroM itself.
    neurom.view
    neurom.view.common
    neurom.view.view
-   neurom.analysis
-   neurom.analysis.morphmath
