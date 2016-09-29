@@ -35,7 +35,7 @@ from neurom.point_neurite.io.utils import load_neuron
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.core.types import NeuriteType
 from neurom import fst
-from neurom.analysis.morphmath import segment_radius as segrad
+from neurom.morphmath import segment_radius as segrad
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

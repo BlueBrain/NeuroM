@@ -30,7 +30,7 @@
 '''Calculate radius of gyration of neurites.'''
 
 import neurom as nm
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 from neurom.fst import _neuritefunc as nf
 from neurom.core.dataformat import COLS
 import numpy as np

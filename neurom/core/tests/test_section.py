@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -27,28 +26,66 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Get sections and segments by ID'''
-
+import math
+from nose import tools as nt
 import neurom as nm
-from neurom import morphmath as mm
-from neurom.core.dataformat import COLS
+from neurom.core import Section
+import numpy as np
 
 
-def get_segment(neuron, section_id, segment_id):
-    '''Get a segment given a section and segment id
+RADIUS = 4.
+POINTS = np.array([[0., 0., 0., RADIUS],
+                   [0., 0., 1., RADIUS],
+                   [0., 0., 2., RADIUS],
+                   [0., 0., 3., RADIUS],
+                   [1., 0., 3., RADIUS],
+                   [2., 0., 3., RADIUS],
+                   [3., 0., 3., RADIUS]])
 
-    Returns:
-        array of two [x, y, z, r] points defining segment
-    '''
-    sec = neuron.sections[section_id]
-    return sec.points[segment_id:segment_id + 2][:, 0:4]
+REF_LEN = 6.0
 
 
-if __name__ == '__main__':
+def test_init_empty():
 
-    nrn = nm.load_neuron('test_data/h5/v1/Neuron.h5')
+    sec = Section([])
+    nt.ok_(sec.id is None)
+    nt.eq_(sec.type, nm.NeuriteType.undefined)
+    nt.eq_(len(sec.points), 0)
 
-    seg = get_segment(nrn, 3, 2)
-    print 'Segment:\n', seg
-    print 'Mid-point (x, y, z):\n', mm.linear_interpolate(seg[0], seg[1], 0.5)
-    print 'Mid-point R:\n', mm.interpolate_radius(seg[0][COLS.R], seg[1][COLS.R], 0.5)
+
+def test_section_id():
+
+    sec = Section([], section_id=42)
+    nt.eq_(sec.id, 42)
+
+
+def test_section_type():
+
+    sec = Section([], section_type=nm.AXON)
+    nt.eq_(sec.type, nm.AXON)
+
+    sec = Section([], section_type=nm.BASAL_DENDRITE)
+    nt.eq_(sec.type, nm.BASAL_DENDRITE)
+
+
+def test_section_length():
+
+    sec = Section(POINTS)
+    nt.assert_almost_equal(sec.length, REF_LEN)
+
+
+def test_section_area():
+
+    sec = Section(POINTS)
+    area = 2 * math.pi * RADIUS * REF_LEN
+    nt.assert_almost_equal(sec.area, area)
+
+
+def test_section_volume():
+
+    sec = Section(POINTS)
+    volume = math.pi * RADIUS * RADIUS * REF_LEN
+    nt.assert_almost_equal(sec.volume, volume)
+
+
+

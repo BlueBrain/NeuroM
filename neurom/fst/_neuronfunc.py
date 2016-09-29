@@ -33,7 +33,7 @@ import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 
 
 def soma_surface_area(nrn):

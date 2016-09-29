@@ -36,7 +36,7 @@ from neurom import fst
 from neurom.fst import sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst import Section
-from neurom.analysis import morphmath as mmth
+from neurom import morphmath as mmth
 from neurom.point_neurite.io import utils as io_utils
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

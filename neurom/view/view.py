@@ -37,7 +37,7 @@ from neurom import NeuriteType
 from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.io import COLS
-from neurom.analysis.morphmath import segment_radius
+from neurom.morphmath import segment_radius
 
 DEFAULT_PARAMS = '''        new_fig: boolean \
             Defines if the tree will be plotted \

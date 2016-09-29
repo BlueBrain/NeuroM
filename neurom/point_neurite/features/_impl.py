@@ -35,13 +35,13 @@ from ..core import iter_neurites
 from neurom.core.types import NeuriteType
 from neurom.point_neurite.core import Neuron
 from neurom.point_neurite import treefunc as _mt
-from neurom.analysis import morphmath as _mm
+from neurom import morphmath as _mm
 from neurom.core.types import tree_type_checker as _ttc
 from neurom.point_neurite import segments as _seg
 from neurom.point_neurite import sections as _sec
 from neurom.point_neurite import bifurcations as _bifs
 from neurom.point_neurite import points as _pts
-from neurom.analysis.morphmath import sphere_area
+from neurom.morphmath import sphere_area
 
 
 def feature_getter(mapfun):

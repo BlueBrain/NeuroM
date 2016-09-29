@@ -29,8 +29,10 @@
 '''Neuron classes and functions'''
 
 from copy import deepcopy
+from itertools import izip
 import numpy as np
 from .tree import Tree
+from ..morphmath import segment_area, segment_volume, section_length
 from . import NeuriteType
 
 
@@ -41,6 +43,43 @@ class Section(Tree):
         self.id = section_id
         self.points = points
         self.type = section_type
+        self._length = None
+        self._area = None
+        self._volume = None
+
+    @property
+    def length(self):
+        '''Return the path length of this section.'''
+        if self._length is None:
+            self._length = section_length(self.points)
+
+        return self._length
+
+    @property
+    def area(self):
+        '''Return the surface area of this section.
+
+        The area is calculated from the segments, as defined by this
+        section's points
+        '''
+        if self._area is None:
+            pts = self.points
+            self._area = sum(segment_area(s) for s in izip(pts[:-1], pts[1:]))
+
+        return self._area
+
+    @property
+    def volume(self):
+        '''Return the volume of this section.
+
+        The volume is calculated from the segments, as defined by this
+        section's points
+        '''
+        if self._volume is None:
+            pts = self.points
+            self._volume = sum(segment_volume(s) for s in izip(pts[:-1], pts[1:]))
+
+        return self._volume
 
     def __str__(self):
         return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
@@ -53,6 +92,9 @@ class Neurite(object):
         self.root_node = root_node
         self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
         self._points = None
+        self._length = None
+        self._area = None
+        self._volume = None
 
     @property
     def points(self):
@@ -66,6 +108,39 @@ class Neurite(object):
             self._points = np.array(_pts)
 
         return self._points
+
+    @property
+    def length(self):
+        '''Return the total length of this neurite.
+
+        The length is defined as the sum of lengths of the sections.
+        '''
+        if self._length is None:
+            self._length = sum(s.length for s in self.iter_sections())
+
+        return self._length
+
+    @property
+    def area(self):
+        '''Return the surface area of this neurite.
+
+        The area is defined as the sum of area of the sections.
+        '''
+        if self._area is None:
+            self._area = sum(s.area for s in self.iter_sections())
+
+        return self._area
+
+    @property
+    def volume(self):
+        '''Return the volume of this neurite.
+
+        The volume is defined as the sum of volumes of the sections.
+        '''
+        if self._volume is None:
+            self._volume = sum(s.volume for s in self.iter_sections())
+
+        return self._volume
 
     def transform(self, trans):
         '''Return a copy of this neurite with a 3D transformation applied'''

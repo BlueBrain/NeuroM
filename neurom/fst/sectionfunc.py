@@ -30,7 +30,7 @@
 
 from itertools import izip
 from functools import wraps
-from neurom.analysis import morphmath as mm
+from neurom import morphmath as mm
 
 
 def section_fun(fun):
@@ -49,11 +49,6 @@ def map_segments(fun, section):
     return list(fun(s) for s in izip(pts[:-1], pts[1:]))
 
 
-def map_sum_segments(fun, section):
-    '''Map function to segments in section and sum the result'''
-    return sum(map_segments(fun, section))
-
-
 def section_path_length(section):
     '''Path length from section to root'''
     return sum(mm.section_length(s.points) for s in section.iupstream())
@@ -61,12 +56,12 @@ def section_path_length(section):
 
 def section_volume(section):
     '''Volume of a section'''
-    return map_sum_segments(mm.segment_volume, section)
+    return section.volume
 
 
 def section_area(section):
     '''Surface area of a section'''
-    return map_sum_segments(mm.segment_area, section)
+    return section.area
 
 
 def section_tortuosity(section):

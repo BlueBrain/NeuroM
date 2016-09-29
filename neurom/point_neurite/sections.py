@@ -32,7 +32,7 @@
 from itertools import izip
 from functools import wraps
 from .core import iter_neurites
-import neurom.analysis.morphmath as mm
+import neurom.morphmath as mm
 from . import point_tree as tr
 from . import treefunc as mt
 from neurom.utils import deprecated_module

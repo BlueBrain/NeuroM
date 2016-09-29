@@ -4,7 +4,7 @@
 import sys
 import neurom as nm
 from neurom.fst import _neuritefunc as _nf
-from neurom.analysis.morphmath import section_length
+from neurom.morphmath import section_length
 
 
 def do_stuff(filename):
