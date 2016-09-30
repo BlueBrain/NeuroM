@@ -62,6 +62,7 @@ def parse_reqs(reqs_file):
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
 # Hack to avoid installation of modules with C extensions
+# in readthedocs documentation building environment.
 if os.environ.get('READTHEDOCS') == 'True':
     REQS = []
 else:
