@@ -45,8 +45,8 @@ Trees
 =====
 
 Trees are hierachical, recursive structures used to represent individual
-neurites in a morphology. NeuroM represents neurites as :ref:`trees containing
-measurement point information at each node<tree-label>`. The role of a tree is
+neurites in a morphology. NeuroM represents neurites as trees containing
+measurement point information at each node. The role of a tree is
 simply to maintain the hierarchy of its components. As will be shown, most of
 the interesting work is done through a combination of different types of tree 
 :ref:`iteration<iterator-label>`,
