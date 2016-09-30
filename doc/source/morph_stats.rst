@@ -29,8 +29,8 @@
 morph_stats: morphometric statistics extraction
 ***********************************************
 
-The ``morph_stats`` application extracts morphometrics from a set of neuron morpholigy
-files and produces a summary JSON output. It may obtain any of the morphometrics available
+The ``morph_stats`` application extracts morphometrics from a set of neuron morphology
+files and produces a summary in JSON or CSV format. It may obtain any of the morphometrics available
 in the :py:func:`neurom.get` function, and is highly configurable, allowing the user to get
 raw or summary statistics from a large set of neurite and neuron features.
 
@@ -65,7 +65,7 @@ Here, there are two feature categories,
 2. ``neuron``: these are morphometrics that can be applied to a whole neuron, e.g. the soma radius,
    the trunk radii, etc.
 
-Each category sub-item (section_lehgths, soma_radii, etc) corresponds to a
+Each category sub-item (section_lengths, soma_radii, etc) corresponds to a
 :py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic, e.g.
 
 * ``raw``: array of raw values

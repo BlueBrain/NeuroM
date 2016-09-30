@@ -36,7 +36,9 @@ import os
 import sys
 import yaml
 import neurom as nm
-from neurom.apps.morph_stats import extract_stats
+from neurom.apps.morph_stats import (extract_stats,
+                                     get_header,
+                                     generate_flattened_dict)
 from neurom.io.utils import get_morph_files
 from tqdm import tqdm
 
@@ -58,8 +60,7 @@ _CONFIG = {
 
 def parse_args():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='Morphology statistics extractor',
-                                     epilog='Note: Outputs json')
+    parser = argparse.ArgumentParser(description='Morphology statistics extractor')
 
     parser.add_argument('datapath',
                         help='Path to a morphology data file or a directory')
@@ -75,7 +76,8 @@ def parse_args():
     parser.add_argument('-C', '--config', help='Configuration File')
 
     parser.add_argument('-o', '--output', dest='output_file',
-                        help='Summary output file name')
+                        help=('Summary output file name, if it ends in .json, '
+                              'a json file is created, if .csv, then a csv file'))
 
     return parser.parse_args()
 
@@ -93,12 +95,8 @@ def _get_config(config):
         return _CONFIG
 
 
-if __name__ == '__main__':
-    args = parse_args()
-    logging.basicConfig(level=(logging.WARNING,
-                               logging.INFO,
-                               logging.DEBUG)[min(args.verbose, 2)])
-
+def main(args):
+    '''main function'''
     _f = args.datapath
     _results = {}
     _config = _get_config(args.config)
@@ -115,8 +113,24 @@ if __name__ == '__main__':
         L.error("Invalid data path %s", _f)
         sys.exit(1)
 
-    print json.dumps(_results, indent=2, separators=(',', ':'))
-
-    if args.output_file:
+    if not args.output_file:
+        print json.dumps(_results, indent=2, separators=(',', ':'))
+    elif args.output_file.endswith('.json'):
         with open(args.output_file, 'w') as output_file:
             json.dump(_results, output_file)
+    elif args.output_file.endswith('.csv'):
+        import csv
+        with open(args.output_file, 'wb') as output_file:
+            csvwriter = csv.writer(output_file)
+            header = get_header(_results)
+            csvwriter.writerow(header)
+            for line in generate_flattened_dict(header, dict(_results)):
+                csvwriter.writerow(line)
+
+
+if __name__ == '__main__':
+    _args = parse_args()
+    logging.basicConfig(level=(logging.WARNING,
+                               logging.INFO,
+                               logging.DEBUG)[min(_args.verbose, 2)])
+    main(_args)
