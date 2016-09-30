@@ -38,8 +38,7 @@ import yaml
 import neurom as nm
 from neurom.apps.morph_stats import (extract_stats,
                                      get_header,
-                                     generate_flattened_dict,
-                                    )
+                                     generate_flattened_dict)
 from neurom.io.utils import get_morph_files
 from tqdm import tqdm
 
