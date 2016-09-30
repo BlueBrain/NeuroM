@@ -34,6 +34,7 @@ import numpy as np
 from neurom.core import Tree, iter_neurites
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
+from neurom.geom import convex_hull
 from neurom import morphmath as mm
 from .sectionfunc import branch_order, section_radial_distance
 from ._bifurcationfunc import (local_bifurcation_angle,
@@ -216,6 +217,20 @@ def total_length_per_neurite(neurites, neurite_type=NeuriteType.all):
 def total_volume_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the volume per neurite in a collection'''
     return list(sum(s.volume for s in n.iter_sections())
+                for n in iter_neurites(neurites, filt=is_type(neurite_type)))
+
+
+def volume_density_per_neurite(neurites, neurite_type=NeuriteType.all):
+    '''Get the volume density per neurite
+
+    The volume density is defined as the ratio of the neurite volume and
+    the volume of the neurite's enclosung convex hull
+    '''
+    def vol_density(neurite):
+        '''volume density of a single neurite'''
+        return neurite.volume / convex_hull(neurite).volume
+
+    return list(vol_density(n)
                 for n in iter_neurites(neurites, filt=is_type(neurite_type)))
 
 

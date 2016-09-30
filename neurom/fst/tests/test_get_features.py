@@ -493,6 +493,46 @@ def test_neurite_volumes_pop():
                        (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864)))
 
 
+def test_neurite_density_nrn():
+
+    feat = 'neurite_volume_density'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN)),
+                       (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.all)),
+                       (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.axon)),
+                       (0.26289304906104355, 0.26289304906104355, 0.26289304906104355, 0.26289304906104355)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519)))
+
+
+def test_neurite_density_pop():
+
+    feat = 'neurite_volume_density'
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP)),
+                       (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.all)),
+                       (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.axon)),
+                       (6.1847539631150784e-06, 0.26465213325053372, 0.5275513670655404, 0.17585045568851346)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
+                       (0.00034968816544949771, 0.52464681266899216, 1.0116620531455183, 0.16861034219091972)))
+
+    nt.ok_(np.allclose(_stats(fst.get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
+                       (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519)))
+
+
 def test_segment_meander_angles_single_section():
 
     class Mock(object):

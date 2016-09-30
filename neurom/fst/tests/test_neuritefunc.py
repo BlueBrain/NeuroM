@@ -33,6 +33,7 @@ import os
 import numpy as np
 import neurom as nm
 from neurom import fst
+from neurom.geom import convex_hull
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst.sectionfunc import section_volume
 from neurom.point_neurite.io import utils as io_utils
@@ -185,3 +186,17 @@ def test_total_volume_per_neurite():
     # regression test
     ref_vol = [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024]
     nt.ok_(np.allclose(vol, ref_vol))
+
+
+def test_volume_density_per_neurite():
+
+    vol = np.array(_nf.total_volume_per_neurite(NRN))
+    hull_vol = np.array([convex_hull(n).volume for n in nm.iter_neurites(NRN)])
+
+    vol_density = _nf.volume_density_per_neurite(NRN)
+    nt.eq_(len(vol_density), 4)
+    nt.ok_(np.allclose(vol_density, vol / hull_vol))
+
+    ref_density = [0.43756606998299519, 0.52464681266899216,
+                   0.24068543213643726, 0.26289304906104355]
+    nt.ok_(np.allclose(vol_density, ref_density))
