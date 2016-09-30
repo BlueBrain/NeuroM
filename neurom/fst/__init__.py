@@ -103,6 +103,7 @@ NEURITEFEATURES = {
     'neurite_lengths': _nrt.total_length_per_neurite,
     'section_lengths': partial(_nrt.map_sections, sec_len),
     'neurite_volumes': _nrt.total_volume_per_neurite,
+    'neurite_volume_density': _nrt.volume_density_per_neurite,
     'section_volumes': partial(_nrt.map_sections, _sec.section_volume),
     'section_areas': partial(_nrt.map_sections, _sec.section_area),
     'section_tortuosity': partial(_nrt.map_sections, _sec.section_tortuosity),
