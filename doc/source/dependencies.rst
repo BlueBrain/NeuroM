@@ -37,14 +37,14 @@ Build and runtime
 .. _pre-dep-label:
 
 When installed using ``pip``, ``NeuroM`` will take care of installing unmet dependencies.
-However, for best performance, it may be preferable to pre-install a the following
+However, for best performance, it may be preferable to pre-install the following
 subset into your system before installing ``NeuroM``. These typically have installation
 packages available for must common Linux distributions and Mac OSX:
 
 * `numpy <http://www.numpy.org/>`_
-* `h5py <http://www.h5py.org/>`_
 * `scipy <http://www.scipy.org/>`_
 * `matplotlib <http://www.matplotlib.org/>`_
+* `h5py <http://www.h5py.org/>`_
 
 These remaining dependencies are lightweight and can be left to the automatic installation:
 
