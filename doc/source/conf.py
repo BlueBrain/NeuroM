@@ -54,7 +54,7 @@ class _Mock(Mock):
     def __getattr__(cls, name):
         return _Mock()
 
-MOCK_MODULES = ['scipy', 'scipy.spatial', 'h5py']
+MOCK_MODULES = ['scipy', 'scipy.spatial', 'h5py', 'yaml', 'tqdm']
 sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,

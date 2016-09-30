@@ -60,7 +60,12 @@ def parse_reqs(reqs_file):
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
-REQS = parse_reqs(os.path.join(BASEDIR, 'requirements.txt'))
+
+# Hack to avoid installation of modules with C extensions
+if os.environ.get('READTHEDOCS') == 'True':
+    REQS = []
+else:
+    REQS = parse_reqs(os.path.join(BASEDIR, 'requirements.txt'))
 
 EXTRA_REQS_PREFIX = 'requirements_'
 EXTRA_REQS = {}
