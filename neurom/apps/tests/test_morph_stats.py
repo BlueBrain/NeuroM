@@ -119,3 +119,25 @@ def test_extract_stats_single_neuron():
         nt.eq_(res[k].keys(), REF_OUT[k].keys())
         for kk in res[k].keys():
             nt.assert_almost_equal(res[k][kk], REF_OUT[k][kk])
+
+
+def test_get_header():
+    fake_results = {'fake_name0': REF_OUT,
+                    'fake_name1': REF_OUT,
+                    'fake_name2': REF_OUT,
+                    }
+    header = ms.get_header(fake_results)
+    nt.eq_(1 + 1 + 4 * 4, len(header))  # name + everything in REF_OUT
+    nt.ok_('name' in header)
+    nt.ok_('mean_soma_radius' in header)
+
+
+def test_generate_flattened_dict():
+    fake_results = {'fake_name0': REF_OUT,
+                    'fake_name1': REF_OUT,
+                    'fake_name2': REF_OUT,
+                    }
+    header = ms.get_header(fake_results)
+    rows = list(ms.generate_flattened_dict(header, fake_results))
+    nt.eq_(3, len(rows))  # one for fake_name[0-2]
+    nt.eq_(1 + 1 + 4 * 4, len(rows[0]))  # name + everything in REF_OUT

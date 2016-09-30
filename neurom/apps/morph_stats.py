@@ -88,6 +88,33 @@ def extract_stats(neurons, config):
     return stats
 
 
+def get_header(results):
+    '''Extracts the headers, using the first value in the dict as the template'''
+    ret = ['name', ]
+    for k, v in results.values()[0].items():
+        if isinstance(v, dict):
+            for metric in v.keys():
+                ret.append('%s:%s' % (k, metric))
+        else:
+            ret.append(k)
+    return ret
+
+
+def generate_flattened_dict(headers, results):
+    '''extract from results the fields in the headers list'''
+    for name, values in results.items():
+        row = []
+        for header in headers:
+            if header == 'name':
+                row.append(name)
+            elif ':' in header:
+                neurite_type, metric = header.split(':')
+                row.append(values[neurite_type][metric])
+            else:
+                row.append(values[header])
+        yield row
+
+
 _NEURITE_MAP = {
     'AXON': nm.AXON,
     'BASAL_DENDRITE': nm.BASAL_DENDRITE,

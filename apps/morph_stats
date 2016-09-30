@@ -36,7 +36,10 @@ import os
 import sys
 import yaml
 import neurom as nm
-from neurom.apps.morph_stats import extract_stats
+from neurom.apps.morph_stats import (extract_stats,
+                                     get_header,
+                                     generate_flattened_dict,
+                                     )
 from neurom.io.utils import get_morph_files
 from tqdm import tqdm
 
@@ -93,33 +96,6 @@ def _get_config(config):
         return _CONFIG
 
 
-def _get_header(results):
-    '''Extracts the headers, using the first value in the dict as the template'''
-    ret = ['name', ]
-    for k, v in results.values()[0].items():
-        if isinstance(v, dict):
-            for metric in v.keys():
-                ret.append('%s:%s' % (k, metric))
-        else:
-            ret.append(k)
-    return ret
-
-
-def _generate_flattened_dict(headers, results):
-    '''extract from results the fields in the headers list'''
-    for name, values in results.items():
-        row = []
-        for header in headers:
-            if header == 'name':
-                row.append(name)
-            elif ':' in header:
-                neurite_type, metric = header.split(':')
-                row.append(values[neurite_type][metric])
-            else:
-                row.append(values[header])
-        yield row
-
-
 def main(args):
     '''main function'''
     _f = args.datapath
@@ -147,9 +123,9 @@ def main(args):
         import csv
         with open(args.output_file, 'wb') as output_file:
             csvwriter = csv.writer(output_file)
-            header = _get_header(_results)
+            header = get_header(_results)
             csvwriter.writerow(header)
-            for line in _generate_flattened_dict(header, dict(_results)):
+            for line in generate_flattened_dict(header, dict(_results)):
                 csvwriter.writerow(line)
 
 
