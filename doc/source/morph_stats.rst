@@ -30,7 +30,7 @@ morph_stats: morphometric statistics extraction
 ***********************************************
 
 The ``morph_stats`` application extracts morphometrics from a set of neuron morphology
-files and produces a summary JSON output. It may obtain any of the morphometrics available
+files and produces a summary in JSON or CSV format. It may obtain any of the morphometrics available
 in the :py:func:`neurom.get` function, and is highly configurable, allowing the user to get
 raw or summary statistics from a large set of neurite and neuron features.
 
