@@ -42,7 +42,6 @@ subset into your system before installing ``NeuroM``. These typically have insta
 packages available for must common Linux distributions and Mac OSX:
 
 * `numpy <http://www.numpy.org/>`_
-* `h5py <http://www.h5py.org/>`_
 * `scipy <http://www.scipy.org/>`_
 * `matplotlib <http://www.matplotlib.org/>`_
 
@@ -50,6 +49,12 @@ These remaining dependencies are lightweight and can be left to the automatic in
 
 * `enum34 <https://pypi.python.org/pypi/enum34/>`_
 * `pyyaml <http://www.pyyaml.org/>`_
+
+Finally, `h5py <http://www.h5py.org/>`_ is an optional dependency, required for processing
+of morphology files in an internal BBP format. If required, It is up to the user to ensure
+it is pre-installed before installing ``NeuroM``.
+
+* `h5py <http://www.h5py.org/>`_
 
 
 Installing and building
