@@ -82,6 +82,17 @@ def test_section_tortuosity():
                mmth.section_length(s.points) / mmth.point_dist(s.points[0],
                                                                s.points[-1]))
 
+def test_setion_tortuosity_single_point():
+
+    sec = Section([(1, 2, 3)])
+    nt.eq_(_sf.section_tortuosity(sec), 1.0)
+
+
+def test_setion_tortuosity_empty_section():
+
+    sec = Section([])
+    nt.eq_(_sf.section_tortuosity(sec), 1.0)
+
 
 def test_section_meander_angles():
 
