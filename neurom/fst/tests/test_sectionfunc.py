@@ -94,6 +94,22 @@ def test_setion_tortuosity_empty_section():
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
+def test_section_tortuosity_looping_section():
+
+    sec = Section([
+        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
+    ])
+
+    # is infinity
+    nt.eq_(_sf.section_tortuosity(sec), np.inf)
+    nt.ok_(math.isinf(_sf.section_tortuosity(sec)))
+    nt.ok_(np.isinf(_sf.section_tortuosity(sec)))
+
+    # is not NaN
+    nt.ok_(not math.isnan(_sf.section_tortuosity(sec)))
+    nt.ok_(not np.isnan(_sf.section_tortuosity(sec)))
+
+
 def test_section_meander_angles():
 
     s0 = Section(np.array([[0, 0, 0],
