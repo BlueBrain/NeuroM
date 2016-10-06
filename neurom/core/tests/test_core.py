@@ -28,12 +28,14 @@
 
 import os
 from os.path import join as joinp
+from itertools import ifilter
 
 from nose import tools as nt
 import neurom as nm
 from neurom.core.population import Population
 from neurom import load_neuron
 from neurom import core
+from neurom.core import Tree
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
@@ -74,3 +76,47 @@ def test_iter_neurites_filter_mapping():
 
     ref = [500, 500, 500]
     nt.assert_sequence_equal(n, ref)
+
+
+def test_iter_sections_default():
+
+    ref = [s for n in POP.neurites for s in n.iter_sections()]
+    nt.assert_sequence_equal(ref,
+                             [n for n in core.iter_sections(POP)])
+
+
+def test_iter_sections_filter():
+
+    for ntyp in nm.NEURITE_TYPES:
+        a = [s for n in ifilter(lambda nn: nn.type == ntyp, POP.neurites)
+             for s in n.iter_sections()]
+        b = [n for n in core.iter_sections(POP, neurite_filter=lambda n : n.type == ntyp)]
+        nt.assert_sequence_equal(a, b)
+
+
+def test_iter_sections_ipostorder():
+
+    ref = [s for n in POP.neurites for s in n.iter_sections(Tree.ipostorder)]
+    nt.assert_sequence_equal(ref,
+                             [n for n in core.iter_sections(POP, iterator_type=Tree.ipostorder)])
+
+
+def test_iter_sections_ibifurcation():
+
+    ref = [s for n in POP.neurites for s in n.iter_sections(Tree.ibifurcation_point)]
+    nt.assert_sequence_equal(ref,
+                             [n for n in core.iter_sections(POP, iterator_type=Tree.ibifurcation_point)])
+
+
+def test_iter_sections_iforking():
+
+    ref = [s for n in POP.neurites for s in n.iter_sections(Tree.iforking_point)]
+    nt.assert_sequence_equal(ref,
+                             [n for n in core.iter_sections(POP, iterator_type=Tree.iforking_point)])
+
+
+def test_iter_sections_ileaf():
+
+    ref = [s for n in POP.neurites for s in n.iter_sections(Tree.ileaf)]
+    nt.assert_sequence_equal(ref,
+                             [n for n in core.iter_sections(POP, iterator_type=Tree.ileaf)])

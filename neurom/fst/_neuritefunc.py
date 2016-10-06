@@ -29,9 +29,9 @@
 '''Neurite functions'''
 
 from functools import partial
-from itertools import imap, chain, izip
+from itertools import chain, izip
 import numpy as np
-from neurom.core import Tree, iter_neurites
+from neurom.core import Tree, iter_neurites, iter_sections
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
 from neurom.geom import convex_hull
@@ -40,21 +40,6 @@ from .sectionfunc import branch_order, section_radial_distance
 from ._bifurcationfunc import (local_bifurcation_angle,
                                remote_bifurcation_angle,
                                bifurcation_partition)
-
-
-def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
-    '''Returns an iterator to the nodes in a iterable of neurite objects
-
-    Parameters:
-        neurites: neuron, population, neurite, or iterable containing neurite objects
-        iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
-        neurite_filter: optional top level filter on properties of neurite neurite objects.
-    '''
-    def _mapfun(neurite):
-        '''Map an iterator type to the root node of a neurite'''
-        return iterator_type(neurite.root_node)
-
-    return chain.from_iterable(imap(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
 
 
 def iter_segments(neurites, neurite_filter=None):
