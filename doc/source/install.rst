@@ -37,8 +37,7 @@ It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to instal
 ``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_. For details on
 how to set it up, see :ref:`venv-label`
 
-Once the :ref:`virtualenv is set up<venv-label>` is set up and the
-:ref:`pre-installed dependencies<pre-dep-label>` are taken care of,
+Once the :ref:`virtualenv is set up<venv-label>` is set up,
 there are three ways to install ``NeuroM``
 
 #. From the official Python Package Index server (PyPI)
@@ -106,7 +105,21 @@ Here, the ``--system-site-packages`` option has been used. This is because depen
 ``matplotlib`` aren't trivial to build in a ``virtualenv``. This setting allows python packages
 installed in the system to be used inside the ``virtualenv``.
 
-The prompt indicates that the ``virtualenv`` has been activated. To de-activate it,
+The prompt indicates that the ``virtualenv`` has been activated.
+
+For efficient installation of dependencies with C extensions, it is recommended to
+use ``pip`` version 8 or higher. You can check your ``virtuanenv``'s version
+with ``pip --version``, and upgrade if it is too low:
+
+.. code-block:: bash
+
+    $(nrm) pip --version               # Check pip version. Should output version >= 8.0.0
+    $(nrm) pip install --upgrade pip   # Install newest pip inside virtualenv if version too old.
+    $(nrm) pip --version               # New version should be >= 8.0.0
+
+This will allow use of pre-compiled python packages most platforms.
+
+To de-activate the virtualenvr run the ``deactivate`` command:
 
 .. code-block:: bash
 
