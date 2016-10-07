@@ -59,7 +59,7 @@ Examples:
 '''
 
 from .version import VERSION as __version__
-from .core import iter_neurites
+from .core import iter_neurites, iter_sections
 from .fst import load_neuron, load_neurons, NeuriteType, get, NEURITE_TYPES
 
 
