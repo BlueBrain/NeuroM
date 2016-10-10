@@ -33,7 +33,8 @@
 Installation
 ============
 
-It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ to install into
+It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ version 8.1.0
+or higher to install into
 ``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_. For details on
 how to set it up, see :ref:`venv-label`
 
