@@ -36,7 +36,9 @@ Build and runtime
 
 .. _pre-dep-label:
 
-When installed using ``pip``, ``NeuroM`` will take care of installing unmet dependencies.
+``NeuroM`` requires Python version 2.6 or higher (but not version 3.x).
+When installed using `pip <https://pip.pypa.io/en/stable/>`_, ``NeuroM``
+will take care of installing unmet dependencies.
 However, for best performance, it may be preferable to pre-install the following
 subset into your system before installing ``NeuroM``. These typically have installation
 packages available for must common Linux distributions and Mac OSX:
@@ -55,7 +57,7 @@ These remaining dependencies are lightweight and can be left to the automatic in
 Installing and building
 -----------------------
 
-* `pip <https://pip.pypa.io/en/stable/>`_
+* `pip <https://pip.pypa.io/en/stable/>`_ version 8.1.0 or higher.
 * `virtualenv <https://virtualenv.pypa.io/en/stable/>`_
 
 Testing and documentation
