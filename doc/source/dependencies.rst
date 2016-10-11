@@ -38,20 +38,16 @@ Build and runtime
 
 ``NeuroM`` requires Python version 2.6 or higher (but not version 3.x).
 When installed using `pip <https://pip.pypa.io/en/stable/>`_, ``NeuroM``
-will take care of installing unmet dependencies.
-However, for best performance, it may be preferable to pre-install the following
-subset into your system before installing ``NeuroM``. These typically have installation
-packages available for must common Linux distributions and Mac OSX:
+will take care of installing unmet dependencies, although it is also possible
+to pre-install before ``NeuroM``.
 
-* `numpy <http://www.numpy.org/>`_
-* `scipy <http://www.scipy.org/>`_
-* `matplotlib <http://www.matplotlib.org/>`_
-* `h5py <http://www.h5py.org/>`_
-
-These remaining dependencies are lightweight and can be left to the automatic installation:
-
-* `enum34 <https://pypi.python.org/pypi/enum34/>`_
-* `pyyaml <http://www.pyyaml.org/>`_
+* `numpy <http://www.numpy.org/>`_ >= 1.8.0
+* `scipy <http://www.scipy.org/>`_ >= 0.17.0
+* `matplotlib <http://www.matplotlib.org/>`_ >= 1.3.1
+* `h5py <http://www.h5py.org/>`_ >= 2.2.1
+* `enum34 <https://pypi.python.org/pypi/enum34/>`_ >= 1.0.4
+* `pyyaml <http://www.pyyaml.org/>`_ >= 3.10.0
+* `tqdm <https://pypi.python.org/pypi/tqdm/>`_ tqdm >= 4.8.4
 
 
 Installing and building

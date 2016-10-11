@@ -98,13 +98,18 @@ Virtualenv setup
 
 .. code-block:: bash
 
-    $ virtualenv --system-site-packages nrm   # creates a virtualenv called "nrm" in nrm directory
-    $ source nrm/bin/activate                 # activates virtualenv
-    (nrm)$                                    # now we are in the nrm virtualenv
+    $ virtualenv nrm           # creates a virtualenv called "nrm" in nrm directory
+    $ source nrm/bin/activate  # activates virtualenv
+    (nrm)$                     # now we are in the nrm virtualenv
 
-Here, the ``--system-site-packages`` option has been used. This is because dependencies such as
-``matplotlib`` aren't trivial to build in a ``virtualenv``. This setting allows python packages
-installed in the system to be used inside the ``virtualenv``.
+This will create a virtualenv that is isolated from system-wide python packages. If you
+prefer to use :ref:`pre-installed dependencies<pre-dep-label>`, you may use
+the ``--system-site-packages`` option, which allows globally installed python packages
+to be used inside the ``virtualenv``:
+
+.. code-block:: bash
+
+    $ virtualenv --system-site-packages nrm   # creates a virtualenv called "nrm" in nrm directory
 
 The prompt indicates that the ``virtualenv`` has been activated.
 
