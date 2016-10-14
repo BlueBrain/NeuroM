@@ -32,13 +32,12 @@ from nose import tools as nt
 import os
 import numpy as np
 import neurom as nm
-from neurom import fst
 from neurom.geom import convex_hull
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst.sectionfunc import section_volume
 from neurom.point_neurite.io import utils as io_utils
 from neurom.core import tree as tr
-from neurom.core import Population
+from neurom.core import Section, Neurite, Population
 from neurom.point_neurite import point_tree as ptr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
@@ -92,47 +91,47 @@ def test_principal_direction_extents():
     _close(np.array(p), np.array(p_ref))
 
 
-s0 = fst.Section(42)
-s1 = s0.add_child(fst.Section(42))
-s2 = s0.add_child(fst.Section(42))
-s3 = s0.add_child(fst.Section(42))
-s4 = s1.add_child(fst.Section(42))
-s5 = s1.add_child(fst.Section(42))
-s6 = s4.add_child(fst.Section(42))
-s7 = s4.add_child(fst.Section(42))
+s0 = Section(42)
+s1 = s0.add_child(Section(42))
+s2 = s0.add_child(Section(42))
+s3 = s0.add_child(Section(42))
+s4 = s1.add_child(Section(42))
+s5 = s1.add_child(Section(42))
+s6 = s4.add_child(Section(42))
+s7 = s4.add_child(Section(42))
 
 
 def test_n_bifurcation_points():
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s0)), 2)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s1)), 2)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s2)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s3)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s4)), 1)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s5)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s6)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(fst.Neurite(s7)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s0)), 2)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s1)), 2)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s2)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s3)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s4)), 1)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s5)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s6)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s7)), 0)
 
 
 def test_n_forking_points():
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s0)), 3)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s1)), 2)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s2)), 0)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s3)), 0)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s4)), 1)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s5)), 0)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s6)), 0)
-    nt.assert_equal(_nf.n_forking_points(fst.Neurite(s7)), 0)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s0)), 3)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s1)), 2)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s2)), 0)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s3)), 0)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s4)), 1)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s5)), 0)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s6)), 0)
+    nt.assert_equal(_nf.n_forking_points(Neurite(s7)), 0)
 
 
 def test_n_leaves():
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s0)), 5)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s1)), 3)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s2)), 1)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s3)), 1)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s4)), 2)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s5)), 1)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s6)), 1)
-    nt.assert_equal(_nf.n_leaves(fst.Neurite(s7)), 1)
+    nt.assert_equal(_nf.n_leaves(Neurite(s0)), 5)
+    nt.assert_equal(_nf.n_leaves(Neurite(s1)), 3)
+    nt.assert_equal(_nf.n_leaves(Neurite(s2)), 1)
+    nt.assert_equal(_nf.n_leaves(Neurite(s3)), 1)
+    nt.assert_equal(_nf.n_leaves(Neurite(s4)), 2)
+    nt.assert_equal(_nf.n_leaves(Neurite(s5)), 1)
+    nt.assert_equal(_nf.n_leaves(Neurite(s6)), 1)
+    nt.assert_equal(_nf.n_leaves(Neurite(s7)), 1)
 
 
 def test_section_radial_distances_displaced_neurite():

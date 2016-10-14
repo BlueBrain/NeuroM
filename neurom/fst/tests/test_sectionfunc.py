@@ -35,7 +35,7 @@ import numpy as np
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
-from neurom.fst import Section
+from neurom.core import Section
 from neurom import morphmath as mmth
 from neurom.point_neurite.io import utils as io_utils
 

@@ -27,8 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neurom import load_neuron
-from neurom.fst import Neurite, NeuriteType, Section
 from neurom.check import morphtree as mt
+from neurom.core import Neurite, NeuriteType, Section
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 import numpy as np

@@ -32,34 +32,30 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
-    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
+    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
+    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=neurom.AXON)
 
 '''
 
 import numpy as _np
-from functools import partial, update_wrapper
+from functools import partial
 from itertools import chain
-from ._core import FstNeuron, Neurite, Section
-from . import _neuritefunc as _nrt
-from ._neuritefunc import iter_sections
+from ._core import FstNeuron
 from ._neuritefunc import iter_segments
+from . import _neuritefunc as _nrt
 from . import _neuronfunc as _nrn
 from . import sectionfunc as _sec
-from ..utils import deprecated
-from ..core.population import Population
-from ..core import Tree
-from ..core import NeuriteType
+from ..core import NeuriteType as _ntype
 from ..core.types import tree_type_checker as _is_type
-from ..morphmath import segment_radius as seg_rad
-from ..morphmath import segment_taper_rate as seg_taper
-from ..morphmath import section_length as sec_len
+from ..morphmath import segment_radius as _seg_rad
+from ..morphmath import segment_taper_rate as _seg_taper
+from ..morphmath import section_length as _sec_len
 
 
-sec_len = _sec.section_fun(sec_len)
+_sec_len = _sec.section_fun(_sec_len)
 
 
-def _iseg(nrn, neurite_type=NeuriteType.all):
+def _iseg(nrn, neurite_type=_ntype.all):
     '''Build a tree type filter from a neurite type and forward to functon
 
     TODO:
@@ -75,10 +71,10 @@ def _as_neurons(fun, nrns, **kwargs):
 
 
 NEURITEFEATURES = {
-    'total_length': partial(_as_neurons, lambda n, **kw: sum(_nrt.map_sections(sec_len, n, **kw))),
+    'total_length': partial(_as_neurons, lambda n, **kw: sum(_nrt.map_sections(_sec_len, n, **kw))),
     'total_length_per_neurite': _nrt.total_length_per_neurite,
     'neurite_lengths': _nrt.total_length_per_neurite,
-    'section_lengths': partial(_nrt.map_sections, sec_len),
+    'section_lengths': partial(_nrt.map_sections, _sec_len),
     'neurite_volumes': _nrt.total_volume_per_neurite,
     'neurite_volume_density': _nrt.volume_density_per_neurite,
     'section_volumes': partial(_nrt.map_sections, _sec.section_volume),
@@ -98,9 +94,9 @@ NEURITEFEATURES = {
     'partition': _nrt.bifurcation_partitions,
     'number_of_segments': partial(_as_neurons, _nrt.n_segments),
     'segment_lengths': _nrt.segment_lengths,
-    'segment_radii': lambda nrn, **kwargs: [seg_rad(s) for s in _iseg(nrn, **kwargs)],
+    'segment_radii': lambda nrn, **kwargs: [_seg_rad(s) for s in _iseg(nrn, **kwargs)],
     'segment_midpoints': _nrt.segment_midpoints,
-    'segment_taper_rates': lambda nrn, **kwargs: [seg_taper(s)
+    'segment_taper_rates': lambda nrn, **kwargs: [_seg_taper(s)
                                                   for s in _iseg(nrn, **kwargs)],
     'segment_radial_distances': _nrt.segment_radial_distances,
     'segment_meander_angles': lambda nrn, **kwargs: list(chain.from_iterable(_nrt.map_sections(
