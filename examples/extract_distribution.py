@@ -33,7 +33,7 @@
    '''
 
 from itertools import chain
-from neurom import fst
+import neurom as nm
 from neurom import stats
 import argparse
 import json
@@ -47,10 +47,10 @@ def parse_args():
                 and corresponding parameters.')
 
     parser.add_argument('datapath',
-                        help='Path to morphology data file or directory')
+                        help='Path to morphology data directory')
 
     parser.add_argument('feature',
-                        help='Feature to be extracted with neurom.fst.get')
+                        help='Feature to be extracted with neurom.get')
 
     return parser.parse_args()
 
@@ -61,9 +61,9 @@ def extract_data(data_path, feature):
        Returns the optimal distribution, corresponding parameters,
        minimun and maximum values.
     '''
-    population = fst.load_neurons(data_path)
+    population = nm.load_neurons(data_path)
 
-    feature_data = [fst.get(feature, n) for n in population]
+    feature_data = [nm.get(feature, n) for n in population]
     feature_data = list(chain(*feature_data))
 
     return stats.optimal_distribution(feature_data)

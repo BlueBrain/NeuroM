@@ -29,7 +29,7 @@
 '''Load and view multiple somas'''
 
 import os
-from neurom.fst import load_neuron
+from neurom import load_neuron
 import neurom.view.common as common
 import matplotlib.pyplot as plt
 import numpy as np

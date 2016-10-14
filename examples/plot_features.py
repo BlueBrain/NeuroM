@@ -28,7 +28,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Plot a selection of features from a morphology population'''
 
-from neurom import fst
+import neurom as nm
 from neurom.view import common as view_utils
 from collections import defaultdict
 from collections import namedtuple
@@ -95,9 +95,9 @@ def calc_limits(data, dist=None, padding=0.25):
 
 
 # Neurite types of interest
-NEURITES_ = (fst.NeuriteType.axon,
-             fst.NeuriteType.apical_dendrite,
-             fst.NeuriteType.basal_dendrite,)
+NEURITES_ = (nm.NeuriteType.axon,
+             nm.NeuriteType.apical_dendrite,
+             nm.NeuriteType.basal_dendrite,)
 
 
 # Features of interest
@@ -111,13 +111,13 @@ FEATURES = ('segment_lengths',
 def load_neurite_features(filepath):
     '''Unpack relevant data into megadict'''
     stuff = defaultdict(lambda: defaultdict(list))
-    nrns = fst.load_neurons(filepath)
+    nrns = nm.load_neurons(filepath)
     # unpack data into arrays
     for nrn in nrns:
         for t in NEURITES_:
             for feat in FEATURES:
                 stuff[feat][str(t).split('.')[1]].extend(
-                    fst.get(feat, nrn, neurite_type=t)
+                    nm.get(feat, nrn, neurite_type=t)
                 )
     return stuff
 
