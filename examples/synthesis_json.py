@@ -35,8 +35,7 @@
    axons: n_neurites
 '''
 
-from neurom.fst import get, load_neurons, NeuriteType
-from neurom import stats
+from neurom import get, load_neurons, NeuriteType, stats
 from neurom.io.utils import get_morph_files
 import argparse
 from collections import OrderedDict

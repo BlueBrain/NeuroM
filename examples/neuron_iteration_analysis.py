@@ -38,7 +38,7 @@ from __future__ import print_function
 from neurom.core.dataformat import COLS
 import neurom as nm
 from neurom import geom
-from neurom.fst import iter_sections, iter_segments, sectionfunc
+from neurom.fst import iter_segments, sectionfunc
 from neurom.core import Tree
 from neurom.core.types import tree_type_checker, NEURITES
 from neurom import morphmath as mm
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         return mm.section_length(sec.points)
 
     print('Total neurite length (sections):',
-          sum(sec_len(s) for s in iter_sections(nrn)))
+          sum(sec_len(s) for s in nm.iter_sections(nrn)))
 
     # Get length of all neurites in cell by iterating over segments,
     # and summing the segment lengths.
@@ -90,14 +90,14 @@ if __name__ == '__main__':
         return n if sec.parent is None else n - 1
 
     print('Total number of points:',
-          sum(n_points(s) for s in iter_sections(nrn)))
+          sum(n_points(s) for s in nm.iter_sections(nrn)))
 
     # get mean radius of neurite points in cell.
     # p[COLS.R] yields the radius for point p.
     # Note: this includes duplicated points at beginning of
     # non-trunk sections
     print('Mean radius of points:',
-          np.mean([s.points[:, COLS.R] for s in iter_sections(nrn)]))
+          np.mean([s.points[:, COLS.R] for s in nm.iter_sections(nrn)]))
 
     # get mean radius of neurite points in cell.
     # p[COLS.R] yields the radius for point p.
@@ -126,18 +126,18 @@ if __name__ == '__main__':
 
     # Number of bifurcation points.
     print('Number of bifurcation points:',
-          sum(1 for _ in iter_sections(nrn,
-                                       iterator_type=Tree.ibifurcation_point)))
+          sum(1 for _ in nm.iter_sections(nrn,
+                                          iterator_type=Tree.ibifurcation_point)))
 
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
-          sum(1 for _ in iter_sections(nrn,
-                                       iterator_type=Tree.ibifurcation_point,
-                                       neurite_filter=tree_type_checker(nm.APICAL_DENDRITE))))
+          sum(1 for _ in nm.iter_sections(nrn,
+                                          iterator_type=Tree.ibifurcation_point,
+                                          neurite_filter=tree_type_checker(nm.APICAL_DENDRITE))))
 
     # Maximum branch order
     print('Maximum branch order:',
-          max(sectionfunc.branch_order(s) for s in iter_sections(nrn)))
+          max(sectionfunc.branch_order(s) for s in nm.iter_sections(nrn)))
 
     # Neuron's bounding box
     # Note: does not account for soma radius
