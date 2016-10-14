@@ -31,6 +31,7 @@
 import os
 import numpy as np
 from nose import tools as nt
+import neurom as nm
 from neurom.core.types import NeuriteType
 from neurom import fst
 from neurom.fst import _neuronfunc as _nrn
@@ -39,7 +40,7 @@ from neurom.fst import sectionfunc as _sec
 from neurom.fst import _bifurcationfunc as _bf
 from neurom.core import Tree
 from neurom.core.tree import i_chain2
-from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
 
@@ -53,8 +54,8 @@ MORPH_FILENAME = 'Neuron.h5'
 SWC_MORPH_FILENAME = 'Neuron.swc'
 
 # Arbitrarily use h5 v1 as reference always
-REF_NRN = load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME),
-                      mt.set_tree_type)
+REF_NRN = load_pt_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME),
+                         mt.set_tree_type)
 
 REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
                      NeuriteType.basal_dendrite, NeuriteType.axon]
@@ -214,7 +215,7 @@ class TestH5V1(SectionTreeBase):
 
     def setUp(self):
         super(TestH5V1, self).setUp()
-        self.sec_nrn = fst.load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
 
@@ -222,15 +223,15 @@ class TestH5V2(SectionTreeBase):
 
     def setUp(self):
         super(TestH5V2, self).setUp()
-        self.sec_nrn = fst.load_neuron(os.path.join(H5V2_DATA_PATH, MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(os.path.join(H5V2_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
 
 class TestSWC(SectionTreeBase):
 
     def setUp(self):
-        self.ref_nrn = load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME),
+        self.ref_nrn = load_pt_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME),
                                    mt.set_tree_type)
-        self.sec_nrn = fst.load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
         self.ref_types = [n.type for n in self.ref_nrn.neurites]

@@ -3,7 +3,7 @@ import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
 import neurom.view._dendrogram as dm
-from neurom.fst import load_neuron, iter_sections, get
+from neurom import load_neuron, get
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')

@@ -31,10 +31,11 @@
 import os
 import numpy as np
 from nose import tools as nt
+import neurom as nm
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
 from neurom import fst
-from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
 
@@ -65,8 +66,8 @@ class TestSectionTree(object):
     '''Base class for section tree tests'''
 
     def setUp(self):
-        self.ref_pop = Population([load_neuron(f, mt.set_tree_type) for f in NRN_PATHS])
-        self.fst_pop = Population([fst.load_neuron(f) for f in NRN_PATHS])
+        self.ref_pop = Population([load_pt_neuron(f, mt.set_tree_type) for f in NRN_PATHS])
+        self.fst_pop = Population([nm.load_neuron(f) for f in NRN_PATHS])
         self.ref_types = [t.type for t in self.ref_pop.neurites]
 
     def _check_neuron_feature(self, ftr, debug=False, rtol=1e-05, atol=1e-08):
@@ -130,7 +131,7 @@ class TestSectionTree(object):
 
     def test_get_segment_midpoint(self):
 
-        for ntyp in fst.NEURITE_TYPES:
+        for ntyp in nm.NEURITE_TYPES:
             pts = fst.get('segment_midpoints', self.fst_pop, neurite_type=ntyp)
             ref_xyz = (get('segment_x_coordinates', self.ref_pop, neurite_type=ntyp),
                        get('segment_y_coordinates', self.ref_pop, neurite_type=ntyp),

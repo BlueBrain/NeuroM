@@ -31,7 +31,7 @@
 from nose import tools as nt
 import os
 import numpy as np
-from neurom import fst
+from neurom import fst, load_neuron
 from neurom.fst import _neuronfunc as _nf
 from neurom.point_neurite.io import utils as io_utils
 from neurom.core import make_soma
@@ -41,7 +41,7 @@ _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
-NRN = fst.load_neuron(DATA_PATH)
+NRN = load_neuron(DATA_PATH)
 NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 

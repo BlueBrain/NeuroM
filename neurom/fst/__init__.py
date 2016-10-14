@@ -30,34 +30,16 @@
 
 Examples:
 
-    Load a neuron
-
-    >>> from neurom import fst
-    >>> nrn = fst.load_neuron('some/data/path/morph_file.swc')
-
     Obtain some morphometrics
 
     >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=fst.NeuriteType.apical_dendrite)
     >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=fst.NeuriteType.axon)
-
-    Load neurons from a directory. This loads all SWC or HDF5 files it finds\
-    and returns a list of neurons
-
-    >>> import numpy as np  # For mean value calculation
-    >>> nrns = fst.load_neurons('some/data/directory')
-    >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean(fst.get('section_lengths', nrn))
-
-    Iterate over all the sections in a neuron
-
-    >>> for s in fst.iter_sections(nrn): print s.points[0][:3]
 
 '''
 
 import numpy as _np
 from functools import partial, update_wrapper
 from itertools import chain
-from ..io.utils import load_neuron, load_neurons
 from ._core import FstNeuron, Neurite, Section
 from . import _neuritefunc as _nrt
 from ._neuritefunc import iter_sections
@@ -68,7 +50,6 @@ from ..utils import deprecated
 from ..core.population import Population
 from ..core import Tree
 from ..core import NeuriteType
-from ..core.types import NEURITES as NEURITE_TYPES
 from ..core.types import tree_type_checker as _is_type
 from ..morphmath import segment_radius as seg_rad
 from ..morphmath import segment_taper_rate as seg_taper
@@ -85,10 +66,6 @@ def _iseg(nrn, neurite_type=NeuriteType.all):
         This should be a decorator
     '''
     return _nrt.iter_segments(nrn, neurite_filter=_is_type(neurite_type))
-
-
-load_population = deprecated(msg='Use load_neurons instead.',
-                             fun_name='load_population')(load_neurons)
 
 
 def _as_neurons(fun, nrns, **kwargs):
