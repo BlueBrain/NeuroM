@@ -47,8 +47,7 @@ from .view.view import tree3d as draw_tree3d
 from .view.view import soma as draw_soma
 from .view.view import soma3d as draw_soma3d
 from .view.view import dendrogram as draw_dendrogram
-from .core import Soma, Neuron
-from .fst import Neurite, Tree
+from .core import Tree, Neurite, Soma, Neuron
 
 
 MODES = ('2d', '3d', 'dendrogram')

@@ -34,6 +34,7 @@ from neurom.point_neurite import segments as seg
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.point_neurite.treefunc import find_tree_type, get_bounding_box
+from neurom.core import Section, Neurite
 from neurom import fst
 from neurom.fst import sectionfunc as secfun
 from neurom import geom
@@ -41,7 +42,7 @@ from neurom import geom
 
 def is_new_style(obj):
     '''Determine whether a neuron or neurite is new or old style'''
-    if isinstance(obj, (fst.FstNeuron, fst.Neurite, fst.Section)):
+    if isinstance(obj, (fst.FstNeuron, Neurite, Section)):
         return True
     elif isinstance(obj, PointTree):
         return len(obj.value.shape) == 2
@@ -52,8 +53,8 @@ def is_new_style(obj):
 def bounding_box(neurite):
     '''Get a neurite's X,Y,Z bounding box'''
     if is_new_style(neurite):
-        if isinstance(neurite, fst.Section):
-            neurite = fst.Neurite(neurite)
+        if isinstance(neurite, Section):
+            neurite = Neurite(neurite)
         return geom.bounding_box(neurite)
     else:
         return get_bounding_box(neurite)
@@ -76,8 +77,8 @@ def map_segments(neurite, fun):
     '''map a function to the segments in a tree'''
 
     if is_new_style(neurite):
-        if isinstance(neurite, fst.Section):
-            neurite = fst.Neurite(neurite)
+        if isinstance(neurite, Section):
+            neurite = Neurite(neurite)
         return [s for ss in neurite.iter_sections()
                 for s in secfun.map_segments(fun, ss)]
     else:

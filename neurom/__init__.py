@@ -59,8 +59,10 @@ Examples:
 '''
 
 from .version import VERSION as __version__
-from .core import iter_neurites, iter_sections
-from .fst import load_neuron, load_neurons, NeuriteType, get, NEURITE_TYPES
+from .core import iter_neurites, iter_sections, NeuriteType
+from .core.types import NEURITES as NEURITE_TYPES
+from .io.utils import load_neuron, load_neurons
+from .fst import get
 
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite

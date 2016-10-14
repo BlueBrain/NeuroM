@@ -94,7 +94,7 @@ whose first and last element are any of the following combinations:
 The first point of a section is a duplicate of the last point of its parent section,
 unless the latter is a soma section.
 
-In ``NeuroM``, a section is represented by class :py:class:`Section<neurom.fst.Section>`.
+In ``NeuroM``, a section is represented by class :py:class:`Section<neurom.core.Section>`.
 This pseudocode shows the relevant parts of the section class:
 
 .. code-block:: python
@@ -152,12 +152,12 @@ implies the following:
 * A node can have an arbitrary number of children.
 * No loops are present in the structure.
 
-Neurites are represented by the class :py:class:`Neurite<neurom.fst.Neurite>`, which contains
+Neurites are represented by the class :py:class:`Neurite<neurom.core.Neurite>`, which contains
 the root node of the aforementioned tree as well as some helper functions to aid iteration
 over sections and collection of points.
 
 In :py:mod:`NeuroM<neurom>` neurite trees are implemented using the recursive structure
-:py:class:`neurom.fst.Section`, :ref:`described above<section-label>`.
+:py:class:`neurom.core.Section`, :ref:`described above<section-label>`.
 
 
 Neuron
@@ -171,7 +171,7 @@ The trees that are expected to be present depend on the type of cell:
 * Interneuron (IN): basal dendrite, axon
 * Pyramidal cell (PC): basal dendrite, apical dendrite, axon
 
-Neurons are represented by the class :py:class:`Neuron<neurom.fst.Neuron>`. This is more
+Neurons are represented by the class :py:class:`Neuron<neurom.core.Neuron>`. This is more
 or less what it looks like:
 
 .. code-block:: python

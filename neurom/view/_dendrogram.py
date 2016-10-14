@@ -28,9 +28,8 @@
 
 '''Dendrogram helper functions and class'''
 
-from neurom.core import Tree
+from neurom.core import Tree, Neurite
 from neurom.core.dataformat import COLS
-from neurom.fst import Neurite
 
 from copy import deepcopy
 import numpy as np

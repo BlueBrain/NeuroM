@@ -31,17 +31,17 @@
 from nose import tools as nt
 import os
 import numpy as np
-from neurom import fst
+from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
 from neurom.point_neurite.io import utils as io_utils
-from neurom.core import make_soma
+from neurom.core import make_soma, Neurite, Section
 from neurom.core.population import Population
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
-NRN = fst.load_neuron(DATA_PATH)
+NRN = load_neuron(DATA_PATH)
 NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 
@@ -70,16 +70,16 @@ def test_trunk_origin_elevations():
     n1 = Mock()
 
     s = make_soma([[0, 0, 0, 4]])
-    t0 = fst.Section(((1, 0, 0, 2), (2, 1, 1, 2)))
-    t0.type = fst.NeuriteType.basal_dendrite
-    t1 = fst.Section(((0, 1, 0, 2), (1, 2, 1, 2)))
-    t1.type = fst.NeuriteType.basal_dendrite
-    n0.neurites = [fst.Neurite(t0), fst.Neurite(t1)]
+    t0 = Section(((1, 0, 0, 2), (2, 1, 1, 2)))
+    t0.type = NeuriteType.basal_dendrite
+    t1 = Section(((0, 1, 0, 2), (1, 2, 1, 2)))
+    t1.type = NeuriteType.basal_dendrite
+    n0.neurites = [Neurite(t0), Neurite(t1)]
     n0.soma = s
 
-    t2 = fst.Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
-    t2.type = fst.NeuriteType.basal_dendrite
-    n1.neurites = [fst.Neurite(t2)]
+    t2 = Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
+    t2.type = NeuriteType.basal_dendrite
+    n1.neurites = [Neurite(t2)]
     n1.soma = s
 
     pop = Population([n0, n1])
@@ -87,19 +87,19 @@ def test_trunk_origin_elevations():
                           [0.0, np.pi/2., -np.pi/2.])
 
     nt.assert_items_equal(
-        _nf.trunk_origin_elevations(pop, neurite_type=fst.NeuriteType.basal_dendrite),
+        _nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
         [0.0, np.pi/2., -np.pi/2.]
     )
 
     nt.eq_(
         len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=fst.NeuriteType.axon)),
+                                        neurite_type=NeuriteType.axon)),
         0
     )
 
     nt.eq_(
         len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=fst.NeuriteType.apical_dendrite)),
+                                        neurite_type=NeuriteType.apical_dendrite)),
         0
     )
 

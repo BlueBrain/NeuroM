@@ -31,18 +31,18 @@ import numpy as np
 from nose import tools as nt
 from neurom.view import _compat
 from neurom.view._dendrogram import Dendrogram
-from neurom.point_neurite.io.utils import load_neuron
+from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.dendrogram import Dendrogram as PointDendrogram
 from neurom.core.types import NeuriteType
-from neurom import fst
+from neurom import load_neuron
 from neurom.morphmath import segment_radius as segrad
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 
-NRN0 = load_neuron(DATA_PATH)
-NRN1 = fst.load_neuron(DATA_PATH)
+NRN0 = load_pt_neuron(DATA_PATH)
+NRN1 = load_neuron(DATA_PATH)
 
 
 def _close(a, b, debug=False):
