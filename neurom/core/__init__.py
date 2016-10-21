@@ -28,7 +28,7 @@
 
 ''' Core functionality and data types of NeuroM '''
 
-from itertools import ifilter, imap, chain
+from itertools import ifilter, imap, chain, izip
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
@@ -92,3 +92,19 @@ def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
         return iterator_type(neurite.root_node)
 
     return chain.from_iterable(imap(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
+
+
+def iter_segments(neurites, neurite_filter=None):
+    '''Return an iterator to the segments in a collection of neurites
+
+    Parameters:
+        neurites: neuron, population, neurite, or iterable containing neurite objects
+        neurite_filter: optional top level filter on properties of neurite neurite objects.
+
+    Note:
+        This is a convenience function provideded for generic access to
+        neuron segments. It may have a performance overhead WRT custom-made
+        segment analysis functions that leverage numpy and section-wise iteration.
+    '''
+    return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
+                 for s in izip(ss.points[:-1], ss.points[1:]))

@@ -31,7 +31,6 @@
 
 import neurom as nm
 from neurom import morphmath as mm
-from neurom.fst import iter_segments
 from neurom.core.dataformat import COLS
 import numpy as np
 
@@ -54,8 +53,8 @@ def neurite_centre_of_mass(neurite):
     centre_of_mass = np.zeros(3)
     total_volume = 0
 
-    seg_vol = np.array(map(mm.segment_volume, iter_segments(neurite)))
-    seg_centre_of_mass = np.array(map(segment_centre_of_mass, iter_segments(neurite)))
+    seg_vol = np.array(map(mm.segment_volume, nm.iter_segments(neurite)))
+    seg_centre_of_mass = np.array(map(segment_centre_of_mass, nm.iter_segments(neurite)))
 
     # multiply array of scalars with array of arrays
     # http://stackoverflow.com/questions/5795700/multiply-numpy-array-of-scalars-by-array-of-vectors
@@ -77,7 +76,7 @@ def radius_of_gyration(neurite):
     centre_mass = neurite_centre_of_mass(neurite)
     sum_sqr_distance = 0
     N = 0
-    dist_sqr = [distance_sqr(centre_mass, s) for s in iter_segments(neurite)]
+    dist_sqr = [distance_sqr(centre_mass, s) for s in nm.iter_segments(neurite)]
     sum_sqr_distance = np.sum(dist_sqr)
     N = len(dist_sqr)
     return np.sqrt(sum_sqr_distance / N)
