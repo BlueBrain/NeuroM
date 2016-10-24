@@ -30,7 +30,7 @@
 
 # NeuroM
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.
 
 
 [![Build Status](https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master)](https://travis-ci.org/BlueBrain/NeuroM)
@@ -54,7 +54,7 @@ NeuroM documentation is built and hosted on [readthedocs](https://readthedocs.or
 
 It is recommended that you use [`pip`](https://pip.pypa.io/en/stable/) to install
 `NeuroM` into a [`virtualenv`](https://virtualenv.pypa.io/en/stable/). The following
-assumes `virtualenv` named `nrm` with access to the dependencies has been set up and
+assumes `virtualenv` named `nrm` has been set up and
 activated. We will see three ways to install `NeuroM`
 
 
