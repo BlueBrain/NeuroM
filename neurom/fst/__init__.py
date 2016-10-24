@@ -41,11 +41,11 @@ import numpy as _np
 from functools import partial
 from itertools import chain
 from ._core import FstNeuron
-from ._neuritefunc import iter_segments
 from . import _neuritefunc as _nrt
 from . import _neuronfunc as _nrn
 from . import sectionfunc as _sec
 from ..core import NeuriteType as _ntype
+from ..core import iter_segments as _isegments
 from ..core.types import tree_type_checker as _is_type
 from ..morphmath import segment_radius as _seg_rad
 from ..morphmath import segment_taper_rate as _seg_taper
@@ -61,7 +61,7 @@ def _iseg(nrn, neurite_type=_ntype.all):
     TODO:
         This should be a decorator
     '''
-    return _nrt.iter_segments(nrn, neurite_filter=_is_type(neurite_type))
+    return _isegments(nrn, neurite_filter=_is_type(neurite_type))
 
 
 def _as_neurons(fun, nrns, **kwargs):

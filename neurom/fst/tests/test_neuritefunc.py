@@ -66,19 +66,6 @@ def _close(a, b, debug=False):
     nt.assert_true(np.allclose(a, b))
 
 
-def test_iter_segments():
-    def seg_fun(seg):
-        return seg[1][:4] - seg[0][:4]
-
-    def seg_fun2(seg):
-        return seg[1].value[:4] - seg[0].value[:4]
-
-    a = np.array([seg_fun(s) for s in _nf.iter_segments(NRN)])
-    b = np.array([seg_fun2(s) for s in tr.i_chain2(NRN_OLD.neurites, ptr.isegment)])
-
-    _equal(a, b, debug=False)
-
-
 def test_principal_direction_extents():
     # test with a realistic neuron
     nrn = nm.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))

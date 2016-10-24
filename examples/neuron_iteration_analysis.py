@@ -38,7 +38,7 @@ from __future__ import print_function
 from neurom.core.dataformat import COLS
 import neurom as nm
 from neurom import geom
-from neurom.fst import iter_segments, sectionfunc
+from neurom.fst import sectionfunc
 from neurom.core import Tree
 from neurom.core.types import tree_type_checker, NEURITES
 from neurom import morphmath as mm
@@ -70,17 +70,17 @@ if __name__ == '__main__':
     # and summing the segment lengths.
     # This should yield the same result as iterating over sections.
     print('Total neurite length (segments):',
-          sum(mm.segment_length(s) for s in iter_segments(nrn)))
+          sum(mm.segment_length(s) for s in nm.iter_segments(nrn)))
 
     # get volume of all neurites in cell by summing over segment
     # volumes
     print('Total neurite volume:',
-          sum(mm.segment_volume(s) for s in iter_segments(nrn)))
+          sum(mm.segment_volume(s) for s in nm.iter_segments(nrn)))
 
     # get area of all neurites in cell by summing over segment
     # areas
     print('Total neurite surface area:',
-          sum(mm.segment_area(s) for s in iter_segments(nrn)))
+          sum(mm.segment_area(s) for s in nm.iter_segments(nrn)))
 
     # get total number of neurite points in cell.
     def n_points(sec):
@@ -109,13 +109,13 @@ if __name__ == '__main__':
 
     # get mean radius of segments
     print('Mean radius of segments:',
-          np.mean(list(mm.segment_radius(s) for s in iter_segments(nrn))))
+          np.mean(list(mm.segment_radius(s) for s in nm.iter_segments(nrn))))
 
     # get stats for the segment taper rate, for different types of neurite
     for ttype in NEURITES:
         ttt = ttype
         seg_taper_rate = [mm.segment_taper_rate(s)
-                          for s in iter_segments(nrn, neurite_filter=tree_type_checker(ttt))]
+                          for s in nm.iter_segments(nrn, neurite_filter=tree_type_checker(ttt))]
 
         print('Segment taper rate (', ttype,
               '):\n  mean=', np.mean(seg_taper_rate),

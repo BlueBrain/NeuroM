@@ -49,6 +49,10 @@ NEURONS = [NRN1, NRN2, NRN3, NRN4]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 POP = Population(NEURONS, name='foo')
 
+
+# TODO: add more unit tests for iter_segments
+
+
 def test_iter_neurites_default():
 
     nt.assert_sequence_equal(POP.neurites,
@@ -120,3 +124,34 @@ def test_iter_sections_ileaf():
     ref = [s for n in POP.neurites for s in n.iter_sections(Tree.ileaf)]
     nt.assert_sequence_equal(ref,
                              [n for n in core.iter_sections(POP, iterator_type=Tree.ileaf)])
+
+
+def test_iter_segments_nrn():
+
+    ref = list(core.iter_segments(NRN1))
+    nt.eq_(len(ref), 840)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 210)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 420)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 210)
+
+
+def test_iter_segments_pop():
+
+    ref = list(core.iter_segments(POP))
+    nt.eq_(len(ref), 3387)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 919)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 1549)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 919)
+

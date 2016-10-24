@@ -31,7 +31,6 @@
 
 import neurom as nm
 from neurom import morphmath
-from neurom.fst import _neuritefunc as nf
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -67,7 +66,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
         '''Distance between segmenr end and trunk'''
         return morphmath.point_dist(seg[1], neurite.root_node.points[0])
 
-    end_to_end_distance = [_dist(s) for s in nf.iter_segments(neurite)]
+    end_to_end_distance = [_dist(s) for s in nm.iter_segments(neurite)]
     make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1,
                                   end_to_end_distance, neurite.type)
 

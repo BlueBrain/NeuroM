@@ -29,7 +29,6 @@
 '''Neurite functions'''
 
 from functools import partial
-from itertools import chain, izip
 import numpy as np
 from neurom.core import Tree, iter_neurites, iter_sections
 from neurom.core.types import tree_type_checker as is_type
@@ -40,22 +39,6 @@ from .sectionfunc import branch_order, section_radial_distance
 from ._bifurcationfunc import (local_bifurcation_angle,
                                remote_bifurcation_angle,
                                bifurcation_partition)
-
-
-def iter_segments(neurites, neurite_filter=None):
-    '''Return an iterator to the segments in a collection of neurites
-
-    Parameters:
-        neurites: neuron, population, neurite, or iterable containing neurite objects
-        neurite_filter: optional top level filter on properties of neurite neurite objects.
-
-    Note:
-        This is a convenience function provideded for generic access to
-        neuron segments. It may have a performance overhead WRT custom
-        made segment analysis functions that leverage numpy.
-    '''
-    return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in izip(ss.points[:-1], ss.points[1:]))
 
 
 def n_segments(neurites, neurite_type=NeuriteType.all):
