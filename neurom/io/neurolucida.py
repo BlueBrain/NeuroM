@@ -153,7 +153,10 @@ def _flatten_subsection(subsection, _type, offset, parent):
         if row in ('Low', 'Generated', 'High', ):
             continue
         elif isinstance(row[0], (str, unicode)):
-            if 4 == len(row):
+            if len(row) in (4, 5, ):
+                if 5 == len(row):
+                    assert 'S' == row[4][0], \
+                        'Only known usage of a fifth member is Sn, found: %s' % row[4][0]
                 yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]) / 2.,
                        _type, offset, parent)
                 parent = offset
@@ -185,6 +188,13 @@ def _extract_section(section):
 
     Note: PARENT_ID starts at -1 for soma and 0 for neurites
     '''
+    # sections with only one element will be skipped,
+    if 1 == len(section):
+        assert 'Sections' == section[0], \
+            ('Only known usage of a single Section content is "Sections", found %s' %
+             section[0])
+        return None
+
     # try and detect type
     _type = WANTED_SECTIONS.get(section[0][0], None)
 
@@ -192,6 +202,7 @@ def _extract_section(section):
     # CellBody often has [['"CellBody"'], ['CellBody'] as its first two elements
     if _type is None:
         _type = WANTED_SECTIONS.get(section[1][0], None)
+
         if _type is None:  # can't determine the type
             return None
         start = 2
