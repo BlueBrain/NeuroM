@@ -36,7 +36,25 @@ class DataWrapper(object):
     '''Class holding a raw data block and section information'''
 
     def __init__(self, data_block, fmt, sections=None):
-        '''Section Data Wrapper'''
+        '''Section Data Wrapper
+
+        data_block is np.array-like with the following columns:
+            [X, Y, Z, R, TYPE, ID, P]
+            X(float): x-coordinate
+            Y(float): y-coordinate
+            Z(float): z-coordinate
+            R(float): radius
+            TYPE(integer): one of the types described by POINT_TYPE
+            ID(integer): unique integer given to each point, the `ROOD_ID` is -1
+            P(integer): the ID of the parent
+
+        Notes:
+            - there is no ordering constraint: a child can reference a parent ID that comes
+              later in the block
+            - there is no requirement that the IDs are dense
+            - there is no upper bound on the number of rows with the same 'P'arent: in other
+              words, multifurcations are allowed
+        '''
         self.data_block = data_block
         self.fmt = fmt
         self.sections = sections if sections is not None else _extract_sections(data_block)
@@ -112,7 +130,7 @@ def _extract_sections(data_block):
     # end points have either no children or more than one
     sec_end_pts = _section_end_points(data_block, id_map)
 
-    # arfificial discontinuity section IDs
+    # artificial discontinuity section IDs
     _gap_sections = set()
 
     _sections = [Section()]
