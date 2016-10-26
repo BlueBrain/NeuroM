@@ -249,3 +249,22 @@ def test_directory_input():
 def test_invalid_data_path_raises_IOError():
     checker = CheckRunner(CONFIG)
     _ = checker.run('foo/bar/baz')
+
+
+def test__sanitize_config():
+    #fails if missing 'checks'
+    nt.assert_raises(Exception, CheckRunner._sanitize_config, {})
+
+    #creates minimal config
+    new_config = CheckRunner._sanitize_config({'checks': {}})
+    nt.eq_(new_config, {'checks':
+                        {'structural_checks': [],
+                         'neuron_checks': [],
+                         },
+                        'options': {},
+                        'color': False,
+                        })
+
+    #makes no changes to already filled out config
+    new_config = CheckRunner._sanitize_config(CONFIG)
+    nt.eq_(CONFIG, new_config)

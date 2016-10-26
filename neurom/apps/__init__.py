@@ -27,3 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Helper code for neurom applications'''
+import yaml
+
+
+def get_config(config, default_config):
+    '''Load configuration from file if in config, else use default'''
+    if config:
+        try:
+            with open(config, 'r') as config_file:
+                return yaml.load(config_file)
+        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
+            raise Exception('Invalid yaml file: \n %s' % str(e))
+    else:
+        return default_config

@@ -29,10 +29,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
+from neurom.apps import get_config
 from neurom.check.runner import CheckRunner
 import argparse
 import logging
-import yaml
 import sys
 import json
 
@@ -152,7 +152,7 @@ def parse_args():
 
 
 # Default check configuration parameters
-CONFIG = {
+_CONFIG = {
     'checks': {
         'structural_checks': [
             'is_single_tree',
@@ -181,23 +181,17 @@ CONFIG = {
     'color': False
 }
 
-
 def main(args):
     '''Run all the checks'''
     _setup_logging(args.debug, args.log_file)
 
-    if args.config:
-        try:
-            with open(args.config, 'r') as stream:
-                _config = yaml.load(stream)
-        except yaml.scanner.ScannerError as e:
-            L.error('Invalid yaml file : \n %s', str(e))
-            sys.exit(1)
-    else:
-        # set default checks
-        _config = CONFIG
+    try:
+        config = get_config(args.config, _CONFIG)
+        checker = CheckRunner(config)
+    except Exception as e:
+        L.error(str(e))
+        sys.exit(1)
 
-    checker = CheckRunner(_config)
     summary = checker.run(args.datapath)
 
     with open(args.output_file, 'w') as json_output:

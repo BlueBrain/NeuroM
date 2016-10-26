@@ -45,9 +45,7 @@ L = logging.getLogger(__name__)
 class CheckRunner(object):
     '''Class managing checks, config and output'''
     def __init__(self, config):
-        self._config = config
-        if 'color' not in self._config:
-            self._config['color'] = False
+        self._config = CheckRunner._sanitize_config(config)
         self.summary = OrderedDict()
         self._check_modules = dict((k, import_module('neurom.check.%s' % k))
                                    for k in config['checks'])
@@ -157,3 +155,24 @@ class CheckRunner(object):
 
         L.log(LOG_LEVELS[ok],
               '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
+
+    @staticmethod
+    def _sanitize_config(config):
+        '''check that the config has the correct keys, add missing keys if necessary'''
+        if 'checks' in config:
+            checks = config['checks']
+            if 'structural_checks' not in checks:
+                checks['structural_checks'] = []
+            if 'neuron_checks' not in checks:
+                checks['neuron_checks'] = []
+        else:
+            raise Exception('Need to have "checks" in the config')
+
+        if 'options' not in config:
+            L.debug('Using default options')
+            config['options'] = {}
+
+        if 'color' not in config:
+            config['color'] = False
+
+        return config
