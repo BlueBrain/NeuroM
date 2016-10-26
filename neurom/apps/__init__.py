@@ -29,6 +29,8 @@
 '''Helper code for neurom applications'''
 import yaml
 
+from neurom.exceptions import ConfigError
+
 
 def get_config(config, default_config):
     '''Load configuration from file if in config, else use default'''
@@ -36,7 +38,9 @@ def get_config(config, default_config):
         try:
             with open(config, 'r') as config_file:
                 return yaml.load(config_file)
-        except (yaml.parser.ParserError, yaml.scanner.ScannerError) as e:
-            raise Exception('Invalid yaml file: \n %s' % str(e))
+        except (yaml.reader.ReaderError,
+                yaml.parser.ParserError,
+                yaml.scanner.ScannerError) as e:
+            raise ConfigError('Invalid yaml file: \n %s' % str(e))
     else:
         return default_config

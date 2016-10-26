@@ -31,6 +31,7 @@
 '''Examples of basic data checks'''
 from neurom.apps import get_config
 from neurom.check.runner import CheckRunner
+from neurom.exceptions import ConfigError
 import argparse
 import logging
 import sys
@@ -181,6 +182,7 @@ _CONFIG = {
     'color': False
 }
 
+
 def main(args):
     '''Run all the checks'''
     _setup_logging(args.debug, args.log_file)
@@ -188,7 +190,7 @@ def main(args):
     try:
         config = get_config(args.config, _CONFIG)
         checker = CheckRunner(config)
-    except Exception as e:
+    except ConfigError as e:
         L.error(str(e))
         sys.exit(1)
 
@@ -201,5 +203,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-
     sys.exit(main(parse_args()))

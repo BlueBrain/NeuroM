@@ -32,6 +32,8 @@ from collections import defaultdict
 import numpy as np
 import neurom as nm
 
+from neurom.exceptions import ConfigError
+
 L = logging.getLogger(__name__)
 
 
@@ -127,7 +129,7 @@ def sanitize_config(config):
     '''check that the config has the correct keys, add missing keys if necessary'''
     if 'neurite' in config:
         if 'neurite_type' not in config:
-            raise Exception('"neurite_type" missing from config, but "neurite" set')
+            raise ConfigError('"neurite_type" missing from config, but "neurite" set')
     else:
         config['neurite'] = {}
 

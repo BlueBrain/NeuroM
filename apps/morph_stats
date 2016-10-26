@@ -39,8 +39,8 @@ from neurom.apps import get_config
 from neurom.apps.morph_stats import (extract_stats,
                                      sanitize_config,
                                      get_header,
-                                     generate_flattened_dict,
-                                     )
+                                     generate_flattened_dict)
+from neurom.exceptions import ConfigError
 from neurom.io.utils import get_morph_files
 from tqdm import tqdm
 
@@ -91,7 +91,7 @@ def main(args):
     try:
         config = get_config(args.config, _CONFIG)
         config = sanitize_config(config)
-    except Exception as e:
+    except ConfigError as e:
         L.error(str(e))
         sys.exit(1)
 
@@ -100,10 +100,7 @@ def main(args):
     elif os.path.isdir(path):
         if not args.as_population:
             for population in tqdm(get_morph_files(path)):
-                try:
-                    results[population] = extract_stats(nm.load_neuron(population), config)
-                except:
-                    pass
+                results[population] = extract_stats(nm.load_neuron(population), config)
         else:
             results[path] = extract_stats(nm.load_neurons(path), config)
     else:

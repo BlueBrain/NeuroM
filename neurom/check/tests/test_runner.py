@@ -29,6 +29,7 @@
 import os
 from copy import copy
 from neurom.check.runner import CheckRunner
+from neurom.exceptions import ConfigError
 from nose import tools as nt
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -253,7 +254,7 @@ def test_invalid_data_path_raises_IOError():
 
 def test__sanitize_config():
     #fails if missing 'checks'
-    nt.assert_raises(Exception, CheckRunner._sanitize_config, {})
+    nt.assert_raises(ConfigError, CheckRunner._sanitize_config, {})
 
     #creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})

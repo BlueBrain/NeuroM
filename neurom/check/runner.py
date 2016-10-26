@@ -36,6 +36,7 @@ import os
 import logging
 from neurom.io.utils import get_morph_files
 from neurom.io import load_data
+from neurom.exceptions import ConfigError
 from neurom.fst import _core as fst_core
 from neurom.check import check_wrapper
 
@@ -166,7 +167,7 @@ class CheckRunner(object):
             if 'neuron_checks' not in checks:
                 checks['neuron_checks'] = []
         else:
-            raise Exception('Need to have "checks" in the config')
+            raise ConfigError('Need to have "checks" in the config')
 
         if 'options' not in config:
             L.debug('Using default options')
