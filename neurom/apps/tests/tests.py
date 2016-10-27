@@ -26,21 +26,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Helper code for neurom applications'''
-import yaml
+import os
 
+from nose import tools as nt
+from neurom.apps import get_config
 from neurom.exceptions import ConfigError
 
 
-def get_config(config, default_config):
-    '''Load configuration from file if in config, else use default'''
-    if config:
-        try:
-            with open(config, 'r') as config_file:
-                return yaml.load(config_file)
-        except (yaml.reader.ReaderError,
-                yaml.parser.ParserError,
-                yaml.scanner.ScannerError) as e:
-            raise ConfigError('Invalid yaml file: \n %s' % str(e))
-    else:
-        return default_config
+def test_get_config():
+    #get the default
+    default = {'default': 'config'}
+    config = get_config(None, default)
+    nt.eq_(config, default)
+
+    #load valid yaml
+    test_yaml = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                '../../../apps/config/morph_stats.yaml'))
+    config = get_config(test_yaml, default)
+
+
+@nt.raises(ConfigError)
+def test_get_config_exception():
+    #current python file isn't a yaml file
+    get_config(__file__, {})

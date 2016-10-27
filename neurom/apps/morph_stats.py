@@ -32,6 +32,8 @@ from collections import defaultdict
 import numpy as np
 import neurom as nm
 
+from neurom.exceptions import ConfigError
+
 L = logging.getLogger(__name__)
 
 
@@ -121,3 +123,17 @@ _NEURITE_MAP = {
     'APICAL_DENDRITE': nm.APICAL_DENDRITE,
     'ALL': nm.ANY_NEURITE
 }
+
+
+def sanitize_config(config):
+    '''check that the config has the correct keys, add missing keys if necessary'''
+    if 'neurite' in config:
+        if 'neurite_type' not in config:
+            raise ConfigError('"neurite_type" missing from config, but "neurite" set')
+    else:
+        config['neurite'] = {}
+
+    if 'neuron' not in config:
+        config['neuron'] = {}
+
+    return config
