@@ -31,6 +31,7 @@ from nose import tools as nt
 import numpy as np
 import neurom as nm
 from neurom.apps import morph_stats as ms
+from neurom.exceptions import ConfigError
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data/swc')
@@ -141,3 +142,25 @@ def test_generate_flattened_dict():
     rows = list(ms.generate_flattened_dict(header, fake_results))
     nt.eq_(3, len(rows))  # one for fake_name[0-2]
     nt.eq_(1 + 1 + 4 * 4, len(rows[0]))  # name + everything in REF_OUT
+
+
+def test_sanitize_config():
+    nt.assert_raises(ConfigError, ms.sanitize_config, {'neurite': []})
+
+    new_config = ms.sanitize_config({}) #empty
+    nt.eq_(2, len(new_config)) #neurite & neuron created
+
+    full_config = {
+        'neurite': {
+            'section_lengths': ['max', 'total'],
+            'section_volumes': ['total'],
+            'section_branch_orders': ['max']
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'neuron': {
+            'soma_radii': ['mean']
+        }
+    }
+    new_config = ms.sanitize_config(full_config)
+    nt.eq_(3, len(new_config)) #neurite, neurite_type & neuron
+
