@@ -39,6 +39,11 @@ class RawDataError(NeuroMError):
     pass
 
 
+class ConfigError(NeuroMError):
+    '''Exception class for configuration data in apps errors'''
+    pass
+
+
 class SomaError(NeuroMError):
     '''Exception for soma construction errors'''
     pass

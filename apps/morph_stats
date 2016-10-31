@@ -34,11 +34,13 @@ import json
 import logging
 import os
 import sys
-import yaml
 import neurom as nm
+from neurom.apps import get_config
 from neurom.apps.morph_stats import (extract_stats,
+                                     sanitize_config,
                                      get_header,
                                      generate_flattened_dict)
+from neurom.exceptions import ConfigError
 from neurom.io.utils import get_morph_files
 from tqdm import tqdm
 
@@ -82,49 +84,41 @@ def parse_args():
     return parser.parse_args()
 
 
-def _get_config(config):
-    '''Load configuration from file if requested in commandline arge, else use default'''
-    if config:
-        try:
-            with open(config, 'r') as config_file:
-                return yaml.load(config_file)
-        except yaml.scanner.ScannerError as e:
-            L.error('Invalid yaml file : \n %s', str(e))
-            sys.exit(1)
-    else:
-        return _CONFIG
-
-
 def main(args):
     '''main function'''
-    _f = args.datapath
-    _results = {}
-    _config = _get_config(args.config)
+    path = args.datapath
+    results = {}
+    try:
+        config = get_config(args.config, _CONFIG)
+        config = sanitize_config(config)
+    except ConfigError as e:
+        L.error(str(e))
+        sys.exit(1)
 
-    if os.path.isfile(_f):
-        _results[_f] = extract_stats(nm.load_neuron(_f), _config)
-    elif os.path.isdir(_f):
+    if os.path.isfile(path):
+        results[path] = extract_stats(nm.load_neuron(path), config)
+    elif os.path.isdir(path):
         if not args.as_population:
-            for _p in tqdm(get_morph_files(_f)):
-                _results[_p] = extract_stats(nm.load_neuron(_p), _config)
+            for population in tqdm(get_morph_files(path)):
+                results[population] = extract_stats(nm.load_neuron(population), config)
         else:
-            _results[_f] = extract_stats(nm.load_neurons(_f), _config)
+            results[path] = extract_stats(nm.load_neurons(path), config)
     else:
-        L.error("Invalid data path %s", _f)
+        L.error("Invalid data path %s", path)
         sys.exit(1)
 
     if not args.output_file:
-        print json.dumps(_results, indent=2, separators=(',', ':'))
+        print json.dumps(results, indent=2, separators=(',', ':'))
     elif args.output_file.endswith('.json'):
         with open(args.output_file, 'w') as output_file:
-            json.dump(_results, output_file)
+            json.dump(results, output_file)
     elif args.output_file.endswith('.csv'):
         import csv
         with open(args.output_file, 'wb') as output_file:
             csvwriter = csv.writer(output_file)
-            header = get_header(_results)
+            header = get_header(results)
             csvwriter.writerow(header)
-            for line in generate_flattened_dict(header, dict(_results)):
+            for line in generate_flattened_dict(header, dict(results)):
                 csvwriter.writerow(line)
 
 
