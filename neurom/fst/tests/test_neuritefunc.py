@@ -190,10 +190,10 @@ def test_volume_density_per_neurite():
 
 def test_terminal_length_per_neurite():
     nrn = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-    terminal_distances = np.array(_nf.terminal_length_per_neurite(nrn))
+    terminal_distances = np.array(_nf.terminal_path_lengths_per_neurite(nrn))
     np.testing.assert_allclose(terminal_distances,
                                np.array([5., 6., 6., 5.]))
-    terminal_distances = np.array(_nf.terminal_length_per_neurite(
+    terminal_distances = np.array(_nf.terminal_path_lengths_per_neurite(
         nrn, neurite_type=nm.AXON))
     np.testing.assert_allclose(terminal_distances,
                                np.array([6., 5.]))

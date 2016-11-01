@@ -182,7 +182,7 @@ def total_length_per_neurite(neurites, neurite_type=NeuriteType.all):
                 for n in iter_neurites(neurites, filt=is_type(neurite_type)))
 
 
-def terminal_length_per_neurite(neurites, neurite_type=NeuriteType.all):
+def terminal_path_lengths_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the path lengths to each terminal point per neurite in a collection'''
     return list(section_path_length(s)
                 for n in iter_neurites(neurites, filt=is_type(neurite_type))

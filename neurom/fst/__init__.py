@@ -76,7 +76,7 @@ NEURITEFEATURES = {
     'total_length': partial(_as_neurons, lambda n, **kw: sum(_nrt.map_sections(_sec_len, n, **kw))),
     'total_length_per_neurite': _nrt.total_length_per_neurite,
     'neurite_lengths': _nrt.total_length_per_neurite,
-    'terminal_length_per_neurite': _nrt.terminal_length_per_neurite,
+    'terminal_path_lengths_per_neurite': _nrt.terminal_path_lengths_per_neurite,
     'section_lengths': partial(_nrt.map_sections, _sec_len),
     'neurite_volumes': _nrt.total_volume_per_neurite,
     'neurite_volume_density': _nrt.volume_density_per_neurite,
