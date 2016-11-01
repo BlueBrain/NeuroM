@@ -46,10 +46,12 @@ from . import _neuronfunc as _nrn
 from . import sectionfunc as _sec
 from ..core import NeuriteType as _ntype
 from ..core import iter_segments as _isegments
+from ..core import iter_neurites as _ineurites
 from ..core.types import tree_type_checker as _is_type
 from ..morphmath import segment_radius as _seg_rad
 from ..morphmath import segment_taper_rate as _seg_taper
 from ..morphmath import section_length as _sec_len
+from ..exceptions import NeuroMError
 
 
 _sec_len = _sec.section_fun(_sec_len)
@@ -112,6 +114,23 @@ NEURONFEATURES = {
     'trunk_origin_elevations': _nrn.trunk_origin_elevations,
     'trunk_section_lengths': _nrn.trunk_section_lengths,
 }
+
+
+def register_neurite_feature(name, func):
+    '''Register a feature to be applied to neurites
+
+    Parameters:
+        name: name of the feature, used for access via get() function.
+        func: single parameter function of a neurite.
+    '''
+    if name in NEURITEFEATURES:
+        raise NeuroMError('Attempt to hide registered feature %s', name)
+
+    def _fun(neurites, neurite_type=_ntype.all):
+        '''Wrap neurite function from outer scope and map into list'''
+        return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
+
+    NEURONFEATURES[name] = _fun
 
 
 def get(feature, obj, **kwargs):
