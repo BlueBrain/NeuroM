@@ -60,15 +60,18 @@ _CONFIG = {
 }
 
 
-def parse_args():
+def get_parser():
     '''Parse command line arguments'''
     parser = argparse.ArgumentParser(description='Morphology statistics extractor')
 
-    parser.add_argument('datapath',
+    parser.add_argument('datapath', nargs='?',
                         help='Path to a morphology data file or a directory')
 
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
                         help='-v for INFO, -vv for DEBUG')
+
+    parser.add_argument('-l', '--list', action='store_true', default=False,
+                        help='List the available features')
 
     parser.add_argument('--as-population',
                         action='store_true',
@@ -81,7 +84,7 @@ def parse_args():
                         help=('Summary output file name, if it ends in .json, '
                               'a json file is created, if .csv, then a csv file'))
 
-    return parser.parse_args()
+    return parser
 
 
 def main(args):
@@ -123,8 +126,16 @@ def main(args):
 
 
 if __name__ == '__main__':
-    _args = parse_args()
+    _args = get_parser().parse_args()
     logging.basicConfig(level=(logging.WARNING,
                                logging.INFO,
                                logging.DEBUG)[min(_args.verbose, 2)])
+
+    if _args.list:
+        print nm.fst._get_doc()  # pylint: disable=W0212
+        sys.exit(0)
+    elif not _args.datapath:
+        get_parser().print_usage()
+        sys.exit('Need a "datapath" to operate on')
+
     main(_args)

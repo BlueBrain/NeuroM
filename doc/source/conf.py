@@ -75,7 +75,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon'
+    'sphinxcontrib.napoleon',
+    'sphinxcontrib.autorun',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

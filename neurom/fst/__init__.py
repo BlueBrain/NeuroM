@@ -137,24 +137,47 @@ def get(feature, obj, **kwargs):
     '''Obtain a feature from a set of morphology objects
 
     Parameters:
-        feature (string): feature to extract.
-        obj: a neuron, population or neurite tree.
-        **kwargs: parameters to forward to underlying worker functions.
+        feature(string): feature to extract
+        obj: a neuron, population or neurite tree
+        **kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D or 2D numpy array.
-        '''
+
+    '''
 
     feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
                else NEURONFEATURES[feature])
 
     return _np.array(feature(obj, **kwargs))
 
+_INDENT = ' ' * 4
 
-_SEP = '\n\t- '
-_get_doc = ('\nNeurite features (neurite, neuron, neuron population):%s%s'
-            '\nNeuron features (neuron, neuron population):%s%s'
-            % (_SEP, _SEP.join(sorted(NEURITEFEATURES)),
-               _SEP, _SEP.join(sorted(NEURONFEATURES))))
 
-get.__doc__ += _get_doc  # pylint: disable=no-member
+def _indent(string, count):
+    '''indent `string` by `count` * INDENT'''
+    indent = _INDENT * count
+    ret = indent + string.replace('\n', '\n' + indent)
+    return ret.rstrip()
+
+
+def _get_doc():
+    '''Get a description of all the known available features'''
+    def get_docstring(func):
+        '''extract doctstring, if possible'''
+        docstring = ':\n'
+        if not isinstance(func, partial) and func.__doc__:
+            docstring += _indent(func.__doc__, 2)
+        return docstring
+
+    ret = ['\nNeurite features (neurite, neuron, neuron population):']
+    ret.extend(_INDENT + '- ' + feature + get_docstring(func)
+               for feature, func in sorted(NEURITEFEATURES.iteritems()))
+
+    ret.append('\nNeuron features (neuron, neuron population):')
+    ret.extend(_INDENT + '- ' + feature + get_docstring(func)
+               for feature, func in sorted(NEURONFEATURES.iteritems()))
+
+    return '\n'.join(ret)
+
+get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(), 2)  # pylint: disable=no-member
