@@ -28,14 +28,18 @@
 
 '''Utility functions and for loading neurons'''
 
+import logging
 import os
+
 from functools import partial
 from neurom.core.population import Population
-from neurom.exceptions import RawDataError
+from neurom.exceptions import (RawDataError, NeuroMError)
 from neurom.io.datawrapper import DataWrapper
 from neurom.io import swc
 from neurom.io import neurolucida
 from neurom.fst._core import FstNeuron
+
+L = logging.getLogger(__name__)
 
 
 def get_morph_files(directory):
@@ -89,14 +93,15 @@ def load_neurons(neurons,
 
 def load_data(filename):
     '''Unpack data into a raw data wrapper'''
-    def _clear_ext(ext):
-        '''Remove extension separation and make lowercase'''
-        return ext.split(os.path.extsep)[-1].lower()
+    ext = os.path.splitext(filename)[1].lower()
+
+    if ext not in _READERS:
+        raise NeuroMError('Do not have a loader for "%s" extension' % ext)
 
     try:
-        ext = os.path.splitext(filename)[1]
-        return _READERS[_clear_ext(ext)](filename)
+        return _READERS[ext](filename)
     except StandardError:
+        L.exception('Error reading file %s, using "%s" loader', filename, ext)
         raise RawDataError('Error reading file %s' % filename)
 
 
@@ -109,9 +114,9 @@ def _load_h5(filename):
 
 
 _READERS = {
-    'swc': partial(swc.read,
-                   data_wrapper=DataWrapper),
-    'h5': _load_h5,
-    'asc': partial(neurolucida.read,
-                   data_wrapper=DataWrapper)
+    '.swc': partial(swc.read,
+                    data_wrapper=DataWrapper),
+    '.h5': _load_h5,
+    '.asc': partial(neurolucida.read,
+                    data_wrapper=DataWrapper)
 }
