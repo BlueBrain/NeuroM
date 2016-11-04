@@ -76,7 +76,7 @@ def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
-    ''' list of lengths of trunk sections of neurites in a neuron'''
+    '''radii of the trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
