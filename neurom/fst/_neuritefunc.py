@@ -35,7 +35,7 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.types import NeuriteType
 from neurom.geom import convex_hull
 from neurom import morphmath as mm
-from .sectionfunc import branch_order, section_radial_distance
+from .sectionfunc import branch_order, section_radial_distance, section_path_length
 from ._bifurcationfunc import (local_bifurcation_angle,
                                remote_bifurcation_angle,
                                bifurcation_partition)
@@ -180,6 +180,13 @@ def total_length_per_neurite(neurites, neurite_type=NeuriteType.all):
     '''Get the path length per neurite in a collection'''
     return list(sum(s.length for s in n.iter_sections())
                 for n in iter_neurites(neurites, filt=is_type(neurite_type)))
+
+
+def terminal_path_lengths_per_neurite(neurites, neurite_type=NeuriteType.all):
+    '''Get the path lengths to each terminal point per neurite in a collection'''
+    return list(section_path_length(s)
+                for n in iter_neurites(neurites, filt=is_type(neurite_type))
+                for s in iter_sections(n, iterator_type=Tree.ileaf))
 
 
 def total_volume_per_neurite(neurites, neurite_type=NeuriteType.all):
