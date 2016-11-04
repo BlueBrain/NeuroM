@@ -72,7 +72,6 @@ Each category sub-item (section_lengths, soma_radii, etc) corresponds to a
 * ``max``, ``min``, ``mean``, ``median``, ``std``: self-explanatory.
 * ``total``: sum of the raw values
   
-
 An additional field ``neurite_type`` specifies the neurite types into which the morphometrics
 are to be split. This is a sample output using the above configuration:
 
@@ -112,8 +111,13 @@ are to be split. This is a sample output using the above configuration:
 For more information on the application and available options, invoke it with the ``--help``
 or ``-h`` option.
 
-
 .. code-block:: bash
 
     morph_stats --help
 
+Features
+********
+
+.. runblock:: console
+
+    $ morph_stats -l
