@@ -33,7 +33,7 @@ from neurom.core import Neuron, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom import get
 from neurom.io import utils
-from neurom.exceptions import RawDataError, SomaError
+from neurom.exceptions import RawDataError, SomaError, NeuroMError
 from nose import tools as nt
 
 
@@ -340,3 +340,7 @@ def test_load_h5_trunk_points_regression():
 
     nt.ok_(np.allclose(nrn.neurites[3].root_node.points[1],
                        [0., 0., 0.1, 7.28555262e-01, 2., 697, 696]))
+
+
+def test_load_unknown_type():
+    nt.assert_raises(NeuroMError, utils.load_data, 'fake.file')
