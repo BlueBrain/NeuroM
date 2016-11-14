@@ -41,11 +41,12 @@ REF_CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'total'],
         'section_volumes': ['total'],
-        'section_branch_orders': ['max']
+        'section_branch_orders': ['max'],
+        'segment_midpoints': ['max'],
     },
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
-        'soma_radii': ['mean']
+        'soma_radii': ['mean'],
     }
 }
 
@@ -55,26 +56,38 @@ REF_OUT = {
         'total_section_length': 207.87975220908129,
         'max_section_length': 11.018460736176685,
         'max_section_branch_order': 10,
-        'total_section_volume': 276.73857657289523
+        'total_section_volume': 276.73857657289523,
+        'max_segment_midpoint_X': 0.0,
+        'max_segment_midpoint_Y': 0.0,
+        'max_segment_midpoint_Z': 49.520305964149998,
     },
     'all': {
         'total_section_length': 840.68521442251949,
         'max_section_length': 11.758281556059444,
         'max_section_branch_order': 10,
-        'total_section_volume': 1104.9077419665782
+        'total_section_volume': 1104.9077419665782,
+        'max_segment_midpoint_X': 64.401674984050004,
+        'max_segment_midpoint_Y': 48.48197694465,
+        'max_segment_midpoint_Z': 53.750947521650005,
     },
     'apical_dendrite': {
         'total_section_length': 214.37304577550353,
         'max_section_length': 11.758281556059444,
         'max_section_branch_order': 10,
-        'total_section_volume': 271.9412385728449
+        'total_section_volume': 271.9412385728449,
+        'max_segment_midpoint_X': 64.401674984050004,
+        'max_segment_midpoint_Y': 0.0,
+        'max_segment_midpoint_Z': 53.750947521650005,
     },
     'basal_dendrite': {
         'total_section_length': 418.43241643793476,
         'max_section_length': 11.652508126101711,
         'max_section_branch_order': 10,
-        'total_section_volume': 556.22792682083821
-    }
+        'total_section_volume': 556.22792682083821,
+        'max_segment_midpoint_X': 64.007872333250006,
+        'max_segment_midpoint_Y': 48.48197694465,
+        'max_segment_midpoint_Z': 51.575580778049996,
+    },
 }
 
 
@@ -110,7 +123,6 @@ def test_eval_stats_applies_numpy_function():
 
 
 def test_extract_stats_single_neuron():
-
     nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
     nt.eq_(res.keys(), REF_OUT.keys())
@@ -128,7 +140,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    nt.eq_(1 + 1 + 4 * 4, len(header))  # name + everything in REF_OUT
+    nt.eq_(1 + 1 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
     nt.ok_('name' in header)
     nt.ok_('mean_soma_radius' in header)
 
@@ -141,7 +153,7 @@ def test_generate_flattened_dict():
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
     nt.eq_(3, len(rows))  # one for fake_name[0-2]
-    nt.eq_(1 + 1 + 4 * 4, len(rows[0]))  # name + everything in REF_OUT
+    nt.eq_(1 + 1 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
 
 
 def test_sanitize_config():
