@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Reader for Neurolucida .ASC files, v3, reversed engineered from looking at output from
+'''Reader for Neurolucida .ASC files, v3, reverse engineered from looking at output from
 Neuroludica
 '''
 
@@ -36,8 +36,8 @@ from neurom._compat import StringType
 
 import numpy as np
 
-from neurom.core.dataformat import COLS, POINT_TYPE
-from .datawrapper import DataWrapper
+from neurom.core.dataformat import POINT_TYPE
+from .datawrapper import BlockNeuronBuilder
 
 
 WANTED_SECTIONS = {
@@ -46,52 +46,35 @@ WANTED_SECTIONS = {
     'Dendrite': POINT_TYPE.BASAL_DENDRITE,
     'Apical': POINT_TYPE.APICAL_DENDRITE,
 }
-UNWANTED_SECTION_NAMES = [
+UNWANTED_SECTIONS = set([
     # Meta-data?
     'Closed', 'Color', 'FillDensity', 'GUID', 'ImageCoords', 'MBFObjectType',
-    'Marker', 'Name', 'Resolution', 'Set',
+    'Marker', 'Name', 'Resolution', 'Set', 'Sections',
     # Marker names?
     'Asterisk', 'Cross', 'Dot', 'DoubleCircle', 'FilledCircle', 'FilledDownTriangle',
     'FilledSquare', 'FilledStar', 'FilledUpTriangle', 'FilledUpTriangle', 'Flower',
     'Flower2', 'OpenCircle', 'OpenDiamond', 'OpenDownTriangle', 'OpenSquare', 'OpenStar',
-    'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar',
-]
-UNWANTED_SECTIONS = dict([(name, True) for name in UNWANTED_SECTION_NAMES])
+    'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar', 'CircleArrow', 'CircleCross',
+    'FilledDiamond', 'MalteseCross', 'SnowFlake', 'TexacoStar', 'FilledQuadStar',
+    'Circle1', 'Circle2', 'Circle3', 'Circle4', 'Circle5',
+    'Circle6', 'Circle7', 'Circle8', 'Circle9',
+])
 L = logging.getLogger(__name__)
-
-
-def _match_section(section, match):
-    '''checks whether the `type` of section is in the `match` dictionary
-
-    Works around the unknown ordering of s-expressions in each section.
-    For instance, the `type` is the 3-rd one in for CellBodies
-        ("CellBody"
-         (Color Yellow)
-         (CellBody)
-         (Set "cell10")
-        )
-
-    Returns:
-        value associated with match[section_type], None if no match
-    '''
-    # TODO: rewrite this so it is more clear, and handles sets & dictionaries for matching
-    for i in range(5):
-        if i >= len(section):
-            return None
-        elif isinstance(section[i], StringType) and section[i] in match:
-            return match[section[i]]
-    return None
 
 
 def _get_tokens(morph_fd):
     '''split a file-like into tokens: split on whitespace
 
-    Note: this also strips newlines and comments
+    Note: this also strips comments and spines
     '''
     for line in morph_fd.readlines():
-        line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
-        squash_token = []  # quoted strings get squashed into one token
+        squash_token = []  # quoted strings get squashed into one token, can be multi-line
+
+        if '<(' in line:  # skip spines, which exist on a single line
+            assert ')>' in line, 'Missing end of spine'
+            continue  # pragma: no cover
+
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
             if squash_token:
                 squash_token.append(token)
@@ -105,165 +88,154 @@ def _get_tokens(morph_fd):
                 yield token
 
 
+def _consume_until_balanced_paren(token_iter, opening_count=1):
+    '''Consume tokens until a opening_count close parens, taking into account balanced pairs'''
+    opening_count = 1
+    for token in token_iter:
+        if token == ')':
+            opening_count -= 1
+        elif token == '(':
+            opening_count += 1
+
+        if opening_count == 0:
+            break
+
+
 def _parse_section(token_iter):
-    '''take a stream of tokens, and create the tree structure that is defined
-    by the s-expressions
+    '''extract from tokens the tree structure that is defined by the s-expressions
+
+    Note: sections tagged as UNWANTED_SECTIONS are not returned
     '''
     sexp = []
     for token in token_iter:
         if '(' == token:
-            new_sexp = _parse_section(token_iter)
-            if not _match_section(new_sexp, UNWANTED_SECTIONS):
-                sexp.append(new_sexp)
+            sub_sexp = _parse_section(token_iter)
+            if sub_sexp:
+                sexp.append(sub_sexp)
         elif ')' == token:
             return sexp
+        elif token in UNWANTED_SECTIONS:
+            _consume_until_balanced_paren(token_iter)
+            break
         else:
             sexp.append(token)
     return sexp
 
 
-def _parse_sections(morph_fd):
-    '''returns array of all the sections that exist
+def _top_level_sections(morph_fd):
+    '''yields the top level sections that exist
 
     The format is nested lists that correspond to the s-expressions
     '''
-    sections = []
     token_iter = _get_tokens(morph_fd)
     for token in token_iter:
         if '(' == token:  # find top-level sections
             section = _parse_section(token_iter)
-            if not _match_section(section, UNWANTED_SECTIONS):
-                sections.append(section)
-    return sections
+            if section:
+                yield section
 
 
-def _flatten_subsection(subsection, _type, offset, parent):
-    '''Flatten a subsection from its nested version
+BLOCK_MARKERS = set(['Low', 'Generated', 'High', 'Normal', 'Incomplete',
+                     'Midpoint', 'Origin', ])
 
-    Args:
-        subsection: Nested subsection as produced by _parse_section, except one level in
-        _type: type of section, ie: AXON, etc
-        parent: first element has this as it's parent
-        offset: position in the final array of the first element
 
-    Returns:
-        Generator of values corresponding to [X, Y, Z, R, TYPE, ID, PARENT_ID]
+def _extract_section_points(section):
+    '''In section, extract all points in the section before a furcation point
+
+    A furcation point is detected as a sub-list
     '''
-    for row in subsection:
-        # TODO: Figure out what these correspond to in neurolucida
-        if row in ('Low', 'Generated', 'High', ):
-            continue
-        elif isinstance(row[0], StringType):
-            if len(row) in (4, 5, ):
-                if 5 == len(row):
-                    assert 'S' == row[4][0], \
-                        'Only known usage of a fifth member is Sn, found: %s' % row[4][0]
-                yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]) / 2.,
-                       _type, offset, parent)
-                parent = offset
-                offset += 1
-        elif isinstance(row[0], list):
-            split_parent = offset - 1
-            start_offset = 0
+    ret = []
+    for row in section:
+        if not isinstance(row[0], StringType):
+            # probably a bifurcation point
+            break
+        elif isinstance(row, StringType):
+            if row not in BLOCK_MARKERS:
+                L.warning('Row: contains unknown block marker: %s', row)
+            continue  # pragma: no cover
 
-            slices = []
-            start = 0
-            for i, value in enumerate(row):
-                if '|' == value:
-                    slices.append(slice(start + start_offset, i))
-                    start = i + 1
-            slices.append(slice(start + start_offset, len(row)))
+        assert len(row) in (4, 5, ), 'Point row contains more columns than 4 or 5: %s' % row
 
-            for split_slice in slices:
-                for _row in _flatten_subsection(row[split_slice], _type, offset,
-                                                split_parent):
-                    offset += 1
-                    yield _row
+        if 5 == len(row) and 'S' != row[4][0]:
+            L.warning('Only known usage of a fifth member is Sn, found: %s', row)
 
-
-def _extract_section(section):
-    '''Find top level sections, and get their flat contents, and append them all
-
-    Returns a numpy array with the row format:
-        [X, Y, Z, R, TYPE, ID, PARENT_ID]
-
-    Note: PARENT_ID starts at -1 for soma and 0 for neurites
-    '''
-    # sections with only one element will be skipped,
-    if 1 == len(section):
-        assert 'Sections' == section[0], \
-            ('Only known usage of a single Section content is "Sections", found %s' %
-             section[0])
-        return None
-
-    # try and detect type
-    _type = WANTED_SECTIONS.get(section[0][0], None)
-
-    start = 1
-    # CellBody often has [['"CellBody"'], ['CellBody'] as its first two elements
-    if _type is None:
-        _type = WANTED_SECTIONS.get(section[1][0], None)
-
-        if _type is None:  # can't determine the type
-            return None
-        start = 2
-
-    parent = -1 if _type == POINT_TYPE.SOMA else 0
-    subsection_iter = _flatten_subsection(section[start:], _type, offset=0,
-                                          parent=parent)
-
-    ret = np.array([row for row in subsection_iter])
-    return ret
-
-
-def _sections_to_raw_data(sections):
-    '''convert list of sections into the `raw_data` format used in neurom
-
-    This finds the soma, and attaches the neurites
-    '''
-    soma = None
-    neurites = []
-    for section in sections:
-        neurite = _extract_section(section)
-        if neurite is None:
-            continue
-        elif neurite[0][COLS.TYPE] == POINT_TYPE.SOMA:
-            assert soma is None, 'Multiple somas defined in file'
-            soma = neurite
-        else:
-            neurites.append(neurite)
-    assert soma is not None, 'No soma found'
-
-    total_length = len(soma) + sum(len(neurite) for neurite in neurites)
-    ret = np.zeros((total_length, 7,), dtype=np.float64)
-    pos = len(soma)
-    ret[0:pos, :] = soma
-
-    for neurite in neurites:
-        end = pos + len(neurite)
-        ret[pos:end, :] = neurite
-        ret[pos:end, COLS.P] += pos
-        ret[pos:end, COLS.ID] += pos
-        # TODO: attach the neurite at the closest point on the soma
-        ret[pos, COLS.P] = len(soma) - 1
-        pos = end
+        ret.append((float(row[0]), float(row[1]), float(row[2]), float(row[3]) / 2., ))
 
     return ret
 
 
-def read(morph_file, data_wrapper=DataWrapper):
-    '''return a 'raw_data' np.array with the full neuron, and the format of the file
-    suitable to be wrapped by DataWrapper
-    '''
+def _find_furcations(rows):
+    '''Neurolucida uses a '|' character for bifurcations'''
+    furcations = []
+    start_start = 0
+    for i, value in enumerate(rows):
+        if '|' == value:
+            furcations.append(slice(start_start, i))
+            start_start = i + 1
+    furcations.append(slice(start_start, len(rows)))
+    return furcations
 
+
+def read_subsection(neuron_builder, id_, parent_id, section_type, subsection, parent_point=None):
+    '''recursively extract each section within the section'''
+    points = _extract_section_points(subsection)
+    used_points = len(points)
+    if parent_point is None:
+        points = np.array(points)
+    else:
+        points = np.vstack((parent_point, points))
+
+    neuron_builder.add_section(id_, parent_id, section_type, points)
+    next_id = id_ + 1
+
+    rest = subsection[used_points:]
+    if rest and isinstance(rest[0], list):
+        parent_point = points[-1]
+        rest = rest[0]
+        furcations = _find_furcations(rest)
+
+        for split in furcations:
+            subsection = rest[split]
+            if not subsection or isinstance(subsection, StringType):
+                continue  # pragma: no cover
+            next_id = read_subsection(
+                neuron_builder, next_id, id_, section_type, subsection, parent_point)
+
+    return next_id
+
+
+def read(morph_file):
+    '''read Neurolucida file, returns a DataWrapper instance'''
     msg = ('This is an experimental reader. '
            'There are no guarantees regarding ability to parse '
            'Neurolucida .asc files or correctness of output.')
-
     warnings.warn(msg)
-    L.warning(msg)
 
+    neuron_builder = BlockNeuronBuilder()
     with open(morph_file) as morph_fd:
-        sections = _parse_sections(morph_fd)
-    raw_data = _sections_to_raw_data(sections)
-    return data_wrapper(raw_data, 'NL-ASCII')
+        id_ = 0
+        for section in _top_level_sections(morph_fd):
+            # try and detect type
+            _type = WANTED_SECTIONS.get(section[0][0], None)
+            start = 1
+
+            # CellBody often has [['"CellBody"'], ['CellBody'] as its first two elements
+            if _type is None:
+                _type = WANTED_SECTIONS.get(section[1][0], None)
+                start = 2
+
+                if _type is None:  # can't determine the type, skip section
+                    continue  # pragma: no cover
+
+            # TODO: all neurites are connected at the 0 point of the soma, should probably
+            # be the point closest to the neurite start
+            parent_id = 0
+            parent_point = None
+            if _type == POINT_TYPE.SOMA:
+                parent_id = -1
+                parent_point = None
+
+            id_ = read_subsection(
+                neuron_builder, id_, parent_id, _type, section[start:], parent_point=parent_point)
+
+    return neuron_builder.get_datawrapper('NL-ASCII')

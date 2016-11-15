@@ -39,8 +39,8 @@ from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType
 
 
-DATA_PATH = './test_data'
-SWC_PATH = os.path.join(DATA_PATH, 'swc/')
+_PWD = os.path.dirname(os.path.abspath(__file__))
+SWC_PATH = os.path.join(_PWD, '../../../test_data', 'swc/')
 fst_neuron = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 simple_neuron = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 

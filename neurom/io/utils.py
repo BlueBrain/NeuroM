@@ -32,10 +32,8 @@ import logging
 import os
 import glob
 
-from functools import partial
 from neurom.core.population import Population
 from neurom.exceptions import (RawDataError, NeuroMError)
-from neurom.io.datawrapper import DataWrapper
 from neurom.io import (swc, neurolucida)
 from neurom.fst._core import FstNeuron
 from neurom._compat import filter, StringType
@@ -151,14 +149,11 @@ def _load_h5(filename):
     '''Delay loading of h5py until it is needed'''
     from neurom.io import hdf5
     return hdf5.read(filename,
-                     remove_duplicates=False,
-                     data_wrapper=DataWrapper)
+                     remove_duplicates=False)
 
 
 _READERS = {
-    '.swc': partial(swc.read,
-                    data_wrapper=DataWrapper),
+    '.swc': swc.read,
     '.h5': _load_h5,
-    '.asc': partial(neurolucida.read,
-                    data_wrapper=DataWrapper)
+    '.asc': neurolucida.read,
 }

@@ -44,7 +44,7 @@ There is one such row per measured point.
 import h5py
 import numpy as np
 
-from .datawrapper import DataWrapper, BlockNeuronBuilder
+from .datawrapper import BlockNeuronBuilder
 from neurom._compat import zip_longest
 
 
@@ -63,7 +63,7 @@ POINT_DIAMETER = 3
 GPFIRST, GTYPE, GPID = range(3)  # groups or structure
 
 
-def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
+def read(filename, remove_duplicates=False):
     '''Read a file and return a `data_wrapper'd` data
 
     * Tries to guess the format and the H5 version.
@@ -94,7 +94,7 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
         neuron_builder.add_section(id_, int(parent_id), int(section_type),
                                    points[point_start:point_end])
 
-    return neuron_builder.get_datawrapper(version, data_wrapper=data_wrapper)
+    return neuron_builder.get_datawrapper(version)
 
 
 def _remove_duplicate_points(points, groups):

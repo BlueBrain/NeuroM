@@ -271,3 +271,10 @@ class BlockNeuronBuilder(object):
         self._check_consistency()
         datablock, sections = self._make_datablock()
         return data_wrapper(datablock, file_format, sections)
+
+    def __str__(self):
+        '''pretty print neuron'''
+        ret = []
+        for section_id, section in self.sections.items():
+            ret.append(str(section_id) + ' ' + str(section))
+        return '\n'.join(ret)
