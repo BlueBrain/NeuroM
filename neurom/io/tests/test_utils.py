@@ -115,7 +115,6 @@ def _check_neurites_have_no_parent(nrn):
         nt.assert_true(n.root_node.parent is None)
 
 
-
 def test_load_neurons():
     nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
@@ -327,7 +326,7 @@ def test_load_neuron_mixed_tree_h5():
 
 
 def test_load_h5_trunk_points_regression():
-    # regression test for issue encoutnered wile
+    # regression test for issue encountered while
     # implementing PR #479, related to H5 unpacking
     # of files with non-standard soma structure.
     # See #480.

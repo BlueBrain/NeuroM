@@ -41,11 +41,10 @@ There is one such row per measured point.
 
 '''
 
-from collections import namedtuple
 import h5py
 import numpy as np
-from ..core.dataformat import COLS
-from .datawrapper import DataWrapper
+
+from .datawrapper import DataWrapper, BlockNeuronBuilder
 from neurom._compat import zip_longest
 
 
@@ -60,21 +59,18 @@ def get_version(h5file):
         return 'H5V2'
 
 
-PX, PY, PZ, PD = range(4)  # points
+POINT_DIAMETER = 3
 GPFIRST, GTYPE, GPID = range(3)  # groups or structure
-
-Section = namedtuple('Section', 'ids, ntype, pid')
 
 
 def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
-    '''Read a file and return a tuple of data, format.
+    '''Read a file and return a `data_wrapper'd` data
 
     * Tries to guess the format and the H5 version.
     * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
 
     Parameters:
-        remove_duplicates: boolean, \
-        If True removes duplicate points \
+        remove_duplicates: boolean, If True removes duplicate points
         from the beginning of each section.
     '''
     with h5py.File(filename, mode='r') as h5file:
@@ -86,47 +82,19 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
                        if s in h5file['neuron1'])
             points, groups = _unpack_v2(h5file, stage=stg)
 
-    data, sec = _unpack_data(points, groups, remove_duplicates)
-
-    return data_wrapper(data, version, sec)
-
-
-def _unpack_data(points, groups, remove_duplicates):
-    '''Unpack data from h5 data groups into internal format'''
-
     if remove_duplicates:
         points, groups = _remove_duplicate_points(points, groups)
 
-    n_points = len(points)
-    group_ids = groups[:, GPFIRST]
+    neuron_builder = BlockNeuronBuilder()
+    points[:, POINT_DIAMETER] /= 2  # Store radius, not diameter
+    for id_, row in enumerate(zip_longest(groups,
+                                          groups[1:, GPFIRST],
+                                          fillvalue=len(points))):
+        (point_start, section_type, parent_id), point_end = row
+        neuron_builder.add_section(id_, int(parent_id), int(section_type),
+                                   points[point_start:point_end])
 
-    # point_id -> group_id map
-    pid_map = np.zeros(n_points)
-    #  point ID -> type map
-    typ_map = np.zeros(n_points)
-    # sections (ids, type, parent_id)
-    sections = [0] * len(group_ids)
-
-    for i, (j, k) in enumerate(zip_longest(group_ids,
-                                           group_ids[1:],
-                                           fillvalue=n_points)):
-        j = int(j)
-        k = int(k)
-        sections[i] = Section(slice(j, k), groups[i][GTYPE], groups[i][GPID])
-        typ_map[j: k] = groups[i][GTYPE]
-        # parent is last point in previous group
-        pid_map[j] = group_ids[groups[i][GPID] + 1] - 1
-        # parent is previous point
-        pid_map[j + 1: k] = np.arange(j, k - 1)
-
-    db = np.zeros((n_points, 7))
-    db[:, : PD + 1] = points
-    db[:, PD] /= 2  # Store radius, not diameter
-    db[:, COLS.ID] = np.arange(n_points)
-    db[:, COLS.P] = pid_map
-    db[:, COLS.TYPE] = typ_map
-
-    return db, sections
+    return neuron_builder.get_datawrapper(version, data_wrapper=data_wrapper)
 
 
 def _remove_duplicate_points(points, groups):
