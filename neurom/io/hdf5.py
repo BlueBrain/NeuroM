@@ -76,16 +76,14 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
         If True removes duplicate points \
         from the beginning of each section.
     '''
-    h5file = h5py.File(filename, mode='r')
-    version = get_version(h5file)
-    if version == 'H5V1':
-        points, groups = _unpack_v1(h5file)
-    elif version == 'H5V2':
-        stg = next(s for s in ('repaired', 'unraveled', 'raw')
-                   if s in h5file['neuron1'])
-        points, groups = _unpack_v2(h5file, stage=stg)
-
-    h5file.close()
+    with h5py.File(filename, mode='r') as h5file:
+        version = get_version(h5file)
+        if version == 'H5V1':
+            points, groups = _unpack_v1(h5file)
+        elif version == 'H5V2':
+            stg = next(s for s in ('repaired', 'unraveled', 'raw')
+                       if s in h5file['neuron1'])
+            points, groups = _unpack_v2(h5file, stage=stg)
 
     data, sec = _unpack_data(points, groups, remove_duplicates)
 

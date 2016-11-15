@@ -43,19 +43,20 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
 def test_get_version():
-    v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r')
-    v2 = h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r')
-    nt.assert_equal(hdf5.get_version(v1), 'H5V1')
-    nt.assert_equal(hdf5.get_version(v2), 'H5V2')
-    v1.close()
-    v2.close()
+    with h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r') as v1:
+        nt.assert_equal(hdf5.get_version(v1), 'H5V1')
+
+    with h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r') as v2:
+        nt.assert_equal(hdf5.get_version(v2), 'H5V2')
 
 
 def test_unpack_h5():
-    v1 = h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r')
-    v2 = h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r')
-    pts1, grp1 = hdf5._unpack_v1(v1)
-    pts2, grp2 = hdf5._unpack_v2(v2, stage='raw')
+    with h5py.File(os.path.join(H5V1_PATH, 'Neuron.h5'), mode='r') as v1:
+        pts1, grp1 = hdf5._unpack_v1(v1)
+
+    with h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r') as v2:
+        pts2, grp2 = hdf5._unpack_v2(v2, stage='raw')
+
     nt.assert_true(np.all(pts1 == pts2))
     nt.assert_true(np.all(grp1 == grp2))
 
