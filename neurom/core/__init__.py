@@ -28,7 +28,11 @@
 
 ''' Core functionality and data types of NeuroM '''
 
-from itertools import ifilter, imap, chain, izip
+import sys
+if sys.version_info < (3, 0):
+    from itertools import ifilter, imap, izip as filter, map, zip
+
+from itertools import chain
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
@@ -65,8 +69,8 @@ def iter_neurites(obj, mapfun=None, filt=None):
     neurites = ((obj,) if isinstance(obj, Neurite)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
 
-    neurite_iter = iter(neurites) if filt is None else ifilter(filt, neurites)
-    return neurite_iter if mapfun is None else imap(mapfun, neurite_iter)
+    neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
+    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
 
 
 def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
@@ -91,7 +95,7 @@ def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
         '''Map an iterator type to the root node of a neurite'''
         return iterator_type(neurite.root_node)
 
-    return chain.from_iterable(imap(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
+    return chain.from_iterable(map(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
 
 
 def iter_segments(neurites, neurite_filter=None):

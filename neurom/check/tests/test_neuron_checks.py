@@ -32,6 +32,7 @@ from neurom import load_neuron
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from nose import tools as nt
+from builtins import range
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -54,7 +55,7 @@ def _make_monotonic(neuron):
             sec = node.points
             if node.parent is not None:
                 sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
-            for point_id in xrange(len(sec) - 1):
+            for point_id in range(len(sec) - 1):
                 sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 
 

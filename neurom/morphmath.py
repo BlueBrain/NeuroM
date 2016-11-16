@@ -28,6 +28,7 @@
 
 '''Mathematical and geometrical functions used to compute morphometrics'''
 import math
+from builtins import range
 from itertools import combinations
 import numpy as np
 from neurom.core.dataformat import COLS
@@ -375,7 +376,7 @@ def principal_direction_extent(points):
 
     extent = np.zeros(3)
 
-    for i in xrange(eigv.shape[1]):
+    for i in range(eigv.shape[1]):
         # orthogonal projection onto the direction of the v component
         scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
         extent[i] = scalar_projs[-1]

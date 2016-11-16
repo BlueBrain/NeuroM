@@ -28,8 +28,13 @@
 
 '''Module containing NeuroM specific exceptions'''
 
+import sys
+if sys.version_info < (3, 0):
+    BaseClass = StandardError
+else:
+    BaseClass = Exception
 
-class NeuroMError(StandardError):
+class NeuroMError(BaseClass):
     '''Base class for all NeuroM exceptions'''
     pass
 

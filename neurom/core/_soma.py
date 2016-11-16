@@ -31,6 +31,7 @@ from neurom.morphmath import average_points_dist
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
 import numpy as np
+from builtins import range
 
 
 class SOMA_TYPE(object):
@@ -41,7 +42,7 @@ class SOMA_TYPE(object):
     * Type SimpleContour: More than three points
     * INVALID: Not satisfying any of the above
     '''
-    INVALID, SinglePoint, ThreePoint, SimpleContour = xrange(4)
+    INVALID, SinglePoint, ThreePoint, SimpleContour = range(4)
 
     @staticmethod
     def get_type(points):
