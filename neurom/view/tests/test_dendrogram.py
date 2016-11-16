@@ -144,7 +144,7 @@ class TestDendrogram(object):
     def test_types_tree(self):
 
         for ctype in self.dtr.types:
-            print ctype
+            print(ctype)
             nt.assert_true(ctype == NeuriteType.apical_dendrite)
 
     def test_types_neuron(self):

@@ -213,4 +213,4 @@ if __name__ == '__main__':
                     for mtype_, files_ in iteritems(mtype_files)]
 
         for res in _results:
-            print json.dumps(res, indent=2), '\n'
+            print(json.dumps(res, indent=2), '\n')
