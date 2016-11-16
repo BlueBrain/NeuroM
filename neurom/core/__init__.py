@@ -29,15 +29,14 @@
 ''' Core functionality and data types of NeuroM '''
 
 import sys
-if sys.version_info < (3, 0):
-    from itertools import ifilter, imap, izip as filter, map, zip
-
 from itertools import chain
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
 from ._neuron import Section, Neurite, Neuron
 from .population import Population
+if sys.version_info < (3, 0):
+    from itertools import ifilter, imap, izip as filter, map, zip
 
 
 def iter_neurites(obj, mapfun=None, filt=None):
@@ -111,4 +110,4 @@ def iter_segments(neurites, neurite_filter=None):
         segment analysis functions that leverage numpy and section-wise iteration.
     '''
     return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in izip(ss.points[:-1], ss.points[1:]))
+                 for s in zip(ss.points[:-1], ss.points[1:]))

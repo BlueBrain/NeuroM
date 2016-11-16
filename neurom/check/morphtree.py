@@ -33,11 +33,11 @@ Python module of NeuroM to check neuronal trees.
 import numpy as np
 from builtins import range
 import sys
-if sys.version_info <= (3, 0):
-    from itertools import ifilter as filter
 from neurom.core.dataformat import COLS
 from neurom import morphmath as mm
 from neurom.morphmath import principal_direction_extent
+if sys.version_info <= (3, 0):
+    from itertools import ifilter as filter
 
 
 def is_monotonic(neurite, tol):

@@ -29,6 +29,7 @@
 '''Data format definitions'''
 from builtins import range
 
+
 class COLS(object):
     '''Column labels for internal data representation'''
     (X, Y, Z, R, TYPE, ID, P) = range(7)

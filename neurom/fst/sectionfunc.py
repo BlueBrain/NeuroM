@@ -30,12 +30,10 @@
 
 import sys
 from builtins import range
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
-
-import numpy as np
 from functools import wraps
 from neurom import morphmath as mm
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 
 
 def section_fun(fun):

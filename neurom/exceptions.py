@@ -34,6 +34,7 @@ if sys.version_info < (3, 0):
 else:
     BaseClass = Exception
 
+
 class NeuroMError(BaseClass):
     '''Base class for all NeuroM exceptions'''
     pass
