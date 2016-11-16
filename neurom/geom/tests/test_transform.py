@@ -31,7 +31,9 @@ import neurom.geom.transform as gtr
 from neurom import load_neuron
 from neurom.fst import _neuritefunc as _nf
 from nose import tools as nt
-from itertools import izip
+import sys
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 import numpy as np
 import os
 
@@ -219,7 +221,7 @@ def _check_fst_nrn_translate(nrn_a, nrn_b, t):
 
 def _check_fst_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
-    for sa, sb in izip(_nf.iter_sections(nrts_a),
+    for sa, sb in zip(_nf.iter_sections(nrts_a),
                        _nf.iter_sections(nrts_b)):
         nt.assert_true(np.allclose((sb.points[:, 0:3] - sa.points[:, 0:3]), t))
 
@@ -287,7 +289,7 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 
 
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
-    for sa, sb in izip(_nf.iter_sections(nrt_a),
+    for sa, sb in zip(_nf.iter_sections(nrt_a),
                        _nf.iter_sections(nrt_b)):
         nt.assert_true(np.allclose(sb.points[:, 0:3],
                                    _apply_rot(sa.points[:, 0:3], rot_mat)))

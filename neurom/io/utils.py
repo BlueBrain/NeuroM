@@ -38,6 +38,11 @@ from neurom.io.datawrapper import DataWrapper
 from neurom.io import swc
 from neurom.io import neurolucida
 from neurom.fst._core import FstNeuron
+import sys
+if sys.version_info < (3, 0):
+    ExceptionBase = StandardError
+else:
+    ExceptionBase = Exception
 
 L = logging.getLogger(__name__)
 
@@ -100,7 +105,7 @@ def load_data(filename):
 
     try:
         return _READERS[ext](filename)
-    except StandardError:
+    except ExceptionBase:
         L.exception('Error reading file %s, using "%s" loader', filename, ext)
         raise RawDataError('Error reading file %s' % filename)
 

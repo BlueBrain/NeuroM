@@ -38,6 +38,7 @@ from neurom import fst
 from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
+from builtins import range
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
@@ -137,7 +138,7 @@ class TestSectionTree(object):
                        get('segment_y_coordinates', self.ref_pop, neurite_type=ntyp),
                        get('segment_z_coordinates', self.ref_pop, neurite_type=ntyp))
 
-            for i in xrange(3):
+            for i in range(3):
                 _equal(pts[:, i], ref_xyz[i])
 
     def test_get_local_bifurcation_angles(self):

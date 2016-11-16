@@ -31,7 +31,10 @@
 These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
-from itertools import izip, product
+import sys
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
+from itertools import product
 from neurom.core import Tree as tr
 from neurom.point_neurite.point_tree import val_iter, imap_val
 from neurom.point_neurite.point_tree import PointTree as ptr
@@ -305,7 +308,7 @@ def compare_trees(tree1, tree2):
 
             is_equal = True
 
-            for node1, node2 in izip(val_iter(tr.iupstream(leaf1)),
+            for node1, node2 in zip(val_iter(tr.iupstream(leaf1)),
                                      val_iter(tr.iupstream(leaf2))):
 
                 if any(node1[0:5] != node2[0:5]):

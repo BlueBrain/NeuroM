@@ -32,7 +32,9 @@ from neurom.core._neuron import Neuron
 from neurom.core import make_soma
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.point_tree import val_iter
-from itertools import izip
+import sys
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 import numpy as np
 
 SOMA_SINGLE_PTS = [[11, 22, 33, 44, 1, 1, -1]]
@@ -66,16 +68,16 @@ def check_cloned_neuron(nrn1, nrn2):
     nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
     nt.eq_(nrn1.soma.radius, nrn2.soma.radius)
 
-    for v1, v2 in izip(nrn1.soma.iter(), nrn2.soma.iter()):
+    for v1, v2 in zip(nrn1.soma.iter(), nrn2.soma.iter()):
 
         nt.assert_true(np.allclose(v1, v2))
 
     # neurites
-    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
 
         nt.assert_true(isinstance(neu2, type(neu1)))
 
-        for v1, v2 in izip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
+        for v1, v2 in zip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
 
             nt.assert_true(np.allclose(v1, v2))
 
@@ -85,7 +87,7 @@ def check_cloned_neuron(nrn1, nrn2):
     nt.assert_true( nrn1.soma is not nrn2.soma)
 
     # neurites
-    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
 
         nt.assert_true(neu1 is not neu2)
 
@@ -95,9 +97,9 @@ def check_cloned_neuron(nrn1, nrn2):
 
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
     # neurites
-    for neu1, neu2 in izip(nrn1.neurites, nrn2.neurites):
+    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
 
-        for v1, v2 in izip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
+        for v1, v2 in zip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
 
             v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
             nt.assert_false(any(v1 == v2))

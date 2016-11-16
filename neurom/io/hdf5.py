@@ -46,6 +46,7 @@ import h5py
 import numpy as np
 from ..core.dataformat import COLS
 from .datawrapper import DataWrapper
+from builtins import range
 
 
 def get_version(h5file):
@@ -59,8 +60,8 @@ def get_version(h5file):
         return 'H5V2'
 
 
-(PX, PY, PZ, PD) = xrange(4)  # points
-(GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
+(PX, PY, PZ, PD) = range(4)  # points
+(GPFIRST, GTYPE, GPID) = range(3)  # groups or structure
 
 Section = namedtuple('Section', 'ids, ntype, pid')
 

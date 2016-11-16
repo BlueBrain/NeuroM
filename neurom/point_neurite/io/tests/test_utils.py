@@ -28,7 +28,9 @@
 
 '''Test neurom.point_neurite.io.utils'''
 import os
-from itertools import izip
+import sys
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 import numpy as np
 from neurom.point_neurite.io import utils
 from neurom.point_neurite import points as pts
@@ -199,7 +201,7 @@ def test_load_trees_good_neuron():
         return point
 
     # Check data are the same in tree collection and neuron's neurites
-    for a, b in izip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
+    for a, b in zip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
         nt.ok_(np.all(a == b))
 
 
