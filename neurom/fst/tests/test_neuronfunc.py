@@ -83,25 +83,19 @@ def test_trunk_origin_elevations():
     n1.soma = s
 
     pop = Population([n0, n1])
-    nt.assert_items_equal(_nf.trunk_origin_elevations(pop),
-                          [0.0, np.pi/2., -np.pi/2.])
-
-    nt.assert_items_equal(
-        _nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
-        [0.0, np.pi/2., -np.pi/2.]
-    )
+    nt.eq_(list(_nf.trunk_origin_elevations(pop)),
+           [0.0, np.pi/2., -np.pi/2.])
 
     nt.eq_(
-        len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=NeuriteType.axon)),
-        0
-    )
+        list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
+        [0.0, np.pi/2., -np.pi/2.])
 
-    nt.eq_(
-        len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=NeuriteType.apical_dendrite)),
-        0
-    )
+    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
+           0)
+
+    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite)),
+           0)
+
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
