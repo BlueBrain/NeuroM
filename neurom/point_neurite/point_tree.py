@@ -29,9 +29,9 @@
 '''Generic tree class and iteration functions'''
 from neurom.core import Tree
 import sys
+from itertools import chain, repeat
 if sys.version_info < (3, 0):
     from itertools import ifilter, imap as filter, map
-from itertools import chain, repeat
 
 
 class PointTree(Tree):
@@ -56,7 +56,7 @@ class PointTree(Tree):
         Parameters:
             iter_mode: iteration mode. Default: ipreorder.
         '''
-        return imap(lambda t: (t.parent, t),
+        return map(lambda t: (t.parent, t),
                     filter(lambda t: t.parent is not None, iter_mode(self)))
 
     def isection(self, iter_mode=Tree.ipreorder):

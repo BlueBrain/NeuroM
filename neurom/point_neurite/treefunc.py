@@ -32,8 +32,6 @@ These functions all depend on the internal structure of the tree or its
 different iteration modes.
 '''
 import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
 from itertools import product
 from neurom.core import Tree as tr
 from neurom.point_neurite.point_tree import val_iter, imap_val
@@ -42,6 +40,8 @@ from neurom.core.types import NeuriteType
 import neurom.morphmath as mm
 from neurom.core.dataformat import COLS
 import numpy as np
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 
 
 def path_length(tree):

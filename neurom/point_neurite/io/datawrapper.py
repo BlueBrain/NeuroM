@@ -41,13 +41,13 @@ There is one such row per measured point.
 
 '''
 import sys
-if sys.version_info < (3, 0):
-    from itertools import ifilter as filter
 from future.utils import iteritems
 from collections import defaultdict
 from neurom.core.dataformat import COLS
 from neurom.core.point import as_point
 from neurom.core.dataformat import POINT_TYPE
+if sys.version_info < (3, 0):
+    from itertools import ifilter as filter
 
 
 class DataWrapper(object):

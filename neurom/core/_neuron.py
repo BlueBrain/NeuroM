@@ -30,13 +30,12 @@
 
 from copy import deepcopy
 import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
-
 import numpy as np
 from .tree import Tree
 from ..morphmath import segment_area, segment_volume, section_length
 from . import NeuriteType
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
 
 
 class Section(Tree):

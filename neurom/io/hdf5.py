@@ -40,19 +40,18 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from collections import namedtuple
+
 import sys
-
-if sys.version_info < (3, 0):
-    from itertools import izip_longest as zip_longest
-else:
-    from itertools import zip_longest
-
+from collections import namedtuple
 import h5py
 import numpy as np
 from ..core.dataformat import COLS
 from .datawrapper import DataWrapper
 from builtins import range
+if sys.version_info < (3, 0):
+    from itertools import izip_longest as zip_longest
+else:
+    from itertools import zip_longest
 
 
 def get_version(h5file):

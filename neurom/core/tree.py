@@ -28,11 +28,10 @@
 
 '''Generic tree class and iteration functions'''
 import sys
-if sys.version_info <= (3, 0):
-    from itertools import ifilter, imap as filter, map
-
 from itertools import chain
 from collections import deque
+if sys.version_info <= (3, 0):
+    from itertools import ifilter, imap as filter, map
 
 
 class Tree(object):
