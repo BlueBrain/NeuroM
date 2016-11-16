@@ -41,7 +41,13 @@ There is one such row per measured point.
 
 '''
 from collections import namedtuple
-from itertools import izip_longest
+import sys
+
+if sys.version_info < (3, 0):
+    from itertools import izip_longest as zip_longest
+else:
+    from itertools import zip_longest
+
 import h5py
 import numpy as np
 from ..core.dataformat import COLS
@@ -107,7 +113,7 @@ def _unpack_data(points, groups, remove_duplicates):
     # sections (ids, type, parent_id)
     sections = [0] * len(group_ids)
 
-    for i, (j, k) in enumerate(izip_longest(group_ids,
+    for i, (j, k) in enumerate(zip_longest(group_ids,
                                             group_ids[1:],
                                             fillvalue=n_points)):
         j = int(j)
