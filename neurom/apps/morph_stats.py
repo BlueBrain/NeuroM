@@ -79,7 +79,7 @@ def extract_stats(neurons, config):
             n = _NEURITE_MAP[n]
             for mode in modes:
                 stat_name = _stat_name(ns, mode)
-                stats[n.name][stat_name] = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
+                stats[n.name][stat_name] = list(eval_stats(nm.get(ns, neurons, neurite_type=n), mode))
                 L.debug('Stat: %s, Neurite: %s, Type: %s',
                         stat_name, n, type(stats[n.name][stat_name]))
 
