@@ -14,6 +14,8 @@ from neurom.point_neurite.core import iter_neurites
 from neurom.point_neurite.io.utils import load_neuron as _load
 from neurom.point_neurite.treefunc import set_tree_type as _set_tt
 
+from numpy.testing import assert_allclose
+
 load_neuron = partial(_load, tree_action=_set_tt)
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -311,31 +313,33 @@ def test_neurite_number():
 
 
 def test_trunk_origin_radii():
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON),
-                          [0.85351288499400002,
-                           0.18391483031299999,
-                           0.66943255462899998,
-                           0.14656092843999999])
+    assert_allclose(get_feat('trunk_origin_radii', NEURON),
+                    [0.85351288499400002,
+                     0.18391483031299999,
+                     0.66943255462899998,
+                     0.14656092843999999])
 
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.apical_dendrite),
-                          [0.14656092843999999])
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.basal_dendrite),
-                          [0.18391483031299999,
-                           0.66943255462899998])
-    nt.assert_items_equal(get_feat('trunk_origin_radii', NEURON, NeuriteType.axon),
-                          [0.85351288499400002])
+    assert_allclose(get_feat('trunk_origin_radii', NEURON, NeuriteType.apical_dendrite),
+                    [0.14656092843999999])
+    assert_allclose(get_feat('trunk_origin_radii', NEURON, NeuriteType.basal_dendrite),
+                    [0.18391483031299999,
+                     0.66943255462899998])
+    assert_allclose(get_feat('trunk_origin_radii', NEURON, NeuriteType.axon),
+                    [0.85351288499400002])
 
 
 def test_get_trunk_section_lengths():
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON), [9.579117366740002,
-                                                                      7.972322416776259,
-                                                                      8.2245287740603779,
-                                                                      9.212707985134525])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.apical_dendrite),
-                          [9.212707985134525])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.basal_dendrite),
-                          [7.972322416776259, 8.2245287740603779])
-    nt.assert_items_equal(get_feat('trunk_section_lengths', NEURON, NeuriteType.axon), [9.579117366740002])
+    assert_allclose(get_feat('trunk_section_lengths', NEURON),
+                    [9.579117366740002,
+                     7.972322416776259,
+                     8.2245287740603779,
+                     9.212707985134525])
+    assert_allclose(get_feat('trunk_section_lengths', NEURON, NeuriteType.apical_dendrite),
+                    [9.212707985134525])
+    assert_allclose(get_feat('trunk_section_lengths', NEURON, NeuriteType.basal_dendrite),
+                    [7.972322416776259, 8.2245287740603779])
+    assert_allclose(get_feat('trunk_section_lengths', NEURON, NeuriteType.axon),
+                    [9.579117366740002])
 
 
 def test_principal_directions_extents():

@@ -88,11 +88,12 @@ BIFURCATING_SOMA_PTS = [
     (6, 1, 0, 0, 6, 0.0, 5),
 ]
 
+
 def test_make_Soma_SinglePoint():
     sm = _soma.make_soma(SOMA_SINGLE_PTS)
     nt.ok_('SomaSinglePoint' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaSinglePoint))
-    nt.assert_items_equal(sm.center, (11, 22, 33))
+    nt.eq_(list(sm.center), [11, 22, 33])
     nt.ok_(sm.radius == 44)
 
 
@@ -100,7 +101,7 @@ def test_make_Soma_ThreePoint():
     sm = _soma.make_soma(SOMA_THREEPOINTS_PTS)
     nt.ok_('SomaThreePoint' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaThreePoint))
-    nt.assert_items_equal(sm.center, (11, 22, 33))
+    nt.eq_(list(sm.center), [11, 22, 33])
     nt.eq_(sm.radius, 0.0)
 
 
