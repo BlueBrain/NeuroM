@@ -30,13 +30,14 @@
 
 import sys
 from itertools import chain
+
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
 from ._neuron import Section, Neurite, Neuron
 from .population import Population
-if sys.version_info < (3, 0):
-    from itertools import ifilter, imap, izip as filter, map, zip
+
+from neurom._compat import map, filter, zip
 
 
 def iter_neurites(obj, mapfun=None, filt=None):

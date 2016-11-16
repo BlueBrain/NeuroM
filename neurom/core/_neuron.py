@@ -29,13 +29,11 @@
 '''Neuron classes and functions'''
 
 from copy import deepcopy
-import sys
 import numpy as np
 from .tree import Tree
 from ..morphmath import segment_area, segment_volume, section_length
 from . import NeuriteType
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
 
 
 class Section(Tree):

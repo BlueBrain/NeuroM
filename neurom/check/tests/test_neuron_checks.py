@@ -32,7 +32,7 @@ from neurom import load_neuron
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from nose import tools as nt
-from builtins import range
+from neurom._compat import range
 
 
 _path = os.path.dirname(os.path.abspath(__file__))

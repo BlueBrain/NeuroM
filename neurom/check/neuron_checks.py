@@ -33,7 +33,6 @@ Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
 import numpy as np
-import sys
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
 from neurom.core.dataformat import COLS
@@ -41,8 +40,7 @@ from neurom.morphmath import section_length, segment_length
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.fst import _neuritefunc as _nf
 from neurom.check import CheckResult
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
 
 
 def _read_neurite_type(neurite):

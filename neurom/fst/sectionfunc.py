@@ -28,12 +28,9 @@
 
 '''Section functions and functional tools'''
 
-import sys
-from builtins import range
 from functools import wraps
 from neurom import morphmath as mm
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip, range
 
 
 def section_fun(fun):

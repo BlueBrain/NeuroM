@@ -97,10 +97,10 @@ if __name__ == '__main__':
             radius_of_gyration(nrte), nrte.type) for nrte in nrn.neurites])
 
     # print mean radius of gyration per neurite type
-    print(('Mean radius of gyration for axons: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.AXON)))
-    print(('Mean radius of gyration for basal dendrites: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE)))
-    print(('Mean radius of gyration for apical dendrites: ',
+    print('Mean radius of gyration for axons: ',
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.AXON))
+    print('Mean radius of gyration for basal dendrites: ',
+          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE))
+    print('Mean radius of gyration for apical dendrites: ',
           mean_rad_of_gyration(n for n in nrn.neurites
-                               if n.type == nm.APICAL_DENDRITE)))
+                               if n.type == nm.APICAL_DENDRITE))

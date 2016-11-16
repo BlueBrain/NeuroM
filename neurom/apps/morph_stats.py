@@ -29,7 +29,6 @@
 '''Core code for morph_stats application'''
 import logging
 from collections import defaultdict
-from future.utils import iteritems
 import numpy as np
 import neurom as nm
 
@@ -74,18 +73,16 @@ def extract_stats(neurons, config):
     '''Extract stats from neurons'''
 
     stats = defaultdict(dict)
-    for ns, modes in iteritems(config['neurite']):
+    for ns, modes in config['neurite'].items():
         for n in config['neurite_type']:
             n = _NEURITE_MAP[n]
             for mode in modes:
                 stat_name = _stat_name(ns, mode)
-                stats[n.name][stat_name] = list(
-                    eval_stats(
-                        nm.get(ns, neurons, neurite_type=n), mode))
+                stats[n.name][stat_name] = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
                 L.debug('Stat: %s, Neurite: %s, Type: %s',
                         stat_name, n, type(stats[n.name][stat_name]))
 
-    for ns, modes in iteritems(config['neuron']):
+    for ns, modes in config['neuron'].items():
         for mode in modes:
             stat_name = _stat_name(ns, mode)
             stats[stat_name] = eval_stats(nm.get(ns, neurons), mode)

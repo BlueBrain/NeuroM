@@ -38,7 +38,6 @@ from neurom import fst
 from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
-from builtins import range
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

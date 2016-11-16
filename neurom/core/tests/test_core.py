@@ -29,16 +29,13 @@
 import os
 from os.path import join as joinp
 
-import sys
-if sys.version_info < (3, 0):
-    from itertools import ifilter as filter
-
 from nose import tools as nt
 import neurom as nm
 from neurom.core.population import Population
 from neurom import load_neuron
 from neurom import core
 from neurom.core import Tree
+from neurom._compat import filter
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')

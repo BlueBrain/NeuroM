@@ -32,9 +32,8 @@ from neurom.core._neuron import Neuron
 from neurom.core import make_soma
 from neurom.point_neurite.point_tree import PointTree
 from neurom.point_neurite.point_tree import val_iter
-import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
+
 import numpy as np
 
 SOMA_SINGLE_PTS = [[11, 22, 33, 44, 1, 1, -1]]

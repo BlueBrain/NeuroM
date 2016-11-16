@@ -31,9 +31,8 @@ import neurom.geom.transform as gtr
 from neurom import load_neuron
 from neurom.fst import _neuritefunc as _nf
 from nose import tools as nt
-import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
+
 import numpy as np
 import os
 

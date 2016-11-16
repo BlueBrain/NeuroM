@@ -35,7 +35,6 @@ from collections import namedtuple
 import sys
 import json
 import argparse
-from future.utils import iteritems
 import numpy as np
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
@@ -160,8 +159,8 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
 
     _plots = []
 
-    for feat, d in iteritems(stuff):
-        for typ, data in iteritems(d):
+    for feat, d in stuff.items():
+        for typ, data in d.items():
             dist = sim_params['components'][typ].get(feat, None)
             print('Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist))
             # if no data available, skip this feature

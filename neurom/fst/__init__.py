@@ -41,7 +41,6 @@ import numpy as _np
 from functools import partial
 from itertools import chain
 from ._core import FstNeuron
-from future.utils import iteritems
 from . import _neuritefunc as _nrt
 from . import _neuronfunc as _nrn
 from . import sectionfunc as _sec
@@ -174,11 +173,11 @@ def _get_doc():
 
     ret = ['\nNeurite features (neurite, neuron, neuron population):']
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(iteritems(NEURITEFEATURES)))
+               for feature, func in sorted(NEURITEFEATURES.items()))
 
     ret.append('\nNeuron features (neuron, neuron population):')
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(iteritems(NEURONFEATURES)))
+               for feature, func in sorted(NEURONFEATURES.items()))
 
     return '\n'.join(ret)
 
