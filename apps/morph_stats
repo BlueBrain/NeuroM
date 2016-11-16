@@ -111,7 +111,7 @@ def main(args):
         sys.exit(1)
 
     if not args.output_file:
-        print json.dumps(results, indent=2, separators=(',', ':'))
+        print(json.dumps(results, indent=2, separators=(',', ':')))
     elif args.output_file.endswith('.json'):
         with open(args.output_file, 'w') as output_file:
             json.dump(results, output_file)
@@ -132,7 +132,7 @@ if __name__ == '__main__':
                                logging.DEBUG)[min(_args.verbose, 2)])
 
     if _args.list:
-        print nm.fst._get_doc()  # pylint: disable=W0212
+        print(nm.fst._get_doc())  # pylint: disable=W0212
         sys.exit(0)
     elif not _args.datapath:
         get_parser().print_usage()

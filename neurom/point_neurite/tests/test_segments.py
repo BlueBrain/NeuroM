@@ -259,6 +259,6 @@ def test_segment_taper_rate():
 def test_cross_section_at_fraction():
 
     res = seg.cross_section_at_fraction((PointTree((1.,1.,1., 1.)),PointTree((2.,2.,2., 2.))), 0.5)
-    print res
+    print(res)
     nt.eq_(tuple(res[0]), (1.5, 1.5, 1.5))
     nt.assert_equal(res[1], 1.5)

@@ -72,5 +72,5 @@ if __name__ == '__main__':
     data_path = args.datapath
 
     result = test_multiple_distr(data_path)
-    print "Optimal distribution fit for soma radius is: %s with parameters %s"\
-        % (result.type, result.params)
+    print("Optimal distribution fit for soma radius is: %s with parameters %s"\
+        % (result.type, result.params))
