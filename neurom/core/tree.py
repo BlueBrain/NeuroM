@@ -27,11 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-import sys
 from itertools import chain
 from collections import deque
-if sys.version_info <= (3, 0):
-    from itertools import ifilter, imap as filter, map
+
+from neurom._compat import map, filter
 
 
 class Tree(object):

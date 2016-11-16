@@ -31,7 +31,6 @@ from neurom.morphmath import average_points_dist
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
 import numpy as np
-from builtins import range
 
 
 class SOMA_TYPE(object):

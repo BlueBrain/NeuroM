@@ -28,7 +28,6 @@
 
 '''Mathematical and geometrical functions used to compute morphometrics'''
 import math
-from builtins import range
 from itertools import combinations
 import numpy as np
 from neurom.core.dataformat import COLS

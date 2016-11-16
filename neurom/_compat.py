@@ -25,40 +25,16 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''python 2/3 compatibility functions'''
 
-'''Module containing NeuroM specific exceptions'''
+# ignore unused-import
+# pylint: disable=W0611
+from builtins import range, filter, map, zip
+import sys
 
-
-class NeuroMError(Exception):
-    '''Base class for all NeuroM exceptions'''
-    pass
-
-
-class RawDataError(NeuroMError):
-    '''Exception class for raw data errors'''
-    pass
-
-
-class ConfigError(NeuroMError):
-    '''Exception class for configuration data in apps errors'''
-    pass
-
-
-class SomaError(NeuroMError):
-    '''Exception for soma construction errors'''
-    pass
-
-
-class IDSequenceError(RawDataError):
-    '''Exception for raw data with illegal point ID sequence'''
-    pass
-
-
-class MultipleTrees(RawDataError):
-    '''Exception for raw data with multiple trees'''
-    pass
-
-
-class MissingParentError(RawDataError):
-    '''Exception for raw data with missing parent IDs'''
-    pass
+# ignore no-name-in-module
+# pylint: disable=E0611
+if sys.version_info < (3, 0):
+    from itertools import izip_longest as zip_longest  # pragma: no cover
+else:
+    from itertools import zip_longest  # pragma: no cover

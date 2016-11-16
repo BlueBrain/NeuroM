@@ -35,9 +35,8 @@ from neurom.point_neurite import segments as seg
 from neurom.point_neurite.core import iter_neurites
 
 import math
-import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
+
 
 class MockNeuron(object):
     pass

@@ -28,9 +28,6 @@
 
 '''Test neurom.point_neurite.io.utils'''
 import os
-import sys
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
 import numpy as np
 from neurom.point_neurite.io import utils
 from neurom.point_neurite import points as pts
@@ -40,6 +37,8 @@ from neurom.point_neurite.core import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.exceptions import (SomaError, IDSequenceError,
                                MultipleTrees, MissingParentError)
+from neurom._compat import zip
+
 from nose import tools as nt
 
 

@@ -51,18 +51,8 @@ print('nl principal direction extents: %s' %
 
 print('\nNumber of neurites:')
 for nt in nm.NeuriteType:
-    print(
-        nt,
-        _nf.n_neurites(
-            nrn_h5, neurite_type=nt),
-        _nf.n_neurites(
-            nrn_asc, neurite_type=nt))
+    print(nt, _nf.n_neurites(nrn_h5, neurite_type=nt), _nf.n_neurites(nrn_asc, neurite_type=nt))
 
 print('\nNumber of segments:')
 for nt in nm.NeuriteType:
-    print(
-        nt,
-        _nf.n_segments(
-            nrn_h5, neurite_type=nt),
-        _nf.n_segments(
-            nrn_asc, neurite_type=nt))
+    print(nt, _nf.n_segments(nrn_h5, neurite_type=nt), _nf.n_segments(nrn_asc, neurite_type=nt))

@@ -30,16 +30,13 @@
 
 '''
 
-import sys
 from functools import wraps
 from .core import iter_neurites
 import neurom.morphmath as mm
 from . import point_tree as tr
 from . import treefunc as mt
 from neurom.utils import deprecated_module
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
-
+from neurom._compat import zip
 
 deprecated_module(__name__)
 

@@ -30,7 +30,6 @@
 Python module of NeuroM to visualize morphologies
 '''
 
-import sys
 from . import common
 from . import _compat
 from neurom import NeuriteType
@@ -38,8 +37,7 @@ from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.io import COLS
 from neurom.morphmath import segment_radius
-if sys.version_info < (3, 0):
-    from itertools import izip as zip
+from neurom._compat import zip
 
 
 DEFAULT_PARAMS = '''        new_fig: boolean \

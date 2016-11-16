@@ -34,18 +34,11 @@ from collections import OrderedDict
 from importlib import import_module
 import os
 import logging
-from future.utils import iteritems
 from neurom.io.utils import get_morph_files
 from neurom.io import load_data
 from neurom.exceptions import ConfigError
 from neurom.fst import _core as fst_core
 from neurom.check import check_wrapper
-
-import sys
-if sys.version_info < (3, 0):
-    ExceptionBase = StandardError
-else:
-    ExceptionBase = Exception
 
 L = logging.getLogger(__name__)
 
@@ -132,9 +125,8 @@ class CheckRunner(object):
 
         try:
             data = load_data(f)
-        except ExceptionBase as e:
+        except Exception as e: # pylint: disable=W0703
             L.error('Failed to load data... skipping tests for this file')
-            # L.error(e.message) # Deprecated after Python 2.6
             L.error(e.args)
             return False, {f: OrderedDict([('ALL', False)])}
 
@@ -142,14 +134,13 @@ class CheckRunner(object):
             result &= self._check_loop(data, 'structural_checks')
             nrn = fst_core.FstNeuron(data)
             result &= self._check_loop(nrn, 'neuron_checks')
-        except ExceptionBase as e:
-            # L.error('Check failed: %s: %s', type(e), e.message) # Deprecated after Python 2.6
+        except Exception as e: # pylint: disable=W0703
             L.error('Check failed:' + str(type(e)) + str(e.args))
             result = False
 
         self.summary['ALL'] = result
 
-        for m, s in iteritems(self.summary):
+        for m, s in self.summary.items():
             self._log_msg(m, s)
 
         return result, {f: self.summary}
