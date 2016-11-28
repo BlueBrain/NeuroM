@@ -54,8 +54,3 @@ class CheckResult(object):
     def __nonzero__(self):
         '''boolean conversion method'''
         return self.status
-
-
-def ok(result):
-    '''Return a boolean pass status for a test result.'''
-    return result.status

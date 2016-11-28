@@ -47,7 +47,7 @@ def iter_neurites(obj, mapfun=None, filt=None):
 
     Parameters:
         obj: a neurite, neuron or neuron population.
-        mapfun: optional neurite mappinf function.
+        mapfun: optional neurite mapping function.
         filt: optional neurite filter function.
 
     Examples:
@@ -66,8 +66,8 @@ def iter_neurites(obj, mapfun=None, filt=None):
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
 
     '''
-    neurites = ((obj,) if isinstance(obj, Neurite)
-                else (obj.neurites if hasattr(obj, 'neurites') else obj))
+    neurites = ((obj,) if isinstance(obj, Neurite) else
+                obj.neurites if hasattr(obj, 'neurites') else obj)
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
     return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
@@ -91,11 +91,8 @@ def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
 
     '''
-    def _mapfun(neurite):
-        '''Map an iterator type to the root node of a neurite'''
-        return iterator_type(neurite.root_node)
-
-    return chain.from_iterable(map(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
+    return chain.from_iterable(iterator_type(neurite.root_node)
+                               for neurite in iter_neurites(neurites, filt=neurite_filter))
 
 
 def iter_segments(neurites, neurite_filter=None):
@@ -110,5 +107,5 @@ def iter_segments(neurites, neurite_filter=None):
         neuron segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     '''
-    return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in zip(ss.points[:-1], ss.points[1:]))
+    return chain.from_iterable(zip(sec.points[:-1], sec.points[1:])
+                               for sec in iter_sections(neurites, neurite_filter=neurite_filter))
