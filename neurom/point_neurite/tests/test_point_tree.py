@@ -26,8 +26,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from copy import deepcopy
 import sys
+
 import numpy as np
+
 from nose import tools as nt
 from neurom.core import Tree
 from neurom.point_neurite.point_tree import PointTree
@@ -36,8 +39,7 @@ from neurom.point_neurite.point_tree import itriplet
 from neurom.point_neurite.point_tree import isection
 from neurom.point_neurite.point_tree import i_branch_end_points
 from neurom.point_neurite.point_tree import val_iter
-from copy import deepcopy
-from builtins import range
+from neurom._compat import range
 
 
 is_root = Tree.is_root

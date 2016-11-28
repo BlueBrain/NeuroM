@@ -46,7 +46,7 @@ import h5py
 import numpy as np
 from ..core.dataformat import COLS
 from .datawrapper import DataWrapper
-from neurom._compat import zip_longest, range
+from neurom._compat import zip_longest
 
 
 def get_version(h5file):
@@ -60,8 +60,8 @@ def get_version(h5file):
         return 'H5V2'
 
 
-(PX, PY, PZ, PD) = range(4)  # points
-(GPFIRST, GTYPE, GPID) = range(3)  # groups or structure
+PX, PY, PZ, PD = range(4)  # points
+GPFIRST, GTYPE, GPID = range(3)  # groups or structure
 
 Section = namedtuple('Section', 'ids, ntype, pid')
 
