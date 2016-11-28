@@ -29,14 +29,14 @@
 '''Basic functions and iterators for neuron neurite section morphometrics
 
 '''
-from itertools import izip
+
 from functools import wraps
 from .core import iter_neurites
 import neurom.morphmath as mm
 from . import point_tree as tr
 from . import treefunc as mt
 from neurom.utils import deprecated_module
-
+from neurom._compat import zip
 
 deprecated_module(__name__)
 
@@ -80,7 +80,7 @@ def length(section):
 def _aggregate_segments(section, f):
     '''Sum the result of applying a function to all segments in a section'''
     return sum(f((a, b))
-               for a, b in izip(section, section[1:]))
+               for a, b in zip(section, section[1:]))
 
 
 @section_function(as_tree=False)

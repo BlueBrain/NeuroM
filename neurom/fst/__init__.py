@@ -173,11 +173,11 @@ def _get_doc():
 
     ret = ['\nNeurite features (neurite, neuron, neuron population):']
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(NEURITEFEATURES.iteritems()))
+               for feature, func in sorted(NEURITEFEATURES.items()))
 
     ret.append('\nNeuron features (neuron, neuron population):')
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(NEURONFEATURES.iteritems()))
+               for feature, func in sorted(NEURONFEATURES.items()))
 
     return '\n'.join(ret)
 

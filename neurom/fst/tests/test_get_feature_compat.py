@@ -47,17 +47,17 @@ NRN_PATHS = [DATA_PATH] * 10
 
 def _close(a, b, debug=False, rtol=1e-05, atol=1e-08):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
-        print '\na - b:%s\n' % (a - b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
+        print('\na - b:%s\n' % (a - b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b, rtol=rtol, atol=atol))
 
 
 def _equal(a, b, debug=False):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 
@@ -137,7 +137,7 @@ class TestSectionTree(object):
                        get('segment_y_coordinates', self.ref_pop, neurite_type=ntyp),
                        get('segment_z_coordinates', self.ref_pop, neurite_type=ntyp))
 
-            for i in xrange(3):
+            for i in range(3):
                 _equal(pts[:, i], ref_xyz[i])
 
     def test_get_local_bifurcation_angles(self):

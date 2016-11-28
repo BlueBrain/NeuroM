@@ -26,9 +26,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from copy import deepcopy
 import sys
 
 import numpy as np
+
 from nose import tools as nt
 from neurom.core import Tree
 from neurom.point_neurite.point_tree import PointTree
@@ -37,7 +39,7 @@ from neurom.point_neurite.point_tree import itriplet
 from neurom.point_neurite.point_tree import isection
 from neurom.point_neurite.point_tree import i_branch_end_points
 from neurom.point_neurite.point_tree import val_iter
-from copy import deepcopy
+from neurom._compat import range
 
 
 is_root = Tree.is_root
@@ -112,7 +114,7 @@ def test_add_child():
 
 def test_parent():
     t = PointTree(0)
-    for i in xrange(10):
+    for i in range(10):
         t.add_child(PointTree(i))
 
     nt.ok_(len(t.children) == 10)
@@ -263,11 +265,17 @@ def test_segment_upstream_iteration():
 
 
 def test_itriplet():
-
-    ref = [[0, 11, 111], [0, 11, 112], [11, 111, 1111], [111, 1111, 11111],
-           [111, 1111, 11112], [111, 1111, 11113],
-           [0, 12, 121], [0, 12, 122], [12, 121, 1211],
-           [121, 1211, 12111], [121, 1211, 12112]]
+    ref = [[0, 11, 111],
+           [0, 11, 112],
+           [11, 111, 1111],
+           [111, 1111, 11111],
+           [111, 1111, 11112],
+           [111, 1111, 11113],
+           [0, 12, 121],
+           [0, 12, 122],
+           [12, 121, 1211],
+           [121, 1211, 12111],
+           [121, 1211, 12112]]
 
     nt.assert_equal(list([n.value for n in t]
                          for t in itriplet(REF_TREE2)),

@@ -100,7 +100,7 @@ def load_data(filename):
 
     try:
         return _READERS[ext](filename)
-    except StandardError:
+    except Exception:
         L.exception('Error reading file %s, using "%s" loader', filename, ext)
         raise RawDataError('Error reading file %s' % filename)
 

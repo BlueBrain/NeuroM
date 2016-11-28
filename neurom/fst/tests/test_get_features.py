@@ -56,6 +56,10 @@ NEURITES = (NeuriteType.axon,
             NeuriteType.all)
 
 
+def assert_items_equal(a, b):
+    nt.eq_(sorted(a), sorted(b))
+
+
 def _stats(seq):
     return np.min(seq), np.max(seq), np.sum(seq), np.mean(seq)
 
@@ -63,18 +67,19 @@ def test_number_of_sections_pop():
 
     feat = 'number_of_sections'
 
-    nt.assert_items_equal(fst_get(feat, POP), [84, 42, 202])
-
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP),
                           [84, 42, 202])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+                          [84, 42, 202])
+
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [21, 21, 179])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [21, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [42, 21, 23])
 
 
@@ -82,18 +87,19 @@ def test_number_of_sections_nrn():
 
     feat = 'number_of_sections'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [84])
-
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN),
                           [84])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+                          [84])
+
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [21])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [21])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [42])
 
 
@@ -135,18 +141,18 @@ def test_number_of_segments_pop():
 
     feat = 'number_of_segments'
 
-    nt.assert_items_equal(fst_get(feat, POP), [840, 419, 5179])
+    assert_items_equal(fst_get(feat, POP), [840, 419, 5179])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
                           [840, 419, 5179])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [210, 209, 4508])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [210, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [420, 210, 671])
 
 
@@ -154,18 +160,18 @@ def test_number_of_segments_nrn():
 
     feat = 'number_of_segments'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [840])
+    assert_items_equal(fst_get(feat, NRN), [840])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
                           [840])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [210])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [210])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [420])
 
 
@@ -173,18 +179,18 @@ def test_number_of_neurites_pop():
 
     feat = 'number_of_neurites'
 
-    nt.assert_items_equal(fst_get(feat, POP), [4, 2, 4])
+    assert_items_equal(fst_get(feat, POP), [4, 2, 4])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
                           [4, 2, 4])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [1, 1, 1])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [1, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [2, 1, 3])
 
 
@@ -192,18 +198,18 @@ def test_number_of_neurites_nrn():
 
     feat = 'number_of_neurites'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [4])
+    assert_items_equal(fst_get(feat, NRN), [4])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
                           [4])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [1])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [1])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [2])
 
 
@@ -211,18 +217,18 @@ def test_number_of_bifurcations_nrn():
 
     feat = 'number_of_bifurcations'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [40])
+    assert_items_equal(fst_get(feat, NRN), [40])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
                           [40])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [10])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [10])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [20])
 
 
@@ -230,18 +236,18 @@ def test_number_of_bifurcations_pop():
 
     feat = 'number_of_bifurcations'
 
-    nt.assert_items_equal(fst_get(feat, POP), [40, 20, 97])
+    assert_items_equal(fst_get(feat, POP), [40, 20, 97])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
                           [40, 20, 97])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [10, 10, 87])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [10, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [20, 10, 10])
 
 
@@ -249,18 +255,18 @@ def test_number_of_forking_points_nrn():
 
     feat = 'number_of_forking_points'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [40])
+    assert_items_equal(fst_get(feat, NRN), [40])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
                           [40])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [10])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [10])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [20])
 
 
@@ -268,18 +274,18 @@ def test_number_of_forking_points_pop():
 
     feat = 'number_of_forking_points'
 
-    nt.assert_items_equal(fst_get(feat, POP), [40, 20, 98])
+    assert_items_equal(fst_get(feat, POP), [40, 20, 98])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
                           [40, 20, 98])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [10, 10, 88])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [10, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [20, 10, 10])
 
 
@@ -287,18 +293,18 @@ def test_number_of_terminations_nrn():
 
     feat = 'number_of_terminations'
 
-    nt.assert_items_equal(fst_get(feat, NRN), [44])
+    assert_items_equal(fst_get(feat, NRN), [44])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.all),
                           [44])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.axon),
                           [11])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.apical_dendrite),
                           [11])
 
-    nt.assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, NRN, neurite_type=NeuriteType.basal_dendrite),
                           [22])
 
 
@@ -306,18 +312,18 @@ def test_number_of_terminations_pop():
 
     feat = 'number_of_terminations'
 
-    nt.assert_items_equal(fst_get(feat, POP), [44, 22, 103])
+    assert_items_equal(fst_get(feat, POP), [44, 22, 103])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.all),
                           [44, 22, 103])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.axon),
                           [11, 11, 90])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite),
                           [11, 0, 0])
 
-    nt.assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
+    assert_items_equal(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite),
                           [22, 11, 13])
 
 
@@ -584,23 +590,23 @@ def test_register_neurite_feature_nrns():
 
     n_points_ref = [len(n.points) for n in iter_neurites(NRNS)]
     n_points = fst.get('foo', NRNS)
-    nt.assert_items_equal(n_points, n_points_ref)
+    assert_items_equal(n_points, n_points_ref)
 
     # test neurite type filtering
     n_points_ref = [len(n.points) for n in iter_neurites(NRNS, filt=_is_type(NeuriteType.axon))]
     n_points = fst.get('foo', NRNS, neurite_type=NeuriteType.axon)
-    nt.assert_items_equal(n_points, n_points_ref)
+    assert_items_equal(n_points, n_points_ref)
 
     fst.register_neurite_feature('bar', vol)
 
     n_volume_ref = [n.volume for n in iter_neurites(NRNS)]
     n_volume = fst.get('bar', NRNS)
-    nt.assert_items_equal(n_volume, n_volume_ref)
+    assert_items_equal(n_volume, n_volume_ref)
 
     # test neurite type filtering
     n_volume_ref = [n.volume for n in iter_neurites(NRNS, filt=_is_type(NeuriteType.axon))]
     n_volume = fst.get('bar', NRNS, neurite_type=NeuriteType.axon)
-    nt.assert_items_equal(n_volume, n_volume_ref)
+    assert_items_equal(n_volume, n_volume_ref)
 
 
 def test_register_neurite_feature_pop():
@@ -615,24 +621,24 @@ def test_register_neurite_feature_pop():
 
     n_points_ref = [len(n.points) for n in iter_neurites(POP)]
     n_points = fst.get('foo', POP)
-    nt.assert_items_equal(n_points, n_points_ref)
+    assert_items_equal(n_points, n_points_ref)
 
     # test neurite type filtering
     n_points_ref = [len(n.points) for n in iter_neurites(POP,
                                                          filt=_is_type(NeuriteType.basal_dendrite))]
     n_points = fst.get('foo', POP, neurite_type=NeuriteType.basal_dendrite)
-    nt.assert_items_equal(n_points, n_points_ref)
+    assert_items_equal(n_points, n_points_ref)
 
     fst.register_neurite_feature('bar', vol)
 
     n_volume_ref = [n.volume for n in iter_neurites(POP)]
     n_volume = fst.get('bar', POP)
-    nt.assert_items_equal(n_volume, n_volume_ref)
+    assert_items_equal(n_volume, n_volume_ref)
 
     # test neurite type filtering
     n_volume_ref = [n.volume for n in iter_neurites(POP, filt=_is_type(NeuriteType.basal_dendrite))]
     n_volume = fst.get('bar', POP, neurite_type=NeuriteType.basal_dendrite)
-    nt.assert_items_equal(n_volume, n_volume_ref)
+    assert_items_equal(n_volume, n_volume_ref)
 
 
 @nt.raises(NeuroMError)

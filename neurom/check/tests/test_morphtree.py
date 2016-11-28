@@ -30,6 +30,7 @@ from neurom import load_neuron
 from neurom.check import morphtree as mt
 from neurom.core import Neurite, NeuriteType, Section
 from neurom.core.dataformat import COLS
+from neurom._compat import range
 from nose import tools as nt
 import numpy as np
 import os
@@ -57,7 +58,7 @@ def _make_monotonic(neuron):
             sec = node.points
             if node.parent is not None:
                 sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
-            for point_id in xrange(len(sec) - 1):
+            for point_id in range(len(sec) - 1):
                 sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 
 
@@ -76,7 +77,7 @@ def _generate_neurite(mode):
         radius = init_radius
 
         sec = []
-        for _ in xrange(5):
+        for _ in range(5):
             sec.append([0, 0, 0, radius, 0, 0])
             radius = new_radius(radius, mode)
 

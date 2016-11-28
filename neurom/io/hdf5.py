@@ -40,12 +40,13 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
+
 from collections import namedtuple
-from itertools import izip_longest
 import h5py
 import numpy as np
 from ..core.dataformat import COLS
 from .datawrapper import DataWrapper
+from neurom._compat import zip_longest
 
 
 def get_version(h5file):
@@ -59,8 +60,8 @@ def get_version(h5file):
         return 'H5V2'
 
 
-(PX, PY, PZ, PD) = xrange(4)  # points
-(GPFIRST, GTYPE, GPID) = xrange(3)  # groups or structure
+PX, PY, PZ, PD = range(4)  # points
+GPFIRST, GTYPE, GPID = range(3)  # groups or structure
 
 Section = namedtuple('Section', 'ids, ntype, pid')
 
@@ -106,9 +107,9 @@ def _unpack_data(points, groups, remove_duplicates):
     # sections (ids, type, parent_id)
     sections = [0] * len(group_ids)
 
-    for i, (j, k) in enumerate(izip_longest(group_ids,
-                                            group_ids[1:],
-                                            fillvalue=n_points)):
+    for i, (j, k) in enumerate(zip_longest(group_ids,
+                                           group_ids[1:],
+                                           fillvalue=n_points)):
         j = int(j)
         k = int(k)
         sections[i] = Section(slice(j, k), groups[i][GTYPE], groups[i][GPID])

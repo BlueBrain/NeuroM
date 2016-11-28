@@ -29,7 +29,7 @@
 '''Module containing NeuroM specific exceptions'''
 
 
-class NeuroMError(StandardError):
+class NeuroMError(Exception):
     '''Base class for all NeuroM exceptions'''
     pass
 

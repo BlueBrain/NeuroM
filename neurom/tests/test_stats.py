@@ -74,8 +74,8 @@ def test_fit_normal_regression():
 def test_fit_default_is_normal():
     fit0_ = st.fit(NORMAL)
     fit1_ = st.fit(NORMAL, 'norm')
-    nt.assert_items_equal(fit0_.params, fit1_.params)
-    nt.assert_items_equal(fit0_.errs, fit1_.errs)
+    nt.eq_(fit0_.params, fit1_.params)
+    nt.eq_(fit0_.errs, fit1_.errs)
 
 
 def test_optimal_distribution_normal():

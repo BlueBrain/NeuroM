@@ -73,5 +73,5 @@ def test_len():
 
 
 def test_getitem():
-    for i in xrange(len(NEURONS)):
+    for i in range(len(NEURONS)):
         nt.assert_true(POP[i] is NEURONS[i])

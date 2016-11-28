@@ -245,7 +245,7 @@ class DataWrapper_Neuron_with_duplicates(object):
                         DataWrapper_Neuron_with_duplicates.fork_pts)
 
     def test_get_endpoints(self):
-        print 'test_here', self.data.get_end_points()
+        print('test_here', self.data.get_end_points())
         nt.assert_equal(self.data.get_end_points(),
                         DataWrapper_Neuron_with_duplicates.end_pts)
 

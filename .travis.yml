@@ -4,6 +4,7 @@ language: python
 python:
   - 2.6
   - 2.7
+  - 3.5
 addons:
   apt:
     packages:
@@ -20,6 +21,7 @@ install:
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then make -f Makefile run_tests; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then make -f Makefile test; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then make -f Makefile run_tests; fi
 after_success:
   - pip install codecov
   - codecov

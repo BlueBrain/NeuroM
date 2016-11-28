@@ -35,7 +35,7 @@ from neurom.point_neurite import segments as seg
 from neurom.point_neurite.core import iter_neurites
 
 import math
-from itertools import izip
+from neurom._compat import zip
 
 
 class MockNeuron(object):
@@ -134,7 +134,7 @@ def _check_segment_volumes(obj):
     ref = (1.0, 1.0, 4.6666667, 4.0, 4.6666667, 0.7708333,
            0.5625, 4.6666667, 0.7708333, 0.5625)
 
-    for a, b in izip(sv, ref):
+    for a, b in zip(sv, ref):
         nt.assert_almost_equal(a, b)
 
 
@@ -145,7 +145,7 @@ def _check_segment_areas(obj):
     ref = (2.0, 2.0, 6.7082039, 4.0, 6.7082039, 1.8038587,
            1.5, 6.7082039, 1.8038587, 1.5)
 
-    for a, b in izip(sa, ref):
+    for a, b in zip(sa, ref):
         nt.assert_almost_equal(a, b)
 
 
@@ -258,6 +258,6 @@ def test_segment_taper_rate():
 def test_cross_section_at_fraction():
 
     res = seg.cross_section_at_fraction((PointTree((1.,1.,1., 1.)),PointTree((2.,2.,2., 2.))), 0.5)
-    print res
+    print(res)
     nt.eq_(tuple(res[0]), (1.5, 1.5, 1.5))
     nt.assert_equal(res[1], 1.5)

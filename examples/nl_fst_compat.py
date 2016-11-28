@@ -26,7 +26,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 '''Compatibility between NL and H5 files'''
 # pylint: disable=protected-access
 
@@ -37,21 +36,23 @@ from neurom.fst import _neuritefunc as _nf
 nrn_h5 = nm.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
 nrn_asc = nm.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
 
-print 'h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0]
-print 'nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0]
-print 'h5 number of segments: %s' % nm.get('number_of_segments', nrn_h5)[0]
-print 'nl number of segments: %s\n' % nm.get('number_of_segments', nrn_asc)[0]
-print 'h5 total neurite length: %s' % np.sum(nm.get('section_lengths', nrn_h5))
-print 'nl total neurite length: %s\n' % np.sum(nm.get('section_lengths', nrn_asc))
-print 'h5 principal direction extents: %s' % nm.get('principal_direction_extents', nrn_h5)
-print 'nl principal direction extents: %s' % nm.get('principal_direction_extents', nrn_asc)
+print('h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0])
+print('nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0])
+print('h5 number of segments: %s' % nm.get('number_of_segments', nrn_h5)[0])
+print('nl number of segments: %s\n' % nm.get('number_of_segments', nrn_asc)[0])
+print('h5 total neurite length: %s' %
+      np.sum(nm.get('section_lengths', nrn_h5)))
+print('nl total neurite length: %s\n' %
+      np.sum(nm.get('section_lengths', nrn_asc)))
+print('h5 principal direction extents: %s' %
+      nm.get('principal_direction_extents', nrn_h5))
+print('nl principal direction extents: %s' %
+      nm.get('principal_direction_extents', nrn_asc))
 
-print '\nNumber of neurites:'
+print('\nNumber of neurites:')
 for nt in nm.NeuriteType:
-    print nt, _nf.n_neurites(nrn_h5, neurite_type=nt),\
-        _nf.n_neurites(nrn_asc, neurite_type=nt)
+    print(nt, _nf.n_neurites(nrn_h5, neurite_type=nt), _nf.n_neurites(nrn_asc, neurite_type=nt))
 
-print '\nNumber of segments:'
+print('\nNumber of segments:')
 for nt in nm.NeuriteType:
-    print nt, _nf.n_segments(nrn_h5, neurite_type=nt),\
-        _nf.n_segments(nrn_asc, neurite_type=nt)
+    print(nt, _nf.n_segments(nrn_h5, neurite_type=nt), _nf.n_segments(nrn_asc, neurite_type=nt))

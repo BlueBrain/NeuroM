@@ -62,14 +62,14 @@ REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
 
 def _close(a, b, debug=False):
     if debug:
-        print 'a: %s\nb:%s\n' % (a, b)
+        print('a: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b))
 
 
 def _equal(a, b, debug=False):
     if debug:
-        print 'a: %s\nb:%s\n' % (a, b)
+        print('a: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 

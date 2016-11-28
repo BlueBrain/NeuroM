@@ -85,7 +85,7 @@ if __name__ == '__main__':
           mean_end_to_end_dist(n for n in nrn.neurites
                                if n.type == nm.APICAL_DENDRITE))
 
-    print 'End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):'
+    print('End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):')
     for nrte in nrn.neurites:
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)

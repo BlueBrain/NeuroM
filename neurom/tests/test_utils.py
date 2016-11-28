@@ -43,7 +43,7 @@ def test_memoize_caches_args():
     ref1 = dummy(42)
     ref2 = dummy(42, 43)
 
-    for _ in xrange(100):
+    for _ in range(10):
         nt.assert_equal(dummy(42), ref1)
         nt.assert_equal(dummy(42, 43), ref2)
 
@@ -59,7 +59,7 @@ def test_memoize_does_not_cache_kwargs():
         ctr += 1
         return ctr
 
-    for i in xrange(100):
+    for i in range(10):
         nt.assert_equal(dummy(42, y=43), i + 1)
 
 

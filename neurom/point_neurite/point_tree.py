@@ -28,7 +28,8 @@
 
 '''Generic tree class and iteration functions'''
 from neurom.core import Tree
-from itertools import chain, imap, ifilter, repeat
+from itertools import chain, repeat
+from neurom._compat import map, filter
 
 
 class PointTree(Tree):
@@ -53,8 +54,7 @@ class PointTree(Tree):
         Parameters:
             iter_mode: iteration mode. Default: ipreorder.
         '''
-        return imap(lambda t: (t.parent, t),
-                    ifilter(lambda t: t.parent is not None, iter_mode(self)))
+        return ((t.parent, t) for t in iter_mode(self) if t.parent is not None)
 
     def isection(self, iter_mode=Tree.ipreorder):
         '''Iterator to sections of a tree.
@@ -79,8 +79,8 @@ class PointTree(Tree):
             '''Is this node a good seed for upstream section finding?'''
             return not n.is_root() and (n.is_leaf() or n.is_forking_point())
 
-        return imap(get_section,
-                    ifilter(seed_node, iter_mode(self)))
+        return map(get_section,
+                   filter(seed_node, iter_mode(self)))
 
     def itriplet(self):
         '''Iterate over triplets
@@ -88,9 +88,9 @@ class PointTree(Tree):
         Post-order iteration yielding tuples with three consecutive sub-trees
         '''
         return chain.from_iterable(
-            imap(lambda n: zip(repeat(n.parent), repeat(n), n.children),
-                 ifilter(lambda n: not n.is_root() and not n.is_leaf(),
-                         self.ipreorder())))
+            zip(repeat(n.parent), repeat(n), n.children)
+            for n in self.ipreorder()
+            if not n.is_root() and not n.is_leaf())
 
     def i_branch_end_points(self):
         '''Iterate over the furthest points in forking sections
@@ -115,7 +115,7 @@ class PointTree(Tree):
             '''
             return (not tree.is_root()) and (tree.is_forking_point() or tree.is_leaf())
 
-        return imap(next_end_point, self.children)
+        return map(next_end_point, self.children)
 
 
 def as_elements(trees):
@@ -130,13 +130,13 @@ def as_elements(trees):
 
 def val_iter(tree_iterator):
     '''Iterator adaptor to iterate over Tree.value'''
-    return imap(as_elements, tree_iterator)
+    return map(as_elements, tree_iterator)
 
 
 def imap_val(f, tree_iterator):
     '''Map function f to value of tree_iterator's target
     '''
-    return imap(f, val_iter(tree_iterator))
+    return map(f, val_iter(tree_iterator))
 
 
 isegment = PointTree.isegment

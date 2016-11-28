@@ -31,10 +31,10 @@ Python module of NeuroM to check neuronal trees.
 '''
 
 import numpy as np
-from itertools import ifilter
 from neurom.core.dataformat import COLS
 from neurom import morphmath as mm
 from neurom.morphmath import principal_direction_extent
+from neurom._compat import range, filter
 
 
 def is_monotonic(neurite, tol):
@@ -49,7 +49,7 @@ def is_monotonic(neurite, tol):
     for node in neurite.iter_sections():
         # check that points in section satisfy monotonicity
         sec = node.points
-        for point_id in xrange(len(sec) - 1):
+        for point_id in range(len(sec) - 1):
             if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
                 return False
         # Check that section boundary points satisfy monotonicity
@@ -173,10 +173,10 @@ def is_back_tracking(neurite):
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    for snode in ifilter(lambda snode: snode.points.shape[0] > 2, neurite.iter_sections()):
-
+    section_itr = (snode for snode in neurite.iter_sections() if snode.points.shape[0] > 2)
+    for snode in section_itr:
         # group each section's points intro triplets
-        segment_pairs = filter(is_not_zero_seg, pair(snode.points))
+        segment_pairs = list(filter(is_not_zero_seg, pair(snode.points)))
 
         # filter out zero length segments
         for i, seg1 in enumerate(segment_pairs[1:]):

@@ -78,4 +78,4 @@ if __name__ == '__main__':
 
     _result = stats.fit_results_to_dict(extract_data(d_path, feat))
 
-    print json.dumps(_result, indent=2, separators=(',', ': '))
+    print(json.dumps(_result, indent=2, separators=(',', ': ')))

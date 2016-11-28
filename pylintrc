@@ -14,7 +14,9 @@
 #R0401 - cyclic-import
 #I0013 - Ignore the 'Ignoring entire file' warning
 #W0142 - Used * or ** magic
-disable=C0103,R0904,R0903,W0511,W0232,R0922,R0801,R0921,W0141,R0401,I0013,W0142
+#W0622 - redefined-builti
+#C0325 - superfluous-parens
+disable=C0103,R0904,R0903,W0511,W0232,R0922,R0801,R0921,W0141,R0401,I0013,W0142,W0622,C0325
 
 [FORMAT]
 # Maximum number of characters on a single line.

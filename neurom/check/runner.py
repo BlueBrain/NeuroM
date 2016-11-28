@@ -125,22 +125,22 @@ class CheckRunner(object):
 
         try:
             data = load_data(f)
-        except StandardError as e:
+        except Exception as e: # pylint: disable=W0703
             L.error('Failed to load data... skipping tests for this file')
-            L.error(e.message)
+            L.error(e.args)
             return False, {f: OrderedDict([('ALL', False)])}
 
         try:
             result &= self._check_loop(data, 'structural_checks')
             nrn = fst_core.FstNeuron(data)
             result &= self._check_loop(nrn, 'neuron_checks')
-        except StandardError as e:
-            L.error('Check failed: %s: %s', type(e), e.message)
+        except Exception as e: # pylint: disable=W0703
+            L.error('Check failed:' + str(type(e)) + str(e.args))
             result = False
 
         self.summary['ALL'] = result
 
-        for m, s in self.summary.iteritems():
+        for m, s in self.summary.items():
             self._log_msg(m, s)
 
         return result, {f: self.summary}
