@@ -2,29 +2,29 @@ sudo: required
 dist: trusty
 language: python
 python:
+  - 2.6
   - 2.7
-virtualenv:
-  system_site_packages: true
-before_install:
-  - sudo apt-get update -qq -y
-  - sudo apt-get install -y python-dev
-  - sudo apt-get install -y python-numpy
-  - sudo apt-get install -y python-scipy
-  - sudo apt-get install -y python-h5py
-  - sudo apt-get install -y python-matplotlib
+addons:
+  apt:
+    packages:
+    - libatlas-dev
+    - libatlas-base-dev
+    - liblapack-dev
+    - gfortran
+    - libmpfr-dev
+    - libhdf5-dev
+cache: pip
 install:
-  - pip install --upgrade pip
+  - pip install --upgrade pip==8.1.2
   - pip install .
-cache:
-  directories:
-    - $HOME/.cache/pip
 script:
-  - make -f Makefile test
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then make -f Makefile run_tests; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then make -f Makefile test; fi
 after_success:
-  - sudo pip install codecov
+  - pip install codecov
   - codecov
 before_deploy:
-  - sudo pip install twine
+  - pip install twine
 deploy:
   provider: pypi
   user: bbp.opensource
