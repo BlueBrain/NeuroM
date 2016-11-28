@@ -33,7 +33,12 @@ import numpy as np
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
-from neurom import morphmath as mm
+from neurom import morphmath
+
+
+def neuron_population(nrns):
+    '''Makes sure `nrns` behaves like a neuron population'''
+    return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
 
 def soma_surface_area(nrn):
@@ -54,7 +59,7 @@ def soma_surface_areas(nrn_pop):
         If a single neuron is passed, a single element list with the surface
         area of its soma member is returned.
     '''
-    nrns = nrn_pop.neurons if hasattr(nrn_pop, 'neurons') else [nrn_pop]
+    nrns = neuron_population(nrn_pop)
     return [soma_surface_area(n) for n in nrns]
 
 
@@ -65,14 +70,15 @@ def soma_radii(nrn_pop):
         If a single neuron is passed, a single element list with the
         radius of its soma member is returned.
     '''
-    nrns = nrn_pop.neurons if hasattr(nrn_pop, 'neurons') else [nrn_pop]
+    nrns = neuron_population(nrn_pop)
     return [n.soma.radius for n in nrns]
 
 
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''list of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
-    return [mm.section_length(s.root_node.points) for s in nrn.neurites if neurite_filter(s)]
+    return [morphmath.section_length(s.root_node.points)
+            for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
@@ -90,15 +96,16 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
     The range of the azimuth angle [-pi, pi] radians
     '''
     neurite_filter = is_type(neurite_type)
-    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+    nrns = neuron_population(nrn)
 
     def _azimuth(section, soma):
         '''Azimuth of a section'''
-        vector = mm.vector(section[0], soma.center)
+        vector = morphmath.vector(section[0], soma.center)
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
     return [_azimuth(s.root_node.points, n.soma)
-            for n in nrns for s in n.neurites if neurite_filter(s)]
+            for n in nrns
+            for s in n.neurites if neurite_filter(s)]
 
 
 def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
@@ -111,11 +118,11 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     The range of the elevation angle [-pi/2, pi/2] radians
     '''
     neurite_filter = is_type(neurite_type)
-    nrns = nrn.neurons if hasattr(nrn, 'neurons') else [nrn]
+    nrns = neuron_population(nrn)
 
     def _elevation(section, soma):
         '''Elevation of a section'''
-        vector = mm.vector(section[0], soma.center)
+        vector = morphmath.vector(section[0], soma.center)
         norm_vector = np.linalg.norm(vector)
 
         if norm_vector >= np.finfo(type(norm_vector)).eps:
@@ -124,4 +131,5 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
             raise ValueError("Norm of vector between soma center and section is almost zero.")
 
     return [_elevation(s.root_node.points, n.soma)
-            for n in nrns for s in n.neurites if neurite_filter(s)]
+            for n in nrns
+            for s in n.neurites if neurite_filter(s)]
