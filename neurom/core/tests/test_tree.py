@@ -27,9 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
-
 from nose import tools as nt
 from neurom.core.tree import Tree
+from neurom._compat import range
 
 REF_TREE = Tree()
 T11 = REF_TREE.add_child(Tree())
@@ -74,7 +74,7 @@ def test_add_child():
 
 def test_parent():
     t = Tree()
-    for i in xrange(10):
+    for i in range(10):
         t.add_child(Tree())
 
     nt.ok_(len(t.children) == 10)

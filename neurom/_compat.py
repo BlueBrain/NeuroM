@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -26,29 +25,16 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''python 2/3 compatibility functions'''
 
-'''Get sections and segments by ID'''
+# ignore unused-import
+# pylint: disable=W0611
+from builtins import range, filter, map, zip
+import sys
 
-import neurom as nm
-from neurom import morphmath as mm
-from neurom.core.dataformat import COLS
-
-
-def get_segment(neuron, section_id, segment_id):
-    '''Get a segment given a section and segment id
-
-    Returns:
-        array of two [x, y, z, r] points defining segment
-    '''
-    sec = neuron.sections[section_id]
-    return sec.points[segment_id:segment_id + 2][:, 0:4]
-
-
-if __name__ == '__main__':
-
-    nrn = nm.load_neuron('test_data/h5/v1/Neuron.h5')
-
-    seg = get_segment(nrn, 3, 2)
-    print('Segment:\n', seg)
-    print('Mid-point (x, y, z):\n', mm.linear_interpolate(seg[0], seg[1], 0.5))
-    print('Mid-point R:\n', mm.interpolate_radius(seg[0][COLS.R], seg[1][COLS.R], 0.5))
+# ignore no-name-in-module
+# pylint: disable=E0611
+if sys.version_info < (3, 0):
+    from itertools import izip_longest as zip_longest  # pragma: no cover
+else:
+    from itertools import zip_longest  # pragma: no cover

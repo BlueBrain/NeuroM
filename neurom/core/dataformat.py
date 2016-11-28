@@ -31,7 +31,7 @@
 
 class COLS(object):
     '''Column labels for internal data representation'''
-    (X, Y, Z, R, TYPE, ID, P) = xrange(7)
+    (X, Y, Z, R, TYPE, ID, P) = range(7)
 
 
 class POINT_TYPE(object):
@@ -40,7 +40,7 @@ class POINT_TYPE(object):
     These follow SWC specification.
     '''
     (UNDEFINED, SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE,
-     FORK_POINT, END_POINT, CUSTOM) = xrange(8)
+     FORK_POINT, END_POINT, CUSTOM) = range(8)
 
     NEURITES = (AXON, BASAL_DENDRITE, APICAL_DENDRITE)
 

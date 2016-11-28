@@ -28,12 +28,16 @@
 
 ''' Core functionality and data types of NeuroM '''
 
-from itertools import ifilter, imap, chain, izip
+import sys
+from itertools import chain
+
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
 from ._neuron import Section, Neurite, Neuron
 from .population import Population
+
+from neurom._compat import map, filter, zip
 
 
 def iter_neurites(obj, mapfun=None, filt=None):
@@ -65,8 +69,8 @@ def iter_neurites(obj, mapfun=None, filt=None):
     neurites = ((obj,) if isinstance(obj, Neurite)
                 else (obj.neurites if hasattr(obj, 'neurites') else obj))
 
-    neurite_iter = iter(neurites) if filt is None else ifilter(filt, neurites)
-    return neurite_iter if mapfun is None else imap(mapfun, neurite_iter)
+    neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
+    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
 
 
 def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
@@ -91,7 +95,7 @@ def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
         '''Map an iterator type to the root node of a neurite'''
         return iterator_type(neurite.root_node)
 
-    return chain.from_iterable(imap(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
+    return chain.from_iterable(map(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
 
 
 def iter_segments(neurites, neurite_filter=None):
@@ -107,4 +111,4 @@ def iter_segments(neurites, neurite_filter=None):
         segment analysis functions that leverage numpy and section-wise iteration.
     '''
     return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in izip(ss.points[:-1], ss.points[1:]))
+                 for s in zip(ss.points[:-1], ss.points[1:]))

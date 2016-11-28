@@ -29,11 +29,11 @@
 '''Neuron classes and functions'''
 
 from copy import deepcopy
-from itertools import izip
 import numpy as np
 from .tree import Tree
 from ..morphmath import segment_area, segment_volume, section_length
 from . import NeuriteType
+from neurom._compat import zip
 
 
 class Section(Tree):
@@ -64,7 +64,7 @@ class Section(Tree):
         '''
         if self._area is None:
             pts = self.points
-            self._area = sum(segment_area(s) for s in izip(pts[:-1], pts[1:]))
+            self._area = sum(segment_area(s) for s in zip(pts[:-1], pts[1:]))
 
         return self._area
 
@@ -77,7 +77,7 @@ class Section(Tree):
         '''
         if self._volume is None:
             pts = self.points
-            self._volume = sum(segment_volume(s) for s in izip(pts[:-1], pts[1:]))
+            self._volume = sum(segment_volume(s) for s in zip(pts[:-1], pts[1:]))
 
         return self._volume
 

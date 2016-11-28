@@ -40,11 +40,11 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 
 '''
-from itertools import ifilter
 from collections import defaultdict
 from neurom.core.dataformat import COLS
 from neurom.core.point import as_point
 from neurom.core.dataformat import POINT_TYPE
+from neurom._compat import filter
 
 
 class DataWrapper(object):
@@ -115,7 +115,7 @@ class DataWrapper(object):
 
     def get_fork_points(self):
         '''Get list of point ids for points with more than one child'''
-        return [i for i, l in self.adj_list.iteritems() if len(l) > 1]
+        return [i for i, l in self.adj_list.items() if len(l) > 1]
 
     def iter_row(self, start_id=None, pred=None):
         '''Get an row iterator to a starting at start_id and satisfying a
@@ -128,4 +128,4 @@ class DataWrapper(object):
             raise LookupError('Invalid id: {0}'.format(start_id))
 
         irow = iter(self.data_block[start_id:])
-        return irow if pred is None else ifilter(pred, irow)
+        return irow if pred is None else filter(pred, irow)

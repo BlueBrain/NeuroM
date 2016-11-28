@@ -33,8 +33,6 @@ Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
 import numpy as np
-
-from itertools import izip
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
 from neurom.core.dataformat import COLS
@@ -42,6 +40,7 @@ from neurom.morphmath import section_length, segment_length
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.fst import _neuritefunc as _nf
 from neurom.check import CheckResult
+from neurom._compat import zip
 
 
 def _read_neurite_type(neurite):
@@ -120,7 +119,7 @@ def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
     bad_ids = []
     for sec in _nf.iter_sections(neuron):
         p = sec.points
-        for i, s in enumerate(izip(p[:-1], p[1:])):
+        for i, s in enumerate(zip(p[:-1], p[1:])):
             if segment_length(s) <= threshold:
                 bad_ids.append((sec.id, i))
 
@@ -190,7 +189,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
     for s in _nf.iter_sections(neuron):
-        it = izip(s.points, s.points[1:])
+        it = zip(s.points, s.points[1:])
         for i, (p0, p1) in enumerate(it):
             info = (s.id, i)
             if max_distance < abs(p0[axis] - p1[axis]):

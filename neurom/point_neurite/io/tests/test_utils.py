@@ -28,7 +28,6 @@
 
 '''Test neurom.point_neurite.io.utils'''
 import os
-from itertools import izip
 import numpy as np
 from neurom.point_neurite.io import utils
 from neurom.point_neurite import points as pts
@@ -38,6 +37,8 @@ from neurom.point_neurite.core import iter_neurites
 from neurom.core.dataformat import COLS
 from neurom.exceptions import (SomaError, IDSequenceError,
                                MultipleTrees, MissingParentError)
+from neurom._compat import zip
+
 from nose import tools as nt
 
 
@@ -199,7 +200,7 @@ def test_load_trees_good_neuron():
         return point
 
     # Check data are the same in tree collection and neuron's neurites
-    for a, b in izip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
+    for a, b in zip(iter_neurites(nrn, elem), iter_neurites(nrn2, elem)):
         nt.ok_(np.all(a == b))
 
 

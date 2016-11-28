@@ -51,7 +51,7 @@ if __name__ == '__main__':
     nrn = make_neuron(rd)
 
     for tt in nrn.neurites:
-        print 'Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE])
+        print('Tree ID: {0}, type: {1}'.format(tt.value[COLS.ID], tt.value[COLS.TYPE]))
         for a in iter_neurites(tt, trip.meander_angle):
             LOG.debug('Angle %f', a)
             if np.isnan(a):

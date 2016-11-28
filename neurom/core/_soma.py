@@ -41,7 +41,7 @@ class SOMA_TYPE(object):
     * Type SimpleContour: More than three points
     * INVALID: Not satisfying any of the above
     '''
-    INVALID, SinglePoint, ThreePoint, SimpleContour = xrange(4)
+    INVALID, SinglePoint, ThreePoint, SimpleContour = range(4)
 
     @staticmethod
     def get_type(points):

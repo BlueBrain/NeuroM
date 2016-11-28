@@ -28,9 +28,9 @@
 
 '''Section functions and functional tools'''
 
-from itertools import izip
 from functools import wraps
 from neurom import morphmath as mm
+from neurom._compat import zip, range
 
 
 def section_fun(fun):
@@ -46,7 +46,7 @@ def section_fun(fun):
 def map_segments(fun, section):
     '''Map a function to segments in a section'''
     pts = section.points
-    return list(fun(s) for s in izip(pts[:-1], pts[1:]))
+    return list(fun(s) for s in zip(pts[:-1], pts[1:]))
 
 
 def section_path_length(section):
@@ -107,4 +107,4 @@ def section_meander_angles(section):
     '''Inter-segment opening angles in a section'''
     p = section.points
     return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
-            for i in xrange(2, len(p))]
+            for i in range(2, len(p))]

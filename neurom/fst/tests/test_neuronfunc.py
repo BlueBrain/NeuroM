@@ -47,17 +47,17 @@ NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 def _equal(a, b, debug=False):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 
 
 def _close(a, b, debug=False):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
-        print '\na - b:%s\n' % (a - b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
+        print('\na - b:%s\n' % (a - b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b))
 
@@ -83,25 +83,19 @@ def test_trunk_origin_elevations():
     n1.soma = s
 
     pop = Population([n0, n1])
-    nt.assert_items_equal(_nf.trunk_origin_elevations(pop),
-                          [0.0, np.pi/2., -np.pi/2.])
-
-    nt.assert_items_equal(
-        _nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
-        [0.0, np.pi/2., -np.pi/2.]
-    )
+    nt.eq_(list(_nf.trunk_origin_elevations(pop)),
+           [0.0, np.pi/2., -np.pi/2.])
 
     nt.eq_(
-        len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=NeuriteType.axon)),
-        0
-    )
+        list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
+        [0.0, np.pi/2., -np.pi/2.])
 
-    nt.eq_(
-        len(_nf.trunk_origin_elevations(pop,
-                                        neurite_type=NeuriteType.apical_dendrite)),
-        0
-    )
+    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
+           0)
+
+    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite)),
+           0)
+
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():

@@ -73,7 +73,7 @@ def extract_stats(neurons, config):
     '''Extract stats from neurons'''
 
     stats = defaultdict(dict)
-    for ns, modes in config['neurite'].iteritems():
+    for ns, modes in config['neurite'].items():
         for n in config['neurite_type']:
             n = _NEURITE_MAP[n]
             for mode in modes:
@@ -89,7 +89,7 @@ def extract_stats(neurons, config):
                         compound_stat_name = stat_name + '_' + str(suffix)
                         stats[n.name][compound_stat_name] = stat[i]
 
-    for ns, modes in config['neuron'].iteritems():
+    for ns, modes in config['neuron'].items():
         for mode in modes:
             stat_name = _stat_name(ns, mode)
             stats[stat_name] = eval_stats(nm.get(ns, neurons), mode)
