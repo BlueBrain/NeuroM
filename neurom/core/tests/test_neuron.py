@@ -26,79 +26,53 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 from nose import tools as nt
 from copy import deepcopy
-from neurom.core._neuron import Neuron
-from neurom.core import make_soma
-from neurom.point_neurite.point_tree import PointTree
-from neurom.point_neurite.point_tree import val_iter
+
+import neurom as nm
+from neurom.core import iter_segments
 from neurom._compat import zip
 
 import numpy as np
 
-SOMA_SINGLE_PTS = [[11, 22, 33, 44, 1, 1, -1]]
-
-TREE = PointTree([0.0, 0.0, 0.0, 1.0, 1, 1, 2] )
-T1 = TREE.add_child(PointTree([0.0, 1.0, 0.0, 1.0, 1, 1, 2]))
-T2 = T1.add_child(PointTree([0.0, 2.0, 0.0, 1.0, 1, 1, 2]))
-T3 = T2.add_child(PointTree([0.0, 4.0, 0.0, 2.0, 1, 1, 2]))
-T4 = T3.add_child(PointTree([0.0, 5.0, 0.0, 2.0, 1, 1, 2]))
-T5 = T4.add_child(PointTree([2.0, 5.0, 0.0, 1.0, 1, 1, 2]))
-T6 = T4.add_child(PointTree([0.0, 5.0, 2.0, 1.0, 1, 1, 2]))
-T7 = T5.add_child(PointTree([3.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-T8 = T7.add_child(PointTree([4.0, 5.0, 0.0, 0.75, 1, 1, 2]))
-T9 = T6.add_child(PointTree([0.0, 5.0, 3.0, 0.75, 1, 1, 2]))
-T10 = T9.add_child(PointTree([0.0, 6.0, 3.0, 0.75, 1, 1, 2]))
-
 
 def test_deep_copy():
-
-    soma = make_soma([[0, 0, 0, 1, 1, 1, -1]])
-    nrn1 = Neuron(soma, [TREE])
+    _path = os.path.dirname(os.path.abspath(__file__))
+    SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
+    nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
     nrn2 = deepcopy(nrn1)
     check_cloned_neuron(nrn1, nrn2)
 
 
 def check_cloned_neuron(nrn1, nrn2):
-
     # check if two neurons are identical
 
-    # somata
-    nt.assert_true(isinstance(nrn2.soma, type(nrn1.soma)))
+    # soma
+    nt.ok_(isinstance(nrn2.soma, type(nrn1.soma)))
     nt.eq_(nrn1.soma.radius, nrn2.soma.radius)
 
     for v1, v2 in zip(nrn1.soma.iter(), nrn2.soma.iter()):
-
-        nt.assert_true(np.allclose(v1, v2))
+        nt.ok_(np.allclose(v1, v2))
 
     # neurites
-    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
-
-        nt.assert_true(isinstance(neu2, type(neu1)))
-
-        for v1, v2 in zip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
-
-            nt.assert_true(np.allclose(v1, v2))
+    for v1, v2 in zip(iter_segments(nrn1), iter_segments(nrn2)):
+        (v1_start, v1_end), (v2_start, v2_end) = v1, v2
+        nt.ok_(np.allclose(v1_start, v2_start))
+        nt.ok_(np.allclose(v1_end, v2_end))
 
     # check if the ids are different
-
     # somata
-    nt.assert_true( nrn1.soma is not nrn2.soma)
+    nt.ok_(nrn1.soma is not nrn2.soma)
 
     # neurites
     for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
-
-        nt.assert_true(neu1 is not neu2)
+        nt.ok_(neu1 is not neu2)
 
     # check if changes are propagated between neurons
-
     nrn2.soma.radius = 10.
-
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
-    # neurites
-    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
 
-        for v1, v2 in zip(val_iter(neu1.ipreorder()), val_iter(neu2.ipreorder())):
-
-            v2 = np.array([-1000., -1000., -1000., 1000., -100., -100., -100.])
-            nt.assert_false(any(v1 == v2))
+    nrn2._data.data_block[0, :] = np.zeros_like(nrn2._data.data_block[0, :])
+    nt.ok_(not np.allclose(nrn1._data.data_block[0, :],
+                           nrn2._data.data_block[0, :]))

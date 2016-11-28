@@ -34,12 +34,12 @@ from nose import tools as nt
 
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
-NRN_PATH_0 = os.path.join(_path, '../../../test_data/swc/Neuron.swc')
-NRN_PATH_1 = os.path.join(_path, '../../../test_data/swc/Neuron_zero_length_sections.swc')
-NRN_PATH_2 = os.path.join(_path, '../../../test_data/swc/Single_apical.swc')
-NRN_PATH_3 = os.path.join(_path, '../../../test_data/swc/Single_basal.swc')
-NRN_PATH_4 = os.path.join(_path, '../../../test_data/swc/Single_axon.swc')
-NRN_PATH_5 = os.path.join(_path, '../../../test_data/swc/Single_apical_no_soma.swc')
+NRN_PATH_0 = os.path.join(SWC_PATH, 'Neuron.swc')
+NRN_PATH_1 = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
+NRN_PATH_2 = os.path.join(SWC_PATH, 'Single_apical.swc')
+NRN_PATH_3 = os.path.join(SWC_PATH, 'Single_basal.swc')
+NRN_PATH_4 = os.path.join(SWC_PATH, 'Single_axon.swc')
+NRN_PATH_5 = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
 CONFIG = {
     'checks': {

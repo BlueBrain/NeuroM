@@ -35,10 +35,8 @@ import neurom as nm
 from neurom.geom import convex_hull
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst.sectionfunc import section_volume
-from neurom.point_neurite.io import utils as io_utils
 from neurom.core import tree as tr
 from neurom.core import Section, Neurite, Population
-from neurom.point_neurite import point_tree as ptr
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -46,7 +44,6 @@ DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 
 NRN = nm.load_neuron(DATA_PATH)
-NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 
 def _equal(a, b, debug=False):

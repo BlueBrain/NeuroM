@@ -64,14 +64,14 @@ def _close(a, b, debug=False):
     if debug:
         print('a: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
+    nt.ok_(np.allclose(a, b))
 
 
 def _equal(a, b, debug=False):
     if debug:
         print('a: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
+    nt.ok_(np.alltrue(a == b))
 
 
 class SectionTreeBase(object):

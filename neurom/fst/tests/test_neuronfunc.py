@@ -33,7 +33,6 @@ import os
 import numpy as np
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
-from neurom.point_neurite.io import utils as io_utils
 from neurom.core import make_soma, Neurite, Section
 from neurom.core.population import Population
 
@@ -42,7 +41,6 @@ H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
 NRN = load_neuron(DATA_PATH)
-NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 
 def _equal(a, b, debug=False):
