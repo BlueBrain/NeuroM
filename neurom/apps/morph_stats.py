@@ -52,7 +52,11 @@ def eval_stats(values, mode):
         mode = 'sum'
 
     try:
-        return getattr(np, mode)(values)
+        tval = getattr(np, mode)(values)
+        if type(tval) is map:  # map cannot be dumped in json
+            return list(tval)
+        else:  # For "mean_soma_radius"
+            return tval
     except ValueError:
         pass
 
