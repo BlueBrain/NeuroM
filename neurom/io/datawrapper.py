@@ -28,8 +28,14 @@
 
 '''Fast neuron IO module'''
 
-from collections import defaultdict
+import logging
+
+from collections import defaultdict, namedtuple
 from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
+
+import numpy as np
+
+L = logging.getLogger(__name__)
 
 
 class DataWrapper(object):
@@ -75,13 +81,15 @@ class DataWrapper(object):
 def _merge_sections(sec_a, sec_b):
     '''Merge two sections
 
-    Merges sec_a into sec_b and sets sec_b attributes to default
+    Merges sec_a into sec_b and sets sec_a attributes to default
     '''
     sec_b.ids = sec_a.ids + sec_b.ids[1:]
     sec_b.ntype = sec_a.ntype
     sec_b.pid = sec_a.pid
+
     sec_a.ids = []
     sec_a.pid = -1
+    sec_a.ntype = 0
 
 
 def _section_end_points(data_block, id_map):
@@ -112,15 +120,21 @@ def _section_end_points(data_block, id_map):
     return end_pts.union(soma_end_pts)
 
 
+class Section(object):
+    '''sections ((ids), type, parent_id)'''
+    def __init__(self, ids=None, ntype=0, pid=-1):
+        self.ids = [] if ids is None else ids
+        self.ntype = ntype
+        self.pid = pid
+
+    def __eq__(self, other):
+        return (self.ids == other.ids and
+                self.ntype == other.ntype and
+                self.pid == other.pid)
+
+
 def _extract_sections(data_block):
     '''Make a list of sections from an SWC-style data wrapper block'''
-
-    class Section(object):
-        '''sections ((ids), type, parent_id)'''
-        def __init__(self, ids=None, ntype=0, pid=-1):
-            self.ids = [] if ids is None else ids
-            self.ntype = ntype
-            self.pid = pid
 
     # get SWC ID to array position map
     id_map = {-1: -1}
@@ -175,3 +189,86 @@ def _extract_sections(data_block):
     # Currently they are required to maintain
     # tree integrity.
     return _sections
+
+
+COL_COUNT = 7
+_, _, _, _, TYPE, ID, PARENT = range(COL_COUNT)
+XYZR = slice(0, 4)
+
+
+class BlockNeuronBuilder(object):
+    '''Helper to create DataWrapper for 'block' sections
+
+    This helps create a new DataWrapper when one already has 'blocks'
+    (ie: contiguous points, forming all the segments) of a section, and they
+    just need to connect them together based on their parent.
+
+    Example:
+        >>> builder = BlockNeuronBuilder()
+        >>> builder.add_section(segment_id, parent_id, segment_type, points)
+        ...
+        >>> morph = builder.get_datawrapper()
+    '''
+    BlockSection = namedtuple('BlockSection', 'parent_id section_type points')
+
+    def __init__(self):
+        self.sections = {}
+
+    def add_section(self, id_, parent_id, section_type, points):
+        '''add a section
+
+        Args:
+            id_(int): identifying number of the section
+            parent_id(int): identifying number of the parent of this section
+            section_type(int): the section type as defined by POINT_TYPE
+            points is an array of [X, Y, Z, R]'''
+        # L.debug('Adding section %d, with parent %d, of type: %d with count: %d',
+        #         id_, parent_id, section_type, len(points))
+        assert id_ not in self.sections, 'id %s already exists in sections' % id_
+        self.sections[id_] = BlockNeuronBuilder.BlockSection(parent_id, section_type, points)
+
+    def _make_datablock(self):
+        '''Make a data_block and sections list as required by DataWrapper'''
+        section_ids = sorted(self.sections)
+
+        # create all insertion id's, this needs to be done ahead of time
+        # as some of the children may have a lower id than their parents
+        id_to_insert_id = {}
+        row_count = 0
+        for section_id in section_ids:
+            row_count += len(self.sections[section_id].points)
+            id_to_insert_id[section_id] = row_count - 1
+
+        datablock = np.empty((row_count, COL_COUNT), dtype=np.float)
+        datablock[:, ID] = np.arange(len(datablock))
+        datablock[:, PARENT] = datablock[:, ID] - 1
+
+        sections = []
+        insert_index = 0
+        for id_ in section_ids:
+            sec = self.sections[id_]
+            points, section_type, parent_id = sec.points, sec.section_type, sec.parent_id
+
+            idx = slice(insert_index, insert_index + len(points))
+            datablock[idx, XYZR] = points
+            datablock[idx, TYPE] = section_type
+            datablock[idx.start, PARENT] = id_to_insert_id.get(parent_id, ROOT_ID)
+            sections.append(Section(idx, section_type, parent_id))
+            insert_index = idx.stop
+
+        return datablock, sections
+
+    def _check_consistency(self):
+        '''see if the sections have obvious errors'''
+        type_count = defaultdict(int)
+        for _, section in sorted(self.sections.items()):
+            type_count[section.section_type] += 1
+
+        if type_count[POINT_TYPE.SOMA] != 1:
+            L.info('Have %d somas, expected 1', type_count[POINT_TYPE.SOMA])
+
+    def get_datawrapper(self, file_format='BlockNeuronBuilder', data_wrapper=DataWrapper):
+        '''returns a DataWrapper'''
+        self._check_consistency()
+        datablock, sections = self._make_datablock()
+        return data_wrapper(datablock, file_format, sections)
