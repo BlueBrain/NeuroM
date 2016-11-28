@@ -30,7 +30,7 @@
 Python module of NeuroM to visualize morphologies
 '''
 
-from itertools import izip
+import sys
 from . import common
 from . import _compat
 from neurom import NeuriteType
@@ -38,6 +38,9 @@ from matplotlib.collections import LineCollection
 import numpy as np
 from neurom.io import COLS
 from neurom.morphmath import segment_radius
+if sys.version_info < (3, 0):
+    from itertools import izip as zip
+
 
 DEFAULT_PARAMS = '''        new_fig: boolean \
             Defines if the tree will be plotted \
@@ -489,7 +492,7 @@ def _render_dendrogram(dnd, ax, displacement):
     # set of unique colors that reflect the set of types of the neurites
     colors = set()
 
-    for n, (indices, ctype) in enumerate(izip(dnd.groups, dnd.types)):
+    for n, (indices, ctype) in enumerate(zip(dnd.groups, dnd.types)):
 
         # slice rectangles array for the current neurite
         group = dnd.data[indices[0]: indices[1]]

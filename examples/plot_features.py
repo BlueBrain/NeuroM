@@ -35,6 +35,7 @@ from collections import namedtuple
 import sys
 import json
 import argparse
+from future.utils import iteritems
 import numpy as np
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
@@ -159,20 +160,20 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
 
     _plots = []
 
-    for feat, d in stuff.iteritems():
-        for typ, data in d.iteritems():
+    for feat, d in iteritems(stuff):
+        for typ, data in iteritems(d):
             dist = sim_params['components'][typ].get(feat, None)
-            print 'Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist)
+            print('Type = %s, Feature = %s, Distribution = %s' % (typ, feat, dist))
             # if no data available, skip this feature
             if not data:
-                print "No data found for feature %s (%s)" % (feat, typ)
+                print("No data found for feature %s (%s)" % (feat, typ))
                 continue
             # print 'DATA', data
             num_bins = 100
             limits = calc_limits(data, dist)
             bin_edges = np.linspace(limits[0], limits[1], num_bins + 1)
             histo = np.histogram(data, bin_edges, normed=True)
-            print 'PLOT LIMITS:', limits
+            print('PLOT LIMITS:', limits)
             # print 'DATA:', data
             # print 'BIN HEIGHT', histo[0]
             plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
@@ -190,7 +191,7 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
 
 if __name__ == '__main__':
     args = parse_args()
-    print 'MTYPE FILE:', args.mtypeconfig
+    print('MTYPE FILE:', args.mtypeconfig)
     plots = main(args.datapath, args.mtypeconfig)
 
     pp = PdfPages(args.output)

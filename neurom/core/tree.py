@@ -27,8 +27,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from itertools import chain, imap, ifilter
+import sys
+from itertools import chain
 from collections import deque
+if sys.version_info <= (3, 0):
+    from itertools import ifilter, imap as filter, map
 
 
 class Tree(object):
@@ -92,7 +95,7 @@ class Tree(object):
 
     def ileaf(self):
         '''Iterator to all leaves of a tree'''
-        return ifilter(Tree.is_leaf, self.ipreorder())
+        return filter(Tree.is_leaf, self.ipreorder())
 
     def iforking_point(self, iter_mode=ipreorder):
         '''Iterator to forking points. Returns a tree object.
@@ -101,7 +104,7 @@ class Tree(object):
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
         '''
-        return ifilter(Tree.is_forking_point, iter_mode(self))
+        return filter(Tree.is_forking_point, iter_mode(self))
 
     def ibifurcation_point(self, iter_mode=ipreorder):
         '''Iterator to bifurcation points. Returns a tree object.
@@ -110,7 +113,7 @@ class Tree(object):
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
         '''
-        return ifilter(Tree.is_bifurcation_point, iter_mode(self))
+        return filter(Tree.is_bifurcation_point, iter_mode(self))
 
 
 def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
@@ -128,5 +131,5 @@ def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None
     nrt = (trees if tree_filter is None
            else filter(tree_filter, trees))
 
-    chain_it = chain.from_iterable(imap(iterator_type, nrt))
-    return chain_it if mapping is None else imap(mapping, chain_it)
+    chain_it = chain.from_iterable(map(iterator_type, nrt))
+    return chain_it if mapping is None else map(mapping, chain_it)

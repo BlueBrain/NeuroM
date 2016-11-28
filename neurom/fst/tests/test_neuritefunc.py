@@ -51,17 +51,17 @@ NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 def _equal(a, b, debug=False):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.alltrue(a == b))
 
 
 def _close(a, b, debug=False):
     if debug:
-        print '\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape)
-        print '\na: %s\nb:%s\n' % (a, b)
-        print '\na - b:%s\n' % (a - b)
+        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
+        print('\na: %s\nb:%s\n' % (a, b))
+        print('\na - b:%s\n' % (a - b))
     nt.assert_equal(len(a), len(b))
     nt.assert_true(np.allclose(a, b))
 

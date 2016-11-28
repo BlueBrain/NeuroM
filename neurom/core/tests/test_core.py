@@ -28,7 +28,10 @@
 
 import os
 from os.path import join as joinp
-from itertools import ifilter
+
+import sys
+if sys.version_info < (3, 0):
+    from itertools import ifilter as filter
 
 from nose import tools as nt
 import neurom as nm
@@ -92,7 +95,7 @@ def test_iter_sections_default():
 def test_iter_sections_filter():
 
     for ntyp in nm.NEURITE_TYPES:
-        a = [s for n in ifilter(lambda nn: nn.type == ntyp, POP.neurites)
+        a = [s for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
              for s in n.iter_sections()]
         b = [n for n in core.iter_sections(POP, neurite_filter=lambda n : n.type == ntyp)]
         nt.assert_sequence_equal(a, b)

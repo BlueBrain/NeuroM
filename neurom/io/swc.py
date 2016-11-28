@@ -39,10 +39,11 @@ There is one such row per measured point.
 
 '''
 import numpy as np
+from builtins import range
 from .datawrapper import DataWrapper
 
 
-(ID, TYPE, X, Y, Z, R, P) = xrange(7)
+(ID, TYPE, X, Y, Z, R, P) = range(7)
 
 
 def read(filename, data_wrapper=DataWrapper):

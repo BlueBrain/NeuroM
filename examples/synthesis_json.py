@@ -42,6 +42,7 @@ from collections import OrderedDict
 from collections import defaultdict
 from collections import namedtuple
 from itertools import chain
+from future.utils import iteritems
 import os
 import json
 from json import encoder
@@ -209,7 +210,7 @@ if __name__ == '__main__':
             mtype_files[mtype_getter(f)].append(f)
 
         _results = [transform_package(mtype_, files_, COMPONENTS)
-                    for mtype_, files_ in mtype_files.iteritems()]
+                    for mtype_, files_ in iteritems(mtype_files)]
 
         for res in _results:
-            print json.dumps(res, indent=2), '\n'
+            print(json.dumps(res, indent=2), '\n')

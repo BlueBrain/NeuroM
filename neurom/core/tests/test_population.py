@@ -32,6 +32,7 @@ from os.path import join as joinp
 from nose import tools as nt
 from neurom.core.population import Population
 from neurom import load_neuron
+from builtins import range
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
@@ -73,5 +74,5 @@ def test_len():
 
 
 def test_getitem():
-    for i in xrange(len(NEURONS)):
+    for i in range(len(NEURONS)):
         nt.assert_true(POP[i] is NEURONS[i])
