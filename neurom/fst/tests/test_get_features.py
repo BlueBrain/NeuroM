@@ -434,7 +434,9 @@ def test_neurite_features_accept_single_tree():
     features = NEURITEFEATURES.keys()
 
     for f in features:
-        fst_get(f, NRN.neurites[0])
+        ret = fst_get(f, NRN.neurites[0])
+        nt.ok_(ret.dtype.kind in ('i', 'f'))
+        nt.ok_(len(ret) or len(ret) == 0) #  make sure that len() resolves
 
 
 def test_register_neurite_feature_nrns():
