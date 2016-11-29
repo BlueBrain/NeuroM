@@ -60,7 +60,7 @@ def count(f):
     '''
     @wraps(f)
     def wrapped(neurites, neurite_type=NeuriteType.all):
-        ''' placeholderg'''
+        ''' placeholder'''
         yield sum(1 for _ in f(neurites, neurite_type))
 
     return wrapped

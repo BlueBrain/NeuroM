@@ -40,6 +40,7 @@ from neurom.fst import sectionfunc as _sec
 from neurom.fst import _bifurcationfunc as _bf
 from neurom.core import Tree
 from neurom.core.tree import i_chain2
+
 from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
@@ -81,8 +82,6 @@ class SectionTreeBase(object):
         self.ref_nrn = REF_NRN
         self.ref_types = REF_NEURITE_TYPES
 
-
-
     def test_neurite_type(self):
 
         neurite_types = [n0.type for n0 in self.sec_nrn.neurites]
@@ -93,7 +92,9 @@ class SectionTreeBase(object):
         nt.assert_equal(_nrt.n_sections(self.sec_nrn.neurites[0]),
                         get('number_of_sections', self.ref_nrn.neurites[0])[0])
 
-        nt.assert_equal(_nrt.n_sections(self.sec_nrn), get('number_of_sections', self.ref_nrn)[0])
+        nt.assert_equal(_nrt.n_sections(self.sec_nrn),
+                        get('number_of_sections', self.ref_nrn)[0])
+
         for t in NeuriteType:
             nt.assert_equal(_nrt.n_sections(self.sec_nrn, neurite_type=t),
                             get('number_of_sections', self.ref_nrn, neurite_type=t)[0])

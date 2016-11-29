@@ -41,7 +41,7 @@ import sys
 def _max_recursion_depth(obj):
     ''' Estimate recursion depth, which is defined as the number of nodes in a tree
     '''
-    neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
+    neurites = obj.neurites if hasattr(obj, 'neurites') else (obj,)
 
     return max(sum(1 for _ in neu.ipreorder()) for neu in neurites)
 
@@ -66,17 +66,11 @@ def _n_rectangles(obj):
     the type of the object
     '''
     if isinstance(obj, Tree):
-
         return _total_rectangles(obj)
-
     elif isinstance(obj, Neuron):
-
         # + 1 accounts for the rectangle needed to represent the soma
         return sum(_total_rectangles(neu) for neu in obj.neurites) + 1
-
-    else:
-
-        return 0
+    return 0
 
 
 def _square_segment(radius, origin):
@@ -187,21 +181,13 @@ class Dendrogram(object):
         sys.setrecursionlimit(max_depth)
 
         if isinstance(self._obj, Tree):
-
             max_diameter = _max_diameter(self._obj)
-
             self._generate_dendro(self._obj, (max_diameter, 0.), offsets)
-
             self._groups.append((0., self._n))
-
             self._dims.append(self._max_dims)
-
         else:
-
             for neurite in self._obj.neurites:
-
                 max_diameter = _max_diameter(neurite)
-
                 self._generate_dendro(neurite, (max_diameter, 0.), offsets)
 
                 # store in trees the indices for the slice which corresponds
