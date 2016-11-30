@@ -165,7 +165,7 @@ along:
     from neurom.morphmath import segment_length
     # for demonstration purposes, get the first leaf we find:
     tree = tree[0]
-    first_leaf = ileaf(tree).next()
+    first_leaf = next(ileaf(tree))
     # now iterate segment-wise, upstream, and sum the lengths
     path_len = sum(segment_length(s) for s in val_iter(isegment(first_leaf, iupstream)))
 
