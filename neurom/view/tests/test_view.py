@@ -26,12 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import os
+import itertools as it
 import numpy as np
 import pylab as plt
 
 from nose import tools as nt
 from neurom import load_neuron
 from neurom.view import view
+from neurom.core import Section
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
@@ -122,8 +124,8 @@ def test_dendrogram():
 
 
 def test_one_point_branch():
-    test_tree = fst_neuron.neurites[0]
-    view.tree(test_tree, diameter=True)
-    view.tree(test_tree, diameter=False)
-    view.tree3d(test_tree, diameter=True)
-    view.tree3d(test_tree, diameter=False)
+    test_section = Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]]))
+    for diameter, linewidth in it.product((True, False),
+                                          (0.0, 1.2)):
+        view.tree(test_section, diameter=diameter, linewidth=linewidth)
+        view.tree3d(test_section, diameter=diameter, linewidth=linewidth)

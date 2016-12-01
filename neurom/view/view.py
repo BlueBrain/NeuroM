@@ -73,13 +73,6 @@ DEFAULT_PARAMS = '''        new_fig: boolean \
 ''' + common.PLOT_STYLE_PARAMS
 
 
-def get_bounding_box(neurite):
-    '''Get a neurite's X,Y,Z bounding box'''
-    if isinstance(neurite, Section):
-        neurite = Neurite(neurite)
-    return geom.bounding_box(neurite)
-
-
 def map_segments(neurite, fun):
     '''map a function to the segments in a tree'''
 
@@ -136,7 +129,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     # Data needed for the viewer: x,y,z,r
-    bounding_box = get_bounding_box(tr)
+    bounding_box = geom.bounding_box(tr)
 
     white_space = get_default('white_space', **kwargs)
 
@@ -281,7 +274,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     for temp_tree in nrn.neurites:
 
-        bounding_box = get_bounding_box(temp_tree)
+        bounding_box = geom.bounding_box(temp_tree)
 
         h.append([bounding_box[0][getattr(COLS, plane[0].capitalize())],
                   bounding_box[1][getattr(COLS, plane[0].capitalize())]])
@@ -330,7 +323,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     # Data needed for the viewer: x,y,z,r
-    bounding_box = get_bounding_box(tr)
+    bounding_box = geom.bounding_box(tr)
 
     def _seg_3d(seg):
         '''2d coordinates needed for the plotting of a segment'''
@@ -452,7 +445,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
     for temp_tree in nrn.neurites:
 
-        bounding_box = get_bounding_box(temp_tree)
+        bounding_box = geom.bounding_box(temp_tree)
 
         boundaries[0].append([bounding_box[0][getattr(COLS, 'X')],
                               bounding_box[1][getattr(COLS, 'X')]])
