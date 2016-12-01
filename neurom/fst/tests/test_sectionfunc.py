@@ -39,28 +39,13 @@ from neurom.fst import _neuritefunc as _nf
 from neurom.core import Section
 from neurom import morphmath as mmth
 
+from utils import _close, _equal
+
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
 NRN = load_neuron(DATA_PATH)
-
-
-def _equal(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
-
-
-def _close(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-        print('\na - b:%s\n' % (a - b))
-    nt.assert_equal(len(a), len(b))
-    assert_allclose(a, b)
 
 
 def test_total_volume_per_neurite():

@@ -45,7 +45,7 @@ from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
 
-
+from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
@@ -60,19 +60,6 @@ REF_NRN = load_pt_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME),
 
 REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
                      NeuriteType.basal_dendrite, NeuriteType.axon]
-
-def _close(a, b, debug=False):
-    if debug:
-        print('a: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.ok_(np.allclose(a, b))
-
-
-def _equal(a, b, debug=False):
-    if debug:
-        print('a: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.ok_(np.alltrue(a == b))
 
 
 class SectionTreeBase(object):

@@ -38,28 +38,12 @@ from neurom import fst
 from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 from neurom.point_neurite.features import get
 from neurom.point_neurite import treefunc as mt
+from utils import _close, _equal
 
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
 NRN_PATHS = [DATA_PATH] * 10
-
-
-def _close(a, b, debug=False, rtol=1e-05, atol=1e-08):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-        print('\na - b:%s\n' % (a - b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b, rtol=rtol, atol=atol))
-
-
-def _equal(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
 
 
 class TestSectionTree(object):

@@ -40,29 +40,14 @@ from neurom.fst.sectionfunc import section_volume
 from neurom.core import tree as tr
 from neurom.core import Section, Neurite, Population
 
+from utils import _close, _equal
+
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 NRN = nm.load_neuron(DATA_PATH)
-
-
-def _equal(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
-
-
-def _close(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-        print('\na - b:%s\n' % (a - b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
 
 
 def test_principal_direction_extents():
