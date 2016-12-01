@@ -39,11 +39,38 @@ from neurom.core.population import Population
 from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
+
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
+NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 
-NRN = load_neuron(DATA_PATH)
+SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
+SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 
+
+
+def test_soma_surface_area():
+    ret = _nf.soma_surface_area(SIMPLE)
+    nt.eq_(ret, 12.566370614359172)
+
+def test_soma_surface_areas():
+    ret = _nf.soma_surface_areas(SIMPLE)
+    nt.eq_(ret, [12.566370614359172, ])
+
+def test_soma_radii():
+    ret = _nf.soma_radii(SIMPLE)
+    nt.eq_(ret, [1., ])
+
+def test_trunk_section_lengths():
+    ret = _nf.trunk_section_lengths(SIMPLE)
+    nt.eq_(ret, [5.0, 4.0])
+
+def test_trunk_origin_radii():
+    ret = _nf.trunk_origin_radii(SIMPLE)
+    nt.eq_(ret, [1.0, 1.0])
+
+def test_trunk_origin_azimuths():
+    ret = _nf.trunk_origin_azimuths(SIMPLE)
+    nt.eq_(ret, [0.0, 0.0])
 
 def test_trunk_origin_elevations():
     class Mock(object):
