@@ -33,6 +33,7 @@ import math
 import numpy as np
 from numpy.testing import assert_allclose
 from nose import tools as nt
+import neurom as nm
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
 from neurom import (core, load_neurons, iter_neurites, iter_sections,
@@ -658,6 +659,17 @@ def test_segment_radial_distances_origin():
     nt.ok_(np.all(rad_dists_origin == ref_segs_origin))
     nt.ok_(np.all(rad_dists_origin != ref_segs))
 
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+            f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
+    pop = Population(nrns)
+    rad_dist_nrns = []
+    for nrn in nrns:
+        rad_dist_nrns.extend(nm.get('segment_radial_distances', nrn))
+
+    rad_dist_nrns = np.array(rad_dist_nrns)
+    rad_dist_pop = nm.get('segment_radial_distances', pop)
+    assert_allclose(rad_dist_nrns, rad_dist_pop)
+
 
 def test_section_radial_distances_endpoint():
     ref_sec_rad_dist = nf.section_radial_distances(NEURON)
@@ -666,6 +678,13 @@ def test_section_radial_distances_endpoint():
 
     nt.eq_(len(rad_dists), 84)
     nt.ok_(np.all(rad_dists == ref_sec_rad_dist))
+
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+            f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
+    pop = Population(nrns)
+    rad_dist_nrns = [nm.get('section_radial_distances', nrn) for nrn in nrns]
+    rad_dist_pop = nm.get('section_radial_distances', pop)
+    assert_items_equal(rad_dist_pop, rad_dist_nrns)
 
 
 def test_section_radial_distances_origin():
