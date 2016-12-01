@@ -28,11 +28,11 @@
 
 '''Example for generating density plots'''
 
-from neurom.point_neurite.features import get as get_feat
 import pylab as plt
-from neurom.view import common
-from neurom.view import view
 import numpy as np
+
+from neurom import get as get_feat
+from neurom.view import (common, view)
 from neurom.core.types import NeuriteType
 
 
@@ -40,16 +40,13 @@ def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.b
     '''Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
     '''
-    horiz = get_feat('segment_%s_coordinates' % plane[0],
-                     population, neurite_type=neurite_type)
-    vert = get_feat('segment_%s_coordinates' % plane[1],
-                    population, neurite_type=neurite_type)
-
-    return np.histogram2d(np.array(horiz), np.array(vert),
-                          bins=(bins, bins))
+    segment_midpoints = get_feat('segment_midpoints', population, neurite_type=neurite_type)
+    horiz = segment_midpoints[:, 'xyz'.index(plane[0])]
+    vert = segment_midpoints[:, 'xyz'.index(plane[1])]
+    return np.histogram2d(np.array(horiz), np.array(vert), bins=(bins, bins))
 
 
-def plot_density(population, # pylint: disable=too-many-arguments, too-many-locals
+def plot_density(population,  # pylint: disable=too-many-arguments, too-many-locals
                  bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
                  colorlabel='Nodes per unit area', labelfontsize=16,
                  color_map='Reds', no_colorbar=False, threshold=0.01,
