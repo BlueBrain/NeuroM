@@ -32,6 +32,7 @@ from nose import tools as nt
 import os
 import math
 import numpy as np
+from numpy.testing import assert_allclose
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
@@ -59,7 +60,21 @@ def _close(a, b, debug=False):
         print('\na: %s\nb:%s\n' % (a, b))
         print('\na - b:%s\n' % (a - b))
     nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
+    assert_allclose(a, b)
+
+
+def test_total_volume_per_neurite():
+
+    vol = _nf.total_volume_per_neurite(NRN)
+    nt.eq_(len(vol), 4)
+
+    # calculate the volumes by hand and compare
+    vol2 = [sum(_sf.section_volume(s) for s in n.iter_sections()) for n in NRN.neurites]
+    nt.eq_(vol, vol2)
+
+    # regression test
+    ref_vol = [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024]
+    assert_allclose(vol, ref_vol)
 
 
 def test_section_tortuosity():
