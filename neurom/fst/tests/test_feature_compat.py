@@ -25,8 +25,8 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-'''Test neurom._point_neurite.features and neurom.fst features compatibility'''
+'''compare neurom.fst features with values dumped from the original
+neurom._point_neurite.features'''
 
 import json
 import os

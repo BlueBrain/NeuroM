@@ -115,7 +115,7 @@ def test_eval_stats_total_returns_sum():
 def test_eval_stats_applies_numpy_function():
     modes = ('min', 'max', 'mean', 'median', 'std')
 
-    ref_array = np.arange(10)
+    ref_array = np.arange(1, 10)
 
     for m in modes:
         nt.eq_(ms.eval_stats(ref_array, m),

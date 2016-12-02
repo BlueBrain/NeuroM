@@ -27,8 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''NeuroM helper utilities'''
+import json
 import functools
 import warnings
+import numpy as np
 
 
 def memoize(fun):
@@ -79,3 +81,17 @@ def deprecated(fun_name=None, msg=""):
 def deprecated_module(mod_name, msg=""):
     '''Issue a deprecation warning for a module'''
     _warn_deprecated('Module %s is deprecated. %s' % (mod_name, msg))
+
+
+class NeuromJSON(json.JSONEncoder):
+    '''JSON encoder that handles numpy types
+
+    In python3, numpy.dtypes don't serialize to correctly, so a custom converter
+    is needed.
+    '''
+    def default(self, obj):  # pylint: disable=method-hidden
+        if isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        return json.JSONEncoder.default(self, obj)
