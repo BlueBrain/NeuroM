@@ -32,6 +32,7 @@ Neuroludica
 
 import logging
 import warnings
+from neurom._compat import StringType
 
 import numpy as np
 
@@ -77,7 +78,7 @@ def _match_section(section, match):
     for i in range(5):
         if i >= len(section):
             return None
-        elif isinstance(section[i], (str, unicode)) and section[i] in match:
+        elif isinstance(section[i], StringType) and section[i] in match:
             return match[section[i]]
     return None
 
@@ -152,7 +153,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
         # TODO: Figure out what these correspond to in neurolucida
         if row in ('Low', 'Generated', 'High', ):
             continue
-        elif isinstance(row[0], (str, unicode)):
+        elif isinstance(row[0], StringType):
             if len(row) in (4, 5, ):
                 if 5 == len(row):
                     assert 'S' == row[4][0], \

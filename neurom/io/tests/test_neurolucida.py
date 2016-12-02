@@ -1,7 +1,11 @@
 import tempfile
 import textwrap
 import os
-from StringIO import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 import numpy as np
 from nose.tools import ok_, eq_
@@ -19,7 +23,7 @@ NEUROLUCIDA_PATH = os.path.join(DATA_PATH, 'neurolucida')
 
 def test__match_section():
     #no match in first 5
-    section = range(5) + ['something']
+    section = [0, 1, 2, 3, 4, 'something']
     match = {'Foo': 'Bar', }
     eq_(nasc._match_section(section, match), None)
 

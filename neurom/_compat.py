@@ -36,5 +36,7 @@ import sys
 # pylint: disable=E0611
 if sys.version_info < (3, 0):
     from itertools import izip_longest as zip_longest  # pragma: no cover
+    StringType = (str, unicode)   # pragma: no cover
 else:
     from itertools import zip_longest  # pragma: no cover
+    StringType = str  # pragma: no cover

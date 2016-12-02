@@ -53,4 +53,8 @@ class CheckResult(object):
 
     def __nonzero__(self):
         '''boolean conversion method'''
+        return self.__bool__()
+
+    def __bool__(self):
+        '''boolean conversion method'''
         return self.status
