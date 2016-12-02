@@ -26,12 +26,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._point_neurite.features and neurom.fst features compatibility'''
+'''compare neurom.fst features with values dumped from the original neurom._point_neurite.features'''
 
 import json
 import os
+import itertools as it
 import numpy as np
+
 from nose import tools as nt
+
 import neurom as nm
 from neurom.core.types import NeuriteType
 from neurom import fst
@@ -40,7 +43,6 @@ from neurom.fst import _neuritefunc as _nrt
 from neurom.fst import sectionfunc as _sec
 from neurom.fst import _bifurcationfunc as _bf
 from neurom.core import Tree
-from neurom.core.tree import i_chain2
 
 from utils import _close, _equal
 
@@ -64,6 +66,25 @@ def get(feat, neurite_format, **kwargs):
     return json_data[neurite_format][feat][neurite_type]
 
 
+
+
+def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
+    '''Returns a mapped iterator to a collection of trees
+
+    Provides access to all the elements of all the trees
+    in one iteration sequence.
+
+    Parameters:
+        trees: iterator or iterable of tree objects
+        iterator_type: type of the iteration (segment, section, triplet...)
+        mapping: optional function to apply to the iterator's target.
+        tree_filter: optional top level filter on properties of tree objects.
+    '''
+    nrt = (trees if tree_filter is None
+           else filter(tree_filter, trees))
+
+    chain_it = it.chain.from_iterable(map(iterator_type, nrt))
+    return chain_it if mapping is None else map(mapping, chain_it)
 class SectionTreeBase(object):
     '''Base class for section tree tests'''
 

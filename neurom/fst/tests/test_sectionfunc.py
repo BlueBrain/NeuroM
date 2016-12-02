@@ -58,12 +58,18 @@ def test_total_volume_per_neurite():
     nt.eq_(vol, vol2)
 
     # regression test
-    ref_vol = [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024]
+    ref_vol = [271.94122143951864, 281.24754646913954,
+               274.98039928781355, 276.73860261723024]
     assert_allclose(vol, ref_vol)
 
 
-def test_section_tortuosity():
+def test_section_area():
+    sec = Section(np.array([[0, 0, 0, 1], [1, 0, 0, 1]]))
+    area = _sf.section_area(sec)
+    nt.eq_(math.pi * 1 * 2 * 1, area)
 
+
+def test_section_tortuosity():
     sec_a = Section([
         (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
     ])
@@ -81,19 +87,16 @@ def test_section_tortuosity():
                                                                s.points[-1]))
 
 def test_setion_tortuosity_single_point():
-
     sec = Section([(1, 2, 3)])
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
 def test_setion_tortuosity_empty_section():
-
     sec = Section([])
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
 def test_section_tortuosity_looping_section():
-
     sec = Section([
         (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
     ])
@@ -109,7 +112,6 @@ def test_section_tortuosity_looping_section():
 
 
 def test_section_meander_angles():
-
     s0 = Section(np.array([[0, 0, 0],
                            [1, 0, 0],
                            [2, 0, 0],
@@ -138,7 +140,5 @@ def test_section_meander_angles():
 
 
 def test_section_meander_angles_single_segment():
-
     s = Section(np.array([[0, 0, 0], [1, 1, 1]]))
-
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)

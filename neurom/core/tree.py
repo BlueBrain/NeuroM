@@ -27,10 +27,9 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Generic tree class and iteration functions'''
-from itertools import chain
 from collections import deque
 
-from neurom._compat import map, filter
+from neurom._compat import filter
 
 
 class Tree(object):
@@ -113,22 +112,3 @@ class Tree(object):
             iter_mode: iteration mode. Default: ipreorder.
         '''
         return filter(Tree.is_bifurcation_point, iter_mode(self))
-
-
-def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
-    '''Returns a mapped iterator to a collection of trees
-
-    Provides access to all the elements of all the trees
-    in one iteration sequence.
-
-    Parameters:
-        trees: iterator or iterable of tree objects
-        iterator_type: type of the iteration (segment, section, triplet...)
-        mapping: optional function to apply to the iterator's target.
-        tree_filter: optional top level filter on properties of tree objects.
-    '''
-    nrt = (trees if tree_filter is None
-           else filter(tree_filter, trees))
-
-    chain_it = chain.from_iterable(map(iterator_type, nrt))
-    return chain_it if mapping is None else map(mapping, chain_it)
