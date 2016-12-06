@@ -49,7 +49,7 @@ class Population(object):
         '''
         self.neurons = tuple(neurons)
         self.somata = tuple(neu.soma for neu in neurons)
-        self.neurites = tuple(chain.from_iterable((neu.neurites for neu in neurons)))
+        self.neurites = tuple(chain.from_iterable(neu.neurites for neu in neurons))
         self.name = name
 
     def __iter__(self):

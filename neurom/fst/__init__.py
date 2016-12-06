@@ -68,7 +68,7 @@ def _iseg(nrn, neurite_type=_ntype.all):
 
 def _as_neurons(fun, nrns, **kwargs):
     '''Get features per neuron'''
-    nrns = nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+    nrns = _nrn.neuron_population(nrns)
     return list(fun(n, **kwargs) for n in nrns)
 
 

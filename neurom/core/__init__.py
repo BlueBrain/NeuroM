@@ -28,87 +28,8 @@
 
 ''' Core functionality and data types of NeuroM '''
 
-import sys
-from itertools import chain
-
 from .tree import Tree
 from .types import NeuriteType
 from ._soma import Soma, make_soma, SomaError
-from ._neuron import Section, Neurite, Neuron
+from ._neuron import Section, Neurite, Neuron, iter_neurites, iter_sections, iter_segments
 from .population import Population
-
-from neurom._compat import map, filter, zip
-
-
-def iter_neurites(obj, mapfun=None, filt=None):
-    '''Iterator to a neurite, neuron or neuron population
-
-    Applies optional neurite filter and mapping functions.
-
-    Parameters:
-        obj: a neurite, neuron or neuron population.
-        mapfun: optional neurite mappinf function.
-        filt: optional neurite filter function.
-
-    Examples:
-
-        Get the number of points in each neurite in a neuron population
-
-        >>> from neurom.core import iter_neurites
-        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
-
-        Get the number of points in each axon in a neuron population
-
-        >>> import neurom as nm
-        >>> from neurom.core import iter_neurites
-        >>> filter = lambda n : n.type == nm.AXON
-        >>> mapping = lambda n : len(n.points)
-        >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
-
-    '''
-    neurites = ((obj,) if isinstance(obj, Neurite)
-                else (obj.neurites if hasattr(obj, 'neurites') else obj))
-
-    neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
-    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
-
-
-def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
-    '''Iterator to the sections in a neurite, neuron or neuron population.
-
-    Parameters:
-        neurites: neuron, population, neurite, or iterable containing neurite objects
-        iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
-        neurite_filter: optional top level filter on properties of neurite neurite objects.
-
-    Examples:
-
-        Get the number of points in each section of all the axons in a neuron population
-
-        >>> import neurom as nm
-        >>> from neurom.core import ites_sections
-        >>> filter = lambda n : n.type == nm.AXON
-        >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
-
-    '''
-    def _mapfun(neurite):
-        '''Map an iterator type to the root node of a neurite'''
-        return iterator_type(neurite.root_node)
-
-    return chain.from_iterable(map(_mapfun, iter_neurites(neurites, filt=neurite_filter)))
-
-
-def iter_segments(neurites, neurite_filter=None):
-    '''Return an iterator to the segments in a collection of neurites
-
-    Parameters:
-        neurites: neuron, population, neurite, or iterable containing neurite objects
-        neurite_filter: optional top level filter on properties of neurite neurite objects.
-
-    Note:
-        This is a convenience function provideded for generic access to
-        neuron segments. It may have a performance overhead WRT custom-made
-        segment analysis functions that leverage numpy and section-wise iteration.
-    '''
-    return chain(s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-                 for s in zip(ss.points[:-1], ss.points[1:]))

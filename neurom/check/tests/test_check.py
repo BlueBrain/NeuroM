@@ -27,19 +27,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from collections import namedtuple
-from neurom.check import ok, check_wrapper
+from neurom.check import check_wrapper
 from nose import tools as nt
 
 
 MockResult = namedtuple('MockResult', 'status')
-
-
-def test_ok_true_is_ok():
-    nt.assert_true(ok(MockResult(True)))
-
-
-def test_ok_false_is_not_ok():
-    nt.assert_true(not ok(MockResult(False)))
 
 
 def test_check_wrapper_title():
