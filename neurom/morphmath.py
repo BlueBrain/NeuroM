@@ -192,7 +192,8 @@ def angle_3points(p0, p1, p2):
     '''
     vec1 = vector(p1, p0)
     vec2 = vector(p2, p0)
-    return math.atan2(np.linalg.norm(np.cross(vec1, vec2)), np.dot(vec1, vec2))
+    return math.atan2(np.linalg.norm(np.cross(vec1, vec2)),
+                      np.dot(vec1, vec2))
 
 
 def polygon_diameter(points):

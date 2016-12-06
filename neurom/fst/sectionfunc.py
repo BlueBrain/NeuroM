@@ -28,19 +28,8 @@
 
 '''Section functions and functional tools'''
 
-from functools import wraps
 from neurom import morphmath as mm
 from neurom._compat import zip, range
-
-
-def section_fun(fun):
-    '''Wrapper to extract points from section argument'''
-    @wraps(fun)
-    def _secfun(sec, **kwargs):
-        '''Get points and forward to fun'''
-        return fun(sec.points, **kwargs)
-
-    return _secfun
 
 
 def map_segments(fun, section):
@@ -51,7 +40,7 @@ def map_segments(fun, section):
 
 def section_path_length(section):
     '''Path length from section to root'''
-    return sum(mm.section_length(s.points) for s in section.iupstream())
+    return sum(s.length for s in section.iupstream())
 
 
 def section_volume(section):

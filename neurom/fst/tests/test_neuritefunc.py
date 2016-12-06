@@ -121,12 +121,12 @@ def test_total_volume_per_neurite():
     nt.ok_(np.allclose(vol, ref_vol))
 
 
-def test_volume_density_per_neurite():
+def test_neurite_volume_density():
 
     vol = np.array(_nf.total_volume_per_neurite(NRN))
     hull_vol = np.array([convex_hull(n).volume for n in nm.iter_neurites(NRN)])
 
-    vol_density = _nf.volume_density_per_neurite(NRN)
+    vol_density = _nf.neurite_volume_density(NRN)
     nt.eq_(len(vol_density), 4)
     nt.ok_(np.allclose(vol_density, vol / hull_vol))
 
@@ -175,8 +175,8 @@ def test_section_path_lengths():
                     (5., 10., 11., # type 3, basal dendrite
                      4., 10., 9.)) # type 2, axon
 
-def test_n_sections_per_neurite():
-    sections = _nf.n_sections_per_neurite(SIMPLE)
+def test_number_of_sections_per_neurite():
+    sections = _nf.number_of_sections_per_neurite(SIMPLE)
     assert_allclose(sections,
                     (3, 3))
 
