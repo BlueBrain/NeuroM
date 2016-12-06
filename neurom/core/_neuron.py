@@ -134,8 +134,7 @@ class Section(Tree):
         The area is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_area(s) for s in zip(self.points[:-1],
-                                                self.points[1:]))
+        return sum(segment_area(s) for s in iter_segments(self))
 
     @property
     @memoize
@@ -145,8 +144,7 @@ class Section(Tree):
         The volume is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_volume(s) for s in zip(self.points[:-1],
-                                                  self.points[1:]))
+        return sum(segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
         return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
