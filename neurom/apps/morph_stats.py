@@ -52,7 +52,7 @@ def eval_stats(values, mode):
         mode = 'sum'
 
     try:
-        return getattr(np, mode)(values)
+        return getattr(np, mode)(values, axis=0)
     except ValueError:
         pass
 
@@ -78,9 +78,16 @@ def extract_stats(neurons, config):
             n = _NEURITE_MAP[n]
             for mode in modes:
                 stat_name = _stat_name(ns, mode)
-                stats[n.name][stat_name] = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
-                L.debug('Stat: %s, Neurite: %s, Type: %s',
-                        stat_name, n, type(stats[n.name][stat_name]))
+                stat = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
+                assert stat.shape in ((), (3, ), ), \
+                    'Statistic must create a scalar or 1x3 result'
+
+                if len(stat.shape) == 0:
+                    stats[n.name][stat_name] = stat
+                else:
+                    for i, suffix in enumerate('XYZ'):
+                        compound_stat_name = stat_name + '_' + suffix
+                        stats[n.name][compound_stat_name] = stat[i]
 
     for ns, modes in config['neuron'].items():
         for mode in modes:
