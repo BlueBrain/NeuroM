@@ -86,7 +86,7 @@ def extract_stats(neurons, config):
                     stats[n.name][stat_name] = stat
                 else:
                     for i, suffix in enumerate('XYZ'):
-                        compound_stat_name = stat_name + '_' + str(suffix)
+                        compound_stat_name = stat_name + '_' + suffix
                         stats[n.name][compound_stat_name] = stat[i]
 
     for ns, modes in config['neuron'].items():
