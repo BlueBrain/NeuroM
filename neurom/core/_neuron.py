@@ -28,13 +28,88 @@
 
 '''Neuron classes and functions'''
 
+from itertools import chain
 from copy import deepcopy
 import numpy as np
-from .tree import Tree
+
+from . import NeuriteType, Tree
 from ..morphmath import segment_area, segment_volume, section_length
-from . import NeuriteType
-from neurom._compat import zip
 from neurom.utils import memoize
+from neurom._compat import filter, map, zip
+
+
+def iter_neurites(obj, mapfun=None, filt=None):
+    '''Iterator to a neurite, neuron or neuron population
+
+    Applies optional neurite filter and mapping functions.
+
+    Parameters:
+        obj: a neurite, neuron or neuron population.
+        mapfun: optional neurite mapping function.
+        filt: optional neurite filter function.
+
+    Examples:
+
+        Get the number of points in each neurite in a neuron population
+
+        >>> from neurom.core import iter_neurites
+        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
+
+        Get the number of points in each axon in a neuron population
+
+        >>> import neurom as nm
+        >>> from neurom.core import iter_neurites
+        >>> filter = lambda n : n.type == nm.AXON
+        >>> mapping = lambda n : len(n.points)
+        >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
+
+    '''
+    neurites = ((obj,) if isinstance(obj, Neurite) else
+                obj.neurites if hasattr(obj, 'neurites') else obj)
+
+    neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
+    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
+
+
+def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
+    '''Iterator to the sections in a neurite, neuron or neuron population.
+
+    Parameters:
+        neurites: neuron, population, neurite, or iterable containing neurite objects
+        iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
+        neurite_filter: optional top level filter on properties of neurite neurite objects.
+
+    Examples:
+
+        Get the number of points in each section of all the axons in a neuron population
+
+        >>> import neurom as nm
+        >>> from neurom.core import ites_sections
+        >>> filter = lambda n : n.type == nm.AXON
+        >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
+
+    '''
+    return chain.from_iterable(iterator_type(neurite.root_node)
+                               for neurite in iter_neurites(neurites, filt=neurite_filter))
+
+
+def iter_segments(obj, neurite_filter=None):
+    '''Return an iterator to the segments in a collection of neurites
+
+    Parameters:
+        obj: neuron, population, neurite, section, or iterable containing neurite objects
+        neurite_filter: optional top level filter on properties of neurite neurite objects
+
+    Note:
+        This is a convenience function provideded for generic access to
+        neuron segments. It may have a performance overhead WRT custom-made
+        segment analysis functions that leverage numpy and section-wise iteration.
+    '''
+    sections = iter((obj,) if isinstance(obj, Section) else
+                    iter_sections(obj, neurite_filter=neurite_filter))
+
+    return chain.from_iterable(zip(sec.points[:-1], sec.points[1:])
+                               for sec in sections)
 
 
 class Section(Tree):
@@ -59,8 +134,7 @@ class Section(Tree):
         The area is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_area(s) for s in zip(self.points[:-1],
-                                                self.points[1:]))
+        return sum(segment_area(s) for s in iter_segments(self))
 
     @property
     @memoize
@@ -70,8 +144,7 @@ class Section(Tree):
         The volume is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_volume(s) for s in zip(self.points[:-1],
-                                                  self.points[1:]))
+        return sum(segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
         return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
@@ -131,7 +204,7 @@ class Neurite(object):
 
     def iter_sections(self, order=Tree.ipreorder):
         '''iteration over section nodes'''
-        return order(self.root_node)
+        return iter_sections(self, iterator_type=order)
 
     def __deepcopy__(self, memo):
         '''Deep copy of neurite object'''

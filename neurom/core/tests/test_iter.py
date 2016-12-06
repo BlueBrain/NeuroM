@@ -31,7 +31,6 @@ from os.path import join as joinp
 
 from nose import tools as nt
 import neurom as nm
-from neurom.core.population import Population
 from neurom import load_neuron
 from neurom import core
 from neurom.core import Tree
@@ -41,16 +40,14 @@ _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
 
 NRN1 = load_neuron(joinp(DATA_PATH, 'swc/Neuron.swc'))
-NRN2 = load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc'))
-NRN3 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc'))
-NRN4 = load_neuron(joinp(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc'))
-
-NEURONS = [NRN1, NRN2, NRN3, NRN4]
+NEURONS = [NRN1,
+           load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc')),
+           load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc')),
+           load_neuron(joinp(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc')),
+           ]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
-POP = Population(NEURONS, name='foo')
+POP = core.Population(NEURONS, name='foo')
 
-
-# TODO: add more unit tests for iter_segments
 
 def assert_sequence_equal(a, b):
     nt.eq_(tuple(a), tuple(b))
@@ -156,3 +153,14 @@ def test_iter_segments_pop():
     ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
     nt.eq_(len(ref), 919)
 
+
+def test_iter_segments_section():
+    sec = core.Section([[1, 2, 3, 4],
+                        [5, 6, 7, 8],
+                        [8, 7, 6, 5],
+                        [4, 3, 2, 1],
+                        ])
+    ref = list(core.iter_segments(sec))
+    nt.eq_(ref, [([1, 2, 3, 4], [5, 6, 7, 8]),
+                 ([5, 6, 7, 8], [8, 7, 6, 5]),
+                 ([8, 7, 6, 5], [4, 3, 2, 1])])

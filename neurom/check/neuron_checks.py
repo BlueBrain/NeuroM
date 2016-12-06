@@ -33,8 +33,9 @@ Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
 import numpy as np
-from neurom.core import Tree
-from neurom.core.types import NeuriteType
+
+from neurom import NeuriteType
+from neurom.core import Tree, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.morphmath import section_length, segment_length
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
@@ -188,10 +189,9 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     '''
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
-    for s in _nf.iter_sections(neuron):
-        it = zip(s.points, s.points[1:])
-        for i, (p0, p1) in enumerate(it):
-            info = (s.id, i)
+    for sec in _nf.iter_sections(neuron):
+        for i, (p0, p1) in enumerate(iter_segments(sec)):
+            info = (sec.id, i)
             if max_distance < abs(p0[axis] - p1[axis]):
                 bad_ids.append(info)
     return CheckResult(len(bad_ids) == 0, bad_ids)
