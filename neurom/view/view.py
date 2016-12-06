@@ -29,14 +29,16 @@
 '''
 Python module of NeuroM to visualize morphologies
 '''
+import numpy as np
+from matplotlib.collections import LineCollection
 
 from . import common
-from . import _compat
-from neurom import NeuriteType
-from matplotlib.collections import LineCollection
-import numpy as np
+from neurom import (NeuriteType, geom, fst)
+
+from neurom.core import Section, Neurite
 from neurom.io import COLS
 from neurom.morphmath import segment_radius
+from neurom.view._dendrogram import Dendrogram
 from neurom._compat import zip
 
 
@@ -69,6 +71,15 @@ DEFAULT_PARAMS = '''        new_fig: boolean \
             Default value is 0.8.
 
 ''' + common.PLOT_STYLE_PARAMS
+
+
+def map_segments(neurite, fun):
+    '''map a function to the segments in a tree'''
+
+    if isinstance(neurite, Section):
+        neurite = Neurite(neurite)
+    return [s for ss in neurite.iter_sections()
+            for s in fst.sectionfunc.map_segments(fun, ss)]
 
 
 def get_default(variable, **kwargs):
@@ -118,7 +129,7 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     # Data needed for the viewer: x,y,z,r
-    bounding_box = _compat.bounding_box(tr)
+    bounding_box = geom.bounding_box(tr)
 
     white_space = get_default('white_space', **kwargs)
 
@@ -134,21 +145,21 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
         vert2 = child_point[vert]
         return ((horz1, vert1), (horz2, vert2))
 
-    segs = _compat.map_segments(tr, _seg_2d)
+    segs = map_segments(tr, _seg_2d)
 
     linewidth = get_default('linewidth', **kwargs)
     # Definition of the linewidth according to diameter, if diameter is True.
     if get_default('diameter', **kwargs):
         scale = get_default('diameter_scale', **kwargs)
         # TODO: This was originally a numpy array. Did it have to be one?
-        linewidth = [2 * r * scale for r in _compat.map_segments(tr, segment_radius)]
+        linewidth = [2 * r * scale for r in map_segments(tr, segment_radius)]
         if len(linewidth) == 0:
             linewidth = get_default('linewidth', **kwargs)
 
     # Plot the collection of lines.
     collection = LineCollection(segs,
                                 color=common.get_color(get_default('treecolor', **kwargs),
-                                                       _compat.neurite_type(tr)),
+                                                       tr.type),
                                 linewidth=linewidth, alpha=get_default('alpha', **kwargs))
 
     ax.add_collection(collection)
@@ -263,7 +274,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     for temp_tree in nrn.neurites:
 
-        bounding_box = _compat.bounding_box(temp_tree)
+        bounding_box = geom.bounding_box(temp_tree)
 
         h.append([bounding_box[0][getattr(COLS, plane[0].capitalize())],
                   bounding_box[1][getattr(COLS, plane[0].capitalize())]])
@@ -312,7 +323,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     # Data needed for the viewer: x,y,z,r
-    bounding_box = _compat.bounding_box(tr)
+    bounding_box = geom.bounding_box(tr)
 
     def _seg_3d(seg):
         '''2d coordinates needed for the plotting of a segment'''
@@ -329,7 +340,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
         depth2 = child_point[depth]
         return ((horz1, vert1, depth1), (horz2, vert2, depth2))
 
-    segs = _compat.map_segments(tr, _seg_3d)
+    segs = map_segments(tr, _seg_3d)
 
     linewidth = get_default('linewidth', **kwargs)
 
@@ -337,14 +348,14 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     if get_default('diameter', **kwargs):
         # TODO: This was originally a numpy array. Did it have to be one?
         scale = get_default('diameter_scale', **kwargs)
-        linewidth = [2 * r * scale for r in _compat.map_segments(tr, segment_radius)]
+        linewidth = [2 * r * scale for r in map_segments(tr, segment_radius)]
         if len(linewidth) == 0:
             linewidth = get_default('linewidth', **kwargs)
 
     # Plot the collection of lines.
     collection = Line3DCollection(segs,
                                   color=common.get_color(get_default('treecolor', **kwargs),
-                                                         _compat.neurite_type(tr)),
+                                                         tr.type),
                                   linewidth=linewidth, alpha=get_default('alpha', **kwargs))
 
     ax.add_collection3d(collection)
@@ -434,7 +445,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
     for temp_tree in nrn.neurites:
 
-        bounding_box = _compat.bounding_box(temp_tree)
+        bounding_box = geom.bounding_box(temp_tree)
 
         boundaries[0].append([bounding_box[0][getattr(COLS, 'X')],
                               bounding_box[1][getattr(COLS, 'X')]])
@@ -543,8 +554,6 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     Returns:
         A 2D matplotlib figure with a dendrogram view.
     '''
-
-    Dendrogram = _compat.dendrogram_class(obj)
 
     # create dendrogram and generate rectangle collection
     dnd = Dendrogram(obj, show_diameters=show_diameters)

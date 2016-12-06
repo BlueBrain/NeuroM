@@ -26,77 +26,66 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from nose import tools as nt
-from neurom import load_neuron
-from neurom import viewer
-from neurom.point_neurite.io.utils import load_neuron as load_pt_neuron
 import os
+from nose import tools as nt
 from matplotlib import pyplot as plt
 
-
-class Dummy(object):
-    pass
-
+from neurom import load_neuron
+from neurom import viewer
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
 MORPH_FILENAME = os.path.join(DATA_PATH, 'Neuron.swc')
 
 nrn = load_neuron(MORPH_FILENAME)
-pt_nrn = load_pt_neuron(MORPH_FILENAME)
 
 
 def test_draw_neuron():
-    viewer.draw(pt_nrn)
     viewer.draw(nrn)
     plt.close('all')
 
 
 def test_draw_neuron3d():
-    viewer.draw(pt_nrn, mode='3d')
     viewer.draw(nrn, mode='3d')
     plt.close('all')
 
 
 def test_draw_tree():
-    viewer.draw(pt_nrn.neurites[0])
     viewer.draw(nrn.neurites[0])
     plt.close('all')
 
 
 def test_draw_tree3d():
-    viewer.draw(pt_nrn.neurites[0], mode='3d')
     viewer.draw(nrn.neurites[0], mode='3d')
     plt.close('all')
 
 
 def test_draw_soma():
-    viewer.draw(pt_nrn.soma)
     viewer.draw(nrn.soma)
     plt.close('all')
 
 
 def test_draw_soma3d():
-    viewer.draw(pt_nrn.soma, mode='3d')
     viewer.draw(nrn.soma, mode='3d')
     plt.close('all')
 
 
 def test_draw_dendrogram():
-    viewer.draw(pt_nrn, mode='dendrogram')
     plt.close('all')
 
 
 @nt.raises(viewer.InvalidDrawModeError)
 def test_invalid_draw_mode_raises():
-    viewer.draw(pt_nrn, mode='4d')
+    viewer.draw(nrn, mode='4d')
 
 
 @nt.raises(viewer.NotDrawableError)
 def test_invalid_object_raises():
+    class Dummy(object):
+        pass
     viewer.draw(Dummy())
 
 
 @nt.raises(viewer.NotDrawableError)
 def test_invalid_combo_raises():
-    viewer.draw(pt_nrn.soma, mode='dendrogram')
+    viewer.draw(nrn.soma, mode='dendrogram')

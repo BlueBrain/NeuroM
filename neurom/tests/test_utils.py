@@ -64,7 +64,6 @@ def test_memoize_does_not_cache_kwargs():
 
 
 def test_deprecated():
-
     @nu.deprecated(msg='Hello')
     def dummy():
         pass
@@ -73,3 +72,9 @@ def test_deprecated():
         dummy()
         nt.ok_(len(s) > 0)
         nt.eq_(s[0].message[0], 'Call to deprecated function dummy. Hello')
+
+
+def test_deprecated_module():
+    with warnings.catch_warnings(record=True) as s:
+        nu.deprecated_module('foo', msg='msg')
+        nt.ok_(len(s) > 0)

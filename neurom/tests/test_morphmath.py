@@ -203,14 +203,21 @@ def test_point_dist2():
     p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
     p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
     dist = mm.point_dist2(p1, p2)
-    nt.ok_(dist==3)
+    nt.eq_(dist, 3)
+
+
+def test_segment_length2():
+    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
+    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    dist = mm.segment_length2((p1, p2))
+    nt.eq_(dist, 3)
 
 
 def test_point_dist():
     p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
     p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
     dist = mm.point_dist(p1,p2)
-    nt.ok_(dist==sqrt(3))
+    nt.eq_(dist, sqrt(3))
 
 
 def test_angle_3points_half_pi():

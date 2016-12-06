@@ -57,20 +57,6 @@ Here we visualize a neuronal morphology:
     >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
     >>> fig.show()
 
-Basic feature extraction example
-********************************
-
-These basic examples illustrate the type of morphometrics that can be easily obtained
-directly from the ``neurom`` module, without the need for any other ``neurom``
-sub-modules or tools.
-
-The idea here is to pre-package the most common analyses so that users can obtain the
-morphometrics with a very minimal knowledge of ``python`` and ``neurom``.
-
-.. literalinclude:: ../../examples/get_features.py
-    :lines: 30-
-
-
 Advanced iterator-based feature extraction example
 **************************************************
 

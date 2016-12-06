@@ -33,34 +33,44 @@ import os
 import numpy as np
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
-from neurom.point_neurite.io import utils as io_utils
 from neurom.core import make_soma, Neurite, Section
 from neurom.core.population import Population
 
+from utils import _close, _equal
+
 _PWD = os.path.dirname(os.path.abspath(__file__))
+
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
+NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 
-NRN = load_neuron(DATA_PATH)
-NRN_OLD = io_utils.load_neuron(DATA_PATH)
-
-
-def _equal(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
+SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
+SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 
 
-def _close(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-        print('\na - b:%s\n' % (a - b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
 
+def test_soma_surface_area():
+    ret = _nf.soma_surface_area(SIMPLE)
+    nt.eq_(ret, 12.566370614359172)
+
+def test_soma_surface_areas():
+    ret = _nf.soma_surface_areas(SIMPLE)
+    nt.eq_(ret, [12.566370614359172, ])
+
+def test_soma_radii():
+    ret = _nf.soma_radii(SIMPLE)
+    nt.eq_(ret, [1., ])
+
+def test_trunk_section_lengths():
+    ret = _nf.trunk_section_lengths(SIMPLE)
+    nt.eq_(ret, [5.0, 4.0])
+
+def test_trunk_origin_radii():
+    ret = _nf.trunk_origin_radii(SIMPLE)
+    nt.eq_(ret, [1.0, 1.0])
+
+def test_trunk_origin_azimuths():
+    ret = _nf.trunk_origin_azimuths(SIMPLE)
+    nt.eq_(ret, [0.0, 0.0])
 
 def test_trunk_origin_elevations():
     class Mock(object):

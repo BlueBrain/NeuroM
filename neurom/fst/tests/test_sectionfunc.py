@@ -32,40 +32,44 @@ from nose import tools as nt
 import os
 import math
 import numpy as np
+from numpy.testing import assert_allclose
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
 from neurom.fst import _neuritefunc as _nf
 from neurom.core import Section
 from neurom import morphmath as mmth
-from neurom.point_neurite.io import utils as io_utils
+
+from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 
 NRN = load_neuron(DATA_PATH)
-NRN_OLD = io_utils.load_neuron(DATA_PATH)
 
 
-def _equal(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.alltrue(a == b))
+def test_total_volume_per_neurite():
+
+    vol = _nf.total_volume_per_neurite(NRN)
+    nt.eq_(len(vol), 4)
+
+    # calculate the volumes by hand and compare
+    vol2 = [sum(_sf.section_volume(s) for s in n.iter_sections()) for n in NRN.neurites]
+    nt.eq_(vol, vol2)
+
+    # regression test
+    ref_vol = [271.94122143951864, 281.24754646913954,
+               274.98039928781355, 276.73860261723024]
+    assert_allclose(vol, ref_vol)
 
 
-def _close(a, b, debug=False):
-    if debug:
-        print('\na.shape: %s\nb.shape: %s\n' % (a.shape, b.shape))
-        print('\na: %s\nb:%s\n' % (a, b))
-        print('\na - b:%s\n' % (a - b))
-    nt.assert_equal(len(a), len(b))
-    nt.assert_true(np.allclose(a, b))
+def test_section_area():
+    sec = Section(np.array([[0, 0, 0, 1], [1, 0, 0, 1]]))
+    area = _sf.section_area(sec)
+    nt.eq_(math.pi * 1 * 2 * 1, area)
 
 
 def test_section_tortuosity():
-
     sec_a = Section([
         (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
     ])
@@ -83,19 +87,16 @@ def test_section_tortuosity():
                                                                s.points[-1]))
 
 def test_setion_tortuosity_single_point():
-
     sec = Section([(1, 2, 3)])
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
 def test_setion_tortuosity_empty_section():
-
     sec = Section([])
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
 def test_section_tortuosity_looping_section():
-
     sec = Section([
         (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
     ])
@@ -111,7 +112,6 @@ def test_section_tortuosity_looping_section():
 
 
 def test_section_meander_angles():
-
     s0 = Section(np.array([[0, 0, 0],
                            [1, 0, 0],
                            [2, 0, 0],
@@ -140,7 +140,5 @@ def test_section_meander_angles():
 
 
 def test_section_meander_angles_single_segment():
-
     s = Section(np.array([[0, 0, 0], [1, 1, 1]]))
-
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)

@@ -28,7 +28,6 @@
 
 import os
 from neurom.check import structural_checks as chk
-from neurom.point_neurite import io as pt_io
 from neurom import io
 from nose import tools as nt
 
@@ -39,10 +38,9 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
 
-class TestIOCheck(object):
-
+class TestIOCheckFST(object):
     def setup(self):
-        self.load_data = pt_io.load_data
+        self.load_data = io.load_data
 
     def test_has_sequential_ids_good_data(self):
 
@@ -177,12 +175,6 @@ class TestIOCheck(object):
         ok = chk.has_all_finite_radius_neurites(self.load_data(f))
         nt.ok_(not ok)
         nt.ok_(list(ok.info) == [194, 210, 246, 304, 493])
-
-
-class TestIOCheckFST(TestIOCheck):
-
-    def setup(self):
-        self.load_data = io.load_data
 
     def test_has_no_missing_parents_bad_data(self):
         try:
