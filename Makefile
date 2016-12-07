@@ -28,14 +28,21 @@
 
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-VENV := neurom_test_venv
-VENV_BIN := $(VENV)/bin
+#see if we're in a virtualenv, and use that, otherwise use the default
+ifdef VIRTUAL_ENV
+   VENV=$(VIRTUAL_ENV)
+else
+   VENV:=venv
+endif
+VENV_BIN:=$(VENV)/bin
 
 # simulate running in headless mode
 unexport DISPLAY
 
 # Test coverage pass threshold (percent)
-MIN_COV ?= 100
+MIN_COV?=100
+PIP_VERSION:=8.1.2
+VENV_INSTALLED=.installed
 
 FIND_LINT_PY=`find neurom examples apps -name "*.py" -not -path "*/*test*"`
 FIND_LINT_APP=`find apps -type f -not -path "*/*\.*" -not -path "*/\.*" -not -path "*/.*~"`
@@ -43,20 +50,23 @@ LINT_PYFILES := $(shell find $(FIND_LINT_PY)) $(shell find $(FIND_LINT_APP))
 
 $(VENV):
 	virtualenv --system-site-packages $(VENV)
-	$(VENV_BIN)/python -m pip install --upgrade pip
+
+$(VENV_INSTALLED): $(VENV)
+	$(VENV_BIN)/pip install --upgrade pip==$(PIP_VERSION)
 	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
 	$(VENV_BIN)/pip install -e .
+	touch $@
 
-run_pep8: $(VENV)
+run_pep8: $(VENV_INSTALLED)
 	$(VENV_BIN)/pep8 --config=pep8rc $(LINT_PYFILES) > pep8.txt
 
-run_pylint: $(VENV)
+run_pylint: $(VENV_INSTALLED)
 	$(VENV_BIN)/pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES) > pylint.txt
 
-run_tests: $(VENV)
+run_tests: $(VENV_INSTALLED)
 	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
 
-run_tests_xunit: $(VENV)
+run_tests_xunit: $(VENV_INSTALLED)
 	@mkdir -p $(ROOT_DIR)/test-reports
 	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
 
@@ -64,14 +74,14 @@ lint: run_pep8 run_pylint
 
 test: lint run_tests
 
-doc: $(VENV)
+doc: $(VENV_INSTALLED)
 	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc html
 
-doc_pdf: $(VENV)
+doc_pdf: $(VENV_INSTALLED)
 	make SPHINXBUILD=$(ROOT_DIR)/$(VENV_BIN)/sphinx-build -C doc latexpdf
 
 clean_test_venv:
-	@rm -rf $(VENV)
+	@rm -rf $(VENV_INSTALLED)
 	@rm -rf $(ROOT_DIR)/test-reports
 
 clean_doc:
@@ -85,5 +95,6 @@ clean: clean_doc clean_test_venv
 	@rm -f .coverage
 	@rm -rf test-reports
 	@rm -rf dist
+	@rm -f $(VENV_INSTALLED)
 
 .PHONY: run_pep8 test clean_test_venv clean doc
