@@ -38,72 +38,47 @@ Examples:
 '''
 
 import numpy as _np
-from functools import partial
-from itertools import chain
-from ._core import FstNeuron
+
 from . import _neuritefunc as _nrt
 from . import _neuronfunc as _nrn
-from . import sectionfunc as _sec
+
+from ._core import FstNeuron
 from ..core import NeuriteType as _ntype
-from ..core import iter_segments as _isegments
 from ..core import iter_neurites as _ineurites
 from ..core.types import tree_type_checker as _is_type
-from ..morphmath import segment_radius as _seg_rad
-from ..morphmath import segment_taper_rate as _seg_taper
-from ..morphmath import section_length as _sec_len
 from ..exceptions import NeuroMError
 
 
-_sec_len = _sec.section_fun(_sec_len)
-
-
-def _iseg(nrn, neurite_type=_ntype.all):
-    '''Build a tree type filter from a neurite type and forward to functon
-
-    TODO:
-        This should be a decorator
-    '''
-    return _isegments(nrn, neurite_filter=_is_type(neurite_type))
-
-
-def _as_neurons(fun, nrns, **kwargs):
-    '''Get features per neuron'''
-    nrns = _nrn.neuron_population(nrns)
-    return list(fun(n, **kwargs) for n in nrns)
-
-
 NEURITEFEATURES = {
-    'total_length': partial(_as_neurons, lambda n, **kw: sum(_nrt.map_sections(_sec_len, n, **kw))),
+    'total_length': _nrt.total_length,
     'total_length_per_neurite': _nrt.total_length_per_neurite,
     'neurite_lengths': _nrt.total_length_per_neurite,
     'terminal_path_lengths_per_neurite': _nrt.terminal_path_lengths_per_neurite,
-    'section_lengths': partial(_nrt.map_sections, _sec_len),
+    'section_lengths': _nrt.section_lengths,
     'neurite_volumes': _nrt.total_volume_per_neurite,
-    'neurite_volume_density': _nrt.volume_density_per_neurite,
-    'section_volumes': partial(_nrt.map_sections, _sec.section_volume),
-    'section_areas': partial(_nrt.map_sections, _sec.section_area),
-    'section_tortuosity': partial(_nrt.map_sections, _sec.section_tortuosity),
+    'neurite_volume_density': _nrt.neurite_volume_density,
+    'section_volumes': _nrt.section_volumes,
+    'section_areas': _nrt.section_areas,
+    'section_tortuosity': _nrt.section_tortuosity,
     'section_path_distances': _nrt.section_path_lengths,
-    'number_of_sections': partial(_as_neurons, _nrt.n_sections),
-    'number_of_sections_per_neurite': _nrt.n_sections_per_neurite,
-    'number_of_neurites': partial(_as_neurons, _nrt.n_neurites),
-    'number_of_bifurcations': partial(_as_neurons, _nrt.n_bifurcation_points),
-    'number_of_forking_points': partial(_as_neurons, _nrt.n_forking_points),
-    'number_of_terminations': partial(_as_neurons, _nrt.n_leaves),
+    'number_of_sections': _nrt.number_of_sections,
+    'number_of_sections_per_neurite': _nrt.number_of_sections_per_neurite,
+    'number_of_neurites': _nrt.number_of_neurites,
+    'number_of_bifurcations': _nrt.number_of_bifurcations,
+    'number_of_forking_points': _nrt.number_of_forking_points,
+    'number_of_terminations': _nrt.number_of_terminations,
     'section_branch_orders': _nrt.section_branch_orders,
     'section_radial_distances': _nrt.section_radial_distances,
     'local_bifurcation_angles': _nrt.local_bifurcation_angles,
     'remote_bifurcation_angles': _nrt.remote_bifurcation_angles,
     'partition': _nrt.bifurcation_partitions,
-    'number_of_segments': partial(_as_neurons, _nrt.n_segments),
+    'number_of_segments': _nrt.number_of_segments,
     'segment_lengths': _nrt.segment_lengths,
-    'segment_radii': lambda nrn, **kwargs: [_seg_rad(s) for s in _iseg(nrn, **kwargs)],
+    'segment_radii': _nrt.segment_radii,
     'segment_midpoints': _nrt.segment_midpoints,
-    'segment_taper_rates': lambda nrn, **kwargs: [_seg_taper(s)
-                                                  for s in _iseg(nrn, **kwargs)],
+    'segment_taper_rates': _nrt.segment_taper_rates,
     'segment_radial_distances': _nrt.segment_radial_distances,
-    'segment_meander_angles': lambda nrn, **kwargs: list(chain.from_iterable(_nrt.map_sections(
-        _sec.section_meander_angles, nrn, **kwargs))),
+    'segment_meander_angles': _nrt.segment_meander_angles,
     'principal_direction_extents': _nrt.principal_direction_extents
 }
 
@@ -167,7 +142,7 @@ def _get_doc():
     def get_docstring(func):
         '''extract doctstring, if possible'''
         docstring = ':\n'
-        if not isinstance(func, partial) and func.__doc__:
+        if func.__doc__:
             docstring += _indent(func.__doc__, 2)
         return docstring
 
