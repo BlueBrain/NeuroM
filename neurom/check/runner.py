@@ -30,7 +30,6 @@
 
 '''runner for neuron morphology checks'''
 
-from collections import OrderedDict
 from importlib import import_module
 import os
 import logging
@@ -39,6 +38,7 @@ from neurom.io import load_data
 from neurom.exceptions import ConfigError
 from neurom.fst import _core as fst_core
 from neurom.check import check_wrapper
+from neurom._compat import OrderedDict
 
 L = logging.getLogger(__name__)
 

@@ -31,10 +31,10 @@
 Nothing fancy. Just commonly used functions using scipy functionality.'''
 
 from collections import namedtuple
-from collections import OrderedDict
 from scipy import stats as _st
 import numpy as np
 from enum import Enum, unique
+from neurom._compat import OrderedDict
 
 FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
 
