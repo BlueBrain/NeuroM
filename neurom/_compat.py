@@ -40,3 +40,10 @@ if sys.version_info < (3, 0):
 else:
     from itertools import zip_longest  # pragma: no cover
     StringType = str  # pragma: no cover
+
+# ignore import-error
+# pylint: disable=F0401
+try:
+    from collections import OrderedDict  # pragma: no cover
+except ImportError:  # pragma: no cover
+    from ordereddict import OrderedDict  # pragma: no cover
