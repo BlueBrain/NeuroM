@@ -28,10 +28,14 @@
 
 import os
 from copy import deepcopy
+
+from nose import tools as nt
+
 from neurom import load_neuron
+from neurom import check
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
-from nose import tools as nt
+
 from neurom._compat import range
 
 
@@ -100,7 +104,6 @@ def test_has_axon_bad_data():
     files = ['Single_apical.swc',
              'Single_basal.swc',
              ]
-
     for n in _pick(files):
         nt.ok_(not nrn_chk.has_axon(n))
 
@@ -324,3 +327,8 @@ def test_has_no_jumps():
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100).status)
 
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100, axis='x').status)
+
+def test__bool__():
+    c = check.CheckResult(status=True)
+    nt.ok_(c.__nonzero__())
+    nt.eq_(c.__bool__(), c.__nonzero__())

@@ -25,13 +25,13 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-'''compare neurom.fst features with values dumped from the original neurom._point_neurite.features'''
+'''compare neurom.fst features with values dumped from the original
+neurom._point_neurite.features'''
 
 import json
 import os
-import itertools as it
 import numpy as np
+from itertools import chain
 
 from nose import tools as nt
 
@@ -66,14 +66,10 @@ def get(feat, neurite_format, **kwargs):
     return json_data[neurite_format][feat][neurite_type]
 
 
-
-
 def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
     '''Returns a mapped iterator to a collection of trees
-
     Provides access to all the elements of all the trees
     in one iteration sequence.
-
     Parameters:
         trees: iterator or iterable of tree objects
         iterator_type: type of the iteration (segment, section, triplet...)
@@ -83,8 +79,10 @@ def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None
     nrt = (trees if tree_filter is None
            else filter(tree_filter, trees))
 
-    chain_it = it.chain.from_iterable(map(iterator_type, nrt))
+    chain_it = chain.from_iterable(map(iterator_type, nrt))
     return chain_it if mapping is None else map(mapping, chain_it)
+
+
 class SectionTreeBase(object):
     '''Base class for section tree tests'''
 

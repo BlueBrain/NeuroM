@@ -105,29 +105,29 @@ def test_section_tortuosity_pop():
 
     feat = 'section_tortuosity'
 
-    nt.ok_(np.allclose(_stats(fst_get(feat, POP)),
-                       (1.0,
-                        4.6571118550276704,
-                        440.40884450374455,
-                        1.3427098917797089)))
+    assert_allclose(_stats(fst_get(feat, POP)),
+                    (1.0,
+                     4.6571118550276704,
+                     440.40884450374455,
+                     1.3427098917797089))
 
-    nt.ok_(np.allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.all)),
-                       (1.0,
-                        4.6571118550276704,
-                        440.40884450374455,
-                        1.3427098917797089)))
+    assert_allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.all)),
+                    (1.0,
+                     4.6571118550276704,
+                     440.40884450374455,
+                     1.3427098917797089))
 
-    nt.ok_(np.allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (1.0702760052031615,
-                        1.5732825321954913,
-                        26.919574286670883,
-                        1.2818844898414707)))
+    assert_allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
+                    (1.0702760052031615,
+                     1.5732825321954913,
+                     26.919574286670883,
+                     1.2818844898414707))
 
-    nt.ok_(np.allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (1.042614577410971,
-                        1.6742599832295344,
-                        106.5960839640893,
-                        1.239489348419643)))
+    assert_allclose(_stats(fst_get(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
+                    (1.042614577410971,
+                     1.6742599832295344,
+                     106.5960839640893,
+                     1.239489348419643))
 
 
 def test_section_tortuosity_nrn():
@@ -434,7 +434,9 @@ def test_neurite_features_accept_single_tree():
     features = NEURITEFEATURES.keys()
 
     for f in features:
-        fst_get(f, NRN.neurites[0])
+        ret = fst_get(f, NRN.neurites[0])
+        nt.ok_(ret.dtype.kind in ('i', 'f'))
+        nt.ok_(len(ret) or len(ret) == 0) #  make sure that len() resolves
 
 
 def test_register_neurite_feature_nrns():
@@ -517,7 +519,7 @@ def test_section_lengths():
     ref_seclen = [n.length for n in iter_sections(NEURON)]
     seclen = fst_get('section_lengths', NEURON)
     nt.eq_(len(seclen), 84)
-    nt.ok_(np.all(seclen == ref_seclen))
+    assert_allclose(seclen, ref_seclen)
 
 
 def test_section_lengths_axon():
@@ -538,37 +540,37 @@ def test_section_lengths_apical():
 def test_total_length_per_neurite_axon():
     tl = fst_get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    nt.ok_(np.allclose(tl, (207.87975221)))
+    assert_allclose(tl, (207.87975221))
 
 
 def test_total_length_per_neurite_basal():
     tl = fst_get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.eq_(len(tl), 2)
-    nt.ok_(np.allclose(tl, (211.11737442, 207.31504202)))
+    assert_allclose(tl, (211.11737442, 207.31504202))
 
 
 def test_total_length_per_neurite_apical():
     tl = fst_get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.eq_(len(tl), 1)
-    nt.ok_(np.allclose(tl, (214.37304578)))
+    assert_allclose(tl, (214.37304578))
 
 
 def test_total_length_axon():
     tl = fst_get('total_length', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    nt.ok_(np.allclose(tl, (207.87975221)))
+    assert_allclose(tl, (207.87975221))
 
 
 def test_total_length_basal():
     tl = fst_get('total_length', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.eq_(len(tl), 1)
-    nt.ok_(np.allclose(tl, (418.43241644)))
+    assert_allclose(tl, (418.43241644))
 
 
 def test_total_length_apical():
     tl = fst_get('total_length', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.eq_(len(tl), 1)
-    nt.ok_(np.allclose(tl, (214.37304578)))
+    assert_allclose(tl, (214.37304578))
 
 
 def test_section_lengths_invalid():
@@ -587,22 +589,22 @@ def test_segment_lengths():
     ref_seglen = nf.segment_lengths(NEURON)
     seglen = fst_get('segment_lengths', NEURON)
     nt.eq_(len(seglen), 840)
-    nt.ok_(np.all(seglen == ref_seglen))
+    assert_allclose(seglen, ref_seglen)
 
     seglen = fst_get('segment_lengths', NEURON, neurite_type=NeuriteType.all)
     nt.eq_(len(seglen), 840)
-    nt.ok_(np.all(seglen == ref_seglen))
+    assert_allclose(seglen, ref_seglen)
 
 
 def test_local_bifurcation_angles():
-    ref_local_bifangles = nf.local_bifurcation_angles(NEURON)
+    ref_local_bifangles = list(nf.local_bifurcation_angles(NEURON))
 
     local_bifangles = fst_get('local_bifurcation_angles', NEURON)
     nt.eq_(len(local_bifangles), 40)
-    nt.ok_(np.all(local_bifangles == ref_local_bifangles))
+    assert_allclose(local_bifangles, ref_local_bifangles)
     local_bifangles = fst_get('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.all)
     nt.eq_(len(local_bifangles), 40)
-    nt.ok_(np.all(local_bifangles == ref_local_bifangles))
+    assert_allclose(local_bifangles, ref_local_bifangles)
 
     s = fst_get('local_bifurcation_angles', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(s), 10)
@@ -622,13 +624,13 @@ def test_local_bifurcation_angles_invalid():
 
 
 def test_remote_bifurcation_angles():
-    ref_remote_bifangles = nf.remote_bifurcation_angles(NEURON)
+    ref_remote_bifangles = list(nf.remote_bifurcation_angles(NEURON))
     remote_bifangles = fst_get('remote_bifurcation_angles', NEURON)
     nt.eq_(len(remote_bifangles), 40)
-    nt.ok_(np.all(remote_bifangles == ref_remote_bifangles))
+    assert_allclose(remote_bifangles, ref_remote_bifangles)
     remote_bifangles = fst_get('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.all)
     nt.eq_(len(remote_bifangles), 40)
-    nt.ok_(np.all(remote_bifangles == ref_remote_bifangles))
+    assert_allclose(remote_bifangles, ref_remote_bifangles)
 
     s = fst_get('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(s), 10)

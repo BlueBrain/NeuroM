@@ -52,5 +52,9 @@ class CheckResult(object):
         self.title = title
 
     def __nonzero__(self):
-        '''boolean conversion method'''
+        '''boolean conversion method py2 version'''
+        return self.__bool__()
+
+    def __bool__(self):
+        '''boolean conversion method py3 version'''
         return self.status

@@ -27,6 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Test neurom.utils'''
+import json
+import numpy as np
 
 from neurom import utils as nu
 from nose import tools as nt
@@ -71,10 +73,30 @@ def test_deprecated():
     with warnings.catch_warnings(record=True) as s:
         dummy()
         nt.ok_(len(s) > 0)
-        nt.eq_(s[0].message[0], 'Call to deprecated function dummy. Hello')
+        nt.eq_(s[0].message.args[0], 'Call to deprecated function dummy. Hello')
 
 
 def test_deprecated_module():
     with warnings.catch_warnings(record=True) as s:
         nu.deprecated_module('foo', msg='msg')
         nt.ok_(len(s) > 0)
+
+
+def test_NeuromJSON():
+    ex = {'zero': 0,
+          'one': np.int64(1),
+          'two': np.float32(2.0),
+          }
+    output = json.dumps(ex, cls=nu.NeuromJSON)
+    loaded = json.loads(output)
+    nt.eq_(loaded,
+           {'zero': 0,
+            'one': 1,
+            'two': 2.0,
+            })
+
+    enc = nu.NeuromJSON()
+    nt.eq_(enc.default(ex['one']), 1)
+    nt.eq_(enc.default(ex['two']), 2.0)
+
+    nt.assert_raises(TypeError, enc.default, 0)

@@ -170,7 +170,7 @@ def test_neurite_volumes():
                     )
 
 def test_section_path_lengths():
-    path_lengths = _nf.section_path_lengths(SIMPLE)
+    path_lengths = list(_nf.section_path_lengths(SIMPLE))
     assert_allclose(path_lengths,
                     (5., 10., 11., # type 3, basal dendrite
                      4., 10., 9.)) # type 2, axon
@@ -181,7 +181,7 @@ def test_n_sections_per_neurite():
                     (3, 3))
 
 def test_section_branch_orders():
-    branch_orders = _nf.section_branch_orders(SIMPLE)
+    branch_orders = list(_nf.section_branch_orders(SIMPLE))
     assert_allclose(branch_orders,
                     (0, 1, 1,  # type 3, basal dendrite
                      0, 1, 1)) # type 2, axon
@@ -193,17 +193,17 @@ def test_section_radial_distances():
                      4.0, sqrt(6**2 + 4**2), sqrt(5**2 + 4**2)))  # type 2, axon
 
 def test_local_bifurcation_angles():
-    local_bif_angles = _nf.local_bifurcation_angles(SIMPLE)
+    local_bif_angles = list(_nf.local_bifurcation_angles(SIMPLE))
     assert_allclose(local_bif_angles,
                     (pi, pi))
 
 def test_remote_bifurcation_angles():
-    remote_bif_angles = _nf.remote_bifurcation_angles(SIMPLE)
+    remote_bif_angles = list(_nf.remote_bifurcation_angles(SIMPLE))
     assert_allclose(remote_bif_angles,
                     (pi, pi))
 
 def test_partition():
-    partition = _nf.bifurcation_partitions(SIMPLE)
+    partition = list(_nf.bifurcation_partitions(SIMPLE))
     assert_allclose(partition,
                     (1.0, 1.0))
 
@@ -231,6 +231,6 @@ def test_segment_radial_distances():
                      2.0, 5.0, sqrt(2.5**2 + 4**2)))
 
 def test_principal_direction_extents():
-    principal_dir = _nf.principal_direction_extents(SIMPLE)
+    principal_dir = list(_nf.principal_direction_extents(SIMPLE))
     assert_allclose(principal_dir,
                     (14.736052694538641, 12.105102672688004))

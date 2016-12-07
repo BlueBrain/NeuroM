@@ -150,7 +150,7 @@ def get(feature, obj, **kwargs):
     feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
                else NEURONFEATURES[feature])
 
-    return _np.array(feature(obj, **kwargs))
+    return _np.array(list(feature(obj, **kwargs)))
 
 _INDENT = ' ' * 4
 

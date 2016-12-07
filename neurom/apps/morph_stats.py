@@ -100,7 +100,8 @@ def extract_stats(neurons, config):
 def get_header(results):
     '''Extracts the headers, using the first value in the dict as the template'''
     ret = ['name', ]
-    for k, v in results.values()[0].items():
+    values = next(iter(results.values()))
+    for k, v in values.items():
         if isinstance(v, dict):
             for metric in v.keys():
                 ret.append('%s:%s' % (k, metric))

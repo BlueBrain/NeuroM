@@ -19,7 +19,7 @@ def test__merge_sections():
     sec_b = dw.Section(range(9, 20), ntype=10, pid=10)
     dw._merge_sections(sec_a, sec_b)
     nt.eq_(sec_a, default_sec)
-    nt.eq_(sec_b.ids, range(20)) # Note: 9 is in this list from sec_a, not from sec_b
+    nt.eq_(sec_b.ids, list(range(20))) # Note: 9 is in this list from sec_a, not from sec_b
     nt.eq_(sec_b.ntype, 1)
     nt.eq_(sec_b.pid, 1)
 

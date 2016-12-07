@@ -83,7 +83,7 @@ def _merge_sections(sec_a, sec_b):
 
     Merges sec_a into sec_b and sets sec_a attributes to default
     '''
-    sec_b.ids = sec_a.ids + sec_b.ids[1:]
+    sec_b.ids = list(sec_a.ids) + list(sec_b.ids[1:])
     sec_b.ntype = sec_a.ntype
     sec_b.pid = sec_a.pid
 
