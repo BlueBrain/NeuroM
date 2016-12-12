@@ -44,7 +44,7 @@ def eval_stats(values, mode):
         values: numpy array of values
         mode: summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
 
-    Note: fails silently if values is empty
+    Note: fails silently if values is empty, and None is returned
     '''
     if mode == 'raw':
         return values.tolist()
@@ -55,6 +55,8 @@ def eval_stats(values, mode):
         return getattr(np, mode)(values, axis=0)
     except ValueError:
         pass
+
+    return None
 
 
 def _stat_name(feat_name, stat_mode):
@@ -79,12 +81,13 @@ def extract_stats(neurons, config):
             for mode in modes:
                 stat_name = _stat_name(ns, mode)
                 stat = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
-                assert stat.shape in ((), (3, ), ), \
-                    'Statistic must create a scalar or 1x3 result'
 
-                if len(stat.shape) == 0:
+                if stat is None or len(stat.shape) == 0:
                     stats[n.name][stat_name] = stat
                 else:
+                    assert stat.shape in ((3, ), ), \
+                        'Statistic must create a 1x3 result'
+
                     for i, suffix in enumerate('XYZ'):
                         compound_stat_name = stat_name + '_' + suffix
                         stats[n.name][compound_stat_name] = stat[i]
