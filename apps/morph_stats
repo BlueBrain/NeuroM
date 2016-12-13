@@ -43,6 +43,7 @@ from neurom.apps.morph_stats import (extract_stats,
 from neurom.exceptions import ConfigError
 from neurom.io.utils import get_morph_files
 from neurom.utils import NeuromJSON
+from neurom.core import features
 from tqdm import tqdm
 
 L = logging.getLogger(__name__)
@@ -133,7 +134,7 @@ if __name__ == '__main__':
                                logging.DEBUG)[min(_args.verbose, 2)])
 
     if _args.list:
-        print(nm.fst._get_doc())  # pylint: disable=W0212
+        print(features.get_doc())
         sys.exit(0)
     elif not _args.datapath:
         get_parser().print_usage()

@@ -136,7 +136,7 @@ class SectionTreeBase(object):
         nt.assert_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
+        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -173,7 +173,7 @@ class SectionTreeBase(object):
                    get('section_radial_distances', self.ref_nrn, neurite_type=t))
 
     def test_get_trunk_origin_radii(self):
-        _equal(fst._nrn.trunk_origin_radii(self.sec_nrn), get('trunk_origin_radii', self.ref_nrn))
+        _equal(_nrn.trunk_origin_radii(self.sec_nrn), get('trunk_origin_radii', self.ref_nrn))
         for t in NeuriteType:
             _equal(_nrn.trunk_origin_radii(self.sec_nrn, neurite_type=t),
                    get('trunk_origin_radii', self.ref_nrn, neurite_type=t))

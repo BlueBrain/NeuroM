@@ -45,7 +45,7 @@ def memoize(fun):
 
     @functools.wraps(fun)
     def memoizer(*args, **kwargs):
-        '''Return cahced value
+        '''Return cached value
 
         Calculate and store if args not in cache.
         '''

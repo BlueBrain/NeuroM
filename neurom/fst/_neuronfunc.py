@@ -30,10 +30,16 @@
 
 import math
 import numpy as np
-from neurom.core.types import NeuriteType
-from neurom.core.types import tree_type_checker as is_type
+
+from functools import partial
+
+from neurom.core.types import NeuriteType, tree_type_checker
 from neurom.core.dataformat import COLS
+from neurom.core.features import feature
 from neurom import morphmath
+
+
+feature = partial(feature, namespace='NEURONFEATURES')
 
 
 def neuron_population(nrns):
@@ -50,6 +56,7 @@ def soma_surface_area(nrn):
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
+@feature
 def soma_surface_areas(nrn_pop):
     '''Get the surface areas of the somata in a population of neurons
 
@@ -63,6 +70,7 @@ def soma_surface_areas(nrn_pop):
     return [soma_surface_area(n) for n in nrns]
 
 
+@feature
 def soma_radii(nrn_pop):
     ''' Get the radii of the somata of a population of neurons
 
@@ -74,19 +82,22 @@ def soma_radii(nrn_pop):
     return [n.soma.radius for n in nrns]
 
 
+@feature
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     '''list of lengths of trunk sections of neurites in a neuron'''
-    neurite_filter = is_type(neurite_type)
+    neurite_filter = tree_type_checker(neurite_type)
     return [morphmath.section_length(s.root_node.points)
             for s in nrn.neurites if neurite_filter(s)]
 
 
+@feature
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     '''radii of the trunk sections of neurites in a neuron'''
-    neurite_filter = is_type(neurite_type)
+    neurite_filter = tree_type_checker(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
+@feature
 def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all the trunk origin azimuths of a neuron or population
 
@@ -95,7 +106,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
 
     The range of the azimuth angle [-pi, pi] radians
     '''
-    neurite_filter = is_type(neurite_type)
+    neurite_filter = tree_type_checker(neurite_type)
     nrns = neuron_population(nrn)
 
     def _azimuth(section, soma):
@@ -108,6 +119,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
+@feature
 def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     '''Get a list of all the trunk origin elevations of a neuron or population
 
@@ -117,7 +129,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
     The range of the elevation angle [-pi/2, pi/2] radians
     '''
-    neurite_filter = is_type(neurite_type)
+    neurite_filter = tree_type_checker(neurite_type)
     nrns = neuron_population(nrn)
 
     def _elevation(section, soma):
