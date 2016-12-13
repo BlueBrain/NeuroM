@@ -210,6 +210,9 @@ class Neurite(object):
         '''Deep copy of neurite object'''
         return Neurite(deepcopy(self.root_node, memo))
 
+    def __str__(self):
+        return 'Neurite <type: %s>' % self.type
+
 
 class Neuron(object):
     '''Class representing a simple neuron'''
@@ -217,3 +220,7 @@ class Neuron(object):
         self.soma = soma
         self.neurites = neurites
         self.sections = sections
+
+    def __str__(self):
+        return 'Neuron <soma: %s, nneurites: %d>' % \
+            (self.soma, len(self.neurites))
