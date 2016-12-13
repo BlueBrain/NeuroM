@@ -44,8 +44,8 @@ NEURONS = [NRN1, NRN2, NRN3]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 POP = Population(NEURONS, name='foo')
 
-def test_population():
 
+def test_population():
     nt.assert_equal(len(POP.neurons), 3)
     nt.ok_(POP.neurons[0].name, 'Neuron')
     nt.ok_(POP.neurons[1].name, 'Single_basal')
@@ -75,3 +75,7 @@ def test_len():
 def test_getitem():
     for i in range(len(NEURONS)):
         nt.assert_true(POP[i] is NEURONS[i])
+
+
+def test_str():
+    nt.ok_('Population' in str(POP))

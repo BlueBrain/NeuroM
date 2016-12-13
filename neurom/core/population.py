@@ -63,3 +63,6 @@ class Population(object):
     def __getitem__(self, idx):
         '''Get neuron at index idx'''
         return self.neurons[idx]
+
+    def __str__(self):
+        return 'Population <name: %s, nneurons: %d>' % (self.name, len(self.neurons))

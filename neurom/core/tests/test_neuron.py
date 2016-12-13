@@ -36,10 +36,10 @@ from neurom._compat import zip
 
 import numpy as np
 
+_path = os.path.dirname(os.path.abspath(__file__))
+SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
 
 def test_deep_copy():
-    _path = os.path.dirname(os.path.abspath(__file__))
-    SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
     nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
     nrn2 = deepcopy(nrn1)
     check_cloned_neuron(nrn1, nrn2)
@@ -76,3 +76,8 @@ def check_cloned_neuron(nrn1, nrn2):
     nrn2._data.data_block[0, :] = np.zeros_like(nrn2._data.data_block[0, :])
     nt.ok_(not np.allclose(nrn1._data.data_block[0, :],
                            nrn2._data.data_block[0, :]))
+
+
+def test_str():
+    n = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+    nt.ok_('Neuron' in str(n))
