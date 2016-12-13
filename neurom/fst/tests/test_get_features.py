@@ -64,7 +64,7 @@ def assert_items_equal(a, b):
     nt.eq_(sorted(a), sorted(b))
 
 
-def assert_features_for_neurite(feat, neurons, expected):
+def assert_features_for_neurite(feat, neurons, expected, exact=True):
     for neurite_type, expected_values in expected.items():
         print('neurite_type: %s' % neurite_type)
 
@@ -75,7 +75,10 @@ def assert_features_for_neurite(feat, neurons, expected):
             res_pop = fst_get(feat, neurons, neurite_type=neurite_type)
             res = fst_get(feat, neurons[0], neurite_type=neurite_type)
 
-        assert_items_equal(res_pop, expected_values)
+        if exact:
+            assert_items_equal(res_pop, expected_values)
+        else:
+            assert_allclose(res_pop, expected_values)
 
         #test for single neuron
         if isinstance(res, np.ndarray):
@@ -83,7 +86,10 @@ def assert_features_for_neurite(feat, neurons, expected):
             # called on a single neuron
             nt.eq_(len(res), 1)
             res = res[0]
-        nt.eq_(res, expected_values[0])
+        if exact:
+            nt.eq_(res, expected_values[0])
+        else:
+            assert_allclose(res, expected_values[0])
 
 
 def _stats(seq):
@@ -225,7 +231,7 @@ def test_total_length_pop():
                 NeuriteType.apical_dendrite: [214.37302709169489, 0, 0],
                 NeuriteType.basal_dendrite: [418.43242292524889, 211.02336090452931, 1483.6696587152967],
                 }
-    assert_features_for_neurite(feat, POP, expected)
+    assert_features_for_neurite(feat, POP, expected, exact=False)
 
 def test_segment_radii_pop():
 

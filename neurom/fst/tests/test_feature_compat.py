@@ -132,13 +132,6 @@ class SectionTreeBase(object):
         pl = [_sec.section_path_length(s) for s in i_chain2(self.sec_nrn_trees)]
         _close(pl, get('section_path_distances', self.ref_nrn))
 
-    @nt.nottest
-    def test_get_segment_lengths(self):
-        _equal(_nrt.segment_lengths(self.sec_nrn), get('segment_lengths', self.ref_nrn))
-        for t in NeuriteType:
-            _equal(_nrt.segment_lengths(self.sec_nrn, neurite_type=t),
-                   get('segment_lengths', self.ref_nrn, neurite_type=t))
-
     def test_get_soma_radius(self):
         nt.assert_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
 
@@ -186,9 +179,9 @@ class SectionTreeBase(object):
                    get('trunk_origin_radii', self.ref_nrn, neurite_type=t))
 
     def test_get_trunk_section_lengths(self):
-        _equal(_nrn.trunk_section_lengths(self.sec_nrn), get('trunk_section_lengths', self.ref_nrn))
+        _close(_nrn.trunk_section_lengths(self.sec_nrn), get('trunk_section_lengths', self.ref_nrn))
         for t in NeuriteType:
-            _equal(_nrn.trunk_section_lengths(self.sec_nrn, neurite_type=t),
+            _close(_nrn.trunk_section_lengths(self.sec_nrn, neurite_type=t),
                    get('trunk_section_lengths', self.ref_nrn, neurite_type=t))
 
 
