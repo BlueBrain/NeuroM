@@ -33,7 +33,8 @@ from copy import deepcopy
 import numpy as np
 
 from . import NeuriteType, Tree
-from ..morphmath import segment_area, segment_volume, section_length
+from neurom import morphmath
+from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 from neurom._compat import filter, map, zip
 
@@ -124,7 +125,7 @@ class Section(Tree):
     @memoize
     def length(self):
         '''Return the path length of this section.'''
-        return section_length(self.points)
+        return morphmath.section_length(self.points)
 
     @property
     @memoize
@@ -134,7 +135,7 @@ class Section(Tree):
         The area is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_area(s) for s in iter_segments(self))
+        return sum(morphmath.segment_area(s) for s in iter_segments(self))
 
     @property
     @memoize
@@ -144,7 +145,7 @@ class Section(Tree):
         The volume is calculated from the segments, as defined by this
         section's points
         '''
-        return sum(segment_volume(s) for s in iter_segments(self))
+        return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
         return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
@@ -162,9 +163,10 @@ class Neurite(object):
     def points(self):
         '''Return unordered array with all the points in this neurite'''
         # add all points in a section except the first one, which is a duplicate
-        _pts = [v for s in self.root_node.ipreorder() for v in s.points[1:, :4]]
+        _pts = [v for s in self.root_node.ipreorder()
+                for v in s.points[1:, COLS.XYZR]]
         # except for the very first point, which is not a duplicate
-        _pts.insert(0, self.root_node.points[0][:4])
+        _pts.insert(0, self.root_node.points[0][COLS.XYZR])
         return np.array(_pts)
 
     @property

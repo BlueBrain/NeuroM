@@ -32,6 +32,8 @@
 class COLS(object):
     '''Column labels for internal data representation'''
     (X, Y, Z, R, TYPE, ID, P) = range(7)
+    XYZ = slice(0, 3)
+    XYZR = slice(0, 4)
 
 
 class POINT_TYPE(object):

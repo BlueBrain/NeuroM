@@ -41,7 +41,7 @@ def get_segment(neuron, section_id, segment_id):
         array of two [x, y, z, r] points defining segment
     '''
     sec = neuron.sections[section_id]
-    return sec.points[segment_id:segment_id + 2][:, 0:4]
+    return sec.points[segment_id:segment_id + 2][:, COLS.XYZR]
 
 
 if __name__ == '__main__':

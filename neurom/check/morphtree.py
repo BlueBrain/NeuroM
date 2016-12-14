@@ -79,7 +79,7 @@ def is_flat(neurite, tol, method='tolerance'):
     Returns:
         True if neurite is flat
     '''
-    ext = principal_direction_extent(neurite.points[:, :3])
+    ext = principal_direction_extent(neurite.points[:, COLS.XYZ])
 
     assert method in ('tolerance', 'ratio'), "Method must be one of 'tolerance', 'ratio'"
     if method == 'ratio':
@@ -108,7 +108,7 @@ def is_back_tracking(neurite):
 
     def coords(node):
         ''' Returns the first three values of the tree that correspond to the x, y, z coordinates'''
-        return node[:COLS.R]
+        return node[COLS.XYZ]
 
     def max_radius(seg):
         ''' Returns maximum radius from the two segment endpoints'''

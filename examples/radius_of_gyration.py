@@ -45,7 +45,7 @@ def segment_centre_of_mass(seg):
     num = r0 * r0 + 2 * r0 * r1 + 3 * r1 * r1
     denom = 4 * (r0 * r0 + r0 * r1 + r1 * r1)
     centre_of_mass_z_loc = num / denom
-    return seg[0][0:3] + (centre_of_mass_z_loc / h) * (seg[1][0:3] - seg[0][0:3])
+    return seg[0][COLS.XYZ] + (centre_of_mass_z_loc / h) * (seg[1][COLS.XYZ] - seg[0][COLS.XYZ])
 
 
 def neurite_centre_of_mass(neurite):
