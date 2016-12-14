@@ -38,12 +38,16 @@ from neurom._compat import range, filter
 
 
 def is_monotonic(neurite, tol):
-    '''Check if neurite tree is monotonic, i.e. if each child has smaller or
-        equal diameters from its parent
+    '''Check if neurite tree is monotonic
 
-    Arguments:
-        neurite : tree object
-        tol: numerical precision
+    If each child has smaller or equal diameters from its parent
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tol(float): tolerance
+
+    Returns:
+        True if neurite flat
     '''
 
     for node in neurite.iter_sections():
@@ -63,22 +67,21 @@ def is_monotonic(neurite, tol):
 def is_flat(neurite, tol, method='tolerance'):
     '''Check if neurite is flat using the given method
 
-    Input:
-        neurite : the neurite tree object
-        tol : tolerance
-        method : the method of flatness estimation. 'tolerance'
-        returns true if any extent of the tree
-        is smaller than the given tolerance
-        'ratio' returns true if the ratio of the smallest directions
-        is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
+    Args:
+        neurite(Neurite): neurite to operate on
+        tol(float): tolerance
+        method(string): the method of flatness estimation:
+            'tolerance' returns true if any extent of the tree is smaller
+            than the given tolerance
+            'ratio' returns true if the ratio of the smallest directions
+            is smaller than tol. e.g. [1,2,3] -> 1/2 < tol
 
     Returns:
-            True if it is flat
-
+        True if neurite is flat
     '''
-
     ext = principal_direction_extent(neurite.points[:, :3])
 
+    assert method in ('tolerance', 'ratio'), "Method must be one of 'tolerance', 'ratio'"
     if method == 'ratio':
         sorted_ext = np.sort(ext)
         return sorted_ext[0] / sorted_ext[1] < float(tol)
@@ -91,30 +94,28 @@ def is_back_tracking(neurite):
     when a daughter of a branching process goes back and either overlaps with a previous point, or
     lies inside the cylindrical volume of the latter.
 
+    Args:
+        neurite(Neurite): neurite to operate on
+
     Returns:
         True Under the following scenaria:
             1. A segment endpoint falls back and overlaps with a previous segment's point
             2. The geometry of a segment overlaps with a previous one in the section
     '''
     def pair(segs):
-        ''' Pairs the input list into triplets
-        '''
+        ''' Pairs the input list into triplets'''
         return zip(segs, segs[1:])
 
     def coords(node):
-        ''' Returns the first three values of the tree that
-        correspond to the x, y, z coordinates
-        '''
+        ''' Returns the first three values of the tree that correspond to the x, y, z coordinates'''
         return node[:COLS.R]
 
     def max_radius(seg):
-        ''' Returns maximum radius from the two segment endpoints
-        '''
+        ''' Returns maximum radius from the two segment endpoints'''
         return max(seg[0][COLS.R], seg[1][COLS.R])
 
     def is_not_zero_seg(seg):
-        ''' Returns True if segment has zero length
-        '''
+        ''' Returns True if segment has zero length'''
         return not np.allclose(coords(seg[0]), coords(seg[1]))
 
     def is_in_the_same_verse(seg1, seg2):
@@ -132,8 +133,7 @@ def is_back_tracking(neurite):
         return dist <= max_radius(seg1) + max_radius(seg2)
 
     def is_seg1_overlapping_with_seg2(seg1, seg2):
-        '''Checks if a segment is in proximity of another one upstream
-        '''
+        '''Checks if a segment is in proximity of another one upstream'''
         # get the coordinates of seg2 (from the origin)
         s1 = coords(seg2[0])
         s2 = coords(seg2[1])
@@ -191,10 +191,10 @@ def is_back_tracking(neurite):
 def get_flat_neurites(neuron, tol=0.1, method='ratio'):
     '''Check if a neuron has neurites that are flat within a tolerance
 
-    Argument:
-        neuron : The neuron object to test
-        tol : the tolerance or the ratio
-        method : way of determining flatness, 'tolerance', 'ratio'
+    Args:
+        neurite(Neurite): neurite to operate on
+        tol(float): the tolerance or the ratio
+        method(string): 'tolerance' or 'ratio' described in :meth:`is_flat`
 
     Returns:
         Bool list corresponding to the flatness check for each neurite
@@ -206,9 +206,9 @@ def get_flat_neurites(neuron, tol=0.1, method='ratio'):
 def get_nonmonotonic_neurites(neuron, tol=1e-6):
     '''Get neurites that are not monotonic
 
-    Argument:
-        neuron : The neuron object to test
-        tol : the tolerance for testing monotonicity
+    Args:
+        neurite(Neurite): neurite to operate on
+        tol(float): the tolerance or the ratio
 
     Returns:
         list of neurites that do not satisfy monotonicity test
@@ -217,9 +217,16 @@ def get_nonmonotonic_neurites(neuron, tol=1e-6):
 
 
 def get_back_tracking_neurites(neuron):
-    '''Get neurites that have back-tracks. A back-track is the placement of
-    a point near a previous segment during the reconstruction, causing
-    a zigzag jump in the morphology which can cause issues with meshing
-    algorithms.
+    '''Get neurites that have back-tracks.
+
+    A back-track is the placement of a point near a previous segment during
+    the reconstruction, causing a zigzag jump in the morphology which can
+    cause issues with meshing algorithms.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+
+    Returns:
+        List of neurons with backtracks
     '''
     return [n for n in neuron.neurites if is_back_tracking(n)]

@@ -29,7 +29,7 @@
 '''Bifurcation point functions'''
 
 import numpy as np
-from neurom import morphmath as mm
+from neurom import morphmath
 from neurom.core.dataformat import COLS
 
 
@@ -51,27 +51,29 @@ def local_bifurcation_angle(bif_point):
 
         return cur
 
-    ch = (skip_0_length(bif_point.children[0].points),
-          skip_0_length(bif_point.children[1].points))
+    ch0, ch1 = (skip_0_length(bif_point.children[0].points),
+                skip_0_length(bif_point.children[1].points))
 
-    return mm.angle_3points(bif_point.points[-1], ch[0], ch[1])
+    return morphmath.angle_3points(bif_point.points[-1], ch0, ch1)
 
 
 def remote_bifurcation_angle(bif_point):
     '''Return the opening angle between two out-going sections
     in a bifurcation point
 
-    The angle is defined as between the bofircation point and the
+    The angle is defined as between the bifurcation point and the
     last points in the out-going sections.
-
     '''
-    return mm.angle_3points(bif_point.points[-1],
-                            bif_point.children[0].points[-1],
-                            bif_point.children[1].points[-1])
+    return morphmath.angle_3points(bif_point.points[-1],
+                                   bif_point.children[0].points[-1],
+                                   bif_point.children[1].points[-1])
 
 
 def bifurcation_partition(bif_point):
-    '''Calculate the partition at a bifurcation point'''
+    '''Calculate the partition at a bifurcation point
+
+    The number of nodes in each child tree is counted. The partition is
+    defined as the ratio of the largest number to the smallest number.'''
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return max(n, m) / min(n, m)

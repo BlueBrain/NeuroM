@@ -47,7 +47,7 @@ def vector(p1, p2):
 
 
 def linear_interpolate(p1, p2, fraction):
-    '''Returns the point p satisfying |p1p| = fraction * |p1p2|'''
+    '''Returns the point p satisfying: p1 + fraction * (p2 - p1)'''
     return np.array((p1[0] + fraction * (p2[0] - p1[0]),
                      p1[1] + fraction * (p2[1] - p1[1]),
                      p1[2] + fraction * (p2[2] - p1[2])))

@@ -59,6 +59,7 @@ for developers of NeuroM itself.
    neurom.morphmath
    neurom.fst
    neurom.fst.sectionfunc
+   neurom.check.morphtree
    neurom.check.structural_checks
    neurom.check.neuron_checks
    neurom.core.types

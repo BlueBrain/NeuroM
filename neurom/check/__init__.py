@@ -35,7 +35,7 @@ def check_wrapper(fun):
     '''Decorate a checking function'''
     @wraps(fun)
     def _wrapper(*args, **kwargs):
-        '''Sets the title property of the result of ijviking a checker'''
+        '''Sets the title property of the result of running a checker'''
         title = fun.__name__.replace('_', ' ').capitalize()
         result = fun(*args, **kwargs)
         result.title = title
