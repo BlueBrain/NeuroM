@@ -1,7 +1,10 @@
 import os
 
 import neurom as nm
+import neurom.io
+import neurom.fst._core
 from neurom.check import neuron_checks as nc
+from neurom.check import structural_checks as sc
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         '../test_data/')
@@ -108,7 +111,32 @@ class TimeFeatures(object):
 class TimeChecks:
     def setup(self):
         path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
-        self.neuron = nm.load_neuron(path)
+        self.data_wrapper = neurom.io.load_data(path)
+        self.neuron = neurom.fst._core.FstNeuron(self.data_wrapper)
+
+    def time_has_sequential_ids(self):
+        sc.has_sequential_ids(self.data_wrapper)
+
+    def time_no_missing_parents(self):
+        sc.no_missing_parents(self.data_wrapper)
+
+    def time_is_single_tree(self):
+        sc.is_single_tree(self.data_wrapper)
+
+    def time_has_increasing_ids(self):
+        sc.has_increasing_ids(self.data_wrapper)
+
+    def time_has_soma_points(self):
+        sc.has_soma_points(self.data_wrapper)
+
+    def time_has_all_finite_radius_neurites(self):
+        sc.has_all_finite_radius_neurites(self.data_wrapper, threshold=0.0)
+
+    def time_has_valid_soma(self):
+        sc.has_valid_soma(self.data_wrapper)
+
+    def time_has_valid_neurites(self):
+        sc.has_valid_neurites(self.data_wrapper)
 
     def time_has_axon(self):
         nc.has_axon(self.neuron)
