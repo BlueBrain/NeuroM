@@ -54,7 +54,7 @@ def no_missing_parents(data_wrapper):
     before child.
 
     Returns:
-        tuple (bool, list of IDs that have no parent)
+        CheckResult with result and list of IDs that have no parent
     '''
     db = data_wrapper.data_block
     ids = np.setdiff1d(db[:, COLS.P], db[:, COLS.ID])[1:]
@@ -65,6 +65,9 @@ def is_single_tree(data_wrapper):
     '''Check that data forms a single tree
 
     Only the first point has ID of -1.
+
+    Returns:
+        CheckResult with result and list of IDs
 
     Note:
         This assumes no_missing_parents passed.
@@ -77,8 +80,9 @@ def is_single_tree(data_wrapper):
 def has_increasing_ids(data_wrapper):
     '''Check that IDs are increasing
 
-    returns tuple (bool, list of IDs that are inconsistent
-    with their predecessor)
+    Returns:
+        CheckResult with result and list of IDs that are inconsistent
+        with their predecessor
     '''
     db = data_wrapper.data_block
     ids = db[:, COLS.ID]
@@ -87,8 +91,11 @@ def has_increasing_ids(data_wrapper):
 
 
 def has_soma_points(data_wrapper):
-    '''Checks if the TYPE column of raw data block has
-    an element of type soma'''
+    '''Checks if the TYPE column of raw data block has an element of type soma
+
+    Returns:
+        CheckResult with result
+    '''
     db = data_wrapper.data_block
     return CheckResult(POINT_TYPE.SOMA in db[:, COLS.TYPE], None)
 
@@ -96,7 +103,8 @@ def has_soma_points(data_wrapper):
 def has_all_finite_radius_neurites(data_wrapper, threshold=0.0):
     '''Check that all points with neurite type have a finite radius
 
-    return: tuple of (bool, [IDs of neurite points with zero radius])
+    Returns:
+        CheckResult with result and list of IDs of neurite points with zero radius
     '''
     db = data_wrapper.data_block
     neurite_ids = np.in1d(db[:, COLS.TYPE], POINT_TYPE.NEURITES)
@@ -107,7 +115,11 @@ def has_all_finite_radius_neurites(data_wrapper, threshold=0.0):
 
 
 def has_valid_soma(data_wrapper):
-    '''Check if a data block has a valid soma'''
+    '''Check if a data block has a valid soma
+
+    Returns:
+        CheckResult with result
+    '''
     try:
         make_soma(data_wrapper.soma_points())
         return CheckResult(True)
@@ -116,6 +128,10 @@ def has_valid_soma(data_wrapper):
 
 
 def has_valid_neurites(data_wrapper):
-    '''Check if any neurites can be reconstructed from data block'''
+    '''Check if any neurites can be reconstructed from data block
+
+    Returns:
+        CheckResult with result
+    '''
     n, _ = make_neurites(data_wrapper)
     return CheckResult(len(n) > 0)
