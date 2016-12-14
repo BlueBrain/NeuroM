@@ -1,12 +1,13 @@
 import os
 
 import neurom as nm
+from neurom.check import neuron_checks as nc
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         '../test_data/')
 
 
-class TimeLoadMorphology:
+class TimeLoadMorphology(object):
     def time_swc(self):
         path = os.path.join(DATA_DIR, 'swc/Neuron.swc')
         nm.load_neuron(path)
@@ -20,7 +21,7 @@ class TimeLoadMorphology:
         nm.load_neuron(path)
 
 
-class TimeFeatures:
+class TimeFeatures(object):
     def setup(self):
         path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.neuron = nm.load_neuron(path)
@@ -102,3 +103,42 @@ class TimeFeatures:
 
     def time_principal_direction_extents(self):
         nm.get('principal_direction_extents', self.neuron)
+
+
+class TimeChecks:
+    def setup(self):
+        path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
+        self.neuron = nm.load_neuron(path)
+
+    def time_has_axon(self):
+        nc.has_axon(self.neuron)
+
+    def time_has_apical_dendrite(self):
+        nc.has_apical_dendrite(self.neuron, min_number=1)
+
+    def time_has_basal_dendrite(self):
+        nc.has_basal_dendrite(self.neuron, min_number=1)
+
+    def time_has_no_flat_neurites(self):
+        nc.has_no_flat_neurites(self.neuron, tol=0.1, method='ratio')
+
+    def time_has_all_monotonic_neurites(self):
+        nc.has_all_monotonic_neurites(self.neuron, tol=1e-6)
+
+    def time_has_all_nonzero_segment_lengths(self):
+        nc.has_all_nonzero_segment_lengths(self.neuron, threshold=0.0)
+
+    def time_has_all_nonzero_section_lengths(self):
+        nc.has_all_nonzero_section_lengths(self.neuron, threshold=0.0)
+
+    def time_has_all_nonzero_neurite_radii(self):
+        nc.has_all_nonzero_neurite_radii(self.neuron, threshold=0.0)
+
+    def time_has_nonzero_soma_radius(self):
+        nc.has_nonzero_soma_radius(self.neuron, threshold=0.0)
+
+    def time_has_no_jumps(self):
+        nc.has_no_jumps(self.neuron, max_distance=30.0, axis='z')
+
+    def time_has_no_fat_ends(self):
+        nc.has_no_fat_ends(self.neuron, multiple_of_mean=2.0, final_point_count=5)
