@@ -65,8 +65,8 @@ class Soma(object):
 
     @property
     def center(self):
-        '''Obtain the radius from the first stored point'''
-        return self._points[0][:COLS.R]
+        '''Obtain the center from the first stored point'''
+        return self._points[0][COLS.XYZ]
 
     def iter(self):
         '''Iterator to soma contents'''
@@ -75,7 +75,7 @@ class Soma(object):
     @property
     def points(self):
         '''Get the set of (x, y, z, r) points this soma'''
-        return self._points[:, 0:4]
+        return self._points[:, COLS.XYZR]
 
 
 class SomaSinglePoint(Soma):
@@ -125,13 +125,13 @@ class SomaSimpleContour(Soma):
     def __init__(self, points):
         super(SomaSimpleContour, self).__init__(points)
         points = np.array(self._points)
-        self.radius = average_points_dist(self.center, points[:, :COLS.R])
+        self.radius = average_points_dist(self.center, points[:, COLS.XYZ])
 
     @property
     def center(self):
         '''Obtain the center from the average of all points'''
         points = np.array(self._points)
-        return np.mean(points[:, :COLS.R], axis=0)
+        return np.mean(points[:, COLS.XYZ], axis=0)
 
     def __str__(self):
         return 'SomaSimpleContour(%s) <center: %s, radius: %s>' % \

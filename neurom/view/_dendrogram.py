@@ -37,7 +37,7 @@ import sys
 
 
 def _n_terminations(tree):
-    '''Get the number of terninations in a tree'''
+    '''Get the number of terminations in a tree'''
     return sum(1 for _ in tree.ileaf())
 
 
@@ -173,6 +173,7 @@ class Dendrogram(object):
         # the max number of nodes on the trees
         old_depth = sys.getrecursionlimit()
         max_depth = old_depth if old_depth > self._max_rec_depth else self._max_rec_depth
+        # TODO: This should be fixed so we don't set sys.setrecursionlimit at all
         sys.setrecursionlimit(max_depth)
 
         if isinstance(self._obj, Neurite):
@@ -228,8 +229,8 @@ class Dendrogram(object):
             terminations = _n_terminations(child)
 
             # segement lengths
-            seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.X: COLS.R],
-                                                     segments[1:, COLS.X: COLS.R]), axis=1)
+            seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.XYZ],
+                                                     segments[1:, COLS.XYZ]), axis=1)
 
             # segment radii
             radii = np.vstack((segments[:-1, COLS.R], segments[1:, COLS.R])).T \
