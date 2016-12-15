@@ -574,6 +574,7 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     kwargs['xlabel'] = kwargs.get('xlabel', 'micrometers (um)')
     kwargs['ylabel'] = kwargs.get('ylabel', 'micrometers (um)')
     kwargs['no_legend'] = False
+    kwargs['aspect_ratio'] = "auto"
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
