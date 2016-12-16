@@ -74,3 +74,27 @@ in a similar way to those presented here.
 
 .. literalinclude:: ../../examples/neuron_iteration_analysis.py
     :lines: 30-
+
+Getting Log Information
+***********************
+
+``neurom`` emits many logging statements during the course of its functioning.
+They are emitted in the ``neurom`` namespace, and can thus be filtered based
+on this.  An example of setting up a handler is:
+
+
+.. code-block:: python
+
+    >>> import logging
+    >>> # setup which namespace will be examined, and at what level
+    >>> # in this case we only want messages from 'neurom' and all messages
+    >>> # (ie: DEBUG, INFO, etc)
+    >>> logger = logging.getLogger('neurom')
+    >>> logger.setLevel(logging.DEBUG)
+    >>> # setup where the output will be saved, in this case the console
+    >>> sh = logging.StreamHandler()
+    >>> logger.addHandler(sh)
+
+For more information on logging, it is recommended to read the official Python
+logging HOWTOs: `Python 2 <https://docs.python.org/2/howto/logging.html>`_ and
+`Python 3 <https://docs.python.org/3/howto/logging.html>`_.
