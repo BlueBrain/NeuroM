@@ -207,6 +207,11 @@ def test_partition():
     assert_allclose(partition,
                     (1.0, 1.0))
 
+def test_partition_asymmetry():
+    partition = list(_nf.partition_asymmetries(SIMPLE))
+    assert_allclose(partition,
+                    (0.0, 0.0))
+
 def test_segment_lengths():
     segment_lengths = _nf.segment_lengths(SIMPLE)
     assert_allclose(segment_lengths,

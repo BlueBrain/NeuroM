@@ -821,6 +821,15 @@ def test_section_path_distances_start_point():
     nt.eq_(len(path_lengths), 84)
     nt.ok_(np.all(path_lengths == ref_sec_path_len_start))
 
+def test_partition():
+    nt.ok_(np.all(fst_get('partition', NRNS)[:10] == np.array([ 19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.])))
+
+def test_partition_asymmetry():
+    nt.ok_(np.allclose(fst_get('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,
+                                                                            0.85714286, 0.83333333,
+                                                                            0.8, 0.75,  0.66666667, 
+                                                                            0.5,  0.])))
+
 #class MockNeuron:
 #    pass
 #
