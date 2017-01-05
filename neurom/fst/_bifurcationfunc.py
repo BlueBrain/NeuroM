@@ -77,3 +77,19 @@ def bifurcation_partition(bif_point):
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return max(n, m) / min(n, m)
+
+
+def partition_asymmetry(bif_point):
+    '''Calculate the partition asymmetry at a bifurcation point
+    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+
+    The number of nodes in each child tree is counted. The partition
+    is defined as the ratio of the absolute difference and the sum
+    of the number of bifurcations in the two daughter subtrees
+    at each branch point.'''
+    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    if n != m:
+        return abs(n - m) / abs(n + m)
+    else:
+        return 0.0
