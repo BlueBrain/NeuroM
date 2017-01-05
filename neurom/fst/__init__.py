@@ -72,6 +72,7 @@ NEURITEFEATURES = {
     'local_bifurcation_angles': _nrt.local_bifurcation_angles,
     'remote_bifurcation_angles': _nrt.remote_bifurcation_angles,
     'partition': _nrt.bifurcation_partitions,
+    'partition_asymmetry': _nrt.partition_asymmetries,
     'number_of_segments': _nrt.number_of_segments,
     'segment_lengths': _nrt.segment_lengths,
     'segment_radii': _nrt.segment_radii,
