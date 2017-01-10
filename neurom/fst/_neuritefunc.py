@@ -254,6 +254,14 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
                              neurite_filter=is_type(neurite_type)))
 
 
+def partition_asymmetries(neurites, neurite_type=NeuriteType.all):
+    '''Partition asymmetry at bifurcation points of a collection of neurites'''
+    return map(_bifurcationfunc.partition_asymmetry,
+               iter_sections(neurites,
+                             iterator_type=Tree.ibifurcation_point,
+                             neurite_filter=is_type(neurite_type)))
+
+
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     '''Remote bifurcation angles in a collection of neurites'''
     dist = []
