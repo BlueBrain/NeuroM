@@ -31,6 +31,13 @@
 from nose import tools as nt
 from neurom.core import Section
 from neurom.fst import _bifurcationfunc as bf
+import os
+import neurom as nm
+import numpy as np
+
+_PWD = os.path.dirname(os.path.abspath(__file__))
+SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
+SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 
 s0 = Section(42)
 s1 = s0.add_child(Section(42))
@@ -41,14 +48,23 @@ s5 = s1.add_child(Section(42))
 s6 = s4.add_child(Section(42))
 s7 = s4.add_child(Section(42))
 
-a0 = Section([0.0, 0.0, 0.0])
-a1 = s0.add_child(Section(42))
-a2 = s0.add_child(Section(42))
-a3 = s0.add_child(Section(42))
-a4 = s1.add_child(Section(42))
-a5 = s1.add_child(Section(42))
-a6 = s4.add_child(Section(42))
-a7 = s4.add_child(Section(42))
+def test_local_bifurcation_angle():
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
+    try:
+        bf.local_bifurcation_angle(SIMPLE.sections[0])
+        nt.ok_(False)
+    except:
+        nt.ok_(True)
+
+def test_remote_bifurcation_angle():
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
+    try:
+        bf.local_bifurcation_angle(SIMPLE.sections[0])
+        nt.ok_(False)
+    except:
+        nt.ok_(True)
 
 def test_bifurcation_partition():
     nt.ok_(bf.bifurcation_partition(s1) == 3.0)
@@ -69,6 +85,3 @@ def test_partition_asymmetry():
         nt.ok_(False)
     except:
         nt.ok_(True)
-
-
-
