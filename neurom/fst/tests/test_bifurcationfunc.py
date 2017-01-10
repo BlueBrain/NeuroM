@@ -46,17 +46,21 @@ s7 = s4.add_child(Section(42))
 test_neurite = Neurite(s0)
 
 def test_bifurcation_partition():
-    nt.ok_(map(bf.bifurcation_partition, iter_sections(Neurite(s0), iterator_type=Tree.ibifurcation_point)) == [3.0, 1.0])
+    nt.ok_(bf.bifurcation_partition(s1) == 3.0)
+    nt.ok_(bf.bifurcation_partition(s4) == 1.0)
     try:
-        map(bf.bifurcation_partition, iter_sections(Neurite(s0), iterator_type=Tree.ileaf))
+        bf.bifurcation_partition(s0) # test if it fails for multifurcation
+        bf.bifurcation_partition(s2) # test if it fails for leaf
         nt.ok_(False)
     except:
         nt.ok_(True)
 
 def test_partition_asymmetry():
-    nt.ok_(map(bf.partition_asymmetry, iter_sections(Neurite(s0), iterator_type=Tree.ibifurcation_point)) == [0.5, 0.0])
+    nt.ok_(bf.partition_asymmetry(s1) == 0.5)
+    nt.ok_(bf.partition_asymmetry(s4) == 0.0)
     try:
-        map(bf.partition_asymmetry, iter_sections(Neurite(s0), iterator_type=Tree.ileaf))
+        bf.bifurcation_asymmetry(s0) # test if it fails for multifurcation
+        bf.bifurcation_asymmetry(s2) # test if it fails for leaf
         nt.ok_(False)
     except:
         nt.ok_(True)
