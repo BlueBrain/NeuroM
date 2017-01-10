@@ -29,10 +29,8 @@
 '''Test neurom._bifurcationfunc functionality'''
 
 from nose import tools as nt
-from neurom.core import Section, Neurite
+from neurom.core import Section
 from neurom.fst import _bifurcationfunc as bf
-from neurom.core import Tree, iter_neurites, iter_sections
-from neurom.fst._neuritefunc import map_sections
 
 s0 = Section(42)
 s1 = s0.add_child(Section(42))
@@ -43,7 +41,14 @@ s5 = s1.add_child(Section(42))
 s6 = s4.add_child(Section(42))
 s7 = s4.add_child(Section(42))
 
-test_neurite = Neurite(s0)
+a0 = Section([0.0, 0.0, 0.0])
+a1 = s0.add_child(Section(42))
+a2 = s0.add_child(Section(42))
+a3 = s0.add_child(Section(42))
+a4 = s1.add_child(Section(42))
+a5 = s1.add_child(Section(42))
+a6 = s4.add_child(Section(42))
+a7 = s4.add_child(Section(42))
 
 def test_bifurcation_partition():
     nt.ok_(bf.bifurcation_partition(s1) == 3.0)
