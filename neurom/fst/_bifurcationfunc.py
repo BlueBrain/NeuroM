@@ -37,6 +37,8 @@ def local_bifurcation_angle(bif_point):
     '''Return the opening angle between two out-going sections
     in a bifurcation point
 
+    We first ensure that the input point has only two children.
+
     The bifurcation angle is defined as the angle between the first non-zero
     length segments of a bifurcation point.
     '''
@@ -51,45 +53,52 @@ def local_bifurcation_angle(bif_point):
 
         return cur
 
-    ch0, ch1 = (skip_0_length(bif_point.children[0].points),
-                skip_0_length(bif_point.children[1].points))
+    if len(bif_point.children) == 2:
+        ch0, ch1 = (skip_0_length(bif_point.children[0].points),
+                    skip_0_length(bif_point.children[1].points))
 
-    return morphmath.angle_3points(bif_point.points[-1], ch0, ch1)
+        return morphmath.angle_3points(bif_point.points[-1], ch0, ch1)
 
 
 def remote_bifurcation_angle(bif_point):
     '''Return the opening angle between two out-going sections
     in a bifurcation point
 
+    We first ensure that the input point has only two children.
+
     The angle is defined as between the bifurcation point and the
     last points in the out-going sections.
     '''
-    return morphmath.angle_3points(bif_point.points[-1],
-                                   bif_point.children[0].points[-1],
-                                   bif_point.children[1].points[-1])
+    if len(bif_point.children) == 2:
+        return morphmath.angle_3points(bif_point.points[-1],
+                                       bif_point.children[0].points[-1],
+                                       bif_point.children[1].points[-1])
 
 
 def bifurcation_partition(bif_point):
     '''Calculate the partition at a bifurcation point
 
+    We first ensure that the input point has only two children.
+
     The number of nodes in each child tree is counted. The partition is
     defined as the ratio of the largest number to the smallest number.'''
-    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
-    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    return max(n, m) / min(n, m)
+    if len(bif_point.children) == 2:
+        n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+        m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+        return max(n, m) / min(n, m)
 
 
 def partition_asymmetry(bif_point):
     '''Calculate the partition asymmetry at a bifurcation point
     as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
+    We first ensure that the input point has only two children.
+
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two daughter subtrees
     at each branch point.'''
-    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
-    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    if n != m:
+    if len(bif_point.children) == 2:
+        n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+        m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
         return abs(n - m) / abs(n + m)
-    else:
-        return 0.0
