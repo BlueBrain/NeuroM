@@ -29,13 +29,7 @@
 '''Section functions and functional tools'''
 
 from neurom import morphmath as mm
-from neurom._compat import zip, range
-
-
-def map_segments(fun, section):
-    '''Map a function to segments in a section'''
-    pts = section.points
-    return list(fun(s) for s in zip(pts[:-1], pts[1:]))
+from neurom._compat import range
 
 
 def section_path_length(section):
