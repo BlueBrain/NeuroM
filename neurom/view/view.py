@@ -215,8 +215,9 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
             horz.append(s_point[plane0])
             vert.append(s_point[plane1])
 
-        horz.append(horz[0]) # To close the loop for a soma viewer. This might be modified!
-        vert.append(vert[0]) # To close the loop for a soma viewer. This might be modified!
+        # To close the loop for a soma viewer. This might be modified!
+        horz.append(horz[0])
+        vert.append(vert[0])
 
         common.plt.plot(horz, vert, color=treecolor,
                         alpha=get_default('alpha', kwargs),
@@ -250,8 +251,6 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
             with the diameter to define the width of the tree line. \
             Default value is 1.
     '''
-    plane0, plane1 = _plane2col(plane)
-
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
@@ -276,6 +275,7 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         tree(neurite, plane=plane, **kwargs)
 
     white_space = get_default('white_space', kwargs)
+    plane0, plane1 = _plane2col(plane)
     if nrn.neurites:
         kwargs['xlim'] = kwargs.get('xlim', [min_bounding_box[plane0] - white_space,
                                              max_bounding_box[plane0] + white_space])
@@ -332,9 +332,6 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     ax.add_collection3d(collection)
 
     kwargs['title'] = kwargs.get('title', 'Tree 3d-view')
-    kwargs['xlabel'] = kwargs.get('xlabel', 'X')
-    kwargs['ylabel'] = kwargs.get('ylabel', 'Y')
-    kwargs['zlabel'] = kwargs.get('zlabel', 'Z')
 
     min_bounding_box, max_bounding_box = geom.bounding_box(tr)
     white_space = get_default('white_space', kwargs)
@@ -369,9 +366,6 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                  color=treecolor, alpha=get_default('alpha', kwargs))
 
     kwargs['title'] = kwargs.get('title', 'Soma view')
-    kwargs['xlabel'] = kwargs.get('xlabel', 'X')
-    kwargs['ylabel'] = kwargs.get('ylabel', 'Y')
-    kwargs['zlabel'] = kwargs.get('zlabel', 'Z')
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -435,8 +429,7 @@ def _format_str(string):
 
 
 def _generate_collection(group, ax, ctype, colors):
-    ''' Render rectangle collection
-    '''
+    '''Render rectangle collection'''
     from matplotlib.collections import PolyCollection
 
     color = common.TREE_COLOR[ctype]
@@ -455,8 +448,7 @@ def _generate_collection(group, ax, ctype, colors):
 
 
 def _render_dendrogram(dnd, ax, displacement):
-    '''Renders dendrogram
-    '''
+    '''Renders dendrogram'''
     # set of unique colors that reflect the set of types of the neurites
     colors = set()
 
@@ -537,9 +529,9 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
-neuron.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
-tree.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
-soma.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
-neuron3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
-tree3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
-soma3d.__doc__ += DEFAULT_PARAMS # pylint: disable=no-member
+neuron.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+tree.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+soma.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+neuron3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+tree3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+soma3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
