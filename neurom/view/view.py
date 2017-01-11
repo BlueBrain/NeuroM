@@ -32,9 +32,9 @@ import numpy as np
 from matplotlib.collections import LineCollection
 
 from . import common
-from neurom import (NeuriteType, geom, fst)
+from neurom import NeuriteType, geom
 
-from neurom.core import Section, Neurite, iter_segments
+from neurom.core import iter_segments
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
@@ -89,18 +89,17 @@ def _plane2col(plane):
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
     assert plane in planes, 'No such plane found! Please select one of: ' + str(planes)
     return (getattr(COLS, plane[0].capitalize()),
-            getattr(COLS, plane[1].capitalize()),
-            )
+            getattr(COLS, plane[1].capitalize()), )
 
 
-def _get_linewidth(tree, parameters):
+def _get_linewidth(tr, parameters):
     '''calculate the desired linewidth based on tree contents, and parameters'''
     linewidth = get_default('linewidth', parameters)
     # Definition of the linewidth according to diameter, if diameter is True.
     if get_default('diameter', parameters):
         # TODO: This was originally a numpy array. Did it have to be one?
         scale = get_default('diameter_scale', parameters)
-        linewidth = [2 * segment_radius(s) * scale for s in iter_segments(tree)]
+        linewidth = [2 * segment_radius(s) * scale for s in iter_segments(tr)]
         if not linewidth:
             linewidth = get_default('linewidth', parameters)
     return linewidth
@@ -132,21 +131,17 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
             the boundary box of the morphology. \
             Default value is 1.
     '''
-
-    # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     plane0, plane1 = _plane2col(plane)
     segs = [((s[0][plane0], s[0][plane1]),
              (s[1][plane0], s[1][plane1]))
             for s in iter_segments(tr)]
-    linewidth = _get_linewidth(tr, kwargs)
 
-    # Plot the collection of lines.
     collection = LineCollection(segs,
-                                color=common.get_color(get_default('treecolor', kwargs),
-                                                       tr.type),
-                                linewidth=linewidth, alpha=get_default('alpha', kwargs))
+                                color=common.get_color(get_default('treecolor', kwargs), tr.type),
+                                linewidth=_get_linewidth(tr, kwargs),
+                                alpha=get_default('alpha', kwargs))
 
     ax.add_collection(collection)
 
