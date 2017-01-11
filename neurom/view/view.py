@@ -25,7 +25,6 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 '''
 Python module of NeuroM to visualize morphologies
 '''
@@ -35,7 +34,7 @@ from matplotlib.collections import LineCollection
 from . import common
 from neurom import (NeuriteType, geom, fst)
 
-from neurom.core import Section, Neurite
+from neurom.core import Section, Neurite, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
@@ -73,15 +72,6 @@ DEFAULT_PARAMS = '''        new_fig: boolean \
 ''' + common.PLOT_STYLE_PARAMS
 
 
-def map_segments(neurite, fun):
-    '''map a function to the segments in a tree'''
-
-    if isinstance(neurite, Section):
-        neurite = Neurite(neurite)
-    return [s for ss in neurite.iter_sections()
-            for s in fst.sectionfunc.map_segments(fun, ss)]
-
-
 def get_default(variable, kwargs):
     '''Returns default variable or kwargs variable if it exists.'''
     default = {'linewidth': 1.2,
@@ -110,7 +100,7 @@ def _get_linewidth(tree, parameters):
     if get_default('diameter', parameters):
         # TODO: This was originally a numpy array. Did it have to be one?
         scale = get_default('diameter_scale', parameters)
-        linewidth = [2 * r * scale for r in map_segments(tree, segment_radius)]
+        linewidth = [2 * segment_radius(s) * scale for s in iter_segments(tree)]
         if not linewidth:
             linewidth = get_default('linewidth', parameters)
     return linewidth
@@ -146,19 +136,10 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
-    # Data needed for the viewer: x,y,z,r
-    min_bounding_box, max_bounding_box = geom.bounding_box(tr)
-    white_space = get_default('white_space', kwargs)
     plane0, plane1 = _plane2col(plane)
-
-    def _seg_2d(seg):
-        '''2d coordinates needed for the plotting of a segment'''
-        parent_point, child_point = seg[0], seg[1]
-        return ((parent_point[plane0], parent_point[plane1]),
-                (child_point[plane0], child_point[plane1]))
-
-    segs = map_segments(tr, _seg_2d)
-
+    segs = [((s[0][plane0], s[0][plane1]),
+             (s[1][plane0], s[1][plane1]))
+            for s in iter_segments(tr)]
     linewidth = _get_linewidth(tr, kwargs)
 
     # Plot the collection of lines.
@@ -169,6 +150,8 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     ax.add_collection(collection)
 
+    min_bounding_box, max_bounding_box = geom.bounding_box(tr)
+    white_space = get_default('white_space', kwargs)
     kwargs['title'] = kwargs.get('title', 'Tree view')
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
@@ -314,13 +297,7 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
                                 subplot=subplot, params={'projection': '3d'})
 
-    def _seg_3d(seg):
-        '''2d coordinates needed for the plotting of a segment'''
-        parent_point, child_point = seg[0], seg[1]
-        return (parent_point[COLS.XYZ],
-                child_point[COLS.XYZ])
-
-    segs = map_segments(tr, _seg_3d)
+    segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tr)]
     linewidth = _get_linewidth(tr, kwargs)
 
     # Plot the collection of lines.
