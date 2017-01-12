@@ -147,13 +147,13 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     min_bounding_box, max_bounding_box = geom.bounding_box(tr)
     white_space = get_default('white_space', kwargs)
-    kwargs['title'] = kwargs.get('title', 'Tree view')
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
-    kwargs['xlim'] = kwargs.get('xlim', [min_bounding_box[plane0] - white_space,
-                                         max_bounding_box[plane0] + white_space])
-    kwargs['ylim'] = kwargs.get('ylim', [min_bounding_box[plane1] - white_space,
-                                         max_bounding_box[plane1] + white_space])
+    kwargs.setdefault('title', 'Tree view')
+    kwargs.setdefault('xlabel', plane[0])
+    kwargs.setdefault('ylabel', plane[1])
+    kwargs.setdefault('xlim', [min_bounding_box[plane0] - white_space,
+                               max_bounding_box[plane0] + white_space])
+    kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
+                               max_bounding_box[plane1] + white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -201,9 +201,9 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
                         alpha=get_default('alpha', kwargs),
                         linewidth=get_default('linewidth', kwargs))
 
-    kwargs['title'] = kwargs.get('title', 'Soma view')
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs.setdefault('title', 'Soma view')
+    kwargs.setdefault('xlabel', plane[0])
+    kwargs.setdefault('ylabel', plane[1])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -238,9 +238,9 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
 
     soma(nrn.soma, plane=plane, **kwargs)
 
-    kwargs['title'] = kwargs.get('title', nrn.name)
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs.setdefault('title', nrn.name)
+    kwargs.setdefault('xlabel', plane[0])
+    kwargs.setdefault('ylabel', plane[1])
 
     min_bounding_box = np.full(shape=(3, ), fill_value=np.inf)
     max_bounding_box = np.full(shape=(3, ), fill_value=-np.inf)
@@ -255,10 +255,10 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
     white_space = get_default('white_space', kwargs)
     plane0, plane1 = _plane2col(plane)
     if nrn.neurites:
-        kwargs['xlim'] = kwargs.get('xlim', [min_bounding_box[plane0] - white_space,
-                                             max_bounding_box[plane0] + white_space])
-        kwargs['ylim'] = kwargs.get('ylim', [min_bounding_box[plane1] - white_space,
-                                             max_bounding_box[plane1] + white_space])
+        kwargs.setdefault('xlim', [min_bounding_box[plane0] - white_space,
+                                   max_bounding_box[plane0] + white_space])
+        kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
+                                   max_bounding_box[plane1] + white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -303,16 +303,16 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
     ax.add_collection3d(collection)
 
-    kwargs['title'] = kwargs.get('title', 'Tree 3d-view')
+    kwargs.setdefault('title', 'Tree 3d-view')
 
     min_bounding_box, max_bounding_box = geom.bounding_box(tr)
     white_space = get_default('white_space', kwargs)
-    kwargs['xlim'] = kwargs.get('xlim', [min_bounding_box[COLS.X] - white_space,
-                                         max_bounding_box[COLS.X] + white_space])
-    kwargs['ylim'] = kwargs.get('ylim', [min_bounding_box[COLS.Y] - white_space,
-                                         max_bounding_box[COLS.Y] + white_space])
-    kwargs['zlim'] = kwargs.get('zlim', [min_bounding_box[COLS.Z] - white_space,
-                                         max_bounding_box[COLS.Z] + white_space])
+    kwargs.setdefault('xlim', [min_bounding_box[COLS.X] - white_space,
+                               max_bounding_box[COLS.X] + white_space])
+    kwargs.setdefault('ylim', [min_bounding_box[COLS.Y] - white_space,
+                               max_bounding_box[COLS.Y] + white_space])
+    kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
+                               max_bounding_box[COLS.Z] + white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -337,7 +337,7 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
     fig, ax = common.plot_sphere(fig, ax, center=sm.center[COLS.XYZ], radius=sm.radius,
                                  color=treecolor, alpha=get_default('alpha', kwargs))
 
-    kwargs['title'] = kwargs.get('title', 'Soma view')
+    kwargs.setdefault('title', 'Soma view')
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -367,7 +367,7 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs['new_fig'] = False
     kwargs['subplot'] = subplot
     kwargs['new_axes'] = False
-    kwargs['title'] = kwargs.get('title', nrn.name)
+    kwargs.setdefault('title', nrn.name)
 
     kwargs['final'] = False
 
@@ -385,12 +385,12 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
 
     white_space = get_default('white_space', kwargs)
     if nrn.neurites:
-        kwargs['xlim'] = kwargs.get('xlim', [min_bounding_box[COLS.X] - white_space,
-                                             max_bounding_box[COLS.X] + white_space])
-        kwargs['ylim'] = kwargs.get('ylim', [min_bounding_box[COLS.Y] - white_space,
-                                             max_bounding_box[COLS.Y] + white_space])
-        kwargs['zlim'] = kwargs.get('zlim', [min_bounding_box[COLS.Z] - white_space,
-                                             max_bounding_box[COLS.Z] + white_space])
+        kwargs.setdefault('xlim', [min_bounding_box[COLS.X] - white_space,
+                                   max_bounding_box[COLS.X] + white_space])
+        kwargs.setdefault('ylim', [min_bounding_box[COLS.Y] - white_space,
+                                   max_bounding_box[COLS.Y] + white_space])
+        kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
+                                   max_bounding_box[COLS.Z] + white_space])
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -493,11 +493,11 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     # customization settings
     kwargs['xlim'] = [- dnd.dims[0][0] * 0.5, dnd.dims[-1][0] * 0.5 + displacement]
 
-    kwargs['title'] = kwargs.get('title', 'Morphology Dendrogram')
-    kwargs['xlabel'] = kwargs.get('xlabel', 'micrometers (um)')
-    kwargs['ylabel'] = kwargs.get('ylabel', 'micrometers (um)')
+    kwargs.setdefault('title', 'Morphology Dendrogram')
+    kwargs.setdefault('xlabel', 'micrometers (um)')
+    kwargs.setdefault('ylabel', 'micrometers (um)')
     kwargs['no_legend'] = False
-    kwargs['aspect_ratio'] = kwargs.get('aspect_ratio', 'auto')
+    kwargs.setdefault('aspect_ratio', 'auto')
 
     return common.plot_style(fig=fig, ax=ax, **kwargs)
 
