@@ -369,6 +369,7 @@ def principal_direction_extent(points):
        eigv : respective eigenvectors of the covariance matrix
     '''
     # center the points around 0.0
+    points = np.copy(points)
     points -= np.mean(points, axis=0)
 
     # principal components
