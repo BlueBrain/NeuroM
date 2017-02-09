@@ -55,16 +55,18 @@ def test_tree():
     c = ax.collections[0]
     nt.eq_(c.get_linewidth()[0], 1.2)
     nt.ok_(np.allclose(c.get_color(), np.array([[ 0.,  0.,  0.,  1.]])))
-    fig, ax = view.tree(tree0, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
+
+    nt.assert_raises(AssertionError, view.tree, tree0, plane='wrong')
+
     plt.close('all')
 
 
 def test_soma():
     fig, ax = view.soma(soma0)
     fig, ax = view.soma(soma0, outline=False)
-    fig, ax = view.soma(soma0, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
+
+    nt.assert_raises(AssertionError, view.tree, soma0, plane='wrong')
+
     plt.close('all')
 
 
@@ -77,8 +79,9 @@ def test_neuron():
     nt.ok_(np.allclose(ax.get_xlim(), (0, 100)) )
     nt.ok_(np.allclose(ax.get_ylim(), (0, 100)) )
     nt.ok_(ax.get_title() == fst_neuron.name)
-    fig, ax = view.neuron(fst_neuron, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
+
+    nt.assert_raises(AssertionError, view.tree, fst_neuron, plane='wrong')
+
     plt.close('all')
 
 
