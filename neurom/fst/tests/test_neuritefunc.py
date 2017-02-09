@@ -196,6 +196,18 @@ def test_section_branch_orders():
                     (0, 1, 1,  # type 3, basal dendrite
                      0, 1, 1)) # type 2, axon
 
+def test_section_bif_branch_orders():
+    bif_branch_orders = list(_nf.section_bif_branch_orders(SIMPLE))
+    assert_allclose(bif_branch_orders,
+                    (0,  # type 3, basal dendrite
+                     0)) # type 2, axon
+
+def test_section_term_branch_orders():
+    term_branch_orders = list(_nf.section_term_branch_orders(SIMPLE))
+    assert_allclose(term_branch_orders,
+                    (1, 1,  # type 3, basal dendrite
+                     1, 1)) # type 2, axon
+
 def test_section_radial_distances():
     radial_distances = _nf.section_radial_distances(SIMPLE)
     assert_allclose(radial_distances,
