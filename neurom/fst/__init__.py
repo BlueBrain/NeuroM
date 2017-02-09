@@ -55,6 +55,8 @@ NEURITEFEATURES = {
     'neurite_lengths': _nrt.total_length_per_neurite,
     'terminal_path_lengths_per_neurite': _nrt.terminal_path_lengths_per_neurite,
     'section_lengths': _nrt.section_lengths,
+    'section_term_lengths': _nrt.section_term_lengths,
+    'section_bif_lengths': _nrt.section_bif_lengths,
     'neurite_volumes': _nrt.total_volume_per_neurite,
     'neurite_volume_density': _nrt.neurite_volume_density,
     'section_volumes': _nrt.section_volumes,

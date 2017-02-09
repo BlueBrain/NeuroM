@@ -135,7 +135,7 @@ def test_neurite_volume_density():
     assert_allclose(vol_density, ref_density)
 
 
-def test_terminal_length_per_neurite():
+def test_terminal_path_length_per_neurite():
     terminal_distances = _nf.terminal_path_lengths_per_neurite(SIMPLE)
     assert_allclose(terminal_distances,
                     (5 + 5., 5 + 6., 4. + 6., 4. + 5))
@@ -174,6 +174,16 @@ def test_section_path_lengths():
     assert_allclose(path_lengths,
                     (5., 10., 11., # type 3, basal dendrite
                      4., 10., 9.)) # type 2, axon
+
+def test_section_term_lengths():
+    term_lengths = list(_nf.section_term_lengths(SIMPLE))
+    assert_allclose(term_lengths,
+                    (5., 6., 6., 5.))
+
+def test_section_bif_lengths():
+    bif_lengths = list(_nf.section_bif_lengths(SIMPLE))
+    assert_allclose(bif_lengths,
+                    (5.,  4.))
 
 def test_number_of_sections_per_neurite():
     sections = _nf.number_of_sections_per_neurite(SIMPLE)

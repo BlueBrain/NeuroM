@@ -96,6 +96,24 @@ def section_lengths(neurites, neurite_type=NeuriteType.all):
     return map_sections(_seclen, neurites, neurite_type=neurite_type)
 
 
+def section_term_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Termination section lengths in a collection of neurites'''
+    def _seclen(sec, **kwargs):
+        '''get section length of `section`'''
+        return morphmath.section_length(sec.points, **kwargs)
+    return map_sections(_seclen, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ileaf)
+
+
+def section_bif_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Bifurcation section lengths in a collection of neurites'''
+    def _seclen(sec, **kwargs):
+        '''get section length of `section`'''
+        return morphmath.section_length(sec.points, **kwargs)
+    return map_sections(_seclen, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ibifurcation_point)
+
+
 def section_branch_orders(neurites, neurite_type=NeuriteType.all):
     '''section branch orders in a collection of neurites'''
     return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type)
