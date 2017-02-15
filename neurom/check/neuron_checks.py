@@ -154,7 +154,7 @@ def has_all_nonzero_section_lengths(neuron, threshold=0.0):
         to be non-zero
 
     Returns:
-        CheckResult with result including list of ids bad sections
+        CheckResult with result including list of ids of bad sections
     '''
     bad_ids = [s.id for s in _nf.iter_sections(neuron.neurites)
                if section_length(s.points) <= threshold]
@@ -208,7 +208,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
         axis(str): one of x/y/z, which axis to check for jumps
 
     Returns:
-        CheckResult with result list of ids bad sections
+        CheckResult with result list of ids of bad sections
     '''
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
@@ -230,7 +230,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         final_point_count(int): how many points to include in the mean
 
     Returns:
-        CheckResult with result list of ids bad sections
+        CheckResult with result list of ids of bad sections
 
     Note:
         A fat end is defined as a leaf segment whose last point is larger
@@ -242,5 +242,29 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         mean_radius = np.mean(leaf.points[-final_point_count:, COLS.R])
         if mean_radius * multiple_of_mean < leaf.points[-1, COLS.R]:
             bad_ids.append((leaf.id, len(leaf.points)))
+
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_narrow_starts(neuron, fraction_smaller=0.9):
+    '''Check if trunk has narrow start segments
+
+    Arguments:
+        neuron(Neuron): The neuron object to test
+        fraction_smaller(float): a bad segment is defined as
+        first.radius < fraction_smaller * second.radius
+
+    Returns:
+        CheckResult with result list of ids of bad sections
+
+    Note:
+        A narrow start segment is defined as a trunk segment whose
+        first point is `fraction_smaller` less than the second point second point
+    '''
+    bad_ids = []
+    for trunk in neuron.neurites:
+        points = trunk.root_node.points
+        if points[0, COLS.R] < fraction_smaller * points[1, COLS.R]:
+            bad_ids.append((trunk.root_node.id, 0))
 
     return CheckResult(len(bad_ids) == 0, bad_ids)
