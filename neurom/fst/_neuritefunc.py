@@ -88,29 +88,25 @@ def map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree
                                   neurite_filter=is_type(neurite_type)))
 
 
+def _section_length(section):
+    '''get section length of `section`'''
+    return morphmath.section_length(section.points)
+
+
 def section_lengths(neurites, neurite_type=NeuriteType.all):
     '''section lengths in a collection of neurites'''
-    def _seclen(sec, **kwargs):
-        '''get section length of `sec`'''
-        return morphmath.section_length(sec.points, **kwargs)
-    return map_sections(_seclen, neurites, neurite_type=neurite_type)
+    return map_sections(_section_length, neurites, neurite_type=neurite_type)
 
 
 def section_term_lengths(neurites, neurite_type=NeuriteType.all):
     '''Termination section lengths in a collection of neurites'''
-    def _seclen(sec, **kwargs):
-        '''get section length of `section`'''
-        return morphmath.section_length(sec.points, **kwargs)
-    return map_sections(_seclen, neurites, neurite_type=neurite_type,
+    return map_sections(_section_length, neurites, neurite_type=neurite_type,
                         iterator_type=Tree.ileaf)
 
 
 def section_bif_lengths(neurites, neurite_type=NeuriteType.all):
     '''Bifurcation section lengths in a collection of neurites'''
-    def _seclen(sec, **kwargs):
-        '''get section length of `section`'''
-        return morphmath.section_length(sec.points, **kwargs)
-    return map_sections(_seclen, neurites, neurite_type=neurite_type,
+    return map_sections(_section_length, neurites, neurite_type=neurite_type,
                         iterator_type=Tree.ibifurcation_point)
 
 
