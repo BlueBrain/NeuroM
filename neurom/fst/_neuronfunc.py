@@ -41,16 +41,17 @@ def neuron_population(nrns):
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
 
-def soma_surface_area(nrn):
+def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
     '''Get the surface area of a neuron's soma.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
     '''
+    assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
-def soma_surface_areas(nrn_pop):
+def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     '''Get the surface areas of the somata in a population of neurons
 
     Note:
@@ -60,16 +61,18 @@ def soma_surface_areas(nrn_pop):
         area of its soma member is returned.
     '''
     nrns = neuron_population(nrn_pop)
+    assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return [soma_surface_area(n) for n in nrns]
 
 
-def soma_radii(nrn_pop):
+def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     ''' Get the radii of the somata of a population of neurons
 
     Note:
         If a single neuron is passed, a single element list with the
         radius of its soma member is returned.
     '''
+    assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     nrns = neuron_population(nrn_pop)
     return [n.soma.radius for n in nrns]
 
