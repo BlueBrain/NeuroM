@@ -42,6 +42,25 @@ from neurom.fst._core import FstNeuron
 L = logging.getLogger(__name__)
 
 
+class NeuronLoader(object):
+    """ Caching morphology loader. """
+    def __init__(self, directory, file_ext='.h5', cache_size=None):
+        self.directory = directory
+        self.file_ext = file_ext
+        if cache_size is not None:
+            from pylru import FunctionCacheManager
+            self.get = FunctionCacheManager(self.get, size=cache_size)
+
+    def _filepath(self, name):
+        """ File path to `name` morphology file. """
+        return os.path.join(self.directory, name + self.file_ext)
+
+    def get(self, name):
+        """ Get `name` morphology data. """
+        return load_neuron(self._filepath(name))
+
+
+
 def get_morph_files(directory):
     '''Get a list of all morphology files in a directory
 

@@ -30,4 +30,4 @@
 
 from ..core.dataformat import COLS
 from ..core.dataformat import ROOT_ID
-from neurom.io.utils import load_data, load_neuron, load_neurons
+from neurom.io.utils import load_data, load_neuron, load_neurons, NeuronLoader
