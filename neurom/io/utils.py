@@ -55,6 +55,7 @@ class NeuronLoader(object):
         """ File path to `name` morphology file. """
         return os.path.join(self.directory, name + self.file_ext)
 
+    # pylint:disable=method-hidden
     def get(self, name):
         """ Get `name` morphology data. """
         return load_neuron(self._filepath(name))
