@@ -61,7 +61,6 @@ class NeuronLoader(object):
         return load_neuron(self._filepath(name))
 
 
-
 def get_morph_files(directory):
     '''Get a list of all morphology files in a directory
 
