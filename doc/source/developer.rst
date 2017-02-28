@@ -72,7 +72,7 @@ The ``Makefile`` also has targets for running only pylint and pep8 individually:
         $ make run_pylint # run only pep8
 
 
-Note that you can also install the test dependencies and run the tests inside of your 
+Note that you can also install the test dependencies and run the tests inside of your
 own virtualenv:
 
 .. code-block:: bash
@@ -99,3 +99,8 @@ Then, run the tests manually in the ``virtualenv``. For example,
     a pull request being rejected.
 
 .. include:: documentation.rst
+
+Python compatibility
+--------------------
+
+We test the code against Python 2.6, 2.7, 3.5.

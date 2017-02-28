@@ -346,3 +346,13 @@ def test_load_h5_trunk_points_regression():
 
 def test_load_unknown_type():
     nt.assert_raises(NeuroMError, utils.load_data, 'fake.file')
+
+
+def test_NeuronLoader():
+    dirpath = os.path.join(DATA_PATH, 'h5', 'v2')
+    loader = utils.NeuronLoader(dirpath, file_ext='.h5', cache_size=5)
+    nrn = loader.get('Neuron')
+    nt.ok_(isinstance(nrn, Neuron))
+    # check caching
+    nt.ok_(nrn == loader.get('Neuron'))
+    nt.ok_(nrn != loader.get('Neuron_2_branch'))
