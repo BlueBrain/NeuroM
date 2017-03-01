@@ -351,11 +351,11 @@ def plot_style(fig, ax, **kwargs):
     # Definition of save options
     output_path = kwargs.get('output_path', None)
 
-    plot_title(fig, ax, **kwargs)
-    plot_labels(fig, ax, **kwargs)
-    plot_ticks(fig, ax, **kwargs)
-    plot_limits(fig, ax, **kwargs)
-    plot_legend(fig, ax, **kwargs)
+    plot_title(ax, **kwargs)
+    plot_labels(ax, **kwargs)
+    plot_ticks(ax, **kwargs)
+    plot_limits(ax, **kwargs)
+    plot_legend(ax, **kwargs)
 
     no_axes = kwargs.get('no_axes', False)
     if no_axes:
@@ -381,11 +381,10 @@ def plot_style(fig, ax, **kwargs):
         plt.show()  # pragma no cover
 
 
-def plot_title(_, ax, **kwargs):
+def plot_title(ax, **kwargs):
     """Function that defines the title options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         pretitle(Optional[str]) : \
             String to include before the general title of the figure. \
@@ -420,11 +419,10 @@ def plot_title(_, ax, **kwargs):
                  fontsize=title_fontsize, **title_arg)
 
 
-def plot_labels(_, ax, **kwargs):
+def plot_labels(ax, **kwargs):
     """ Function that defines the labels options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xlabel (Optional[str]): \
             The xlabel for the figure. \
@@ -480,14 +478,13 @@ def plot_labels(_, ax, **kwargs):
         ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
 
-def plot_ticks(_, ax, **kwargs):
+def plot_ticks(ax, **kwargs):
 
     """
     Function that defines the labels options
     of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xticks (Optional[list of ticks]): \
             Defines the values of x ticks in the figure. \
@@ -545,11 +542,10 @@ def plot_ticks(_, ax, **kwargs):
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
 
-def plot_limits(_, ax, **kwargs):
+def plot_limits(ax, **kwargs):
     """Sets the limit options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xlim (Optional[list of two floats]): \
             Defines the min and the max values in x-axis. \
@@ -572,14 +568,13 @@ def plot_limits(_, ax, **kwargs):
         ax.set_zlim(zlim)
 
 
-def plot_legend(_, ax, **kwargs):
+def plot_legend(ax, **kwargs):
 
     """
     Function that defines the legend options
     of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         no_legend (Optional[boolean]): \
             Defines the presence of a legend in the figure. \

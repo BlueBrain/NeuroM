@@ -127,95 +127,95 @@ def get_fig_3d():
 
 def test_plot_title():
     with get_fig_2d() as (fig, ax):
-        plot_title(fig, ax)
+        plot_title(ax)
         nt.eq_(ax.get_title(), 'Figure')
 
     with get_fig_2d() as (fig, ax):
-        plot_title(fig, ax, title='Test')
+        plot_title(ax, title='Test')
         nt.eq_(ax.get_title(), 'Test')
 
 
 def test_plot_labels():
     with get_fig_2d() as (fig, ax):
-        plot_labels(fig, ax)
+        plot_labels(ax)
         nt.eq_(ax.get_xlabel(), 'X')
         nt.eq_(ax.get_ylabel(), 'Y')
 
     with get_fig_2d() as (fig, ax):
-        plot_labels(fig, ax, xlabel='T', ylabel='R')
+        plot_labels(ax, xlabel='T', ylabel='R')
         nt.eq_(ax.get_xlabel(), 'T')
         nt.eq_(ax.get_ylabel(), 'R')
 
     with get_fig_3d() as (fig0, ax0):
-        plot_labels(fig0, ax0)
+        plot_labels(ax0)
         nt.eq_(ax0.get_zlabel(), 'Z')
 
     with get_fig_3d() as (fig0, ax0):
-        plot_labels(fig0, ax0, zlabel='T')
+        plot_labels(ax0, zlabel='T')
         nt.eq_(ax0.get_zlabel(), 'T')
 
 
 def test_plot_legend():
     with get_fig_2d() as (fig, ax):
-        plot_legend(fig, ax)
+        plot_legend(ax)
         legend = ax.get_legend()
         nt.ok_(legend is None)
 
     with get_fig_2d() as (fig, ax):
-        plot_legend(fig, ax, no_legend=False)
+        plot_legend(ax, no_legend=False)
         legend = ax.get_legend()
         nt.eq_(legend.get_texts()[0].get_text(), 'test')
 
 
 def test_plot_limits():
     with get_fig_2d() as (fig, ax):
-        plot_limits(fig, ax)
+        plot_limits(ax)
         xlim = ax.get_xlim()
         ylim = ax.get_ylim()
         nt.eq_(ax.get_xlim(), xlim)
         nt.eq_(ax.get_ylim(), ylim)
 
     with get_fig_2d() as (fig, ax):
-        plot_limits(fig, ax, xlim=(0, 100), ylim=(-100, 0))
+        plot_limits(ax, xlim=(0, 100), ylim=(-100, 0))
         nt.eq_(ax.get_xlim(), (0, 100))
         nt.eq_(ax.get_ylim(), (-100, 0))
 
     with get_fig_3d() as (fig0, ax0):
-        plot_limits(fig0, ax0)
+        plot_limits(ax0)
         zlim0 = ax0.get_zlim()
         nt.ok_(np.allclose(ax0.get_zlim(), zlim0))
 
     with get_fig_3d() as (fig0, ax0):
-        plot_limits(fig0, ax0, zlim=(0, 100))
+        plot_limits(ax0, zlim=(0, 100))
         nt.ok_(np.allclose(ax0.get_zlim(), (0, 100)))
 
 
 def test_plot_ticks():
     with get_fig_2d() as (fig, ax):
-        plot_ticks(fig, ax)
+        plot_ticks(ax)
         nt.ok_(len(ax.get_xticks()))
         nt.ok_(len(ax.get_yticks()))
 
     with get_fig_2d() as (fig, ax):
-        plot_ticks(fig, ax, xticks=[], yticks=[])
+        plot_ticks(ax, xticks=[], yticks=[])
         nt.eq_(len(ax.get_xticks()), 0)
         nt.eq_(len(ax.get_yticks()), 0)
 
     with get_fig_2d() as (fig, ax):
-        plot_ticks(fig, ax, xticks=np.arange(3), yticks=np.arange(4))
+        plot_ticks(ax, xticks=np.arange(3), yticks=np.arange(4))
         nt.eq_(len(ax.get_xticks()), 3)
         nt.eq_(len(ax.get_yticks()), 4)
 
     with get_fig_3d() as (fig0, ax0):
-        plot_ticks(fig0, ax0)
+        plot_ticks(ax0)
         nt.ok_(len(ax0.get_zticks()))
 
     with get_fig_3d() as (fig0, ax0):
-        plot_ticks(fig0, ax0, zticks=[])
+        plot_ticks(ax0, zticks=[])
         nt.eq_(len(ax0.get_zticks()), 0)
 
     with get_fig_3d() as (fig0, ax0):
-        plot_ticks(fig0, ax0, zticks=np.arange(3))
+        plot_ticks(ax0, zticks=np.arange(3))
         nt.eq_(len(ax0.get_zticks()), 3)
 
 

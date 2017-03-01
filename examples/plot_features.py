@@ -176,7 +176,7 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
             # print 'DATA:', data
             # print 'BIN HEIGHT', histo[0]
             plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
-            view_utils.plot_limits(plot.fig, plot.ax, xlim=limits, no_ylim=True)
+            view_utils.plot_limits(plot.ax, xlim=limits, no_ylim=True)
             plot.ax.bar(histo[1][:-1], histo[0], width=bin_widths(histo[1]))
             dp, bc = dist_points(histo[1], dist)
             # print 'BIN CENTERS:', bc, len(bc)
