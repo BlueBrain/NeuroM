@@ -336,7 +336,7 @@ def save_plot(fig, **kwargs):
 
     output = os.path.join(output_path, prefile + output_name + postfile + "." + output_format)
 
-    plt.savefig(output, dpi=dpi, transparent=transparent)
+    fig.savefig(output, dpi=dpi, transparent=transparent)
 
 
 def plot_style(fig, ax, **kwargs):
@@ -371,7 +371,7 @@ def plot_style(fig, ax, **kwargs):
         fig.set_tight_layout(True)
 
     if output_path is not None:
-        fig = save_plot(fig=ax, **kwargs)
+        save_plot(fig=fig, **kwargs)
 
     show_plot = kwargs.get('show_plot', True)
     final = kwargs.get('final', False)
@@ -381,11 +381,8 @@ def plot_style(fig, ax, **kwargs):
         plt.show()  # pragma no cover
 
 
-def plot_title(fig, ax, **kwargs):
-
-    """
-    Function that defines the title options
-    of a matplotlib plot.
+def plot_title(_, ax, **kwargs):
+    """Function that defines the title options of a matplotlib plot.
 
     Parameters:
         fig: matplotlib figure
@@ -423,11 +420,8 @@ def plot_title(fig, ax, **kwargs):
                  fontsize=title_fontsize, **title_arg)
 
 
-def plot_labels(fig, ax, **kwargs):
-
-    """
-    Function that defines the labels options
-    of a matplotlib plot.
+def plot_labels(_, ax, **kwargs):
+    """ Function that defines the labels options of a matplotlib plot.
 
     Parameters:
         fig: matplotlib figure
@@ -486,7 +480,7 @@ def plot_labels(fig, ax, **kwargs):
         ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
 
-def plot_ticks(fig, ax, **kwargs):
+def plot_ticks(_, ax, **kwargs):
 
     """
     Function that defines the labels options
@@ -551,7 +545,7 @@ def plot_ticks(fig, ax, **kwargs):
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
 
-def plot_limits(fig, ax, **kwargs):
+def plot_limits(_, ax, **kwargs):
     """Sets the limit options of a matplotlib plot.
 
     Parameters:
@@ -578,7 +572,7 @@ def plot_limits(fig, ax, **kwargs):
         ax.set_zlim(zlim)
 
 
-def plot_legend(fig, ax, **kwargs):
+def plot_legend(_, ax, **kwargs):
 
     """
     Function that defines the legend options
@@ -607,7 +601,7 @@ def plot_legend(fig, ax, **kwargs):
         ax.legend(**legend_arg)
 
 
-def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
+def plot_sphere(_, ax, center, radius, color='black', alpha=1.):
     """Plots a 3d sphere, given the center and the radius."""
 
     u = np.linspace(0, 2 * np.pi, 300)
