@@ -1146,7 +1146,7 @@
    }, 
    "soma_radii": {
 	  "": [
-		 0.17071067811865476
+		 0.13065629648763766
 	  ]
    }, 
    "section_path_distances": {
@@ -1463,7 +1463,7 @@
    }, 
    "soma_surface_areas": {
 	  "": [
-		 0.36621087674172226
+		 0.21452136490675905
 	  ]
    }, 
    "number_of_sections_per_neurite": {

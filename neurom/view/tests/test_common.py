@@ -31,7 +31,7 @@ from nose import tools as nt
 
 from neurom.view.common import (plt, figure_naming, get_figure, save_plot, plot_style,
                                 plot_title, plot_labels, plot_legend, plot_limits, plot_ticks,
-                                plot_sphere, get_color)
+                                plot_sphere, get_color, plot_cylinder)
 
 from neurom.core.types import NeuriteType
 
@@ -78,7 +78,7 @@ def test_get_figure():
     plt.close('all')
 
     fig = plt.figure()
-    ax  = fig.add_subplot(111)
+    ax = fig.add_subplot(111)
     fig2, ax2 = get_figure(new_fig=False, new_axes=False)
     nt.eq_(fig2, plt.gcf())
     nt.eq_(ax2, plt.gca())
@@ -259,7 +259,16 @@ def test_get_color():
     nt.eq_(get_color('yellow', NeuriteType.axon), "yellow")
 
 
+def test_plot_cylinder():
+    fig0, ax0 = get_figure(params={'projection': '3d'})
+    start, end = np.array([0, 0, 0]), np.array([1, 0, 0])
+    plot_cylinder(ax0, start=start, end=end,
+                  start_radius=0, end_radius=10.,
+                  color='black', alpha=1.)
+    nt.ok_(ax0.has_data())
+
+
 def test_plot_sphere():
     fig0, ax0 = get_figure(params={'projection': '3d'})
-    plot_sphere(fig0, ax0, [0, 0, 0], 10., color='black', alpha=1.)
+    plot_sphere(ax0, [0, 0, 0], 10., color='black', alpha=1.)
     nt.ok_(ax0.has_data())

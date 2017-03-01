@@ -36,8 +36,7 @@ from functools import partial
 from neurom.core.population import Population
 from neurom.exceptions import (RawDataError, NeuroMError)
 from neurom.io.datawrapper import DataWrapper
-from neurom.io import swc
-from neurom.io import neurolucida
+from neurom.io import (swc, neurolucida)
 from neurom.fst._core import FstNeuron
 from neurom._compat import filter
 

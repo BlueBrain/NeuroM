@@ -36,11 +36,17 @@ import os
 #  TODO: Awful hack to use non-GUI backend when no display
 #  is available. For unixy systems.
 import matplotlib
-if 'DISPLAY' not in os.environ:  # noqa
-    matplotlib.use('Agg')  # noqa
+if 'DISPLAY' not in os.environ: # noqa
+    matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+from matplotlib.patches import Polygon
+from scipy.linalg import norm
+from scipy.spatial import ConvexHull
+
+# needed so that projection='3d' works with fig.add_subplot
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 
 
@@ -292,9 +298,7 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
 
 
 def save_plot(fig, **kwargs):
-    """
-    Function to be used for viewing - plotting
-    to save a matplotlib figure.
+    """Function to be used for viewing - plotting to save a matplotlib figure.
 
     Generates a figure file in the selected directory.
 
@@ -340,8 +344,7 @@ def save_plot(fig, **kwargs):
 
 
 def plot_style(fig, ax, **kwargs):
-    """
-    Function to set the basic options of a matplotlib figure,
+    """Function to set the basic options of a matplotlib figure,
     to be used by viewing - plotting functions.
 
     Parameters:
@@ -379,6 +382,9 @@ def plot_style(fig, ax, **kwargs):
         plt.close()
     elif final:
         plt.show()  # pragma no cover
+
+
+plot_style.__doc__ += PLOT_STYLE_PARAMS  # pylint: disable=no-member
 
 
 def plot_title(ax, **kwargs):
@@ -457,19 +463,12 @@ def plot_labels(ax, **kwargs):
     xlabel = kwargs.get('xlabel', 'X')
     ylabel = kwargs.get('ylabel', 'Y')
     zlabel = kwargs.get('zlabel', 'Z')
+
     label_fontsize = kwargs.get('labelfontsize', 14)
-    xlabel_arg = kwargs.get('xlabel_arg', None)
-    ylabel_arg = kwargs.get('ylabel_arg', None)
-    zlabel_arg = kwargs.get('zlabel_arg', None)
 
-    if xlabel_arg is None:
-        xlabel_arg = {}
-
-    if ylabel_arg is None:
-        ylabel_arg = {}
-
-    if zlabel_arg is None:
-        zlabel_arg = {}
+    xlabel_arg = kwargs.get('xlabel_arg', {})
+    ylabel_arg = kwargs.get('ylabel_arg', {})
+    zlabel_arg = kwargs.get('zlabel_arg', {})
 
     ax.set_xlabel(xlabel, fontsize=label_fontsize, **xlabel_arg)
     ax.set_ylabel(ylabel, fontsize=label_fontsize, **ylabel_arg)
@@ -479,10 +478,7 @@ def plot_labels(ax, **kwargs):
 
 
 def plot_ticks(ax, **kwargs):
-
-    """
-    Function that defines the labels options
-    of a matplotlib plot.
+    """Function that defines the labels options of a matplotlib plot.
 
     Parameters:
         ax: matplotlib axes
@@ -569,7 +565,6 @@ def plot_limits(ax, **kwargs):
 
 
 def plot_legend(ax, **kwargs):
-
     """
     Function that defines the legend options
     of a matplotlib plot.
@@ -596,16 +591,94 @@ def plot_legend(ax, **kwargs):
         ax.legend(**legend_arg)
 
 
-def plot_sphere(_, ax, center, radius, color='black', alpha=1.):
-    """Plots a 3d sphere, given the center and the radius."""
+_LINSPACE_COUNT = 300
 
-    u = np.linspace(0, 2 * np.pi, 300)
-    v = np.linspace(0, np.pi, 300)
 
-    x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
-    y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
+def _get_normals(v):
+    '''get two vectors that form a basis w/ v
+
+    Note: returned vectors are unit
+    '''
+    not_v = np.array([1, 0, 0])
+    if np.all(np.abs(v) == not_v):
+        not_v = np.array([0, 1, 0])
+    n1 = np.cross(v, not_v)
+    n1 /= norm(n1)
+    n2 = np.cross(v, n1)
+    return n1, n2
+
+
+def generate_cylindrical_points(start, end, start_radius, end_radius,
+                                linspace_count=_LINSPACE_COUNT):
+    '''Generate a 3d mesh of a cylinder with start and end points, and varying radius
+
+    Based on: http://stackoverflow.com/a/32383775
+    '''
+    v = end - start
+    length = norm(v)
+    v = v / length
+    n1, n2 = _get_normals(v)
+
+    # pylint: disable=unbalanced-tuple-unpacking
+    l, theta = np.meshgrid(np.linspace(0, length, linspace_count),
+                           np.linspace(0, 2 * np.pi, linspace_count))
+
+    radii = np.linspace(start_radius, end_radius, linspace_count)
+    rsin = np.multiply(radii, np.sin(theta))
+    rcos = np.multiply(radii, np.cos(theta))
+
+    return np.array([start[i] +
+                     v[i] * l +
+                     n1[i] * rsin + n2[i] * rcos
+                     for i in range(3)])
+
+
+def project_cylinder_onto_2d(ax, plane,
+                             start, end, start_radius, end_radius,
+                             color='black', alpha=1.):
+    '''take cylinder defined by start/end, and project it onto the plane
+
+    Args:
+        ax: matplotlib axes
+        plane(tuple of int): where x, y, z = 0, 1, 2, so (0, 1) is the xy axis
+        start(np.array): start coordinates
+        end(np.array): end coordinates
+        start_radius(float): start radius
+        end_radius(float): end radius
+        color: matplotlib color
+        alpha(float): alpha value
+
+    Note: There are probably more efficient ways of doing this: here the
+    3d outline is calculated, the non-used plane coordinates are dropped, a
+    tight convex hull is found, and that is used for a filled polygon
+
+    '''
+
+    points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
+    points = np.vstack([points[plane[0]].ravel(),
+                        points[plane[1]].ravel()])
+    points = points.T
+    hull = ConvexHull(points)
+    ax.add_patch(Polygon(points[hull.vertices], fill=True, color=color, alpha=alpha))
+
+
+def plot_cylinder(ax, start, end, start_radius, end_radius,
+                  color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+    '''plot a 3d cylinder'''
+    assert not np.all(start == end), 'Cylinder must have length'
+    x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
+                                          linspace_count=linspace_count)
+    ax.plot_surface(x, y, z, color=color, alpha=alpha)
+
+
+def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+    """ Plots a 3d sphere, given the center and the radius.  """
+
+    u = np.linspace(0, 2 * np.pi, linspace_count)
+    v = np.linspace(0, np.pi, linspace_count)
+    sin_v = np.sin(v)
+    x = center[0] + radius * np.outer(np.cos(u), sin_v)
+    y = center[1] + radius * np.outer(np.sin(u), sin_v)
     z = center[2] + radius * np.outer(np.ones_like(u), np.cos(v))
 
     ax.plot_surface(x, y, z, linewidth=0.0, color=color, alpha=alpha)
-
-plot_style.__doc__ += PLOT_STYLE_PARAMS  # pylint: disable=no-member

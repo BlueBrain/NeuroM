@@ -34,11 +34,11 @@ import math
 
 SOMA_SINGLE_PTS = [[11, 22, 33, 44, 1, 1, -1]]
 
-SOMA_THREEPOINTS_PTS = [
-    [11, 22, 33, 44, 1, 1, -1],
-    [11, 22, 33, 44, 2, 1, 1],
-    [11, 22, 33, 44, 3, 1, 2],
-]
+SOMA_THREEPOINTS_PTS = np.array([
+    [0, 0, 0, 44, 1, 1, -1],
+    [0, -44, 0, 44, 2, 1, 1],
+    [0, +44, 0, 44, 3, 1, 1],
+])
 
 SOMA_SIMPLECONTOUR_PTS_4 = [
     [1, 0, 0, 44, 1, 1, -1],
@@ -79,15 +79,6 @@ INVALID_PTS_2 = [
     [11, 22, 33, 44, 2, 1, 1]
 ]
 
-BIFURCATING_SOMA_PTS = [
-    (1, 1, 0, 0, 0, 0.0, -1),
-    (2, 1, 0, 0, 2, 0.0, 1),
-    (3, 1, 0, 0, 3, 0.0, 2),
-    (4, 1, 0, 0, 4, 0.0, 2),
-    (5, 1, 0, 0, 5, 0.0, 4),
-    (6, 1, 0, 0, 6, 0.0, 5),
-]
-
 
 def test_make_Soma_SinglePoint():
     sm = _soma.make_soma(SOMA_SINGLE_PTS)
@@ -98,11 +89,19 @@ def test_make_Soma_SinglePoint():
 
 
 def test_make_Soma_ThreePoint():
-    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS)
+    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class='contour')
     nt.ok_('SomaThreePoint' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaThreePoint))
-    nt.eq_(list(sm.center), [11, 22, 33])
-    nt.eq_(sm.radius, 0.0)
+    nt.eq_(list(sm.center), [0, 0, 0])
+    nt.eq_(sm.radius, 44)
+
+
+def test_make_Soma_ThreePointCylinder():
+    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class='cylinder')
+    nt.ok_('SomaThreePointCylinders' in str(sm))
+    nt.ok_(isinstance(sm, _soma.SomaThreePointCylinders))
+    nt.eq_(list(sm.center), [0, 0, 0])
+    nt.eq_(sm.radius, 44)
 
 
 def check_SomaC(points):
@@ -127,3 +126,58 @@ def test_invalid_soma_points_0_raises_SomaError():
 @nt.raises(SomaError)
 def test_invalid_soma_points_2_raises_SomaError():
     _soma.make_soma(INVALID_PTS_2)
+
+
+def test_make_Soma_Cylinders():
+    points = [[0, 0, -10, 40],
+              [0, 0,   0, 40],
+              [0, 0,  10, 40],
+              ]
+    s = _soma.SomaCylinders(points)
+    # if r = 2*h (ie: as in this case 10 - -10 == 20), then the
+    # area of a cylinder (excluding end caps) is:
+    # 2*pi*r*h == 4*pi*r^2 == area of a sphere of radius 20
+    nt.eq_(s.radius, 20.0)
+    nt.assert_almost_equal(s.area, 5026.548245743669)
+    nt.eq_(s.center, [0, 0, -10])
+    nt.ok_('SomaCylinders' in str(s))
+
+    # cylinder: h = 10, r = 20
+    soma_2pt_normal = np.array([
+        [0.0,   0.0,  0.0, 20.0, 1, 1, -1],
+        [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
+    ])
+    s = _soma.make_soma(soma_2pt_normal, soma_class='cylinder')
+    nt.assert_almost_equal(s.area, 1256.6370614) # see r = 2*h above
+    nt.eq_(list(s.center), [0., 0., 0.])
+
+    #check tapering
+    soma_2pt_normal = np.array([
+        [0.0,   0.0,  0.0, 0.0, 1, 1, -1],
+        [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
+    ])
+    s = _soma.make_soma(soma_2pt_normal, soma_class='cylinder')
+    nt.assert_almost_equal(s.area, 1404.9629462081452) # cone area, not including 'bottom'
+
+    # neuromorpho style
+    soma_3pt_neuromorpho = np.array([
+        [0.0,   0.0,  0.0, 10.0, 1, 1, -1],
+        [0.0, -10.0,  0.0, 10.0, 1, 2,  1],
+        [0.0,   10.0, 0.0, 10.0, 1, 3,  1],
+    ])
+    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class='cylinder')
+    nt.ok_('SomaThreePointCylinders' in str(s))
+    nt.eq_(list(s.center), [0., 0., 0.])
+    nt.assert_almost_equal(s.area, 1256.6370614)
+
+    soma_4pt_normal = np.array([
+        [0.0, 0.0,  0.0, 0.0,  1, 1, -1],
+        [0.0, 2.0,  0.0, 2.0,  1, 2, 1],
+        [0.0, 4.0,  0.0, 4.0,  1, 3, 2],
+        [0.0, 6.0,  0.0, 6.0,  1, 4, 3],
+        [0.0, 8.0,  0.0, 8.0,  1, 5, 4],
+        [0.0, 10.0, 0.0, 10.0, 1, 6, 5],
+    ])
+    s = _soma.make_soma(soma_4pt_normal, soma_class='cylinder')
+    nt.eq_(list(s.center), [0., 0., 0.])
+    nt.assert_almost_equal(s.area, 444.288293851) # cone area, not including bottom

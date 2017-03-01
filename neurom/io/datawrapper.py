@@ -51,7 +51,7 @@ class DataWrapper(object):
             Z(float): z-coordinate
             R(float): radius
             TYPE(integer): one of the types described by POINT_TYPE
-            ID(integer): unique integer given to each point, the `ROOD_ID` is -1
+            ID(integer): unique integer given to each point, the `ROOT_ID` is -1
             P(integer): the ID of the parent
 
         Notes:
@@ -193,7 +193,6 @@ def _extract_sections(data_block):
 
 COL_COUNT = 7
 _, _, _, _, TYPE, ID, PARENT = range(COL_COUNT)
-XYZR = slice(0, 4)
 
 
 class BlockNeuronBuilder(object):
@@ -250,7 +249,7 @@ class BlockNeuronBuilder(object):
             points, section_type, parent_id = sec.points, sec.section_type, sec.parent_id
 
             idx = slice(insert_index, insert_index + len(points))
-            datablock[idx, XYZR] = points
+            datablock[idx, COLS.XYZR] = points
             datablock[idx, TYPE] = section_type
             datablock[idx.start, PARENT] = id_to_insert_id.get(parent_id, ROOT_ID)
             sections.append(Section(idx, section_type, parent_id))
