@@ -182,16 +182,33 @@ def number_of_segments(neurites, neurite_type=NeuriteType.all):
     return map_neurons(n_segments, neurites, neurite_type)
 
 
+def map_segments(func, neurites, neurite_type):
+    ''' Map `func` to all the segments in a collection of neurites
+
+        `func` accepts a section and returns list of values corresponding to each segment.
+    '''
+    neurite_filter = is_type(neurite_type)
+    return [
+        s for ss in iter_sections(neurites, neurite_filter=neurite_filter) for s in func(ss)
+    ]
+
+
 def segment_lengths(neurites, neurite_type=NeuriteType.all):
     '''Lengths of the segments in a collection of neurites'''
     def _seg_len(sec):
         '''list of segment lengths of a section'''
-        return np.linalg.norm(np.diff(sec.points[:, :COLS.R], axis=0),
-                              axis=1)
+        return np.linalg.norm(np.diff(sec.points[:, :COLS.R], axis=0), axis=1)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_len(ss)]
+    return map_segments(_seg_len, neurites, neurite_type)
+
+
+def segment_volumes(neurites, neurite_type=NeuriteType.all):
+    '''Volumes of the segments in a collection of neurites'''
+    def _func(sec):
+        '''list of segment volumes of a section'''
+        return [morphmath.segment_volume(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
+
+    return map_segments(_func, neurites, neurite_type)
 
 
 def segment_radii(neurites, neurite_type=NeuriteType.all):
@@ -201,9 +218,7 @@ def segment_radii(neurites, neurite_type=NeuriteType.all):
         pts = sec.points[:, COLS.R]
         return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_radii(ss)]
+    return map_segments(_seg_radii, neurites, neurite_type)
 
 
 def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
@@ -218,9 +233,7 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
         distance = np.linalg.norm(diff[:, :COLS.R], axis=1)
         return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_taper_rates(ss)]
+    return map_segments(_seg_taper_rates, neurites, neurite_type)
 
 
 def segment_meander_angles(neurites, neurite_type=NeuriteType.all):
@@ -233,12 +246,10 @@ def segment_midpoints(neurites, neurite_type=NeuriteType.all):
     '''Return a list of segment mid-points in a collection of neurites'''
     def _seg_midpoint(sec):
         '''Return the mid-points of segments in a section'''
-        pts = sec.points
-        return np.divide(np.add(pts[:-1], pts[1:])[:, :3], 2.0)
+        pts = sec.points[:, :COLS.R]
+        return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_midpoint(ss)]
+    return map_segments(_seg_midpoint, neurites, neurite_type)
 
 
 def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
