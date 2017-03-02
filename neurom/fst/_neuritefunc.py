@@ -197,7 +197,7 @@ def segment_lengths(neurites, neurite_type=NeuriteType.all):
     '''Lengths of the segments in a collection of neurites'''
     def _seg_len(sec):
         '''list of segment lengths of a section'''
-        return np.linalg.norm(np.diff(sec.points[:, :COLS.R], axis=0), axis=1)
+        return np.linalg.norm(np.diff(sec.points[:, COLS.XYZ], axis=0), axis=1)
 
     return map_segments(_seg_len, neurites, neurite_type)
 
@@ -228,9 +228,9 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
     '''
     def _seg_taper_rates(sec):
         '''vectorized taper rates'''
-        pts = sec.points[:, :COLS.TYPE]
+        pts = sec.points[:, COLS.XYZR]
         diff = np.diff(pts, axis=0)
-        distance = np.linalg.norm(diff[:, :COLS.R], axis=1)
+        distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
         return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
 
     return map_segments(_seg_taper_rates, neurites, neurite_type)
@@ -246,7 +246,7 @@ def segment_midpoints(neurites, neurite_type=NeuriteType.all):
     '''Return a list of segment mid-points in a collection of neurites'''
     def _seg_midpoint(sec):
         '''Return the mid-points of segments in a section'''
-        pts = sec.points[:, :COLS.R]
+        pts = sec.points[:, COLS.XYZ]
         return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
     return map_segments(_seg_midpoint, neurites, neurite_type)
