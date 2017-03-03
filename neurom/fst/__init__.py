@@ -79,6 +79,7 @@ NEURITEFEATURES = {
     'partition_asymmetry': _nrt.partition_asymmetries,
     'number_of_segments': _nrt.number_of_segments,
     'segment_lengths': _nrt.segment_lengths,
+    'segment_volumes': _nrt.segment_volumes,
     'segment_radii': _nrt.segment_radii,
     'segment_midpoints': _nrt.segment_midpoints,
     'segment_taper_rates': _nrt.segment_taper_rates,

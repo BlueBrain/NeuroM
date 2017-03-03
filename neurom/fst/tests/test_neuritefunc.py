@@ -240,6 +240,18 @@ def test_segment_lengths():
                     (5.0, 5.0, 6.0,   # type 3, basal dendrite
                      4.0, 6.0, 5.0))  # type 2, axon
 
+def test_segment_volumes():
+    expected = [
+        15.70796327,
+         5.23598776,
+         6.28318531,
+        12.56637061,
+         6.28318531,
+         5.23598776,
+    ]
+    result = _nf.segment_volumes(SIMPLE)
+    assert_allclose(result, expected)
+
 def test_segment_midpoints():
     midpoints = np.array(_nf.segment_midpoints(SIMPLE))
     assert_allclose(midpoints,
