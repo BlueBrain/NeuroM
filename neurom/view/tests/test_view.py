@@ -28,11 +28,10 @@
 import os
 import itertools as it
 import numpy as np
-import pylab as plt
 
 from nose import tools as nt
 from neurom import load_neuron
-from neurom.view import view
+from neurom.view import view, common
 from neurom.core import Section
 
 DATA_PATH = './test_data'
@@ -58,7 +57,7 @@ def test_tree():
 
     nt.assert_raises(AssertionError, view.tree, tree0, plane='wrong')
 
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_soma():
@@ -67,22 +66,23 @@ def test_soma():
 
     nt.assert_raises(AssertionError, view.tree, soma0, plane='wrong')
 
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_neuron():
     fig, ax = view.neuron(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001)) )
+    np.testing.assert_allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179))
+    np.testing.assert_allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001))
     nt.ok_(ax.get_title() == fst_neuron.name)
-    fig, ax = view.neuron(fst_neuron, xlim=(0,100), ylim=(0,100))
-    nt.ok_(np.allclose(ax.get_xlim(), (0, 100)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (0, 100)) )
+
+    fig, ax = view.neuron(fst_neuron, xlim=(0, 100), ylim=(0, 100))
+    np.testing.assert_allclose(ax.get_xlim(), (0, 100))
+    np.testing.assert_allclose(ax.get_ylim(), (0, 100))
     nt.ok_(ax.get_title() == fst_neuron.name)
 
     nt.assert_raises(AssertionError, view.tree, fst_neuron, plane='wrong')
 
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_tree3d():

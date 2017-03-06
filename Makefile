@@ -64,11 +64,11 @@ run_pylint: $(VENV_INSTALLED)
 	$(VENV_BIN)/pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES) > pylint.txt
 
 run_tests: $(VENV_INSTALLED)
-	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-package neurom
+	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-erase --cover-package neurom
 
 run_tests_xunit: $(VENV_INSTALLED)
 	@mkdir -p $(ROOT_DIR)/test-reports
-	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
+	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-erase --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
 
 lint: run_pep8 run_pylint
 

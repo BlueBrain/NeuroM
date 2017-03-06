@@ -32,12 +32,12 @@ to be used by view-plot modules.
 """
 from neurom import NeuriteType
 import os
-import matplotlib
 
-#  Awful hack to use non-GUI backend when no display
+#  TODO: Awful hack to use non-GUI backend when no display
 #  is available. For unixy systems.
-if 'DISPLAY' not in os.environ: # noqa
-    matplotlib.use('Agg')
+import matplotlib
+if 'DISPLAY' not in os.environ:  # noqa
+    matplotlib.use('Agg')  # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -264,7 +264,7 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
             Default value is False.
 
     Returns:
-        Figure is no_axes is True, otherwise axes.
+        Figure if no_axes is True, otherwise axes.
     """
     if new_fig:
         fig = plt.figure()
@@ -321,9 +321,6 @@ def save_plot(fig, **kwargs):
         transparent (Optional(bool):\
             If True the saved figure will have a transparent background.\
             Default value is False.
-
-    Returns:
-       input matplotlib figure
     """
 
     prefile = kwargs.get('prefile', '')
@@ -335,13 +332,11 @@ def save_plot(fig, **kwargs):
     transparent = kwargs.get('transparent', False)
 
     if not os.path.exists(output_path):
-        os.makedirs(output_path) # Make output directory if non-exsiting
+        os.makedirs(output_path)  # Make output directory if non-exsiting
 
     output = os.path.join(output_path, prefile + output_name + postfile + "." + output_format)
 
-    plt.savefig(output, dpi=dpi, transparent=transparent)
-
-    return fig
+    fig.savefig(output, dpi=dpi, transparent=transparent)
 
 
 def plot_style(fig, ax, **kwargs):
@@ -353,65 +348,43 @@ def plot_style(fig, ax, **kwargs):
         fig: matplotlib figure
         ax: matplotlib axes
     """
-    # Definition of title/file naming variables
-    prefile = kwargs.get('prefile', '')
-    postfile = kwargs.get('postfile', '')
-    pretitle = kwargs.get('pretitle', '')
-    posttitle = kwargs.get('posttitle', '')
-
-    # Definition of global options
-    no_axes = kwargs.get('no_axes', False)
-    show_plot = kwargs.get('show_plot', True)
-    tight = kwargs.get('tight', False)
-    aspect_ratio = kwargs.get('aspect_ratio', 'equal')
-
-    final = kwargs.get('final', False)
-
     # Definition of save options
     output_path = kwargs.get('output_path', None)
 
-    pretitle, posttitle, prefile, postfile = figure_naming(pretitle, posttitle, prefile, postfile)
+    plot_title(ax, **kwargs)
+    plot_labels(ax, **kwargs)
+    plot_ticks(ax, **kwargs)
+    plot_limits(ax, **kwargs)
+    plot_legend(ax, **kwargs)
 
-    fig, ax = plot_title(fig, ax, **kwargs)
-
-    fig, ax = plot_labels(fig, ax, **kwargs)
-
-    fig, ax = plot_ticks(fig, ax, **kwargs)
-
-    fig, ax = plot_limits(fig, ax, **kwargs)
-
-    fig, ax = plot_legend(fig, ax, **kwargs)
-
+    no_axes = kwargs.get('no_axes', False)
     if no_axes:
         ax.set_frame_on(False)
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
 
+    aspect_ratio = kwargs.get('aspect_ratio', 'equal')
     ax.set_aspect(aspect_ratio)
 
+    tight = kwargs.get('tight', False)
     if tight:
         fig.set_tight_layout(True)
 
     if output_path is not None:
-        fig = save_plot(fig=ax, **kwargs)
+        save_plot(fig=fig, **kwargs)
 
+    show_plot = kwargs.get('show_plot', True)
+    final = kwargs.get('final', False)
     if not show_plot:
         plt.close()
-        return (None, None)
-    else:
-        if final:
-            plt.show()  # pragma no cover
-        return fig, ax
+    elif final:
+        plt.show()  # pragma no cover
 
 
-def plot_title(fig, ax, **kwargs):
-
-    """
-    Function that defines the title options
-    of a matplotlib plot.
+def plot_title(ax, **kwargs):
+    """Function that defines the title options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         pretitle(Optional[str]) : \
             String to include before the general title of the figure. \
@@ -430,9 +403,6 @@ def plot_title(fig, ax, **kwargs):
             Defines the arguments that will be passsed \
             into matplotlib as title arguments. \
             Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
     """
 
     # Definition of title options
@@ -448,17 +418,11 @@ def plot_title(fig, ax, **kwargs):
     ax.set_title(pretitle + title + posttitle,
                  fontsize=title_fontsize, **title_arg)
 
-    return fig, ax
 
-
-def plot_labels(fig, ax, **kwargs):
-
-    """
-    Function that defines the labels options
-    of a matplotlib plot.
+def plot_labels(ax, **kwargs):
+    """ Function that defines the labels options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xlabel (Optional[str]): \
             The xlabel for the figure. \
@@ -487,9 +451,6 @@ def plot_labels(fig, ax, **kwargs):
             Defines the arguments that will be passsed, \
             into matplotlib as zlabel arguments. \
             Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
     """
 
     # Definition of label options
@@ -516,17 +477,14 @@ def plot_labels(fig, ax, **kwargs):
     if hasattr(ax, 'zaxis'):
         ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
-    return fig, ax
 
-
-def plot_ticks(fig, ax, **kwargs):
+def plot_ticks(ax, **kwargs):
 
     """
     Function that defines the labels options
     of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xticks (Optional[list of ticks]): \
             Defines the values of x ticks in the figure. \
@@ -558,28 +516,18 @@ def plot_ticks(fig, ax, **kwargs):
             Defines the arguments that will be passsed \
             into matplotlib as zticks arguments. \
             Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
     """
 
     # Definition of tick options
     xticks = kwargs.get('xticks', None)
     yticks = kwargs.get('yticks', None)
     zticks = kwargs.get('zticks', None)
+
     tick_fontsize = kwargs.get('tickfontsize', 12)
-    xticks_arg = kwargs.get('xticksarg', None)
-    yticks_arg = kwargs.get('yticksarg', None)
-    zticks_arg = kwargs.get('zticksarg', None)
 
-    if xticks_arg is None:
-        xticks_arg = {}
-
-    if yticks_arg is None:
-        yticks_arg = {}
-
-    if zticks_arg is None:
-        zticks_arg = {}
+    xticks_arg = kwargs.get('xticksarg', {})
+    yticks_arg = kwargs.get('yticksarg', {})
+    zticks_arg = kwargs.get('zticksarg', {})
 
     if xticks is not None:
         ax.set_xticks(xticks)
@@ -593,17 +541,11 @@ def plot_ticks(fig, ax, **kwargs):
         ax.set_zticks(zticks)
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
-    return fig, ax
 
-
-def plot_limits(fig, ax, **kwargs):
-
-    """
-    Function that defines the limit options
-    of a matplotlib plot.
+def plot_limits(ax, **kwargs):
+    """Sets the limit options of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         xlim (Optional[list of two floats]): \
             Defines the min and the max values in x-axis. \
@@ -614,9 +556,6 @@ def plot_limits(fig, ax, **kwargs):
         zlim (Optional[list of two floats]): \
             Defines the min and the max values in z-axis. \
             To use default limits select None.
-
-    Returns:
-        Matplotlib figure, axes
     """
     # Definition of limit options
     xlim = kwargs.get('xlim', None)
@@ -625,21 +564,17 @@ def plot_limits(fig, ax, **kwargs):
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-
     if hasattr(ax, 'zaxis'):
         ax.set_zlim(zlim)
 
-    return fig, ax
 
-
-def plot_legend(fig, ax, **kwargs):
+def plot_legend(ax, **kwargs):
 
     """
     Function that defines the legend options
     of a matplotlib plot.
 
     Parameters:
-        fig: matplotlib figure
         ax: matplotlib axes
         no_legend (Optional[boolean]): \
             Defines the presence of a legend in the figure. \
@@ -649,9 +584,6 @@ def plot_legend(fig, ax, **kwargs):
             Defines the arguments that will be passsed \
             into matplotlib as legend arguments. \
             Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
     """
     # Definition of legend options
     no_legend = kwargs.get('no_legend', True)
@@ -663,13 +595,9 @@ def plot_legend(fig, ax, **kwargs):
     if not no_legend:
         ax.legend(**legend_arg)
 
-    return fig, ax
 
-
-def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
-    """
-    Plots a 3d sphere, given the center and the radius.
-    """
+def plot_sphere(_, ax, center, radius, color='black', alpha=1.):
+    """Plots a 3d sphere, given the center and the radius."""
 
     u = np.linspace(0, 2 * np.pi, 300)
     v = np.linspace(0, np.pi, 300)
@@ -680,6 +608,4 @@ def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
 
     ax.plot_surface(x, y, z, linewidth=0.0, color=color, alpha=alpha)
 
-    return fig, ax
-
-plot_style.__doc__ += PLOT_STYLE_PARAMS # pylint: disable=no-member
+plot_style.__doc__ += PLOT_STYLE_PARAMS  # pylint: disable=no-member

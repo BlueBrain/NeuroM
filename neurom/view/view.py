@@ -28,10 +28,11 @@
 '''
 Python module of NeuroM to visualize morphologies
 '''
+from . import common
+
 import numpy as np
 from matplotlib.collections import LineCollection
 
-from . import common
 from neurom import NeuriteType, geom
 
 from neurom.core import iter_segments
@@ -155,7 +156,8 @@ def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
                                max_bounding_box[plane1] + white_space])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
@@ -205,7 +207,8 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
     kwargs.setdefault('xlabel', plane[0])
     kwargs.setdefault('ylabel', plane[1])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
@@ -260,7 +263,8 @@ def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
         kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
                                    max_bounding_box[plane1] + white_space])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
@@ -314,7 +318,8 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
     kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
                                max_bounding_box[COLS.Z] + white_space])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
@@ -334,12 +339,13 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
     treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
 
     # Plot the soma as a circle.
-    fig, ax = common.plot_sphere(fig, ax, center=sm.center[COLS.XYZ], radius=sm.radius,
-                                 color=treecolor, alpha=get_default('alpha', kwargs))
+    common.plot_sphere(fig, ax, center=sm.center[COLS.XYZ], radius=sm.radius,
+                       color=treecolor, alpha=get_default('alpha', kwargs))
 
     kwargs.setdefault('title', 'Soma view')
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
@@ -392,7 +398,8 @@ def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
         kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
                                    max_bounding_box[COLS.Z] + white_space])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 
 def _format_str(string):
@@ -499,7 +506,8 @@ def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=Fa
     kwargs['no_legend'] = False
     kwargs.setdefault('aspect_ratio', 'auto')
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    common.plot_style(fig=fig, ax=ax, **kwargs)
+    return fig, ax
 
 neuron.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
 tree.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member

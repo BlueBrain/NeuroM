@@ -40,27 +40,21 @@ Examples:
 
 '''
 
-from .view.view import neuron as draw_neuron
-from .view.view import neuron3d as draw_neuron3d
-from .view.view import tree as draw_tree
-from .view.view import tree3d as draw_tree3d
-from .view.view import soma as draw_soma
-from .view.view import soma3d as draw_soma3d
-from .view.view import dendrogram as draw_dendrogram
+from .view.view import (neuron, neuron3d, tree, tree3d, soma, soma3d, dendrogram)
 from .core import Tree, Neurite, Soma, Neuron
 
 
 MODES = ('2d', '3d', 'dendrogram')
 
 _VIEWERS = {
-    'neuron_3d': draw_neuron3d,
-    'neuron_2d': draw_neuron,
-    'neuron_dendrogram': draw_dendrogram,
-    'tree_3d': draw_tree3d,
-    'tree_2d': draw_tree,
-    'tree_dendrogram': draw_dendrogram,
-    'soma_3d': draw_soma3d,
-    'soma_2d': draw_soma
+    'neuron_3d': neuron3d,
+    'neuron_2d': neuron,
+    'neuron_dendrogram': dendrogram,
+    'tree_3d': tree3d,
+    'tree_2d': tree,
+    'tree_dendrogram': dendrogram,
+    'soma_3d': soma3d,
+    'soma_2d': soma
 }
 
 
