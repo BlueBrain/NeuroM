@@ -39,6 +39,7 @@ from neurom.io.datawrapper import DataWrapper
 from neurom.io import swc
 from neurom.io import neurolucida
 from neurom.fst._core import FstNeuron
+from neurom._compat import filter
 
 
 L = logging.getLogger(__name__)
@@ -73,9 +74,9 @@ class NeuronLoader(object):
         if self.file_ext is None:
             candidates = glob.glob(os.path.join(self.directory, name + ".*"))
             candidates = filter(_is_morphology_file, candidates)
-            if candidates:
-                return candidates[0]
-            else:
+            try:
+                return candidates.next()
+            except StopIteration:
                 raise NeuroMError("Can not find morphology file for '%s' " % name)
         else:
             return os.path.join(self.directory, name + self.file_ext)
@@ -93,7 +94,7 @@ def get_morph_files(directory):
         list with all files with extensions '.swc' , 'h5' or '.asc' (case insensitive)
     '''
     lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
-    return filter(_is_morphology_file, lsdir)
+    return list(filter(_is_morphology_file, lsdir))
 
 
 def load_neuron(filename):
