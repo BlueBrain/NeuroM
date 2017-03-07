@@ -356,3 +356,11 @@ def test_NeuronLoader():
     # check caching
     nt.ok_(nrn == loader.get('Neuron'))
     nt.ok_(nrn != loader.get('Neuron_2_branch'))
+
+
+def test_NeuronLoader_mixed_file_extensions():
+    dirpath = os.path.join(DATA_PATH, 'valid_set')
+    loader = utils.NeuronLoader(dirpath)
+    loader.get('Neuron')
+    loader.get('Neuron_h5v1')
+    nt.assert_raises(NeuroMError, loader.get, 'NoSuchNeuron')
