@@ -75,7 +75,7 @@ class NeuronLoader(object):
             candidates = glob.glob(os.path.join(self.directory, name + ".*"))
             candidates = filter(_is_morphology_file, candidates)
             try:
-                return candidates.next()
+                return next(candidates)
             except StopIteration:
                 raise NeuroMError("Can not find morphology file for '%s' " % name)
         else:
