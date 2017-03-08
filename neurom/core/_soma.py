@@ -140,12 +140,17 @@ class SomaThreePointCylinders(SomaCylinders):
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
+        def tol_eq(p0, p1):
+            '''check if p0 is within 1e-6 of p1'''
+            return abs(p0 - p1) < 1e-6
+
         # make sure the above invariant holds
-        assert points[0, COLS.R] == points[1, COLS.R] == points[2, COLS.R], \
+        assert (tol_eq(points[0, COLS.R], points[1, COLS.R]) and
+                tol_eq(points[0, COLS.R], points[2, COLS.R])), \
             'All radii must be the same'
-        assert points[0, COLS.Y] - points[1, COLS.Y] == points[0, COLS.R], \
+        assert tol_eq(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
             'The first point must be one radius below 0 on the y-plane'
-        assert points[0, COLS.Y] - points[2, COLS.Y] == -points[0, COLS.R], \
+        assert tol_eq(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
             'The second point must be one radius above 0 on the y-plane'
 
         r = points[0, COLS.R]
@@ -206,6 +211,11 @@ class SomaSimpleContour(Soma):
                 (repr(self._points), self.center, self.radius))
 
 
+# classes of somas
+SOMA_CONTOUR = 'contour'
+SOMA_CYLINDER = 'cylinder'
+
+
 def _get_type(points, soma_class):
     '''get the type of the soma
 
@@ -213,14 +223,15 @@ def _get_type(points, soma_class):
         points: Soma points
         soma_class(str): one of 'contour' or 'cylinder' to specify the type
     '''
-    assert soma_class in ('contour', 'cylinder', )
+    assert soma_class in (SOMA_CONTOUR, SOMA_CYLINDER)
+
     npoints = len(points)
-    if soma_class == 'contour':
+    if soma_class is SOMA_CONTOUR:
         return {0: None,
                 1: SomaSinglePoint,
                 3: SomaThreePoint,
                 2: None}.get(npoints, SomaSimpleContour)
-    elif soma_class == 'cylinder':
+    elif soma_class is SOMA_CYLINDER:
         if(npoints == 3 and
            points[0][COLS.P] == -1 and
            points[1][COLS.P] == 1 and
@@ -238,7 +249,7 @@ def _get_type(points, soma_class):
                 1: SomaSinglePoint}.get(npoints, SomaCylinders)
 
 
-def make_soma(points, soma_check=None, soma_class='contour'):
+def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
     '''Make a soma object from a set of points
 
     Infers the soma type (SomaSinglePoint, SomaSimpleContour)

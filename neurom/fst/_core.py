@@ -32,9 +32,9 @@ from copy import deepcopy
 
 import numpy as np
 
-from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError,
-                         make_soma)
+from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError,)
 from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
+from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
 
 class FstNeuron(Neuron):
@@ -151,8 +151,8 @@ _SOMA_CONFIG = {
     #    cylinder in the path to the soma (the parent of the root being the soma itself)."
     #
     # that the SWC format uses cylinders to represent the soma.
-    'SWC': (_check_soma_topology_swc, 'cylinder'),
-    'H5V1': (None, 'contour'),
-    'H5V2': (None, 'contour'),
-    'NL-ASCII': (None, 'contour'),
+    'SWC': (_check_soma_topology_swc, SOMA_CYLINDER),
+    'H5V1': (None, SOMA_CONTOUR),
+    'H5V2': (None, SOMA_CONTOUR),
+    'NL-ASCII': (None, SOMA_CONTOUR),
 }

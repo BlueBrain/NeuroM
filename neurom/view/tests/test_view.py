@@ -33,7 +33,7 @@ from nose import tools as nt
 from neurom import load_neuron
 from neurom.view import view, common
 from neurom.core import Section
-from neurom.core._soma import make_soma
+from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
@@ -125,7 +125,7 @@ soma_2pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
     [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
 ])
-soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class='cylinder')
+soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
 
 #upright, uniform radius, multiple cylinders
 soma_3pt_normal_pts = np.array([
@@ -133,7 +133,7 @@ soma_3pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
     [0.0,   10.0, 0.0, 10.0, 1, 3,  2],
 ])
-soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class='cylinder')
+soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
 
 #increasing radius, multiple cylinders
 soma_4pt_normal_pts = np.array([
@@ -142,8 +142,8 @@ soma_4pt_normal_pts = np.array([
     [0.0,   -10.0, -10.0, 3.0, 1, 3, 2],
     [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
 ])
-soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class='cylinder')
-soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class='contour')
+soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CONTOUR)
 
 
 def test_soma():

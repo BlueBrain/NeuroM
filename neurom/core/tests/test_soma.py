@@ -89,7 +89,7 @@ def test_make_Soma_SinglePoint():
 
 
 def test_make_Soma_ThreePoint():
-    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class='contour')
+    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CONTOUR)
     nt.ok_('SomaThreePoint' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaThreePoint))
     nt.eq_(list(sm.center), [0, 0, 0])
@@ -97,7 +97,7 @@ def test_make_Soma_ThreePoint():
 
 
 def test_make_Soma_ThreePointCylinder():
-    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class='cylinder')
+    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CYLINDER)
     nt.ok_('SomaThreePointCylinders' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
@@ -147,7 +147,7 @@ def test_make_Soma_Cylinders():
         [0.0,   0.0,  0.0, 20.0, 1, 1, -1],
         [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
     ])
-    s = _soma.make_soma(soma_2pt_normal, soma_class='cylinder')
+    s = _soma.make_soma(soma_2pt_normal, soma_class=_soma.SOMA_CYLINDER)
     nt.assert_almost_equal(s.area, 1256.6370614) # see r = 2*h above
     nt.eq_(list(s.center), [0., 0., 0.])
 
@@ -156,7 +156,7 @@ def test_make_Soma_Cylinders():
         [0.0,   0.0,  0.0, 0.0, 1, 1, -1],
         [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
     ])
-    s = _soma.make_soma(soma_2pt_normal, soma_class='cylinder')
+    s = _soma.make_soma(soma_2pt_normal, soma_class=_soma.SOMA_CYLINDER)
     nt.assert_almost_equal(s.area, 1404.9629462081452) # cone area, not including 'bottom'
 
     # neuromorpho style
@@ -165,7 +165,7 @@ def test_make_Soma_Cylinders():
         [0.0, -10.0,  0.0, 10.0, 1, 2,  1],
         [0.0,   10.0, 0.0, 10.0, 1, 3,  1],
     ])
-    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class='cylinder')
+    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
     nt.ok_('SomaThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 1256.6370614)
@@ -178,6 +178,6 @@ def test_make_Soma_Cylinders():
         [0.0, 8.0,  0.0, 8.0,  1, 5, 4],
         [0.0, 10.0, 0.0, 10.0, 1, 6, 5],
     ])
-    s = _soma.make_soma(soma_4pt_normal, soma_class='cylinder')
+    s = _soma.make_soma(soma_4pt_normal, soma_class=_soma.SOMA_CYLINDER)
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 444.288293851) # cone area, not including bottom
