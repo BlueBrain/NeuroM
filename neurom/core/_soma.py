@@ -153,11 +153,6 @@ class SomaThreePointCylinders(SomaCylinders):
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
 
-    @property
-    def center(self):
-        '''Obtain the center from the first stored point'''
-        return self._points[0][COLS.XYZ]
-
     def __str__(self):
         return ('SomaThreePointCylinders(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
