@@ -140,17 +140,13 @@ class SomaThreePointCylinders(SomaCylinders):
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
-        def tol_eq(p0, p1):
-            '''check if p0 is within 1e-6 of p1'''
-            return abs(p0 - p1) < 1e-6
-
         # make sure the above invariant holds
-        assert (tol_eq(points[0, COLS.R], points[1, COLS.R]) and
-                tol_eq(points[0, COLS.R], points[2, COLS.R])), \
+        assert (np.isclose(points[0, COLS.R], points[1, COLS.R]) and
+                np.isclose(points[0, COLS.R], points[2, COLS.R])), \
             'All radii must be the same'
-        assert tol_eq(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
+        assert np.isclose(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
             'The first point must be one radius below 0 on the y-plane'
-        assert tol_eq(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
+        assert np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
             'The second point must be one radius above 0 on the y-plane'
 
         r = points[0, COLS.R]
