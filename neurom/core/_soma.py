@@ -80,14 +80,16 @@ class SomaCylinders(Soma):
     '''Soma composed of cylinders (like in SWC)
 
     points describe the locations of the cylinder start/end points, with
-    their respective radii, much like how neurites are described: ex:
+    their respective radii, much like how neurites are described:
 
-                 /)
-                / o)
-        ______ /  )
-      (|)      ) /
-     ( o )    o )
-      (|)_____ )
+        ex::
+
+                             /)
+                            / o)
+                    ______ /  )
+                (|)      ) /
+                ( o )    o )
+                (|)_____ )
 
       Here we have a 'side-view', with each 'o' representing a point, and the
       radius is the heigh of a '|' character, and the ')' try and show the
