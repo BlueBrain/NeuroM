@@ -348,13 +348,10 @@ def plot_style(fig, ax, **kwargs):
         fig: matplotlib figure
         ax: matplotlib axes
     """
-    # Definition of save options
-    output_path = kwargs.get('output_path', None)
-
     plot_title(ax, **kwargs)
     plot_labels(ax, **kwargs)
     plot_ticks(ax, **kwargs)
-    plot_limits(ax, **kwargs)
+    plot_limits(ax, kwargs.get('white_space', 30))
     plot_legend(ax, **kwargs)
 
     no_axes = kwargs.get('no_axes', False)
@@ -370,6 +367,7 @@ def plot_style(fig, ax, **kwargs):
     if tight:
         fig.set_tight_layout(True)
 
+    output_path = kwargs.get('output_path', None)
     if output_path is not None:
         save_plot(fig=fig, **kwargs)
 
@@ -381,7 +379,8 @@ def plot_style(fig, ax, **kwargs):
         plt.show()  # pragma no cover
 
 
-def plot_title(ax, **kwargs):
+def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None,
+               **_):
     """Function that defines the title options of a matplotlib plot.
 
     Parameters:
@@ -406,17 +405,13 @@ def plot_title(ax, **kwargs):
     """
 
     # Definition of title options
-    pretitle = kwargs.get('pretitle', '')
-    posttitle = kwargs.get('posttitle', '')
-    title = kwargs.get('title', 'Figure')
-    title_fontsize = kwargs.get('titlefontsize', 14)
-    title_arg = kwargs.get('titlearg', None)
+    title = ax.get_title()
+    if not title:
+        title = pretitle + title + posttitle
 
-    if title_arg is None:
-        title_arg = {}
+    title_arg = {} if title_arg is None else title_arg
 
-    ax.set_title(pretitle + title + posttitle,
-                 fontsize=title_fontsize, **title_arg)
+    ax.set_title(title, fontsize=title_fontsize)
 
 
 def plot_labels(ax, **kwargs):
@@ -542,7 +537,7 @@ def plot_ticks(ax, **kwargs):
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
 
-def plot_limits(ax, **kwargs):
+def plot_limits(ax, ws):
     """Sets the limit options of a matplotlib plot.
 
     Parameters:
@@ -557,15 +552,24 @@ def plot_limits(ax, **kwargs):
             Defines the min and the max values in z-axis. \
             To use default limits select None.
     """
-    # Definition of limit options
-    xlim = kwargs.get('xlim', None)
-    ylim = kwargs.get('ylim', None)
-    zlim = kwargs.get('zlim', None)
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-    if hasattr(ax, 'zaxis'):
-        ax.set_zlim(zlim)
+    if hasattr(ax, 'zz_dataLim'):
+        #  xy_bounds = ax.xy_dataLim.bounds
+        #  z_bounds = ax.zz_dataLim.bounds
+        #  ax.auto_scale_xyz([xy_bounds[0] - ws, xy_bounds[0] + xy_bounds[2] + ws],
+        #                    [xy_bounds[1] - ws, xy_bounds[1] + xy_bounds[3] + ws],
+        #                    [z_bounds[0] - ws, z_bounds[0] + z_bounds[2] + ws])
+
+        bounds = ax.xy_dataLim.bounds
+        ax.set_xlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
+        ax.set_ylim(bounds[1] - ws, bounds[1] + bounds[3] + ws)
+
+        bounds = ax.zz_dataLim.bounds
+        ax.set_zlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
+    else:
+        bounds = ax.dataLim.bounds
+        ax.set_xlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
+        ax.set_ylim(bounds[1] - ws, bounds[1] + bounds[3] + ws)
 
 
 def plot_legend(ax, **kwargs):
@@ -596,7 +600,7 @@ def plot_legend(ax, **kwargs):
         ax.legend(**legend_arg)
 
 
-def plot_sphere(_, ax, center, radius, color='black', alpha=1.):
+def plot_sphere(ax, center, radius, color='black', alpha=1.):
     """Plots a 3d sphere, given the center and the radius."""
 
     u = np.linspace(0, 2 * np.pi, 300)

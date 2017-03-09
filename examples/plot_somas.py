@@ -46,12 +46,12 @@ def random_color():
 
 def plot_somas(somas):
     '''Plot set of somas on same figure as spheres, each with different color'''
-    fig, ax = common.get_figure(new_fig=True, subplot=111,
-                                params={'projection': '3d', 'aspect': 'equal'})
+    _, ax = common.get_figure(new_fig=True, subplot=111,
+                              params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
         center = s.center
         radius = s.radius
-        common.plot_sphere(fig, ax, center, radius, color=random_color(), alpha=1)
+        common.plot_sphere(ax, center, radius, color=random_color(), alpha=1)
     plt.show()
 
 

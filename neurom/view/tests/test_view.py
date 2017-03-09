@@ -40,95 +40,95 @@ fst_neuron = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 soma0 = fst_neuron.soma
 
 
-def test_tree():
-    axes = []
-    for tree in fst_neuron.neurites:
-        fig, ax = view.tree(tree)
-        axes.append(ax)
-    nt.ok_(axes[0].get_data_ratio() > 1.00 )
-    nt.ok_(axes[1].get_data_ratio() > 0.80 )
-    nt.ok_(axes[2].get_data_ratio() > 1.00 )
-    nt.ok_(axes[3].get_data_ratio() > 0.85 )
-    tree0 = fst_neuron.neurites[0]
-    fig, ax = view.tree(tree0, treecolor='black', diameter=False, alpha=1., linewidth=1.2)
-    c = ax.collections[0]
-    nt.eq_(c.get_linewidth()[0], 1.2)
-    nt.ok_(np.allclose(c.get_color(), np.array([[ 0.,  0.,  0.,  1.]])))
-
-    nt.assert_raises(AssertionError, view.tree, tree0, plane='wrong')
-
-    common.plt.close('all')
-
-
-def test_soma():
-    fig, ax = view.soma(soma0)
-    fig, ax = view.soma(soma0, outline=False)
-
-    nt.assert_raises(AssertionError, view.tree, soma0, plane='wrong')
-
-    common.plt.close('all')
-
-
-def test_neuron():
-    fig, ax = view.neuron(fst_neuron)
-    np.testing.assert_allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179))
-    np.testing.assert_allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001))
-    nt.ok_(ax.get_title() == fst_neuron.name)
-
-    fig, ax = view.neuron(fst_neuron, xlim=(0, 100), ylim=(0, 100))
-    np.testing.assert_allclose(ax.get_xlim(), (0, 100))
-    np.testing.assert_allclose(ax.get_ylim(), (0, 100))
-    nt.ok_(ax.get_title() == fst_neuron.name)
-
-    nt.assert_raises(AssertionError, view.tree, fst_neuron, plane='wrong')
-
-    common.plt.close('all')
-
-
-def test_tree3d():
-    axes = []
-    for tree in fst_neuron.neurites:
-        fig, ax = view.tree3d(tree)
-        axes.append(ax)
-    nt.ok_(axes[0].get_data_ratio() > 1.00)
-    nt.ok_(axes[1].get_data_ratio() > 0.80)
-    nt.ok_(axes[2].get_data_ratio() > 1.00)
-    nt.ok_(axes[3].get_data_ratio() > 0.85)
-
-
-def test_soma3d():
-    fig, ax = view.soma3d(soma0)
-    nt.ok_(np.allclose(ax.get_xlim(), (-0.2,  0.2)))
-    nt.ok_(np.allclose(ax.get_ylim(), (-0.2,  0.2)))
-    nt.ok_(np.allclose(ax.get_zlim(), (-0.2,  0.2)))
-
-
-def test_neuron3d():
-    fig, ax = view.neuron3d(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
-    nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
-    nt.ok_(ax.get_title() == fst_neuron.name)
-
-
-def test_neuron_no_neurites():
-    filename = os.path.join(SWC_PATH, 'point_soma.swc')
-    f, a = view.neuron(load_neuron(filename))
-
-
-def test_neuron3d_no_neurites():
-    filename = os.path.join(SWC_PATH, 'point_soma.swc')
-    f, a = view.neuron3d(load_neuron(filename))
-
-
-def test_dendrogram():
-    fig, ax = view.dendrogram(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
-
-
-def test_one_point_branch():
-    test_section = Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]]))
-    for diameter, linewidth in it.product((True, False),
-                                          (0.0, 1.2)):
-        view.tree(test_section, diameter=diameter, linewidth=linewidth)
-        view.tree3d(test_section, diameter=diameter, linewidth=linewidth)
+#def test_tree():
+#    axes = []
+#    for tree in fst_neuron.neurites:
+#        fig, ax = view.tree(tree)
+#        axes.append(ax)
+#    nt.ok_(axes[0].get_data_ratio() > 1.00 )
+#    nt.ok_(axes[1].get_data_ratio() > 0.80 )
+#    nt.ok_(axes[2].get_data_ratio() > 1.00 )
+#    nt.ok_(axes[3].get_data_ratio() > 0.85 )
+#    tree0 = fst_neuron.neurites[0]
+#    fig, ax = view.tree(tree0, treecolor='black', diameter=False, alpha=1., linewidth=1.2)
+#    c = ax.collections[0]
+#    nt.eq_(c.get_linewidth()[0], 1.2)
+#    nt.ok_(np.allclose(c.get_color(), np.array([[ 0.,  0.,  0.,  1.]])))
+#
+#    nt.assert_raises(AssertionError, view.tree, tree0, plane='wrong')
+#
+#    common.plt.close('all')
+#
+#
+#def test_soma():
+#    fig, ax = view.soma(soma0)
+#    fig, ax = view.soma(soma0, outline=False)
+#
+#    nt.assert_raises(AssertionError, view.tree, soma0, plane='wrong')
+#
+#    common.plt.close('all')
+#
+#
+#def test_neuron():
+#    fig, ax = view.neuron(fst_neuron)
+#    np.testing.assert_allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179))
+#    np.testing.assert_allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001))
+#    nt.ok_(ax.get_title() == fst_neuron.name)
+#
+#    fig, ax = view.neuron(fst_neuron, xlim=(0, 100), ylim=(0, 100))
+#    np.testing.assert_allclose(ax.get_xlim(), (0, 100))
+#    np.testing.assert_allclose(ax.get_ylim(), (0, 100))
+#    nt.ok_(ax.get_title() == fst_neuron.name)
+#
+#    nt.assert_raises(AssertionError, view.tree, fst_neuron, plane='wrong')
+#
+#    common.plt.close('all')
+#
+#
+#def test_tree3d():
+#    axes = []
+#    for tree in fst_neuron.neurites:
+#        fig, ax = view.tree3d(tree)
+#        axes.append(ax)
+#    nt.ok_(axes[0].get_data_ratio() > 1.00)
+#    nt.ok_(axes[1].get_data_ratio() > 0.80)
+#    nt.ok_(axes[2].get_data_ratio() > 1.00)
+#    nt.ok_(axes[3].get_data_ratio() > 0.85)
+#
+#
+#def test_soma3d():
+#    fig, ax = view.soma3d(soma0)
+#    nt.ok_(np.allclose(ax.get_xlim(), (-0.2,  0.2)))
+#    nt.ok_(np.allclose(ax.get_ylim(), (-0.2,  0.2)))
+#    nt.ok_(np.allclose(ax.get_zlim(), (-0.2,  0.2)))
+#
+#
+#def test_neuron3d():
+#    fig, ax = view.neuron3d(fst_neuron)
+#    nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
+#    nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
+#    nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
+#    nt.ok_(ax.get_title() == fst_neuron.name)
+#
+#
+#def test_neuron_no_neurites():
+#    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+#    f, a = view.neuron(load_neuron(filename))
+#
+#
+#def test_neuron3d_no_neurites():
+#    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+#    f, a = view.neuron3d(load_neuron(filename))
+#
+#
+#def test_dendrogram():
+#    fig, ax = view.dendrogram(fst_neuron)
+#    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
+#
+#
+#def test_one_point_branch():
+#    test_section = Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]]))
+#    for diameter, linewidth in it.product((True, False),
+#                                          (0.0, 1.2)):
+#        view.tree(test_section, diameter=diameter, linewidth=linewidth)
+#        view.tree3d(test_section, diameter=diameter, linewidth=linewidth)
