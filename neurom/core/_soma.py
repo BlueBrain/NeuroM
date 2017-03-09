@@ -224,12 +224,12 @@ def _get_type(points, soma_class):
     assert soma_class in (SOMA_CONTOUR, SOMA_CYLINDER)
 
     npoints = len(points)
-    if soma_class is SOMA_CONTOUR:
+    if soma_class == SOMA_CONTOUR:
         return {0: None,
                 1: SomaSinglePoint,
                 3: SomaThreePoint,
                 2: None}.get(npoints, SomaSimpleContour)
-    elif soma_class is SOMA_CYLINDER:
+    elif soma_class == SOMA_CYLINDER:
         if(npoints == 3 and
            points[0][COLS.P] == -1 and
            points[1][COLS.P] == 1 and
