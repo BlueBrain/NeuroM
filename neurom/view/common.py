@@ -38,10 +38,14 @@ from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 
 
 plt = None
+
+
 def _get_plt():
-    global plt
+    '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    global plt  # pylint: disable=global-statement
     import matplotlib.pyplot
     plt = matplotlib.pyplot
+
 
 # Map tree type to color
 TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
@@ -339,7 +343,7 @@ def save_plot(fig, **kwargs):
     fig.savefig(output, dpi=dpi, transparent=transparent)
 
 
-def plot_style(fig, ax, **kwargs):
+def plot_style(fig, ax, white_space=30, **kwargs):
     """
     Function to set the basic options of a matplotlib figure,
     to be used by viewing - plotting functions.
@@ -351,7 +355,7 @@ def plot_style(fig, ax, **kwargs):
     plot_title(ax, **kwargs)
     plot_labels(ax, **kwargs)
     plot_ticks(ax, **kwargs)
-    plot_limits(ax, kwargs.get('white_space', 30))
+    plot_limits(ax, white_space=white_space)
     plot_legend(ax, **kwargs)
 
     no_axes = kwargs.get('no_axes', False)
@@ -371,13 +375,13 @@ def plot_style(fig, ax, **kwargs):
     if output_path is not None:
         save_plot(fig=fig, **kwargs)
 
-    #####XXXXXX
-    #show_plot = kwargs.get('show_plot', True)
-    #final = kwargs.get('final', False)
-    #if not show_plot:
-    #    plt.close()
-    #elif final:
-    #    plt.show()  # pragma no cover
+    # XXX
+    # show_plot = kwargs.get('show_plot', True)
+    # final = kwargs.get('final', False)
+    # if not show_plot:
+    #     plt.close()
+    # elif final:
+    #     plt.show()  # pragma no cover
 
 
 def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None,
@@ -538,39 +542,27 @@ def plot_ticks(ax, **kwargs):
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
 
-def plot_limits(ax, ws):
+def plot_limits(ax, white_space):
     """Sets the limit options of a matplotlib plot.
 
     Parameters:
         ax: matplotlib axes
-        xlim (Optional[list of two floats]): \
-            Defines the min and the max values in x-axis. \
-            To use default limits select None.
-        ylim (Optional[list of two floats]): \
-            Defines the min and the max values in y-axis. \
-            To use default limits select None.
-        zlim (Optional[list of two floats]): \
-            Defines the min and the max values in z-axis. \
-            To use default limits select None.
+        white_space(float): whitespace added to surround the tight limit of the data
+
+    Note: This relies on ax.dataLim (in 2d) and ax.[xy, zz]_dataLim being set in 3d
     """
 
     if hasattr(ax, 'zz_dataLim'):
-        #  xy_bounds = ax.xy_dataLim.bounds
-        #  z_bounds = ax.zz_dataLim.bounds
-        #  ax.auto_scale_xyz([xy_bounds[0] - ws, xy_bounds[0] + xy_bounds[2] + ws],
-        #                    [xy_bounds[1] - ws, xy_bounds[1] + xy_bounds[3] + ws],
-        #                    [z_bounds[0] - ws, z_bounds[0] + z_bounds[2] + ws])
-
         bounds = ax.xy_dataLim.bounds
-        ax.set_xlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
-        ax.set_ylim(bounds[1] - ws, bounds[1] + bounds[3] + ws)
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
         bounds = ax.zz_dataLim.bounds
-        ax.set_zlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
+        ax.set_zlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
     else:
         bounds = ax.dataLim.bounds
-        ax.set_xlim(bounds[0] - ws, bounds[0] + bounds[2] + ws)
-        ax.set_ylim(bounds[1] - ws, bounds[1] + bounds[3] + ws)
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
 
 def plot_legend(ax, **kwargs):
