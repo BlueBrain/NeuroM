@@ -33,16 +33,15 @@ to be used by view-plot modules.
 from neurom import NeuriteType
 import os
 
-#  TODO: Awful hack to use non-GUI backend when no display
-#  is available. For unixy systems.
-import matplotlib
-if 'DISPLAY' not in os.environ:  # noqa
-    matplotlib.use('Agg')  # noqa
-
-import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 
+
+plt = None
+def _get_plt():
+    global plt
+    import matplotlib.pyplot
+    plt = matplotlib.pyplot
 
 # Map tree type to color
 TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
@@ -266,6 +265,7 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
     Returns:
         Figure if no_axes is True, otherwise axes.
     """
+    _get_plt()
     if new_fig:
         fig = plt.figure()
     else:
@@ -371,12 +371,13 @@ def plot_style(fig, ax, **kwargs):
     if output_path is not None:
         save_plot(fig=fig, **kwargs)
 
-    show_plot = kwargs.get('show_plot', True)
-    final = kwargs.get('final', False)
-    if not show_plot:
-        plt.close()
-    elif final:
-        plt.show()  # pragma no cover
+    #####XXXXXX
+    #show_plot = kwargs.get('show_plot', True)
+    #final = kwargs.get('final', False)
+    #if not show_plot:
+    #    plt.close()
+    #elif final:
+    #    plt.show()  # pragma no cover
 
 
 def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None,
@@ -449,8 +450,8 @@ def plot_labels(ax, **kwargs):
     """
 
     # Definition of label options
-    xlabel = kwargs.get('xlabel', 'X')
-    ylabel = kwargs.get('ylabel', 'Y')
+    xlabel = kwargs.get('xlabel', ax.get_xlabel() or 'X')
+    ylabel = kwargs.get('ylabel', ax.get_ylabel() or 'Y')
     zlabel = kwargs.get('zlabel', 'Z')
     label_fontsize = kwargs.get('labelfontsize', 14)
     xlabel_arg = kwargs.get('xlabel_arg', None)

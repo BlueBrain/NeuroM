@@ -28,6 +28,12 @@
 
 import os
 
+import matplotlib
+if 'DISPLAY' not in os.environ:  # noqa
+    matplotlib.use('Agg')  # noqa
+
+import os
+
 from neurom.view import common
 from neurom import load_neuron
 from neurom import viewer
