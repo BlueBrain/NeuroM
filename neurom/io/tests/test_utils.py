@@ -64,35 +64,8 @@ DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_component
 
 MISSING_PARENTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
-NON_CONSECUTIVE_ID_FILE = os.path.join(SWC_PATH,
-                                       'non_sequential_trunk_off_1_16pt.swc')
-
 INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH,
                                         'non_increasing_trunk_off_1_16pt.swc')
-
-SOMA_IDS = [[1, 2, 3],
-            [],
-            [1, 2, 3],
-            [1, 2, 3],
-            [1, 2, 3],
-            [1, 9],
-            [2, 10],
-            [43, 51],
-            [1, 2, 3]]
-
-INIT_IDS = [[4, 215, 426, 637],
-            [],
-            [4],
-            [4],
-            [4],
-            [2, 10],
-            [3, 11],
-            [44, 52],
-            [4]]
-
-
-RAW_DATA = [utils.load_data(f) for f in FILES]
-NO_SOMA_RAW_DATA = utils.load_data(NO_SOMA_FILE)
 
 
 def _get_name(filename):
@@ -147,28 +120,9 @@ def test_neuron_name():
         nt.eq_(nrn.name, nn)
 
 
-def test_load_contour_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_soma_neuron.swc'))
-    nt.eq_(len(nrn.neurites), 3)
-    nt.eq_(len(nrn.soma.points), 8)
-    nt.eq_(nrn.soma.radius, 2.125)
-    _check_neurites_have_no_parent(nrn)
-
-
-def test_load_contour_split_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_split_soma_neuron.swc'))
-    nt.eq_(len(nrn.neurites), 3)
-    nt.eq_(len(nrn.soma.points), 8)
-    nt.eq_(nrn.soma.radius, 2.125)
-    _check_neurites_have_no_parent(nrn)
-
-
-def test_load_contour_split_1st_soma_neuron():
-    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'contour_split_1st_soma_neuron.swc'))
-    nt.eq_(len(nrn.neurites), 3)
-    nt.eq_(len(nrn.soma.points), 6)
-    nt.eq_(nrn.soma.radius, 2.0)
-    _check_neurites_have_no_parent(nrn)
+@nt.raises(SomaError)
+def test_load_bifurcating_soma_points_raises_SomaError():
+    utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'bifurcating_soma.swc'))
 
 
 def test_load_neuromorpho_3pt_soma():
@@ -179,11 +133,6 @@ def test_load_neuromorpho_3pt_soma():
     _check_neurites_have_no_parent(nrn)
 
 
-@nt.raises(SomaError)
-def test_load_bifurcating_soma_points_raises_SomaError():
-    utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'bifurcating_soma.swc'))
-
-
 NRN = utils.load_neuron(FILENAMES[0])
 
 
@@ -192,6 +141,7 @@ def test_neuron_section_ids():
     # check section IDs
     for i, sec in enumerate(NRN.sections):
         nt.eq_(i, sec.id)
+
 
 def test_neurites_have_no_parent():
 

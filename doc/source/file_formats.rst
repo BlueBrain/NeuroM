@@ -50,42 +50,25 @@ The SWC format represents a neuron as a set of trees that are connected to a som
 The neuronal morphology is encoded as a rooted tree of 3D points and the corresponding radii.
 More information can be found `here <http://research.mssm.edu/cnic/swc.html>`_.
 
-.. note::
-    The following information about SWC format concern the standard representation as 
-    it has been established in the neuromorpho.org database.
-    This file format is not yet supported by NeuroM, but it may be modified 
-    to do so in the future. Currently, NeuroM does not enforce all the semantic restrictions
-    for the different soma representations, and is therefore more permissive.
+The soma format is considered to be a series of connected cylinders if there
+are 2 or more points, and a sphere if there is only a single point.
 
-The points of type "1" that represent the soma, have to be in the beginning of the file. 
-The soma can be represented in one of the following formats: 
+In the special case of a 3 point soma where points follow the following
+scheme:
 
-TypeA: One point soma
-^^^^^^^^^^^^^^^^^^^^^
 
-The soma is represented by its center and a radius that corresponds to the sphere
-that preserves the surface area of the soma. The center of the soma has as parent ID -1 
-and all the initial points of the neuronal trees are connected to the soma. 
+=== ==== == ======= == ======= =========
+  1    2  4       5  6       7         8
+--- ---- -- ------- -- ------- ---------
+ ID Type  X       Y Z   Radius Parent ID
+=== ==== == ======= == ======= =========
+  1    1 xs      ys zs      rs        -1
+  2    1 xs (ys-rs) zs      rs         1
+  3    1 xs (ys+rs) zs      rs         1
+=== ==== == ======= == ======= =========
 
-TypeB: Three point soma
-^^^^^^^^^^^^^^^^^^^^^^^
+They are detected as the as NeuroMorpho SWC soma style, and used that way: see :py:class:`Soma<neurom.core._soma.SomaThreePointCylinders>` for more details.
 
-The soma is represented by three points that correspond to the center of the soma (x, y, z), 
-with parent ID -1, and two diametrically opposite points (x, y-r, z) and (x, y+r, z), where r 
-is the radius of the sphere that  preserves the surface area of the soma. The radii of the soma 
-points are not necessarily meaningful, so they can be set to zero. As such, they should not be 
-taken into account in further calculations. The other two of the soma points are connected to the 
-center of the soma, as well as the first points of all the neuronal trees. 
-
-TypeC: N - points soma
-^^^^^^^^^^^^^^^^^^^^^^
-
-The soma is represented by a set of points. The first point of the soma has as parent ID -1. 
-The other points define a contour of the soma in the maximum cross-section of the x-y plane. 
-The radii of the soma points are not necessarily meaningful, so they can be set to zero. 
-As such, they should not be taken into account in further calculations. The radius of the 
-soma is computed from the equivalent sphere that preserves the surface area of the soma. 
-The first points of all the neuronal trees have as parent one of the soma points.
 
 Tree sections
 ^^^^^^^^^^^^^

@@ -51,7 +51,7 @@ REF_CONFIG = {
 }
 
 REF_OUT = {
-    'mean_soma_radius': 0.17071067811865476,
+    'mean_soma_radius': 0.13065629648763766,
     'axon': {
         'total_section_length': 207.87975220908129,
         'max_section_length': 11.018460736176685,
@@ -126,6 +126,8 @@ def test_extract_stats_single_neuron():
     nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
     nt.eq_(res.keys(), REF_OUT.keys())
+    #Note: soma radius is calculated from the sphere that gives the area
+    # of the cylinders described in Neuron.swc
     nt.assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
 
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):

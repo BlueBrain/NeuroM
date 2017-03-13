@@ -41,8 +41,6 @@ DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
 FILENAMES = [os.path.join(DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
-NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
-
 
 def test_neuron_name():
 

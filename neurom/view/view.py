@@ -31,11 +31,13 @@ Python module of NeuroM to visualize morphologies
 from . import common
 
 import numpy as np
-from matplotlib.collections import LineCollection
+from matplotlib.collections import LineCollection, PolyCollection
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 from neurom import NeuriteType, geom
 
 from neurom.core import iter_segments
+from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
@@ -172,9 +174,6 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
             Default value is 'xy'.
     '''
     treecolor = kwargs.get('treecolor', None)
-    outline = kwargs.get('outline', True)
-
-    plane0, plane1 = _plane2col(plane)
 
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
@@ -182,26 +181,27 @@ def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
     # Definition of the tree color depending on the tree type.
     treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
 
-    # Plot the outline of the soma as a circle, is outline is selected.
-    if not outline:
-        soma_circle = common.plt.Circle(sm.center, sm.radius, color=treecolor,
-                                        alpha=get_default('alpha', kwargs))
-        ax.add_artist(soma_circle)
-    else:
-        horz = []
-        vert = []
+    if isinstance(sm, SomaCylinders):
+        plane0, plane1 = _plane2col(plane)
+        for start, end in zip(sm.points, sm.points[1:]):
+            common.project_cylinder_onto_2d(ax, (plane0, plane1),
+                                            start=start[COLS.XYZ], end=end[COLS.XYZ],
+                                            start_radius=start[COLS.R], end_radius=end[COLS.R],
+                                            color=treecolor, alpha=get_default('alpha', kwargs))
+    else:  # contour
+        # Plot the outline of the soma as a circle, if outline is selected.
+        if not kwargs.get('outline', True):
+            ax.add_artist(common.plt.Circle(sm.center, sm.radius, color=treecolor,
+                                            alpha=get_default('alpha', kwargs)))
+        else:
+            plane0, plane1 = _plane2col(plane)
+            points = [(p[plane0], p[plane1]) for p in sm.iter()]
 
-        for s_point in sm.iter():
-            horz.append(s_point[plane0])
-            vert.append(s_point[plane1])
-
-        # To close the loop for a soma viewer. This might be modified!
-        horz.append(horz[0])
-        vert.append(vert[0])
-
-        common.plt.plot(horz, vert, color=treecolor,
-                        alpha=get_default('alpha', kwargs),
-                        linewidth=get_default('linewidth', kwargs))
+            if points:
+                points.append(points[0])  # close the loop
+                common.plt.plot(points, color=treecolor,
+                                alpha=get_default('alpha', kwargs),
+                                linewidth=get_default('linewidth', kwargs))
 
     kwargs.setdefault('title', 'Soma view')
     kwargs.setdefault('xlabel', plane[0])
@@ -290,8 +290,6 @@ def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
             the boundary box of the morphology. \
             Default value is 1.
     '''
-    from mpl_toolkits.mplot3d.art3d import Line3DCollection
-
     # Initialization of matplotlib figure and axes.
     fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
                                 subplot=subplot, params={'projection': '3d'})
@@ -335,12 +333,18 @@ def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
                                 subplot=subplot, params={'projection': '3d'})
 
     # Definition of the tree color depending on the tree type.
-    treecolor = kwargs.get('treecolor', None)
-    treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
+    treecolor = common.get_color(kwargs.get('treecolor', None), tree_type=NeuriteType.soma)
 
-    # Plot the soma as a circle.
-    common.plot_sphere(fig, ax, center=sm.center[COLS.XYZ], radius=sm.radius,
-                       color=treecolor, alpha=get_default('alpha', kwargs))
+    if isinstance(sm, SomaCylinders):
+        for start, end in zip(sm.points, sm.points[1:]):
+            common.plot_cylinder(ax,
+                                 start=start[COLS.XYZ], end=end[COLS.XYZ],
+                                 start_radius=start[COLS.R], end_radius=end[COLS.R],
+                                 color=treecolor, alpha=get_default('alpha', kwargs))
+    else:
+        # Plot the soma as a sphere
+        common.plot_sphere(ax, center=sm.center[COLS.XYZ], radius=sm.radius,
+                           color=treecolor, alpha=get_default('alpha', kwargs))
 
     kwargs.setdefault('title', 'Soma view')
 
@@ -409,8 +413,6 @@ def _format_str(string):
 
 def _generate_collection(group, ax, ctype, colors):
     '''Render rectangle collection'''
-    from matplotlib.collections import PolyCollection
-
     color = common.TREE_COLOR[ctype]
 
     # generate segment collection

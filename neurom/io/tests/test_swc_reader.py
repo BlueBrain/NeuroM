@@ -27,9 +27,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+
 import numpy as np
-from neurom.io import COLS
+
+from neurom.core.dataformat import COLS
 from neurom.io import swc
+
 from nose import tools as nt
 
 
