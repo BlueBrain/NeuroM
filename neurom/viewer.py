@@ -125,6 +125,11 @@ def draw(obj, mode='2d', **kwargs):
         plotter(ax, obj, **kwargs)
 
         common.plot_style(fig=fig, ax=ax, **kwargs)
+
+        if 'output_path' in kwargs:
+            save_plot(fig=fig, **kwargs)
+
+
         return fig, ax
     except KeyError:
         raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode))

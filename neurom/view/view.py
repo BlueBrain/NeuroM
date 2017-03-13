@@ -46,6 +46,11 @@ from neurom._compat import zip
 _LINEWIDTH = 1.2
 _ALPHA = 0.8
 _DIAMETER_SCALE = 1.0
+TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
+              NeuriteType.apical_dendrite: 'purple',
+              NeuriteType.axon: 'blue',
+              NeuriteType.soma: 'black',
+              NeuriteType.undefined: 'green'}
 
 
 def _plane2col(plane):
@@ -67,6 +72,14 @@ def _get_linewidth(tree, linewidth, diameter_scale):
         linewidth = [2 * segment_radius(s) * diameter_scale
                      for s in iter_segments(tree)]
     return linewidth
+
+
+def _get_color(treecolor, tree_type):
+    """if treecolor set, it's returned, otherwise tree_type is used to return set colors"""
+    if treecolor is not None:
+        return treecolor
+    else:
+        return TREE_COLOR.get(tree_type, 'green')
 
 
 def plot_tree(ax, tree, plane='xy',
@@ -94,7 +107,7 @@ def plot_tree(ax, tree, plane='xy',
             for s in iter_segments(tree)]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = common.get_color(color, tree.type)
+    color = _get_color(color, tree.type)
 
     collection = LineCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection(collection)
@@ -117,7 +130,7 @@ def plot_soma(ax, soma, plane='xy',
         alpha(float): Transparency of plotted values
     '''
     plane0, plane1 = _plane2col(plane)
-    color = common.get_color(color, tree_type=NeuriteType.soma)
+    color = _get_color(color, tree_type=NeuriteType.soma)
 
     if isinstance(soma, SomaCylinders):
         plane0, plane1 = _plane2col(plane)
@@ -135,10 +148,14 @@ def plot_soma(ax, soma, plane='xy',
 
             if points:
                 points.append(points[0])  # close the loop
-                common.plt.plot(points, color=color, alpha=alpha, linewidth=linewidth)
+                ax.plot(points, color=color, alpha=alpha, linewidth=linewidth)
 
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
+    min_bounding_box, max_bounding_box = geom.bounding_box(soma)
+    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
+                           max_bounding_box[:COLS.Z]))
+    ax.dataLim.update_from_data_xy(xy_bounds)
 
 
 def plot_neuron(ax, nrn, plane='xy',
@@ -171,6 +188,17 @@ def plot_neuron(ax, nrn, plane='xy',
     ax.set_ylabel(plane[1])
 
 
+def _update_3d_datalim(ax, obj):
+    min_bounding_box, max_bounding_box = geom.bounding_box(obj)
+    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
+                           max_bounding_box[:COLS.Z]))
+    ax.xy_dataLim.update_from_data_xy(xy_bounds)
+
+    z_bounds = np.vstack(((min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
+                          (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z])))
+    ax.zz_dataLim.update_from_data_xy(z_bounds)
+
+
 def plot_tree3d(ax, tree,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA,
@@ -191,20 +219,13 @@ def plot_tree3d(ax, tree,
     segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = common.get_color(color, tree.type),
+    color = _get_color(color, tree.type),
 
     collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
 
     # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
-    min_bounding_box, max_bounding_box = geom.bounding_box(tree)
-    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
-                           max_bounding_box[:COLS.Z]))
-    ax.xy_dataLim.update_from_data_xy(xy_bounds)
-
-    z_bounds = np.vstack(((min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
-                          (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z])))
-    ax.zz_dataLim.update_from_data_xy(z_bounds)
+    _update_3d_datalim(ax, tree)
 
 
 def plot_soma3d(ax, soma, color=None, alpha=_ALPHA, **_):
@@ -216,7 +237,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA, **_):
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     '''
-    color = common.get_color(color, tree_type=NeuriteType.soma)
+    color = _get_color(color, tree_type=NeuriteType.soma)
 
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
@@ -227,6 +248,9 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA, **_):
     else:
         common.plot_sphere(ax, center=soma.center[COLS.XYZ], radius=soma.radius,
                            color=color, alpha=alpha)
+
+    # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
+    _update_3d_datalim(ax, soma)
 
 
 def plot_neuron3d(ax, nrn,
@@ -306,7 +330,7 @@ def _render_dendrogram(dnd, ax, displacement):
     return displacement
 
 
-def plot_dendrogram(obj, show_diameters=True, **kwargs):
+def plot_dendrogram(fig, ax, obj, show_diameters=True, **kwargs):
     '''Dendrogram of `obj`
 
     Args:
@@ -316,12 +340,9 @@ def plot_dendrogram(obj, show_diameters=True, **kwargs):
             Determines if node diameters will \
             be show or not.
     '''
-
     # create dendrogram and generate rectangle collection
     dnd = Dendrogram(obj, show_diameters=show_diameters)
     dnd.generate()
-
-    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes, subplot=subplot)
 
     # render dendrogram and take into account neurite displacement which
     # starts as zero. It is important to avoid overlapping of neurites
