@@ -16,7 +16,7 @@ addons:
     - libhdf5-dev
 cache: pip
 install:
-  - pip install 'matplotlib==1.5.2'
+  - pip install 'matplotlib==1.5.2' 'scipy==0.18.1'
   - pip install .
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then make -f Makefile run_tests; fi

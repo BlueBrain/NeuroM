@@ -122,13 +122,14 @@ def draw(obj, mode='2d', **kwargs):
     viewer = '%s_%s' % (tag, mode)
     try:
         plotter = _VIEWERS[viewer]
+        output_path = kwargs.pop('output_path', False)
         plotter(ax, obj, **kwargs)
 
         if mode != 'dendrogram':
             common.plot_style(fig=fig, ax=ax, **kwargs)
 
-        if 'output_path' in kwargs:
-            common.save_plot(fig=fig, **kwargs)
+        if output_path:
+            common.save_plot(fig=fig, output_path=output_path, **kwargs)
 
         return fig, ax
     except KeyError:

@@ -226,8 +226,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
         fig.set_tight_layout(True)
 
 
-def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None,
-               **_):
+def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None):
     """Set title options of a matplotlib plot
 
     Args:
@@ -238,21 +237,20 @@ def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14,
         title_fontsize (int): Defines the size of the title's font
         title_arg (dict): Addition arguments for matplotlib.title() call
     """
-    title = ax.get_title()  # current title
+    current_title = ax.get_title()
 
-    if not title:
-        title = pretitle + title + posttitle
+    if not current_title:
+        current_title = pretitle + title + posttitle
 
     title_arg = dict_if_none(title_arg)
 
-    ax.set_title(title, fontsize=title_fontsize, **title_arg)
+    ax.set_title(current_title, fontsize=title_fontsize, **title_arg)
 
 
 def plot_labels(ax, label_fontsize=14,
                 xlabel=None, xlabel_arg=None,
                 ylabel=None, ylabel_arg=None,
-                zlabel=None, zlabel_arg=None,
-                **_):
+                zlabel=None, zlabel_arg=None):
     """Sets the labels options of a matplotlib plot
 
     Args:
@@ -265,8 +263,6 @@ def plot_labels(ax, label_fontsize=14,
         zlabel(str): The zlabel for the figure
         zlabel_arg(dict):  Passsed into matplotlib as zlabel arguments
     """
-
-    # Definition of label options
     xlabel = xlabel if xlabel is not None else ax.get_xlabel() or 'X'
     ylabel = ylabel if ylabel is not None else ax.get_ylabel() or 'Y'
 
@@ -285,8 +281,7 @@ def plot_labels(ax, label_fontsize=14,
 def plot_ticks(ax, tick_fontsize=12,
                xticks=None, xticks_args=None,
                yticks=None, yticks_args=None,
-               zticks=None, zticks_args=None,
-               **_):
+               zticks=None, zticks_args=None):
     """Function that defines the labels options of a matplotlib plot.
 
     Args:
@@ -338,7 +333,7 @@ def plot_limits(ax, white_space):
         ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
 
-def plot_legend(ax, no_legend=True, legend_arg=None, **_):
+def plot_legend(ax, no_legend=True, legend_arg=None):
     """
     Function that defines the legend options
     of a matplotlib plot.

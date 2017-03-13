@@ -84,8 +84,7 @@ def _get_color(treecolor, tree_type):
 
 def plot_tree(ax, tree, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA,
-              **_):
+              color=None, alpha=_ALPHA):
     '''Plots a 2d figure of the tree's segments
 
     Args:
@@ -116,8 +115,7 @@ def plot_tree(ax, tree, plane='xy',
 def plot_soma(ax, soma, plane='xy',
               soma_outline=True,
               linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA,
-              **_):
+              color=None, alpha=_ALPHA):
     '''Generates a 2d figure of the soma.
 
     Args:
@@ -155,14 +153,14 @@ def plot_soma(ax, soma, plane='xy',
 
     bounding_box = geom.bounding_box(soma)
     ax.dataLim.update_from_data_xy(np.vstack(([bounding_box[0][plane0], bounding_box[0][plane1]],
-                                              [bounding_box[1][plane0], bounding_box[1][plane1]])))
+                                              [bounding_box[1][plane0], bounding_box[1][plane1]])),
+                                   ignore=False)
 
 
 def plot_neuron(ax, nrn, plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA,
-                **_):
+                color=None, alpha=_ALPHA):
     '''Plots a 2D figure of the neuron, that contains a soma and the neurites
 
     Args:
@@ -193,17 +191,16 @@ def _update_3d_datalim(ax, obj):
     min_bounding_box, max_bounding_box = geom.bounding_box(obj)
     xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
                            max_bounding_box[:COLS.Z]))
-    ax.xy_dataLim.update_from_data_xy(xy_bounds)
+    ax.xy_dataLim.update_from_data_xy(xy_bounds, ignore=False)
 
     z_bounds = np.vstack(((min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
                           (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z])))
-    ax.zz_dataLim.update_from_data_xy(z_bounds)
+    ax.zz_dataLim.update_from_data_xy(z_bounds, ignore=False)
 
 
 def plot_tree3d(ax, tree,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA,
-                **_):
+                color=None, alpha=_ALPHA):
     '''Generates a figure of the tree in 3d.
 
     If the tree contains one single point the plot will be empty \
@@ -228,7 +225,7 @@ def plot_tree3d(ax, tree,
     _update_3d_datalim(ax, tree)
 
 
-def plot_soma3d(ax, soma, color=None, alpha=_ALPHA, **_):
+def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
     '''Generates a 3d figure of the soma.
 
     Args:
@@ -255,8 +252,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA, **_):
 
 def plot_neuron3d(ax, nrn,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                  color=None, alpha=_ALPHA,
-                  **_):
+                  color=None, alpha=_ALPHA):
     '''
     Generates a figure of the neuron,
     that contains a soma and a list of trees.

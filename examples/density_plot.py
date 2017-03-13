@@ -97,3 +97,6 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,
                         color_map=color_map, no_colorbar=no_colorbar, threshold=threshold,
                         neurite_type=neurite_type, **kwargs)
+
+if __name__ == '__main__':
+    main()
