@@ -91,7 +91,7 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
     '''
     _, ax = common.get_figure(new_fig=new_fig)
 
-    view.tree(ax, population.neurites[0])
+    view.plot_tree(ax, population.neurites[0])
 
     return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,

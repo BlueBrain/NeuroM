@@ -128,8 +128,7 @@ def draw(obj, mode='2d', **kwargs):
             common.plot_style(fig=fig, ax=ax, **kwargs)
 
         if 'output_path' in kwargs:
-            save_plot(fig=fig, **kwargs)
-
+            common.save_plot(fig=fig, **kwargs)
 
         return fig, ax
     except KeyError:

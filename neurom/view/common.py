@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Functionality for styling plots"""
-from neurom import NeuriteType
 import os
 
 import numpy as np
@@ -84,13 +83,13 @@ def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
     return pretitle, posttitle, prefile, postfile
 
 
-def get_figure(new_figure=True, subplot='111', params=None):
+def get_figure(new_fig=True, subplot='111', params=None):
     """
     Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
 
     Args:
-        new_figure(bool): Defines if a new figure will be created, if false current figure is used
+        new_fig(bool): Defines if a new figure will be created, if false current figure is used
         subplot (tuple or matplolib subplot specifier string): Create axes with these parameters
         params (dict): extra options passed to add_subplot()
 
@@ -99,7 +98,7 @@ def get_figure(new_figure=True, subplot='111', params=None):
     """
     _get_plt()
 
-    if new_figure:
+    if new_fig:
         fig = plt.figure()
     else:
         fig = plt.gcf()
@@ -137,7 +136,7 @@ def save_plot(fig, prefile='', postfile='', output_path='./', output_name='Figur
     fig.savefig(output, dpi=dpi, transparent=transparent)
 
 
-def plot_style(fig, ax,
+def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
                # plot_title
                pretitle='',
                title='Figure',
@@ -192,11 +191,11 @@ def plot_style(fig, ax,
 
         tick_fontsize (int): Defines the size of the ticks' font
         xticks([list of ticks]): Defines the values of x ticks in the figure
-        xticks_arg(dict):  Passsed into matplotlib as xticks arguments
+        xticks_args(dict):  Passsed into matplotlib as xticks arguments
         yticks([list of ticks]): Defines the values of y ticks in the figure
-        yticks_arg(dict):  Passsed into matplotlib as yticks arguments
+        yticks_args(dict):  Passsed into matplotlib as yticks arguments
         zticks([list of ticks]): Defines the values of z ticks in the figure
-        zticks_arg(dict):  Passsed into matplotlib as zticks arguments
+        zticks_args(dict):  Passsed into matplotlib as zticks arguments
 
         white_space(float): whitespace added to surround the tight limit of the data
 
@@ -302,18 +301,18 @@ def plot_ticks(ax, tick_fontsize=12,
     """
     if xticks is not None:
         ax.set_xticks(xticks)
-        xticks_arg = dict_if_none(xticks_arg)
-        ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
+        xticks_args = dict_if_none(xticks_args)
+        ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_args)
 
     if yticks is not None:
         ax.set_yticks(yticks)
-        yticks_arg = dict_if_none(yticks_arg)
-        ax.yaxis.set_tick_params(labelsize=tick_fontsize, **yticks_arg)
+        yticks_args = dict_if_none(yticks_args)
+        ax.yaxis.set_tick_params(labelsize=tick_fontsize, **yticks_args)
 
     if zticks is not None:
         ax.set_zticks(zticks)
-        zticks_arg = dict_if_none(zticks_arg)
-        ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
+        zticks_args = dict_if_none(zticks_args)
+        ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_args)
 
 
 def plot_limits(ax, white_space):

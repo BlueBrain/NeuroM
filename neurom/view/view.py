@@ -138,7 +138,7 @@ def plot_soma(ax, soma, plane='xy',
             common.project_cylinder_onto_2d(ax, (plane0, plane1),
                                             start=start[COLS.XYZ], end=end[COLS.XYZ],
                                             start_radius=start[COLS.R], end_radius=end[COLS.R],
-                                            color=treecolor, alpha=alpha)
+                                            color=color, alpha=alpha)
     else:
         if soma_outline:
             ax.add_artist(Circle(soma.center, soma.radius, color=color, alpha=alpha))
@@ -152,10 +152,10 @@ def plot_soma(ax, soma, plane='xy',
 
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
-    min_bounding_box, max_bounding_box = geom.bounding_box(soma)
-    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
-                           max_bounding_box[:COLS.Z]))
-    ax.dataLim.update_from_data_xy(xy_bounds)
+
+    bounding_box = geom.bounding_box(soma)
+    ax.dataLim.update_from_data_xy(np.vstack(([bounding_box[0][plane0], bounding_box[0][plane1]],
+                                              [bounding_box[1][plane0], bounding_box[1][plane1]])))
 
 
 def plot_neuron(ax, nrn, plane='xy',
@@ -189,6 +189,7 @@ def plot_neuron(ax, nrn, plane='xy',
 
 
 def _update_3d_datalim(ax, obj):
+    '''unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually'''
     min_bounding_box, max_bounding_box = geom.bounding_box(obj)
     xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
                            max_bounding_box[:COLS.Z]))
@@ -224,7 +225,6 @@ def plot_tree3d(ax, tree,
     collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
 
-    # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
     _update_3d_datalim(ax, tree)
 
 
@@ -330,7 +330,7 @@ def _render_dendrogram(dnd, ax, displacement):
     return displacement
 
 
-def plot_dendrogram(fig, ax, obj, show_diameters=True):
+def plot_dendrogram(ax, obj, show_diameters=True):
     '''Dendrogram of `obj`
 
     Args:
@@ -348,7 +348,7 @@ def plot_dendrogram(fig, ax, obj, show_diameters=True):
     # starts as zero. It is important to avoid overlapping of neurites
     # and to determine tha limits of the figure.
 
-    displacement = _render_dendrogram(dnd, ax, 0.)
+    _render_dendrogram(dnd, ax, 0.)
 
     ax.set_title('Morphology Dendrogram')
     ax.set_xlabel('micrometers (um)')
