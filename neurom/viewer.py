@@ -41,6 +41,7 @@ Examples:
 '''
 
 from .view.view import (neuron, neuron3d, tree, tree3d, soma, soma3d, dendrogram)
+from .view import common
 from .core import Tree, Neurite, Soma, Neuron
 
 
@@ -101,6 +102,11 @@ def draw(obj, mode='2d', **kwargs):
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s', mode)
 
+    if mode in ('2d', 'dendrogram'):
+        fig, ax = common.get_figure()
+    else:
+        fig, ax = common.get_figure(params={'projection': '3d'})
+
     if isinstance(obj, Neuron):
         tag = 'neuron'
     elif isinstance(obj, (Tree, Neurite)):
@@ -112,6 +118,10 @@ def draw(obj, mode='2d', **kwargs):
 
     viewer = '%s_%s' % (tag, mode)
     try:
-        return _VIEWERS[viewer](obj, **kwargs)
+        plotter = _VIEWERS[viewer]
+        plotter(ax, obj, **kwargs)
+
+        common.plot_style(fig=fig, ax=ax, **kwargs)
+        return fig, ax
     except KeyError:
         raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode))

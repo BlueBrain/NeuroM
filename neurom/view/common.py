@@ -33,13 +33,6 @@ to be used by view-plot modules.
 from neurom import NeuriteType
 import os
 
-#  TODO: Awful hack to use non-GUI backend when no display
-#  is available. For unixy systems.
-import matplotlib
-if 'DISPLAY' not in os.environ: # noqa
-    matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 import numpy as np
 
 from matplotlib.patches import Polygon
@@ -48,6 +41,16 @@ from scipy.spatial import ConvexHull
 
 # needed so that projection='3d' works with fig.add_subplot
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
+
+
+plt = None
+
+
+def _get_plt():
+    '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    global plt  # pylint: disable=global-statement
+    import matplotlib.pyplot
+    plt = matplotlib.pyplot
 
 
 # Map tree type to color
@@ -272,6 +275,7 @@ def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=
     Returns:
         Figure if no_axes is True, otherwise axes.
     """
+    _get_plt()
     if new_fig:
         fig = plt.figure()
     else:
@@ -343,21 +347,18 @@ def save_plot(fig, **kwargs):
     fig.savefig(output, dpi=dpi, transparent=transparent)
 
 
-def plot_style(fig, ax, **kwargs):
-    """Function to set the basic options of a matplotlib figure,
-    to be used by viewing - plotting functions.
+def plot_style(fig, ax, white_space=30, **kwargs):
+    """
+    Function to set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Parameters:
         fig: matplotlib figure
         ax: matplotlib axes
     """
-    # Definition of save options
-    output_path = kwargs.get('output_path', None)
-
     plot_title(ax, **kwargs)
     plot_labels(ax, **kwargs)
     plot_ticks(ax, **kwargs)
-    plot_limits(ax, **kwargs)
+    plot_limits(ax, white_space=white_space)
     plot_legend(ax, **kwargs)
 
     no_axes = kwargs.get('no_axes', False)
@@ -373,21 +374,24 @@ def plot_style(fig, ax, **kwargs):
     if tight:
         fig.set_tight_layout(True)
 
+    output_path = kwargs.get('output_path', None)
     if output_path is not None:
         save_plot(fig=fig, **kwargs)
 
-    show_plot = kwargs.get('show_plot', True)
-    final = kwargs.get('final', False)
-    if not show_plot:
-        plt.close()
-    elif final:
-        plt.show()  # pragma no cover
+    # XXX
+    # show_plot = kwargs.get('show_plot', True)
+    # final = kwargs.get('final', False)
+    # if not show_plot:
+    #     plt.close()
+    # elif final:
+    #     plt.show()  # pragma no cover
 
 
 plot_style.__doc__ += PLOT_STYLE_PARAMS  # pylint: disable=no-member
 
 
-def plot_title(ax, **kwargs):
+def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None,
+               **_):
     """Function that defines the title options of a matplotlib plot.
 
     Parameters:
@@ -412,17 +416,13 @@ def plot_title(ax, **kwargs):
     """
 
     # Definition of title options
-    pretitle = kwargs.get('pretitle', '')
-    posttitle = kwargs.get('posttitle', '')
-    title = kwargs.get('title', 'Figure')
-    title_fontsize = kwargs.get('titlefontsize', 14)
-    title_arg = kwargs.get('titlearg', None)
+    title = ax.get_title()
+    if not title:
+        title = pretitle + title + posttitle
 
-    if title_arg is None:
-        title_arg = {}
+    title_arg = {} if title_arg is None else title_arg
 
-    ax.set_title(pretitle + title + posttitle,
-                 fontsize=title_fontsize, **title_arg)
+    ax.set_title(title, fontsize=title_fontsize)
 
 
 def plot_labels(ax, **kwargs):
@@ -460,8 +460,8 @@ def plot_labels(ax, **kwargs):
     """
 
     # Definition of label options
-    xlabel = kwargs.get('xlabel', 'X')
-    ylabel = kwargs.get('ylabel', 'Y')
+    xlabel = kwargs.get('xlabel', ax.get_xlabel() or 'X')
+    ylabel = kwargs.get('ylabel', ax.get_ylabel() or 'Y')
     zlabel = kwargs.get('zlabel', 'Z')
 
     label_fontsize = kwargs.get('labelfontsize', 14)
@@ -538,30 +538,27 @@ def plot_ticks(ax, **kwargs):
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
 
 
-def plot_limits(ax, **kwargs):
+def plot_limits(ax, white_space):
     """Sets the limit options of a matplotlib plot.
 
     Parameters:
         ax: matplotlib axes
-        xlim (Optional[list of two floats]): \
-            Defines the min and the max values in x-axis. \
-            To use default limits select None.
-        ylim (Optional[list of two floats]): \
-            Defines the min and the max values in y-axis. \
-            To use default limits select None.
-        zlim (Optional[list of two floats]): \
-            Defines the min and the max values in z-axis. \
-            To use default limits select None.
-    """
-    # Definition of limit options
-    xlim = kwargs.get('xlim', None)
-    ylim = kwargs.get('ylim', None)
-    zlim = kwargs.get('zlim', None)
+        white_space(float): whitespace added to surround the tight limit of the data
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-    if hasattr(ax, 'zaxis'):
-        ax.set_zlim(zlim)
+    Note: This relies on ax.dataLim (in 2d) and ax.[xy, zz]_dataLim being set in 3d
+    """
+
+    if hasattr(ax, 'zz_dataLim'):
+        bounds = ax.xy_dataLim.bounds
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
+
+        bounds = ax.zz_dataLim.bounds
+        ax.set_zlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+    else:
+        bounds = ax.dataLim.bounds
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
 
 def plot_legend(ax, **kwargs):

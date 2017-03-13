@@ -212,6 +212,11 @@ class Neurite(object):
         '''Deep copy of neurite object'''
         return Neurite(deepcopy(self.root_node, memo))
 
+    def __nonzero__(self):
+        return bool(self.root_node)
+
+    __bool__ = __nonzero__
+
     def __str__(self):
         return 'Neurite <type: %s>' % self.type
 
