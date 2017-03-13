@@ -40,7 +40,10 @@ Examples:
 
 '''
 
-from .view.view import (neuron, neuron3d, tree, tree3d, soma, soma3d, dendrogram)
+from .view import (plot_neuron, plot_neuron3d,
+                   plot_tree, plot_tree3d,
+                   plot_soma, plot_soma3d,
+                   plot_dendrogram)
 from .view import common
 from .core import Tree, Neurite, Soma, Neuron
 
@@ -48,14 +51,14 @@ from .core import Tree, Neurite, Soma, Neuron
 MODES = ('2d', '3d', 'dendrogram')
 
 _VIEWERS = {
-    'neuron_3d': neuron3d,
-    'neuron_2d': neuron,
-    'neuron_dendrogram': dendrogram,
-    'tree_3d': tree3d,
-    'tree_2d': tree,
-    'tree_dendrogram': dendrogram,
-    'soma_3d': soma3d,
-    'soma_2d': soma
+    'neuron_3d': plot_neuron3d,
+    'neuron_2d': plot_neuron,
+    'neuron_dendrogram': plot_dendrogram,
+    'tree_3d': plot_tree3d,
+    'tree_2d': plot_tree,
+    'tree_dendrogram': plot_dendrogram,
+    'soma_3d': plot_soma3d,
+    'soma_2d': plot_soma
 }
 
 
