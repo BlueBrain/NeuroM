@@ -281,7 +281,7 @@ def plot_neuron3d(ax, nrn,
 
 def _generate_collection(group, ax, ctype, colors):
     '''Render rectangle collection'''
-    color = common.TREE_COLOR[ctype]
+    color = TREE_COLOR[ctype]
 
     # generate segment collection
     collection = PolyCollection(group, closed=False, antialiaseds=True,
@@ -330,7 +330,7 @@ def _render_dendrogram(dnd, ax, displacement):
     return displacement
 
 
-def plot_dendrogram(fig, ax, obj, show_diameters=True, **kwargs):
+def plot_dendrogram(fig, ax, obj, show_diameters=True):
     '''Dendrogram of `obj`
 
     Args:
@@ -350,15 +350,9 @@ def plot_dendrogram(fig, ax, obj, show_diameters=True, **kwargs):
 
     displacement = _render_dendrogram(dnd, ax, 0.)
 
-    #XXX
-    kwargs['xlim'] = [- dnd.dims[0][0] * 0.5, dnd.dims[-1][0] * 0.5 + displacement]
-
-    ax.title('Morphology Dendrogram')
+    ax.set_title('Morphology Dendrogram')
     ax.set_xlabel('micrometers (um)')
     ax.set_ylabel('micrometers (um)')
 
-    kwargs['no_legend'] = False
-    ax.set_aspect_ratio('auto')
-
-    #XXX make sure this matches original behavior
-    common.plot_style(fig=fig, ax=ax, **kwargs)
+    ax.set_aspect('auto')
+    ax.legend()

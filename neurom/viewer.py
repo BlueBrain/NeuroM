@@ -124,7 +124,8 @@ def draw(obj, mode='2d', **kwargs):
         plotter = _VIEWERS[viewer]
         plotter(ax, obj, **kwargs)
 
-        common.plot_style(fig=fig, ax=ax, **kwargs)
+        if mode != 'dendrogram':
+            common.plot_style(fig=fig, ax=ax, **kwargs)
 
         if 'output_path' in kwargs:
             save_plot(fig=fig, **kwargs)
