@@ -38,7 +38,7 @@ from neurom.exceptions import (RawDataError, NeuroMError)
 from neurom.io.datawrapper import DataWrapper
 from neurom.io import (swc, neurolucida)
 from neurom.fst._core import FstNeuron
-from neurom._compat import filter
+from neurom._compat import filter, StringType
 
 
 L = logging.getLogger(__name__)
@@ -125,7 +125,7 @@ def load_neurons(neurons,
     if isinstance(neurons, list) or isinstance(neurons, tuple):
         files = neurons
         name = name if name is not None else 'Population'
-    elif isinstance(neurons, str):
+    elif isinstance(neurons, StringType):
         files = get_morph_files(neurons)
         name = name if name is not None else os.path.basename(neurons)
 

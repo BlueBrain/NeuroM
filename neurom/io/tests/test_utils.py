@@ -28,12 +28,16 @@
 
 '''Test neurom.io.utils'''
 import os
+import sys
+
 import numpy as np
+
 from neurom.core import Neuron, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom import get
 from neurom.io import utils
 from neurom.exceptions import RawDataError, SomaError, NeuroMError
+
 from nose import tools as nt
 
 
@@ -104,13 +108,18 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
-
 def test_load_neuron():
-
     nrn = utils.load_neuron(FILENAMES[0])
     nt.assert_true(isinstance(NRN, Neuron))
     nt.assert_equal(NRN.name, 'Neuron')
     _check_neurites_have_no_parent(nrn)
+
+    # python2 only test, for unicode strings
+    if sys.version_info < (3, 0):
+        nrn = utils.load_neuron(unicode(FILENAMES[0]))
+        nt.assert_true(isinstance(NRN, Neuron))
+        nt.assert_equal(NRN.name, 'Neuron')
+        _check_neurites_have_no_parent(nrn)
 
 
 def test_neuron_name():
@@ -200,7 +209,6 @@ def test_load_neuron_invalid_id_sequence_raises():
 
 
 def test_load_neurons_directory():
-
     pop = utils.load_neurons(VALID_DATA_PATH)
     nt.assert_equal(len(pop.neurons), 5)
     nt.assert_equal(len(pop), 5)
@@ -219,7 +227,6 @@ def test_load_neurons_directory_name():
 
 
 def test_load_neurons_filenames():
-
     pop = utils.load_neurons(FILENAMES, name='test123')
     nt.assert_equal(len(pop.neurons), 3)
     nt.assert_equal(pop.name, 'test123')
