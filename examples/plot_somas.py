@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -46,12 +47,11 @@ def random_color():
 
 def plot_somas(somas):
     '''Plot set of somas on same figure as spheres, each with different color'''
-    fig, ax = common.get_figure(new_fig=True, subplot=111,
-                                params={'projection': '3d', 'aspect': 'equal'})
+    _, ax = common.get_figure(new_fig=True, subplot=111,
+                              params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
         common.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
-    fig.show()
-    plt.close(fig)
+    plt.show()
 
 
 if __name__ == '__main__':

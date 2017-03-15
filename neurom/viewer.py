@@ -40,21 +40,25 @@ Examples:
 
 '''
 
-from .view.view import (neuron, neuron3d, tree, tree3d, soma, soma3d, dendrogram)
+from .view import (plot_neuron, plot_neuron3d,
+                   plot_tree, plot_tree3d,
+                   plot_soma, plot_soma3d,
+                   plot_dendrogram)
+from .view import common
 from .core import Tree, Neurite, Soma, Neuron
 
 
 MODES = ('2d', '3d', 'dendrogram')
 
 _VIEWERS = {
-    'neuron_3d': neuron3d,
-    'neuron_2d': neuron,
-    'neuron_dendrogram': dendrogram,
-    'tree_3d': tree3d,
-    'tree_2d': tree,
-    'tree_dendrogram': dendrogram,
-    'soma_3d': soma3d,
-    'soma_2d': soma
+    'neuron_3d': plot_neuron3d,
+    'neuron_2d': plot_neuron,
+    'neuron_dendrogram': plot_dendrogram,
+    'tree_3d': plot_tree3d,
+    'tree_2d': plot_tree,
+    'tree_dendrogram': plot_dendrogram,
+    'soma_3d': plot_soma3d,
+    'soma_2d': plot_soma
 }
 
 
@@ -101,6 +105,11 @@ def draw(obj, mode='2d', **kwargs):
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s', mode)
 
+    if mode in ('2d', 'dendrogram'):
+        fig, ax = common.get_figure()
+    else:
+        fig, ax = common.get_figure(params={'projection': '3d'})
+
     if isinstance(obj, Neuron):
         tag = 'neuron'
     elif isinstance(obj, (Tree, Neurite)):
@@ -112,6 +121,17 @@ def draw(obj, mode='2d', **kwargs):
 
     viewer = '%s_%s' % (tag, mode)
     try:
-        return _VIEWERS[viewer](obj, **kwargs)
+        plotter = _VIEWERS[viewer]
     except KeyError:
         raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode))
+
+    output_path = kwargs.pop('output_path', None)
+    plotter(ax, obj, **kwargs)
+
+    if mode != 'dendrogram':
+        common.plot_style(fig=fig, ax=ax, **kwargs)
+
+    if output_path:
+        common.save_plot(fig=fig, output_path=output_path, **kwargs)
+
+    return fig, ax
