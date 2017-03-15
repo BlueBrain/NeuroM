@@ -25,27 +25,20 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from .utils import get_fig_2d, get_fig_3d # needs to be at top to trigger matplotlib Agg backend
 
 import os
-import matplotlib
-if 'DISPLAY' not in os.environ:  # noqa
-    matplotlib.use('Agg')  # noqa
-
-
 from nose import tools as nt
-
-from .utils import get_fig_2d, get_fig_3d
-
-from neurom.view.common import (plt, figure_naming, get_figure, save_plot, plot_style,
-                                plot_title, plot_labels, plot_legend, plot_limits, plot_ticks,
-                                plot_sphere, plot_cylinder, _get_plt)
-
 import shutil
 import tempfile
 
-from contextlib import contextmanager
-
 import numpy as np
+
+
+from neurom.view.common import (plt, figure_naming, get_figure, save_plot, plot_style,
+                                plot_title, plot_labels, plot_legend, update_plot_limits, plot_ticks,
+                                plot_sphere, plot_cylinder)
+
 
 def test_figure_naming():
     pretitle, posttitle, prefile, postfile = figure_naming(pretitle='Test', prefile="", postfile=3)
@@ -108,24 +101,6 @@ def test_save_plot():
         plt.close('all')
 
 
-@contextmanager
-def get_fig_2d():
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.plot([0, 0], [1, 2], label='test')
-    yield fig, ax
-    plt.close(fig)
-
-
-@contextmanager
-def get_fig_3d():
-    fig0 = plt.figure()
-    ax0 = fig0.add_subplot((111), projection='3d')
-    ax0.plot([0, 0], [1, 2], [2, 1])
-    yield fig0, ax0
-    plt.close(fig0)
-
-
 def test_plot_title():
     with get_fig_2d() as (fig, ax):
         plot_title(ax)
@@ -163,28 +138,25 @@ def test_plot_legend():
         nt.ok_(legend is None)
 
     with get_fig_2d() as (fig, ax):
+        ax.plot([1, 2, 3], [1, 2, 3], label='line 1')
         plot_legend(ax, no_legend=False)
         legend = ax.get_legend()
-        nt.eq_(legend.get_texts()[0].get_text(), 'test')
+        nt.eq_(legend.get_texts()[0].get_text(), 'line 1')
 
 
 def test_plot_limits():
     with get_fig_2d() as (fig, ax):
-        plot_limits(ax, white_space=0)
-        xlim = ax.get_xlim()
-        ylim = ax.get_ylim()
-        nt.eq_(ax.get_xlim(), xlim)
-        nt.eq_(ax.get_ylim(), ylim)
+        nt.assert_raises(AssertionError, update_plot_limits, ax, white_space=0)
 
     with get_fig_2d() as (fig, ax):
         ax.dataLim.update_from_data_xy(((0, -100), (100, 0)))
 
-        plot_limits(ax, white_space=0)
+        update_plot_limits(ax, white_space=0)
         nt.eq_(ax.get_xlim(), (0, 100))
         nt.eq_(ax.get_ylim(), (-100, 0))
 
     with get_fig_3d() as (fig0, ax0):
-        plot_limits(ax0, white_space=0)
+        update_plot_limits(ax0, white_space=0)
         zlim0 = ax0.get_zlim()
         nt.ok_(np.allclose(ax0.get_zlim(), zlim0))
 
@@ -220,18 +192,25 @@ def test_plot_ticks():
 
 def test_plot_style():
     with get_fig_2d() as (fig, ax):
+        ax.dataLim.update_from_data_xy(((0, -100), (100, 0)))
+
         plot_style(fig, ax)
+
         nt.eq_(ax.get_title(), 'Figure')
         nt.eq_(ax.get_xlabel(), 'X')
         nt.eq_(ax.get_ylabel(), 'Y')
 
     with get_fig_2d() as (fig, ax):
+        ax.dataLim.update_from_data_xy(((0, -100), (100, 0)))
+
         plot_style(fig, ax, no_axes=True)
+
         nt.ok_(not ax.get_frame_on())
         nt.ok_(not ax.xaxis.get_visible())
         nt.ok_(not ax.yaxis.get_visible())
 
     with get_fig_2d() as (fig, ax):
+        ax.dataLim.update_from_data_xy(((0, -100), (100, 0)))
         plot_style(fig, ax, tight=True)
         nt.ok_(fig.get_tight_layout())
 

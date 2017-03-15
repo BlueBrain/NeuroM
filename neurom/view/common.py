@@ -34,6 +34,7 @@ import numpy as np
 from matplotlib.patches import Polygon
 from scipy.linalg import norm
 from scipy.spatial import ConvexHull
+from neurom._compat import map
 
 # needed so that projection='3d' works with fig.add_subplot
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
@@ -159,7 +160,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
                yticks_args=None,
                zticks=None,
                zticks_args=None,
-               # plot_limits
+               # update_plot_limits
                white_space=30,
                # plot_legend
                no_legend=True,
@@ -212,7 +213,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
     plot_title(ax, pretitle, title, posttitle, title_fontsize, title_arg)
     plot_labels(ax, label_fontsize, xlabel, xlabel_arg, ylabel, ylabel_arg, zlabel, zlabel_arg)
     plot_ticks(ax, tick_fontsize, xticks, xticks_args, yticks, yticks_args, zticks, zticks_args)
-    plot_limits(ax, white_space)
+    update_plot_limits(ax, white_space)
     plot_legend(ax, no_legend, legend_arg)
 
     if no_axes:
@@ -310,7 +311,7 @@ def plot_ticks(ax, tick_fontsize=12,
         ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_args)
 
 
-def plot_limits(ax, white_space):
+def update_plot_limits(ax, white_space):
     """Sets the limit options of a matplotlib plot.
 
     Args:
@@ -329,6 +330,7 @@ def plot_limits(ax, white_space):
         ax.set_zlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
     else:
         bounds = ax.dataLim.bounds
+        assert not any(map(np.isinf, bounds)), 'Cannot set bounds if dataLim has infinite elements'
         ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
         ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 

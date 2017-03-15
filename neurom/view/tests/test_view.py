@@ -25,16 +25,11 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from .utils import get_fig_2d, get_fig_3d # needs to be at top to trigger matplotlib Agg backend
 import os
-
-import matplotlib
-if 'DISPLAY' not in os.environ:  # noqa
-    matplotlib.use('Agg')  # noqa
 
 import itertools as it
 import numpy as np
-
-from .utils import get_fig_2d, get_fig_3d, plt
 
 from nose import tools as nt
 from neurom import load_neuron
@@ -86,7 +81,7 @@ def test_tree3d():
         xy_bounds = ax.xy_dataLim.bounds
         np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
         zz_bounds = ax.zz_dataLim.bounds
-        np.testing.assert_allclose(zz_bounds, (0., 0., 2., 2.))
+        np.testing.assert_allclose(zz_bounds, (0., 0., 1., 1.))
 
 
 def test_neuron3d():
