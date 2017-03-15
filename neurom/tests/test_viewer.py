@@ -27,6 +27,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import shutil
+import tempfile
+
+import matplotlib
+if 'DISPLAY' not in os.environ:  # noqa
+    matplotlib.use('Agg')  # noqa
 
 from neurom.view import common
 from neurom import load_neuron
@@ -72,6 +78,7 @@ def test_draw_soma3d():
 
 
 def test_draw_dendrogram():
+    viewer.draw(nrn, mode='dendrogram')
     common.plt.close('all')
 
 
@@ -90,3 +97,18 @@ def test_invalid_object_raises():
 @nt.raises(viewer.NotDrawableError)
 def test_invalid_combo_raises():
     viewer.draw(nrn.soma, mode='dendrogram')
+
+
+def test_writing_output():
+    fig_name = 'Figure.png'
+
+    tempdir = tempfile.mkdtemp('test_viewer')
+    try:
+        old_dir = os.getcwd()
+        os.chdir(tempdir)
+        viewer.draw(nrn, mode='2d', output_path='subdir')
+        nt.ok_(os.path.isfile(os.path.join(tempdir, 'subdir', fig_name)))
+    finally:
+        os.chdir(old_dir)
+        shutil.rmtree(tempdir)
+        common.plt.close('all')
