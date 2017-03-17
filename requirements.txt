@@ -28,7 +28,7 @@
 
 # pip will install these dependencies with neurom if not found on the system
 numpy>=1.8.0
-scipy>=0.17.0
+scipy>=0.13.3
 enum34>=1.0.4
 pyyaml>=3.10
 tqdm>=4.8.4
