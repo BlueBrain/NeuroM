@@ -170,6 +170,19 @@ def test_make_Soma_Cylinders():
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 1256.6370614)
 
+    # some neuromorpho files don't follow the convention
+    #but have (ys + rs) as point 2, and have xs different in each line
+    # ex: http://neuromorpho.org/dableFiles/brumberg/CNG%20version/april11s1cell-1.CNG.swc
+    soma_3pt_neuromorpho = np.array([
+        [ 0.0,   0.0,  0.0, 10.0, 1, 1, -1],
+        [-2.0,   6.0,  0.0, 10.0, 1, 2,  1],
+        [ 2.0,  -6.0,  0.0, 10.0, 1, 3,  1],
+    ])
+    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
+    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
+    nt.eq_(list(s.center), [0., 0., 0.])
+    nt.assert_almost_equal(s.area, 794.76706126368811)
+
     soma_4pt_normal = np.array([
         [0.0, 0.0,  0.0, 0.0,  1, 1, -1],
         [0.0, 2.0,  0.0, 2.0,  1, 2, 1],

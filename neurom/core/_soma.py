@@ -153,7 +153,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         #     'The third point must be one radius above 0 on the y-plane'
 
         r = points[0, COLS.R]
-        h = points[2, COLS.Y] - points[1, COLS.Y]
+        h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
 
