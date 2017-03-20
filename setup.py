@@ -37,7 +37,7 @@ from pip.req import parse_requirements
 from optparse import Option
 
 
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 
 
 def parse_reqs(reqs_file):
