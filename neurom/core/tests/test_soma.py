@@ -98,8 +98,8 @@ def test_make_Soma_ThreePoint():
 
 def test_make_Soma_ThreePointCylinder():
     sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CYLINDER)
-    nt.ok_('SomaThreePointCylinders' in str(sm))
-    nt.ok_(isinstance(sm, _soma.SomaThreePointCylinders))
+    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
+    nt.ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
     nt.eq_(sm.radius, 44)
 
@@ -166,7 +166,7 @@ def test_make_Soma_Cylinders():
         [0.0,   10.0, 0.0, 10.0, 1, 3,  1],
     ])
     s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
-    nt.ok_('SomaThreePointCylinders' in str(s))
+    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 1256.6370614)
 
