@@ -87,8 +87,8 @@ class SomaCylinders(Soma):
                              /)
                             / o)
                     ______ /  )
-                (|)      ) /
-                ( o )    o )
+                (|)      ) / /
+                ( o )    o )/
                 (|)_____ )
 
       Here we have a 'side-view', with each 'o' representing a point, and the
@@ -115,7 +115,7 @@ class SomaCylinders(Soma):
                 (repr(self._points), self.center, self.radius))
 
 
-class SomaThreePointCylinders(SomaCylinders):
+class SomaNeuromorphoThreePointCylinders(SomaCylinders):
     ''' NeuroMorpho compatible soma
 
     Reference:
@@ -135,7 +135,7 @@ class SomaThreePointCylinders(SomaCylinders):
         the surface area of a sphere of radius rs.
     '''
     def __init__(self, points):
-        super(SomaThreePointCylinders, self).__init__(points)
+        super(SomaNeuromorphoThreePointCylinders, self).__init__(points)
 
         # X    Y     Z   R    P
         # xs ys      zs rs   -1
@@ -146,10 +146,11 @@ class SomaThreePointCylinders(SomaCylinders):
         assert (np.isclose(points[0, COLS.R], points[1, COLS.R]) and
                 np.isclose(points[0, COLS.R], points[2, COLS.R])), \
             'All radii must be the same'
-        assert np.isclose(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
-            'The first point must be one radius below 0 on the y-plane'
-        assert np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
-            'The second point must be one radius above 0 on the y-plane'
+        # These checks were turned off after https://github.com/BlueBrain/NeuroM/issues/614
+        # assert np.isclose(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
+        #     'The second point must be one radius below 0 on the y-plane'
+        # assert np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
+        #     'The third point must be one radius above 0 on the y-plane'
 
         r = points[0, COLS.R]
         h = points[2, COLS.Y] - points[1, COLS.Y]
@@ -157,7 +158,7 @@ class SomaThreePointCylinders(SomaCylinders):
         self.radius = math.sqrt(self.area / (4. * math.pi))
 
     def __str__(self):
-        return ('SomaThreePointCylinders(%s) <center: %s, radius: %s>' %
+        return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
 
@@ -241,7 +242,7 @@ def _get_type(points, soma_class):
             # somas into their custom 'Three-point soma representation':
             #  http://neuromorpho.org/SomaFormat.html
 
-            return SomaThreePointCylinders
+            return SomaNeuromorphoThreePointCylinders
 
         return {0: None,
                 1: SomaSinglePoint}.get(npoints, SomaCylinders)
