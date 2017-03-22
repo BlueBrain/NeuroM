@@ -47,7 +47,6 @@ class CheckRunner(object):
     '''Class managing checks, config and output'''
     def __init__(self, config):
         self._config = CheckRunner._sanitize_config(config)
-        self.summary = OrderedDict()
         self._check_modules = dict((k, import_module('neurom.check.%s' % k))
                                    for k in config['checks'])
 
@@ -109,20 +108,20 @@ class CheckRunner(object):
         check_module = self._check_modules[check_mod_str]
         checks = self._config['checks'][check_mod_str]
         result = True
+        summary = OrderedDict()
         for check in checks:
             ok = self._do_check(obj, check_module, check)
-            self.summary[ok.title] = ok.status
+            summary[ok.title] = ok.status
             result &= ok.status
 
-        return result
+        return result, summary
 
     def _check_file(self, f):
         '''Run tests on a morphology file'''
-
         L.info('File: %s', f)
 
-        result = True
-
+        full_result = True
+        full_summary = OrderedDict()
         try:
             data = load_data(f)
         except Exception as e: # pylint: disable=W0703
@@ -131,19 +130,24 @@ class CheckRunner(object):
             return False, {f: OrderedDict([('ALL', False)])}
 
         try:
-            result &= self._check_loop(data, 'structural_checks')
+            result, summary = self._check_loop(data, 'structural_checks')
+            full_result &= result
+            full_summary.update(summary)
+
             nrn = fst_core.FstNeuron(data)
-            result &= self._check_loop(nrn, 'neuron_checks')
-        except Exception as e: # pylint: disable=W0703
+            result, summary = self._check_loop(nrn, 'neuron_checks')
+            full_result &= result
+            full_summary.update(summary)
+        except Exception as e:  # pylint: disable=W0703
             L.error('Check failed:' + str(type(e)) + str(e.args))
-            result = False
+            full_result = False
 
-        self.summary['ALL'] = result
+        full_summary['ALL'] = full_result
 
-        for m, s in self.summary.items():
+        for m, s in full_summary.items():
             self._log_msg(m, s)
 
-        return result, {f: self.summary}
+        return full_result, {f: full_summary}
 
     def _log_msg(self, msg, ok):
         '''Helper to log message to the right level'''
