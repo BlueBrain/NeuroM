@@ -85,7 +85,8 @@ NEURITEFEATURES = {
     'segment_taper_rates': _nrt.segment_taper_rates,
     'segment_radial_distances': _nrt.segment_radial_distances,
     'segment_meander_angles': _nrt.segment_meander_angles,
-    'principal_direction_extents': _nrt.principal_direction_extents
+    'principal_direction_extents': _nrt.principal_direction_extents,
+    'total_area_per_neurite': _nrt.total_area_per_neurite,
 }
 
 NEURONFEATURES = {
