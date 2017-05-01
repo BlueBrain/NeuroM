@@ -213,6 +213,12 @@ def test_section_branch_orders():
                     (0, 1, 1,  # type 3, basal dendrite
                      0, 1, 1)) # type 2, axon
 
+def test_section_strahler_orders():
+    strahler_orders = list(_nf.section_strahler_orders(SIMPLE))
+    assert_allclose(strahler_orders,
+                    (2, 1, 1,  # type 3, basal dendrite
+                     2, 1, 1)) # type 2, axon
+
 def test_section_bif_branch_orders():
     bif_branch_orders = list(_nf.section_bif_branch_orders(SIMPLE))
     assert_allclose(bif_branch_orders,
