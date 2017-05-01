@@ -244,6 +244,8 @@ def test_single_apical_no_soma():
 def test_directory_input():
     checker = CheckRunner(CONFIG)
     summ = checker.run(SWC_PATH)
+    nt.eq_(summ['files'][NRN_PATH_0]['Has axon'], True)
+    nt.eq_(summ['files'][NRN_PATH_2]['Has axon'], False)
 
 
 @nt.raises(IOError)

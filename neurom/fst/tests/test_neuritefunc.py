@@ -105,6 +105,23 @@ def test_n_leaves():
     nt.assert_equal(_nf.n_leaves(Neurite(s7)), 1)
 
 
+def test_total_area_per_neurite():
+    def surface(r0, r1, h):
+        return pi * (r0 + r1) * sqrt((r0 - r1) ** 2 + h ** 2)
+
+    basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = _nf.total_area_per_neurite(SIMPLE,
+            neurite_type=nm.BASAL_DENDRITE)
+    nt.assert_almost_equal(ret[0], basal_area)
+
+    axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = _nf.total_area_per_neurite(SIMPLE, neurite_type=nm.AXON)
+    nt.assert_almost_equal(ret[0], axon_area)
+
+    ret = _nf.total_area_per_neurite(SIMPLE)
+    nt.ok_(np.allclose(ret, [basal_area, axon_area]))
+
+
 def test_total_volume_per_neurite():
     vol = _nf.total_volume_per_neurite(NRN)
     nt.eq_(len(vol), 4)
@@ -135,7 +152,7 @@ def test_neurite_volume_density():
     assert_allclose(vol_density, ref_density)
 
 
-def test_terminal_length_per_neurite():
+def test_terminal_path_length_per_neurite():
     terminal_distances = _nf.terminal_path_lengths_per_neurite(SIMPLE)
     assert_allclose(terminal_distances,
                     (5 + 5., 5 + 6., 4. + 6., 4. + 5))
@@ -175,6 +192,16 @@ def test_section_path_lengths():
                     (5., 10., 11., # type 3, basal dendrite
                      4., 10., 9.)) # type 2, axon
 
+def test_section_term_lengths():
+    term_lengths = list(_nf.section_term_lengths(SIMPLE))
+    assert_allclose(term_lengths,
+                    (5., 6., 6., 5.))
+
+def test_section_bif_lengths():
+    bif_lengths = list(_nf.section_bif_lengths(SIMPLE))
+    assert_allclose(bif_lengths,
+                    (5.,  4.))
+
 def test_number_of_sections_per_neurite():
     sections = _nf.number_of_sections_per_neurite(SIMPLE)
     assert_allclose(sections,
@@ -185,6 +212,18 @@ def test_section_branch_orders():
     assert_allclose(branch_orders,
                     (0, 1, 1,  # type 3, basal dendrite
                      0, 1, 1)) # type 2, axon
+
+def test_section_bif_branch_orders():
+    bif_branch_orders = list(_nf.section_bif_branch_orders(SIMPLE))
+    assert_allclose(bif_branch_orders,
+                    (0,  # type 3, basal dendrite
+                     0)) # type 2, axon
+
+def test_section_term_branch_orders():
+    term_branch_orders = list(_nf.section_term_branch_orders(SIMPLE))
+    assert_allclose(term_branch_orders,
+                    (1, 1,  # type 3, basal dendrite
+                     1, 1)) # type 2, axon
 
 def test_section_radial_distances():
     radial_distances = _nf.section_radial_distances(SIMPLE)
@@ -217,6 +256,18 @@ def test_segment_lengths():
     assert_allclose(segment_lengths,
                     (5.0, 5.0, 6.0,   # type 3, basal dendrite
                      4.0, 6.0, 5.0))  # type 2, axon
+
+def test_segment_volumes():
+    expected = [
+        15.70796327,
+         5.23598776,
+         6.28318531,
+        12.56637061,
+         6.28318531,
+         5.23598776,
+    ]
+    result = _nf.segment_volumes(SIMPLE)
+    assert_allclose(result, expected)
 
 def test_segment_midpoints():
     midpoints = np.array(_nf.segment_midpoints(SIMPLE))

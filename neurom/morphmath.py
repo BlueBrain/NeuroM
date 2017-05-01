@@ -277,7 +277,7 @@ def segment_radial_dist(seg, pos):
     Parameters:
         seg: tree segment
 
-        pos: origin to which disrances are measured. It must have at lease 3
+        pos: origin to which distances are measured. It must have at lease 3
         components. The first 3 components are (x, y, z).
     '''
     return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))

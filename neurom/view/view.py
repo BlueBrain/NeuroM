@@ -25,63 +25,32 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
-Python module of NeuroM to visualize morphologies
-'''
-import numpy as np
-from matplotlib.collections import LineCollection
-
+'''visualize morphologies'''
 from . import common
+
+import numpy as np
+from matplotlib.collections import LineCollection, PolyCollection
+from matplotlib.patches import Circle
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
 from neurom import NeuriteType, geom
 
 from neurom.core import iter_segments
+from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
 from neurom._compat import zip
 
 
-DEFAULT_PARAMS = '''        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-        treecolor: str or None \
-            Defines the color of the tree. \
-            If None the default values will be used, \
-            depending on the type of tree: \
-            Basal dendrite: "red" \
-            Axon : "blue" \
-            Apical dendrite: "purple" \
-            Undefined tree: "black" \
-            Default value is None.
-        linewidth: float \
-            Defines the linewidth of the tree, \
-            if diameter is set to False. \
-            Default value is 1.2.
-        alpha: float \
-            Defines throughe transparency of the tree. \
-            0.0 transparent through 1.0 opaque. \
-            Default value is 0.8.
-
-''' + common.PLOT_STYLE_PARAMS
-
-
-def get_default(variable, kwargs):
-    '''Returns default variable or kwargs variable if it exists.'''
-    default = {'linewidth': 1.2,
-               'alpha': 0.8,
-               'treecolor': None,
-               'diameter': True,
-               'diameter_scale': 1.0,
-               'white_space': 30.}
-
-    return kwargs.get(variable, default[variable])
+_LINEWIDTH = 1.2
+_ALPHA = 0.8
+_DIAMETER_SCALE = 1.0
+TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
+              NeuriteType.apical_dendrite: 'purple',
+              NeuriteType.axon: 'blue',
+              NeuriteType.soma: 'black',
+              NeuriteType.undefined: 'green'}
 
 
 def _plane2col(plane):
@@ -92,319 +61,223 @@ def _plane2col(plane):
             getattr(COLS, plane[1].capitalize()), )
 
 
-def _get_linewidth(tr, parameters):
-    '''calculate the desired linewidth based on tree contents, and parameters'''
-    linewidth = get_default('linewidth', parameters)
-    # Definition of the linewidth according to diameter, if diameter is True.
-    if get_default('diameter', parameters):
-        # TODO: This was originally a numpy array. Did it have to be one?
-        scale = get_default('diameter_scale', parameters)
-        linewidth = [2 * segment_radius(s) * scale for s in iter_segments(tr)]
-        if not linewidth:
-            linewidth = get_default('linewidth', parameters)
+def _get_linewidth(tree, linewidth, diameter_scale):
+    '''calculate the desired linewidth based on tree contents
+
+    If diameter_scale exists, it is used to scale the diameter of each of the segments
+    in the tree
+    If diameter_scale is None, the linewidth is used.
+    '''
+    if diameter_scale is not None and tree:
+        linewidth = [2 * segment_radius(s) * diameter_scale
+                     for s in iter_segments(tree)]
     return linewidth
 
 
-def tree(tr, plane='xy', new_fig=True, subplot=False, **kwargs):
-    '''
-    Generates a 2d figure of the tree's segments. \
-    If the tree contains one single point the plot will be empty \
-    since no segments can be constructed.
+def _get_color(treecolor, tree_type):
+    """if treecolor set, it's returned, otherwise tree_type is used to return set colors"""
+    if treecolor is not None:
+        return treecolor
+    else:
+        return TREE_COLOR.get(tree_type, 'green')
 
-    Parameters:
-        tr: Tree \
-            neurom.Tree object
-        plane: str \
-            Accepted values: Any pair of of xyz \
-            Default value is 'xy'.
-        diameter: boolean
-            If True the diameter, scaled with diameter_scale factor, \
-            will define the width of the tree lines. \
-            If False use linewidth to select the width of the tree lines. \
-            Default value is True.
-        diameter_scale: float \
-            Defines the scale factor that will be multiplied \
-            with the diameter to define the width of the tree line. \
-            Default value is 1.
-        white_space: float \
-            Defines the white space around \
-            the boundary box of the morphology. \
-            Default value is 1.
-    '''
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
+def plot_tree(ax, tree, plane='xy',
+              diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+              color=None, alpha=_ALPHA):
+    '''Plots a 2d figure of the tree's segments
+
+    Args:
+        ax(matplotlib axes): on what to plot
+        tree(neurom.core.Tree or neurom.core.Neurite): plotted tree
+        plane(str): Any pair of 'xyz'
+        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
+
+    Note:
+        If the tree contains one single point the plot will be empty
+        since no segments can be constructed.
+    '''
     plane0, plane1 = _plane2col(plane)
     segs = [((s[0][plane0], s[0][plane1]),
              (s[1][plane0], s[1][plane1]))
-            for s in iter_segments(tr)]
+            for s in iter_segments(tree)]
 
-    collection = LineCollection(segs,
-                                color=common.get_color(get_default('treecolor', kwargs), tr.type),
-                                linewidth=_get_linewidth(tr, kwargs),
-                                alpha=get_default('alpha', kwargs))
+    linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
+    color = _get_color(color, tree.type)
 
+    collection = LineCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection(collection)
 
-    min_bounding_box, max_bounding_box = geom.bounding_box(tr)
-    white_space = get_default('white_space', kwargs)
-    kwargs.setdefault('title', 'Tree view')
-    kwargs.setdefault('xlabel', plane[0])
-    kwargs.setdefault('ylabel', plane[1])
-    kwargs.setdefault('xlim', [min_bounding_box[plane0] - white_space,
-                               max_bounding_box[plane0] + white_space])
-    kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
-                               max_bounding_box[plane1] + white_space])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+def plot_soma(ax, soma, plane='xy',
+              soma_outline=True,
+              linewidth=_LINEWIDTH,
+              color=None, alpha=_ALPHA):
+    '''Generates a 2d figure of the soma.
 
-
-def soma(sm, plane='xy', new_fig=True, subplot=False, **kwargs):
+    Args:
+        ax(matplotlib axes): on what to plot
+        soma(neurom.core.Soma): plotted soma
+        plane(str): Any pair of 'xyz'
+        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
     '''
-    Generates a 2d figure of the soma.
-
-    Parameters:
-        soma: Soma \
-        neurom.Soma object
-        plane: str \
-            Accepted values: Any pair of of xyz \
-            Default value is 'xy'.
-    '''
-    treecolor = kwargs.get('treecolor', None)
-    outline = kwargs.get('outline', True)
-
     plane0, plane1 = _plane2col(plane)
+    color = _get_color(color, tree_type=NeuriteType.soma)
 
-    # Initialization of matplotlib figure and axes.
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
-
-    # Definition of the tree color depending on the tree type.
-    treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
-
-    # Plot the outline of the soma as a circle, is outline is selected.
-    if not outline:
-        soma_circle = common.plt.Circle(sm.center, sm.radius, color=treecolor,
-                                        alpha=get_default('alpha', kwargs))
-        ax.add_artist(soma_circle)
+    if isinstance(soma, SomaCylinders):
+        plane0, plane1 = _plane2col(plane)
+        for start, end in zip(soma.points, soma.points[1:]):
+            common.project_cylinder_onto_2d(ax, (plane0, plane1),
+                                            start=start[COLS.XYZ], end=end[COLS.XYZ],
+                                            start_radius=start[COLS.R], end_radius=end[COLS.R],
+                                            color=color, alpha=alpha)
     else:
-        horz = []
-        vert = []
+        if soma_outline:
+            ax.add_artist(Circle(soma.center, soma.radius, color=color, alpha=alpha))
+        else:
+            plane0, plane1 = _plane2col(plane)
+            points = [(p[plane0], p[plane1]) for p in soma.iter()]
 
-        for s_point in sm.iter():
-            horz.append(s_point[plane0])
-            vert.append(s_point[plane1])
+            if points:
+                points.append(points[0])  # close the loop
+                ax.plot(points, color=color, alpha=alpha, linewidth=linewidth)
 
-        # To close the loop for a soma viewer. This might be modified!
-        horz.append(horz[0])
-        vert.append(vert[0])
+    ax.set_xlabel(plane[0])
+    ax.set_ylabel(plane[1])
 
-        common.plt.plot(horz, vert, color=treecolor,
-                        alpha=get_default('alpha', kwargs),
-                        linewidth=get_default('linewidth', kwargs))
-
-    kwargs.setdefault('title', 'Soma view')
-    kwargs.setdefault('xlabel', plane[0])
-    kwargs.setdefault('ylabel', plane[1])
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    bounding_box = geom.bounding_box(soma)
+    ax.dataLim.update_from_data_xy(np.vstack(([bounding_box[0][plane0], bounding_box[0][plane1]],
+                                              [bounding_box[1][plane0], bounding_box[1][plane1]])),
+                                   ignore=False)
 
 
-def neuron(nrn, plane='xy', new_fig=True, subplot=False, **kwargs):
+def plot_neuron(ax, nrn, plane='xy',
+                soma_outline=True,
+                diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+                color=None, alpha=_ALPHA):
+    '''Plots a 2D figure of the neuron, that contains a soma and the neurites
+
+    Args:
+        ax(matplotlib axes): on what to plot
+        nrn(neuron): neuron to be plotted
+        soma_outline(bool): should the soma be drawn as an outline
+        plane(str): Any pair of 'xyz'
+        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
     '''
-    Generates a 2d figure of the neuron, \
-    that contains a soma and a list of trees.
-
-    Parameters:
-        neuron: Neuron \
-        neurom.Neuron object
-        plane: str \
-            Accepted values: Any pair of of xyz \
-            Default value is 'xy'.
-        diameter: boolean
-            If True the diameter, scaled with diameter_scale factor, \
-            will define the width of the tree lines. \
-            If False use linewidth to select the width of the tree lines. \
-            Default value is True.
-        diameter_scale: float \
-            Defines the scale factor that will be multiplied \
-            with the diameter to define the width of the tree line. \
-            Default value is 1.
-    '''
-    # Initialization of matplotlib figure and axes.
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
-
-    kwargs['new_fig'] = False
-    kwargs['subplot'] = subplot
-    kwargs['final'] = False
-
-    soma(nrn.soma, plane=plane, **kwargs)
-
-    kwargs.setdefault('title', nrn.name)
-    kwargs.setdefault('xlabel', plane[0])
-    kwargs.setdefault('ylabel', plane[1])
-
-    min_bounding_box = np.full(shape=(3, ), fill_value=np.inf)
-    max_bounding_box = np.full(shape=(3, ), fill_value=-np.inf)
+    plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
+              color=color, alpha=alpha)
 
     for neurite in nrn.neurites:
-        bounding_box = geom.bounding_box(neurite)
-        min_bounding_box = np.minimum(min_bounding_box, bounding_box[0][COLS.XYZ])
-        max_bounding_box = np.maximum(max_bounding_box, bounding_box[1][COLS.XYZ])
+        plot_tree(ax, neurite, plane=plane,
+                  diameter_scale=diameter_scale, linewidth=linewidth,
+                  color=color, alpha=alpha)
 
-        tree(neurite, plane=plane, **kwargs)
-
-    white_space = get_default('white_space', kwargs)
-    plane0, plane1 = _plane2col(plane)
-    if nrn.neurites:
-        kwargs.setdefault('xlim', [min_bounding_box[plane0] - white_space,
-                                   max_bounding_box[plane0] + white_space])
-        kwargs.setdefault('ylim', [min_bounding_box[plane1] - white_space,
-                                   max_bounding_box[plane1] + white_space])
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    ax.set_title(nrn.name)
+    ax.set_xlabel(plane[0])
+    ax.set_ylabel(plane[1])
 
 
-def tree3d(tr, new_fig=True, new_axes=True, subplot=False, **kwargs):
-    '''
-    Generates a figure of the tree in 3d.
+def _update_3d_datalim(ax, obj):
+    '''unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually'''
+    min_bounding_box, max_bounding_box = geom.bounding_box(obj)
+    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
+                           max_bounding_box[:COLS.Z]))
+    ax.xy_dataLim.update_from_data_xy(xy_bounds, ignore=False)
+
+    z_bounds = np.vstack(((min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
+                          (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z])))
+    ax.zz_dataLim.update_from_data_xy(z_bounds, ignore=False)
+
+
+def plot_tree3d(ax, tree,
+                diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+                color=None, alpha=_ALPHA):
+    '''Generates a figure of the tree in 3d.
+
     If the tree contains one single point the plot will be empty \
     since no segments can be constructed.
 
-    Parameters:
-        tr: Tree \
-        neurom.Tree object
-        diameter: boolean \
-            If True the diameter, scaled with diameter_scale factor, \
-            will define the width of the tree lines. \
-            If False use linewidth to select the width of the tree lines. \
-            Default value is True.
-        diameter_scale: float \
-            Defines the scale factor that will be multiplied \
-            with the diameter to define the width of the tree line. \
-            Default value is 1.
-        white_space: float \
-            Defines the white space around \
-            the boundary box of the morphology. \
-            Default value is 1.
+    Args:
+        ax(matplotlib axes): on what to plot
+        tree(neurom.core.Tree or neurom.core.Neurite): plotted tree
+        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
     '''
-    from mpl_toolkits.mplot3d.art3d import Line3DCollection
+    segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
 
-    # Initialization of matplotlib figure and axes.
-    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
-                                subplot=subplot, params={'projection': '3d'})
+    linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
+    color = _get_color(color, tree.type),
 
-    segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tr)]
-    linewidth = _get_linewidth(tr, kwargs)
-
-    # Plot the collection of lines.
-    collection = Line3DCollection(segs,
-                                  color=common.get_color(get_default('treecolor', kwargs),
-                                                         tr.type),
-                                  linewidth=linewidth, alpha=get_default('alpha', kwargs))
-
+    collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
 
-    kwargs.setdefault('title', 'Tree 3d-view')
-
-    min_bounding_box, max_bounding_box = geom.bounding_box(tr)
-    white_space = get_default('white_space', kwargs)
-    kwargs.setdefault('xlim', [min_bounding_box[COLS.X] - white_space,
-                               max_bounding_box[COLS.X] + white_space])
-    kwargs.setdefault('ylim', [min_bounding_box[COLS.Y] - white_space,
-                               max_bounding_box[COLS.Y] + white_space])
-    kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
-                               max_bounding_box[COLS.Z] + white_space])
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    _update_3d_datalim(ax, tree)
 
 
-def soma3d(sm, new_fig=True, new_axes=True, subplot=False, **kwargs):
+def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
+    '''Generates a 3d figure of the soma.
+
+    Args:
+        ax(matplotlib axes): on what to plot
+        soma(neurom.core.Soma): plotted soma
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
     '''
-    Generates a 3d figure of the soma.
+    color = _get_color(color, tree_type=NeuriteType.soma)
 
-    Parameters:
-        soma: Soma \
-        neurom.Soma object
-    '''
-    # Initialization of matplotlib figure and axes.
-    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
-                                subplot=subplot, params={'projection': '3d'})
+    if isinstance(soma, SomaCylinders):
+        for start, end in zip(soma.points, soma.points[1:]):
+            common.plot_cylinder(ax,
+                                 start=start[COLS.XYZ], end=end[COLS.XYZ],
+                                 start_radius=start[COLS.R], end_radius=end[COLS.R],
+                                 color=color, alpha=alpha)
+    else:
+        common.plot_sphere(ax, center=soma.center[COLS.XYZ], radius=soma.radius,
+                           color=color, alpha=alpha)
 
-    # Definition of the tree color depending on the tree type.
-    treecolor = kwargs.get('treecolor', None)
-    treecolor = common.get_color(treecolor, tree_type=NeuriteType.soma)
-
-    # Plot the soma as a circle.
-    fig, ax = common.plot_sphere(fig, ax, center=sm.center[COLS.XYZ], radius=sm.radius,
-                                 color=treecolor, alpha=get_default('alpha', kwargs))
-
-    kwargs.setdefault('title', 'Soma view')
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
+    _update_3d_datalim(ax, soma)
 
 
-def neuron3d(nrn, new_fig=True, new_axes=True, subplot=False, **kwargs):
+def plot_neuron3d(ax, nrn,
+                  diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+                  color=None, alpha=_ALPHA):
     '''
     Generates a figure of the neuron,
     that contains a soma and a list of trees.
 
-    Parameters:
-        neuron: Neuron \
-        neurom.Neuron object
-        diameter: boolean
-            If True the diameter, scaled with diameter_scale factor, \
-            will define the width of the tree lines. \
-            If False use linewidth to select the width of the tree lines. \
-            Default value is True.
-        diameter_scale: float \
-            Defines the scale factor that will be multiplied \
-            with the diameter to define the width of the tree line. \
-            Default value is 1.
+    Args:
+        ax(matplotlib axes): on what to plot
+        nrn(neuron): neuron to be plotted
+        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
+        color(str or None): Color of plotted values, None corresponds to default choice
+        alpha(float): Transparency of plotted values
     '''
-    # Initialization of matplotlib figure and axes.
-    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes,
-                                subplot=subplot, params={'projection': '3d'})
+    plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
-    kwargs['new_fig'] = False
-    kwargs['subplot'] = subplot
-    kwargs['new_axes'] = False
-    kwargs.setdefault('title', nrn.name)
+    for neurite in nrn.neurites:
+        plot_tree3d(ax, neurite,
+                    diameter_scale=diameter_scale, linewidth=linewidth,
+                    color=color, alpha=alpha)
 
-    kwargs['final'] = False
-
-    soma3d(nrn.soma, **kwargs)
-
-    min_bounding_box = np.full(shape=(3, ), fill_value=np.inf)
-    max_bounding_box = np.full(shape=(3, ), fill_value=-np.inf)
-
-    for temp_tree in nrn.neurites:
-        bounding_box = geom.bounding_box(temp_tree)
-        min_bounding_box = np.minimum(min_bounding_box, bounding_box[0][COLS.XYZ])
-        max_bounding_box = np.maximum(max_bounding_box, bounding_box[1][COLS.XYZ])
-
-        tree3d(temp_tree, **kwargs)
-
-    white_space = get_default('white_space', kwargs)
-    if nrn.neurites:
-        kwargs.setdefault('xlim', [min_bounding_box[COLS.X] - white_space,
-                                   max_bounding_box[COLS.X] + white_space])
-        kwargs.setdefault('ylim', [min_bounding_box[COLS.Y] - white_space,
-                                   max_bounding_box[COLS.Y] + white_space])
-        kwargs.setdefault('zlim', [min_bounding_box[COLS.Z] - white_space,
-                                   max_bounding_box[COLS.Z] + white_space])
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
-
-
-def _format_str(string):
-    '''String formatting'''
-    return string.replace('NeuriteType.', '').replace('_', ' ').capitalize()
+    ax.set_title(nrn.name)
 
 
 def _generate_collection(group, ax, ctype, colors):
     '''Render rectangle collection'''
-    from matplotlib.collections import PolyCollection
-
-    color = common.TREE_COLOR[ctype]
+    color = TREE_COLOR[ctype]
 
     # generate segment collection
     collection = PolyCollection(group, closed=False, antialiaseds=True,
@@ -415,7 +288,8 @@ def _generate_collection(group, ax, ctype, colors):
 
     # dummy plot for the legend
     if color not in colors:
-        ax.plot((0., 0.), (0., 0.), c=color, label=_format_str(str(ctype)))
+        label = str(ctype).replace('NeuriteType.', '').replace('_', ' ').capitalize()
+        ax.plot((0., 0.), (0., 0.), c=color, label=label)
         colors.add(color)
 
 
@@ -427,7 +301,7 @@ def _render_dendrogram(dnd, ax, displacement):
     for n, (indices, ctype) in enumerate(zip(dnd.groups, dnd.types)):
 
         # slice rectangles array for the current neurite
-        group = dnd.data[indices[0]: indices[1]]
+        group = dnd.data[indices[0]:indices[1]]
 
         if n > 0:
             # displace the neurites by half of their maximum x dimension
@@ -452,58 +326,29 @@ def _render_dendrogram(dnd, ax, displacement):
     return displacement
 
 
-def dendrogram(obj, show_diameters=True, new_fig=True, new_axes=True, subplot=False, **kwargs):
-    '''
-    Generates a figure of the neuron,
-    that contains a soma and a list of trees.
+def plot_dendrogram(ax, obj, show_diameters=True):
+    '''Dendrogram of `obj`
 
-    Parameters:
+    Args:
         obj: Neuron or tree \
         neurom.Neuron, neurom.Tree
         show_diameters : boolean \
             Determines if node diameters will \
             be show or not.
-        new_fig: boolean \
-            Defines if the tree will be plotted \
-            in the current figure (False) \
-            or in a new figure (True) \
-            Default value is True.
-        subplot: matplotlib subplot value or False \
-            If False the default subplot 111 will be used. \
-            For any other value a matplotlib subplot \
-            will be generated. \
-            Default value is False.
-
-    Returns:
-        A 2D matplotlib figure with a dendrogram view.
     '''
-
     # create dendrogram and generate rectangle collection
     dnd = Dendrogram(obj, show_diameters=show_diameters)
     dnd.generate()
-
-    fig, ax = common.get_figure(new_fig=new_fig, new_axes=new_axes, subplot=subplot)
 
     # render dendrogram and take into account neurite displacement which
     # starts as zero. It is important to avoid overlapping of neurites
     # and to determine tha limits of the figure.
 
-    displacement = _render_dendrogram(dnd, ax, 0.)
+    _render_dendrogram(dnd, ax, 0.)
 
-    # customization settings
-    kwargs['xlim'] = [- dnd.dims[0][0] * 0.5, dnd.dims[-1][0] * 0.5 + displacement]
+    ax.set_title('Morphology Dendrogram')
+    ax.set_xlabel('micrometers (um)')
+    ax.set_ylabel('micrometers (um)')
 
-    kwargs.setdefault('title', 'Morphology Dendrogram')
-    kwargs.setdefault('xlabel', 'micrometers (um)')
-    kwargs.setdefault('ylabel', 'micrometers (um)')
-    kwargs['no_legend'] = False
-    kwargs.setdefault('aspect_ratio', 'auto')
-
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
-
-neuron.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
-tree.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
-soma.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
-neuron3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
-tree3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
-soma3d.__doc__ += DEFAULT_PARAMS  # pylint: disable=no-member
+    ax.set_aspect('auto')
+    ax.legend()
