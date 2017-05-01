@@ -68,6 +68,7 @@ NEURITEFEATURES = {
     'number_of_forking_points': _nrt.number_of_forking_points,
     'number_of_terminations': _nrt.number_of_terminations,
     'section_branch_orders': _nrt.section_branch_orders,
+    'section_strahler_orders': _nrt.section_strahler_orders,
     'section_radial_distances': _nrt.section_radial_distances,
     'local_bifurcation_angles': _nrt.local_bifurcation_angles,
     'remote_bifurcation_angles': _nrt.remote_bifurcation_angles,
