@@ -72,6 +72,26 @@ def branch_order(section):
     return sum(1 for _ in section.iupstream()) - 1
 
 
+def strahler_order(section):
+    '''Branching order of a tree section
+
+    The strahler order is the inverse of the branch order,
+    since this is computed from the tips of the tree
+    towards the root.
+    This is computed as the maximum branch order of
+    a section's descendants minus the section's own branch order
+    plus one to start counting from 1.
+
+    Note:
+        The leaves have branch order 1.
+    '''
+    if len(section.children) == 0:
+        return 1
+    else:
+        max_bo_children = max([branch_order(i) for i in section.ipreorder()])
+        return max_bo_children - branch_order(section) + 1
+
+
 def section_radial_distance(section, origin):
     '''Return the radial distances of a tree section to a given origin point
 

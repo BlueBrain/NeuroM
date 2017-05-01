@@ -123,6 +123,11 @@ def section_branch_orders(neurites, neurite_type=NeuriteType.all):
     return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type)
 
 
+def section_strahler_orders(neurites, neurite_type=NeuriteType.all):
+    '''section strahler orders in a collection of neurites'''
+    return map_sections(sectionfunc.strahler_order, neurites, neurite_type=neurite_type)
+
+
 def section_bif_branch_orders(neurites, neurite_type=NeuriteType.all):
     '''Bifurcation section branch orders in a collection of neurites'''
     return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type,
