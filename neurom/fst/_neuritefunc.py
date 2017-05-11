@@ -81,6 +81,14 @@ def n_leaves(neurites, neurite_type=NeuriteType.all):
     return n_sections(neurites, neurite_type=neurite_type, iterator_type=Tree.ileaf)
 
 
+def total_area_per_neurite(neurites, neurite_type=NeuriteType.all):
+    '''Surface area in a collection of neurites.
+
+    The area is defined as the sum of the area of the sections.
+    '''
+    return [neurite.area for neurite in iter_neurites(neurites, filt=is_type(neurite_type))]
+
+
 def map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreorder):
     '''Map `fun` to all the sections in a collection of neurites'''
     return map(fun, iter_sections(neurites,

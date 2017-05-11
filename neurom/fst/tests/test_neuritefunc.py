@@ -105,6 +105,23 @@ def test_n_leaves():
     nt.assert_equal(_nf.n_leaves(Neurite(s7)), 1)
 
 
+def test_total_area_per_neurite():
+    def surface(r0, r1, h):
+        return pi * (r0 + r1) * sqrt((r0 - r1) ** 2 + h ** 2)
+
+    basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = _nf.total_area_per_neurite(SIMPLE,
+            neurite_type=nm.BASAL_DENDRITE)
+    nt.assert_almost_equal(ret[0], basal_area)
+
+    axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = _nf.total_area_per_neurite(SIMPLE, neurite_type=nm.AXON)
+    nt.assert_almost_equal(ret[0], axon_area)
+
+    ret = _nf.total_area_per_neurite(SIMPLE)
+    nt.ok_(np.allclose(ret, [basal_area, axon_area]))
+
+
 def test_total_volume_per_neurite():
     vol = _nf.total_volume_per_neurite(NRN)
     nt.eq_(len(vol), 4)
