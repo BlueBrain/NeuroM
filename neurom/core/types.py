@@ -28,11 +28,11 @@
 
 '''Type enumerations'''
 
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 
 @unique
-class NeuriteType(Enum):
+class NeuriteType(IntEnum):
     '''Enum representing valid tree types'''
     undefined = 1
     soma = 2
