@@ -107,6 +107,9 @@ class TimeFeatures(object):
     def time_principal_direction_extents(self):
         nm.get('principal_direction_extents', self.neuron)
 
+    def time_sholl_frequency(self):
+        nm.get('sholl_frequency', self.neuron)
+
 
 class TimeChecks:
     def setup(self):
