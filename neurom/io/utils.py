@@ -96,6 +96,19 @@ def get_morph_files(directory):
     return list(filter(_is_morphology_file, lsdir))
 
 
+def get_files_by_path(path):
+    '''Get a file or set of files from a file path
+
+    Return list of files with path
+    '''
+    if os.path.isfile(path):
+        return [path]
+    elif os.path.isdir(path):
+        return get_morph_files(path)
+
+    raise IOError('Invalid data path %s' % path)
+
+
 def load_neuron(filename):
     '''Build section trees from an h5 or swc file'''
     rdw = load_data(filename)
@@ -106,7 +119,8 @@ def load_neuron(filename):
 def load_neurons(neurons,
                  neuron_loader=load_neuron,
                  name=None,
-                 population_class=Population):
+                 population_class=Population,
+                 ignored_exceptions=()):
     '''Create a population object from all morphologies in a directory\
         of from morphologies in a list of file names
 
@@ -126,10 +140,22 @@ def load_neurons(neurons,
         files = neurons
         name = name if name is not None else 'Population'
     elif isinstance(neurons, StringType):
-        files = get_morph_files(neurons)
+        files = get_files_by_path(neurons)
         name = name if name is not None else os.path.basename(neurons)
 
-    pop = population_class([neuron_loader(f) for f in files], name=name)
+    ignored_exceptions = tuple(ignored_exceptions)
+    pop = []
+    for f in files:
+        try:
+            pop.append(neuron_loader(f))
+        except NeuroMError as e:
+            if isinstance(e, ignored_exceptions):
+                L.info('Ignoring exception "%s" for file %s',
+                       e, os.path.basename(f))
+                continue
+            raise
+
+    pop = population_class(pop, name=name)
     return pop
 
 

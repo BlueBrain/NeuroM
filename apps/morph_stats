@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -32,7 +31,6 @@
 import argparse
 import json
 import logging
-import os
 import sys
 import neurom as nm
 from neurom.apps import get_config
@@ -40,23 +38,26 @@ from neurom.apps.morph_stats import (extract_stats,
                                      sanitize_config,
                                      get_header,
                                      generate_flattened_dict)
-from neurom.exceptions import ConfigError
-from neurom.io.utils import get_morph_files
+from neurom import exceptions
+from neurom.io.utils import get_files_by_path
 from neurom.utils import NeuromJSON
 
 L = logging.getLogger(__name__)
-
 
 _CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'total'],
         'section_volumes': ['total'],
-        'section_branch_orders': ['max']
+        'section_branch_orders': ['max'],
     },
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
-        'soma_radii': ['mean']
-    }
+        'soma_radii': ['mean'],
+    },
+}
+
+IGNORABLE_EXCEPTIONS = {
+    'SomaError': exceptions.SomaError,
 }
 
 
@@ -69,7 +70,6 @@ def get_parser():
 
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
                         help='-v for INFO, -vv for DEBUG')
-
     parser.add_argument('-l', '--list', action='store_true', default=False,
                         help='List the available features')
 
@@ -84,32 +84,33 @@ def get_parser():
                         help=('Summary output file name, if it ends in .json, '
                               'a json file is created, if .csv, then a csv file'))
 
+    parser.add_argument('-I', '--ignored-exceptions', dest='ignored_exceptions',
+                        default=[], choices=IGNORABLE_EXCEPTIONS, action='append',
+                        help='Exception to ignore')
+
     return parser
 
 
 def main(args):
     '''main function'''
-    path = args.datapath
-    results = {}
     try:
         config = get_config(args.config, _CONFIG)
         config = sanitize_config(config)
-    except ConfigError as e:
+    except exceptions.ConfigError as e:
         L.error(str(e))
         sys.exit(1)
 
-    if os.path.isfile(path):
-        results[path] = extract_stats(nm.load_neuron(path), config)
-    elif os.path.isdir(path):
-        if not args.as_population:
-            from tqdm import tqdm
-            for population in tqdm(get_morph_files(path)):
-                results[population] = extract_stats(nm.load_neuron(population), config)
-        else:
-            results[path] = extract_stats(nm.load_neurons(path), config)
+    ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in args.ignored_exceptions)
+    neurons = nm.load_neurons(get_files_by_path(args.datapath),
+                              ignored_exceptions=ignored_exceptions)
+
+    results = {}
+    if args.as_population:
+        results[args.datapath] = extract_stats(neurons, config)
     else:
-        L.error("Invalid data path %s", path)
-        sys.exit(1)
+        from tqdm import tqdm
+        for neuron in tqdm(neurons):
+            results[neuron.name] = extract_stats(neuron, config)
 
     if not args.output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))
