@@ -29,9 +29,13 @@
 '''Data format definitions'''
 
 
+_COL_COUNT = 7
+
+
 class COLS(object):
     '''Column labels for internal data representation'''
-    (X, Y, Z, R, TYPE, ID, P) = range(7)
+    COL_COUNT = _COL_COUNT
+    (X, Y, Z, R, TYPE, ID, P) = range(_COL_COUNT)
     XYZ = slice(0, 3)
     XYZR = slice(0, 4)
 

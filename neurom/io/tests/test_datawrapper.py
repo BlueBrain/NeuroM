@@ -8,15 +8,15 @@ from neurom.core.dataformat import POINT_TYPE, ROOT_ID
 
 
 def test__merge_sections():
-    default_sec = dw.Section()
+    default_sec = dw.DataBlockSection()
 
-    sec_a = dw.Section([], ntype=0, pid=-1)
-    sec_b = dw.Section([], ntype=0, pid=-1)
+    sec_a = dw.DataBlockSection([], ntype=0, pid=-1)
+    sec_b = dw.DataBlockSection([], ntype=0, pid=-1)
     dw._merge_sections(sec_a, sec_b)
     nt.eq_(sec_a, default_sec)
 
-    sec_a = dw.Section(range(10), ntype=1, pid=1)
-    sec_b = dw.Section(range(9, 20), ntype=10, pid=10)
+    sec_a = dw.DataBlockSection(range(10), ntype=1, pid=1)
+    sec_b = dw.DataBlockSection(range(9, 20), ntype=10, pid=10)
     dw._merge_sections(sec_a, sec_b)
     nt.eq_(sec_a, default_sec)
     nt.eq_(sec_b.ids, list(range(20))) # Note: 9 is in this list from sec_a, not from sec_b

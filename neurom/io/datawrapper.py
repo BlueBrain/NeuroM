@@ -54,6 +54,11 @@ class DataWrapper(object):
             ID(integer): unique integer given to each point, the `ROOT_ID` is -1
             P(integer): the ID of the parent
 
+        Args:
+            data_block: as defined above
+            fmt: File format designation, eg: SWC
+            sections: Already extracted sections, otherwise data_block will be used
+
         Notes:
             - there is no ordering constraint: a child can reference a parent ID that comes
               later in the block
@@ -120,7 +125,7 @@ def _section_end_points(data_block, id_map):
     return end_pts.union(soma_end_pts)
 
 
-class Section(object):
+class DataBlockSection(object):
     '''sections ((ids), type, parent_id)'''
     def __init__(self, ids=None, ntype=0, pid=-1):
         self.ids = [] if ids is None else ids
@@ -145,10 +150,10 @@ def _extract_sections(data_block):
     sec_end_pts = _section_end_points(data_block, id_map)
 
     # artificial discontinuity section IDs
-    _gap_sections = set()
+    gap_sections = set()
 
-    _sections = [Section()]
-    curr_section = _sections[-1]
+    sections = [DataBlockSection()]
+    curr_section = sections[-1]
     parent_section = {-1: -1}
 
     for row in data_block:
@@ -158,7 +163,11 @@ def _extract_sections(data_block):
             # first in section point is parent.
             curr_section.ids.append(parent_id)
             curr_section.ntype = int(row[COLS.TYPE])
+
+        # a 'gap' is when a section has part of it's segments interleaved
+        # with those of another section
         gap = parent_id != curr_section.ids[-1]
+
         # If parent is not the previous point, create
         # a section end-point. Else add the point
         # to this section
@@ -168,31 +177,30 @@ def _extract_sections(data_block):
             curr_section.ids.append(row_id)
 
         if row_id in sec_end_pts:
-            parent_section[curr_section.ids[-1]] = len(_sections) - 1
-            _sections.append(Section())
-            curr_section = _sections[-1]
+            parent_section[curr_section.ids[-1]] = len(sections) - 1
             # Parent-child discontinuity section
             if gap:
+                sections.append(DataBlockSection())
+                curr_section = sections[-1]
                 curr_section.ids.extend((parent_id, row_id))
                 curr_section.ntype = int(row[COLS.TYPE])
-                _gap_sections.add(len(_sections) - 2)
+                gap_sections.add(len(sections) - 2)
+            elif row_id != len(data_block) - 1:
+                # avoid creating an extra DataBlockSection for last row if it's a leaf
+                sections.append(DataBlockSection())
+                curr_section = sections[-1]
 
-    for sec in _sections:
+    for sec in sections:
         # get the section parent ID from the id of the first point.
         if sec.ids:
             sec.pid = parent_section[sec.ids[0]]
         # join gap sections and "disable" first half
-        if sec.pid in _gap_sections:
-            _merge_sections(_sections[sec.pid], sec)
+        if sec.pid in gap_sections:
+            _merge_sections(sections[sec.pid], sec)
 
-    # TODO find a way to remove empty sections.
-    # Currently they are required to maintain
-    # tree integrity.
-    return _sections
-
-
-COL_COUNT = 7
-_, _, _, _, TYPE, ID, PARENT = range(COL_COUNT)
+    # TODO find a way to remove empty sections.  Currently they are
+    # required to maintain tree integrity.
+    return sections
 
 
 class BlockNeuronBuilder(object):
@@ -207,6 +215,9 @@ class BlockNeuronBuilder(object):
         >>> builder.add_section(segment_id, parent_id, segment_type, points)
         ...
         >>> morph = builder.get_datawrapper()
+
+    Note:
+        This will re-number the IDs if they are not 'dense' (ie: have gaps)
     '''
     BlockSection = namedtuple('BlockSection', 'parent_id section_type points')
 
@@ -220,7 +231,8 @@ class BlockNeuronBuilder(object):
             id_(int): identifying number of the section
             parent_id(int): identifying number of the parent of this section
             section_type(int): the section type as defined by POINT_TYPE
-            points is an array of [X, Y, Z, R]'''
+            points is an array of [X, Y, Z, R]
+        '''
         # L.debug('Adding section %d, with parent %d, of type: %d with count: %d',
         #         id_, parent_id, section_type, len(points))
         assert id_ not in self.sections, 'id %s already exists in sections' % id_
@@ -238,9 +250,9 @@ class BlockNeuronBuilder(object):
             row_count += len(self.sections[section_id].points)
             id_to_insert_id[section_id] = row_count - 1
 
-        datablock = np.empty((row_count, COL_COUNT), dtype=np.float)
-        datablock[:, ID] = np.arange(len(datablock))
-        datablock[:, PARENT] = datablock[:, ID] - 1
+        datablock = np.empty((row_count, COLS.COL_COUNT), dtype=np.float)
+        datablock[:, COLS.ID] = np.arange(len(datablock))
+        datablock[:, COLS.P] = datablock[:, COLS.ID] - 1
 
         sections = []
         insert_index = 0
@@ -250,9 +262,9 @@ class BlockNeuronBuilder(object):
 
             idx = slice(insert_index, insert_index + len(points))
             datablock[idx, COLS.XYZR] = points
-            datablock[idx, TYPE] = section_type
-            datablock[idx.start, PARENT] = id_to_insert_id.get(parent_id, ROOT_ID)
-            sections.append(Section(idx, section_type, parent_id))
+            datablock[idx, COLS.TYPE] = section_type
+            datablock[idx.start, COLS.P] = id_to_insert_id.get(parent_id, ROOT_ID)
+            sections.append(DataBlockSection(idx, section_type, parent_id))
             insert_index = idx.stop
 
         return datablock, sections
