@@ -38,6 +38,9 @@ import numpy as np
 L = logging.getLogger(__name__)
 
 
+TYPE, ID, PID = 0, 1, 2
+
+
 class DataWrapper(object):
     '''Class holding a raw data block and section information'''
 
@@ -68,6 +71,7 @@ class DataWrapper(object):
         '''
         self.data_block = data_block
         self.fmt = fmt
+        # list of DataBlockSection
         self.sections = sections if sections is not None else _extract_sections(data_block)
 
     def neurite_root_section_ids(self):
@@ -97,30 +101,22 @@ def _merge_sections(sec_a, sec_b):
     sec_a.ntype = 0
 
 
-def _section_end_points(data_block, id_map):
-    '''Get the section end-points '''
-    def _is_soma_neurite_break(idx):
-        '''determine if idx is the index of the first non-soma point'''
-        row = data_block[idx]
-        pid = id_map[int(row[COLS.P])]
-        if row[COLS.P] == ROOT_ID:
-            return False
-
-        return (row[COLS.TYPE] != POINT_TYPE.SOMA and
-                data_block[pid][COLS.TYPE] == POINT_TYPE.SOMA)
-
-    soma_end_pts = set()
-
-    # number of children per point
-    n_children = defaultdict(int)
-    for i, row in enumerate(data_block):
-        n_children[int(row[COLS.P])] += 1
-        if _is_soma_neurite_break(i):
-            soma_end_pts.add(id_map[int(data_block[i][COLS.P])])
+def _section_end_points(structure_block, id_map):
+    '''Get the section end-points'''
+    soma_idx = structure_block[:, TYPE] == POINT_TYPE.SOMA
+    soma_ids = structure_block[soma_idx, ID]
+    neurite_idx = structure_block[:, TYPE] != POINT_TYPE.SOMA
+    neurite_rows = structure_block[neurite_idx, :]
+    soma_end_pts = set(id_map[id_]
+                       for id_ in soma_ids[np.in1d(soma_ids, neurite_rows[:, PID])])
 
     # end points have either no children or more than one
-    end_pts = set(i for i, row in enumerate(data_block)
-                  if n_children[row[COLS.ID]] != 1)
+    # ie: leaf or multifurcation nodes
+    n_children = defaultdict(int)
+    for row in structure_block:
+        n_children[row[PID]] += 1
+    end_pts = set(i for i, row in enumerate(structure_block)
+                  if n_children[row[ID]] != 1)
 
     return end_pts.union(soma_end_pts)
 
@@ -137,40 +133,53 @@ class DataBlockSection(object):
                 self.ntype == other.ntype and
                 self.pid == other.pid)
 
+    def __str__(self):
+        return ('%s: ntype=%s, pid=%s: n_ids=%d' %
+                (self.__class__, self.ntype, self.pid, len(self.ids)))
+
+    __repr__ = __str__
+
 
 def _extract_sections(data_block):
     '''Make a list of sections from an SWC-style data wrapper block'''
+    structure_block = data_block[:, COLS.TYPE:COLS.COL_COUNT].astype(np.int)
 
-    # get SWC ID to array position map
+    # SWC ID -> structure_block position
     id_map = {-1: -1}
-    for i, r in enumerate(data_block):
-        id_map[int(r[COLS.ID])] = i
+    for i, row in enumerate(structure_block):
+        id_map[row[ID]] = i
 
-    # end points have either no children or more than one
-    sec_end_pts = _section_end_points(data_block, id_map)
+    # end points have either no children, more than one, or are the start
+    # of a new gap
+    sec_end_pts = _section_end_points(structure_block, id_map)
 
-    # artificial discontinuity section IDs
+    # a 'gap' is when a section has part of it's segments interleaved
+    # with those of another section
     gap_sections = set()
 
-    sections = [DataBlockSection()]
-    curr_section = sections[-1]
+    sections = []
+
+    def new_section():
+        '''new_section'''
+        sections.append(DataBlockSection())
+        return sections[-1]
+
+    curr_section = new_section()
+
     parent_section = {-1: -1}
 
-    for row in data_block:
-        row_id = id_map[int(row[COLS.ID])]
-        parent_id = id_map[int(row[COLS.P])]
-        if len(curr_section.ids) == 0:
-            # first in section point is parent.
+    for row in structure_block:
+        row_id = id_map[row[ID]]
+        parent_id = id_map[row[PID]]
+        if not curr_section.ids:
+            # first in section point is parent
             curr_section.ids.append(parent_id)
-            curr_section.ntype = int(row[COLS.TYPE])
+            curr_section.ntype = row[TYPE]
 
-        # a 'gap' is when a section has part of it's segments interleaved
-        # with those of another section
         gap = parent_id != curr_section.ids[-1]
 
-        # If parent is not the previous point, create
-        # a section end-point. Else add the point
-        # to this section
+        # If parent is not the previous point, create a section end-point.
+        # Else add the point to this section
         if gap:
             sec_end_pts.add(row_id)
         else:
@@ -180,20 +189,19 @@ def _extract_sections(data_block):
             parent_section[curr_section.ids[-1]] = len(sections) - 1
             # Parent-child discontinuity section
             if gap:
-                sections.append(DataBlockSection())
-                curr_section = sections[-1]
+                curr_section = new_section()
                 curr_section.ids.extend((parent_id, row_id))
-                curr_section.ntype = int(row[COLS.TYPE])
+                curr_section.ntype = row[TYPE]
                 gap_sections.add(len(sections) - 2)
             elif row_id != len(data_block) - 1:
                 # avoid creating an extra DataBlockSection for last row if it's a leaf
-                sections.append(DataBlockSection())
-                curr_section = sections[-1]
+                curr_section = new_section()
 
     for sec in sections:
         # get the section parent ID from the id of the first point.
         if sec.ids:
             sec.pid = parent_section[sec.ids[0]]
+
         # join gap sections and "disable" first half
         if sec.pid in gap_sections:
             _merge_sections(sections[sec.pid], sec)
