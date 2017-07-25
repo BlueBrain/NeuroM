@@ -148,8 +148,10 @@ class Section(Tree):
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
-        return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
-            (self.id, self.points, self.parent, len(self.children))
+        return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \
+            (self.id, self.type, len(self.points), self.parent, len(self.children))
+
+    __repr__ = __str__
 
 
 class Neurite(object):
@@ -220,6 +222,8 @@ class Neurite(object):
     def __str__(self):
         return 'Neurite <type: %s>' % self.type
 
+    __repr__ = __str__
+
 
 class Neuron(object):
     '''Class representing a simple neuron'''
@@ -229,5 +233,7 @@ class Neuron(object):
         self.sections = sections
 
     def __str__(self):
-        return 'Neuron <soma: %s, nneurites: %d>' % \
+        return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
+
+    __repr__ = __str__

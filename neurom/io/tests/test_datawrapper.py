@@ -34,6 +34,10 @@ def test__merge_sections():
 #neurite_root_section_ids
 #soma_points
 
+def test_DataBlockSection_str():
+    s = str(dw.DataBlockSection())
+    nt.ok_('DataBlockSection' in s)
+
 def test_BlockNeuronBuilder():
     builder = dw.BlockNeuronBuilder()
     soma_points = np.array([[0, 0, 0, 1]])
