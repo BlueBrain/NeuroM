@@ -70,6 +70,7 @@ NEURITEFEATURES = {
     'number_of_forking_points': _nrt.number_of_forking_points,
     'number_of_terminations': _nrt.number_of_terminations,
     'section_branch_orders': _nrt.section_branch_orders,
+    'section_strahler_orders': _nrt.section_strahler_orders,
     'section_term_branch_orders': _nrt.section_term_branch_orders,
     'section_bif_branch_orders': _nrt.section_bif_branch_orders,
     'section_radial_distances': _nrt.section_radial_distances,

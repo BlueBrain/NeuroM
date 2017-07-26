@@ -69,6 +69,16 @@ def test_section_area():
     nt.eq_(math.pi * 1 * 2 * 1, area)
 
 
+def test_section_branch_orders():
+    nt.eq_(0, _sf.branch_order(NRN.sections[0]))
+    nt.eq_(10, _sf.branch_order(NRN.sections[21]))
+
+
+def test_section_strahler_orders():
+    nt.eq_(1, _sf.strahler_order(NRN.sections[0]))
+    nt.eq_(11, _sf.strahler_order(NRN.sections[2]))
+
+
 def test_section_tortuosity():
     sec_a = Section([
         (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
