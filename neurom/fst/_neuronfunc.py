@@ -133,3 +133,71 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     return [_elevation(s.root_node.points, n.soma)
             for n in nrns
             for s in n.neurites if neurite_filter(s)]
+
+
+def trunk_vectors(nrn, neurite_type=NeuriteType.all):
+    '''Calculates the vectors between all the trunks of the neuron
+    and the soma center.
+    '''
+    neurite_filter = is_type(neurite_type)
+    nrns = neuron_population(nrn)
+
+    def _vectors(section, soma):
+        '''Vector between soma and initial point computation'''
+        return morphmath.vector(section[0], soma.center)
+
+    return np.array([_vectors(s.root_node.points, n.soma)            
+                    for n in nrns
+                    for s in n.neurites if neurite_filter(s)])
+
+
+def trunk_angles(nrn, neurite_type=NeuriteType.all, plane='XY'):
+    '''Calculates the angles between all the trunks of the neuron.
+    The angles are defined on the x-y plane and the trees
+    are sorted from the y axis and anticlock-wise.
+    '''
+    from neurom.core.dataformat import COLS
+    neurite_filter = is_type(neurite_type)
+    nrns = neuron_population(nrn)
+
+    horz = getattr(COLS, plane[0])
+    vert = getattr(COLS, plane[1])
+
+    def _vectors(section, soma):
+        '''Vector between soma and initial point computation'''
+        return morphmath.vector(section[0], soma.center)
+
+    def _angle_between(p1, p2):
+        '''Clockwise angle computation'''
+        ang1 = np.arctan2(*p1[::-1])
+        ang2 = np.arctan2(*p2[::-1])
+        return (ang1 - ang2)
+
+    vectors = np.array([_vectors(s.root_node.points, n.soma)            
+                        for n in nrns
+                        for s in n.neurites if neurite_filter(s)])
+
+    # sorting angles according to x-y plane
+    order = np.argsort(np.array([_angle_between(i/ np.linalg.norm(i), [0,1])
+                                 for i in vectors[:, 0:2]]))
+
+    angles = []
+
+    selected_vectors = vectors[:, [horz, vert]]
+
+    for i,v in enumerate(selected_vectors):
+
+        a = _angle_between(selected_vectors[i], selected_vectors[i-1])
+
+        if np.abs(2 * np.pi - np.abs(a)) < np.abs(a):
+            angles.append(np.abs(2 * np.pi - np.abs(a)) - 2 * np.pi / len(vectors))
+        else:
+            angles.append(np.abs(a) - 2 * np.pi / len(vectors))
+
+    return angles
+
+    # angles = np.array([_angle_between(i/ np.linalg.norm(i), [0,1]) for i in vectors[:, 0:2]])
+    #return [angles[order][i-1] - angles[order][i] 
+    #        if np.abs(angles[order][i-1] - angles[order][i]) < np.pi
+    #        else 2*np.pi - np.abs(angles[order][i-1] - angles[order][i])
+    #        for i in xrange(len(order))]

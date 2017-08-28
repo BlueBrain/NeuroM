@@ -93,3 +93,14 @@ def partition_asymmetry(bif_point):
         return abs(n - m) / abs(n + m)
     else:
         return 0.0
+
+
+def partition_pair(bif_point):
+    '''Calculate the partition pairs at a bifurcation point
+
+    The number of nodes in each child tree is counted. The partition
+    pairs is the number of bifurcations in the two daughter subtrees
+    at each branch point.'''
+    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    return (n, m)

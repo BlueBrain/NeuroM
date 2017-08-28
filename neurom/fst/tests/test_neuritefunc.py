@@ -135,7 +135,7 @@ def test_neurite_volume_density():
     assert_allclose(vol_density, ref_density)
 
 
-def test_terminal_length_per_neurite():
+def test_terminal_path_length_per_neurite():
     terminal_distances = _nf.terminal_path_lengths_per_neurite(SIMPLE)
     assert_allclose(terminal_distances,
                     (5 + 5., 5 + 6., 4. + 6., 4. + 5))

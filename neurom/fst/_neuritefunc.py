@@ -96,6 +96,32 @@ def section_lengths(neurites, neurite_type=NeuriteType.all):
     return map_sections(_seclen, neurites, neurite_type=neurite_type)
 
 
+def section_term_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Termination section lengths in a collection of neurites'''
+    def _seclen(sec, **kwargs):
+        '''get section length of `section`'''
+        return morphmath.section_length(sec.points, **kwargs)
+    return map_sections(_seclen, neurites, neurite_type=neurite_type, iterator_type=Tree.ileaf)
+
+
+def section_bif_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Bifurcation section lengths in a collection of neurites'''
+    def _seclen(sec, **kwargs):
+        '''get section length of `section`'''
+        return morphmath.section_length(sec.points, **kwargs)
+    return map_sections(_seclen, neurites, neurite_type=neurite_type, iterator_type=Tree.ibifurcation_point)
+
+
+def section_term_branch_orders(neurites, neurite_type=NeuriteType.all):
+    '''Termination section branch orders in a collection of neurites'''
+    return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type, iterator_type=Tree.ileaf)
+
+
+def section_bif_branch_orders(neurites, neurite_type=NeuriteType.all):
+    '''Bifurcation section branch orders in a collection of neurites'''
+    return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type, iterator_type=Tree.ibifurcation_point)
+
+
 def section_branch_orders(neurites, neurite_type=NeuriteType.all):
     '''section branch orders in a collection of neurites'''
     return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type)
@@ -262,6 +288,14 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all):
                              neurite_filter=is_type(neurite_type)))
 
 
+def partition_pairs(neurites, neurite_type=NeuriteType.all):
+    '''Partition pairs at bifurcation points of a collection of neurites'''
+    return map(_bifurcationfunc.partition_pair,
+               iter_sections(neurites,
+                             iterator_type=Tree.ibifurcation_point,
+                             neurite_filter=is_type(neurite_type)))
+
+
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     '''Remote bifurcation angles in a collection of neurites'''
     dist = []
@@ -270,6 +304,30 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
         dist.extend([sectionfunc.section_radial_distance(s, pos)
                      for s in n.iter_sections()])
 
+    return dist
+
+
+def section_term_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
+    '''Get the radial distances of the termination sections for a collection of neurites'''
+    dist = []
+    for n in iter_neurites(neurites, filt=is_type(neurite_type)):
+        pos = n.root_node.points[0] if origin is None else origin
+        dist.extend([sectionfunc.section_radial_distance(s, pos)
+                     for s in iter_sections(n,
+                                            iterator_type=Tree.ileaf,
+                                            neurite_filter=is_type(neurite_type))])
+    return dist
+
+
+def section_bif_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
+    '''Get the radial distances of the bifurcation sections for a collection of neurites'''
+    dist = []
+    for n in iter_neurites(neurites, filt=is_type(neurite_type)):
+        pos = n.root_node.points[0] if origin is None else origin
+        dist.extend([sectionfunc.section_radial_distance(s, pos)
+                     for s in iter_sections(n,
+                                            iterator_type=Tree.ibifurcation_point,
+                                            neurite_filter=is_type(neurite_type))])
     return dist
 
 
@@ -325,6 +383,11 @@ def section_areas(neurites, neurite_type=NeuriteType.all):
 def section_tortuosity(neurites, neurite_type=NeuriteType.all):
     '''section tortuosities in a collection of neurites'''
     return map_sections(sectionfunc.section_tortuosity, neurites, neurite_type=neurite_type)
+
+
+def section_end_distances(neurites, neurite_type=NeuriteType.all):
+    '''section end to end distances in a collection of neurites'''
+    return map_sections(sectionfunc.section_end_distance, neurites, neurite_type=neurite_type)
 
 
 def principal_direction_extents(neurites, neurite_type=NeuriteType.all, direction=0):
