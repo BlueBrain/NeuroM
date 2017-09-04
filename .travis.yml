@@ -1,10 +1,10 @@
-sudo: required
 dist: trusty
 language: python
 python:
   - 2.6
   - 2.7
   - 3.5
+  - 3.6
 addons:
   apt:
     packages:
@@ -16,12 +16,13 @@ addons:
     - libhdf5-dev
 cache: pip
 install:
-  - pip install 'matplotlib==1.5.2' 'scipy==0.18.1'
+  - pip install 'matplotlib==1.5.2'
   - pip install .
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then make -f Makefile run_tests; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install  'scipy==0.18.1' 'Sphinx==1.5.5'; make -f Makefile run_tests PIP_INSTALL_OPTIONS=; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then make -f Makefile test; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then make -f Makefile run_tests; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then make -f Makefile run_tests; fi
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install codecov; codecov; fi
 before_deploy:

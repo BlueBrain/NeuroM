@@ -43,6 +43,7 @@ unexport DISPLAY
 MIN_COV?=100
 PIP_VERSION:=8.1.2
 VENV_INSTALLED=.installed
+PIP_INSTALL_OPTIONS=--ignore-installed
 
 FIND_LINT_PY=`find neurom examples apps -name "*.py" -not -path "*/*test*"`
 FIND_LINT_APP=`find apps -type f -not -path "*/*\.*" -not -path "*/\.*" -not -path "*/.*~"`
@@ -53,7 +54,7 @@ $(VENV):
 
 $(VENV_INSTALLED): $(VENV)
 	$(VENV_BIN)/pip install --upgrade pip==$(PIP_VERSION)
-	$(VENV_BIN)/pip install --ignore-installed -r requirements_dev.txt
+	$(VENV_BIN)/pip install $(PIP_INSTALL_OPTIONS) -r requirements_dev.txt
 	$(VENV_BIN)/pip install -e .
 	touch $@
 

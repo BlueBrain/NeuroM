@@ -96,6 +96,7 @@ def test_load_neurons():
     nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, _get_name(FILES[i]))
+    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
 
 def test_get_morph_files():
@@ -321,3 +322,22 @@ def test_NeuronLoader_mixed_file_extensions():
     loader.get('Neuron')
     loader.get('Neuron_h5v1')
     nt.assert_raises(NeuroMError, loader.get, 'NoSuchNeuron')
+
+
+def test_ignore_exceptions():
+    pop = utils.load_neurons((NO_SOMA_FILE, ), ignored_exceptions=(SomaError, ))
+    nt.eq_(len(pop), 0)
+
+    pop = utils.load_neurons((NO_SOMA_FILE, ),
+                             ignored_exceptions=(SomaError, RawDataError, ))
+    nt.eq_(len(pop), 0)
+
+
+def test_get_files_by_path():
+    single_neurom = utils.get_files_by_path(NO_SOMA_FILE)
+    nt.eq_(len(single_neurom), 1)
+
+    neuron_dir = utils.get_files_by_path(VALID_DATA_PATH)
+    nt.eq_(len(neuron_dir), 5)
+
+    nt.assert_raises(IOError, utils.get_files_by_path, 'this/is/a/fake/path')

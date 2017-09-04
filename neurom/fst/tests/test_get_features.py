@@ -803,6 +803,23 @@ def test_soma_surface_areas():
     nt.eq_(fst_get('soma_surface_areas', NEURON), area)
 
 
+def test_sholl_frequency():
+    assert_allclose(fst_get('sholl_frequency', NEURON),
+                    [4, 8, 8, 14, 9, 8, 7, 7])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.all),
+                    [4, 8, 8, 14, 9, 8, 7, 7])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.apical_dendrite),
+                    [1, 2, 2, 2, 2, 2, 1, 1])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.basal_dendrite),
+                    [2, 4, 4, 6, 5, 4, 4, 4])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.axon),
+                    [1, 2, 2, 6, 2, 2, 2, 2])
+
+
 @nt.nottest  # test_get_segment_lengths is disabled in test_get_features
 def test_section_path_distances_endpoint():
 

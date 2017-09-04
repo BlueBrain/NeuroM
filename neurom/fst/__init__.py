@@ -96,6 +96,7 @@ NEURONFEATURES = {
     'trunk_origin_azimuths': _nrn.trunk_origin_azimuths,
     'trunk_origin_elevations': _nrn.trunk_origin_elevations,
     'trunk_section_lengths': _nrn.trunk_section_lengths,
+    'sholl_frequency': _nrn.sholl_frequency,
 }
 
 
