@@ -46,7 +46,7 @@ It is recommended that you install NeuroM into a virtual environment.
 
 ::
 
-    $ virtualenv --system-site-packages nrm    # creates a virtualenv called "nrm" in nrm directory
+    $ virtualenv nrm                           # creates a virtualenv called "nrm" in nrm directory
     $ source nrm/bin/activate                  # activates virtualenv
     (nrm)$                                     # now we are in the nrm virtualenv
 
