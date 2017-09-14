@@ -203,7 +203,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
 
     Arguments:
         neuron(Neuron): The neuron object to test
-        max_z_distance(float): value above which consecutive z-values are
+        max_distance(float): value above which consecutive z-values are
         considered a jump
         axis(str): one of x/y/z, which axis to check for jumps
 

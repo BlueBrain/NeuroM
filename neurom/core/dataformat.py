@@ -36,6 +36,9 @@ class COLS(object):
     '''Column labels for internal data representation'''
     COL_COUNT = _COL_COUNT
     (X, Y, Z, R, TYPE, ID, P) = range(_COL_COUNT)
+    XY = slice(0, 2)
+    XZ = slice(0, 3, 2)
+    YZ = slice(1, 3)
     XYZ = slice(0, 3)
     XYZR = slice(0, 4)
 

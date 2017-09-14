@@ -92,7 +92,7 @@ def get_morph_files(directory):
     Returns:
         list with all files with extensions '.swc' , 'h5' or '.asc' (case insensitive)
     '''
-    lsdir = [os.path.join(directory, m) for m in os.listdir(directory)]
+    lsdir = (os.path.join(directory, m) for m in os.listdir(directory))
     return list(filter(_is_morphology_file, lsdir))
 
 
