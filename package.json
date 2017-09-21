@@ -1,0 +1,13 @@
+{
+  "name": "NeuroM",
+  "description": "NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.",
+  "version": "1.4.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BlueBrain/NeuroM/releases",
+    "issuesurl": "https://github.com/BlueBrain/NeuroM/issues"
+  },
+  "author": "Michael Gevaert, Lida Kanari, Juan Palacios, Eleftherios Zisis",
+  "contributors": ["Oren Amsalem", "Jean-Denis Courcol", "Michael Gevaert", "Lida Kanari", "Juan Palacios", "Arseny Povolotsky", "Liesbeth Vanherpe", "Eleftherios Zisis"],
+  "license": "BSD 3-Clause"
+}
