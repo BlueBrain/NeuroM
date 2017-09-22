@@ -2,6 +2,9 @@
   "name": "NeuroM",
   "description": "NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.",
   "version": "1.4.2",
+  "scripts": {
+    "build_doc": "echo 'neurom.readthedocs.io/en/latest'"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/BlueBrain/NeuroM/releases",
