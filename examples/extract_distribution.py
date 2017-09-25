@@ -33,10 +33,11 @@
    '''
 
 from itertools import chain
-import neurom as nm
-from neurom import stats
 import argparse
 import json
+
+import neurom as nm
+from neurom import stats
 
 
 def parse_args():

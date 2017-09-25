@@ -35,8 +35,6 @@
    axons: n_neurites
 '''
 
-from neurom import get, load_neurons, NeuriteType, stats
-from neurom.io.utils import get_morph_files
 import argparse
 from collections import OrderedDict
 from collections import defaultdict
@@ -45,6 +43,9 @@ from itertools import chain
 import os
 import json
 from json import encoder
+
+from neurom import get, load_neurons, NeuriteType, stats
+from neurom.io.utils import get_morph_files
 
 encoder.FLOAT_REPR = lambda o: format(o, '.2f')
 
