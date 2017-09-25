@@ -51,10 +51,12 @@ def _create_1d_distributions(points, bin_width):
     min_, max_ = np.min(points, axis=0), np.max(points, axis=0)
     hist = dict()
     for i, plane in enumerate('XYZ'):
-        bins_min = np.arange(min_[i], max_[i] + bin_width, bin_width)
-        bins_max = np.arange(max_[i], min_[i] - bin_width, -bin_width)[::-1]
-        hist[plane] = (np.histogram(points[:, i], bins=bins_min),
-                       np.histogram(points[:, i], bins=bins_max))
+        # Two binnings with same spacing but different offsets
+        # first is attached to min_[i], last is attached to max_[i]
+        binning_first_slice = np.arange(min_[i], max_[i] + bin_width, bin_width)
+        binning_last_slice = np.arange(max_[i], min_[i] - bin_width, -bin_width)[::-1]
+        hist[plane] = (np.histogram(points[:, i], bins=binning_first_slice),
+                       np.histogram(points[:, i], bins=binning_last_slice))
     return hist
 
 
@@ -101,8 +103,10 @@ def draw_neuron(neuron, cut_plane_position, cut_leaves=None):
                             the relevant plots
         cut_leaves: leaves to be highlighted by blue circles
     '''
+    figures = dict()
     for draw_plane in ['yz', 'xy', 'xz']:
-        _, axes = viewer.draw(neuron, plane=draw_plane)
+        fig, axes = viewer.draw(neuron, plane=draw_plane)
+        figures[draw_plane] = (fig, axes)
 
         if cut_leaves is not None:
             import matplotlib
@@ -116,12 +120,13 @@ def draw_neuron(neuron, cut_plane_position, cut_leaves=None):
             for axis, line_func in zip(draw_plane, ['axvline', 'axhline']):
                 if axis == cut_plane.lower():
                     getattr(axes, line_func)(position)
+    return figures
 
 
 def draw_dist_1d(hist, cut_position=None):
     '''Draw the 1D histograms, optionally also drawing a vertical line at cut_position'''
     import matplotlib.pyplot as plt
-    plt.figure()
+    fig = plt.figure()
 
     h, bins = hist
     plt.hist(bins[:-1], bins=bins, weights=h, label='Point distribution')
@@ -131,6 +136,7 @@ def draw_dist_1d(hist, cut_position=None):
     if cut_position:
         plt.gca().axvline(cut_position, color='r', label='Cut plane')
         plt.legend()
+    return {'distrib_1d': (fig, plt.gca())}
 
 
 def _get_status(minus_log_p):
@@ -139,8 +145,7 @@ def _get_status(minus_log_p):
     if minus_log_p < _THRESHOLD:
         return 'The probability that there is in fact NO cut plane is high: -log(p) = {0} !'\
             .format(minus_log_p)
-    else:
-        return 'ok'
+    return 'ok'
 
 
 def find_cut_plane(neuron, bin_width=10, display=False):
@@ -151,6 +156,16 @@ def find_cut_plane(neuron, bin_width=10, display=False):
         bin_width: The size of the binning
         display: where or not to display the control plots
                  Note: It is the user responsability to call matplotlib.pyplot.show()
+
+    Returns:
+        A dictionary with the following items:
+        status: 'ok' if everything went write, else an informative string
+        cut_plane: a tuple (plane, position) where 'plane' is 'X', 'Y' or 'Z'
+                   and 'position' is the position
+        cut_leaves: an np.array of all termination points in the cut plane
+        figures: if 'display' option was used, a dict where values are tuples (fig, ax)
+                 for each figure
+        details: A dict currently only containing -LogP of the bin where the cut plane was found
 
     1) The distribution of all points along X, Y and Z is computed
        and put into 3 histograms.
@@ -168,8 +183,8 @@ def find_cut_plane(neuron, bin_width=10, display=False):
                        for neurite in (neuron.neurites or [])
                        for section in nm.iter_sections(neurite)
                        for point in section.points])
-    if not len(points):
-        return {'cut_leaves': None, 'status': "Empty neuron", 'cut_plane': None}
+    if not points.size:
+        return {'cut_leaves': None, 'status': "Empty neuron", 'cut_plane': None, 'details': None}
 
     hist = _create_1d_distributions(points, bin_width)
     iter_proba = _get_probabilities(hist)
@@ -180,12 +195,15 @@ def find_cut_plane(neuron, bin_width=10, display=False):
     cut_position = histo[1][side]
     cut_leaves = _get_cut_leaves(neuron, (cut_plane, cut_position), bin_width)
 
+    result = {'cut_leaves': cut_leaves,
+              'status': _get_status(minus_log_p),
+              'details': {'-LogP': minus_log_p},
+              'cut_plane': (cut_plane, cut_position)}
+
     if display:
-        draw_neuron(neuron, (cut_plane, cut_position), cut_leaves)
-        draw_dist_1d(histo, cut_position)
+        result['figures'] = dict()
+        result['figures'].update(draw_neuron(neuron, (cut_plane, cut_position), cut_leaves))
+        result['figures'].update(draw_dist_1d(histo, cut_position))
         L.info('Trigger the plot display with: matplotlib.pyplot.show()')
 
-    return {'cut_leaves': cut_leaves,
-            'status': _get_status(minus_log_p),
-            'details': {'-LogP': minus_log_p},
-            'cut_plane': (cut_plane, cut_position)}
+    return result

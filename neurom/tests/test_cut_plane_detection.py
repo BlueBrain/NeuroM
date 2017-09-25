@@ -1,5 +1,6 @@
 from nose import tools as nt
 import numpy as np
+import subprocess
 
 from neurom.apps.cut_plane_detection import find_cut_plane, _get_probabilities, _create_1d_distributions
 from neurom.core import Neuron
@@ -39,8 +40,7 @@ def test_get_probabilities():
 
 
 def test_cut_neuron():
-    result = find_cut_plane(load_neuron(
-        'test_data/valid_set/Neuron_slice.h5'), display=True)
+    result = find_cut_plane(load_neuron('test_data/valid_set/Neuron_slice.h5'))
     nt.assert_equal(result['status'], 'ok')
 
     cut_axis, position = result['cut_plane']
@@ -48,6 +48,19 @@ def test_cut_neuron():
     nt.assert_true(abs(position - 48) < 2)
 
 
+def test_display():
+    result = find_cut_plane(load_neuron('test_data/valid_set/Neuron_slice.h5'), display=True)
+    for fig, ax in result['figures'].values():
+        nt.assert_true(fig)
+        nt.assert_true(ax)
+    nt.assert_equal(set(result['figures'].keys()), set(['distrib_1d', 'xy', 'xz', 'yz']))
+
+
 def test_repaired_neuron():
     result = find_cut_plane(load_neuron('test_data/h5/v1/bio_neuron-000.h5'))
     nt.assert_not_equals(result['status'], 'ok')
+
+
+def test_apps():
+    subprocess.call(
+        ['./apps/cut_plane_detection', 'test_data/valid_set/Neuron_slice.h5'])

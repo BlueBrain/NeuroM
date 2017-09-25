@@ -90,12 +90,18 @@ def main(args):
                for path in args.datapath
                for f in tqdm(get_files_by_path(path))}
 
+    for result in results.values():
+        result.pop('figures', None)
+
     if not args.output_file:
         print('\n')
         for k, v in results.items():
             print('{}: {}'.format(k, v))
     else:
         with open(args.output_file, 'w') as output_file:
+            if 'figures' in results:
+                print('deleting stuff')
+                del results['figures']
             json.dump(results, output_file, cls=NeuromJSON)
 
     return _check_results(results)
