@@ -100,7 +100,6 @@ def main(args):
     else:
         with open(args.output_file, 'w') as output_file:
             if 'figures' in results:
-                print('deleting stuff')
                 del results['figures']
             json.dump(results, output_file, cls=NeuromJSON)
 

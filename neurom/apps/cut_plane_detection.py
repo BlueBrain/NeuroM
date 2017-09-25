@@ -187,10 +187,8 @@ def find_cut_plane(neuron, bin_width=10, display=False):
         return {'cut_leaves': None, 'status': "Empty neuron", 'cut_plane': None, 'details': None}
 
     hist = _create_1d_distributions(points, bin_width)
-    iter_proba = _get_probabilities(hist)
 
-    cut_plane, side, minus_log_p, histo = max(
-        iter_proba, key=operator.itemgetter(2))
+    cut_plane, side, minus_log_p, histo = max(_get_probabilities(hist), key=operator.itemgetter(2))
 
     cut_position = histo[1][side]
     cut_leaves = _get_cut_leaves(neuron, (cut_plane, cut_position), bin_width)
