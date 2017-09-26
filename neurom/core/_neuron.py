@@ -32,11 +32,12 @@ from itertools import chain
 from copy import deepcopy
 import numpy as np
 
-from . import NeuriteType, Tree
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 from neurom._compat import filter, map, zip
+
+from . import NeuriteType, Tree
 
 
 def iter_neurites(obj, mapfun=None, filt=None):
@@ -115,6 +116,7 @@ def iter_segments(obj, neurite_filter=None):
 
 class Section(Tree):
     '''Class representing a neurite section'''
+
     def __init__(self, points, section_id=None, section_type=NeuriteType.undefined):
         super(Section, self).__init__()
         self.id = section_id
@@ -156,6 +158,7 @@ class Section(Tree):
 
 class Neurite(object):
     '''Class representing a neurite tree'''
+
     def __init__(self, root_node):
         self.root_node = root_node
         self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
@@ -227,6 +230,7 @@ class Neurite(object):
 
 class Neuron(object):
     '''Class representing a simple neuron'''
+
     def __init__(self, soma=None, neurites=None, sections=None):
         self.soma = soma
         self.neurites = neurites

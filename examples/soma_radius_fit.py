@@ -32,9 +32,10 @@
    for the soma radii of the population (list) of neurons.
    '''
 
+import argparse
+
 import neurom as nm
 from neurom import stats as st
-import argparse
 
 
 def parse_args():

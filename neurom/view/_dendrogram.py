@@ -28,12 +28,12 @@
 
 '''Dendrogram helper functions and class'''
 
+from copy import deepcopy
+import sys
+import numpy as np
+
 from neurom.core import Tree, Neurite
 from neurom.core.dataformat import COLS
-
-from copy import deepcopy
-import numpy as np
-import sys
 
 
 def _n_terminations(tree):
@@ -65,7 +65,7 @@ def _n_rectangles(obj):
     the type of the object
     '''
     return sum(_total_rectangles(neu) for neu in obj.neurites) \
-           if hasattr(obj, 'neurites') else _total_rectangles(obj)
+        if hasattr(obj, 'neurites') else _total_rectangles(obj)
 
 
 def _square_segment(radius, origin):
@@ -234,7 +234,7 @@ class Dendrogram(object):
 
             # segment radii
             radii = np.vstack((segments[:-1, COLS.R], segments[1:, COLS.R])).T \
-                    if self._show_diameters else np.zeros((seg_lengths.shape[0], 2))
+                if self._show_diameters else np.zeros((seg_lengths.shape[0], 2))
 
             y_offset = offsets[1]
             for i, slen in enumerate(seg_lengths):

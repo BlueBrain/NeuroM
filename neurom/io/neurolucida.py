@@ -32,10 +32,10 @@ Neuroludica
 
 import logging
 import warnings
-from neurom._compat import StringType
 
 import numpy as np
 
+from neurom._compat import StringType
 from neurom.core.dataformat import COLS, POINT_TYPE
 from .datawrapper import DataWrapper
 
@@ -111,11 +111,11 @@ def _parse_section(token_iter):
     '''
     sexp = []
     for token in token_iter:
-        if '(' == token:
+        if token == '(':
             new_sexp = _parse_section(token_iter)
             if not _match_section(new_sexp, UNWANTED_SECTIONS):
                 sexp.append(new_sexp)
-        elif ')' == token:
+        elif token == ')':
             return sexp
         else:
             sexp.append(token)
@@ -130,7 +130,7 @@ def _parse_sections(morph_fd):
     sections = []
     token_iter = _get_tokens(morph_fd)
     for token in token_iter:
-        if '(' == token:  # find top-level sections
+        if token == '(':  # find top-level sections
             section = _parse_section(token_iter)
             if not _match_section(section, UNWANTED_SECTIONS):
                 sections.append(section)
@@ -155,8 +155,8 @@ def _flatten_subsection(subsection, _type, offset, parent):
             continue
         elif isinstance(row[0], StringType):
             if len(row) in (4, 5, ):
-                if 5 == len(row):
-                    assert 'S' == row[4][0], \
+                if len(row) == 5:
+                    assert row[4][0] == 'S', \
                         'Only known usage of a fifth member is Sn, found: %s' % row[4][0]
                 yield (float(row[0]), float(row[1]), float(row[2]), float(row[3]) / 2.,
                        _type, offset, parent)
@@ -169,7 +169,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
             slices = []
             start = 0
             for i, value in enumerate(row):
-                if '|' == value:
+                if value == '|':
                     slices.append(slice(start + start_offset, i))
                     start = i + 1
             slices.append(slice(start + start_offset, len(row)))
@@ -190,8 +190,8 @@ def _extract_section(section):
     Note: PARENT_ID starts at -1 for soma and 0 for neurites
     '''
     # sections with only one element will be skipped,
-    if 1 == len(section):
-        assert 'Sections' == section[0], \
+    if len(section) == 1:
+        assert section[0] == 'Sections', \
             ('Only known usage of a single Section content is "Sections", found %s' %
              section[0])
         return None
