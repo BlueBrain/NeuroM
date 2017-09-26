@@ -26,7 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''visualize morphologies'''
-from . import common
 
 import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
@@ -42,6 +41,7 @@ from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
 from neurom._compat import zip
 
+from . import common
 
 _LINEWIDTH = 1.2
 _ALPHA = 0.8

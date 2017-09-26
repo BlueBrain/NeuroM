@@ -29,9 +29,10 @@
 
 '''Simple Histogram function for multiple neurons
 '''
+from itertools import chain
+
 import numpy as np
 from neurom.view import common
-from itertools import chain
 
 
 def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
