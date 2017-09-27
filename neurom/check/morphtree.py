@@ -47,7 +47,7 @@ def is_monotonic(neurite, tol):
         tol(float): tolerance
 
     Returns:
-        True if neurite flat
+        True if neurite monotonic
     '''
 
     for node in neurite.iter_sections():

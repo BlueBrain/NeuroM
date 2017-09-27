@@ -100,7 +100,7 @@ def test_load_neurons():
 
 
 def test_get_morph_files():
-    ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5',
+    ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5', 'Neuron_slice.h5',
                'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
 
     FILE_PATH = os.path.abspath(os.path.join(DATA_PATH, 'valid_set'))
@@ -211,8 +211,8 @@ def test_load_neuron_invalid_id_sequence_raises():
 
 def test_load_neurons_directory():
     pop = utils.load_neurons(VALID_DATA_PATH)
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(len(pop.neurons), 6)
+    nt.assert_equal(len(pop), 6)
     nt.assert_equal(pop.name, 'valid_set')
     for nrn in pop:
         nt.assert_true(isinstance(nrn, Neuron))
@@ -220,8 +220,8 @@ def test_load_neurons_directory():
 
 def test_load_neurons_directory_name():
     pop = utils.load_neurons(VALID_DATA_PATH, name='test123')
-    nt.assert_equal(len(pop.neurons), 5)
-    nt.assert_equal(len(pop), 5)
+    nt.assert_equal(len(pop.neurons), 6)
+    nt.assert_equal(len(pop), 6)
     nt.assert_equal(pop.name, 'test123')
     for nrn in pop:
         nt.assert_true(isinstance(nrn, Neuron))
@@ -338,6 +338,6 @@ def test_get_files_by_path():
     nt.eq_(len(single_neurom), 1)
 
     neuron_dir = utils.get_files_by_path(VALID_DATA_PATH)
-    nt.eq_(len(neuron_dir), 5)
+    nt.eq_(len(neuron_dir), 6)
 
     nt.assert_raises(IOError, utils.get_files_by_path, 'this/is/a/fake/path')
