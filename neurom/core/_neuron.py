@@ -33,6 +33,7 @@ from copy import deepcopy
 import numpy as np
 
 from neurom import morphmath
+from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 from neurom._compat import filter, map, zip
@@ -114,6 +115,12 @@ def iter_segments(obj, neurite_filter=None):
                                for sec in sections)
 
 
+def graft_neuron(root_section):
+    '''Returns a neuron starting at root_section'''
+    assert isinstance(root_section, Section)
+    return Neuron(soma=Soma(root_section.points[:1]), neurites=[Neurite(root_section)])
+
+
 class Section(Tree):
     '''Class representing a neurite section'''
 
@@ -161,7 +168,8 @@ class Neurite(object):
 
     def __init__(self, root_node):
         self.root_node = root_node
-        self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
+        self.type = root_node.type if hasattr(
+            root_node, 'type') else NeuriteType.undefined
 
     @property
     @memoize
@@ -220,6 +228,12 @@ class Neurite(object):
     def __nonzero__(self):
         return bool(self.root_node)
 
+    def __eq__(self, other):
+        return self.type == other.type and self.root_node == other.root_node
+
+    def __hash__(self):
+        return hash((self.type, self.root_node))
+
     __bool__ = __nonzero__
 
     def __str__(self):
@@ -231,8 +245,9 @@ class Neurite(object):
 class Neuron(object):
     '''Class representing a simple neuron'''
 
-    def __init__(self, soma=None, neurites=None, sections=None):
+    def __init__(self, soma=None, neurites=None, sections=None, name='Neuron'):
         self.soma = soma
+        self.name = name
         self.neurites = neurites
         self.sections = sections
 

@@ -44,8 +44,10 @@ class Soma(object):
     Holds a list of raw data rows corresponding to soma points
     and provides iterator access to them.
     '''
+
     def __init__(self, points):
         self._points = points
+        self.radius = 0
 
     @property
     def center(self):
@@ -67,6 +69,7 @@ class SomaSinglePoint(Soma):
     Type A: 1point soma
     Represented by a single point.
     '''
+
     def __init__(self, points):
         super(SomaSinglePoint, self).__init__(points)
         self.radius = points[0][COLS.R]
@@ -99,6 +102,7 @@ class SomaCylinders(Soma):
   in a line, then the overlap between cylinders isn't taken into account for
   the area calculation
   '''
+
     def __init__(self, points):
         super(SomaCylinders, self).__init__(points)
         self.area = sum(morphmath.segment_area((p0, p1))
@@ -134,6 +138,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         and +rs, respectively (Figure 2). The surface area of this soma cylinder equals
         the surface area of a sphere of radius rs.
     '''
+
     def __init__(self, points):
         super(SomaNeuromorphoThreePointCylinders, self).__init__(points)
 
@@ -173,6 +178,7 @@ class SomaThreePoint(Soma):
         An equivalent radius (rs) is computed as the average distance
         of the other two points.'
     '''
+
     def __init__(self, points):
         super(SomaThreePoint, self).__init__(points)
         self.radius = morphmath.average_points_dist(points[0], (points[1],
@@ -193,6 +199,7 @@ class SomaSimpleContour(Soma):
     Note: This doesn't currently check to see if the contour is in a plane. Also
     the radii of the points are not taken into account.
     '''
+
     def __init__(self, points):
         super(SomaSimpleContour, self).__init__(points)
         points = np.array(self._points)
