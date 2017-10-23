@@ -28,18 +28,21 @@
 
 '''Utility functions and for loading neurons'''
 
+import glob
 import logging
 import os
-import glob
-
+import shutil
+import tempfile
+import uuid
 from functools import partial
-from neurom.core.population import Population
-from neurom.exceptions import (RawDataError, NeuroMError)
-from neurom.io.datawrapper import DataWrapper
-from neurom.io import (swc, neurolucida)
-from neurom.fst._core import FstNeuron
-from neurom._compat import filter, StringType
+from io import IOBase
 
+from neurom._compat import StringType, filter
+from neurom.core.population import Population
+from neurom.exceptions import NeuroMError, RawDataError
+from neurom.fst._core import FstNeuron
+from neurom.io import neurolucida, swc
+from neurom.io.datawrapper import DataWrapper
 
 L = logging.getLogger(__name__)
 
@@ -109,10 +112,13 @@ def get_files_by_path(path):
     raise IOError('Invalid data path %s' % path)
 
 
-def load_neuron(filename):
+def load_neuron(handle, reader=None):
     '''Build section trees from an h5 or swc file'''
-    rdw = load_data(filename)
-    name = os.path.splitext(os.path.basename(filename))[0]
+    rdw = load_data(handle, reader)
+    if isinstance(handle, StringType):
+        name = os.path.splitext(os.path.basename(handle))[0]
+    else:
+        name = None
     return FstNeuron(rdw, name)
 
 
@@ -136,7 +142,7 @@ def load_neurons(neurons,
         neuron population object
 
     '''
-    if isinstance(neurons, list) or isinstance(neurons, tuple):
+    if isinstance(neurons, (list, tuple)):
         files = neurons
         name = name if name is not None else 'Population'
     elif isinstance(neurons, StringType):
@@ -158,17 +164,35 @@ def load_neurons(neurons,
     return population_class(pop, name=name)
 
 
-def load_data(filename):
+def _get_file(handle):
+    '''Returns the filename of the file to read
+
+    If handle is a stream, a temp file is written on disk first
+    and its filename is returned'''
+    if not isinstance(handle, IOBase):
+        return handle
+
+    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()), prefix='neurom-')
+    os.close(fd)
+    with open(temp_file, 'w') as fd:
+        handle.seek(0)
+        shutil.copyfileobj(handle, fd)
+    return temp_file
+
+
+def load_data(handle, reader=None):
     '''Unpack data into a raw data wrapper'''
-    ext = os.path.splitext(filename)[1].lower()
+    if not reader:
+        reader = os.path.splitext(handle)[1][1:].lower()
 
-    if ext not in _READERS:
-        raise NeuroMError('Do not have a loader for "%s" extension' % ext)
+    if reader not in _READERS:
+        raise NeuroMError('Do not have a loader for "%s" extension' % reader)
 
+    filename = _get_file(handle)
     try:
-        return _READERS[ext](filename)
+        return _READERS[reader](filename)
     except Exception:
-        L.exception('Error reading file %s, using "%s" loader', filename, ext)
+        L.exception('Error reading file %s, using "%s" loader', filename, reader)
         raise RawDataError('Error reading file %s' % filename)
 
 
@@ -181,9 +205,9 @@ def _load_h5(filename):
 
 
 _READERS = {
-    '.swc': partial(swc.read,
-                    data_wrapper=DataWrapper),
-    '.h5': _load_h5,
-    '.asc': partial(neurolucida.read,
-                    data_wrapper=DataWrapper)
+    'swc': partial(swc.read,
+                   data_wrapper=DataWrapper),
+    'h5': _load_h5,
+    'asc': partial(neurolucida.read,
+                   data_wrapper=DataWrapper)
 }

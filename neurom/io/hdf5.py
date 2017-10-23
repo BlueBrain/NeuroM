@@ -43,9 +43,9 @@ There is one such row per measured point.
 
 import h5py
 import numpy as np
+from future.moves.itertools import zip_longest
 
-from neurom._compat import zip_longest
-from .datawrapper import DataWrapper, BlockNeuronBuilder
+from .datawrapper import BlockNeuronBuilder, DataWrapper
 
 
 def get_version(h5file):

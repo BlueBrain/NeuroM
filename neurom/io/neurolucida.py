@@ -37,8 +37,8 @@ import numpy as np
 
 from neurom._compat import StringType
 from neurom.core.dataformat import COLS, POINT_TYPE
-from .datawrapper import DataWrapper
 
+from .datawrapper import DataWrapper
 
 WANTED_SECTIONS = {
     'CellBody': POINT_TYPE.SOMA,

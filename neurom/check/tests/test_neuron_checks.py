@@ -31,13 +31,10 @@ from copy import deepcopy
 
 from nose import tools as nt
 
-from neurom import load_neuron
-from neurom import check
+from neurom import check, load_neuron
+from neurom._compat import range
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
-
-from neurom._compat import range
-
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -85,6 +82,7 @@ NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
                                           'Single_axon.swc',
                                           'Single_basal.swc',
                                           ]])
+
 
 def _pick(files):
     return [NEURONS[f] for f in files]
@@ -327,6 +325,17 @@ def test_has_no_jumps():
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100).status)
 
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100, axis='x').status)
+
+
+def test_has_no_dangling_branch():
+    _, nrn = _load_neuron('dangling_axon.swc')
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+
+    _, nrn = _load_neuron('dangling_dendrite.swc')
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+
 
 def test__bool__():
     c = check.CheckResult(status=True)

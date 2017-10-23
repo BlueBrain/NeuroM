@@ -1,0 +1,88 @@
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''Module for the detection of the cut plane'''
+import logging
+from functools import partial
+from itertools import chain
+
+from neurom.check.neuron_checks import (has_no_dangling_branch,
+                                        has_no_fat_ends, has_no_jumps,
+                                        has_no_narrow_start)
+from neurom.core.dataformat import COLS
+
+L = logging.getLogger(__name__)
+
+
+def generate_annotation(neuron, checker):
+    '''Generate the annotation for a given checker
+
+    Arguments
+        neuron(Neuron): The neuron object
+        checker: A tuple where the first item is the checking function (usually from neuron_checks)
+                 and the second item is a dictionary of settings for the annotation. It must
+                 contain the keys name, label and color
+    Returns
+        An S-expression-like string representing the annotation
+    '''
+    func, settings = checker
+    result = func(neuron)
+    if result.status:
+        return ""
+
+    header = ("\n\n"
+              "({label}   ; MUK_ANNOTATION\n"
+              "    (Color {color})   ; MUK_ANNOTATION\n"
+              "    (Name \"{name}\")   ; MUK_ANNOTATION").format(**settings)
+
+    points = [p for _, _points in result.info for p in _points]
+
+    annotations = ("    ({0} {1} {2} 0.50)   ; MUK_ANNOTATION".format(
+        p[COLS.X], p[COLS.Y], p[COLS.Z]) for p in points)
+    footer = ")   ; MUK_ANNOTATION\n"
+
+    return '\n'.join(chain.from_iterable(([header], annotations, [footer])))
+
+
+def annotate(neuron, checkers=None):
+    '''Concatenate the annotations of all checkers'''
+    if checkers is None:
+        checkers = {has_no_fat_ends: {"name": "fat end",
+                                      "label": "Circle3",
+                                      "color": "Blue"},
+                    partial(has_no_jumps, axis='z'): {"name": "zjump",
+                                                      "label": "Circle2",
+                                                      "color": "Green"},
+                    has_no_narrow_start: {"name": "narrow start",
+                                          "label": "Circle1",
+                                          "color": "Blue"},
+                    has_no_dangling_branch: {"name": "dangling",
+                                             "label": "Circle6",
+                                             "color": "Magenta"}}
+
+    annotations = (generate_annotation(neuron, checker) for checker in checkers.items())
+    return '\n'.join(annot for annot in annotations if annot)

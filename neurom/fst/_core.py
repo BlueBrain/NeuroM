@@ -79,7 +79,7 @@ def make_neurites(rdw):
     '''Build neurite trees from a raw data wrapper'''
     post_action = _NEURITE_ACTION[rdw.fmt]
     trunks = rdw.neurite_root_section_ids()
-    if len(trunks) == 0:
+    if not trunks:
         return [], []
 
     # One pass over sections to build nodes
