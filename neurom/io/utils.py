@@ -35,7 +35,7 @@ import shutil
 import tempfile
 import uuid
 from functools import partial
-from io import IOBase
+from io import IOBase, open
 
 from neurom._compat import StringType, filter
 from neurom.core.population import Population
@@ -191,9 +191,9 @@ def load_data(handle, reader=None):
     filename = _get_file(handle)
     try:
         return _READERS[reader](filename)
-    except Exception:
+    except Exception as e:
         L.exception('Error reading file %s, using "%s" loader', filename, reader)
-        raise RawDataError('Error reading file %s' % filename)
+        raise RawDataError('Error reading file %s: %s' % (filename, str(e)))
 
 
 def _load_h5(filename):

@@ -32,6 +32,7 @@ Neuroludica
 
 import logging
 import warnings
+from io import open
 
 import numpy as np
 

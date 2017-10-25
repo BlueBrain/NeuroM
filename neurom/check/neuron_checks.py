@@ -32,7 +32,7 @@ Contains functions for checking validity of neuron neurites and somata.
 Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
-from itertools import chain
+from itertools import chain, islice
 
 import numpy as np
 
@@ -214,10 +214,11 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     '''
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
-    for sec in iter_sections(neuron):
-        for (p0, p1) in iter_segments(sec):
-            if max_distance < abs(p0[axis] - p1[axis]):
-                bad_ids.append((sec.id, [p0, p1]))
+    for neurite in iter_neurites(neuron):
+        for sec in islice(iter_sections(neurite), 1, None):
+            for (p0, p1) in iter_segments(sec):
+                if max_distance < abs(p0[axis] - p1[axis]):
+                    bad_ids.append((sec.id, [p0, p1]))
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
