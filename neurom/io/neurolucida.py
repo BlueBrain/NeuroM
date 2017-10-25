@@ -88,7 +88,7 @@ def _get_tokens(morph_fd):
 
     Note: this also strips newlines and comments
     '''
-    for line in morph_fd.readlines():
+    for line in morph_fd:
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
         squash_token = []  # quoted strings get squashed into one token
@@ -263,7 +263,7 @@ def read(morph_file, data_wrapper=DataWrapper):
     warnings.warn(msg)
     L.warning(msg)
 
-    with open(morph_file) as morph_fd:
+    with open(morph_file, encoding='utf-8', errors='replace') as morph_fd:
         sections = _parse_sections(morph_fd)
     raw_data = _sections_to_raw_data(sections)
     return data_wrapper(raw_data, 'NL-ASCII')
