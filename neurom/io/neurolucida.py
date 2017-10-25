@@ -233,7 +233,7 @@ def _sections_to_raw_data(sections):
             soma = neurite
         else:
             neurites.append(neurite)
-    assert soma is not None, 'No soma found'
+    assert soma is not None, 'Missing CellBody element (ie. soma)'
 
     total_length = len(soma) + sum(len(neurite) for neurite in neurites)
     ret = np.zeros((total_length, 7,), dtype=np.float64)

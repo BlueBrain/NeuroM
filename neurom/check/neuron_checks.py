@@ -215,10 +215,11 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
     for neurite in iter_neurites(neuron):
-        for sec in islice(iter_sections(neurite), 1, None):
-            for (p0, p1) in iter_segments(sec):
-                if max_distance < abs(p0[axis] - p1[axis]):
-                    bad_ids.append((sec.id, [p0, p1]))
+        section_segment = ((sec, seg) for sec in iter_sections(neurite)
+                           for seg in iter_segments(sec))
+        for sec, (p0, p1) in islice(section_segment, 1, None):  # Skip neurite root segment
+            if max_distance < abs(p0[axis] - p1[axis]):
+                bad_ids.append((sec.id, [p0, p1]))
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
