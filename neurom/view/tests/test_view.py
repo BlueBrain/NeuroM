@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from .utils import get_fig_2d, get_fig_3d # needs to be at top to trigger matplotlib Agg backend
+from .utils import get_fig_2d, get_fig_3d  # needs to be at top to trigger matplotlib Agg backend
 import os
 
 import itertools as it
@@ -110,7 +110,7 @@ def test_neuron3d_no_neurites():
 def test_dendrogram():
     with get_fig_2d() as (fig, ax):
         view.plot_dendrogram(ax, fst_neuron)
-        np.testing.assert_allclose(ax.get_xlim(), (-20., 100.))
+        np.testing.assert_allclose(ax.get_xlim(), (-20., 100.), rtol=0.25)
 
 
 def test_one_point_branch():
@@ -125,14 +125,14 @@ def test_one_point_branch():
 
 soma0 = fst_neuron.soma
 
-#upright, varying radius
+# upright, varying radius
 soma_2pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
     [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
 ])
 soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
 
-#upright, uniform radius, multiple cylinders
+# upright, uniform radius, multiple cylinders
 soma_3pt_normal_pts = np.array([
     [0.0, -10.0,  0.0, 10.0, 1, 1, -1],
     [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
@@ -140,7 +140,7 @@ soma_3pt_normal_pts = np.array([
 ])
 soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
 
-#increasing radius, multiple cylinders
+# increasing radius, multiple cylinders
 soma_4pt_normal_pts = np.array([
     [0.0,   0.0,     0.0, 1.0, 1, 1, -1],
     [0.0,   -10.0,   0.0, 2.0, 1, 2, 1],
@@ -167,11 +167,11 @@ def test_soma():
 
 
 def test_soma3d():
-    with get_fig_3d() as (fig, ax):
+    with get_fig_3d() as (_, ax):
         view.plot_soma3d(ax, soma_2pt_normal)
-        np.testing.assert_allclose(ax.get_xlim(), (-10.,  10.))
-        np.testing.assert_allclose(ax.get_ylim(), (  0.,  10.))
-        np.testing.assert_allclose(ax.get_zlim(), (-10.,  10.))
+        np.testing.assert_allclose(ax.get_xlim(), (-10.,  10.), atol=2)
+        np.testing.assert_allclose(ax.get_ylim(), (0.,  10.), atol=2)
+        np.testing.assert_allclose(ax.get_zlim(), (-10.,  10.), atol=2)
 
 
 def test_get_color():

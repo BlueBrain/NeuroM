@@ -30,15 +30,13 @@
 import os
 
 import numpy as np
-
 from matplotlib.patches import Polygon
+# needed so that projection='3d' works with fig.add_subplot
+from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=relative-import,unused-import
 from scipy.linalg import norm
 from scipy.spatial import ConvexHull
-from neurom._compat import map
 
-# needed so that projection='3d' works with fig.add_subplot
-from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
-
+from neurom._compat import map  # pylint: disable=ungrouped-imports
 
 plt = None  # refer to _get_plt()
 

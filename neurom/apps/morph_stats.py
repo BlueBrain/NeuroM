@@ -82,7 +82,7 @@ def extract_stats(neurons, config):
                 stat_name = _stat_name(ns, mode)
                 stat = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
 
-                if stat is None or len(stat.shape) == 0:
+                if stat is None or not stat.shape:
                     stats[n.name][stat_name] = stat
                 else:
                     assert stat.shape in ((3, ), ), \

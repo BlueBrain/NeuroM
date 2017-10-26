@@ -28,9 +28,11 @@
 
 import os
 from copy import copy
+
+from nose import tools as nt
+
 from neurom.check.runner import CheckRunner
 from neurom.exceptions import ConfigError
-from nose import tools as nt
 
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
@@ -255,10 +257,10 @@ def test_invalid_data_path_raises_IOError():
 
 
 def test__sanitize_config():
-    #fails if missing 'checks'
+    # fails if missing 'checks'
     nt.assert_raises(ConfigError, CheckRunner._sanitize_config, {})
 
-    #creates minimal config
+    # creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})
     nt.eq_(new_config, {'checks':
                         {'structural_checks': [],
@@ -268,6 +270,6 @@ def test__sanitize_config():
                         'color': False,
                         })
 
-    #makes no changes to already filled out config
+    # makes no changes to already filled out config
     new_config = CheckRunner._sanitize_config(CONFIG)
     nt.eq_(CONFIG, new_config)

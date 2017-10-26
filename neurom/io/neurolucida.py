@@ -32,13 +32,14 @@ Neuroludica
 
 import logging
 import warnings
+from io import open
 
 import numpy as np
 
 from neurom._compat import StringType
 from neurom.core.dataformat import COLS, POINT_TYPE
-from .datawrapper import DataWrapper
 
+from .datawrapper import DataWrapper
 
 WANTED_SECTIONS = {
     'CellBody': POINT_TYPE.SOMA,
@@ -88,7 +89,7 @@ def _get_tokens(morph_fd):
 
     Note: this also strips newlines and comments
     '''
-    for line in morph_fd.readlines():
+    for line in morph_fd:
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
         squash_token = []  # quoted strings get squashed into one token
@@ -232,7 +233,7 @@ def _sections_to_raw_data(sections):
             soma = neurite
         else:
             neurites.append(neurite)
-    assert soma is not None, 'No soma found'
+    assert soma is not None, 'Missing CellBody element (ie. soma)'
 
     total_length = len(soma) + sum(len(neurite) for neurite in neurites)
     ret = np.zeros((total_length, 7,), dtype=np.float64)
@@ -263,7 +264,7 @@ def read(morph_file, data_wrapper=DataWrapper):
     warnings.warn(msg)
     L.warning(msg)
 
-    with open(morph_file) as morph_fd:
+    with open(morph_file, encoding='utf-8', errors='replace') as morph_fd:
         sections = _parse_sections(morph_fd)
     raw_data = _sections_to_raw_data(sections)
     return data_wrapper(raw_data, 'NL-ASCII')

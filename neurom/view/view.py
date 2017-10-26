@@ -17,7 +17,7 @@
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 501ARE
 # DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -30,16 +30,16 @@
 import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 from matplotlib.patches import Circle
-from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 from neurom import NeuriteType, geom
-
+from neurom._compat import zip
 from neurom.core import iter_segments
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
-from neurom._compat import zip
+
+from mpl_toolkits.mplot3d.art3d import Line3DCollection  # pylint: disable=relative-import
 
 from . import common
 
@@ -78,8 +78,7 @@ def _get_color(treecolor, tree_type):
     """if treecolor set, it's returned, otherwise tree_type is used to return set colors"""
     if treecolor is not None:
         return treecolor
-    else:
-        return TREE_COLOR.get(tree_type, 'green')
+    return TREE_COLOR.get(tree_type, 'green')
 
 
 def plot_tree(ax, tree, plane='xy',

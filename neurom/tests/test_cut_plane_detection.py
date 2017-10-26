@@ -1,3 +1,5 @@
+import os
+
 from nose import tools as nt
 import numpy as np
 import subprocess
@@ -58,9 +60,10 @@ def test_display():
 
 def test_repaired_neuron():
     result = find_cut_plane(load_neuron('test_data/h5/v1/bio_neuron-000.h5'))
-    nt.assert_not_equals(result['status'], 'ok')
+    nt.assert_not_equal(result['status'], 'ok')
 
 
 def test_apps():
-    subprocess.call(
-        ['./apps/cut_plane_detection', 'test_data/valid_set/Neuron_slice.h5'])
+    with open(os.devnull, 'w') as fnull:
+        subprocess.call(
+            ['./apps/cut_plane_detection', 'test_data/valid_set/Neuron_slice.h5'], stdout=fnull)
