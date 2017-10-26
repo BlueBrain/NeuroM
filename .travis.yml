@@ -19,7 +19,6 @@ install:
   - pip install 'matplotlib==1.5.2'
   - pip install .
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install  'scipy==0.18.1' 'Sphinx==1.5.5'; make -f Makefile run_tests PIP_INSTALL_OPTIONS=; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then make -f Makefile test; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then make -f Makefile run_tests; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then make -f Makefile run_tests; fi
