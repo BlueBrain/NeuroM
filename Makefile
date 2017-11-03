@@ -58,11 +58,11 @@ $(VENV_INSTALLED): $(VENV)
 	$(VENV_BIN)/pip install -e .
 	touch $@
 
-run_pep8: $(VENV_INSTALLED)
-	$(VENV_BIN)/pep8 --config=pep8rc $(LINT_PYFILES) #> pep8.txt
+run_pycodestyle: $(VENV_INSTALLED)
+	$(VENV_BIN)/pycodestyle --config=pycodestylerc $(LINT_PYFILES) > pycodestyle.txt
 
 run_pylint: $(VENV_INSTALLED)
-	$(VENV_BIN)/pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES) #> pylint.txt
+	$(VENV_BIN)/pylint --rcfile=pylintrc --extension-pkg-whitelist=numpy $(LINT_PYFILES) > pylint.txt
 
 run_tests: $(VENV_INSTALLED)
 	$(VENV_BIN)/nosetests -v --with-coverage --cover-min-percentage=$(MIN_COV) --cover-erase --cover-package neurom
@@ -71,7 +71,7 @@ run_tests_xunit: $(VENV_INSTALLED)
 	@mkdir -p $(ROOT_DIR)/test-reports
 	$(VENV_BIN)/nosetests neurom --with-coverage --cover-min-percentage=$(MIN_COV) --cover-inclusive --cover-erase --cover-package=neurom  --with-xunit --xunit-file=test-reports/nosetests_neurom.xml
 
-lint: run_pep8 run_pylint
+lint: run_pycodestyle run_pylint
 
 test: lint run_tests
 
@@ -90,7 +90,7 @@ clean_doc:
 	@rm -rf $(ROOT_DIR)/doc/source/_neurom_build
 
 clean: clean_doc clean_test_venv
-	@rm -f pep8.txt
+	@rm -f pycodestyle.txt
 	@rm -f pylint.txt
 	@rm -rf neurom.egg-info
 	@rm -f .coverage
@@ -98,4 +98,4 @@ clean: clean_doc clean_test_venv
 	@rm -rf dist
 	@rm -f $(VENV_INSTALLED)
 
-.PHONY: run_pep8 test clean_test_venv clean doc
+.PHONY: run_pycodestyle test clean_test_venv clean doc

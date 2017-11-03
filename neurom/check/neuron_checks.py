@@ -156,7 +156,7 @@ def has_all_nonzero_section_lengths(neuron, threshold=0.0):
         to be non-zero
 
     Returns:
-        CheckResult with result including list of ids bad sections
+        CheckResult with result including list of ids of bad sections
     '''
     bad_ids = [s.id for s in _nf.iter_sections(neuron.neurites)
                if section_length(s.points) <= threshold]
@@ -210,7 +210,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
         axis(str): one of x/y/z, which axis to check for jumps
 
     Returns:
-        CheckResult with result list of ids bad sections
+        CheckResult with result list of ids of bad sections
     '''
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
@@ -233,7 +233,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         final_point_count(int): how many points to include in the mean
 
     Returns:
-        CheckResult with result list of ids bad sections
+        CheckResult with result list of ids of bad sections
 
     Note:
         A fat end is defined as a leaf segment whose last point is larger
@@ -250,14 +250,14 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def has_no_narrow_start(neuron):
+def has_no_narrow_start(neuron, frac=0.9):
     '''Check if neurites have a narrow start
 
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
     '''
     bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]]) for neurite in neuron.neurites
-               if neurite.root_node.points[1][COLS.R] < 0.9 * neurite.root_node.points[2][COLS.R]]
+               if neurite.root_node.points[1][COLS.R] < frac * neurite.root_node.points[2][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
