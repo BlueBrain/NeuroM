@@ -300,6 +300,17 @@ def test_has_no_fat_ends():
     nt.ok_(nrn_chk.has_no_fat_ends(nrn).status)
 
 
+def test_has_no_narrow_starts():
+    _, nrn = _load_neuron('narrow_start.swc')
+    nt.ok_(not nrn_chk.has_no_narrow_starts(nrn).status)
+
+    _, nrn = _load_neuron('narrow_start.swc')
+    nt.ok_(nrn_chk.has_no_narrow_starts(nrn, 0.25).status)
+
+    _, nrn = _load_neuron('fat_end.swc')  # doesn't have narrow start
+    nt.ok_(nrn_chk.has_no_narrow_starts(nrn, 0.25).status)
+
+
 def test_has_nonzero_soma_radius_threshold():
 
     class Dummy(object):
