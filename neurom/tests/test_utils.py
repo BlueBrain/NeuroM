@@ -86,6 +86,7 @@ def test_NeuromJSON():
     ex = {'zero': 0,
           'one': np.int64(1),
           'two': np.float32(2.0),
+          'three': np.array([1, 2, 3])
           }
     output = json.dumps(ex, cls=nu.NeuromJSON)
     loaded = json.loads(output)
@@ -93,6 +94,7 @@ def test_NeuromJSON():
            {'zero': 0,
             'one': 1,
             'two': 2.0,
+            'three': [1, 2, 3]
             })
 
     enc = nu.NeuromJSON()

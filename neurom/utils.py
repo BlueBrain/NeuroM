@@ -89,9 +89,12 @@ class NeuromJSON(json.JSONEncoder):
     In python3, numpy.dtypes don't serialize to correctly, so a custom converter
     is needed.
     '''
-    def default(self, obj):  # pylint: disable=method-hidden
-        if isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.integer):
-            return int(obj)
-        return json.JSONEncoder.default(self, obj)
+
+    def default(self, o):  # pylint: disable=method-hidden
+        if isinstance(o, np.floating):
+            return float(o)
+        elif isinstance(o, np.integer):
+            return int(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
+        return json.JSONEncoder.default(self, o)

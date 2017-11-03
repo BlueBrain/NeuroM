@@ -39,13 +39,13 @@ from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
 class FstNeuron(Neuron):
     '''Class representing a neuron'''
+
     def __init__(self, data_wrapper, name='Neuron'):
         self._data = data_wrapper
         neurites, sections = make_neurites(self._data)
         soma_check, soma_class = _SOMA_CONFIG[self._data.fmt]
         soma = make_soma(self._data.soma_points(), soma_check, soma_class)
-        super(FstNeuron, self).__init__(soma, neurites, sections)
-        self.name = name
+        super(FstNeuron, self).__init__(soma, neurites, sections, name)
         self._points = None
 
     @property
@@ -79,7 +79,7 @@ def make_neurites(rdw):
     '''Build neurite trees from a raw data wrapper'''
     post_action = _NEURITE_ACTION[rdw.fmt]
     trunks = rdw.neurite_root_section_ids()
-    if len(trunks) == 0:
+    if not trunks:
         return [], []
 
     # One pass over sections to build nodes

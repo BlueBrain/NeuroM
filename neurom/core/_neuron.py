@@ -28,15 +28,18 @@
 
 '''Neuron classes and functions'''
 
-from itertools import chain
 from copy import deepcopy
+from itertools import chain
+
 import numpy as np
 
-from . import NeuriteType, Tree
 from neurom import morphmath
+from neurom._compat import filter, map, zip
+from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
-from neurom._compat import filter, map, zip
+
+from . import NeuriteType, Tree
 
 
 def iter_neurites(obj, mapfun=None, filt=None):
@@ -113,8 +116,15 @@ def iter_segments(obj, neurite_filter=None):
                                for sec in sections)
 
 
+def graft_neuron(root_section):
+    '''Returns a neuron starting at root_section'''
+    assert isinstance(root_section, Section)
+    return Neuron(soma=Soma(root_section.points[:1]), neurites=[Neurite(root_section)])
+
+
 class Section(Tree):
     '''Class representing a neurite section'''
+
     def __init__(self, points, section_id=None, section_type=NeuriteType.undefined):
         super(Section, self).__init__()
         self.id = section_id
@@ -148,15 +158,19 @@ class Section(Tree):
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
-        return 'Section(id = %s, points=%s) <parent: %s, nchildren: %d>' % \
-            (self.id, self.points, self.parent, len(self.children))
+        return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \
+            (self.id, self.type, len(self.points), self.parent, len(self.children))
+
+    __repr__ = __str__
 
 
 class Neurite(object):
     '''Class representing a neurite tree'''
+
     def __init__(self, root_node):
         self.root_node = root_node
-        self.type = root_node.type if hasattr(root_node, 'type') else NeuriteType.undefined
+        self.type = root_node.type if hasattr(
+            root_node, 'type') else NeuriteType.undefined
 
     @property
     @memoize
@@ -215,19 +229,31 @@ class Neurite(object):
     def __nonzero__(self):
         return bool(self.root_node)
 
+    def __eq__(self, other):
+        return self.type == other.type and self.root_node == other.root_node
+
+    def __hash__(self):
+        return hash((self.type, self.root_node))
+
     __bool__ = __nonzero__
 
     def __str__(self):
         return 'Neurite <type: %s>' % self.type
 
+    __repr__ = __str__
+
 
 class Neuron(object):
     '''Class representing a simple neuron'''
-    def __init__(self, soma=None, neurites=None, sections=None):
+
+    def __init__(self, soma=None, neurites=None, sections=None, name='Neuron'):
         self.soma = soma
+        self.name = name
         self.neurites = neurites
         self.sections = sections
 
     def __str__(self):
-        return 'Neuron <soma: %s, nneurites: %d>' % \
+        return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
+
+    __repr__ = __str__

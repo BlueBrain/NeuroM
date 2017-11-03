@@ -32,16 +32,18 @@ Contains functions for checking validity of neuron neurites and somata.
 Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
 '''
+from itertools import chain, islice
+
 import numpy as np
 
 from neurom import NeuriteType
-from neurom.core import Tree, iter_segments
-from neurom.core.dataformat import COLS
-from neurom.morphmath import section_length, segment_length
-from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
-from neurom.fst import _neuritefunc as _nf
-from neurom.check import CheckResult
 from neurom._compat import zip
+from neurom.check import CheckResult
+from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
+from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
+from neurom.core.dataformat import COLS
+from neurom.fst import _neuritefunc as _nf
+from neurom.morphmath import section_length, segment_length
 
 
 def _read_neurite_type(neurite):
@@ -203,7 +205,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
 
     Arguments:
         neuron(Neuron): The neuron object to test
-        max_z_distance(float): value above which consecutive z-values are
+        max_distance(float): value above which consecutive z-values are
         considered a jump
         axis(str): one of x/y/z, which axis to check for jumps
 
@@ -212,18 +214,19 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     '''
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
-    for sec in _nf.iter_sections(neuron):
-        for i, (p0, p1) in enumerate(iter_segments(sec)):
-            info = (sec.id, i)
+    for neurite in iter_neurites(neuron):
+        section_segment = ((sec, seg) for sec in iter_sections(neurite)
+                           for seg in iter_segments(sec))
+        for sec, (p0, p1) in islice(section_segment, 1, None):  # Skip neurite root segment
             if max_distance < abs(p0[axis] - p1[axis]):
-                bad_ids.append(info)
+                bad_ids.append((sec.id, [p0, p1]))
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
 def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     '''Check if leaf points are too large
 
-    Arguments:
+    Arguments
         neuron(Neuron): The neuron object to test
         multiple_of_mean(float): how many times larger the final radius
         has to be compared to the mean of the final points
@@ -239,8 +242,48 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     '''
     bad_ids = []
     for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Tree.ileaf):
-        mean_radius = np.mean(leaf.points[-final_point_count:, COLS.R])
-        if mean_radius * multiple_of_mean < leaf.points[-1, COLS.R]:
-            bad_ids.append((leaf.id, len(leaf.points)))
+        mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
 
+        if mean_radius * multiple_of_mean <= leaf.points[-1, COLS.R]:
+            bad_ids.append((leaf.id, leaf.points[-1:]))
+
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_narrow_start(neuron):
+    '''Check if neurites have a narrow start
+
+    Returns:
+        CheckResult with a list of all first segments of neurites with a narrow start
+    '''
+    bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]]) for neurite in neuron.neurites
+               if neurite.root_node.points[1][COLS.R] < 0.9 * neurite.root_node.points[2][COLS.R]]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_dangling_branch(n):
+    '''Check if the neuron has dangling neurites'''
+    soma_center = n.soma.points[:, COLS.XYZ].mean(axis=0)
+    recentered_soma = n.soma.points[:, COLS.XYZ] - soma_center
+    radius = np.linalg.norm(recentered_soma, axis=1)
+    soma_max_radius = radius.max()
+
+    def is_dangling(neurite):
+        '''Is the neurite dangling ?'''
+        starting_point = neurite.points[1][COLS.XYZ]
+
+        if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
+            return False
+
+        if neurite.type != NeuriteType.axon:
+            return True
+
+        all_points = list(chain.from_iterable(_neurite.points[1:] for _neurite in iter_neurites(n)
+                                              if _neurite.type != NeuriteType.axon))
+        res = [np.linalg.norm(starting_point - p[COLS.XYZ]) >= 2 * p[COLS.R] + 2
+               for p in all_points]
+        return all(res)
+
+    bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
+               for neurite in iter_neurites(n) if is_dangling(neurite)]
     return CheckResult(len(bad_ids) == 0, bad_ids)

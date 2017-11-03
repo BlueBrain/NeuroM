@@ -28,14 +28,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Plot a selection of features from a morphology population'''
 
-import neurom as nm
-from neurom.view import common as view_utils
 from collections import defaultdict
 from collections import namedtuple
 import sys
 import json
 import argparse
+
 import numpy as np
+import neurom as nm
+from neurom.view import common as view_utils
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -121,6 +122,7 @@ def load_neurite_features(filepath):
                 )
     return stuff
 
+
 Plot = namedtuple('Plot', 'fig, ax')
 
 
@@ -145,7 +147,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(data_dir, mtype_file): # pylint: disable=too-many-locals
+def main(data_dir, mtype_file):  # pylint: disable=too-many-locals
     '''Run the stuff'''
     # data structure to store results
     stuff = load_neurite_features(data_dir)
@@ -187,6 +189,7 @@ def main(data_dir, mtype_file): # pylint: disable=too-many-locals
             _plots.append(plot)
 
     return _plots
+
 
 if __name__ == '__main__':
     args = parse_args()
