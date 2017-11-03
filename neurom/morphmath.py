@@ -29,7 +29,9 @@
 '''Mathematical and geometrical functions used to compute morphometrics'''
 import math
 from itertools import combinations
+
 import numpy as np
+
 from neurom.core.dataformat import COLS
 
 
@@ -348,6 +350,7 @@ def sphere_area(r):
     ''' Compute the area of a sphere with radius r
     '''
     return 4. * math.pi * r ** 2
+
 
 # Useful alias for path_distance
 section_length = path_distance

@@ -250,14 +250,14 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def has_no_narrow_start(neuron, fraction_smaller=0.9):
+def has_no_narrow_start(neuron, frac=0.9):
     '''Check if neurites have a narrow start
 
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
     '''
     bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]]) for neurite in neuron.neurites
-               if neurite.root_node.points[1][COLS.R] < fraction_smaller * neurite.root_node.points[2][COLS.R]]
+               if neurite.root_node.points[1][COLS.R] < frac * neurite.root_node.points[2][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 

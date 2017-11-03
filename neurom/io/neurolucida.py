@@ -50,7 +50,7 @@ WANTED_SECTIONS = {
 UNWANTED_SECTION_NAMES = [
     # Meta-data?
     'Closed', 'Color', 'FillDensity', 'GUID', 'ImageCoords', 'MBFObjectType',
-    'Marker', 'Name', 'Resolution', 'Set',
+    'Marker', 'Name', 'Resolution', 'Set', 'Description',
     # Marker names?
     'Asterisk', 'Cross', 'Dot', 'DoubleCircle', 'FilledCircle', 'FilledDownTriangle',
     'FilledSquare', 'FilledStar', 'FilledUpTriangle', 'FilledUpTriangle', 'Flower',

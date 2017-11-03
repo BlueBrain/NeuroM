@@ -41,13 +41,11 @@ import numpy as _np
 
 from . import _neuritefunc as _nrt
 from . import _neuronfunc as _nrn
-
-from ._core import FstNeuron
 from ..core import NeuriteType as _ntype
 from ..core import iter_neurites as _ineurites
 from ..core.types import tree_type_checker as _is_type
 from ..exceptions import NeuroMError
-
+from ._core import FstNeuron
 
 NEURITEFEATURES = {
     'total_length': _nrt.total_length,
@@ -135,6 +133,7 @@ def get(feature, obj, **kwargs):
 
     return _np.array(list(feature(obj, **kwargs)))
 
+
 _INDENT = ' ' * 4
 
 
@@ -163,5 +162,6 @@ def _get_doc():
                for feature, func in sorted(NEURONFEATURES.items()))
 
     return '\n'.join(ret)
+
 
 get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(), 2)  # pylint: disable=no-member
