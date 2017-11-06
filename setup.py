@@ -30,14 +30,13 @@
 """
 # pylint: disable=R0801
 import os
-from setuptools import setup
-from setuptools import find_packages
-import pip
-from pip.req import parse_requirements
 from optparse import Option
 
+import pip
+from pip.req import parse_requirements
+from setuptools import find_packages, setup
 
-VERSION = "1.4.2"
+VERSION = "1.4.3"
 
 
 def parse_reqs(reqs_file):
