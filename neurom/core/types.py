@@ -42,6 +42,14 @@ class NeuriteType(IntEnum):
     all = 32
 
 
+NEURITES = (NeuriteType.all,
+            NeuriteType.axon,
+            NeuriteType.basal_dendrite,
+            NeuriteType.apical_dendrite)
+
+ROOT_ID = -1
+
+
 def tree_type_checker(*ref):
     '''Tree type checker functor
 
@@ -71,10 +79,11 @@ def tree_type_checker(*ref):
     return check_tree_type
 
 
-NEURITES = (NeuriteType.all,
-            NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+def dendrite_filter(n):
+    '''Select only dendrites'''
+    return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite
 
 
-ROOT_ID = -1
+def axon_filter(n):
+    '''Select only axons'''
+    return n.type == NeuriteType.axon
