@@ -13,5 +13,5 @@ Maintainer / release manager
 ----------------------------
 
 * [Benoit Coste @ BBP](https://github.com/wizmer)
-* [Michael Gevaert @ BBP](https://github.com/mgpelf)
+* [Michael Gevaert @ BBP](https://github.com/mgeplf)
 
