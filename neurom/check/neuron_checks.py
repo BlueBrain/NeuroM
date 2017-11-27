@@ -287,3 +287,26 @@ def has_no_dangling_branch(n):
     bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
                for neurite in iter_neurites(n) if is_dangling(neurite)]
     return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_narrow_neurite_section(neuron,
+                                  neurite_filter,
+                                  radius_threshold=0.05,
+                                  considered_section_min_length=50):
+    '''Check if the neuron has dendrites with narrow sections
+        sections below 'considered_section_min_length' are not taken into account
+    Returns:
+        CheckResult with result. result.info contains the narrow section ids and their
+        first point
+    '''
+
+    considered_sections = (sec for sec in iter_sections(neuron, neurite_filter=neurite_filter)
+                           if sec.length > considered_section_min_length)
+
+    def narrow_section(section):
+        '''Select narrow sections'''
+        return section.points[:, COLS.R].mean() < radius_threshold
+
+    bad_ids = [(section.id, section.points[1])
+               for section in considered_sections if narrow_section(section)]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
