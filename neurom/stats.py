@@ -59,7 +59,7 @@ def get_test(stest):
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
-    '''Create a JSON-comparible dict from a FitResults object
+    '''Create a JSON-comparable dict from a FitResults object
 
     Parameters:
         fit_results (FitResults): object containing fit parameters,\
@@ -102,7 +102,7 @@ def fit(data, distribution='norm'):
         distribution (str): type of distribution to fit. Default 'norm'.
 
     Returns:
-        FitResults object with fitted parameters, errors and distrubution type
+        FitResults object with fitted parameters, errors and distribution type
 
     Note:
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
@@ -122,7 +122,7 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
         distr_to_check: tuple of distributions to be checked
 
     Returns:
-        FitResults object with fitted parameters, errors and distrubution type\
+        FitResults object with fitted parameters, errors and distribution type\
             of the fit with the smallest fit distance
 
     Note:
@@ -142,7 +142,7 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
         functions: tuple of numpy stat functions to apply on data
 
     Returns:
-        Dictionary with tha name of the function as key and the result
+        Dictionary with the name of the function as key and the result
         as the respective value
     '''
     stats = {}
