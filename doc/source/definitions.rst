@@ -33,7 +33,7 @@ NeuroM morphology definitions
 =============================
 
 These are ``NeuroM`` specific working definitions of various components of
-neuron morpholigies.
+neuron morphologies.
 
 
 .. _point-label:
@@ -74,7 +74,7 @@ Segment
 A segment consists of two consecutive :ref:`points<point-label>` belonging to
 the same :ref:`neurite<neurite-label>` and :ref:`section<section-label>`.
 
-In ``NeuroM`` a segment is represented as a length 2 tuple or numpy array of
+In ``NeuroM`` a segment is represented as a length 2 tuple or ``numpy`` array of
 `points<point-label>`.
 
 

@@ -105,7 +105,7 @@ def iter_segments(obj, neurite_filter=None):
         neurite_filter: optional top level filter on properties of neurite neurite objects
 
     Note:
-        This is a convenience function provideded for generic access to
+        This is a convenience function provided for generic access to
         neuron segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     '''
