@@ -90,7 +90,7 @@ HDF5
 
 The HDF5 morphology formats developed by the BBP represent the neuron as a tree of
 :ref:`sections<section-label>`. The specifications for the two versions of the format
-cn be found in `the HBP morphology format documentation page <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/index.html>`_.
+can be found in `the HBP morphology format documentation page <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/index.html>`_.
 
 NeuroLucida (experimental)
 --------------------------
