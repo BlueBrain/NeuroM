@@ -69,7 +69,7 @@ The ``Makefile`` also has targets for running only ``pylint`` and ``pep8`` indiv
 
         $ make lint       # runs pep8 and pylint if that succeeds
         $ make run_pep8   # run only pep8
-        $ make run_pylint # run only pep8
+        $ make run_pylint # run only pylint
 
 
 Note that you can also install the test dependencies and run the tests inside of your

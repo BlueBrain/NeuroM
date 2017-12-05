@@ -125,7 +125,7 @@ with ``pip --version``, and upgrade if it is too low:
 
 This will allow use of pre-compiled python packages most platforms.
 
-To de-activate the virtualenvr run the ``deactivate`` command:
+To de-activate the virtualenv run the ``deactivate`` command:
 
 .. code-block:: bash
 
