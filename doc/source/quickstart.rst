@@ -97,7 +97,7 @@ Iterate over neurites with :py:func:`neurom.iter_neurites`
 ----------------------------------------------------------
 
 The :py:func:`neurom.iter_neurites` function allows to iterate over the neurites
-of a sungle neuron or a neuron population. It can also be applied to a single
+of a single neuron or a neuron population. It can also be applied to a single
 neurite or a list of neurites. It allows to optionally pass a function to be
 mapped onto each neurite, as well as a neurite filter function. In this example,
 we apply a simple user defined function to the apical dendrites in a population:
@@ -121,7 +121,7 @@ View neurons with :py:mod:`neurom.viewer`
 There are also helper functions to  plot a neuron in 2 and 3 dimensions.
 
 The :py:func:`neurom.viewer.draw` function allows the user to make two and three-dimensional
-plots of neurites, somata and neurons. It also has a dendrogram neurom plotting mode.
+plots of neurites, somata and neurons. It also has a dendrogram neuron plotting mode.
 
 .. seealso::
     The :py:mod:`neurom.viewer` documentation for more details and examples.
@@ -132,7 +132,7 @@ Extract morphometrics into JSON files
 
 The :doc:`morph_stats<morph_stats>` application lets you obtain various morphometrics
 quantities from a set of morphology files. It is highly configurable, and gives access
-to all the features avaulable via the :py:func:`neurom.get` function.
+to all the features available via the :py:func:`neurom.get` function.
 
 For example,
 
@@ -178,7 +178,7 @@ For example,
 Check data validity
 -------------------
 
-The :doc:`morph_check<morph_check>` application applies some structural and semantic 
+The :doc:`morph_check<morph_check>` application applies some structural and semantic
 checks to morphology data files in order to
 determine whether it is suitable to construct a neuron structure and whether certain
 defects within the structure are detected. It can be invoked from the command line, and

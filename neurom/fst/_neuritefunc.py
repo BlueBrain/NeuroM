@@ -347,7 +347,7 @@ def neurite_volume_density(neurites, neurite_type=NeuriteType.all):
     '''Get the volume density per neurite
 
     The volume density is defined as the ratio of the neurite volume and
-    the volume of the neurite's enclosung convex hull
+    the volume of the neurite's enclosing convex hull
     '''
     def vol_density(neurite):
         '''volume density of a single neurite'''

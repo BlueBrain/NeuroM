@@ -30,9 +30,9 @@ Applications
 ************
 
 NeuroM ships with configurable command line applications for commonly needed
-functionality. These are convenience tools which leverage ``NeuroM`` library funtionality
+functionality. These are convenience tools which leverage ``NeuroM`` library functionality
 without users having to concern themselves with writing any code beyond simple and optional
-configuration scripts. These commanline tools are installed as executable scripts with
+configuration scripts. These command-line tools are installed as executable scripts with
 ``NeuroM``. The tools are designed to be used in batch mode, i.e. they do not require any
 user interactivity upon launch, and do not require access to a display.
 
