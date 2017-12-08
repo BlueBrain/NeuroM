@@ -27,18 +27,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''Module for the detection of the cut plane'''
 import logging
-from functools import partial
 from itertools import chain
 
-from neurom.check.neuron_checks import (has_no_dangling_branch,
-                                        has_no_fat_ends, has_no_jumps,
-                                        has_no_narrow_start)
 from neurom.core.dataformat import COLS
 
 L = logging.getLogger(__name__)
 
 
-def generate_annotation(neuron, checker):
+def generate_annotation(result, settings):
     '''Generate the annotation for a given checker
 
     Arguments
@@ -49,8 +45,6 @@ def generate_annotation(neuron, checker):
     Returns
         An S-expression-like string representing the annotation
     '''
-    func, settings = checker
-    result = func(neuron)
     if result.status:
         return ""
 
@@ -68,21 +62,8 @@ def generate_annotation(neuron, checker):
     return '\n'.join(chain.from_iterable(([header], annotations, [footer])))
 
 
-def annotate(neuron, checkers=None):
+def annotate(results, settings):
     '''Concatenate the annotations of all checkers'''
-    if checkers is None:
-        checkers = {has_no_fat_ends: {"name": "fat end",
-                                      "label": "Circle3",
-                                      "color": "Blue"},
-                    partial(has_no_jumps, axis='z'): {"name": "zjump",
-                                                      "label": "Circle2",
-                                                      "color": "Green"},
-                    has_no_narrow_start: {"name": "narrow start",
-                                          "label": "Circle1",
-                                          "color": "Blue"},
-                    has_no_dangling_branch: {"name": "dangling",
-                                             "label": "Circle6",
-                                             "color": "Magenta"}}
-
-    annotations = (generate_annotation(neuron, checker) for checker in checkers.items())
+    annotations = (generate_annotation(result, setting)
+                   for result, setting in zip(results, settings))
     return '\n'.join(annot for annot in annotations if annot)
