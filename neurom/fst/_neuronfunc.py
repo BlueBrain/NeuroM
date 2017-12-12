@@ -29,13 +29,15 @@
 '''Morphometrics functions for neurons or neuron populations'''
 
 import math
+
 import numpy as np
-from neurom.geom import bounding_box
-from neurom.core.types import NeuriteType
-from neurom.core.types import tree_type_checker as is_type
-from neurom.core.dataformat import COLS
-from neurom.core._neuron import iter_neurites, iter_segments
+
 from neurom import morphmath
+from neurom.core._neuron import iter_neurites, iter_segments
+from neurom.core.dataformat import COLS
+from neurom.core.types import tree_type_checker as is_type
+from neurom.core.types import NeuriteType
+from neurom.geom import bounding_box
 
 
 def neuron_population(nrns):
@@ -189,16 +191,13 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
     nrns = neuron_population(nrn)
     neurite_filter = is_type(neurite_type)
 
-    min_soma_edge = float('Inf')
-    max_radii = 0
-    neurites_list = []
-    for neuron in nrns:
-        neurites_list.extend(((neurites, neuron.soma.center)
-                              for neurites in neuron.neurites
-                              if neurite_filter(neurites)))
+    neurites_list = [(neurites, neuron.soma.center)
+                     for neuron in nrns
+                     for neurites in neuron.neurites
+                     if neurite_filter(neurites)]
 
-        min_soma_edge = min(min_soma_edge, neuron.soma.radius)
-        max_radii = max(max_radii, np.max(np.abs(bounding_box(neuron))))
+    min_soma_edge = min(neuron.soma.radius for neuron in nrns)
+    max_radii = np.max([np.abs(bounding_box(neuron)) for neuron in nrns])
 
     radii = np.arange(min_soma_edge, max_radii + step_size, step_size)
     ret = np.zeros_like(radii)
