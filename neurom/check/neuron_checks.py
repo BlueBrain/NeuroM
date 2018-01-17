@@ -35,14 +35,12 @@ i.e. soma- and neurite-related structural tests pass.
 from itertools import chain, islice
 
 import numpy as np
-
 from neurom import NeuriteType
 from neurom._compat import zip
 from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
-from neurom.fst import _neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
 
 

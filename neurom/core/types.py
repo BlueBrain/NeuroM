@@ -30,17 +30,7 @@
 
 from enum import IntEnum, unique
 
-
-@unique
-class NeuriteType(IntEnum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
-
+from python_brion import SectionType as NeuriteType
 
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
@@ -81,7 +71,7 @@ def tree_type_checker(*ref):
 
 def dendrite_filter(n):
     '''Select only dendrites'''
-    return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite
+    return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite or n.type == NeuriteType.dendrite
 
 
 def axon_filter(n):

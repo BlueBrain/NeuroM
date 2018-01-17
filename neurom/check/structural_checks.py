@@ -29,10 +29,8 @@
 '''Module with consistency/validity checks for raw data  blocks'''
 import numpy as np
 from neurom.check import CheckResult
-from neurom.core.dataformat import COLS
-from neurom.core.dataformat import POINT_TYPE
 from neurom.core import make_soma
-from neurom.fst._core import make_neurites
+from neurom.core.dataformat import COLS, POINT_TYPE
 from neurom.exceptions import SomaError
 
 
@@ -125,13 +123,3 @@ def has_valid_soma(data_wrapper):
         return CheckResult(True)
     except SomaError:
         return CheckResult(False)
-
-
-def has_valid_neurites(data_wrapper):
-    '''Check if any neurites can be reconstructed from data block
-
-    Returns:
-        CheckResult with result
-    '''
-    n, _ = make_neurites(data_wrapper)
-    return CheckResult(len(n) > 0)

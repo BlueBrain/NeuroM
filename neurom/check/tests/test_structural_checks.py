@@ -27,10 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from neurom.check import structural_checks as chk
-from neurom import io
-from nose import tools as nt
 
+from neurom import io
+from neurom.check import structural_checks as chk
+from nose import tools as nt
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -187,13 +187,3 @@ class TestIOCheckFST(object):
             return super(TestIOCheckFST, self).test_has_sequential_ids_bad_data()
         except Exception:
             return False
-
-    def test_has_valid_neurites_good_data(self):
-        dw = self.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
-        nt.ok_(chk.has_valid_neurites(dw))
-        dw = self.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
-        nt.ok_(chk.has_valid_neurites(dw))
-
-    def test_has_valid_neurites_bad_data(self):
-        dw = self.load_data(os.path.join(SWC_PATH, 'Soma_origin.swc'))
-        nt.ok_(not chk.has_valid_neurites(dw))
