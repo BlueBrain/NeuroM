@@ -28,7 +28,7 @@
 
 import os
 
-from neurom import io
+from neurom import load_neuron
 from neurom.check import structural_checks as chk
 from nose import tools as nt
 
@@ -40,7 +40,7 @@ H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
 class TestIOCheckFST(object):
     def setup(self):
-        self.load_data = io.load_data
+        self.load_neuron = load_neuron
 
     def test_has_sequential_ids_good_data(self):
 
@@ -58,7 +58,7 @@ class TestIOCheckFST(object):
                  ]
 
         for f in files:
-            ok = chk.has_sequential_ids(self.load_data(f))
+            ok = chk.has_sequential_ids(self.load_neuron(f))
             nt.ok_(ok)
             nt.ok_(len(ok.info) == 0)
 
@@ -66,7 +66,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
 
-        ok = chk.has_sequential_ids(self.load_data(f))
+        ok = chk.has_sequential_ids(self.load_neuron(f))
         nt.ok_(not ok)
         nt.eq_(list(ok.info), [6, 217, 428, 639])
 
@@ -86,7 +86,7 @@ class TestIOCheckFST(object):
                  ]
 
         for f in files:
-            ok = chk.has_increasing_ids(self.load_data(f))
+            ok = chk.has_increasing_ids(self.load_neuron(f))
             nt.ok_(ok)
             nt.ok_(len(ok.info) == 0)
 
@@ -94,7 +94,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
-        ok = chk.has_increasing_ids(self.load_data(f))
+        ok = chk.has_increasing_ids(self.load_neuron(f))
         nt.ok_(not ok)
         nt.eq_(list(ok.info), [6, 12])
 
@@ -102,7 +102,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
 
-        ok = chk.is_single_tree(self.load_data(f))
+        ok = chk.is_single_tree(self.load_neuron(f))
         nt.ok_(not ok)
         nt.eq_(list(ok.info), [6, 217, 428, 639])
 
@@ -110,7 +110,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-        ok = chk.is_single_tree(self.load_data(f))
+        ok = chk.is_single_tree(self.load_neuron(f))
         nt.ok_(ok)
         nt.eq_(len(ok.info), 0)
 
@@ -118,7 +118,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
-        ok = chk.no_missing_parents(self.load_data(f))
+        ok = chk.no_missing_parents(self.load_neuron(f))
         nt.ok_(not ok)
         nt.eq_(list(ok.info), [6, 217, 428, 639])
 
@@ -126,7 +126,7 @@ class TestIOCheckFST(object):
 
         f = os.path.join(SWC_PATH, 'Neuron.swc')
 
-        ok = chk.no_missing_parents(self.load_data(f))
+        ok = chk.no_missing_parents(self.load_neuron(f))
         nt.ok_(ok)
         nt.eq_(len(ok.info), 0)
 
@@ -140,20 +140,20 @@ class TestIOCheckFST(object):
         files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
         for f in files:
-            nt.ok_(chk.has_soma_points(self.load_data(f)))
+            nt.ok_(chk.has_soma_points(self.load_neuron(f)))
 
     def test_has_soma_points_bad_data(self):
         f = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
-        nt.ok_(not chk.has_soma_points(self.load_data(f)))
+        nt.ok_(not chk.has_soma_points(self.load_neuron(f)))
 
     def test_has_valid_soma_good_data(self):
-        dw = self.load_data(os.path.join(SWC_PATH, 'Neuron.swc'))
+        dw = self.load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
         nt.ok_(chk.has_valid_soma(dw))
-        dw = self.load_data(os.path.join(H5V1_PATH, 'Neuron.h5'))
+        dw = self.load_neuron(os.path.join(H5V1_PATH, 'Neuron.h5'))
         nt.ok_(chk.has_valid_soma(dw))
 
     def test_has_valid_soma_bad_data(self):
-        dw = self.load_data(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
+        dw = self.load_neuron(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
         nt.ok_(not chk.has_valid_soma(dw))
 
     def test_has_finite_radius_neurites_good_data(self):
@@ -166,13 +166,13 @@ class TestIOCheckFST(object):
         files.append(os.path.join(H5V1_PATH, 'Neuron_2_branch.h5'))
 
         for f in files:
-            ok = chk.has_all_finite_radius_neurites(self.load_data(f))
+            ok = chk.has_all_finite_radius_neurites(self.load_neuron(f))
             nt.ok_(ok)
             nt.ok_(len(ok.info) == 0)
 
     def test_has_finite_radius_neurites_bad_data(self):
         f = os.path.join(SWC_PATH, 'Neuron_zero_radius.swc')
-        ok = chk.has_all_finite_radius_neurites(self.load_data(f))
+        ok = chk.has_all_finite_radius_neurites(self.load_neuron(f))
         nt.ok_(not ok)
         nt.ok_(list(ok.info) == [194, 210, 246, 304, 493])
 

@@ -34,7 +34,7 @@ from itertools import chain
 import numpy as np
 from neurom import morphmath
 from neurom._compat import filter, map, zip
-from neurom.core._soma import Soma
+from neurom.core._soma import Soma, SomaThreePoint
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
@@ -282,7 +282,11 @@ class BrionNeuron(Neuron):
         neurites = [Neurite(_section_builder(root_node))
                     for root_node in morphology.getRootSections()]
 
-        soma = Soma(np.vstack(morphology.getSoma().getProfilePoints()))
+        soma_points = np.vstack(morphology.getSoma().getProfilePoints())
+        if len(soma_points) == 3:
+            soma = SomaThreePoint(soma_points)
+        else:
+            soma = Soma(soma_points)
         super(BrionNeuron, self).__init__(soma=soma,
                                           name=name,
                                           neurites=neurites)

@@ -41,7 +41,7 @@ import numpy as np
 from neurom._compat import StringType, filter
 from neurom.core._neuron import BrionNeuron, Neurite, Section
 from neurom.core.population import Population
-from neurom.exceptions import NeuroMError, RawDataError
+from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
 from neurom.io import neurolucida, swc
 from neurom.io.datawrapper import DataWrapper
 
@@ -58,6 +58,7 @@ def _is_morphology_file(filepath):
     )
 
 
+# TODO: put directly in Brion
 class NeuronLoader(object):
     """
         Caching morphology loader.
@@ -158,7 +159,7 @@ def load_neurons(neurons,
     for f in files:
         try:
             pop.append(neuron_loader(f))
-        except NeuroMError as e:
+        except (NeuroMError, BrionError) as e:
             if isinstance(e, ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s',
                        e, os.path.basename(f))
@@ -182,36 +183,3 @@ def _get_file(handle):
         handle.seek(0)
         shutil.copyfileobj(handle, fd)
     return temp_file
-
-
-def load_data(handle, reader=None):
-    '''Unpack data into a raw data wrapper'''
-    if not reader:
-        reader = os.path.splitext(handle)[1][1:].lower()
-
-    if reader not in _READERS:
-        raise NeuroMError('Do not have a loader for "%s" extension' % reader)
-
-    filename = _get_file(handle)
-    try:
-        return _READERS[reader](filename)
-    except Exception as e:
-        L.exception('Error reading file %s, using "%s" loader', filename, reader)
-        raise RawDataError('Error reading file %s:\n%s' % (filename, str(e)))
-
-
-def _load_h5(filename):
-    '''Delay loading of h5py until it is needed'''
-    from neurom.io import hdf5
-    return hdf5.read(filename,
-                     remove_duplicates=False,
-                     data_wrapper=DataWrapper)
-
-
-_READERS = {
-    'swc': partial(swc.read,
-                   data_wrapper=DataWrapper),
-    'h5': _load_h5,
-    'asc': partial(neurolucida.read,
-                   data_wrapper=DataWrapper)
-}

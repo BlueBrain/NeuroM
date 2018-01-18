@@ -34,9 +34,9 @@ from io import StringIO
 import numpy as np
 from nose import tools as nt
 
-from neurom import get
+from neurom import get, load_neuron
 from neurom.core import Neuron, SomaError
-from neurom.exceptions import NeuroMError, RawDataError, SomaError
+from neurom.exceptions import NeuroMError, RawDataError, SomaError, MissingParentError, UnknownFileType
 from neurom.fst import _neuritefunc as _nf
 from neurom.io import utils
 
@@ -208,7 +208,7 @@ def test_load_neuron_disconnected_points_raises():
     utils.load_neuron(DISCONNECTED_POINTS_FILE)
 
 
-@nt.raises(RawDataError)
+@nt.raises(MissingParentError)
 def test_load_neuron_missing_parents_raises():
     utils.load_neuron(MISSING_PARENTS_FILE)
 
@@ -315,7 +315,7 @@ def test_load_h5_trunk_points_regression():
 
 
 def test_load_unknown_type():
-    nt.assert_raises(NeuroMError, utils.load_data, 'fake.file')
+    nt.assert_raises(UnknownFileType, load_neuron, 'fake.file')
 
 
 def test_NeuronLoader():

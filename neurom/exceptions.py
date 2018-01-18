@@ -29,36 +29,12 @@
 '''Module containing NeuroM specific exceptions'''
 
 
+from python_brion import Error, RawDataError, SomaError, IDSequenceError, MultipleTrees, MissingParentError
+
 class NeuroMError(Exception):
-    '''Base class for all NeuroM exceptions'''
+    '''Base class for NeuroM errors'''
     pass
-
-
-class RawDataError(NeuroMError):
-    '''Exception class for raw data errors'''
-    pass
-
 
 class ConfigError(NeuroMError):
     '''Exception class for configuration data in apps errors'''
-    pass
-
-
-class SomaError(NeuroMError):
-    '''Exception for soma construction errors'''
-    pass
-
-
-class IDSequenceError(RawDataError):
-    '''Exception for raw data with illegal point ID sequence'''
-    pass
-
-
-class MultipleTrees(RawDataError):
-    '''Exception for raw data with multiple trees'''
-    pass
-
-
-class MissingParentError(RawDataError):
-    '''Exception for raw data with missing parent IDs'''
     pass

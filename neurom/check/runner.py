@@ -34,9 +34,9 @@ from importlib import import_module
 
 from future.moves.collections import OrderedDict
 
+from neurom import load_neuron
 from neurom.check import check_wrapper
 from neurom.exceptions import ConfigError
-from neurom.fst import _core as fst_core
 from neurom.io import load_data, utils
 
 L = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ class CheckRunner(object):
             full_result &= result
             full_summary.update(summary)
 
-            nrn = fst_core.FstNeuron(data)
+            nrn = load_neuron(data)
             result, summary = self._check_loop(nrn, 'neuron_checks')
             full_result &= result
             full_summary.update(summary)
