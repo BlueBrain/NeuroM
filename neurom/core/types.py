@@ -32,6 +32,9 @@ from enum import IntEnum, unique
 
 from python_brion import SectionType as NeuriteType
 
+NeuriteType.name = property(lambda self: str(self).split('.')[-1])
+
+
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
             NeuriteType.basal_dendrite,

@@ -52,29 +52,29 @@ POP = core.Population(NEURONS, name='foo')
 def assert_sequence_equal(a, b):
     nt.eq_(tuple(a), tuple(b))
 
+
 def test_iter_neurites_default():
     assert_sequence_equal(POP.neurites,
                           [n for n in core.iter_neurites(POP)])
+
 
 def test_iter_neurites_filter():
 
     for ntyp in nm.NEURITE_TYPES:
         a = [n for n in POP.neurites if n.type == ntyp]
-        b = [n for n in core.iter_neurites(POP, filt=lambda n : n.type == ntyp)]
+        b = [n for n in core.iter_neurites(POP, filt=lambda n: n.type == ntyp)]
         assert_sequence_equal(a, b)
 
 
 def test_iter_neurites_mapping():
-
-    n = [n for n in core.iter_neurites(POP, mapfun=lambda n : len(n.points))]
-    ref = [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500]
-    assert_sequence_equal(n, ref)
+    assert_sequence_equal(list(core.iter_neurites(POP, mapfun=lambda n: len(n.points))),
+                          [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500])
 
 
 def test_iter_neurites_filter_mapping():
     n = [n for n in core.iter_neurites(POP,
-                                       mapfun=lambda n : len(n.points),
-                                       filt=lambda n : len(n.points) > 250)]
+                                       mapfun=lambda n: len(n.points),
+                                       filt=lambda n: len(n.points) > 250)]
 
     ref = [500, 500, 500]
     assert_sequence_equal(n, ref)

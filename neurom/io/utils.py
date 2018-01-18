@@ -39,7 +39,7 @@ from io import IOBase, open
 
 import numpy as np
 from neurom._compat import StringType, filter
-from neurom.core._neuron import Neurite, Section
+from neurom.core._neuron import BrionNeuron, Neurite, Section
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
 from neurom.io import neurolucida, swc
@@ -115,31 +115,13 @@ def get_files_by_path(path):
     raise IOError('Invalid data path %s' % path)
 
 
-def _section_builder(brain_section):
-    points = np.vstack(brain_section.getSamples())
-    section_id = brain_section.getID()
-    section_type = brain_section.getType()
-    section = Section(points, section_id, section_type)
-    for child in brain_section.getChildren():
-        section.add_child(_section_builder(child))
-    return section
-
-
-class Neuron:
-    def __init__(self, brion_morphology):
-        self.morphology = brion_morphology
-
-        self.neurites = [Neurite(_section_builder(root_node))
-                         for root_node in self.morphology.getRootSections()]
-
-    @property
-    def soma(self):
-        return self.morphology.getSoma()
-
-
 def load_neuron(handle, reader=None):
     '''Build section trees from an h5 or swc file'''
-    return Neuron(python_brion.Morphology(handle))
+    if isinstance(handle, StringType):
+        name = os.path.splitext(os.path.basename(handle))[0]
+    else:
+        name = None
+    return BrionNeuron(handle, name)
 
 
 def load_neurons(neurons,
@@ -168,6 +150,8 @@ def load_neurons(neurons,
     elif isinstance(neurons, StringType):
         files = get_files_by_path(neurons)
         name = name if name is not None else os.path.basename(neurons)
+    else:
+        raise TypeError('Cannot handle neurons of type: {}'.format(type(neurons)))
 
     ignored_exceptions = tuple(ignored_exceptions)
     pop = []
