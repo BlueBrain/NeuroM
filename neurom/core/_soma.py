@@ -95,7 +95,7 @@ class SomaCylinders(Soma):
                 (|)_____ )
 
       Here we have a 'side-view', with each 'o' representing a point, and the
-      radius is the heigh of a '|' character, and the ')' try and show the
+      radius is the height of a '|' character, and the ')' try and show the
       curvature of the cylinger
 
   Note: when, as in the case above, the cylinder center points don't lie
