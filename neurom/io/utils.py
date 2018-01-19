@@ -42,8 +42,6 @@ from neurom._compat import StringType, filter
 from neurom.core._neuron import BrionNeuron, Neurite, Section
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
-from neurom.io import neurolucida, swc
-from neurom.io.datawrapper import DataWrapper
 
 import python_brion
 
@@ -121,8 +119,8 @@ def load_neuron(handle, reader=None):
     if isinstance(handle, StringType):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:
-        name = None
-    return BrionNeuron(handle, name)
+        name=None
+    return BrionNeuron(_get_file(handle), name)
 
 
 def load_neurons(neurons,
@@ -168,18 +166,20 @@ def load_neurons(neurons,
 
     return population_class(pop, name=name)
 
-
-def _get_file(handle):
+# TODO: embed this feature directly in Brion
+def _get_file(handle, ext=None):
     '''Returns the filename of the file to read
 
-    If handle is a stream, a temp file is written on disk first
-    and its filename is returned'''
-    if not isinstance(handle, IOBase):
+    If handle is a tuple (extension, stream), the stream is written in
+    a temp file and its filename (ending with the provided extension) is returned'''
+    if not isinstance(handle, tuple):
         return handle
 
-    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()), prefix='neurom-')
+    extension, stream = handle
+    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4())+'.'+extension,
+                                     prefix='neurom-')
     os.close(fd)
     with open(temp_file, 'w') as fd:
-        handle.seek(0)
-        shutil.copyfileobj(handle, fd)
+        stream.seek(0)
+        shutil.copyfileobj(stream, fd)
     return temp_file

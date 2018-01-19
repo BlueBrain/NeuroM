@@ -29,7 +29,8 @@
 '''Module containing NeuroM specific exceptions'''
 
 
-from python_brion import Error, RawDataError, SomaError, IDSequenceError, MultipleTrees, MissingParentError
+from python_brion import (Error, RawDataError, SomaError, IDSequenceError,
+                          MultipleTrees, MissingParentError, UnknownFileType)
 
 class NeuroMError(Exception):
     '''Base class for NeuroM errors'''

@@ -30,7 +30,7 @@
 
 from .tree import Tree
 from .types import NeuriteType
-from ._soma import Soma, make_soma, SomaError
+from ._soma import Soma, SomaError
 from ._neuron import (Section, Neurite, Neuron, iter_neurites,
                       iter_sections, iter_segments, graft_neuron)
 from .population import Population

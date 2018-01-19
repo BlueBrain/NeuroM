@@ -247,15 +247,24 @@ class Neurite(object):
 class Neuron(object):
     '''Class representing a simple neuron'''
 
-    def __init__(self, soma=None, neurites=None, sections=None, name='Neuron'):
+    def __init__(self, soma=None, neurites=None, name='Neuron'):
         self.soma = soma
         self.name = name
         self.neurites = neurites
-        self.sections = sections
 
     def __str__(self):
         return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
+
+
+    @property
+    def sections(self):
+        return list(iter_sections(self))
+
+    @property
+    def points(self):
+        '''Return unordered array with all the points in this neuron (soma and neurites)'''
+        return np.vstack([self.soma.points]+[neurite.points for neurite in self.neurites])
 
     __repr__ = __str__
 

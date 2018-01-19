@@ -122,16 +122,16 @@ def test_load_neuron():
         _check_neurites_have_no_parent(nrn)
 
     neuron_str = u""" 1 1  0  0 0 1. -1
- 2 3  0  0 0 1.  1
- 3 3  0  5 0 1.  2
- 4 3 -5  5 0 0.  3
- 5 3  6  5 0 0.  3
- 6 2  0  0 0 1.  1
- 7 2  0 -4 0 1.  6
- 8 2  6 -4 0 0.  7
- 9 2 -5 -4 0 0.  7
-"""
-    utils.load_neuron(StringIO(neuron_str), reader='swc')
+                      2 3  0  0 0 1.  1
+                      3 3  0  5 0 1.  2
+                      4 3 -5  5 0 0.  3
+                      5 3  6  5 0 0.  3
+                      6 2  0  0 0 1.  1
+                      7 2  0 -4 0 1.  6
+                      8 2  6 -4 0 0.  7
+                      9 2 -5 -4 0 0.  7
+                     """
+    utils.load_neuron(('swc', StringIO(neuron_str)))
 
 
 def test_neuron_name():
@@ -158,7 +158,6 @@ NRN = utils.load_neuron(FILENAMES[0])
 
 
 def test_neuron_section_ids():
-
     # check section IDs
     for i, sec in enumerate(NRN.sections):
         nt.eq_(i, sec.id)
@@ -170,15 +169,9 @@ def test_neurites_have_no_parent():
 
 
 def test_neuron_sections():
-    all_nodes = set(NRN.sections)
-    neurite_nodes = set(_nf.iter_sections(NRN.neurites))
-
     # check no duplicates
-    nt.assert_true(len(all_nodes) == len(NRN.sections))
+    nt.assert_true(len(set(NRN.sections)) == len(list(NRN.sections)))
 
-    # check all neurite tree nodes are
-    # in sections attribute
-    nt.assert_true(len(set(NRN.sections) - neurite_nodes) > 0)
 
 
 def test_neuron_sections_are_connected():
@@ -301,6 +294,7 @@ def test_load_h5_trunk_points_regression():
     # of files with non-standard soma structure.
     # See #480.
     nrn = utils.load_neuron(os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
+    print("nrn.neurites[0].root_node.points[1]: {}".format(nrn.neurites[0].root_node.points[1]))
     nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1],
                        [0., 0., 0.1, 0.31646374, 4., 4., 3.]))
 

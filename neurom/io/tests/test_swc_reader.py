@@ -30,6 +30,7 @@ import os
 
 import numpy as np
 
+from neurom import load_neuron
 from neurom.core.dataformat import COLS
 from neurom.io import swc
 
@@ -42,42 +43,19 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
 
-def test_read_swc_basic_with_offset_0():
-    '''first ID = 0, rare to find'''
-    rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_0_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
-
-
-def test_read_swc_basic_with_offset_1():
-    '''More normal ID numbering, starting at 1'''
-    rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_1_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
-
-
-def test_read_swc_basic_with_offset_42():
-    '''ID numbering starting at 42'''
-    rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
-
-
 def test_read_single_neurite():
-    rdw = swc.read(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [1])
-    nt.eq_(len(rdw.soma_points()), 1)
-    nt.eq_(len(rdw.sections), 2)
+    neuron = load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    nt.eq_(n.neurites[0].root_node, [1])
+    nt.eq_(len(neuron.soma_points()), 1)
+    nt.eq_(len(neuron.sections), 2)
 
 
 def test_read_split_soma():
-    rdw = swc.read(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [1, 3])
-    nt.eq_(len(rdw.soma_points()), 3)
-    nt.eq_(len(rdw.sections), 4)
+    neuron = load_neuron(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
+    root_nodes = [neurite.root_node for neurite in neuron.neurites]
+    nt.eq_(root_nodes, [1, 3])
+    nt.eq_(len(neuron.soma_points()), 3)
+    nt.eq_(len(neuron.sections), 4)
 
     ref_ids = [[-1, 0],
                [0, 1, 2, 3, 4],
@@ -85,12 +63,13 @@ def test_read_split_soma():
                [6, 7, 8, 9, 10],
                []]
 
-    for s, r in zip(rdw.sections, ref_ids):
+    for s, r in zip(neuron.sections, ref_ids):
         nt.eq_(s.ids, r)
 
 
 def test_simple_reversed():
-    rdw = swc.read(os.path.join(SWC_PATH, 'simple_reversed.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [5, 6])
-    nt.eq_(len(rdw.soma_points()), 1)
-    nt.eq_(len(rdw.sections), 7)
+    neuron = load_neuron(os.path.join(SWC_PATH, 'simple_reversed.swc'))
+    root_nodes = [neurite.root_node for neurite in neuron.neurites]
+    nt.eq_(root_nodes, [5, 6])
+    nt.eq_(len(neuron.soma_points()), 1)
+    nt.eq_(len(neuron.sections), 7)
