@@ -39,3 +39,4 @@ sphinxcontrib-napoleon>=0.3.0
 sphinx_rtd_theme>=0.1.0
 sphinxcontrib-autorun
 future>=0.16.0
+pyyaml>=3.10
