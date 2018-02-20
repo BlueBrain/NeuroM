@@ -32,13 +32,15 @@ from copy import deepcopy
 from itertools import chain
 
 import numpy as np
+
 from neurom import morphmath
+from neurom.exceptions import UnknownFileType
 from neurom._compat import filter, map, zip
-from neurom.core._soma import Soma, SomaThreePoint
+from neurom.core._soma import make_soma, Soma, SomaThreePoint, _SOMA_CONFIG
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
-import python_brion
+import python_morphio
 
 from . import NeuriteType, Tree
 
@@ -256,7 +258,6 @@ class Neuron(object):
         return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
 
-
     @property
     def sections(self):
         return list(iter_sections(self))
@@ -270,32 +271,40 @@ class Neuron(object):
 
 
 def _section_builder(brain_section, is_root=True):
-    points = np.vstack(brain_section.getSamples())
+    points = np.concatenate((brain_section.points(),
+                             brain_section.diameters()[:, np.newaxis] / 2.),
+                            axis=1)
+
 
     # In Brion the first neurite point is the Soma point
     # if is_root:
     #     points = points[1:]
-    section_id = brain_section.getID()
-    section_type = brain_section.getType()
+    section_id = brain_section.id()
+    section_type = brain_section.type()
     section = Section(points, section_id, section_type)
-    for child in brain_section.getChildren():
+    for child in brain_section.children():
         section.add_child(_section_builder(child, is_root=False))
     return section
 
 
 class BrionNeuron(Neuron):
     def __init__(self, handle, name=None):
-        if not name:
-            name = 'Neuron'
-        morphology = python_brion.Morphology(handle)
+        morphology = python_morphio.Morphology(handle)
         neurites = [Neurite(_section_builder(root_node))
-                    for root_node in morphology.getRootSections()]
+                    for root_node in morphology.rootSections()]
 
-        soma_points = np.vstack(morphology.getSoma().getProfilePoints())
-        if len(soma_points) == 3:
-            soma = SomaThreePoint(soma_points)
-        else:
-            soma = Soma(soma_points)
+        brain_soma = morphology.soma()
+        soma_points = np.concatenate((brain_soma.points(),
+                                 brain_soma.diameters()[:, np.newaxis] / 2.),
+                                axis=1)
+
+
+        # soma_check, soma_class = _SOMA_CONFIG.get(morphology.getVersion())
+
+        soma = make_soma(soma_points
+                         # , soma_class=soma_class
+        )
+
         super(BrionNeuron, self).__init__(soma=soma,
-                                          name=name,
+                                          name=name or 'Neuron',
                                           neurites=neurites)

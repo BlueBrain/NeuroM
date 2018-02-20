@@ -33,11 +33,10 @@ import os
 import numpy as np
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
-from neurom.core import make_soma, Neurite, Section
+from neurom.core import Neurite, Section
 from neurom.core import _soma
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core.population import Population
-from neurom.io.datawrapper import BlockNeuronBuilder
 
 from utils import _close, _equal
 
@@ -64,8 +63,8 @@ def test_soma_radii():
     nt.eq_(ret, [1., ])
 
 def test_trunk_section_lengths():
-    ret = _nf.trunk_section_lengths(SIMPLE)
-    nt.eq_(ret, [5.0, 4.0])
+    ret = set(_nf.trunk_section_lengths(SIMPLE))
+    nt.eq_(ret, set([5.0, 4.0]))
 
 def test_trunk_origin_radii():
     ret = _nf.trunk_origin_radii(SIMPLE)
@@ -74,41 +73,6 @@ def test_trunk_origin_radii():
 def test_trunk_origin_azimuths():
     ret = _nf.trunk_origin_azimuths(SIMPLE)
     nt.eq_(ret, [0.0, 0.0])
-
-def test_trunk_origin_elevations():
-    class Mock(object):
-        pass
-
-    n0 = Mock()
-    n1 = Mock()
-
-    s = make_soma([[0, 0, 0, 4]])
-    t0 = Section(((1, 0, 0, 2), (2, 1, 1, 2)))
-    t0.type = NeuriteType.basal_dendrite
-    t1 = Section(((0, 1, 0, 2), (1, 2, 1, 2)))
-    t1.type = NeuriteType.basal_dendrite
-    n0.neurites = [Neurite(t0), Neurite(t1)]
-    n0.soma = s
-
-    t2 = Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
-    t2.type = NeuriteType.basal_dendrite
-    n1.neurites = [Neurite(t2)]
-    n1.soma = s
-
-    pop = Population([n0, n1])
-    nt.eq_(list(_nf.trunk_origin_elevations(pop)),
-           [0.0, np.pi/2., -np.pi/2.])
-
-    nt.eq_(
-        list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
-        [0.0, np.pi/2., -np.pi/2.])
-
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
-           0)
-
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite)),
-           0)
-
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():

@@ -66,8 +66,6 @@ def assert_items_equal(a, b):
 
 def assert_features_for_neurite(feat, neurons, expected, exact=True):
     for neurite_type, expected_values in expected.items():
-        print('neurite_type: %s' % neurite_type)
-
         if neurite_type is None:
             res_pop = fst_get(feat, neurons)
             res = fst_get(feat, neurons[0])
@@ -78,7 +76,7 @@ def assert_features_for_neurite(feat, neurons, expected, exact=True):
         if exact:
             assert_items_equal(res_pop, expected_values)
         else:
-            assert_allclose(res_pop, expected_values)
+            assert_allclose(res_pop, expected_values, rtol=1e-5)
 
         #test for single neuron
         if isinstance(res, np.ndarray):
@@ -133,7 +131,8 @@ def test_section_tortuosity_pop():
                     (1.042614577410971,
                      1.6742599832295344,
                      106.5960839640893,
-                     1.239489348419643))
+                     1.239489348419643),
+                    rtol=1e-5)
 
 
 def test_section_tortuosity_nrn():
@@ -546,13 +545,13 @@ def test_section_lengths_apical():
 def test_total_length_per_neurite_axon():
     tl = fst_get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (207.87975221))
+    assert_allclose(tl, (207.87975221), rtol=1e-5)
 
 
 def test_total_length_per_neurite_basal():
     tl = fst_get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.eq_(len(tl), 2)
-    assert_allclose(tl, (211.11737442, 207.31504202))
+    assert_allclose(tl, (207.31504202, 211.11737442))
 
 
 def test_total_length_per_neurite_apical():
@@ -564,7 +563,7 @@ def test_total_length_per_neurite_apical():
 def test_total_length_axon():
     tl = fst_get('total_length', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (207.87975221))
+    assert_allclose(tl, (207.87975221), rtol=1e-5)
 
 
 def test_total_length_basal():
@@ -795,6 +794,7 @@ def test_get_trunk_section_lengths():
 
 
 def test_soma_radii():
+    print("NEURON.soma.points: {}".format(NEURON.soma.points))
     nt.eq_(fst_get('soma_radii', NEURON)[0], 0.13065629648763766)
 
 
@@ -925,5 +925,3 @@ def test_partition_asymmetry():
 #    nt.ok_(np.allclose(extents1, [0., 0., 0.]))
 #    extents2 = fst_get('principal_direction_extents', neurites, direction='third')
 #    nt.ok_(np.allclose(extents2, [0., 0., 0.]))
-
-

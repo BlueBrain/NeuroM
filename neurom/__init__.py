@@ -69,4 +69,3 @@ APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite
 AXON = NeuriteType.axon
 SOMA = NeuriteType.soma
-ANY_NEURITE = NeuriteType.all

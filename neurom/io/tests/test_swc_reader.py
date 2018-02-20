@@ -32,7 +32,6 @@ import numpy as np
 
 from neurom import load_neuron
 from neurom.core.dataformat import COLS
-from neurom.io import swc
 
 from nose import tools as nt
 
@@ -44,15 +43,16 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
 
 def test_read_single_neurite():
-    neuron = load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
-    nt.eq_(n.neurites[0].root_node, [1])
-    nt.eq_(len(neuron.soma_points()), 1)
-    nt.eq_(len(neuron.sections), 2)
+    n= load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    nt.eq_(n.neurites[0].root_node.id, 1)
+    nt.eq_(len(n.soma.points), 1)
+    nt.eq_(len(n.sections), 1)
 
 
 def test_read_split_soma():
     neuron = load_neuron(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
-    root_nodes = [neurite.root_node for neurite in neuron.neurites]
+    root_nodes = [neurite.root_node.points for neurite in neuron.neurites]
+
     nt.eq_(root_nodes, [1, 3])
     nt.eq_(len(neuron.soma_points()), 3)
     nt.eq_(len(neuron.sections), 4)

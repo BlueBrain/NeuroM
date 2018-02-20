@@ -61,6 +61,8 @@ FILES = [os.path.join(SWC_PATH, f)
 FILENAMES = [os.path.join(VALID_DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
+NRN = utils.load_neuron(FILENAMES[0])
+
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
 DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
@@ -152,15 +154,6 @@ def test_load_neuromorpho_3pt_soma():
     nt.eq_(len(nrn.soma.points), 3)
     nt.eq_(nrn.soma.radius, 2)
     _check_neurites_have_no_parent(nrn)
-
-
-NRN = utils.load_neuron(FILENAMES[0])
-
-
-def test_neuron_section_ids():
-    # check section IDs
-    for i, sec in enumerate(NRN.sections):
-        nt.eq_(i, sec.id)
 
 
 def test_neurites_have_no_parent():
@@ -294,22 +287,21 @@ def test_load_h5_trunk_points_regression():
     # of files with non-standard soma structure.
     # See #480.
     nrn = utils.load_neuron(os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
-    print("nrn.neurites[0].root_node.points[1]: {}".format(nrn.neurites[0].root_node.points[1]))
     nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1],
-                       [0., 0., 0.1, 0.31646374, 4., 4., 3.]))
+                       [0., 0., 0.1, 0.31646374]))
 
     nt.ok_(np.allclose(nrn.neurites[1].root_node.points[1],
-                       [0., 0., 0.1, 1.84130445e-01, 3.0, 235., 234.]))
+                       [0., 0., 0.1, 1.84130445e-01]))
 
     nt.ok_(np.allclose(nrn.neurites[2].root_node.points[1],
-                       [0., 0., 0.1, 5.62225521e-01, 3., 466, 465]))
+                       [0., 0., 0.1, 5.62225521e-01]))
 
     nt.ok_(np.allclose(nrn.neurites[3].root_node.points[1],
-                       [0., 0., 0.1, 7.28555262e-01, 2., 697, 696]))
+                       [0., 0., 0.1, 7.28555262e-01]))
 
 
 def test_load_unknown_type():
-    nt.assert_raises(UnknownFileType, load_neuron, 'fake.file')
+    nt.assert_raises(UnknownFileType, load_neuron, os.path.join(DATA_PATH, 'unsupported_extension.fake'))
 
 
 def test_NeuronLoader():

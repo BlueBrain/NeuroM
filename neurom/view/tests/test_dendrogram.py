@@ -4,6 +4,7 @@ from nose import tools as nt
 from neurom.core.types import NeuriteType
 import neurom.view._dendrogram as dm
 from neurom import load_neuron, get
+from numpy.testing import assert_allclose
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
@@ -102,7 +103,7 @@ class TestDendrogram(object):
                          [-0.17071068,  0.        ],
                          [ 0.17071068,  0.        ],
                          [ 0.17071068, -0.34142136]])
-        nt.assert_true(np.allclose(vrec, trec))
+        assert_allclose(vrec, trec)
 
         vrec = self.dtr.soma
 

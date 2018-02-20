@@ -46,6 +46,9 @@ NEURONS = [NRN1,
            load_neuron(joinp(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc')),
            ]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
+
+SIMPLE = load_neuron(joinp(DATA_PATH, 'swc/simple.swc'))
+
 POP = core.Population(NEURONS, name='foo')
 
 
@@ -53,31 +56,57 @@ def assert_sequence_equal(a, b):
     nt.eq_(tuple(a), tuple(b))
 
 
-def test_iter_neurites_default():
-    assert_sequence_equal(POP.neurites,
-                          [n for n in core.iter_neurites(POP)])
+def test_iter_segments_nrn():
+    ref = list(core.iter_segments(SIMPLE))
+    nt.eq_(len(ref), 6)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 0)
+
+    ref = list(core.iter_segments(NRN1))
+    nt.eq_(len(ref), 840)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 210)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 420)
+
+    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 210)
 
 
-def test_iter_neurites_filter():
+def test_iter_segments_pop():
 
-    for ntyp in nm.NEURITE_TYPES:
-        a = [n for n in POP.neurites if n.type == ntyp]
-        b = [n for n in core.iter_neurites(POP, filt=lambda n: n.type == ntyp)]
-        assert_sequence_equal(a, b)
+    ref = list(core.iter_segments(POP))
+    nt.eq_(len(ref), 3387)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 919)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 1549)
+
+    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 919)
 
 
-def test_iter_neurites_mapping():
-    assert_sequence_equal(list(core.iter_neurites(POP, mapfun=lambda n: len(n.points))),
-                          [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500])
-
-
-def test_iter_neurites_filter_mapping():
-    n = [n for n in core.iter_neurites(POP,
-                                       mapfun=lambda n: len(n.points),
-                                       filt=lambda n: len(n.points) > 250)]
-
-    ref = [500, 500, 500]
-    assert_sequence_equal(n, ref)
+def test_iter_segments_section():
+    sec = core.Section([[1, 2, 3, 4],
+                        [5, 6, 7, 8],
+                        [8, 7, 6, 5],
+                        [4, 3, 2, 1],
+                        ])
+    ref = list(core.iter_segments(sec))
+    nt.eq_(ref, [([1, 2, 3, 4], [5, 6, 7, 8]),
+                 ([5, 6, 7, 8], [8, 7, 6, 5]),
+                 ([8, 7, 6, 5], [4, 3, 2, 1])])
 
 
 def test_iter_sections_default():
@@ -124,43 +153,28 @@ def test_iter_sections_ileaf():
                           [n for n in core.iter_sections(POP, iterator_type=Tree.ileaf)])
 
 
-def test_iter_segments_nrn():
-
-    ref = list(core.iter_segments(NRN1))
-    nt.eq_(len(ref), 840)
-
-    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.AXON))
-    nt.eq_(len(ref), 210)
-
-    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
-    nt.eq_(len(ref), 420)
-
-    ref = list(core.iter_segments(NRN1, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
-    nt.eq_(len(ref), 210)
+def test_iter_neurites_default():
+    assert_sequence_equal(POP.neurites,
+                          [n for n in core.iter_neurites(POP)])
 
 
-def test_iter_segments_pop():
+def test_iter_neurites_filter():
 
-    ref = list(core.iter_segments(POP))
-    nt.eq_(len(ref), 3387)
-
-    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.AXON))
-    nt.eq_(len(ref), 919)
-
-    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
-    nt.eq_(len(ref), 1549)
-
-    ref = list(core.iter_segments(POP, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
-    nt.eq_(len(ref), 919)
+    for ntyp in nm.NEURITE_TYPES:
+        a = [n for n in POP.neurites if n.type == ntyp]
+        b = [n for n in core.iter_neurites(POP, filt=lambda n: n.type == ntyp)]
+        assert_sequence_equal(a, b)
 
 
-def test_iter_segments_section():
-    sec = core.Section([[1, 2, 3, 4],
-                        [5, 6, 7, 8],
-                        [8, 7, 6, 5],
-                        [4, 3, 2, 1],
-                        ])
-    ref = list(core.iter_segments(sec))
-    nt.eq_(ref, [([1, 2, 3, 4], [5, 6, 7, 8]),
-                 ([5, 6, 7, 8], [8, 7, 6, 5]),
-                 ([8, 7, 6, 5], [4, 3, 2, 1])])
+def test_iter_neurites_mapping():
+    assert_sequence_equal(list(core.iter_neurites(POP, mapfun=lambda n: len(n.points))),
+                          [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500])
+
+
+def test_iter_neurites_filter_mapping():
+    n = [n for n in core.iter_neurites(POP,
+                                       mapfun=lambda n: len(n.points),
+                                       filt=lambda n: len(n.points) > 250)]
+
+    ref = [500, 500, 500]
+    assert_sequence_equal(n, ref)

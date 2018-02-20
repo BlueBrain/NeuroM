@@ -43,7 +43,7 @@ from neurom.core._neuron import BrionNeuron, Neurite, Section
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
 
-import python_brion
+import python_morphio
 
 L = logging.getLogger(__name__)
 
@@ -115,7 +115,15 @@ def get_files_by_path(path):
 
 
 def load_neuron(handle, reader=None):
-    '''Build section trees from an h5 or swc file'''
+    '''Build section trees from a stream or a h5, swc or asc file.
+    Args:
+        handle: A filename with the h5, swc or asc extension
+        or a tuple (extension, stream) where extension (h5, swc or asc) specifies the morphology
+        format for the stream.
+
+    Returns:
+        A Neuron object
+    '''
     if isinstance(handle, StringType):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:

@@ -27,82 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Module with consistency/validity checks for raw data  blocks'''
-import numpy as np
 from neurom.check import CheckResult
-from neurom.core.dataformat import COLS, POINT_TYPE
-from neurom.exceptions import SomaError
 
 
 def has_sequential_ids(neuron):
-    '''Check that IDs are increasing and consecutive
-
-    returns tuple (bool, list of IDs that are not consecutive
-    with their predecessor)
-    '''
-    points = neuron.points
-    ids = points[:, COLS.ID]
-    steps = ids[np.where(np.diff(ids) != 1)[0] + 1].astype(int)
-    return CheckResult(len(steps) == 0, steps)
-
-
+    raise NotImplementedError("Should be reimplemented directly in Brion")
 def no_missing_parents(neuron):
-    '''Check that all points have existing parents
-    Point's parent ID must exist and parent must be declared
-    before child.
-
-    Returns:
-        CheckResult with result and list of IDs that have no parent
-    '''
-    points = neuron.points
-    ids = np.setdiff1d(points[:, COLS.P], points[:, COLS.ID])[1:]
-    return CheckResult(len(ids) == 0, ids.astype(np.int) + 1)
-
-
+    raise NotImplementedError("Should be reimplemented directly in Brion")
 def is_single_tree(neuron):
-    '''Check that data forms a single tree
-
-    Only the first point has ID of -1.
-
-    Returns:
-        CheckResult with result and list of IDs
-
-    Note:
-        This assumes no_missing_parents passed.
-    '''
-    points = neuron.points
-    bad_ids = points[points[:, COLS.P] == -1][1:, COLS.ID]
-    return CheckResult(len(bad_ids) == 0, bad_ids.tolist())
-
-
+    raise NotImplementedError("Should be reimplemented directly in Brion")
 def has_increasing_ids(neuron):
-    '''Check that IDs are increasing
-
-    Returns:
-        CheckResult with result and list of IDs that are inconsistent
-        with their predecessor
-    '''
-    ids = neuron.points[:, COLS.ID]
-    steps = ids[np.where(np.diff(ids) <= 0)[0] + 1].astype(int)
-    return CheckResult(len(steps) == 0, steps)
-
-
+    raise NotImplementedError("Should be reimplemented directly in Brion")
 def has_soma_points(neuron):
-    '''Checks if the TYPE column of raw data block has an element of type soma
-
-    Returns:
-        CheckResult with result
-    '''
-    points = neuron.points
-    return CheckResult(POINT_TYPE.SOMA in points[:, COLS.TYPE], None)
-
-
+    raise NotImplementedError("Should be reimplemented directly in Brion")
 def has_all_finite_radius_neurites(neuron, threshold=0.0):
-    '''Check that all points with neurite type have a finite radius
-
-    Returns:
-        CheckResult with result and list of IDs of neurite points with zero radius
-    '''
-    points = np.vstack([neurite.points for neurite in neuron.neurites])
-    zero_radius_ids = points[:, COLS.R] <= threshold
-    bad_pts = np.where(zero_radius_ids)[0].tolist()
-    return CheckResult(len(bad_pts) == 0, bad_pts)
+    raise NotImplementedError("Should be reimplemented directly in Brion")
+def has_valid_soma(neuron):
+    raise NotImplementedError("Should be reimplemented directly in Brion")

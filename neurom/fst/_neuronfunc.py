@@ -79,20 +79,20 @@ def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     return [n.soma.radius for n in nrns]
 
 
-def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
+def trunk_section_lengths(nrn, neurite_type=None):
     '''list of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [morphmath.section_length(s.root_node.points)
             for s in nrn.neurites if neurite_filter(s)]
 
 
-def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_radii(nrn, neurite_type=None):
     '''radii of the trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
-def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_azimuths(nrn, neurite_type=None):
     '''Get a list of all the trunk origin azimuths of a neuron or population
 
     The azimuth is defined as Angle between x-axis and the vector
@@ -113,7 +113,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
-def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_elevations(nrn, neurite_type=None):
     '''Get a list of all the trunk origin elevations of a neuron or population
 
     The elevation is defined as the angle between x-axis and the
@@ -169,7 +169,7 @@ def sholl_crossings(neurites, center, radii):
                      for r in radii])
 
 
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
+def sholl_frequency(nrn, neurite_type=None, step_size=10):
     '''perform Sholl frequency calculations on a population of neurites
 
     Args:
