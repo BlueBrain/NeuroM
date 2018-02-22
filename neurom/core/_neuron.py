@@ -40,8 +40,6 @@ from neurom.core._soma import make_soma, Soma, SomaThreePoint, _SOMA_CONFIG
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
-import python_morphio
-
 from . import NeuriteType, Tree
 
 
@@ -160,6 +158,16 @@ class Section(Tree):
         '''
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
+    def transform(self, trans):
+        '''Return a copy of this section with a 3D transformation applied'''
+        section = Section(trans(points),
+                          section_id=self.id,
+                          section_type=self.type)
+        for child in self.children():
+            section.add_child(child.transform(trans))
+        return section
+
+
     def __str__(self):
         return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \
             (self.id, self.type, len(self.points), self.parent, len(self.children))
@@ -217,7 +225,7 @@ class Neurite(object):
         '''Return a copy of this neurite with a 3D transformation applied'''
         clone = deepcopy(self)
         for n in clone.iter_sections():
-            n.points[:, 0:3] = trans(n.points[:, 0:3])
+            n.points[:, COLS.XYZ] = trans(n.points[:, COLS.XYZ])
 
         return clone
 
@@ -267,44 +275,11 @@ class Neuron(object):
         '''Return unordered array with all the points in this neuron (soma and neurites)'''
         return np.vstack([self.soma.points]+[neurite.points for neurite in self.neurites])
 
+
+    def transform(self, trans):
+        '''Return a copy of this neuron with a 3D transformation applied'''
+        return Neuron(self.soma.transform(trans),
+                      [neurite.transform(trans) for neurite in self.neurites],
+                      name=self.name)
+
     __repr__ = __str__
-
-
-def _section_builder(brain_section, is_root=True):
-    points = np.concatenate((brain_section.points(),
-                             brain_section.diameters()[:, np.newaxis] / 2.),
-                            axis=1)
-
-
-    # In Brion the first neurite point is the Soma point
-    # if is_root:
-    #     points = points[1:]
-    section_id = brain_section.id()
-    section_type = brain_section.type()
-    section = Section(points, section_id, section_type)
-    for child in brain_section.children():
-        section.add_child(_section_builder(child, is_root=False))
-    return section
-
-
-class BrionNeuron(Neuron):
-    def __init__(self, handle, name=None):
-        morphology = python_morphio.Morphology(handle)
-        neurites = [Neurite(_section_builder(root_node))
-                    for root_node in morphology.rootSections()]
-
-        brain_soma = morphology.soma()
-        soma_points = np.concatenate((brain_soma.points(),
-                                 brain_soma.diameters()[:, np.newaxis] / 2.),
-                                axis=1)
-
-
-        # soma_check, soma_class = _SOMA_CONFIG.get(morphology.getVersion())
-
-        soma = make_soma(soma_points
-                         # , soma_class=soma_class
-        )
-
-        super(BrionNeuron, self).__init__(soma=soma,
-                                          name=name or 'Neuron',
-                                          neurites=neurites)

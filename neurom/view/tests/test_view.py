@@ -59,7 +59,7 @@ def test_tree():
     with get_fig_2d() as (fig, ax):
         tree = simple_neuron.neurites[0]
         view.plot_tree(ax, tree)
-        np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=1e-10)
+        np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=5)
 
 
 def test_neuron():
@@ -79,7 +79,7 @@ def test_tree3d():
         tree = simple_neuron.neurites[0]
         view.plot_tree3d(ax, tree)
         xy_bounds = ax.xy_dataLim.bounds
-        np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
+        np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.), atol=5)
         zz_bounds = ax.zz_dataLim.bounds
         np.testing.assert_allclose(zz_bounds, (0., 0., 1., 1.))
 

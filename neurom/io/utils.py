@@ -39,7 +39,8 @@ from io import IOBase, open
 
 import numpy as np
 from neurom._compat import StringType, filter
-from neurom.core._neuron import BrionNeuron, Neurite, Section
+from neurom.core._neuron import Neurite, Section
+from neurom.core._morphio import BrionNeuron
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
 
