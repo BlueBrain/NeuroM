@@ -44,7 +44,7 @@ from neurom.core._morphio import BrionNeuron
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
 
-import python_morphio
+import morphio
 
 L = logging.getLogger(__name__)
 

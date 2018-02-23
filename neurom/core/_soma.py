@@ -35,7 +35,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-from python_morphio import MorphologyVersion
+from morphio import MorphologyVersion
 
 
 L = logging.getLogger(__name__)

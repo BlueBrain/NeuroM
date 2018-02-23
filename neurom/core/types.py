@@ -30,7 +30,7 @@
 
 from enum import IntEnum, unique
 
-from python_morphio import SectionType as NeuriteType
+from morphio import SectionType as NeuriteType
 
 NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
