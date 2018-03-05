@@ -136,8 +136,26 @@ def test_load_neuron():
     utils.load_neuron(('swc', StringIO(neuron_str)))
 
 
-def test_neuron_name():
+    neuron_str = u""" 1 1  0  0 0 1. -1
+                      2 3  0  0 0 1.  1
+                      3 3  0  5 0 1.  2
 
+       # weirdly indented comments
+
+    # and whitespaces
+
+                      4 3 -5  5 0 0.  3
+                      5 3  6  5 0 0.  3
+                      6 2  0  0 0 1.  1
+                      7 2  0 -4 0 1.  6
+                      8 2  6 -4 0 0.  7
+                      9 2 -5 -4 0 0.  7
+                     """
+    utils.load_neuron(('swc', StringIO(neuron_str)))
+
+
+
+def test_neuron_name():
     for fn, nn in zip(FILENAMES, NRN_NAMES):
         nrn = utils.load_neuron(fn)
         nt.eq_(nrn.name, nn)
@@ -181,10 +199,6 @@ def test_load_neuron_soma_only():
     nt.eq_(len(nrn.neurites), 0)
     nt.assert_equal(nrn.name, 'Soma_origin')
 
-
-@nt.raises(SomaError)
-def test_load_neuron_no_soma_raises_SomaError():
-    utils.load_neuron(NO_SOMA_FILE)
 
 
 # TODO: decide if we want to check for this in fst.

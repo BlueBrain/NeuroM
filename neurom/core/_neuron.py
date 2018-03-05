@@ -268,7 +268,11 @@ class Neuron(object):
 
     @property
     def sections(self):
-        return list(iter_sections(self))
+        soma_section = Section(self.soma.points, section_id=0, section_type=NeuriteType.soma)
+        for neurite in self.neurites:
+            soma_section.add_child(neurite.root_node)
+
+        return list(chain([soma_section], iter_sections(self)))
 
     @property
     def points(self):

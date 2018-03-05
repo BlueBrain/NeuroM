@@ -107,7 +107,7 @@ def register_neurite_feature(name, func):
     if name in NEURITEFEATURES:
         raise NeuroMError('Attempt to hide registered feature %s', name)
 
-    def _fun(neurites, neurite_type=_ntype.all):
+    def _fun(neurites, neurite_type=None):
         '''Wrap neurite function from outer scope and map into list'''
         return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
 

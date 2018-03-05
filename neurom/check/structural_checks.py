@@ -38,8 +38,9 @@ def is_single_tree(neuron):
     raise NotImplementedError("Should be reimplemented directly in Brion")
 def has_increasing_ids(neuron):
     raise NotImplementedError("Should be reimplemented directly in Brion")
+
 def has_soma_points(neuron):
-    raise NotImplementedError("Should be reimplemented directly in Brion")
+    return len(neuron.soma.points) > 0
 def has_all_finite_radius_neurites(neuron, threshold=0.0):
     raise NotImplementedError("Should be reimplemented directly in Brion")
 def has_valid_soma(neuron):

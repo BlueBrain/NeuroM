@@ -1,10 +1,11 @@
 import numpy as np
 
 import morphio
-from neurom.core import Neurite, Neuron, Section
+from neurom.core import Neurite, Neuron, Section, Soma
 from neurom.core._soma import _SOMA_CONFIG, make_soma
 
-def _section_builder(brain_section, is_root=True):
+
+def _section_builder(brain_section):
     points = np.concatenate((brain_section.points,
                              brain_section.diameters[:, np.newaxis] / 2.),
                             axis=1)
@@ -13,7 +14,7 @@ def _section_builder(brain_section, is_root=True):
     section_type = brain_section.type
     section = Section(points, section_id, section_type)
     for child in brain_section.children:
-        section.add_child(_section_builder(child, is_root=False))
+        section.add_child(_section_builder(child ))
     return section
 
 
@@ -31,8 +32,10 @@ class BrionNeuron(Neuron):
 
         soma_check, soma_class = _SOMA_CONFIG.get(morphology.version)
 
-        soma = make_soma(soma_points , soma_class=soma_class)
-
+        if soma_points.size:
+            soma = make_soma(soma_points , soma_class=soma_class)
+        else:
+            soma = Soma(points=np.empty((0,4)))
         super(BrionNeuron, self).__init__(soma=soma,
                                           name=name or 'Neuron',
                                           neurites=neurites)

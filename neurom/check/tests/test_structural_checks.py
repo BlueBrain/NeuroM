@@ -73,12 +73,7 @@ class TestIOCheckFST(object):
 
     @nt.raises(MissingParentError)
     def test_has_sequential_ids_bad_data(self):
-
-        f = os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')
-
-        ok = chk.has_sequential_ids(self.load_neuron(f))
-        nt.ok_(not ok)
-        nt.eq_(list(ok.info), [6, 217, 428, 639])
+        nt.ok_(self.load_neuron(os.path.join(SWC_PATH, 'Neuron_missing_ids.swc')))
 
     @nt.raises(NotImplementedError)
     def test_has_increasing_ids_good_data(self):
@@ -103,21 +98,18 @@ class TestIOCheckFST(object):
 
     @nt.raises(NotImplementedError)
     def test_has_increasing_ids_bad_data(self):
-
         f = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
         ok = chk.has_increasing_ids(self.load_neuron(f))
         nt.ok_(not ok)
         nt.eq_(list(ok.info), [6, 12])
 
-    @nt.raises(NotImplementedError)
     def test_is_single_tree_bad_data(self):
+        nt.ok_(self.load_neuron(os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')))
 
-        f = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
-
-        ok = chk.is_single_tree(self.load_neuron(f))
-        nt.ok_(not ok)
-        nt.eq_(list(ok.info), [6, 217, 428, 639])
+    @nt.raises(SomaError)
+    def test_multiple_somata(self):
+        nt.ok_(self.load_neuron(os.path.join(SWC_PATH, 'multiple_somata.swc')))
 
     @nt.raises(NotImplementedError)
     def test_is_single_tree_good_data(self):
@@ -130,12 +122,7 @@ class TestIOCheckFST(object):
 
     @nt.raises(MissingParentError)
     def test_has_no_missing_parents_bad_data(self):
-
-        f = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
-
-        ok = chk.no_missing_parents(self.load_neuron(f))
-        nt.ok_(not ok)
-        nt.eq_(list(ok.info), [6, 217, 428, 639])
+        nt.ok_(self.load_neuron(os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')))
 
     @nt.raises(NotImplementedError)
     def test_has_no_missing_parents_good_data(self):
@@ -146,7 +133,6 @@ class TestIOCheckFST(object):
         nt.ok_(ok)
         nt.eq_(len(ok.info), 0)
 
-    @nt.raises(NotImplementedError)
     def test_has_soma_points_good_data(self):
         files = [os.path.join(SWC_PATH, f)
                  for f in ['Neuron.swc',
@@ -159,7 +145,6 @@ class TestIOCheckFST(object):
         for f in files:
             nt.ok_(chk.has_soma_points(self.load_neuron(f)))
 
-    @nt.raises(SomaError)
     def test_has_soma_points_bad_data(self):
         f = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
         nt.ok_(not chk.has_soma_points(self.load_neuron(f)))
@@ -173,7 +158,7 @@ class TestIOCheckFST(object):
         dw = self.load_neuron(os.path.join(H5V1_PATH, 'Neuron.h5'))
         nt.ok_(chk.has_valid_soma(dw))
 
-    @nt.raises(SomaError)
+    # @nt.raises(MissingParentError)
     def test_has_valid_soma_bad_data(self):
         dw = self.load_neuron(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
         # nt.ok_(not chk.has_valid_soma(dw))

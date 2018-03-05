@@ -32,6 +32,7 @@ import numpy as np
 
 from neurom import load_neuron
 from neurom.core.dataformat import COLS
+from numpy.testing import assert_array_equal
 
 from nose import tools as nt
 
@@ -43,33 +44,61 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
 
 def test_read_single_neurite():
-    n= load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    n = load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
+    nt.eq_(len(n.neurites), 1)
     nt.eq_(n.neurites[0].root_node.id, 1)
-    nt.eq_(len(n.soma.points), 1)
-    nt.eq_(len(n.sections), 1)
+    assert_array_equal(n.soma.points,
+                       [[0,0,0,3.0]])
+    nt.eq_(len(n.neurites), 1)
+    nt.eq_(len(n.sections), 2)
+    assert_array_equal(n.neurites[0].points,
+                       np.array([[0,0,2,0.5],
+                                 [0,0,3,0.5],
+                                 [0,0,4,0.5],
+                                 [0,0,5,0.5]]))
 
 
 def test_read_split_soma():
-    neuron = load_neuron(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
-    root_nodes = [neurite.root_node.points for neurite in neuron.neurites]
+    n = load_neuron(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
 
-    nt.eq_(root_nodes, [1, 3])
-    nt.eq_(len(neuron.soma_points()), 3)
-    nt.eq_(len(neuron.sections), 4)
+    assert_array_equal(n.soma.points,
+                       [[1,0,1,4.0],
+                        [2,0,0,4.0],
+                        [3,0,0,4.0]])
 
-    ref_ids = [[-1, 0],
-               [0, 1, 2, 3, 4],
-               [0, 5, 6],
-               [6, 7, 8, 9, 10],
-               []]
+    nt.assert_equal(len(n.neurites), 2)
+    assert_array_equal(n.neurites[0].points,
+                       [[0,0,2,0.5],
+                        [0,0,3,0.5],
+                        [0,0,4,0.5],
+                        [0,0,5,0.5]])
 
-    for s, r in zip(neuron.sections, ref_ids):
-        nt.eq_(s.ids, r)
+    assert_array_equal(n.neurites[1].points,
+                       [[0,0,6,0.5],
+                        [0,0,7,0.5],
+                        [0,0,8,0.5],
+                        [0,0,9,0.5]])
+
+    nt.eq_(len(n.sections), 3)
 
 
 def test_simple_reversed():
-    neuron = load_neuron(os.path.join(SWC_PATH, 'simple_reversed.swc'))
-    root_nodes = [neurite.root_node for neurite in neuron.neurites]
-    nt.eq_(root_nodes, [5, 6])
-    nt.eq_(len(neuron.soma_points()), 1)
-    nt.eq_(len(neuron.sections), 7)
+    n = load_neuron(os.path.join(SWC_PATH, 'whitespaces.swc'))
+
+
+def test_simple_reversed():
+    n = load_neuron(os.path.join(SWC_PATH, 'simple_reversed.swc'))
+    assert_array_equal(n.soma.points,
+                       [[0,0,0,1]])
+    nt.assert_equal(len(n.neurites), 2)
+    nt.assert_equal(len(n.neurites[0].points), 4)
+    assert_array_equal(n.neurites[0].points,
+                       [[0,0,0,1],
+                        [0,5,0,1],
+                        [-5,5,0,0],
+                        [6,5,0,0]])
+    assert_array_equal(n.neurites[1].points,
+                       [[0,0,0,1],
+                        [0,-4,0,1],
+                        [6,-4,0,0],
+                        [-5,-4,0,0]])
