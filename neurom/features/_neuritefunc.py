@@ -36,9 +36,7 @@ from neurom import morphmath
 from neurom.core import Tree, iter_neurites, iter_sections, NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.fst import _bifurcationfunc
-from neurom.fst import _neuronfunc
-from neurom.fst import sectionfunc
+from neurom.features import _bifurcationfunc, _neuronfunc, sectionfunc
 from neurom.geom import convex_hull
 
 

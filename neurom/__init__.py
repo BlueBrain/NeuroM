@@ -61,7 +61,7 @@ Examples:
 from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
                    iter_segments)
 from .core.types import NEURITES as NEURITE_TYPES
-from .fst import get
+from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons
 from .version import VERSION as __version__
 
