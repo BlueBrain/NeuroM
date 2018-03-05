@@ -34,8 +34,7 @@ import math
 import numpy as np
 from numpy.testing import assert_allclose
 from neurom import load_neuron
-from neurom.fst import sectionfunc as _sf
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import sectionfunc as _sf, neuritefunc as _nf
 from neurom.core import Section
 from neurom import morphmath as mmth
 

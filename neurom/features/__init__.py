@@ -40,8 +40,8 @@ Examples:
 import re
 import numpy as _np
 
-from . import _neuritefunc as _nrt
-from . import _neuronfunc as _nrn
+from . import neuritefunc as _nrt
+from . import neuronfunc as _nrn
 from ..core import NeuriteType as _ntype
 from ..core import iter_neurites as _ineurites
 from ..core.types import tree_type_checker as _is_type

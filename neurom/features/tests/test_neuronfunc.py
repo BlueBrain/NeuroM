@@ -26,13 +26,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuronfunc functionality'''
+'''Test neurom.neuronfunc functionality'''
 import tempfile
 from nose import tools as nt
 import os
 import numpy as np
-from neurom import fst, load_neuron, NeuriteType
-from neurom.fst import _neuronfunc as _nf
+from neurom import load_neuron, NeuriteType
+from neurom.features import neuronfunc as _nf
 from neurom.core import Neurite, Section
 from neurom.core import _soma
 from neurom.core.dataformat import POINT_TYPE

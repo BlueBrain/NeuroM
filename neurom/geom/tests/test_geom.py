@@ -29,7 +29,6 @@
 import os
 import numpy as np
 import neurom as nm
-from neurom import fst
 from neurom import geom
 
 from nose import tools as nt
@@ -37,6 +36,7 @@ from nose import tools as nt
 _PWD = os.path.dirname(os.path.abspath(__file__))
 SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
 NRN = nm.load_neuron(os.path.join(SWC_DATA_PATH, 'Neuron.swc'))
+SIMPLE = nm.load_neuron(os.path.join(SWC_DATA_PATH, 'simple.swc'))
 
 
 class PointObj(object):
@@ -70,8 +70,8 @@ def test_bounding_box_soma():
 
 
 def test_bounding_box_neurite():
-    nrt = NRN.neurites[3]
-    ref = np.array([[-33.25305769, -57.600172, 0.], [0., 0., 49.70137991]])
+    nrt = SIMPLE.neurites[0]
+    ref = np.array([[-5.,  0.,  0.], [ 6.,  5.,  0.]])
     np.testing.assert_allclose(geom.bounding_box(nrt), ref)
 
 

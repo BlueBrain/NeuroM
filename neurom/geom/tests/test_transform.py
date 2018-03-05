@@ -29,7 +29,7 @@
 import math
 import neurom.geom.transform as gtr
 from neurom import load_neuron
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 from nose import tools as nt
 from neurom._compat import zip
 

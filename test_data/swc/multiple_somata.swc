@@ -17,7 +17,8 @@
 #           (0, -4)
 #
 # all radii are 1, except for end points, which are 0
-
+#
+# An additional soma at the end
 
  1 1  0  0 0 1. -1
  2 3  0  0 0 1.  1
@@ -28,3 +29,4 @@
  7 2  0 -4 0 1.  6
  8 2  6 -4 0 0.  7
  9 2 -5 -4 0 0.  7
+ 10 1 2 0 0 2 -1

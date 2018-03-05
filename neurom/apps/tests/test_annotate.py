@@ -35,9 +35,7 @@ def test_annotate():
 (Circle1   ; MUK_ANNOTATION
     (Color Blue)   ; MUK_ANNOTATION
     (Name "narrow start")   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
+    (0.0 0.0 2.0 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
 """
 
@@ -45,6 +43,7 @@ def test_annotate():
                                       "label": "Circle1",
                                       "color": "Blue"}}
 
-    neuron = load_neuron('test_data/swc/Neuron_zero_radius.swc')
+
+    neuron = load_neuron('test_data/swc/narrow_start.swc')
     results = [checker(neuron) for checker in checkers.keys()]
     nt.assert_equal(annotate(results, checkers.values()), correct_result)

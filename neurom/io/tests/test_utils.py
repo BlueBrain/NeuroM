@@ -37,7 +37,7 @@ from nose import tools as nt
 from neurom import get, load_neuron
 from neurom.core import Neuron, SomaError
 from neurom.exceptions import NeuroMError, RawDataError, SomaError, MissingParentError, UnknownFileType
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 from neurom.io import utils
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -97,7 +97,13 @@ def test_load_neurons():
     nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, _get_name(FILES[i]))
-    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
+
+    nt.assert_raises(MissingParentError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+
+def test_ignore_exceptions():
+    nt.assert_raises(MissingParentError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+    pop=utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=[MissingParentError])
+    nt.eq_(len(pop), 0)
 
 
 def test_get_morph_files():
@@ -335,14 +341,6 @@ def test_NeuronLoader_mixed_file_extensions():
     loader.get('Neuron_h5v1')
     nt.assert_raises(NeuroMError, loader.get, 'NoSuchNeuron')
 
-
-def test_ignore_exceptions():
-    pop = utils.load_neurons((NO_SOMA_FILE, ), ignored_exceptions=(SomaError, ))
-    nt.eq_(len(pop), 0)
-
-    pop = utils.load_neurons((NO_SOMA_FILE, ),
-                             ignored_exceptions=(SomaError, RawDataError, ))
-    nt.eq_(len(pop), 0)
 
 
 def test_get_files_by_path():

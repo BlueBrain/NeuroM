@@ -10,7 +10,7 @@ def _section_builder(brain_section):
                              brain_section.diameters[:, np.newaxis] / 2.),
                             axis=1)
 
-    section_id = brain_section.id
+    section_id = brain_section.id-1
     section_type = brain_section.type
     section = Section(points, section_id, section_type)
     for child in brain_section.children:

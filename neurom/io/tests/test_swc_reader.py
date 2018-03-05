@@ -46,7 +46,7 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 def test_read_single_neurite():
     n = load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
     nt.eq_(len(n.neurites), 1)
-    nt.eq_(n.neurites[0].root_node.id, 1)
+    nt.eq_(n.neurites[0].root_node.id, 0)
     assert_array_equal(n.soma.points,
                        [[0,0,0,3.0]])
     nt.eq_(len(n.neurites), 1)
