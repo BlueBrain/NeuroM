@@ -49,13 +49,13 @@ s6 = s4.add_child(Section(42))
 s7 = s4.add_child(Section(42))
 
 def test_local_bifurcation_angle():
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
     bf.local_bifurcation_angle(SIMPLE.sections[0])
 
 def test_remote_bifurcation_angle():
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
     try:
         bf.local_bifurcation_angle(SIMPLE.sections[0])
         nt.ok_(False)

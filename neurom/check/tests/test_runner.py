@@ -34,24 +34,20 @@ from nose import tools as nt
 from neurom.check.runner import CheckRunner
 from neurom.exceptions import ConfigError
 
+from collections import OrderedDict
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
-NRN_PATH_0 = os.path.join(SWC_PATH, 'Neuron.swc')
-NRN_PATH_1 = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
-NRN_PATH_2 = os.path.join(SWC_PATH, 'Single_apical.swc')
-NRN_PATH_3 = os.path.join(SWC_PATH, 'Single_basal.swc')
-NRN_PATH_4 = os.path.join(SWC_PATH, 'Single_axon.swc')
-NRN_PATH_5 = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+
 
 CONFIG = {
     'checks': {
         'structural_checks': [
-            'is_single_tree',
+            #'is_single_tree',
             'has_soma_points',
-            'has_sequential_ids',
-            'has_increasing_ids',
+            # 'has_sequential_ids',
+            # 'has_increasing_ids',
             'has_valid_soma',
-            'has_valid_neurites'
+            # 'has_valid_neurites'
         ],
         'neuron_checks': [
             'has_basal_dendrite',
@@ -74,180 +70,154 @@ CONFIG = {
 CONFIG_COLOR = copy(CONFIG)
 CONFIG_COLOR['color'] = True
 
-REF_0 = {
-    'files': {
-        NRN_PATH_0: {
-            "Is single tree": True,
-            "Has soma points": True,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": True,
-            "Has valid neurites": True,
-            "Has basal dendrite": True,
-            "Has axon": True,
-            "Has apical dendrite": True,
-            "Has all nonzero segment lengths": True,
-            "Has all nonzero section lengths": True,
-            "Has all nonzero neurite radii": True,
-            "Has nonzero soma radius": True,
-            "ALL": True
-        }
-    },
-    "STATUS": "PASS"
-}
-
-REF_1 = {
-    'files': {
-        NRN_PATH_1: {
-            "Is single tree": True,
-            "Has soma points": True,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": True,
-            "Has valid neurites": True,
-            "Has basal dendrite": True,
-            "Has axon": True,
-            "Has apical dendrite": True,
-            "Has all nonzero segment lengths": False,
-            "Has all nonzero section lengths": False,
-            "Has all nonzero neurite radii": True,
-            "Has nonzero soma radius": True,
-            "ALL": False
-        }
-    },
-    "STATUS": "FAIL"
-}
-
-REF_2 = {
-    'files': {
-        NRN_PATH_2: {
-            "Is single tree": True,
-            "Has soma points": True,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": True,
-            "Has valid neurites": True,
-            "Has basal dendrite": False,
-            "Has axon": False,
-            "Has apical dendrite": True,
-            "Has all nonzero segment lengths": False,
-            "Has all nonzero section lengths": True,
-            "Has all nonzero neurite radii": True,
-            "Has nonzero soma radius": True,
-            "ALL": False
-        }
-    },
-    "STATUS": "FAIL"
-}
-
-REF_3 = {
-    'files': {
-        NRN_PATH_3: {
-            "Is single tree": True,
-            "Has soma points": True,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": True,
-            "Has valid neurites": True,
-            "Has basal dendrite": True,
-            "Has axon": False,
-            "Has apical dendrite": False,
-            "Has all nonzero segment lengths": False,
-            "Has all nonzero section lengths": True,
-            "Has all nonzero neurite radii": True,
-            "Has nonzero soma radius": False,
-            "ALL": False
-        }
-    },
-    "STATUS": "FAIL"
-}
-
-REF_4 = {
-    'files': {
-        NRN_PATH_4: {
-            "Is single tree": True,
-            "Has soma points": True,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": True,
-            "Has valid neurites": True,
-            "Has basal dendrite": False,
-            "Has axon": True,
-            "Has apical dendrite": False,
-            "Has all nonzero segment lengths": False,
-            "Has all nonzero section lengths": True,
-            "Has all nonzero neurite radii": True,
-            "Has nonzero soma radius": True,
-            "ALL": False
-        }
-    },
-    "STATUS": "FAIL"
-}
 
 
-REF_5 = {
-    'files': {
-        NRN_PATH_5: {
-            "Is single tree": True,
-            "Has soma points": False,
-            "Has sequential ids": True,
-            "Has increasing ids": True,
-            "Has valid soma": False,
-            "Has valid neurites": False,
-            "ALL": False
-        }
-    },
-    "STATUS": "FAIL"
-}
+def _run_test(path, ref, config=CONFIG, should_pass=False):
+    '''Run checkers with the passed "config" on file "path"
+    and compare the results to "ref"'''
+    results = CheckRunner(CONFIG).run(path)
+    for item, item_ref in zip(results['files'][path].items(), ref.items()):
+        nt.assert_equal(item, item_ref)
+    nt.assert_equal(results['STATUS'],
+                    "PASS" if should_pass else "FAIL")
 
+ref = OrderedDict([
+    # "Is single tree": True,
+    ("Has soma points", True),
+    # "Has sequential ids": True,
+    # "Has increasing ids": True,
+    ("Has valid soma", True),
+    # "Has valid neurites": True,
+    ("Has basal dendrite", True),
+    ("Has axon", True),
+    ("Has apical dendrite", True),
+    ("Has all nonzero segment lengths", True),
+    ("Has all nonzero section lengths", True),
+    ("Has all nonzero neurite radii", True),
+    ("Has nonzero soma radius", True),
+    ("ALL", True)
+])
 
 def test_ok_neuron():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_0)
-    nt.assert_equal(summ, REF_0)
-
+    _run_test(os.path.join(SWC_PATH, 'Neuron.swc'),
+              ref,
+              should_pass=True)
 
 def test_ok_neuron_color():
-    checker = CheckRunner(CONFIG_COLOR)
-    summ = checker.run(NRN_PATH_0)
-    nt.assert_equal(summ, REF_0)
+    _run_test(os.path.join(SWC_PATH, 'Neuron.swc'),
+              ref,
+              CONFIG_COLOR,
+              should_pass=True)
 
 
 def test_zero_length_sections_neuron():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_1)
-    nt.assert_equal(summ, REF_1)
+    _run_test(os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc'),
+              OrderedDict([
+                  # "Is single tree": True,
+                  ("Has soma points", True),
+                  # "Has sequential ids": True,
+                  # "Has increasing ids": True,
+                  ("Has valid soma", True),
+                  # "Has valid neurites": True,
+                  ("Has basal dendrite", True),
+                  ("Has axon", True),
+                  ("Has apical dendrite", True),
+                  ("Has all nonzero segment lengths", False),
+                  ("Has all nonzero section lengths", False),
+                  ("Has all nonzero neurite radii", True),
+                  ("Has nonzero soma radius", True),
+                  ("ALL", False)
+              ]))
 
 
 def test_single_apical_neuron():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_2)
-    nt.assert_equal(summ, REF_2)
+    _run_test(os.path.join(SWC_PATH, 'Single_apical.swc'),
+              OrderedDict([
+                  # "Is single tree": True,
+                  ("Has soma points", True),
+                  # "Has sequential ids": True,
+                  # "Has increasing ids": True,
+                  ("Has valid soma", True),
+                  # "Has valid neurites": True,
+                  ("Has basal dendrite", False),
+                  ("Has axon", False),
+                  ("Has apical dendrite", True),
+                  ("Has all nonzero segment lengths", False),
+                  ("Has all nonzero section lengths", True),
+                  ("Has all nonzero neurite radii", True),
+                  ("Has nonzero soma radius", True),
+                  ("ALL", False)
+              ]))
 
 
 def test_single_basal_neuron():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_3)
-    nt.assert_equal(summ, REF_3)
+    _run_test(os.path.join(SWC_PATH, 'Single_basal.swc'),
+              OrderedDict(
+                  ([
+                      # "Is single tree": True,
+                      ("Has soma points", True),
+                      # "Has sequential ids": True,
+                      # "Has increasing ids": True,
+                      ("Has valid soma", True),
+                      # "Has valid neurites": True,
+                      ("Has basal dendrite", True),
+                      ("Has axon", False),
+                      ("Has apical dendrite", False),
+                      ("Has all nonzero segment lengths", False),
+                      ("Has all nonzero section lengths", True),
+                      ("Has all nonzero neurite radii", True),
+                      ("Has nonzero soma radius", True),
+                      ("ALL", False)
+                  ])))
 
 
 def test_single_axon_neuron():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_4)
-    nt.assert_equal(summ, REF_4)
+    _run_test(os.path.join(SWC_PATH, 'Single_axon.swc'),
+              OrderedDict([
+                  # "Is single tree": True,
+                  ("Has soma points", True),
+                  # "Has sequential ids": True,
+                  # "Has increasing ids": True,
+                  ("Has valid soma", True),
+                  # "Has valid neurites": True,
+                  ("Has basal dendrite", False),
+                  ("Has axon", True),
+                  ("Has apical dendrite", False),
+                  ("Has all nonzero segment lengths", False),
+                  ("Has all nonzero section lengths", True),
+                  ("Has all nonzero neurite radii", True),
+                  ("Has nonzero soma radius", True),
+                  ("ALL", False)
+              ]))
 
 
 def test_single_apical_no_soma():
-    checker = CheckRunner(CONFIG)
-    summ = checker.run(NRN_PATH_5)
-    nt.assert_equal(summ, REF_5)
+    import neurom
+    n=neurom.load_neuron(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'))
+    _run_test(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'),
+              OrderedDict([
+                  # "Is single tree": True,
+                  ("Has soma points", False),
+                  # "Has sequential ids": True,
+                  # "Has increasing ids": True,
+                  ("Has valid soma", False),
+                  # "Has valid neurites": False,
+                  ("Has basal dendrite", False),
+                  ("Has axon", False),
+                  ("Has apical dendrite", True),
+                  ("Has all nonzero segment lengths", False),
+                  ("Has all nonzero section lengths", True),
+                  ("Has all nonzero neurite radii", True),
+                  ("Has nonzero soma radius", False),
+                  ("ALL", False)
+              ]))
 
 
 def test_directory_input():
     checker = CheckRunner(CONFIG)
     summ = checker.run(SWC_PATH)
-    nt.eq_(summ['files'][NRN_PATH_0]['Has axon'], True)
-    nt.eq_(summ['files'][NRN_PATH_2]['Has axon'], False)
+    nt.eq_(summ['files'][os.path.join(SWC_PATH, 'Single_axon.swc')]['Has axon'], True)
+    nt.eq_(summ['files'][os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')]['Has axon'], False)
 
 
 @nt.raises(IOError)
