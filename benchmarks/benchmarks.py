@@ -2,7 +2,6 @@ import os
 
 import neurom as nm
 import neurom.io
-import neurom.fst._core
 from neurom.check import neuron_checks as nc
 from neurom.check import structural_checks as sc
 
@@ -116,18 +115,6 @@ class TimeChecks:
         path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.data_wrapper = neurom.io.load_data(path)
         self.neuron = neurom.fst._core.FstNeuron(self.data_wrapper)
-
-    def time_has_sequential_ids(self):
-        sc.has_sequential_ids(self.data_wrapper)
-
-    def time_no_missing_parents(self):
-        sc.no_missing_parents(self.data_wrapper)
-
-    def time_is_single_tree(self):
-        sc.is_single_tree(self.data_wrapper)
-
-    def time_has_increasing_ids(self):
-        sc.has_increasing_ids(self.data_wrapper)
 
     def time_has_soma_points(self):
         sc.has_soma_points(self.data_wrapper)

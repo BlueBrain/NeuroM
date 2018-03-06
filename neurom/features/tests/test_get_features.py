@@ -736,7 +736,7 @@ def test_get_trunk_section_lengths():
 
 
 def test_soma_radii():
-    nt.eq_(features_get('soma_radii', NEURON)[0], 0.13065629648763766)
+    nt.assert_almost_equals(features_get('soma_radii', NEURON)[0], 0.130656, places=6)
 
 
 def test_soma_surface_areas():
@@ -777,7 +777,8 @@ def test_section_path_distances_start_point():
     nt.ok_(np.all(path_lengths == ref_sec_path_len_start))
 
 def test_partition():
-    nt.ok_(np.all(features_get('partition', NRNS)[:10] == np.array([ 19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.])))
+    nt.ok_(np.all(features_get('partition', NRNS)[:10] ==
+                  np.array([ 19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.])))
 
 def test_partition_asymmetry():
     nt.ok_(np.allclose(features_get('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,

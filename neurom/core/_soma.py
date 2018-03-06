@@ -35,7 +35,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-from morphio import MorphologyVersion
+from morphio import MorphologyVersion, SomaType
 
 
 L = logging.getLogger(__name__)
@@ -263,32 +263,27 @@ def _get_type(points, soma_class):
                 1: SomaSinglePoint}.get(npoints, SomaCylinders)
 
 
-def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
+def make_soma(soma_type, points=[]):
     '''Make a soma object from a set of points
 
-    Infers the soma type (SomaSinglePoint, SomaSimpleContour)
-    from the points and the 'soma_class'
-
     Parameters:
+        soma_type: the type of soma
         points: collection of points forming a soma.
-        soma_check: optional validation function applied to points. Should
-        raise a SomaError if points not valid.
-        soma_class(str): one of 'contour' or 'cylinder' to specify the type
-
-    Raises:
-        SomaError if no soma points found, points incompatible with soma, or
-        if soma_check(points) fails.
     '''
 
-    if soma_check:
-        soma_check(points)
 
-    stype = _get_type(points, soma_class)
-
-    if stype is None:
+    if soma_type == SomaType.SOMA_UNDEFINED:
         raise SomaError('Invalid soma points')
 
-    return stype(points)
+    SomaBuilders = {
+        SomaType.SOMA_SINGLE_POINT: SomaSinglePoint,
+        SomaType.SOMA_CYLINDERS: SomaCylinders,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: SomaNeuromorphoThreePointCylinders,
+        SomaType.SOMA_THREE_POINTS: SomaThreePoint,
+        SomaType.SOMA_SIMPLE_CONTOUR: SomaSimpleContour,
+    }
+
+    return SomaBuilders[soma_type](points)
 
 def _check_soma_topology_swc(points):
     '''check if points form valid soma
@@ -302,27 +297,3 @@ def _check_soma_topology_swc(points):
     parents = tuple(p[COLS.P] for p in points if p[COLS.P] != ROOT_ID)
     if len(parents) > len(set(parents)):
         raise SomaError("Bifurcating soma")
-
-_SOMA_CONFIG = {
-    # after much debate (https://github.com/BlueBrain/NeuroM/issues/597)
-    # and research:
-    #
-    #  Cannon et al., 1998: http://www.sciencedirect.com/science/article/pii/S0165027098000910
-    #    'Each line has the same seven fields: numbered point index, user defined flag denoting the
-    #    specific part of the structure (cell body, dendrite, axon etc.), three-dimensional position
-    #    (x, y and z, in mm), radius (r, in mm), and the parent point index'
-    #
-    #  Ascoli et al., 2001: http://www.jstor.org/stable/3067144
-    #    'In the SWC format, dendritic segments are characterized by an identification number, a
-    #    type (to distinguish basal, apical, proximal, distal and lateral trees), the x, y, z
-    #    positions of the cylinder ending point (in pm with respect to a fixed reference point), a
-    #    radius value (also in pm), and the identification number of the 'parent', i.e. the adjacent
-    #    cylinder in the path to the soma (the parent of the root being the soma itself)."
-    #
-    # that the SWC format uses cylinders to represent the soma.
-    MorphologyVersion.MORPHOLOGY_VERSION_SWC_1: (_check_soma_topology_swc, SOMA_CYLINDER),
-    MorphologyVersion.MORPHOLOGY_VERSION_H5_1: (None, SOMA_CONTOUR),
-    MorphologyVersion.MORPHOLOGY_VERSION_H5_1_1: (None, SOMA_CONTOUR),
-    MorphologyVersion.MORPHOLOGY_VERSION_H5_2: (None, SOMA_CONTOUR),
-    # 'NL-ASCII': (None, SOMA_CONTOUR),
-}

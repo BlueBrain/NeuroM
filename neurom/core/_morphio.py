@@ -2,7 +2,7 @@ import numpy as np
 
 import morphio
 from neurom.core import Neurite, Neuron, Section, Soma
-from neurom.core._soma import _SOMA_CONFIG, make_soma
+from neurom.core._soma import make_soma
 
 
 def _section_builder(brain_section):
@@ -30,10 +30,8 @@ class BrionNeuron(Neuron):
                                 axis=1)
 
 
-        soma_check, soma_class = _SOMA_CONFIG.get(morphology.version)
-
         if soma_points.size:
-            soma = make_soma(soma_points , soma_class=soma_class)
+            soma = make_soma(morphology.somaType, soma_points)
         else:
             soma = Soma(points=np.empty((0,4)))
         super(BrionNeuron, self).__init__(soma=soma,

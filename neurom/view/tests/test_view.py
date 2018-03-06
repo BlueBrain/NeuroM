@@ -37,6 +37,7 @@ from neurom.view import view, common
 from neurom.core import Section
 from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType
+from morphio import SomaType
 
 
 DATA_PATH = './test_data'
@@ -130,7 +131,7 @@ soma_2pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
     [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
 ])
-soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_2pt_normal = make_soma(SomaType.SOMA_CYLINDERS, soma_2pt_normal_pts)
 
 # upright, uniform radius, multiple cylinders
 soma_3pt_normal_pts = np.array([
@@ -138,7 +139,7 @@ soma_3pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
     [0.0,   10.0, 0.0, 10.0, 1, 3,  2],
 ])
-soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_3pt_normal = make_soma(SomaType.SOMA_CYLINDERS, soma_3pt_normal_pts)
 
 # increasing radius, multiple cylinders
 soma_4pt_normal_pts = np.array([
@@ -147,8 +148,8 @@ soma_4pt_normal_pts = np.array([
     [0.0,   -10.0, -10.0, 3.0, 1, 3, 2],
     [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
 ])
-soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CYLINDER)
-soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CONTOUR)
+soma_4pt_normal_cylinder = make_soma(SomaType.SOMA_CYLINDERS, soma_4pt_normal_pts)
+soma_4pt_normal_contour = make_soma(SomaType.SOMA_CYLINDERS, soma_4pt_normal_pts)
 
 
 def test_soma():

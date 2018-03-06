@@ -61,7 +61,7 @@ FILES = [os.path.join(SWC_PATH, f)
 FILENAMES = [os.path.join(VALID_DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
-NRN = utils.load_neuron(FILENAMES[0])
+NRN = utils.load_neuron(os.path.join(VALID_DATA_PATH, 'Neuron.swc'))
 
 NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
 
@@ -69,8 +69,7 @@ DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_component
 
 MISSING_PARENTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
 
-INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH,
-                                        'non_increasing_trunk_off_1_16pt.swc')
+INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
 
 def _get_name(filename):

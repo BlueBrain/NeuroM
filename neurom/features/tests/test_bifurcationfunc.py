@@ -30,7 +30,7 @@
 
 from nose import tools as nt
 from neurom.core import Section
-from neurom.fst import _bifurcationfunc as bf
+from neurom.features import bifurcationfunc as bf
 import os
 import neurom as nm
 import numpy as np

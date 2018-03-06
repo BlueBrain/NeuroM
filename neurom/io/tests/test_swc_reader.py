@@ -50,7 +50,7 @@ def test_read_single_neurite():
     assert_array_equal(n.soma.points,
                        [[0,0,0,3.0]])
     nt.eq_(len(n.neurites), 1)
-    nt.eq_(len(n.sections), 2)
+    nt.eq_(len(n.sections), 1)
     assert_array_equal(n.neurites[0].points,
                        np.array([[0,0,2,0.5],
                                  [0,0,3,0.5],
@@ -59,7 +59,7 @@ def test_read_single_neurite():
 
 
 def test_read_split_soma():
-    n = load_neuron(os.path.join(SWC_PATH, 'split_soma_single_neurites.swc'))
+    n = load_neuron(os.path.join(SWC_PATH, 'split_soma_two_neurites.swc'))
 
     assert_array_equal(n.soma.points,
                        [[1,0,1,4.0],
@@ -79,7 +79,7 @@ def test_read_split_soma():
                         [0,0,8,0.5],
                         [0,0,9,0.5]])
 
-    nt.eq_(len(n.sections), 3)
+    nt.eq_(len(n.sections), 2)
 
 
 def test_simple_reversed():

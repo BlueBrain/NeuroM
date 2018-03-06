@@ -30,14 +30,6 @@
 from neurom.check import CheckResult
 
 
-def has_sequential_ids(neuron):
-    raise NotImplementedError("Should be reimplemented directly in Brion")
-def no_missing_parents(neuron):
-    raise NotImplementedError("Should be reimplemented directly in Brion")
-def is_single_tree(neuron):
-    raise NotImplementedError("Should be reimplemented directly in Brion")
-def has_increasing_ids(neuron):
-    raise NotImplementedError("Should be reimplemented directly in Brion")
 
 def has_soma_points(neuron):
     return len(neuron.soma.points) > 0
