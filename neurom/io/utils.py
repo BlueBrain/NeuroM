@@ -35,7 +35,7 @@ import shutil
 import tempfile
 import uuid
 from functools import partial
-from io import IOBase, open
+from io import IOBase, open, StringIO
 
 import numpy as np
 from neurom._compat import StringType, filter
@@ -124,6 +124,22 @@ def load_neuron(handle, reader=None):
 
     Returns:
         A Neuron object
+
+    Examples:
+            neuron = neurom.load_neuron('my_neuron_file.h5')
+            neuron = neurom.load_neuron(("asc", """((Dendrite)
+                                                   (3 -4 0 2)
+                                                   (3 -6 0 2)
+                                                   (3 -8 0 2)
+                                                   (3 -10 0 2)
+                                                   (
+                                                     (0 -10 0 2)
+                                                     (-3 -10 0 2)
+                                                     |
+                                                     (6 -10 0 2)
+                                                     (9 -10 0 2)
+                                                   )
+                                                   )"""))
     '''
     if isinstance(handle, StringType):
         name = os.path.splitext(os.path.basename(handle))[0]
@@ -185,6 +201,7 @@ def _get_file(handle, ext=None):
         return handle
 
     extension, stream = handle
+    stream = StringIO(stream)
     fd, temp_file = tempfile.mkstemp(str(uuid.uuid4())+'.'+extension,
                                      prefix='neurom-')
     os.close(fd)

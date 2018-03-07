@@ -186,13 +186,16 @@ class Neurite(object):
     @property
     @memoize
     def points(self):
-        '''Return unordered array with all the points in this neurite'''
-        # add all points in a section except the first one, which is a duplicate
-        _pts = [v for s in self.root_node.ipreorder()
-                for v in s.points[1:, COLS.XYZR]]
-        # except for the very first point, which is not a duplicate
-        _pts.insert(0, self.root_node.points[0][COLS.XYZR])
-        return np.array(_pts)
+        '''Return unordered array with all the points in this neurite
+
+        Note: Duplicate points at section bifurcations are removed'''
+
+        # Neurite first point must be added manually
+        _ptr = list(chain([self.root_node.points[0][COLS.XYZR]],
+
+                          [v for s in self.root_node.ipreorder()
+                           for v in s.points[1:, COLS.XYZR]]))
+        return np.array(_ptr)
 
     @property
     @memoize
