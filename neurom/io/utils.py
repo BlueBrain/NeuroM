@@ -201,7 +201,8 @@ def _get_file(handle, ext=None):
         return handle
 
     extension, stream = handle
-    stream = StringIO(stream)
+    if isinstance(stream, str):
+        stream = StringIO(stream)
     fd, temp_file = tempfile.mkstemp(str(uuid.uuid4())+'.'+extension,
                                      prefix='neurom-')
     os.close(fd)
