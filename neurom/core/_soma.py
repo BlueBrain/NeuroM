@@ -284,16 +284,3 @@ def make_soma(soma_type, points=[]):
     }
 
     return SomaBuilders[soma_type](points)
-
-def _check_soma_topology_swc(points):
-    '''check if points form valid soma
-
-    Currently checks if there are bifurcations within a soma
-    with more than three points.
-    '''
-    if len(points) == 3:
-        return
-
-    parents = tuple(p[COLS.P] for p in points if p[COLS.P] != ROOT_ID)
-    if len(parents) > len(set(parents)):
-        raise SomaError("Bifurcating soma")

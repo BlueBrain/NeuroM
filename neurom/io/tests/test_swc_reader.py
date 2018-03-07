@@ -35,7 +35,7 @@ from neurom.core.dataformat import COLS
 from numpy.testing import assert_array_equal
 
 from nose import tools as nt
-from neurom.core import SomaError
+from neurom.exceptions import SomaError, RawDataError
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -43,6 +43,10 @@ DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
+
+@nt.raises(RawDataError)
+def test_repeated_id():
+    n = load_neuron(os.path.join(SWC_PATH, 'repeated_id.swc'))
 
 @nt.raises(SomaError)
 def test_neurite_followed_by_soma():
