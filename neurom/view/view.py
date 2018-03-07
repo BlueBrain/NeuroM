@@ -31,6 +31,8 @@ import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 from matplotlib.patches import Circle
 
+from mpl_toolkits.mplot3d.art3d import Line3DCollection  # pylint: disable=relative-import
+
 from neurom import NeuriteType, geom
 from neurom._compat import zip
 from neurom.core import iter_segments
@@ -39,7 +41,6 @@ from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
 
-from mpl_toolkits.mplot3d.art3d import Line3DCollection  # pylint: disable=relative-import
 
 from . import common
 
@@ -216,7 +217,7 @@ def plot_tree3d(ax, tree,
     segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type),
+    color = (_get_color(color, tree.type),)
 
     collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)

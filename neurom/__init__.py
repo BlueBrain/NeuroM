@@ -58,8 +58,13 @@ Examples:
 
 '''
 
-from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
-                   iter_segments)
+# All MorphIO is imported here so other NeuroM module can refer
+# to the neurom._core._morphio objects and won't need the following pragma:
+# pylint: disable=unused-import,import-error
+from morphio import Morphology, MorphologyVersion, SomaType, SectionType as NeuriteType
+
+
+from .core import (graft_neuron, iter_neurites, iter_sections, iter_segments)
 from .core.types import NEURITES as NEURITE_TYPES
 from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons

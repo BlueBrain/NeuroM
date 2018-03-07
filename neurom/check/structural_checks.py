@@ -28,12 +28,18 @@
 
 '''Module with consistency/validity checks for raw data  blocks'''
 from neurom.check import CheckResult
-from morphio import SomaType
 
 
 def has_soma_points(neuron):
+    '''Check if has soma points'''
     return CheckResult(len(neuron.soma.points) > 0, None)
-def has_all_finite_radius_neurites(neuron, threshold=0.0):
+
+
+def has_all_finite_radius_neurites(neuron, threshold=0.0):  # pylint: disable=unused-argument
+    '''Check if has finite radius neurites'''
     raise NotImplementedError("Should be reimplemented directly in Brion")
-def has_valid_soma(neuron):
+
+
+def has_valid_soma(neuron):  # pylint: disable=unused-argument
+    '''Check if has valid soma'''
     return CheckResult(len(neuron.soma.points) > 0)

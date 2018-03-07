@@ -91,8 +91,34 @@ def test_read_split_soma():
     nt.eq_(len(n.sections), 2)
 
 
-def test_simple_reversed():
-    n = load_neuron(os.path.join(SWC_PATH, 'whitespaces.swc'))
+def test_weird_indent():
+
+    n = load_neuron(("swc",
+                 """
+
+                 # this is the same as simple.swc
+
+# but with a questionable styling
+
+     1 1  0  0 0 1. -1
+ 2 3  0  0 0 1.  1
+
+ 3 3  0  5 0 1.  2
+ 4 3 -5  5 0 0.  3
+
+
+
+ 5 3  6  5 0 0.  3
+     6 2  0  0 0 1.  1
+ 7 2  0 -4 0 1.  6
+
+ 8 2  6 -4 0         0.  7
+ 9 2 -5 -4 0 0.  7
+"""))
+
+    simple = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+    assert_array_equal(simple.points,
+                       n.points)
 
 
 def test_simple_reversed():

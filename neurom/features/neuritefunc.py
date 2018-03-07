@@ -33,7 +33,7 @@ from itertools import chain
 import numpy as np
 
 from neurom import morphmath
-from neurom.core import Tree, iter_neurites, iter_sections, NeuriteType
+from neurom.core import Tree, iter_neurites, iter_sections
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import bifurcationfunc, neuronfunc, sectionfunc

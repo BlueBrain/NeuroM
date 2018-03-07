@@ -31,14 +31,14 @@
 import os
 import math
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_array_equal
 from nose import tools as nt
 import neurom as nm
 from neurom.core.types import NeuriteType
 from neurom.core.population import Population
 from neurom import (core, load_neurons, iter_neurites, iter_sections,
                     load_neuron, features)
-from neurom.features import get as features_get, FEATURES, neuritefunc as nf
+from neurom.features import get as features_get, FEATURES, neuritefunc as nf, _get_doc
 from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
 
@@ -786,31 +786,26 @@ def test_partition_asymmetry():
                                                                             0.8, 0.75,  0.66666667,
                                                                             0.5,  0.])))
 
-#class MockNeuron:
-#    pass
-#
-#
-#def test_trunk_origin_elevations():
-#    n0 = MockNeuron()
-#    n1 = MockNeuron()
-#
-#    s = make_soma([[0, 0, 0, 4]])
-#    t0 = PointTree((1, 0, 0, 2))
-#    t0.type = NeuriteType.basal_dendrite
-#    t1 = PointTree((0, 1, 0, 2))
-#    t1.type = NeuriteType.basal_dendrite
-#    n0.neurites = [t0, t1]
-#    n0.soma = s
-#
-#    t2 = PointTree((0, -1, 0, 2))
-#    t2.type = NeuriteType.basal_dendrite
-#    n1.neurites = [t2]
-#    n1.soma = s
-#
-#    pop = [n0, n1]
-#    nt.ok_(np.all(features_get('trunk_origin_elevations', pop) ==
-#                          [0.0, np.pi/2., -np.pi/2.]))
-#    nt.eq_(len(features_get('trunk_origin_elevations', pop, neurite_type=NeuriteType.axon)), 0)
+class MockNeuron:
+   pass
+
+
+def test_trunk_origin_elevations():
+   n0 = load_neuron(('swc',"""
+   1 1 0 0 0 4 -1
+   2 3 1 0 0 2 1
+   3 3 0 1 0 2 1
+   """))
+
+   n1 = load_neuron(('swc',"""
+   1 1 0 0 0 4 -1
+   2 3 0 -1 0 2 1
+   """))
+
+   pop = [n0, n1]
+   assert_array_equal(features_get('trunk_origin_elevations', pop),
+                      np.array([0.0, np.pi/2., -np.pi/2.], dtype=np.float32))
+   nt.eq_(len(features_get('trunk_origin_elevations', pop, neurite_type=NeuriteType.axon)), 0)
 #
 #def test_trunk_origin_azimuths():
 #    n0 = MockNeuron()
@@ -864,3 +859,10 @@ def test_partition_asymmetry():
 #    nt.ok_(np.allclose(extents1, [0., 0., 0.]))
 #    extents2 = features_get('principal_direction_extents', neurites, direction='third')
 #    nt.ok_(np.allclose(extents2, [0., 0., 0.]))
+
+def test_get_doc():
+    # test that no filtering returns more results than filter on 'radii'
+    nt.ok_(len(_get_doc('')) > len(_get_doc('radii')))
+
+    # test that filter on 'radii' returns more result than filter on 'alsjkdfas'
+    nt.ok_(len(_get_doc('radii')) > len(_get_doc('alsjkdfas')))

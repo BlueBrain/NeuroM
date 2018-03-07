@@ -34,17 +34,13 @@ import os
 import shutil
 import tempfile
 import uuid
-from functools import partial
-from io import IOBase, open, StringIO
+from io import StringIO, open
 
-import numpy as np
 from neurom._compat import StringType, filter
-from neurom.core._neuron import Neurite, Section
 from neurom.core._morphio import BrionNeuron
 from neurom.core.population import Population
-from neurom.exceptions import NeuroMError, RawDataError, Error as BrionError
+from neurom.exceptions import Error as BrionError, NeuroMError
 
-import morphio
 
 L = logging.getLogger(__name__)
 
@@ -115,7 +111,7 @@ def get_files_by_path(path):
     raise IOError('Invalid data path %s' % path)
 
 
-def load_neuron(handle, reader=None):
+def load_neuron(handle):
     '''Build section trees from a stream or a h5, swc or asc file.
     Args:
         handle: A filename with the h5, swc or asc extension
@@ -144,7 +140,7 @@ def load_neuron(handle, reader=None):
     if isinstance(handle, StringType):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:
-        name=None
+        name = None
     return BrionNeuron(_get_file(handle), name)
 
 
@@ -174,8 +170,6 @@ def load_neurons(neurons,
     elif isinstance(neurons, StringType):
         files = get_files_by_path(neurons)
         name = name if name is not None else os.path.basename(neurons)
-    else:
-        raise TypeError('Cannot handle neurons of type: {}'.format(type(neurons)))
 
     ignored_exceptions = tuple(ignored_exceptions)
     pop = []
@@ -192,7 +186,9 @@ def load_neurons(neurons,
     return population_class(pop, name=name)
 
 # TODO: embed this feature directly in Brion
-def _get_file(handle, ext=None):
+
+
+def _get_file(handle):
     '''Returns the filename of the file to read
 
     If handle is a tuple (extension, stream), the stream is written in
@@ -203,7 +199,7 @@ def _get_file(handle, ext=None):
     extension, stream = handle
     if isinstance(stream, str):
         stream = StringIO(stream)
-    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4())+'.'+extension,
+    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.' + extension,
                                      prefix='neurom-')
     os.close(fd)
     with open(temp_file, 'w') as fd:

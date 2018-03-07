@@ -53,7 +53,9 @@ def local_bifurcation_angle(bif_point):
 
         return cur
 
-    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly_one 2 children, found {}'.format(len(bif_point.children))
+    assert len(bif_point.children) == 2, \
+        ('A bifurcation point must have exactly_one 2 children,'
+         ' found {}'.format(len(bif_point.children)))
 
     ch0, ch1 = (skip_0_length(bif_point.children[0].points),
                 skip_0_length(bif_point.children[1].points))

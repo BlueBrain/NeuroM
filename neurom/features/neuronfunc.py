@@ -34,7 +34,7 @@ from neurom.geom import bounding_box
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
-from neurom.core._neuron import iter_neurites, iter_segments
+from neurom.core._neuron import iter_neurites, iter_segments, Neuron
 from neurom import morphmath
 
 
@@ -123,7 +123,9 @@ def trunk_origin_elevations(nrn, neurite_type=None):
     The range of the elevation angle [-pi/2, pi/2] radians
     '''
     neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
+
+    if isinstance(nrn, Neuron):
+        nrn = neuron_population(nrn)
 
     def _elevation(section, soma):
         '''Elevation of a section'''
@@ -136,7 +138,7 @@ def trunk_origin_elevations(nrn, neurite_type=None):
             raise ValueError("Norm of vector between soma center and section is almost zero.")
 
     return [_elevation(s.root_node.points, n.soma)
-            for n in nrns
+            for n in nrn
             for s in n.neurites if neurite_filter(s)]
 
 

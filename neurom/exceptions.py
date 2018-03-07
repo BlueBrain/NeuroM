@@ -29,12 +29,15 @@
 '''Module containing NeuroM specific exceptions'''
 
 
+# pylint: disable=unused-import, import-error
 from morphio import (Error, RawDataError, SomaError, IDSequenceError,
-                          MultipleTrees, MissingParentError, UnknownFileType)
+                     MultipleTrees, MissingParentError, UnknownFileType)
+
 
 class NeuroMError(Exception):
     '''Base class for NeuroM errors'''
     pass
+
 
 class ConfigError(NeuroMError):
     '''Exception class for configuration data in apps errors'''

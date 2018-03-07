@@ -71,7 +71,8 @@ def get_parser():
     parser.add_argument('-v', '--verbose', action='count', dest='verbose', default=0,
                         help='-v for INFO, -vv for DEBUG')
     parser.add_argument('-l', '--list', nargs='?', const='',
-                        help='List the available features. An optional pattern can be passed to filter the results')
+                        help=('List the available features.'
+                              'An optional pattern can be passed to filter the results'))
 
     parser.add_argument('--as-population',
                         action='store_true',
@@ -132,7 +133,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=(logging.WARNING,
                                logging.INFO,
                                logging.DEBUG)[min(_args.verbose, 2)])
-
 
     if _args.list is not None:
         print(nm.features._get_doc(_args.list))  # pylint: disable=W0212

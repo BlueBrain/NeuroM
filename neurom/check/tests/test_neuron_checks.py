@@ -149,10 +149,7 @@ def test_has_basal_dendrite_bad_data():
         nt.ok_(not nrn_chk.has_basal_dendrite(n))
 
 
-# Disabled while BrionNeuron.transform is not implemented
-@nt.nottest
 def test_has_no_flat_neurites():
-
     _, n = _load_neuron('Neuron.swc')
 
     nt.assert_true(nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance'))

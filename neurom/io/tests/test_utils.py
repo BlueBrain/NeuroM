@@ -141,25 +141,6 @@ def test_load_neuron():
     utils.load_neuron(('swc', StringIO(neuron_str)))
 
 
-    neuron_str = u""" 1 1  0  0 0 1. -1
-                      2 3  0  0 0 1.  1
-                      3 3  0  5 0 1.  2
-
-       # weirdly indented comments
-
-    # and whitespaces
-
-                      4 3 -5  5 0 0.  3
-                      5 3  6  5 0 0.  3
-                      6 2  0  0 0 1.  1
-                      7 2  0 -4 0 1.  6
-                      8 2  6 -4 0 0.  7
-                      9 2 -5 -4 0 0.  7
-                     """
-    utils.load_neuron(('swc', StringIO(neuron_str)))
-
-
-
 def test_neuron_name():
     for fn, nn in zip(FILENAMES, NRN_NAMES):
         nrn = utils.load_neuron(fn)

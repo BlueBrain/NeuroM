@@ -48,7 +48,7 @@ from ..core.types import tree_type_checker as _is_type
 from ..exceptions import NeuroMError
 
 FEATURES = {
-    'NEURITE' : {
+    'NEURITE': {
         'total_length': _nrt.total_length,
         'total_length_per_neurite': _nrt.total_length_per_neurite,
         'neurite_lengths': _nrt.total_length_per_neurite,
@@ -88,7 +88,7 @@ FEATURES = {
         'total_area_per_neurite': _nrt.total_area_per_neurite,
     },
 
-    'NEURON' : {
+    'NEURON': {
         'soma_radii': _nrn.soma_radii,
         'soma_surface_areas': _nrn.soma_surface_areas,
         'trunk_origin_radii': _nrn.trunk_origin_radii,
@@ -162,15 +162,19 @@ def _get_doc(pattern):
              'NEURON': '\n\033[94mNeuron features (neuron, neuron population):\033[0m\n'}
 
     def filtered_doc(features):
+        '''Enable filtering of the doc based on pattern'''
         if pattern:
-            filt = lambda k: re.search(pattern, k)
+            def filt(k):   # pylint: disable=missing-docstring
+                return re.search(pattern, k)
         else:
-            filt = lambda k: True
-        filtered_features = ((k,v) for k,v in  features.items() if filt(k))
+            def filt(_):  # pylint: disable=missing-docstring
+                return True
+        filtered_features = ((k, v) for k, v in features.items() if filt(k))
         return '\n'.join(GREEN + _INDENT + '- ' + feature + ENDC + get_docstring(func)
-             for feature, func in sorted(filtered_features))
+                         for feature, func in sorted(filtered_features))
 
     return '\n'.join(BLUE + title[feature_type] + ENDC + filtered_doc(FEATURES[feature_type])
                      for feature_type in ['NEURITE', 'NEURON'])
+
 
 get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(''), 2)  # pylint: disable=no-member

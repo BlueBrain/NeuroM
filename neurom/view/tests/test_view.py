@@ -35,7 +35,7 @@ from nose import tools as nt
 from neurom import load_neuron
 from neurom.view import view, common
 from neurom.core import Section
-from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
+from neurom.core._soma import make_soma
 from neurom.core.types import NeuriteType
 from morphio import SomaType
 
@@ -149,7 +149,7 @@ soma_4pt_normal_pts = np.array([
     [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
 ])
 soma_4pt_normal_cylinder = make_soma(SomaType.SOMA_CYLINDERS, soma_4pt_normal_pts)
-soma_4pt_normal_contour = make_soma(SomaType.SOMA_CYLINDERS, soma_4pt_normal_pts)
+soma_4pt_normal_contour = make_soma(SomaType.SOMA_SIMPLE_CONTOUR, soma_4pt_normal_pts)
 
 
 def test_soma():

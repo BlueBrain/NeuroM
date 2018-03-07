@@ -28,9 +28,8 @@
 
 '''Type enumerations'''
 
-from enum import IntEnum, unique
 
-from morphio import SectionType as NeuriteType
+from neurom import NeuriteType
 
 NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
@@ -62,6 +61,7 @@ def tree_type_checker(*ref):
         return lambda x: True
 
     ref = tuple(ref)
+
     def check_tree_type(tree):
         '''Check whether tree has the same type as ref
 

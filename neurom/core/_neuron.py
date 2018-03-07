@@ -34,9 +34,8 @@ from itertools import chain
 import numpy as np
 
 from neurom import morphmath
-from neurom.exceptions import UnknownFileType
 from neurom._compat import filter, map, zip
-from neurom.core._soma import make_soma, Soma, SomaThreePoint
+from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
@@ -157,16 +156,6 @@ class Section(Tree):
         section's points
         '''
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
-
-    def transform(self, trans):
-        '''Return a copy of this section with a 3D transformation applied'''
-        section = Section(trans(points),
-                          section_id=self.id,
-                          section_type=self.type)
-        for child in self.children():
-            section.add_child(child.transform(trans))
-        return section
-
 
     def __str__(self):
         return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \

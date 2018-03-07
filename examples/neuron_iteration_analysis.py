@@ -38,7 +38,7 @@ from __future__ import print_function
 from neurom.core.dataformat import COLS
 import neurom as nm
 from neurom import geom
-from neurom.fst import sectionfunc
+from neurom.features import sectionfunc
 from neurom.core import Tree
 from neurom.core.types import tree_type_checker, NEURITES
 from neurom import morphmath as mm
