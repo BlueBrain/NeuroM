@@ -48,45 +48,47 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 def test_repeated_id():
     n = load_neuron(os.path.join(SWC_PATH, 'repeated_id.swc'))
 
+
 @nt.raises(SomaError)
 def test_neurite_followed_by_soma():
     load_neuron(os.path.join(SWC_PATH, 'soma_with_neurite_parent.swc'))
+
 
 def test_read_single_neurite():
     n = load_neuron(os.path.join(SWC_PATH, 'point_soma_single_neurite.swc'))
     nt.eq_(len(n.neurites), 1)
     nt.eq_(n.neurites[0].root_node.id, 0)
     assert_array_equal(n.soma.points,
-                       [[0,0,0,3.0]])
+                       [[0, 0, 0, 3.0]])
     nt.eq_(len(n.neurites), 1)
     nt.eq_(len(n.sections), 1)
     assert_array_equal(n.neurites[0].points,
-                       np.array([[0,0,2,0.5],
-                                 [0,0,3,0.5],
-                                 [0,0,4,0.5],
-                                 [0,0,5,0.5]]))
+                       np.array([[0, 0, 2, 0.5],
+                                 [0, 0, 3, 0.5],
+                                 [0, 0, 4, 0.5],
+                                 [0, 0, 5, 0.5]]))
 
 
 def test_read_split_soma():
     n = load_neuron(os.path.join(SWC_PATH, 'split_soma_two_neurites.swc'))
 
     assert_array_equal(n.soma.points,
-                       [[1,0,1,4.0],
-                        [2,0,0,4.0],
-                        [3,0,0,4.0]])
+                       [[1, 0, 1, 4.0],
+                        [2, 0, 0, 4.0],
+                        [3, 0, 0, 4.0]])
 
     nt.assert_equal(len(n.neurites), 2)
     assert_array_equal(n.neurites[0].points,
-                       [[0,0,2,0.5],
-                        [0,0,3,0.5],
-                        [0,0,4,0.5],
-                        [0,0,5,0.5]])
+                       [[0, 0, 2, 0.5],
+                        [0, 0, 3, 0.5],
+                        [0, 0, 4, 0.5],
+                        [0, 0, 5, 0.5]])
 
     assert_array_equal(n.neurites[1].points,
-                       [[0,0,6,0.5],
-                        [0,0,7,0.5],
-                        [0,0,8,0.5],
-                        [0,0,9,0.5]])
+                       [[0, 0, 6, 0.5],
+                        [0, 0, 7, 0.5],
+                        [0, 0, 8, 0.5],
+                        [0, 0, 9, 0.5]])
 
     nt.eq_(len(n.sections), 2)
 
@@ -94,7 +96,7 @@ def test_read_split_soma():
 def test_weird_indent():
 
     n = load_neuron(("swc",
-                 """
+                     """
 
                  # this is the same as simple.swc
 
@@ -121,19 +123,33 @@ def test_weird_indent():
                        n.points)
 
 
+@nt.raises(RawDataError)
+def test_cyclic():
+    load_neuron(('swc', """
+    1 1  0  0 0 1. -1
+    2 3  0  0 0 1.  1
+    3 3  0  5 0 1.  2
+    4 3 -5  5 0 0.  3
+    5 3  6  5 0 0.  3
+    6 2  0  0 0 1.  6  # <-- cyclic point
+    7 2  0 -4 0 1.  6
+    8 2  6 -4 0 0.  7
+    9 2 -5 -4 0 0.  7"""))
+
+
 def test_simple_reversed():
     n = load_neuron(os.path.join(SWC_PATH, 'simple_reversed.swc'))
     assert_array_equal(n.soma.points,
-                       [[0,0,0,1]])
+                       [[0, 0, 0, 1]])
     nt.assert_equal(len(n.neurites), 2)
     nt.assert_equal(len(n.neurites[0].points), 4)
     assert_array_equal(n.neurites[0].points,
-                       [[0,0,0,1],
-                        [0,5,0,1],
-                        [-5,5,0,0],
-                        [6,5,0,0]])
+                       [[0, 0, 0, 1],
+                        [0, 5, 0, 1],
+                        [-5, 5, 0, 0],
+                        [6, 5, 0, 0]])
     assert_array_equal(n.neurites[1].points,
-                       [[0,0,0,1],
-                        [0,-4,0,1],
-                        [6,-4,0,0],
-                        [-5,-4,0,0]])
+                       [[0, 0, 0, 1],
+                        [0, -4, 0, 1],
+                        [6, -4, 0, 0],
+                        [-5, -4, 0, 0]])

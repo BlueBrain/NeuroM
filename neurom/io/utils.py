@@ -37,9 +37,9 @@ import uuid
 from io import StringIO, open
 
 from neurom._compat import StringType, filter
-from neurom.core._morphio import BrionNeuron
+from neurom.core._morphio import MorphioNeuron
 from neurom.core.population import Population
-from neurom.exceptions import Error as BrionError, NeuroMError
+from neurom.exceptions import MorphioError, NeuroMError
 
 
 L = logging.getLogger(__name__)
@@ -53,7 +53,6 @@ def _is_morphology_file(filepath):
     )
 
 
-# TODO: put directly in Brion
 class NeuronLoader(object):
     """
         Caching morphology loader.
@@ -141,7 +140,7 @@ def load_neuron(handle):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:
         name = None
-    return BrionNeuron(_get_file(handle), name)
+    return MorphioNeuron(_get_file(handle), name)
 
 
 def load_neurons(neurons,
@@ -176,7 +175,7 @@ def load_neurons(neurons,
     for f in files:
         try:
             pop.append(neuron_loader(f))
-        except (NeuroMError, BrionError) as e:
+        except (NeuroMError, MorphioError) as e:
             if isinstance(e, ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s',
                        e, os.path.basename(f))

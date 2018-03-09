@@ -30,7 +30,7 @@
 
 
 # pylint: disable=unused-import, import-error
-from morphio import (Error, RawDataError, SomaError, IDSequenceError,
+from morphio import (MorphioError, RawDataError, SomaError, IDSequenceError,
                      MultipleTrees, MissingParentError, UnknownFileType)
 
 

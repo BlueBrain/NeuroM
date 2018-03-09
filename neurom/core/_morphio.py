@@ -20,7 +20,7 @@ def _section_builder(brain_section):
     return section
 
 
-class BrionNeuron(Neuron):
+class MorphioNeuron(Neuron):
     '''The MorphIO neuron wrapper'''
 
     def __init__(self, handle, name=None):
@@ -38,6 +38,6 @@ class BrionNeuron(Neuron):
             soma = make_soma(morphology.somaType, soma_points)
         else:
             soma = Soma(points=np.empty((0, 4)))
-        super(BrionNeuron, self).__init__(soma=soma,
-                                          name=name or 'Neuron',
-                                          neurites=neurites)
+        super(MorphioNeuron, self).__init__(soma=soma,
+                                            name=name or 'Neuron',
+                                            neurites=neurites)

@@ -113,7 +113,7 @@ def trunk_origin_azimuths(nrn, neurite_type=None):
             for s in n.neurites if neurite_filter(s)]
 
 
-def trunk_origin_elevations(nrn, neurite_type=None):
+def trunk_origin_elevations(nrns, neurite_type=None):
     '''Get a list of all the trunk origin elevations of a neuron or population
 
     The elevation is defined as the angle between x-axis and the
@@ -124,8 +124,8 @@ def trunk_origin_elevations(nrn, neurite_type=None):
     '''
     neurite_filter = is_type(neurite_type)
 
-    if isinstance(nrn, Neuron):
-        nrn = neuron_population(nrn)
+    if isinstance(nrns, Neuron):
+        nrns = neuron_population(nrns)
 
     def _elevation(section, soma):
         '''Elevation of a section'''
@@ -138,7 +138,7 @@ def trunk_origin_elevations(nrn, neurite_type=None):
             raise ValueError("Norm of vector between soma center and section is almost zero.")
 
     return [_elevation(s.root_node.points, n.soma)
-            for n in nrn
+            for n in nrns
             for s in n.neurites if neurite_filter(s)]
 
 
