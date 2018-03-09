@@ -37,8 +37,10 @@ if 'DISPLAY' not in os.environ:  # noqa
 from neurom.view import common
 from neurom import load_neuron
 from neurom import viewer
+from neurom import NeuriteType
 
 from nose import tools as nt
+from numpy.testing import assert_allclose
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
@@ -49,6 +51,15 @@ nrn = load_neuron(MORPH_FILENAME)
 
 def test_draw_neuron():
     viewer.draw(nrn)
+    common.plt.close('all')
+
+
+def test_draw_filter_neurite():
+    for mode in ['2d', '3d']:
+        viewer.draw(nrn, mode=mode, neurite_type=NeuriteType.basal_dendrite)
+        assert_allclose(common.plt.gca().get_ylim(),
+                        [-30., 78], atol=5)
+
     common.plt.close('all')
 
 
