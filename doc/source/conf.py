@@ -71,12 +71,12 @@ needs_sphinx = '1.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_autorun',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.napoleon',
-    'sphinxcontrib.autorun',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
