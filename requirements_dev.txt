@@ -36,4 +36,6 @@ nosexcover>=1.0.8
 sphinx>=1.3.0
 sphinxcontrib-napoleon>=0.3.0
 sphinx_rtd_theme>=0.1.0
-sphinxcontrib-autorun
+sphinx-autorun
+pyyaml>=3.10
+future>=0.16.0
