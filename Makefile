@@ -41,7 +41,6 @@ unexport DISPLAY
 
 # Test coverage pass threshold (percent)
 MIN_COV?=100
-PIP_VERSION:=9.0.2
 VENV_INSTALLED=.installed
 PIP_INSTALL_OPTIONS=--ignore-installed
 
@@ -53,7 +52,7 @@ $(VENV):
 	virtualenv --system-site-packages $(VENV)
 
 $(VENV_INSTALLED): $(VENV)
-	$(VENV_BIN)/pip install --upgrade pip==$(PIP_VERSION)
+	$(VENV_BIN)/pip install --upgrade pip
 	$(VENV_BIN)/pip install $(PIP_INSTALL_OPTIONS) -r requirements_dev.txt
 	$(VENV_BIN)/pip install -e .
 	touch $@
