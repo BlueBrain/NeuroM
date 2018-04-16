@@ -381,3 +381,8 @@ def principal_direction_extents(neurites, neurite_type=NeuriteType.all, directio
         return morphmath.principal_direction_extent(points)[direction]
 
     return map(_pde, iter_neurites(neurites, filt=is_type(neurite_type)))
+
+
+def section_strahler_orders(neurites, neurite_type=NeuriteType.all):
+    '''Inter-segment opening angles in a section'''
+    return map_sections(sectionfunc.strahler_order, neurites, neurite_type)
