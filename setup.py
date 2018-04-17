@@ -33,7 +33,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.5"
+VERSION = "1.4.6"
 
 REQS = ['enum34>=1.0.4',
         'future>=0.16.0',
@@ -49,9 +49,8 @@ REQS = ['enum34>=1.0.4',
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
-    'author': 'BBP Algorithm Development Team',
+    'author': 'BBP Neuroscientific Software Engineering',
     'url': 'http://https://github.com/BlueBrain/NeuroM',
-    'author_email': 'lida.kanari@epfl.ch',
     'version': VERSION,
     'install_requires': REQS,
     'packages': find_packages(),
