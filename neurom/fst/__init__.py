@@ -71,6 +71,7 @@ NEURITEFEATURES = {
     'section_term_branch_orders': _nrt.section_term_branch_orders,
     'section_bif_branch_orders': _nrt.section_bif_branch_orders,
     'section_radial_distances': _nrt.section_radial_distances,
+    'section_strahler_orders': _nrt.section_strahler_orders,
     'local_bifurcation_angles': _nrt.local_bifurcation_angles,
     'remote_bifurcation_angles': _nrt.remote_bifurcation_angles,
     'partition': _nrt.bifurcation_partitions,

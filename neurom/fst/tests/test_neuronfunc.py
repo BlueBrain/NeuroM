@@ -192,5 +192,4 @@ def test_sholl_analysis_custom():
                        ''')
     nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 10, 10])
-    #from neurom.view import view
     #view.neuron(morph_C)[0].savefig('foo.png')

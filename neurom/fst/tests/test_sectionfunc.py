@@ -39,11 +39,10 @@ from neurom.fst import _neuritefunc as _nf
 from neurom.core import Section
 from neurom import morphmath as mmth
 
-from utils import _close, _equal
-
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
 DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
+SWC_PATH = os.path.join(_PWD, '../../../test_data/swc/')
 
 NRN = load_neuron(DATA_PATH)
 
@@ -142,3 +141,10 @@ def test_section_meander_angles():
 def test_section_meander_angles_single_segment():
     s = Section(np.array([[0, 0, 0], [1, 1, 1]]))
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)
+
+
+def test_strahler_order():
+    path = os.path.join(SWC_PATH, 'strahler.swc')
+    n = load_neuron(path)
+    strahler_order = _sf.strahler_order(n.neurites[0].root_node)
+    nt.eq_(strahler_order, 4)

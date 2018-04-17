@@ -847,6 +847,13 @@ def test_partition_asymmetry():
                                                                             0.8, 0.75,  0.66666667,
                                                                             0.5,  0.])))
 
+
+def test_section_strahler_orders():
+    path = os.path.join(SWC_PATH, 'strahler.swc')
+    n = nm.load_neuron(path)
+    assert_allclose(fst_get('section_strahler_orders', n),
+                    [4, 1, 4, 3, 2, 1, 1, 2, 1, 1, 3, 1, 3, 2, 1, 1, 2, 1, 1])
+
 #class MockNeuron:
 #    pass
 #
@@ -925,5 +932,3 @@ def test_partition_asymmetry():
 #    nt.ok_(np.allclose(extents1, [0., 0., 0.]))
 #    extents2 = fst_get('principal_direction_extents', neurites, direction='third')
 #    nt.ok_(np.allclose(extents2, [0., 0., 0.]))
-
-

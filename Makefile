@@ -41,7 +41,7 @@ unexport DISPLAY
 
 # Test coverage pass threshold (percent)
 MIN_COV?=100
-PIP_VERSION:=8.1.2
+PIP_VERSION:=9.0.2
 VENV_INSTALLED=.installed
 PIP_INSTALL_OPTIONS=--ignore-installed
 
