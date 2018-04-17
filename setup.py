@@ -51,7 +51,9 @@ REQS = ['enum34>=1.0.4',
 # Hack to avoid installation of modules with C extensions
 # in readthedocs documentation building environment.
 if os.environ.get('READTHEDOCS') == 'True':
-    REQS = []
+    REQS = ['future>=0.16.0',
+            'pyyaml>=3.10',
+            ]
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
