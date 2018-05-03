@@ -148,3 +148,31 @@ def test_strahler_order():
     n = load_neuron(path)
     strahler_order = _sf.strahler_order(n.neurites[0].root_node)
     nt.eq_(strahler_order, 4)
+
+
+def test_locate_segment_position():
+    s = Section(np.array([[0, 0, 0, 0], [3, 0, 4, 100], [6, 4, 4, 200]]))
+    nt.assert_equal(
+        _sf.locate_segment_position(s, 0.0),
+        (0, 0.0)
+    )
+    nt.assert_equal(
+        _sf.locate_segment_position(s, 0.25),
+        (0, 2.5)
+    )
+    nt.assert_equal(
+        _sf.locate_segment_position(s, 0.75),
+        (1, 2.5)
+    )
+    nt.assert_equal(
+        _sf.locate_segment_position(s, 1.0),
+        (1, 5.0)
+    )
+    nt.assert_raises(
+        ValueError,
+        _sf.locate_segment_position, s, 1.1
+    )
+    nt.assert_raises(
+        ValueError,
+        _sf.locate_segment_position, s, -0.1
+    )

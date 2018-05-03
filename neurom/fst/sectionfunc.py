@@ -123,3 +123,10 @@ def strahler_order(section):
             return max_so_children + 1
         return max_so_children
     return 1
+
+
+def locate_segment_position(section, fraction):
+    '''
+    Segment ID / offset corresponding to a given fraction of section length.
+    '''
+    return mm.path_fraction_id_offset(section.points, fraction)
