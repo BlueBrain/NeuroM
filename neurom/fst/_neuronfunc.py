@@ -177,6 +177,9 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all, plane='XY'):
                         for n in nrns
                         for s in n.neurites if neurite_filter(s)])
 
+    # In order to avoid the failure of the process in case the neurite_type does not exist
+    if len(vectors) == 0:
+        return []
     # sorting angles according to x-y plane
     order = np.argsort(np.array([_angle_between(i/ np.linalg.norm(i), [0,1])
                                  for i in vectors[:, 0:2]]))
