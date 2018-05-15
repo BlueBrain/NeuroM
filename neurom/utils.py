@@ -28,31 +28,48 @@
 
 '''NeuroM helper utilities'''
 import json
-import functools
 import warnings
+from functools import partial, wraps
+
 import numpy as np
 
 
-def memoize(fun):
-    '''Memoize a function
+class memoize(object):
+    """cache the return value of a method
 
-    Caches return values based on function arguments.
+    This class is meant to be used as a decorator of methods. The return value
+    from a given method invocation will be cached on the instance whose method
+    was invoked. All arguments passed to a method decorated with memoize must
+    be hashable.
 
-    Note:
-        Does not cache calls with keyword arguments.
-    '''
-    _cache = {}
+    If a memoized method is invoked directly on its class the result will not
+    be cached. Instead the method will be invoked like a static method:
+    class Obj(object):
+        @memoize
+        def add_to(self, arg):
+            return self + arg
+    Obj.add_to(1) # not enough arguments
+    Obj.add_to(1, 2) # returns 3, result is not cached
+    """
 
-    @functools.wraps(fun)
-    def memoizer(*args, **kwargs):
-        '''Return cahced value
+    def __init__(self, func):
+        self.func = func
 
-        Calculate and store if args not in cache.
-        '''
-        if args not in _cache or kwargs:
-            _cache[args] = fun(*args, **kwargs)
-        return _cache[args]
-    return memoizer
+    def __get__(self, obj, objtype=None):
+        return partial(self, obj)
+
+    def __call__(self, *args, **kw):
+        obj = args[0]
+        try:
+            cache = obj.__cache  # pylint: disable=protected-access
+        except AttributeError:
+            cache = obj.__cache = {}
+        key = (self.func, args[1:], frozenset(kw.items()))
+        try:
+            res = cache[key]
+        except KeyError:
+            res = cache[key] = self.func(*args, **kw)
+        return res
 
 
 def _warn_deprecated(msg):
@@ -66,7 +83,7 @@ def deprecated(fun_name=None, msg=""):
     '''Issue a deprecation warning for a function'''
     def _deprecated(fun):
         '''Issue a deprecation warning for a function'''
-        @functools.wraps(fun)
+        @wraps(fun)
         def _wrapper(*args, **kwargs):
             '''Issue deprecation warning and forward arguments to fun'''
             name = fun_name if fun_name is not None else fun.__name__
@@ -89,9 +106,12 @@ class NeuromJSON(json.JSONEncoder):
     In python3, numpy.dtypes don't serialize to correctly, so a custom converter
     is needed.
     '''
-    def default(self, obj):  # pylint: disable=method-hidden
-        if isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.integer):
-            return int(obj)
-        return json.JSONEncoder.default(self, obj)
+
+    def default(self, o):  # pylint: disable=method-hidden
+        if isinstance(o, np.floating):
+            return float(o)
+        elif isinstance(o, np.integer):
+            return int(o)
+        elif isinstance(o, np.ndarray):
+            return o.tolist()
+        return json.JSONEncoder.default(self, o)

@@ -795,12 +795,29 @@ def test_get_trunk_section_lengths():
 
 
 def test_soma_radii():
-    nt.eq_(fst_get('soma_radii', NEURON), 0.17071067811865476)
+    nt.eq_(fst_get('soma_radii', NEURON)[0], 0.13065629648763766)
 
 
 def test_soma_surface_areas():
     area = 4. * math.pi * fst_get('soma_radii', NEURON)[0] ** 2
     nt.eq_(fst_get('soma_surface_areas', NEURON), area)
+
+
+def test_sholl_frequency():
+    assert_allclose(fst_get('sholl_frequency', NEURON),
+                    [4, 8, 8, 14, 9, 8, 7, 7])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.all),
+                    [4, 8, 8, 14, 9, 8, 7, 7])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.apical_dendrite),
+                    [1, 2, 2, 2, 2, 2, 1, 1])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.basal_dendrite),
+                    [2, 4, 4, 6, 5, 4, 4, 4])
+
+    assert_allclose(fst_get('sholl_frequency', NEURON, neurite_type=NeuriteType.axon),
+                    [1, 2, 2, 6, 2, 2, 2, 2])
 
 
 @nt.nottest  # test_get_segment_lengths is disabled in test_get_features
@@ -827,8 +844,16 @@ def test_partition():
 def test_partition_asymmetry():
     nt.ok_(np.allclose(fst_get('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,
                                                                             0.85714286, 0.83333333,
-                                                                            0.8, 0.75,  0.66666667, 
+
+                                                                            0.8, 0.75,  0.66666667,
                                                                             0.5,  0.])))
+
+
+def test_section_strahler_orders():
+    path = os.path.join(SWC_PATH, 'strahler.swc')
+    n = nm.load_neuron(path)
+    assert_allclose(fst_get('section_strahler_orders', n),
+                    [4, 1, 4, 3, 2, 1, 1, 2, 1, 1, 3, 1, 3, 2, 1, 1, 2, 1, 1])
 
 #class MockNeuron:
 #    pass
@@ -908,5 +933,3 @@ def test_partition_asymmetry():
 #    nt.ok_(np.allclose(extents1, [0., 0., 0.]))
 #    extents2 = fst_get('principal_direction_extents', neurites, direction='third')
 #    nt.ok_(np.allclose(extents2, [0., 0., 0.]))
-
-

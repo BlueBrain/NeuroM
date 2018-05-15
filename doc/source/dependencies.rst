@@ -36,13 +36,13 @@ Build and runtime
 
 .. _pre-dep-label:
 
-``NeuroM`` requires Python version 2.6 or higher (but not version 3.x).
+``NeuroM`` requires Python version 2.7 or higher.
 When installed using `pip <https://pip.pypa.io/en/stable/>`_, ``NeuroM``
 will take care of installing unmet dependencies, although it is also possible
 to pre-install before ``NeuroM``.
 
 * `numpy <http://www.numpy.org/>`_ >= 1.8.0
-* `scipy <http://www.scipy.org/>`_ >= 0.17.0
+* `scipy <http://www.scipy.org/>`_ >= 0.13.3
 * `matplotlib <http://www.matplotlib.org/>`_ >= 1.3.1
 * `h5py <http://www.h5py.org/>`_ >= 2.2.1
 * `enum34 <https://pypi.python.org/pypi/enum34/>`_ >= 1.0.4

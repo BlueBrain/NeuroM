@@ -27,30 +27,48 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from nose import tools as nt
 from mock import Mock
+from nose import tools as nt
 
-from neurom.core.types import NeuriteType, tree_type_checker, NEURITES
+from neurom.core.types import (NEURITES, NeuriteType, axon_filter,
+                               dendrite_filter, tree_type_checker)
 
 
 def test_tree_type_checker():
-    #check that when NeuriteType.all, we accept all trees, w/o checking type
+    # check that when NeuriteType.all, we accept all trees, w/o checking type
     tree_filter = tree_type_checker(NeuriteType.all)
     nt.ok_(tree_filter('fake_tree'))
 
     mock_tree = Mock()
     mock_tree.type = NeuriteType.axon
 
-    #single arg
+    # single arg
     tree_filter = tree_type_checker(NeuriteType.axon)
     nt.ok_(tree_filter(mock_tree))
 
     mock_tree.type = NeuriteType.basal_dendrite
     nt.ok_(not tree_filter(mock_tree))
 
-    #multiple args
+    # multiple args
     tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
     nt.ok_(tree_filter(mock_tree))
 
     tree_filter = tree_type_checker(*NEURITES)
     nt.ok_(tree_filter('fake_tree'))
+
+
+def test_type_filters():
+    axon = Mock()
+    axon.type = NeuriteType.axon
+    nt.ok_(axon_filter(axon))
+    nt.ok_(not dendrite_filter(axon))
+
+    basal_dendrite = Mock()
+    basal_dendrite.type = NeuriteType.basal_dendrite
+    nt.ok_(not axon_filter(basal_dendrite))
+    nt.ok_(dendrite_filter(basal_dendrite))
+
+    apical_dendrite = Mock()
+    apical_dendrite.type = NeuriteType.apical_dendrite
+    nt.ok_(not axon_filter(apical_dendrite))
+    nt.ok_(dendrite_filter(apical_dendrite))

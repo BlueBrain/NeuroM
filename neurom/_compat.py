@@ -27,23 +27,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''python 2/3 compatibility functions'''
 
+import sys
 # ignore unused-import
 # pylint: disable=W0611
-from builtins import range, filter, map, zip
-import sys
+from builtins import filter, map, range, zip
 
-# ignore no-name-in-module
-# pylint: disable=E0611
 if sys.version_info < (3, 0):
-    from itertools import izip_longest as zip_longest  # pragma: no cover
-    StringType = (str, unicode)   # pragma: no cover
+    StringType = (str, unicode)   # pragma: no cover pylint: disable=E0602
 else:
-    from itertools import zip_longest  # pragma: no cover
     StringType = str  # pragma: no cover
-
-# ignore import-error
-# pylint: disable=F0401
-try:
-    from collections import OrderedDict  # pragma: no cover
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict  # pragma: no cover

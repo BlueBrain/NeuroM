@@ -112,3 +112,8 @@ class Tree(object):
             iter_mode: iteration mode. Default: ipreorder.
         '''
         return filter(Tree.is_bifurcation_point, iter_mode(self))
+
+    def __nonzero__(self):
+        return bool(self.children)
+
+    __bool__ = __nonzero__

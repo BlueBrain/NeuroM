@@ -28,16 +28,15 @@
 
 import os
 from copy import deepcopy
+from io import StringIO
 
 from nose import tools as nt
 
-from neurom import load_neuron
-from neurom import check
+from neurom import check, load_neuron
+from neurom._compat import range
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
-
-from neurom._compat import range
-
+from neurom.core.types import dendrite_filter
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -85,6 +84,7 @@ NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
                                           'Single_axon.swc',
                                           'Single_basal.swc',
                                           ]])
+
 
 def _pick(files):
     return [NEURONS[f] for f in files]
@@ -302,6 +302,17 @@ def test_has_no_fat_ends():
     nt.ok_(nrn_chk.has_no_fat_ends(nrn).status)
 
 
+def test_has_no_narrow_start():
+    _, nrn = _load_neuron('narrow_start.swc')
+    nt.ok_(not nrn_chk.has_no_narrow_start(nrn).status)
+
+    _, nrn = _load_neuron('narrow_start.swc')
+    nt.ok_(nrn_chk.has_no_narrow_start(nrn, 0.25).status)
+
+    _, nrn = _load_neuron('fat_end.swc')  # doesn't have narrow start
+    nt.ok_(nrn_chk.has_no_narrow_start(nrn, 0.25).status)
+
+
 def test_has_nonzero_soma_radius_threshold():
 
     class Dummy(object):
@@ -327,6 +338,61 @@ def test_has_no_jumps():
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100).status)
 
     nt.ok_(nrn_chk.has_no_jumps(nrn, 100, axis='x').status)
+
+
+def test_has_no_narrow_dendritic_section():
+    swc_content = StringIO(u"""
+# index, type, x, y, z, radius, parent
+    1 1  0  0 0 10. -1
+    2 2  0  0 0 10.  1
+    3 2  0  50 0 10.  2
+    4 2 -5  51 0 10.  3
+    5 2  6  53 0 10.  3
+    6 3  0  0 0 5.  1  # start of the narrow section
+    7 3  0 -4 0 5.  6
+    8 3  6 -4 0 10.  7
+    9 3 -5 -4 0 10.  7
+""")
+    nrn = load_neuron(swc_content, reader='swc')
+    res = nrn_chk.has_no_narrow_neurite_section(nrn,
+                                                dendrite_filter,
+                                                radius_threshold=5,
+                                                considered_section_min_length=0)
+
+    nt.ok_(res.status)
+
+    res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
+                                                radius_threshold=7,
+                                                considered_section_min_length=0)
+    nt.ok_(not res.status)
+
+    swc_content = StringIO(u"""
+# index, type, x, y, z, radius, parent
+    1 1  0  0 0 10. -1
+    2 2  0  0 0 5  1 # narrow soma
+    3 2  0  50 0 5  2
+    4 2 -5  51 0 5  3
+    5 2  6  53 0 5  3
+    6 3  0  0 0 5  1 # narrow axon
+    7 3  0 -4 0 10.  6
+    8 3  6 -4 0 10.  7
+    9 3 -5 -4 0 10.  7
+""")
+    res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
+                                                radius_threshold=5,
+                                                considered_section_min_length=0)
+    nt.ok_(res.status, 'Narrow soma or axons should not raise bad status when checking for narrow dendrites')
+
+
+def test_has_no_dangling_branch():
+    _, nrn = _load_neuron('dangling_axon.swc')
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+
+    _, nrn = _load_neuron('dangling_dendrite.swc')
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+
 
 def test__bool__():
     c = check.CheckResult(status=True)

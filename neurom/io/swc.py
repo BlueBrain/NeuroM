@@ -36,7 +36,6 @@ SWC format:
     [ID, TYPE, X, Y, Z, R, PARENT_ID]
 
 There is one such row per measured point.
-
 '''
 import numpy as np
 from .datawrapper import DataWrapper

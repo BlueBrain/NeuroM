@@ -27,14 +27,17 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Test neurom._neuronfunc functionality'''
-
+import tempfile
 from nose import tools as nt
 import os
 import numpy as np
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
 from neurom.core import make_soma, Neurite, Section
+from neurom.core import _soma
+from neurom.core.dataformat import POINT_TYPE
 from neurom.core.population import Population
+from neurom.io.datawrapper import BlockNeuronBuilder
 
 from utils import _close, _equal
 
@@ -110,3 +113,83 @@ def test_trunk_origin_elevations():
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
     _nf.trunk_origin_elevations(NRN)
+
+
+def test_sholl_crossings_simple():
+    center = SIMPLE.soma.center
+    radii = []
+    nt.eq_(list(_nf.sholl_crossings(SIMPLE, center, radii=radii)),
+           [])
+
+    radii = [1.0]
+    nt.eq_([2],
+           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+
+    radii = [1.0, 5.1]
+    nt.eq_([2, 4],
+           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+
+    radii = [1., 4., 5.]
+    nt.eq_([2, 4, 5],
+           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+
+
+def load_swc(string):
+    with tempfile.NamedTemporaryFile(prefix='test_neuron_func', mode='w', suffix='.swc') as fd:
+        fd.write(string)
+        fd.flush()
+        return load_neuron(fd.name)
+
+
+def test_sholl_analysis_custom():
+    #recreate morphs from Fig 2 of
+    #http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
+    radii = np.arange(10, 81, 10)
+    center = 0, 0, 0
+    morph_A = load_swc('''\
+ 1 1   0  0  0 1. -1
+ 2 3   0  0  0 1.  1
+ 3 3  80  0  0 1.  2
+ 4 4   0  0  0 1.  1
+ 5 4 -80  0  0 1.  4''')
+    nt.eq_(list(_nf.sholl_crossings(morph_A, center, radii=radii)),
+           [2, 2, 2, 2, 2, 2, 2, 2])
+
+    morph_B = load_swc('''\
+ 1 1   0   0  0 1. -1
+ 2 3   0   0  0 1.  1
+ 3 3  35   0  0 1.  2
+ 4 3  51  10  0 1.  3
+ 5 3  51   5  0 1.  3
+ 6 3  51   0  0 1.  3
+ 7 3  51  -5  0 1.  3
+ 8 3  51 -10  0 1.  3
+ 9 4 -35   0  0 1.  2
+10 4 -51  10  0 1.  9
+11 4 -51   5  0 1.  9
+12 4 -51   0  0 1.  9
+13 4 -51  -5  0 1.  9
+14 4 -51 -10  0 1.  9
+                       ''')
+    nt.eq_(list(_nf.sholl_crossings(morph_B, center, radii=radii)),
+           [2, 2, 2, 10, 10, 0, 0, 0])
+
+    morph_C = load_swc('''\
+ 1 1   0   0  0 1. -1
+ 2 3   0   0  0 1.  1
+ 3 3  65   0  0 1.  2
+ 4 3  85  10  0 1.  3
+ 5 3  85   5  0 1.  3
+ 6 3  85   0  0 1.  3
+ 7 3  85  -5  0 1.  3
+ 8 3  85 -10  0 1.  3
+ 9 4  65   0  0 1.  2
+10 4  85  10  0 1.  9
+11 4  85   5  0 1.  9
+12 4  85   0  0 1.  9
+13 4  85  -5  0 1.  9
+14 4  85 -10  0 1.  9
+                       ''')
+    nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
+           [2, 2, 2, 2, 2, 2, 10, 10])
+    #view.neuron(morph_C)[0].savefig('foo.png')

@@ -25,107 +25,161 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from .utils import get_fig_2d, get_fig_3d  # needs to be at top to trigger matplotlib Agg backend
 import os
+
 import itertools as it
 import numpy as np
-import pylab as plt
 
 from nose import tools as nt
 from neurom import load_neuron
-from neurom.view import view
+from neurom.view import view, common
 from neurom.core import Section
+from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
+from neurom.core.types import NeuriteType
+
 
 DATA_PATH = './test_data'
 SWC_PATH = os.path.join(DATA_PATH, 'swc/')
 fst_neuron = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
-soma0 = fst_neuron.soma
+simple_neuron = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 
 
 def test_tree():
-    axes = []
-    for tree in fst_neuron.neurites:
-        fig, ax = view.tree(tree)
-        axes.append(ax)
-    nt.ok_(axes[0].get_data_ratio() > 1.00 )
-    nt.ok_(axes[1].get_data_ratio() > 0.80 )
-    nt.ok_(axes[2].get_data_ratio() > 1.00 )
-    nt.ok_(axes[3].get_data_ratio() > 0.85 )
-    tree0 = fst_neuron.neurites[0]
-    fig, ax = view.tree(tree0, treecolor='black', diameter=False, alpha=1., linewidth=1.2)
-    c = ax.collections[0]
-    nt.eq_(c.get_linewidth()[0], 1.2)
-    nt.ok_(np.allclose(c.get_color(), np.array([[ 0.,  0.,  0.,  1.]])))
-    fig, ax = view.tree(tree0, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
-    plt.close('all')
+    with get_fig_2d() as (fig, ax):
+        tree = fst_neuron.neurites[0]
+        view.plot_tree(ax, tree, color='black', diameter_scale=None, alpha=1., linewidth=1.2)
+        collection = ax.collections[0]
+        nt.eq_(collection.get_linewidth()[0], 1.2)
+        np.testing.assert_allclose(collection.get_color(), np.array([[0., 0., 0., 1.]]))
 
+    with get_fig_2d() as (fig, ax):
+        nt.assert_raises(AssertionError, view.plot_tree, ax, tree, plane='wrong')
 
-def test_soma():
-    fig, ax = view.soma(soma0)
-    fig, ax = view.soma(soma0, outline=False)
-    fig, ax = view.soma(soma0, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
-    plt.close('all')
+    with get_fig_2d() as (fig, ax):
+        tree = simple_neuron.neurites[0]
+        view.plot_tree(ax, tree)
+        np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=1e-10)
 
 
 def test_neuron():
-    fig, ax = view.neuron(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-70.328535157399998, 94.7472627179)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (-87.600171997199993, 78.51626225230001)) )
-    nt.ok_(ax.get_title() == fst_neuron.name)
-    fig, ax = view.neuron(fst_neuron, xlim=(0,100), ylim=(0,100))
-    nt.ok_(np.allclose(ax.get_xlim(), (0, 100)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (0, 100)) )
-    nt.ok_(ax.get_title() == fst_neuron.name)
-    fig, ax = view.neuron(fst_neuron, plane='wrong')
-    nt.ok_(ax == 'No such plane found! Please select one of: xy, xz, yx, yz, zx, zy.')
-    plt.close('all')
+    with get_fig_2d() as (fig, ax):
+        view.plot_neuron(ax, fst_neuron)
+        nt.ok_(ax.get_title() == fst_neuron.name)
+        np.testing.assert_allclose(ax.dataLim.get_points(),
+                                   [[-40.32853516, -57.600172],
+                                    [64.74726272, 48.51626225], ])
+
+    with get_fig_2d() as (fig, ax):
+        nt.assert_raises(AssertionError, view.plot_tree, ax, fst_neuron, plane='wrong')
 
 
 def test_tree3d():
-    axes = []
-    for tree in fst_neuron.neurites:
-        fig, ax = view.tree3d(tree)
-        axes.append(ax)
-    nt.ok_(axes[0].get_data_ratio() > 1.00)
-    nt.ok_(axes[1].get_data_ratio() > 0.80)
-    nt.ok_(axes[2].get_data_ratio() > 1.00)
-    nt.ok_(axes[3].get_data_ratio() > 0.85)
-
-
-def test_soma3d():
-    fig, ax = view.soma3d(soma0)
-    nt.ok_(np.allclose(ax.get_xlim(), (-0.2,  0.2)))
-    nt.ok_(np.allclose(ax.get_ylim(), (-0.2,  0.2)))
-    nt.ok_(np.allclose(ax.get_zlim(), (-0.2,  0.2)))
+    with get_fig_3d() as (fig, ax):
+        tree = simple_neuron.neurites[0]
+        view.plot_tree3d(ax, tree)
+        xy_bounds = ax.xy_dataLim.bounds
+        np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
+        zz_bounds = ax.zz_dataLim.bounds
+        np.testing.assert_allclose(zz_bounds, (0., 0., 1., 1.))
 
 
 def test_neuron3d():
-    fig, ax = view.neuron3d(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-70.32853516, 94.74726272)) )
-    nt.ok_(np.allclose(ax.get_ylim(), (-87.60017200, 78.51626225)) )
-    nt.ok_(np.allclose(ax.get_zlim(), (-30.00000000, 84.20408797)) )
-    nt.ok_(ax.get_title() == fst_neuron.name)
+    with get_fig_3d() as (fig, ax):
+        view.plot_neuron3d(ax, fst_neuron)
+        nt.ok_(ax.get_title() == fst_neuron.name)
+        np.testing.assert_allclose(ax.xy_dataLim.get_points(),
+                                   [[-40.32853516, -57.600172],
+                                    [64.74726272, 48.51626225], ])
+        np.testing.assert_allclose(ax.zz_dataLim.get_points().T[0],
+                                   (-00.09999862, 54.20408797))
 
 
 def test_neuron_no_neurites():
     filename = os.path.join(SWC_PATH, 'point_soma.swc')
-    f, a = view.neuron(load_neuron(filename))
+    with get_fig_2d() as (fig, ax):
+        view.plot_neuron(ax, load_neuron(filename))
 
 
 def test_neuron3d_no_neurites():
     filename = os.path.join(SWC_PATH, 'point_soma.swc')
-    f, a = view.neuron3d(load_neuron(filename))
+    with get_fig_3d() as (fig, ax):
+        view.plot_neuron3d(ax, load_neuron(filename))
 
 
 def test_dendrogram():
-    fig, ax = view.dendrogram(fst_neuron)
-    nt.ok_(np.allclose(ax.get_xlim(), (-11.46075159339, 80.591751611909999)))
+    with get_fig_2d() as (fig, ax):
+        view.plot_dendrogram(ax, fst_neuron)
+        np.testing.assert_allclose(ax.get_xlim(), (-20., 100.), rtol=0.25)
 
 
 def test_one_point_branch():
     test_section = Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]]))
-    for diameter, linewidth in it.product((True, False),
-                                          (0.0, 1.2)):
-        view.tree(test_section, diameter=diameter, linewidth=linewidth)
-        view.tree3d(test_section, diameter=diameter, linewidth=linewidth)
+    for diameter_scale, linewidth in it.product((1.0, None),
+                                                (0.0, 1.2)):
+        with get_fig_2d() as (fig, ax):
+            view.plot_tree(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
+        with get_fig_3d() as (fig, ax):
+            view.plot_tree3d(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
+
+
+soma0 = fst_neuron.soma
+
+# upright, varying radius
+soma_2pt_normal_pts = np.array([
+    [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
+    [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
+])
+soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
+
+# upright, uniform radius, multiple cylinders
+soma_3pt_normal_pts = np.array([
+    [0.0, -10.0,  0.0, 10.0, 1, 1, -1],
+    [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
+    [0.0,   10.0, 0.0, 10.0, 1, 3,  2],
+])
+soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
+
+# increasing radius, multiple cylinders
+soma_4pt_normal_pts = np.array([
+    [0.0,   0.0,     0.0, 1.0, 1, 1, -1],
+    [0.0,   -10.0,   0.0, 2.0, 1, 2, 1],
+    [0.0,   -10.0, -10.0, 3.0, 1, 3, 2],
+    [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
+])
+soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CONTOUR)
+
+
+def test_soma():
+    for s in (soma0,
+              soma_2pt_normal,
+              soma_3pt_normal,
+              soma_4pt_normal_cylinder,
+              soma_4pt_normal_contour):
+        with get_fig_2d() as (fig, ax):
+            view.plot_soma(ax, s)
+            common.plt.close(fig)
+
+        with get_fig_2d() as (fig, ax):
+            view.plot_soma(ax, s, soma_outline=False)
+            common.plt.close(fig)
+
+
+def test_soma3d():
+    with get_fig_3d() as (_, ax):
+        view.plot_soma3d(ax, soma_2pt_normal)
+        np.testing.assert_allclose(ax.get_xlim(), (-10.,  10.), atol=2)
+        np.testing.assert_allclose(ax.get_ylim(), (0.,  10.), atol=2)
+        np.testing.assert_allclose(ax.get_zlim(), (-10.,  10.), atol=2)
+
+
+def test_get_color():
+    nt.eq_(view._get_color(None, NeuriteType.basal_dendrite), "red")
+    nt.eq_(view._get_color(None, NeuriteType.axon), "blue")
+    nt.eq_(view._get_color(None, NeuriteType.apical_dendrite), "purple")
+    nt.eq_(view._get_color(None, NeuriteType.soma), "black")
+    nt.eq_(view._get_color(None, NeuriteType.undefined), "green")
+    nt.eq_(view._get_color(None, 'wrong'), "green")
+    nt.eq_(view._get_color('blue', 'wrong'), "blue")
+    nt.eq_(view._get_color('yellow', NeuriteType.axon), "yellow")

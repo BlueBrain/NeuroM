@@ -47,7 +47,7 @@ def is_monotonic(neurite, tol):
         tol(float): tolerance
 
     Returns:
-        True if neurite flat
+        True if neurite monotonic
     '''
 
     for node in neurite.iter_sections():
@@ -85,8 +85,7 @@ def is_flat(neurite, tol, method='tolerance'):
     if method == 'ratio':
         sorted_ext = np.sort(ext)
         return sorted_ext[0] / sorted_ext[1] < float(tol)
-    else:
-        return any(ext < float(tol))
+    return any(ext < float(tol))
 
 
 def is_back_tracking(neurite):

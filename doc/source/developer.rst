@@ -39,7 +39,7 @@ Development Workflow
 
 Before making a pull request, make sure that your fork is up to date and that all the
 tests pass locally. This will make it less likely that your pull request will get
-rejected by making breaking chages or by failing the test requirements.
+rejected by making breaking changes or by failing the test requirements.
 
 Running the tests
 -----------------
@@ -63,17 +63,17 @@ installing all extra dependencies needed for running the tests, diagnosing the r
 performing linting on the source code. These dependencies are installed into a
 ``virtuanelv`` named ``neurom_test_venv``:
 
-The ``Makefile`` also has targets for running only pylint and pep8 individually:
+The ``Makefile`` also has targets for running only ``pylint`` and ``pep8`` individually:
 
 .. code-block:: bash
 
         $ make lint       # runs pep8 and pylint if that succeeds
         $ make run_pep8   # run only pep8
-        $ make run_pylint # run only pep8
+        $ make run_pylint # run only pylint
 
 
-Note that you can also install the test dependencies and run the tests inside of your 
-own virtualenv:
+Note that you can also install the test dependencies and run the tests inside of your
+own ``virtualenv``:
 
 .. code-block:: bash
 
@@ -99,3 +99,8 @@ Then, run the tests manually in the ``virtualenv``. For example,
     a pull request being rejected.
 
 .. include:: documentation.rst
+
+Python compatibility
+--------------------
+
+We test the code against Python 2.7, 3.5 and 3.6.

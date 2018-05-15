@@ -30,7 +30,7 @@ morph_check: the morphology checker
 ***************************************
 
 The ``morph_check`` application performs checks on reconstructed morphologies from
-data contained in morphology files, and so may be used as a morphology validaiton
+data contained in morphology files, and so may be used as a morphology validation
 of sorts.
 
 The tests are grouped in two categories:
@@ -45,9 +45,9 @@ The tests are grouped in two categories:
 It is very likely that a failure in the structural tests will make the neuron
 tests fail. Furthermore, inability to build a soma typically results
 in an inability to build neurites. Failure to build a soma or neurites results
-in an early faulure for a given morphology file.
+in an early failure for a given morphology file.
 
-The application may be invoked with a YAML configuration file specifying which
+The application may be invoked with a ``YAML`` configuration file specifying which
 checks to perform. The structure of the configuration file reflects the test categories
 mentioned above. Here is an example configuration:
 
@@ -74,15 +74,15 @@ mentioned above. Here is an example configuration:
         has_all_nonzero_section_lengths : 0.01
 
 
-As can be seen, the configuration file is split into two sections ``checks``, and ``options``. 
+As can be seen, the configuration file is split into two sections ``checks``, and ``options``.
 Each of the ``checks`` sub-items corresponds to a sub-module of :py:mod:`neurom.check`, namely
-:py:mod:`structural_checks<neurom.check.structural_checks>` 
+:py:mod:`structural_checks<neurom.check.structural_checks>`
 and :py:mod:`neuron_checks<neurom.check.neuron_checks>`. And each
 of their sub-items corresponds to a function in that sub-module. This illustrates the possible
 checks that may be applied by ``morph_check``.
 
 
-The application also produces a summary json file, which can be useful when
+The application also produces a summary ``json`` file, which can be useful when
 processing more than one file:
 
 .. code-block:: javascript

@@ -28,11 +28,11 @@
 
 '''Type enumerations'''
 
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 
 @unique
-class NeuriteType(Enum):
+class NeuriteType(IntEnum):
     '''Enum representing valid tree types'''
     undefined = 1
     soma = 2
@@ -40,6 +40,14 @@ class NeuriteType(Enum):
     basal_dendrite = 4
     apical_dendrite = 5
     all = 32
+
+
+NEURITES = (NeuriteType.all,
+            NeuriteType.axon,
+            NeuriteType.basal_dendrite,
+            NeuriteType.apical_dendrite)
+
+ROOT_ID = -1
 
 
 def tree_type_checker(*ref):
@@ -71,10 +79,11 @@ def tree_type_checker(*ref):
     return check_tree_type
 
 
-NEURITES = (NeuriteType.all,
-            NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+def dendrite_filter(n):
+    '''Select only dendrites'''
+    return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite
 
 
-ROOT_ID = -1
+def axon_filter(n):
+    '''Select only axons'''
+    return n.type == NeuriteType.axon

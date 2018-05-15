@@ -27,11 +27,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from nose import tools as nt
-from matplotlib import pyplot as plt
+import shutil
+import tempfile
 
+import matplotlib
+if 'DISPLAY' not in os.environ:  # noqa
+    matplotlib.use('Agg')  # noqa
+
+from neurom.view import common
 from neurom import load_neuron
 from neurom import viewer
+
+from nose import tools as nt
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
@@ -42,36 +49,37 @@ nrn = load_neuron(MORPH_FILENAME)
 
 def test_draw_neuron():
     viewer.draw(nrn)
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_neuron3d():
     viewer.draw(nrn, mode='3d')
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_tree():
     viewer.draw(nrn.neurites[0])
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_tree3d():
     viewer.draw(nrn.neurites[0], mode='3d')
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_soma():
     viewer.draw(nrn.soma)
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_soma3d():
     viewer.draw(nrn.soma, mode='3d')
-    plt.close('all')
+    common.plt.close('all')
 
 
 def test_draw_dendrogram():
-    plt.close('all')
+    viewer.draw(nrn, mode='dendrogram')
+    common.plt.close('all')
 
 
 @nt.raises(viewer.InvalidDrawModeError)
@@ -89,3 +97,18 @@ def test_invalid_object_raises():
 @nt.raises(viewer.NotDrawableError)
 def test_invalid_combo_raises():
     viewer.draw(nrn.soma, mode='dendrogram')
+
+
+def test_writing_output():
+    fig_name = 'Figure.png'
+
+    tempdir = tempfile.mkdtemp('test_viewer')
+    try:
+        old_dir = os.getcwd()
+        os.chdir(tempdir)
+        viewer.draw(nrn, mode='2d', output_path='subdir')
+        nt.ok_(os.path.isfile(os.path.join(tempdir, 'subdir', fig_name)))
+    finally:
+        os.chdir(old_dir)
+        shutil.rmtree(tempdir)
+        common.plt.close('all')

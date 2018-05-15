@@ -29,12 +29,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.check import structural_checks as st_chk
-from neurom.io.utils import get_morph_files
-from neurom.io import load_data
 import argparse
 import os
 import sys
+
+from neurom.check import structural_checks as st_chk
+from neurom.io.utils import get_morph_files
+from neurom.io import load_data
 
 DESCRIPTION = '''
 NeuroM Raw Data Checker
@@ -78,9 +79,8 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
-
-    args = parse_args()
+def run(args):
+    '''Check if all files have a soma points and sequential ids'''
     data_path = args.datapath
     if os.path.isfile(data_path):
         files = [data_path]
@@ -91,11 +91,15 @@ if __name__ == '__main__':
         sys.exit('ERROR: Invalid data path %s' % data_path)
 
     for f in files:
-        rd = load_data(f)
+        raw_data = load_data(f)
         print('\nCheck file %s...' % f)
-        print('Has soma points? %s' % st_chk.has_soma_points(rd))
+        print('Has soma points? %s' % st_chk.has_soma_points(raw_data))
 
-        ci = st_chk.has_sequential_ids(rd)
-        print('Consecutive indices? %s' % ci[0])
-        if not ci[0]:
-            print('Non consecutive IDs detected:', ci[1])
+        result = st_chk.has_sequential_ids(raw_data)
+        print('Consecutive indices? {}'.format(result.status))
+        if not result.status:
+            print('Non consecutive IDs detected: {}'.format(result.info))
+
+
+if __name__ == '__main__':
+    run(parse_args())

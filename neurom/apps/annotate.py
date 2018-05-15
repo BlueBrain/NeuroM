@@ -25,13 +25,45 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+'''Module for the detection of the cut plane'''
+import logging
+from itertools import chain
 
-# pip will install these dependencies with neurom if not found on the system
-numpy>=1.8.0
-scipy>=0.17.0
-enum34>=1.0.4
-pyyaml>=3.10
-tqdm>=4.8.4
-matplotlib>=1.3.1
-h5py>=2.2.1
-future>=0.16.0
+from neurom.core.dataformat import COLS
+
+L = logging.getLogger(__name__)
+
+
+def generate_annotation(result, settings):
+    '''Generate the annotation for a given checker
+
+    Arguments
+        neuron(Neuron): The neuron object
+        checker: A tuple where the first item is the checking function (usually from neuron_checks)
+                 and the second item is a dictionary of settings for the annotation. It must
+                 contain the keys name, label and color
+    Returns
+        An S-expression-like string representing the annotation
+    '''
+    if result.status:
+        return ""
+
+    header = ("\n\n"
+              "({label}   ; MUK_ANNOTATION\n"
+              "    (Color {color})   ; MUK_ANNOTATION\n"
+              "    (Name \"{name}\")   ; MUK_ANNOTATION").format(**settings)
+
+    points = [p for _, _points in result.info for p in _points]
+
+    annotations = ("    ({0} {1} {2} 0.50)   ; MUK_ANNOTATION".format(
+        p[COLS.X], p[COLS.Y], p[COLS.Z]) for p in points)
+    footer = ")   ; MUK_ANNOTATION\n"
+
+    return '\n'.join(chain.from_iterable(([header], annotations, [footer])))
+
+
+def annotate(results, settings):
+    '''Concatenate the annotations of all checkers'''
+    annotations = (generate_annotation(result, setting)
+                   for result, setting in zip(results, settings))
+    return '\n'.join(annot for annot in annotations if annot)

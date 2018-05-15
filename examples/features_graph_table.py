@@ -29,10 +29,11 @@
 
 '''Example for comparison of the same feature of multiple cells
 '''
-import pylab as pl
-from neurom.io.utils import get_morph_files
 import argparse
+
+import pylab as pl
 import neurom as nm
+from neurom.io.utils import get_morph_files
 
 
 def parse_args():

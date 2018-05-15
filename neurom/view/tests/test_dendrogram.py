@@ -75,6 +75,7 @@ def test_update_offsets():
     nt.assert_almost_equal(offs[0], 30.)
     nt.assert_almost_equal(offs[1], 42.8)
 
+
 class TestDendrogram(object):
 
     def setUp(self):
@@ -97,8 +98,10 @@ class TestDendrogram(object):
     def test_generate_soma(self):
 
         vrec = self.dnrn.soma
-        trec = np.array([[-0.17071068, -0.34142136], [-0.17071068,  0.        ],
-                         [ 0.17071068,  0.        ], [ 0.17071068, -0.34142136]])
+        trec = np.array([[-0.17071068, -0.34142136],
+                         [-0.17071068,  0.        ],
+                         [ 0.17071068,  0.        ],
+                         [ 0.17071068, -0.34142136]])
         nt.assert_true(np.allclose(vrec, trec))
 
         vrec = self.dtr.soma
@@ -132,25 +135,19 @@ class TestDendrogram(object):
         nt.assert_false(np.all(self.dtr.data == 0.))
 
     def test_groups(self):
-
-        nt.assert_false(not self.dnrn.groups)
-        nt.assert_false(not self.dtr.groups)
+        nt.ok_(self.dnrn.groups)
+        nt.ok_(self.dtr.groups)
 
     def test_dims(self):
 
-        nt.assert_false(not self.dnrn.dims)
-        nt.assert_false(not self.dtr.dims)
+        nt.ok_(self.dnrn.dims)
+        nt.ok_(self.dtr.dims)
 
     def test_types_tree(self):
-
         for ctype in self.dtr.types:
-            print(ctype)
-            nt.assert_true(ctype == NeuriteType.apical_dendrite)
+            nt.eq_(ctype, NeuriteType.apical_dendrite)
 
     def test_types_neuron(self):
         types = tuple(self.dnrn.types)
-        nt.assert_true(types[0] == NeuriteType.apical_dendrite)
-        nt.assert_true(types[1] == NeuriteType.basal_dendrite)
-
-
-
+        nt.eq_(types[0], NeuriteType.apical_dendrite)
+        nt.eq_(types[1], NeuriteType.basal_dendrite)

@@ -26,361 +26,193 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Module containing the common functionality
-to be used by view-plot modules.
-"""
-from neurom import NeuriteType
+"""Functionality for styling plots"""
 import os
-import matplotlib
 
-#  Awful hack to use non-GUI backend when no display
-#  is available. For unixy systems.
-if 'DISPLAY' not in os.environ: # noqa
-    matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
+from matplotlib.patches import Polygon
+# needed so that projection='3d' works with fig.add_subplot
+from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=relative-import,unused-import
+from scipy.linalg import norm
+from scipy.spatial import ConvexHull
+
+from neurom._compat import map  # pylint: disable=ungrouped-imports
+
+plt = None  # refer to _get_plt()
 
 
-# Map tree type to color
-TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
-              NeuriteType.apical_dendrite: 'purple',
-              NeuriteType.axon: 'blue',
-              NeuriteType.soma: 'black',
-              NeuriteType.undefined: 'green'}
-
-PLOT_STYLE_PARAMS = '''        pretitle (Optional[str]): String to include before the\
-            general title of the figure. Default value is None.
-        posttitle (Optional[str[): String to include after the\
-            general title of the figure. Default value is None.
-        prefile (Optional[str]): String to include before the\
-            general filename of the figure. Default value is None.
-        postfile (Optional[str]): String to include after the\
-            general filename of the figure. Default value is None.
-        title (Optional[str]): \
-            Set the title for the figure. \
-            If "" no title will be added. \
-            Default value is "Figure".
-        title_fontsize (Optional[int]): \
-            Defines the size of the title's font. \
-            Default value is 14.
-        title_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as title arguments. \
-            Default value is None.
-        xlabel (Optional[str]): \
-            The xlabel for the figure. \
-            For no_xlabel set to ''. \
-            Default value is "X".
-        ylabel (Optional[str]): \
-            The xlabel for the figure. \
-            For no_ylabel set to ''. \
-            Default value is "Y".
-        zlabel (Optional[str]): \
-            The zlabel for the figure. \
-            For no_zlabel set to ''. \
-            Default value is "Z".
-        label_fontsize (Optional[int]): \
-            Defines the size of the labels' font. \
-            Default value is 14.
-        xlabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as xlabel arguments. \
-            Default value is None.
-        ylabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as ylabel arguments. \
-            Default value is None.
-        zlabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed, \
-            into matplotlib as zlabel arguments. \
-            Default value is None.
-        xticks (Optional[list of ticks]): \
-            Defines the values of x ticks in the figure. \
-            If None the xticks will not be modified. \
-            For no_xticks set to []. \
-            Default value is None.
-        yticks (Optional[list of ticks]): \
-            Defines the values of y ticks in the figure. \
-            If None the yticks will not be modified. \
-            For no_yticks set to []. \
-            Default value is None.
-        zticks (Optional[list of ticks]): \
-            Defines the values of z ticks in the figure. \
-            If None the zticks will not be modified. \
-            For no_zticks set to []. \
-            Default value is None.
-        tick_fontsize (Optional[int]): \
-            Defines the size of the ticks' font. \
-            Default value is 12.
-        xticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as xticks arguments. \
-            Default value is None.
-        yticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as yticks arguments. \
-            Default value is None.
-        zticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as zticks arguments. \
-            Default value is None.
-        xlim (Optional[list of two floats]): \
-            Defines the min and the max values in x-axis. \
-            Default in None
-        ylim (Optional[list of two floats]): \
-            Defines the min and the max values in y-axis. \
-            Default in None
-        zlim (Optional[list of two floats]): \
-            Defines the min and the max values in z-axis. \
-            Default in None
-        no_legend (Optional[boolean]): \
-            Defines the presence of a legend in the figure. \
-            If True the legend will not be included in the Figure. \
-            Default value is True.
-        legend_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as legend arguments. \
-            Default value is None.
-        show_plot (bool):\
-            If True the figure is displayed.\
-            Default value is True.
-        no_axes (bool):\
-            If True the labels and the frame will be set off.\
-            Default value is False.
-        tight (bool):\
-            If True the set layout of matplotlib will be activated.\
-            Default value is False.
-        output_path (str):\
-            String to define the path to the output directory.\
-            Default value is './'
-        output_name (str):\
-            String to define the name of the output figure.\
-            Default value is 'Figure'
-        output_format (Optional[str]):\
-            String to define the format of the output figure.\
-            Default value is 'png'
-        dpi (Optional[int]):\
-            Define the DPI (Dots per Inch) of the figure.\
-            Default value is 300.
-        transparent (Optional(bool):\
-            If True the saved figure will have a transparent background.\
-            Default value is False.
-        aspect_ratio (Optional(str):\
-            Defines the aspect ratio of the figure, \
-            according to matplotlib default options. \
-            For equal aspect ratio select 'equal'. \
-            For normal aspect ration select 'auto'. \
-            Default value is set to 'equal'.
-
-    Returns:
-        Matplotlib figure, matplotlib axes'''
+def _get_plt():
+    '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    global plt  # pylint: disable=global-statement
+    import matplotlib.pyplot
+    plt = matplotlib.pyplot
 
 
-def figure_naming(pretitle=None, posttitle=None, prefile=None, postfile=None):
+def dict_if_none(arg):
+    '''return an empty dict if arg is None'''
+    return arg if arg is not None else {}
+
+
+def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
     """
     Helper function to define the strings that handle pre-post conventions
     for viewing - plotting title and saving options.
 
-    Parameters:
-        pretitle (Optional[str]): String to include before the\
-            general title of the figure.
-        posttitle (Optional[str[): String to include after the\
-            general title of the figure.
-        prefile (Optional[str]): String to include before the\
-            general filename of the figure.
-        postfile (Optional[str]): String to include after the\
-            general filename of the figure.
+    Args:
+        pretitle(str): String to include before the general title of the figure.
+        posttitle(str): String to include after the general title of the figure.
+        prefile(str): String to include before the general filename of the figure.
+        postfile(str): String to include after the general filename of the figure.
+
     Returns:
         str: String to include in the figure name and title, in a suitable form.
     """
-    if not pretitle:
-        pretitle = ""
-    else:
+    if pretitle:
         pretitle = "%s -- " % pretitle
 
-    if not posttitle:
-        posttitle = ""
-    else:
+    if posttitle:
         posttitle = " -- %s" % posttitle
 
-    if not prefile:
-        prefile = ""
-    else:
+    if prefile:
         prefile = "%s_" % prefile
 
-    if not postfile:
-        postfile = ""
-    else:
+    if postfile:
         postfile = "_%s" % postfile
 
     return pretitle, posttitle, prefile, postfile
 
 
-def get_color(treecolor, tree_type):
-    """
-    If treecolor is None returns the color depending on the type, \
-    otherwise it returns the treecolor.
-
-    Returns: str color
-
-        basal dendrite: red
-
-        axon : blue
-
-        apical dendrite: purple
-
-        soma: black
-
-        undefined or any other type: green
-    """
-    if treecolor is not None:
-        return treecolor
-    else:
-        return TREE_COLOR.get(tree_type, 'green')
-
-
-def get_figure(new_fig=True, new_axes=True, subplot=False, params=None, no_axes=False):
+def get_figure(new_fig=True, subplot='111', params=None):
     """
     Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
 
-    Parameters:
-        new_fig (Optional[bool]):\
-        Defines if a new figure will be created.\
-        If False the current figure is returned.\
-        Default is True.
-        subplot (Optional[bool]): Defines if a subplot will be generated.\
-        If False the subplot is the standard 111.\
-        Default is False.
-        params (Optional[dict]): If empty dictonary no supplementary parameters\
-            will be used.If dict not None the parameters will be passed\
-            to the initialization of the axes. Defaults to None.
-        no_axes (Optional[bool]): Defines the output of the function:\
-            If False the axes is returned.\
-            If True the figure is returned.\
-            Default value is False.
+    Args:
+        new_fig(bool): Defines if a new figure will be created, if false current figure is used
+        subplot (tuple or matplolib subplot specifier string): Create axes with these parameters
+        params (dict): extra options passed to add_subplot()
 
     Returns:
-        Figure is no_axes is True, otherwise axes.
+        Matplotlib Figure and Axes
     """
+    _get_plt()
+
     if new_fig:
         fig = plt.figure()
     else:
         fig = plt.gcf()
 
-    if no_axes:
-        return fig
+    params = dict_if_none(params)
 
-    if not subplot:
-        subplot = 111
-
-    if params is None:
-        params = dict()
-
-    if new_axes:
-        if isinstance(subplot, (tuple, list)):
-            ax = fig.add_subplot(subplot[0], subplot[1], subplot[2], **params)
-        else:
-            ax = fig.add_subplot(subplot, **params)
+    if isinstance(subplot, (tuple, list)):
+        ax = fig.add_subplot(*subplot, **params)
     else:
-        ax = plt.gca()
+        ax = fig.add_subplot(subplot, **params)
 
     return fig, ax
 
 
-def save_plot(fig, **kwargs):
-    """
-    Function to be used for viewing - plotting
-    to save a matplotlib figure.
+def save_plot(fig, prefile='', postfile='', output_path='./', output_name='Figure',
+              output_format='png', dpi=300, transparent=False, **_):
+    """Generates a figure file in the selected directory.
 
-    Generates a figure file in the selected directory.
-
-    Parameters:
+    Args:
         fig: matplotlib figure
-        prefile (Optional[str]):\
-            String to include before the general filename of the figure.\
-            Default is None.
-        postfile (Optional[str]):\
-            String to include after the general filename of the figure.\
-            Default is None.
-        output_path (str):\
-            String to define the path to the output directory.\
-            Default value is './'
-        output_name (str):\
-            String to define the name of the output figure.\
-            Default value is 'Figure'
-        output_format (Optional[str]):\
-            String to define the format of the output figure.\
-            Default value is 'png'
-        dpi (Optional[int]):\
-            Define the DPI (Dots per Inch) of the figure.\
-            Default value is 300.
-        transparent (Optional(bool):\
-            If True the saved figure will have a transparent background.\
-            Default value is False.
+        prefile(str): Include before the general filename of the figure
+        postfile(str): Included after the general filename of the figure
+        output_path(str): Define the path to the output directory
+        output_name(str): String to define the name of the output figure
+        output_format(str): String to define the format of the output figure
+        dpi(int): Define the DPI (Dots per Inch) of the figure
+        transparent(bool): If True the saved figure will have a transparent background
+    """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)  # Make output directory if non-exsiting
+
+    output = os.path.join(output_path,
+                          prefile + output_name + postfile + "." + output_format)
+
+    fig.savefig(output, dpi=dpi, transparent=transparent)
+
+
+def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
+               # plot_title
+               pretitle='',
+               title='Figure',
+               posttitle='',
+               title_fontsize=14,
+               title_arg=None,
+               # plot_labels
+               label_fontsize=14,
+               xlabel=None,
+               xlabel_arg=None,
+               ylabel=None,
+               ylabel_arg=None,
+               zlabel=None,
+               zlabel_arg=None,
+               # plot_ticks
+               tick_fontsize=12,
+               xticks=None,
+               xticks_args=None,
+               yticks=None,
+               yticks_args=None,
+               zticks=None,
+               zticks_args=None,
+               # update_plot_limits
+               white_space=30,
+               # plot_legend
+               no_legend=True,
+               legend_arg=None,
+               # internal
+               no_axes=False,
+               aspect_ratio='equal',
+               tight=False,
+               **_):
+    """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions
+
+    Args:
+        fig(matplotlib figure): figure
+        ax(matplotlib axes, belonging to `fig`): axes
+
+        pretitle(str): String to include before the general title of the figure
+        posttitle (str): String to include after the general title of the figure
+        title (str): Set the title for the figure
+        title_fontsize (int): Defines the size of the title's font
+        title_arg (dict): Addition arguments for matplotlib.title() call
+
+        label_fontsize(int): Size of the labels' font
+        xlabel(str): The xlabel for the figure
+        xlabel_arg(dict):  Passsed into matplotlib as xlabel arguments
+        ylabel(str): The ylabel for the figure
+        ylabel_arg(dict):  Passsed into matplotlib as ylabel arguments
+        zlabel(str): The zlabel for the figure
+        zlabel_arg(dict):  Passsed into matplotlib as zlabel arguments
+
+        tick_fontsize (int): Defines the size of the ticks' font
+        xticks([list of ticks]): Defines the values of x ticks in the figure
+        xticks_args(dict):  Passsed into matplotlib as xticks arguments
+        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks_args(dict):  Passsed into matplotlib as yticks arguments
+        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks_args(dict):  Passsed into matplotlib as zticks arguments
+
+        white_space(float): whitespace added to surround the tight limit of the data
+
+        no_legend (bool): Defines the presence of a legend in the figure
+        legend_arg (dict): Addition arguments for matplotlib.legend() call
+
+        no_axes(bool): If True the labels and the frame will be set off
+        aspect_ratio(str): Sets aspect ratio of the figure, according to matplotlib aspect_ratio
+        tight(bool): If True the tight layout of matplotlib will be activated
 
     Returns:
-       input matplotlib figure
+        Matplotlib figure, matplotlib axes
     """
-
-    prefile = kwargs.get('prefile', '')
-    postfile = kwargs.get('postfile', '')
-    output_path = kwargs.get('output_path', './')
-    output_name = kwargs.get('output_name', 'Figure')
-    output_format = kwargs.get('output_format', 'png')
-    dpi = kwargs.get('dpi', 300)
-    transparent = kwargs.get('transparent', False)
-
-    if not os.path.exists(output_path):
-        os.makedirs(output_path) # Make output directory if non-exsiting
-
-    output = os.path.join(output_path, prefile + output_name + postfile + "." + output_format)
-
-    plt.savefig(output, dpi=dpi, transparent=transparent)
-
-    return fig
-
-
-def plot_style(fig, ax, **kwargs):
-    """
-    Function to set the basic options of a matplotlib figure,
-    to be used by viewing - plotting functions.
-
-    Parameters:
-        fig: matplotlib figure
-        ax: matplotlib axes
-    """
-    # Definition of title/file naming variables
-    prefile = kwargs.get('prefile', '')
-    postfile = kwargs.get('postfile', '')
-    pretitle = kwargs.get('pretitle', '')
-    posttitle = kwargs.get('posttitle', '')
-
-    # Definition of global options
-    no_axes = kwargs.get('no_axes', False)
-    show_plot = kwargs.get('show_plot', True)
-    tight = kwargs.get('tight', False)
-    aspect_ratio = kwargs.get('aspect_ratio', 'equal')
-
-    final = kwargs.get('final', False)
-
-    # Definition of save options
-    output_path = kwargs.get('output_path', None)
-
-    pretitle, posttitle, prefile, postfile = figure_naming(pretitle, posttitle, prefile, postfile)
-
-    fig, ax = plot_title(fig, ax, **kwargs)
-
-    fig, ax = plot_labels(fig, ax, **kwargs)
-
-    fig, ax = plot_ticks(fig, ax, **kwargs)
-
-    fig, ax = plot_limits(fig, ax, **kwargs)
-
-    fig, ax = plot_legend(fig, ax, **kwargs)
+    plot_title(ax, pretitle, title, posttitle, title_fontsize, title_arg)
+    plot_labels(ax, label_fontsize, xlabel, xlabel_arg, ylabel, ylabel_arg, zlabel, zlabel_arg)
+    plot_ticks(ax, tick_fontsize, xticks, xticks_args, yticks, yticks_args, zticks, zticks_args)
+    update_plot_limits(ax, white_space)
+    plot_legend(ax, no_legend, legend_arg)
 
     if no_axes:
         ax.set_frame_on(False)
@@ -392,294 +224,217 @@ def plot_style(fig, ax, **kwargs):
     if tight:
         fig.set_tight_layout(True)
 
-    if output_path is not None:
-        fig = save_plot(fig=ax, **kwargs)
 
-    if not show_plot:
-        plt.close()
-        return (None, None)
-    else:
-        if final:
-            plt.show()  # pragma no cover
-        return fig, ax
+def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None):
+    """Set title options of a matplotlib plot
 
-
-def plot_title(fig, ax, **kwargs):
-
-    """
-    Function that defines the title options
-    of a matplotlib plot.
-
-    Parameters:
-        fig: matplotlib figure
+    Args:
         ax: matplotlib axes
-        pretitle(Optional[str]) : \
-            String to include before the general title of the figure. \
-            Default value is None.
-        posttitle (Optional[str]): \
-            String to include after the general title of the figure. \
-            Default value is None.
-        title (Optional[str]): \
-            Set the title for the figure. \
-            If "" no title will be added. \
-            Default value is "Figure".
-        title_fontsize (Optional[int]): \
-            Defines the size of the title's font. \
-            Default value is 14.
-        title_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as title arguments. \
-            Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
+        pretitle(str): String to include before the general title of the figure
+        posttitle (str): String to include after the general title of the figure
+        title (str): Set the title for the figure
+        title_fontsize (int): Defines the size of the title's font
+        title_arg (dict): Addition arguments for matplotlib.title() call
     """
+    current_title = ax.get_title()
 
-    # Definition of title options
-    pretitle = kwargs.get('pretitle', '')
-    posttitle = kwargs.get('posttitle', '')
-    title = kwargs.get('title', 'Figure')
-    title_fontsize = kwargs.get('titlefontsize', 14)
-    title_arg = kwargs.get('titlearg', None)
+    if not current_title:
+        current_title = pretitle + title + posttitle
 
-    if title_arg is None:
-        title_arg = {}
+    title_arg = dict_if_none(title_arg)
 
-    ax.set_title(pretitle + title + posttitle,
-                 fontsize=title_fontsize, **title_arg)
-
-    return fig, ax
+    ax.set_title(current_title, fontsize=title_fontsize, **title_arg)
 
 
-def plot_labels(fig, ax, **kwargs):
+def plot_labels(ax, label_fontsize=14,
+                xlabel=None, xlabel_arg=None,
+                ylabel=None, ylabel_arg=None,
+                zlabel=None, zlabel_arg=None):
+    """Sets the labels options of a matplotlib plot
 
-    """
-    Function that defines the labels options
-    of a matplotlib plot.
-
-    Parameters:
-        fig: matplotlib figure
+    Args:
         ax: matplotlib axes
-        xlabel (Optional[str]): \
-            The xlabel for the figure. \
-            For no_xlabel set to ''. \
-            Default value is "X".
-        ylabel (Optional[str]): \
-            The xlabel for the figure. \
-            For no_ylabel set to ''. \
-            Default value is "Y".
-        zlabel (Optional[str]): \
-            The zlabel for the figure. \
-            For no_zlabel set to ''. \
-            Default value is "Z".
-        label_fontsize (Optional[int]): \
-            Defines the size of the labels' font. \
-            Default value is 14.
-        xlabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as xlabel arguments. \
-            Default value is None.
-        ylabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as ylabel arguments. \
-            Default value is None.
-        zlabel_arg (Optional[dict]): \
-            Defines the arguments that will be passsed, \
-            into matplotlib as zlabel arguments. \
-            Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
+        label_fontsize(int): Size of the labels' font
+        xlabel(str): The xlabel for the figure
+        xlabel_arg(dict):  Passsed into matplotlib as xlabel arguments
+        ylabel(str): The ylabel for the figure
+        ylabel_arg(dict):  Passsed into matplotlib as ylabel arguments
+        zlabel(str): The zlabel for the figure
+        zlabel_arg(dict):  Passsed into matplotlib as zlabel arguments
     """
+    xlabel = xlabel if xlabel is not None else ax.get_xlabel() or 'X'
+    ylabel = ylabel if ylabel is not None else ax.get_ylabel() or 'Y'
 
-    # Definition of label options
-    xlabel = kwargs.get('xlabel', 'X')
-    ylabel = kwargs.get('ylabel', 'Y')
-    zlabel = kwargs.get('zlabel', 'Z')
-    label_fontsize = kwargs.get('labelfontsize', 14)
-    xlabel_arg = kwargs.get('xlabel_arg', None)
-    ylabel_arg = kwargs.get('ylabel_arg', None)
-    zlabel_arg = kwargs.get('zlabel_arg', None)
-
-    if xlabel_arg is None:
-        xlabel_arg = {}
-
-    if ylabel_arg is None:
-        ylabel_arg = {}
-
-    if zlabel_arg is None:
-        zlabel_arg = {}
+    xlabel_arg = dict_if_none(xlabel_arg)
+    ylabel_arg = dict_if_none(ylabel_arg)
 
     ax.set_xlabel(xlabel, fontsize=label_fontsize, **xlabel_arg)
     ax.set_ylabel(ylabel, fontsize=label_fontsize, **ylabel_arg)
 
     if hasattr(ax, 'zaxis'):
+        zlabel = zlabel if zlabel is not None else ax.get_zlabel() or 'Z'
+        zlabel_arg = dict_if_none(zlabel_arg)
         ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
-    return fig, ax
 
+def plot_ticks(ax, tick_fontsize=12,
+               xticks=None, xticks_args=None,
+               yticks=None, yticks_args=None,
+               zticks=None, zticks_args=None):
+    """Function that defines the labels options of a matplotlib plot.
 
-def plot_ticks(fig, ax, **kwargs):
-
-    """
-    Function that defines the labels options
-    of a matplotlib plot.
-
-    Parameters:
-        fig: matplotlib figure
+    Args:
         ax: matplotlib axes
-        xticks (Optional[list of ticks]): \
-            Defines the values of x ticks in the figure. \
-            If None the xticks will not be modified. \
-            For no_xticks set to []. \
-            Default value is None.
-        yticks (Optional[list of ticks]): \
-            Defines the values of y ticks in the figure. \
-            If None the yticks will not be modified. \
-            For no_yticks set to []. \
-            Default value is None.
-        zticks (Optional[list of ticks]): \
-            Defines the values of z ticks in the figure. \
-            If None the zticks will not be modified. \
-            For no_zticks set to []. \
-            Default value is None.
-        tick_fontsize (Optional[int]): \
-            Defines the size of the ticks' font. \
-            Default value is 12.
-        xticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as xticks arguments. \
-            Default value is None.
-        yticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as yticks arguments. \
-            Default value is None.
-        zticks_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as zticks arguments. \
-            Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
+        tick_fontsize (int): Defines the size of the ticks' font
+        xticks([list of ticks]): Defines the values of x ticks in the figure
+        xticks_arg(dict):  Passsed into matplotlib as xticks arguments
+        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks_arg(dict):  Passsed into matplotlib as yticks arguments
+        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks_arg(dict):  Passsed into matplotlib as zticks arguments
     """
-
-    # Definition of tick options
-    xticks = kwargs.get('xticks', None)
-    yticks = kwargs.get('yticks', None)
-    zticks = kwargs.get('zticks', None)
-    tick_fontsize = kwargs.get('tickfontsize', 12)
-    xticks_arg = kwargs.get('xticksarg', None)
-    yticks_arg = kwargs.get('yticksarg', None)
-    zticks_arg = kwargs.get('zticksarg', None)
-
-    if xticks_arg is None:
-        xticks_arg = {}
-
-    if yticks_arg is None:
-        yticks_arg = {}
-
-    if zticks_arg is None:
-        zticks_arg = {}
-
     if xticks is not None:
         ax.set_xticks(xticks)
-        ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_arg)
+        xticks_args = dict_if_none(xticks_args)
+        ax.xaxis.set_tick_params(labelsize=tick_fontsize, **xticks_args)
 
     if yticks is not None:
         ax.set_yticks(yticks)
-        ax.yaxis.set_tick_params(labelsize=tick_fontsize, **yticks_arg)
+        yticks_args = dict_if_none(yticks_args)
+        ax.yaxis.set_tick_params(labelsize=tick_fontsize, **yticks_args)
 
     if zticks is not None:
         ax.set_zticks(zticks)
-        ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_arg)
+        zticks_args = dict_if_none(zticks_args)
+        ax.zaxis.set_tick_params(labelsize=tick_fontsize, **zticks_args)
 
-    return fig, ax
 
+def update_plot_limits(ax, white_space):
+    """Sets the limit options of a matplotlib plot.
 
-def plot_limits(fig, ax, **kwargs):
-
-    """
-    Function that defines the limit options
-    of a matplotlib plot.
-
-    Parameters:
-        fig: matplotlib figure
+    Args:
         ax: matplotlib axes
-        xlim (Optional[list of two floats]): \
-            Defines the min and the max values in x-axis. \
-            To use default limits select None.
-        ylim (Optional[list of two floats]): \
-            Defines the min and the max values in y-axis. \
-            To use default limits select None.
-        zlim (Optional[list of two floats]): \
-            Defines the min and the max values in z-axis. \
-            To use default limits select None.
+        white_space(float): whitespace added to surround the tight limit of the data
 
-    Returns:
-        Matplotlib figure, axes
+    Note: This relies on ax.dataLim (in 2d) and ax.[xy, zz]_dataLim being set in 3d
     """
-    # Definition of limit options
-    xlim = kwargs.get('xlim', None)
-    ylim = kwargs.get('ylim', None)
-    zlim = kwargs.get('zlim', None)
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
+    if hasattr(ax, 'zz_dataLim'):
+        bounds = ax.xy_dataLim.bounds
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
-    if hasattr(ax, 'zaxis'):
-        ax.set_zlim(zlim)
+        bounds = ax.zz_dataLim.bounds
+        ax.set_zlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+    else:
+        bounds = ax.dataLim.bounds
+        assert not any(map(np.isinf, bounds)), 'Cannot set bounds if dataLim has infinite elements'
+        ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
+        ax.set_ylim(bounds[1] - white_space, bounds[1] + bounds[3] + white_space)
 
-    return fig, ax
 
-
-def plot_legend(fig, ax, **kwargs):
-
+def plot_legend(ax, no_legend=True, legend_arg=None):
     """
     Function that defines the legend options
     of a matplotlib plot.
 
-    Parameters:
-        fig: matplotlib figure
+    Args:
         ax: matplotlib axes
-        no_legend (Optional[boolean]): \
-            Defines the presence of a legend in the figure. \
-            If True the legend will not be included in the Figure. \
-            Default value is True.
-        legend_arg (Optional[dict]): \
-            Defines the arguments that will be passsed \
-            into matplotlib as legend arguments. \
-            Default value is None.
-
-    Returns:
-        Matplotlib figure, axes
+        no_legend (bool): Defines the presence of a legend in the figure
+        legend_arg (dict): Addition arguments for matplotlib.legend() call
     """
-    # Definition of legend options
-    no_legend = kwargs.get('no_legend', True)
-    legend_arg = kwargs.get('legendarg', None)
-
-    if legend_arg is None:
-        legend_arg = {}
+    legend_arg = dict_if_none(legend_arg)
 
     if not no_legend:
         ax.legend(**legend_arg)
 
-    return fig, ax
+
+_LINSPACE_COUNT = 300
 
 
-def plot_sphere(fig, ax, center, radius, color='black', alpha=1.):
-    """
-    Plots a 3d sphere, given the center and the radius.
-    """
+def _get_normals(v):
+    '''get two vectors that form a basis w/ v
 
-    u = np.linspace(0, 2 * np.pi, 300)
-    v = np.linspace(0, np.pi, 300)
+    Note: returned vectors are unit
+    '''
+    not_v = np.array([1, 0, 0])
+    if np.all(np.abs(v) == not_v):
+        not_v = np.array([0, 1, 0])
+    n1 = np.cross(v, not_v)
+    n1 /= norm(n1)
+    n2 = np.cross(v, n1)
+    return n1, n2
 
-    x = center[0] + radius * np.outer(np.cos(u), np.sin(v))
-    y = center[1] + radius * np.outer(np.sin(u), np.sin(v))
+
+def generate_cylindrical_points(start, end, start_radius, end_radius,
+                                linspace_count=_LINSPACE_COUNT):
+    '''Generate a 3d mesh of a cylinder with start and end points, and varying radius
+
+    Based on: http://stackoverflow.com/a/32383775
+    '''
+    v = end - start
+    length = norm(v)
+    v = v / length
+    n1, n2 = _get_normals(v)
+
+    # pylint: disable=unbalanced-tuple-unpacking
+    l, theta = np.meshgrid(np.linspace(0, length, linspace_count),
+                           np.linspace(0, 2 * np.pi, linspace_count))
+
+    radii = np.linspace(start_radius, end_radius, linspace_count)
+    rsin = np.multiply(radii, np.sin(theta))
+    rcos = np.multiply(radii, np.cos(theta))
+
+    return np.array([start[i] +
+                     v[i] * l +
+                     n1[i] * rsin + n2[i] * rcos
+                     for i in range(3)])
+
+
+def project_cylinder_onto_2d(ax, plane,
+                             start, end, start_radius, end_radius,
+                             color='black', alpha=1.):
+    '''take cylinder defined by start/end, and project it onto the plane
+
+    Args:
+        ax: matplotlib axes
+        plane(tuple of int): where x, y, z = 0, 1, 2, so (0, 1) is the xy axis
+        start(np.array): start coordinates
+        end(np.array): end coordinates
+        start_radius(float): start radius
+        end_radius(float): end radius
+        color: matplotlib color
+        alpha(float): alpha value
+
+    Note: There are probably more efficient ways of doing this: here the
+    3d outline is calculated, the non-used plane coordinates are dropped, a
+    tight convex hull is found, and that is used for a filled polygon
+    '''
+    points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
+    points = np.vstack([points[plane[0]].ravel(),
+                        points[plane[1]].ravel()])
+    points = points.T
+    hull = ConvexHull(points)
+    ax.add_patch(Polygon(points[hull.vertices], fill=True, color=color, alpha=alpha))
+
+
+def plot_cylinder(ax, start, end, start_radius, end_radius,
+                  color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+    '''plot a 3d cylinder'''
+    assert not np.all(start == end), 'Cylinder must have length'
+    x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
+                                          linspace_count=linspace_count)
+    ax.plot_surface(x, y, z, color=color, alpha=alpha)
+
+
+def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+    """ Plots a 3d sphere, given the center and the radius.  """
+
+    u = np.linspace(0, 2 * np.pi, linspace_count)
+    v = np.linspace(0, np.pi, linspace_count)
+    sin_v = np.sin(v)
+    x = center[0] + radius * np.outer(np.cos(u), sin_v)
+    y = center[1] + radius * np.outer(np.sin(u), sin_v)
     z = center[2] + radius * np.outer(np.ones_like(u), np.cos(v))
 
     ax.plot_surface(x, y, z, linewidth=0.0, color=color, alpha=alpha)
-
-    return fig, ax
-
-plot_style.__doc__ += PLOT_STYLE_PARAMS # pylint: disable=no-member

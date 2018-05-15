@@ -81,6 +81,14 @@ def n_leaves(neurites, neurite_type=NeuriteType.all):
     return n_sections(neurites, neurite_type=neurite_type, iterator_type=Tree.ileaf)
 
 
+def total_area_per_neurite(neurites, neurite_type=NeuriteType.all):
+    '''Surface area in a collection of neurites.
+
+    The area is defined as the sum of the area of the sections.
+    '''
+    return [neurite.area for neurite in iter_neurites(neurites, filt=is_type(neurite_type))]
+
+
 def map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreorder):
     '''Map `fun` to all the sections in a collection of neurites'''
     return map(fun, iter_sections(neurites,
@@ -88,12 +96,26 @@ def map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree
                                   neurite_filter=is_type(neurite_type)))
 
 
+def _section_length(section):
+    '''get section length of `section`'''
+    return morphmath.section_length(section.points)
+
+
 def section_lengths(neurites, neurite_type=NeuriteType.all):
     '''section lengths in a collection of neurites'''
-    def _seclen(sec, **kwargs):
-        '''get section length of `sec`'''
-        return morphmath.section_length(sec.points, **kwargs)
-    return map_sections(_seclen, neurites, neurite_type=neurite_type)
+    return map_sections(_section_length, neurites, neurite_type=neurite_type)
+
+
+def section_term_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Termination section lengths in a collection of neurites'''
+    return map_sections(_section_length, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ileaf)
+
+
+def section_bif_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Bifurcation section lengths in a collection of neurites'''
+    return map_sections(_section_length, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ibifurcation_point)
 
 
 def section_term_lengths(neurites, neurite_type=NeuriteType.all):
@@ -125,6 +147,18 @@ def section_bif_branch_orders(neurites, neurite_type=NeuriteType.all):
 def section_branch_orders(neurites, neurite_type=NeuriteType.all):
     '''section branch orders in a collection of neurites'''
     return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type)
+
+
+def section_bif_branch_orders(neurites, neurite_type=NeuriteType.all):
+    '''Bifurcation section branch orders in a collection of neurites'''
+    return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ibifurcation_point)
+
+
+def section_term_branch_orders(neurites, neurite_type=NeuriteType.all):
+    '''Termination section branch orders in a collection of neurites'''
+    return map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type,
+                        iterator_type=Tree.ileaf)
 
 
 def section_path_lengths(neurites, neurite_type=NeuriteType.all):
@@ -182,16 +216,33 @@ def number_of_segments(neurites, neurite_type=NeuriteType.all):
     return map_neurons(n_segments, neurites, neurite_type)
 
 
+def map_segments(func, neurites, neurite_type):
+    ''' Map `func` to all the segments in a collection of neurites
+
+        `func` accepts a section and returns list of values corresponding to each segment.
+    '''
+    neurite_filter = is_type(neurite_type)
+    return [
+        s for ss in iter_sections(neurites, neurite_filter=neurite_filter) for s in func(ss)
+    ]
+
+
 def segment_lengths(neurites, neurite_type=NeuriteType.all):
     '''Lengths of the segments in a collection of neurites'''
     def _seg_len(sec):
         '''list of segment lengths of a section'''
-        return np.linalg.norm(np.diff(sec.points[:, :COLS.R], axis=0),
-                              axis=1)
+        return np.linalg.norm(np.diff(sec.points[:, COLS.XYZ], axis=0), axis=1)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_len(ss)]
+    return map_segments(_seg_len, neurites, neurite_type)
+
+
+def segment_volumes(neurites, neurite_type=NeuriteType.all):
+    '''Volumes of the segments in a collection of neurites'''
+    def _func(sec):
+        '''list of segment volumes of a section'''
+        return [morphmath.segment_volume(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
+
+    return map_segments(_func, neurites, neurite_type)
 
 
 def segment_radii(neurites, neurite_type=NeuriteType.all):
@@ -201,9 +252,7 @@ def segment_radii(neurites, neurite_type=NeuriteType.all):
         pts = sec.points[:, COLS.R]
         return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_radii(ss)]
+    return map_segments(_seg_radii, neurites, neurite_type)
 
 
 def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
@@ -213,14 +262,12 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
     '''
     def _seg_taper_rates(sec):
         '''vectorized taper rates'''
-        pts = sec.points[:, :COLS.TYPE]
+        pts = sec.points[:, COLS.XYZR]
         diff = np.diff(pts, axis=0)
-        distance = np.linalg.norm(diff[:, :COLS.R], axis=1)
+        distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
         return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_taper_rates(ss)]
+    return map_segments(_seg_taper_rates, neurites, neurite_type)
 
 
 def segment_meander_angles(neurites, neurite_type=NeuriteType.all):
@@ -233,12 +280,10 @@ def segment_midpoints(neurites, neurite_type=NeuriteType.all):
     '''Return a list of segment mid-points in a collection of neurites'''
     def _seg_midpoint(sec):
         '''Return the mid-points of segments in a section'''
-        pts = sec.points
-        return np.divide(np.add(pts[:-1], pts[1:])[:, :3], 2.0)
+        pts = sec.points[:, COLS.XYZ]
+        return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    neurite_filter = is_type(neurite_type)
-    return [s for ss in iter_sections(neurites, neurite_filter=neurite_filter)
-            for s in _seg_midpoint(ss)]
+    return map_segments(_seg_midpoint, neurites, neurite_type)
 
 
 def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
@@ -360,7 +405,7 @@ def neurite_volume_density(neurites, neurite_type=NeuriteType.all):
     '''Get the volume density per neurite
 
     The volume density is defined as the ratio of the neurite volume and
-    the volume of the neurite's enclosung convex hull
+    the volume of the neurite's enclosing convex hull
     '''
     def vol_density(neurite):
         '''volume density of a single neurite'''
@@ -399,3 +444,8 @@ def principal_direction_extents(neurites, neurite_type=NeuriteType.all, directio
         return morphmath.principal_direction_extent(points)[direction]
 
     return map(_pde, iter_neurites(neurites, filt=is_type(neurite_type)))
+
+
+def section_strahler_orders(neurites, neurite_type=NeuriteType.all):
+    '''Inter-segment opening angles in a section'''
+    return map_sections(sectionfunc.strahler_order, neurites, neurite_type)

@@ -29,14 +29,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Examples of basic data checks'''
-from neurom.apps import get_config
-from neurom.check.runner import CheckRunner
-from neurom.exceptions import ConfigError
 import argparse
 import logging
 import sys
 import json
 
+from neurom.apps import get_config
+from neurom.check.runner import CheckRunner
+from neurom.exceptions import ConfigError
 
 DESCRIPTION = '''
 NeuroM Morphology Checker
@@ -95,10 +95,12 @@ Default values for options
 
 Available Checks
 ----------------
-                    Options
-has_no_jumps:      has_no_jumps - default 30 micrometer
-                                  distance considered a jump
-                   axis - default 'z', which axis to check
+                      Options
+has_no_jumps:         has_no_jumps - default 30 micrometer
+                                     distance considered a jump
+                      axis - default 'z', which axis to check
+has_no_narrow_starts: fraction_smaller - default 0.9 - difference between first
+                      and second trunk segment points
 
 Examples
 --------
