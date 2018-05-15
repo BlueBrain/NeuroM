@@ -99,6 +99,7 @@ def partition_asymmetry(bif_point):
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two daughter subtrees
     at each branch point.'''
+    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     if n == m:
