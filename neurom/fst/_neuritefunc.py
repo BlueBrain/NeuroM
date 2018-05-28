@@ -320,8 +320,8 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
-        dist.extend([sectionfunc.section_radial_distance(s, pos)
-                     for s in n.iter_sections()])
+        dist.extend(sectionfunc.section_radial_distance(s, pos)
+                     for s in n.iter_sections())
 
     return dist
 
@@ -331,10 +331,10 @@ def section_term_radial_distances(neurites, neurite_type=NeuriteType.all, origin
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
-        dist.extend([sectionfunc.section_radial_distance(s, pos)
-                     for s in iter_sections(n,
-                                            iterator_type=Tree.ileaf,
-                                            neurite_filter=is_type(neurite_type))])
+        dist.extend(sectionfunc.section_radial_distance(s, pos)
+                    for s in iter_sections(n,
+                                           iterator_type=Tree.ileaf,
+                                           neurite_filter=is_type(neurite_type)))
     return dist
 
 
@@ -343,10 +343,10 @@ def section_bif_radial_distances(neurites, neurite_type=NeuriteType.all, origin=
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
-        dist.extend([sectionfunc.section_radial_distance(s, pos)
-                     for s in iter_sections(n,
-                                            iterator_type=Tree.ibifurcation_point,
-                                            neurite_filter=is_type(neurite_type))])
+        dist.extend(sectionfunc.section_radial_distance(s, pos)
+                    for s in iter_sections(n,
+                                           iterator_type=Tree.ibifurcation_point,
+                                           neurite_filter=is_type(neurite_type)))
     return dist
 
 

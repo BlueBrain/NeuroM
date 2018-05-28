@@ -147,11 +147,7 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
 
-    def _vectors(section, soma):
-        '''Vector between soma and initial point computation'''
-        return morphmath.vector(section[0], soma.center)
-
-    return np.array([_vectors(s.root_node.points, n.soma)
+    return np.array([morphmath.vector(s.root_node.points[0], n.soma.center)
                      for n in nrns
                      for s in n.neurites if neurite_filter(s)])
 
