@@ -151,64 +151,49 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
         '''Vector between soma and initial point computation'''
         return morphmath.vector(section[0], soma.center)
 
-    return np.array([_vectors(s.root_node.points, n.soma)            
-                    for n in nrns
-                    for s in n.neurites if neurite_filter(s)])
+    return np.array([_vectors(s.root_node.points, n.soma)
+                     for n in nrns
+                     for s in n.neurites if neurite_filter(s)])
 
 
-def trunk_angles(nrn, neurite_type=NeuriteType.all, plane='XY'):
+def trunk_angles(nrn, neurite_type=NeuriteType.all):
     '''Calculates the angles between all the trunks of the neuron.
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
     '''
-    from neurom.core.dataformat import COLS
-    neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
-
-    horz = getattr(COLS, plane[0])
-    vert = getattr(COLS, plane[1])
-
-    def _vectors(section, soma):
-        '''Vector between soma and initial point computation'''
-        return morphmath.vector(section[0], soma.center)
+    vectors = trunk_vectors(nrn, neurite_type=neurite_type)
 
     def _angle_between(p1, p2):
-        '''Clockwise angle computation'''
+        """ Returns the angle in radians between vectors 'p1' and 'p2'::
+                >>> angle_between((1, 0), (0, 1))
+                1.5707963267948966
+                >>> angle_between((1, 0), (1, 0))
+                0.0
+                >>> angle_between((1, 0), (-1, 0))
+                3.141592653589793
+        """
+        v1 = p1 / np.linalg.norm(p1)
+        v2 = p2 / np.linalg.norm(p2)
+        return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
+
+    def _sort_angle(p1, p2):
+        """Angle between p1-p2 to sort vectors"""
         ang1 = np.arctan2(*p1[::-1])
         ang2 = np.arctan2(*p2[::-1])
         return (ang1 - ang2)
 
-    vectors = np.array([_vectors(s.root_node.points, n.soma)            
-                        for n in nrns
-                        for s in n.neurites if neurite_filter(s)])
-
     # In order to avoid the failure of the process in case the neurite_type does not exist
-    if len(vectors) == 0:
+    if not vectors.size:
         return []
-    # sorting angles according to x-y plane
-    order = np.argsort(np.array([_angle_between(i/ np.linalg.norm(i), [0,1])
+    # Sorting angles according to x-y plane
+    order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
                                  for i in vectors[:, 0:2]]))
 
-    angles = []
+    ordered_vectors = vectors[order][:, [COLS.X, COLS.Y]]
 
-    selected_vectors = vectors[:, [horz, vert]]
+    return [_angle_between(ordered_vectors[i], ordered_vectors[i - 1])
+            for i, _ in enumerate(ordered_vectors)]
 
-    for i,v in enumerate(selected_vectors):
-
-        a = _angle_between(selected_vectors[i], selected_vectors[i-1])
-
-        if np.abs(2 * np.pi - np.abs(a)) < np.abs(a):
-            angles.append(np.abs(2 * np.pi - np.abs(a)) - 2 * np.pi / len(vectors))
-        else:
-            angles.append(np.abs(a) - 2 * np.pi / len(vectors))
-
-    return angles
-
-    # angles = np.array([_angle_between(i/ np.linalg.norm(i), [0,1]) for i in vectors[:, 0:2]])
-    #return [angles[order][i-1] - angles[order][i] 
-    #        if np.abs(angles[order][i-1] - angles[order][i]) < np.pi
-    #        else 2*np.pi - np.abs(angles[order][i-1] - angles[order][i])
-    #        for i in xrange(len(order))]
 
 def sholl_crossings(neurites, center, radii):
     '''calculate crossings of neurites

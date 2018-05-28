@@ -64,7 +64,7 @@ def section_tortuosity(section):
 def section_end_distance(section):
     '''End to end distance of a section
 
-    The end to end distance of a section is defined as 
+    The end to end distance of a section is defined as
     the euclidian distnce between its end points.
 
     If the section contains less than 2 points, the value 0 is returned.

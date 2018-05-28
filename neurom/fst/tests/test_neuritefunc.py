@@ -202,6 +202,26 @@ def test_section_bif_lengths():
     assert_allclose(bif_lengths,
                     (5.,  4.))
 
+def test_section_bif_radial_distances():
+    bif_rads = list(_nf.section_bif_radial_distances(SIMPLE))
+    assert_allclose(bif_rads,
+                    [5.,  4.])
+
+def test_section_end_distances():
+    end_dist = list(_nf.section_end_distances(SIMPLE))
+    assert_allclose(end_dist,
+                    [5.0, 5.0, 6.0, 4.0, 6.0, 5.0])
+
+def test_section_partition_pairs():
+    part_pairs = list(_nf.partition_pairs(SIMPLE))
+    assert_allclose(part_pairs,
+                    [(1.0, 1.0), (1.0, 1.0)])
+
+def test_section_term_radial_distances():
+    trm_rads = list(_nf.section_term_radial_distances(SIMPLE))
+    assert_allclose(trm_rads,
+                    [7.0710678118654755, 7.810249675906654, 7.211102550927978, 6.4031242374328485])
+
 def test_number_of_sections_per_neurite():
     sections = _nf.number_of_sections_per_neurite(SIMPLE)
     assert_allclose(sections,
