@@ -315,39 +315,31 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
                              neurite_filter=is_type(neurite_type)))
 
 
-def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
-    '''Remote bifurcation angles in a collection of neurites'''
+def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None,
+                             iterator_type=Tree.ipreorder):
+    '''Remote bifurcation angles in a collection of neurites.
+    The iterator_type can be used to select only terminal sections (ileaf)
+    or only bifurcations (ibifurcation_point).'''
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
         dist.extend(sectionfunc.section_radial_distance(s, pos)
-                    for s in n.iter_sections())
-
+                    for s in iter_sections(n,
+                                           iterator_type=iterator_type,
+                                           neurite_filter=is_type(neurite_type)))
     return dist
 
 
 def section_term_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     '''Get the radial distances of the termination sections for a collection of neurites'''
-    dist = []
-    for n in iter_neurites(neurites, filt=is_type(neurite_type)):
-        pos = n.root_node.points[0] if origin is None else origin
-        dist.extend(sectionfunc.section_radial_distance(s, pos)
-                    for s in iter_sections(n,
-                                           iterator_type=Tree.ileaf,
-                                           neurite_filter=is_type(neurite_type)))
-    return dist
+    return section_radial_distances(neurites, neurite_type=neurite_type, origin=origin,
+                                    iterator_type=Tree.ileaf)
 
 
 def section_bif_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     '''Get the radial distances of the bifurcation sections for a collection of neurites'''
-    dist = []
-    for n in iter_neurites(neurites, filt=is_type(neurite_type)):
-        pos = n.root_node.points[0] if origin is None else origin
-        dist.extend(sectionfunc.section_radial_distance(s, pos)
-                    for s in iter_sections(n,
-                                           iterator_type=Tree.ibifurcation_point,
-                                           neurite_filter=is_type(neurite_type)))
-    return dist
+    return section_radial_distances(neurites, neurite_type=neurite_type, origin=origin,
+                                    iterator_type=Tree.ibifurcation_point)
 
 
 def number_of_sections_per_neurite(neurites, neurite_type=NeuriteType.all):
