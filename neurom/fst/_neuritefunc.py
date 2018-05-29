@@ -321,7 +321,7 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
         dist.extend(sectionfunc.section_radial_distance(s, pos)
-                     for s in n.iter_sections())
+                    for s in n.iter_sections())
 
     return dist
 
