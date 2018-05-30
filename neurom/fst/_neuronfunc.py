@@ -158,19 +158,9 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
     are sorted from the y axis and anticlock-wise.
     '''
     vectors = trunk_vectors(nrn, neurite_type=neurite_type)
-
-    def _angle_between(p1, p2):
-        """ Returns the angle in radians between vectors 'p1' and 'p2'::
-                >>> angle_between((1, 0), (0, 1))
-                1.5707963267948966
-                >>> angle_between((1, 0), (1, 0))
-                0.0
-                >>> angle_between((1, 0), (-1, 0))
-                3.141592653589793
-        """
-        v1 = p1 / np.linalg.norm(p1)
-        v2 = p2 / np.linalg.norm(p2)
-        return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
+    # In order to avoid the failure of the process in case the neurite_type does not exist
+    if not vectors.size:
+        return []
 
     def _sort_angle(p1, p2):
         """Angle between p1-p2 to sort vectors"""
@@ -178,16 +168,13 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
         ang2 = np.arctan2(*p2[::-1])
         return (ang1 - ang2)
 
-    # In order to avoid the failure of the process in case the neurite_type does not exist
-    if not vectors.size:
-        return []
     # Sorting angles according to x-y plane
     order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
                                  for i in vectors[:, 0:2]]))
 
     ordered_vectors = vectors[order][:, [COLS.X, COLS.Y]]
 
-    return [_angle_between(ordered_vectors[i], ordered_vectors[i - 1])
+    return [morphmath.angle_between_vectors(ordered_vectors[i], ordered_vectors[i - 1])
             for i, _ in enumerate(ordered_vectors)]
 
 

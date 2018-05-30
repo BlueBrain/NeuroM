@@ -209,6 +209,22 @@ def angle_3points(p0, p1, p2):
                       np.dot(vec1, vec2))
 
 
+def angle_between_vectors(p1, p2):
+    """ Computes the angle in radians between vectors 'p1' and 'p2'
+    Normalizes the input vectors and computes the relative angle
+    between them.
+        >>> angle_between((1, 0), (0, 1))
+        1.5707963267948966
+        >>> angle_between((1, 0), (1, 0))
+        0.0
+        >>> angle_between((1, 0), (-1, 0))
+        3.141592653589793
+    """
+    v1 = p1 / np.linalg.norm(p1)
+    v2 = p2 / np.linalg.norm(p2)
+    return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
+
+
 def polygon_diameter(points):
     ''' Compute the maximun euclidian distance between any two points
     in a list of points

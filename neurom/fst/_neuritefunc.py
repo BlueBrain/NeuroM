@@ -308,7 +308,9 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all):
 
 
 def partition_pairs(neurites, neurite_type=NeuriteType.all):
-    '''Partition pairs at bifurcation points of a collection of neurites'''
+    '''Partition pairs at bifurcation points of a collection of neurites.
+    Partition pait is defined as the number of bifurcations at the two
+    daughters of the bifurcating section'''
     return map(_bifurcationfunc.partition_pair,
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
@@ -317,7 +319,7 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
 
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None,
                              iterator_type=Tree.ipreorder):
-    '''Remote bifurcation angles in a collection of neurites.
+    '''Section radial distances in a collection of neurites.
     The iterator_type can be used to select only terminal sections (ileaf)
     or only bifurcations (ibifurcation_point).'''
     dist = []
