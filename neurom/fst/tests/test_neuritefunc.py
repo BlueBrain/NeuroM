@@ -202,6 +202,51 @@ def test_section_bif_lengths():
     assert_allclose(bif_lengths,
                     (5.,  4.))
 
+def test_section_end_distances():
+    end_dist = list(_nf.section_end_distances(SIMPLE))
+    assert_allclose(end_dist,
+                    [5.0, 5.0, 6.0, 4.0, 6.0, 5.0])
+
+def test_section_partition_pairs():
+    part_pairs = list(_nf.partition_pairs(SIMPLE))
+    assert_allclose(part_pairs,
+                    [(1.0, 1.0), (1.0, 1.0)])
+
+def test_section_bif_radial_distances():
+    bif_rads = list(_nf.section_bif_radial_distances(SIMPLE))
+    assert_allclose(bif_rads,
+                    [5.,  4.])
+    trm_rads = list(_nf.section_bif_radial_distances(NRN, neurite_type=nm.AXON))
+    assert_allclose(trm_rads,
+                    [8.842008561870646,
+                     16.7440421479104,
+                     23.070306480850533,
+                     30.181121708042546,
+                     36.62766031035137,
+                     43.967487830324885,
+                     51.91971040624528,
+                     59.427722328770955,
+                     66.25222507299583,
+                     74.05119754074926])
+
+def test_section_term_radial_distances():
+    trm_rads = list(_nf.section_term_radial_distances(SIMPLE))
+    assert_allclose(trm_rads,
+                    [7.0710678118654755, 7.810249675906654, 7.211102550927978, 6.4031242374328485])
+    trm_rads = list(_nf.section_term_radial_distances(NRN, neurite_type=nm.APICAL_DENDRITE))
+    assert_allclose(trm_rads,
+                    [16.22099879395879,
+                     25.992977561564082,
+                     33.31600613822663,
+                     42.721314797308175,
+                     52.379508081911546,
+                     59.44327819128149,
+                     67.07832724133213,
+                     79.97743930553612,
+                     87.10434825508366,
+                     97.25246040544428,
+                     99.58945832481642])
+
 def test_number_of_sections_per_neurite():
     sections = _nf.number_of_sections_per_neurite(SIMPLE)
     assert_allclose(sections,

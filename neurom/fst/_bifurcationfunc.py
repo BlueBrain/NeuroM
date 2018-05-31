@@ -95,14 +95,24 @@ def partition_asymmetry(bif_point):
     '''Calculate the partition asymmetry at a bifurcation point
     as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
-    We first ensure that the input point has only two children.
-
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two daughter subtrees
     at each branch point.'''
     assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
-
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    if n == m:
+        return 0.0
     return abs(n - m) / abs(n + m)
+
+
+def partition_pair(bif_point):
+    '''Calculate the partition pairs at a bifurcation point
+
+    The number of nodes in each child tree is counted. The partition
+    pairs is the number of bifurcations in the two daughter subtrees
+    at each branch point.'''
+    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    return (n, m)

@@ -61,6 +61,18 @@ def section_tortuosity(section):
     return 1 if len(pts) < 2 else mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
+def section_end_distance(section):
+    '''End to end distance of a section
+
+    The end to end distance of a section is defined as
+    the euclidian distnce between its end points.
+
+    If the section contains less than 2 points, the value 0 is returned.
+    '''
+    pts = section.points
+    return 0 if len(pts) < 2 else mm.point_dist(pts[-1], pts[0])
+
+
 def branch_order(section):
     '''Branching order of a tree section
 

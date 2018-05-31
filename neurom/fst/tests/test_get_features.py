@@ -844,6 +844,7 @@ def test_partition():
 def test_partition_asymmetry():
     nt.ok_(np.allclose(fst_get('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,
                                                                             0.85714286, 0.83333333,
+
                                                                             0.8, 0.75,  0.66666667,
                                                                             0.5,  0.])))
 
