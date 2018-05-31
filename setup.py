@@ -43,7 +43,7 @@ REQS = ['enum34>=1.0.4',
         'numpy>=1.8.0',
         'pylru>=1.0',
         'pyyaml>=3.10',
-        'scipy>=0.13.3',
+        'scipy>=0.17.0',
         'tqdm>=4.8.4',
         'future>=0.16.0',
         ]
