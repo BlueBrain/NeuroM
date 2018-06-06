@@ -25,15 +25,12 @@ after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install codecov; codecov; fi
 before_deploy:
   - pip install twine
-
-jobs:
-  include:
-    - stage: deploy
-      python: 2.7
-      provider: pypi
-      user: bbp.opensource
-      password:
-        secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
-      on:
-        tags: true
-        branch: master
+deploy:
+  provider: pypi
+  user: bbp.opensource
+  password:
+    secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
+  on:
+    tags: true
+    branch: master
+    condition: "$TRAVIS_PYTHON_VERSION == 2.7"
