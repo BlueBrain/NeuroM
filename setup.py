@@ -38,7 +38,7 @@ VERSION = "1.4.7"
 
 REQS = ['enum34>=1.0.4',
         'future>=0.16.0',
-        'h5py==2.7.1',
+        'h5py>=2.7.1',
         'matplotlib>=1.3.1',
         'numpy>=1.8.0',
         'pylru>=1.0',
