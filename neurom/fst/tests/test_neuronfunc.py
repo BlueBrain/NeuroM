@@ -50,35 +50,42 @@ NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
+SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
 
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
     nt.eq_(ret, 12.566370614359172)
 
+
 def test_soma_surface_areas():
     ret = _nf.soma_surface_areas(SIMPLE)
     nt.eq_(ret, [12.566370614359172, ])
+
 
 def test_soma_radii():
     ret = _nf.soma_radii(SIMPLE)
     nt.eq_(ret, [1., ])
 
+
 def test_trunk_section_lengths():
     ret = _nf.trunk_section_lengths(SIMPLE)
     nt.eq_(ret, [5.0, 4.0])
+
 
 def test_trunk_origin_radii():
     ret = _nf.trunk_origin_radii(SIMPLE)
     nt.eq_(ret, [1.0, 1.0])
 
+
 def test_trunk_origin_azimuths():
     ret = _nf.trunk_origin_azimuths(SIMPLE)
     nt.eq_(ret, [0.0, 0.0])
 
+
 def test_trunk_angles():
     ret = _nf.trunk_angles(SIMPLE_TRUNK)
-    assert_array_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
+    assert_array_equal(ret, [np.pi / 2, np.pi / 2, np.pi / 2, np.pi / 2])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
     assert_array_equal(ret, [np.pi, np.pi])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
@@ -119,11 +126,11 @@ def test_trunk_origin_elevations():
 
     pop = Population([n0, n1])
     nt.eq_(list(_nf.trunk_origin_elevations(pop)),
-           [0.0, np.pi/2., -np.pi/2.])
+           [0.0, np.pi / 2., -np.pi / 2.])
 
     nt.eq_(
         list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
-        [0.0, np.pi/2., -np.pi/2.])
+        [0.0, np.pi / 2., -np.pi / 2.])
 
     nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
            0)
@@ -134,7 +141,7 @@ def test_trunk_origin_elevations():
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _nf.trunk_origin_elevations(NRN)
+    _nf.trunk_origin_elevations(SWC_NRN)
 
 
 def test_sholl_crossings_simple():
@@ -164,8 +171,8 @@ def load_swc(string):
 
 
 def test_sholl_analysis_custom():
-    #recreate morphs from Fig 2 of
-    #http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
+    # recreate morphs from Fig 2 of
+    # http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
     radii = np.arange(10, 81, 10)
     center = 0, 0, 0
     morph_A = load_swc('''\
@@ -214,4 +221,4 @@ def test_sholl_analysis_custom():
                        ''')
     nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 10, 10])
-    #view.neuron(morph_C)[0].savefig('foo.png')
+    # view.neuron(morph_C)[0].savefig('foo.png')

@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from nose import tools as nt
+from nose.tools import assert_almost_equal, ok_
 from neurom.core import _soma
 from neurom.exceptions import SomaError
 import numpy as np
@@ -47,8 +48,8 @@ SOMA_SIMPLECONTOUR_PTS_4 = [
     [0, -1, 0, 44, 4, 1, 3],
 ]
 
-sin_pi_by_4 = math.cos(math.pi/4.)
-cos_pi_by_4 = math.sin(math.pi/4.)
+sin_pi_by_4 = math.cos(math.pi / 4.)
+cos_pi_by_4 = math.sin(math.pi / 4.)
 
 SOMA_SIMPLECONTOUR_PTS_6 = [
     [1, 0, 0, 44, 1, 1, -1],
@@ -82,32 +83,31 @@ INVALID_PTS_2 = [
 
 def test_make_Soma_SinglePoint():
     sm = _soma.make_soma(SOMA_SINGLE_PTS)
-    nt.ok_('SomaSinglePoint' in str(sm))
-    nt.ok_(isinstance(sm, _soma.SomaSinglePoint))
+    ok_('SomaSinglePoint' in str(sm))
+    ok_(isinstance(sm, _soma.SomaSinglePoint))
     nt.eq_(list(sm.center), [11, 22, 33])
-    nt.ok_(sm.radius == 44)
+    ok_(sm.radius == 44)
 
 
 def test_make_Soma_ThreePoint():
     sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CONTOUR)
-    nt.ok_('SomaThreePoint' in str(sm))
-    nt.ok_(isinstance(sm, _soma.SomaThreePoint))
+    ok_(isinstance(sm, _soma.SomaSimpleContour))
     nt.eq_(list(sm.center), [0, 0, 0])
-    nt.eq_(sm.radius, 44)
+    assert_almost_equal(sm.radius, 29.33333333, places=5)
 
 
 def test_make_Soma_ThreePointCylinder():
     sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CYLINDER)
-    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
-    nt.ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
+    ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
+    ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
     nt.eq_(sm.radius, 44)
 
 
 def check_SomaC(points):
     sm = _soma.make_soma(points)
-    nt.ok_('SomaSimpleContour' in str(sm))
-    nt.ok_(isinstance(sm, _soma.SomaSimpleContour))
+    ok_('SomaSimpleContour' in str(sm))
+    ok_(isinstance(sm, _soma.SomaSimpleContour))
     np.testing.assert_allclose(sm.center, (0., 0., 0.), atol=1e-16)
     nt.eq_(sm.radius, 1.0)
 
@@ -140,7 +140,7 @@ def test_make_Soma_Cylinders():
     nt.eq_(s.radius, 20.0)
     nt.assert_almost_equal(s.area, 5026.548245743669)
     nt.eq_(s.center, [0, 0, -10])
-    nt.ok_('SomaCylinders' in str(s))
+    ok_('SomaCylinders' in str(s))
 
     # cylinder: h = 10, r = 20
     soma_2pt_normal = np.array([
@@ -148,16 +148,16 @@ def test_make_Soma_Cylinders():
         [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
     ])
     s = _soma.make_soma(soma_2pt_normal, soma_class=_soma.SOMA_CYLINDER)
-    nt.assert_almost_equal(s.area, 1256.6370614) # see r = 2*h above
+    nt.assert_almost_equal(s.area, 1256.6370614)  # see r = 2*h above
     nt.eq_(list(s.center), [0., 0., 0.])
 
-    #check tapering
+    # check tapering
     soma_2pt_normal = np.array([
         [0.0,   0.0,  0.0, 0.0, 1, 1, -1],
         [0.0, -10.0,  0.0, 20.0, 1, 2,  1],
     ])
     s = _soma.make_soma(soma_2pt_normal, soma_class=_soma.SOMA_CYLINDER)
-    nt.assert_almost_equal(s.area, 1404.9629462081452) # cone area, not including 'bottom'
+    nt.assert_almost_equal(s.area, 1404.9629462081452)  # cone area, not including 'bottom'
 
     # neuromorpho style
     soma_3pt_neuromorpho = np.array([
@@ -166,20 +166,20 @@ def test_make_Soma_Cylinders():
         [0.0,   10.0, 0.0, 10.0, 1, 3,  1],
     ])
     s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
-    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
+    ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 1256.6370614)
 
     # some neuromorpho files don't follow the convention
-    #but have (ys + rs) as point 2, and have xs different in each line
+    # but have (ys + rs) as point 2, and have xs different in each line
     # ex: http://neuromorpho.org/dableFiles/brumberg/CNG%20version/april11s1cell-1.CNG.swc
     soma_3pt_neuromorpho = np.array([
-        [ 0.0,   0.0,  0.0, 10.0, 1, 1, -1],
+        [0.0,   0.0,  0.0, 10.0, 1, 1, -1],
         [-2.0,   6.0,  0.0, 10.0, 1, 2,  1],
-        [ 2.0,  -6.0,  0.0, 10.0, 1, 3,  1],
+        [2.0,  -6.0,  0.0, 10.0, 1, 3,  1],
     ])
     s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
-    nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
+    ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 794.76706126368811)
 
@@ -193,4 +193,4 @@ def test_make_Soma_Cylinders():
     ])
     s = _soma.make_soma(soma_4pt_normal, soma_class=_soma.SOMA_CYLINDER)
     nt.eq_(list(s.center), [0., 0., 0.])
-    nt.assert_almost_equal(s.area, 444.288293851) # cone area, not including bottom
+    nt.assert_almost_equal(s.area, 444.288293851)  # cone area, not including bottom

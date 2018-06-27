@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from nose import tools as nt
+from numpy.testing import assert_array_almost_equal
 from neurom.core.types import NeuriteType
 import neurom.view._dendrogram as dm
 from neurom import load_neuron, get
@@ -14,6 +15,7 @@ TREE = NEURITE.root_node
 OLD_OFFS = [1.2, -1.2]
 NEW_OFFS = [2.3, -2.3]
 SPACING = (40., 0.)
+
 
 def test_n_rectangles_tree():
 
@@ -29,10 +31,10 @@ def test_vertical_segment():
 
     radii = [10., 20.]
 
-    res = np.array([[ -7.7,  -1.2],
+    res = np.array([[-7.7,  -1.2],
                     [-17.7,  -2.3],
-                    [ 22.3,  -2.3],
-                    [ 12.3,  -1.2]])
+                    [22.3,  -2.3],
+                    [12.3,  -1.2]])
 
     seg = dm._vertical_segment(OLD_OFFS, NEW_OFFS, SPACING, radii)
 
@@ -43,10 +45,10 @@ def test_horizontal_segment():
 
     diameter = 10.
 
-    res = np.array([[  1.2,  -1.2],
-                    [  2.3,  -1.2],
-                    [  2.3, -11.2],
-                    [  1.2, -11.2]])
+    res = np.array([[1.2,  -1.2],
+                    [2.3,  -1.2],
+                    [2.3, -11.2],
+                    [1.2, -11.2]])
 
     seg = dm._horizontal_segment(OLD_OFFS, NEW_OFFS, SPACING, diameter)
 
@@ -98,11 +100,11 @@ class TestDendrogram(object):
     def test_generate_soma(self):
 
         vrec = self.dnrn.soma
-        trec = np.array([[-0.17071068, -0.34142136],
-                         [-0.17071068,  0.        ],
-                         [ 0.17071068,  0.        ],
-                         [ 0.17071068, -0.34142136]])
-        nt.assert_true(np.allclose(vrec, trec))
+        assert_array_almost_equal(vrec,
+                                  np.array([[-0.092495, -0.18499],
+                                            [-0.092495,  0.],
+                                            [0.092495,  0.],
+                                            [0.092495, -0.18499]]))
 
         vrec = self.dtr.soma
 
