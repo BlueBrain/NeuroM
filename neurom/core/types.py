@@ -28,11 +28,13 @@
 
 '''Type enumerations'''
 
-from enum import IntEnum, unique
+from enum import unique
+
+from neurom.utils import OrderedEnum
 
 
 @unique
-class NeuriteType(IntEnum):
+class NeuriteType(OrderedEnum):
     '''Enum representing valid tree types'''
     undefined = 1
     soma = 2
