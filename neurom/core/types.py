@@ -34,6 +34,17 @@ from neurom.utils import OrderedEnum
 
 
 @unique
+class NeuriteIter(OrderedEnum):
+    '''Neurite iteration orders'''
+    FileOrder = 1  # Order in which neurites appear in the file
+
+    # NRN simulator order: soma -> axon -> basal -> apical
+    # Coming from:
+    # https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874
+    NRN = 2
+
+
+@unique
 class NeuriteType(OrderedEnum):
     '''Enum representing valid tree types'''
     undefined = 1

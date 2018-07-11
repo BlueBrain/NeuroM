@@ -1,0 +1,6 @@
+# NRN simulator neurite order is: soma -> axon -> basal -> apical
+# In this file the order is reversed
+ 1 1  0  0 0 1. -1
+ 2 5  0  0 0 1.  1 # apical
+ 6 4  0  0 0 1.  1 # basal
+ 6 3  0  0 0 1.  1 # axon
