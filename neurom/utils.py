@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''NeuroM helper utilities'''
+from enum import Enum
 import json
 import warnings
 from functools import partial, wraps
@@ -115,3 +116,29 @@ class NeuromJSON(json.JSONEncoder):
         elif isinstance(o, np.ndarray):
             return o.tolist()
         return json.JSONEncoder.default(self, o)
+
+
+class OrderedEnum(Enum):
+    '''Implementation taken here: https://docs.python.org/3/library/enum.html#orderedenum
+
+    Fixes https://github.com/BlueBrain/NeuroM/issues/697'''
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        raise NotImplementedError
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        raise NotImplementedError
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        raise NotImplementedError
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        raise NotImplementedError

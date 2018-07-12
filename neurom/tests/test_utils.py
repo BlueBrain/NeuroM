@@ -94,3 +94,23 @@ def test_NeuromJSON():
     nt.eq_(enc.default(ex['two']), 2.0)
 
     nt.assert_raises(TypeError, enc.default, 0)
+
+
+def test_ordered_enum():
+    class Grade(nu.OrderedEnum):
+        A = 5
+        B = 4
+        C = 3
+        D = 2
+        F = 1
+
+    nt.ok_(Grade.C < Grade.A)
+    nt.ok_(Grade.C <= Grade.A)
+    nt.ok_(Grade.C <= Grade.C)
+    nt.ok_(not Grade.C > Grade.A)
+    nt.ok_(not Grade.C >= Grade.A)
+    nt.ok_(Grade.C >= Grade.C)
+    nt.assert_raises(NotImplementedError, Grade.__ge__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__le__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__gt__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__lt__, Grade.A, 1)
