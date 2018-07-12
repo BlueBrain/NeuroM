@@ -73,6 +73,10 @@ def test_neurite_type():
     nrt = Neurite(root_node)
     nt.eq_(nrt.type, nm.BASAL_DENDRITE)
 
+    # https://github.com/BlueBrain/NeuroM/issues/697
+    nt.assert_equal(np.array([nm.AXON, nm.BASAL_DENDRITE]).dtype,
+                    np.object)
+
 
 def test_neurite_length():
     nrt = Neurite(ROOT_NODE)
