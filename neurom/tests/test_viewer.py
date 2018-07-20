@@ -29,14 +29,16 @@
 import os
 import shutil
 import tempfile
+import mock
+import sys
 
 import matplotlib
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
-from neurom.view import common
-from neurom import load_neuron
-from neurom import viewer
+from neurom.view import common, plotly
+import neurom
+from neurom import load_neuron, viewer
 
 from nose import tools as nt
 
@@ -45,6 +47,34 @@ DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
 MORPH_FILENAME = os.path.join(DATA_PATH, 'Neuron.swc')
 
 nrn = load_neuron(MORPH_FILENAME)
+
+
+def _reload_module(module):
+    '''Force module reload'''
+    if sys.version_info >= (3,):
+        import importlib
+        importlib.reload(module)
+    else:
+        reload(module)
+
+
+def test_plotly_extra_not_installed():
+    with mock.patch.dict(sys.modules, {'plotly': None}):
+        try:
+            _reload_module(neurom.view.plotly)
+            nt.ok_(False, "ImportError not triggered")
+        except ImportError as e:
+            nt.assert_equal(str(e),
+                            'neurom[plotly] is not installed. '
+                            'Please install it by doing: pip install neurom[plotly]')
+
+
+def test_plotly_draw_neuron():
+    plotly.draw(nrn, plane='3d', auto_open=False)
+
+
+def test_plotly_draw_neuron3d():
+    plotly.draw(nrn, plane='xy', auto_open=False)
 
 
 def test_draw_neuron():
