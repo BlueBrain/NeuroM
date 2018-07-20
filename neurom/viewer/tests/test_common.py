@@ -35,7 +35,7 @@ import tempfile
 import numpy as np
 
 
-from neurom.view.common import (plt, figure_naming, get_figure, save_plot, plot_style,
+from neurom.viewer.common import (plt, figure_naming, get_figure, save_plot, plot_style,
                                 plot_title, plot_labels, plot_legend, update_plot_limits, plot_ticks,
                                 plot_sphere, plot_cylinder)
 

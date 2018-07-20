@@ -12,7 +12,7 @@ except ImportError:
         'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]')
 
 from neurom import COLS, iter_segments, iter_neurites
-from neurom.view.view import TREE_COLOR
+from neurom.viewer.view import TREE_COLOR
 
 
 def draw(obj, plane='3d', inline=False, **kwargs):

@@ -40,12 +40,13 @@ Examples:
 
 '''
 
-from .view import (plot_neuron, plot_neuron3d,
-                   plot_tree, plot_tree3d,
-                   plot_soma, plot_soma3d,
-                   plot_dendrogram)
-from .view import common
-from .core import Tree, Neurite, Soma, Neuron
+from neurom.viewer.view import (plot_neuron, plot_neuron3d,
+                                plot_tree, plot_tree3d,
+                                plot_soma, plot_soma3d,
+                                plot_dendrogram)
+
+from neurom.viewer import common
+from neurom.core import Tree, Neurite, Soma, Neuron
 
 
 MODES = ('2d', '3d', 'dendrogram')

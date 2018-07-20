@@ -33,7 +33,7 @@ import numpy as np
 
 from nose import tools as nt
 from neurom import load_neuron
-from neurom.view import view, common
+from neurom.viewer import view, common
 from neurom.core import Section
 from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType

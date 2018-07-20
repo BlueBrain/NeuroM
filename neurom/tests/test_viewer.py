@@ -36,7 +36,7 @@ import matplotlib
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
-from neurom.view import common, plotly
+from neurom.viewer import common, plotly
 import neurom
 from neurom import load_neuron, viewer
 
@@ -61,7 +61,7 @@ def _reload_module(module):
 def test_plotly_extra_not_installed():
     with mock.patch.dict(sys.modules, {'plotly': None}):
         try:
-            _reload_module(neurom.view.plotly)
+            _reload_module(neurom.viewer.plotly)
             nt.ok_(False, "ImportError not triggered")
         except ImportError as e:
             nt.assert_equal(str(e),

@@ -72,5 +72,5 @@ for developers of NeuroM itself.
    neurom.io.swc
    neurom.io.hdf5
    neurom.view
-   neurom.view.common
-   neurom.view.view
+   neurom.viewer.common
+   neurom.viewer.view

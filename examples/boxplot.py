@@ -30,7 +30,7 @@
 ''' Box Plot function for multiple neurons
 '''
 
-from neurom.view import common
+from neurom.viewer import common
 
 
 def boxplot(neurons, feature, new_fig=True, subplot=False):

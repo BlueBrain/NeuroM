@@ -6,10 +6,10 @@ if 'DISPLAY' not in os.environ:  # noqa
 
 from contextlib import contextmanager
 
-from neurom.view import common
+from neurom.viewer import common
 common._get_plt()
 
-from neurom.view.common import plt
+from neurom.viewer.common import plt
 
 
 @contextmanager

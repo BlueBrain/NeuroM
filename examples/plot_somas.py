@@ -30,10 +30,12 @@
 '''Load and view multiple somas'''
 
 import os
-from neurom import load_neuron
-import neurom.view.common as common
+
 import matplotlib.pyplot as plt
 import numpy as np
+
+import neurom.viewer.common as common
+from neurom import load_neuron
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../test_data')

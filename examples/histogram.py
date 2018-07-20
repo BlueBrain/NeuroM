@@ -32,7 +32,7 @@
 from itertools import chain
 
 import numpy as np
-from neurom.view import common
+from neurom.viewer import common
 
 
 def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):

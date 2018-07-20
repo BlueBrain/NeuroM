@@ -37,7 +37,7 @@ from neurom.core import iter_segments
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.morphmath import segment_radius
-from neurom.view._dendrogram import Dendrogram
+from neurom.viewer._dendrogram import Dendrogram
 
 from mpl_toolkits.mplot3d.art3d import Line3DCollection  # pylint: disable=relative-import
 
