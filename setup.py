@@ -68,6 +68,9 @@ config = {
                 'apps/morph_stats',
                 ],
     'name': 'neurom',
+    'extras_require': {
+        'plotly': ['plotly==3.0.0'],
+    },
     'include_package_data': True,
 }
 

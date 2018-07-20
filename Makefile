@@ -54,7 +54,7 @@ $(VENV):
 $(VENV_INSTALLED): $(VENV)
 	$(VENV_BIN)/pip install --upgrade pip
 	$(VENV_BIN)/pip install $(PIP_INSTALL_OPTIONS) -r requirements_dev.txt
-	$(VENV_BIN)/pip install -e .
+	$(VENV_BIN)/pip install -e .[plotly]
 	touch $@
 
 run_pycodestyle: $(VENV_INSTALLED)

@@ -66,7 +66,7 @@ def assert_items_equal(a, b):
 
 def assert_features_for_neurite(feat, neurons, expected, exact=True):
     for neurite_type, expected_values in expected.items():
-
+        # print('neurite_type: %s' % neurite_type)
         if neurite_type is None:
             res_pop = fst_get(feat, neurons)
             res = fst_get(feat, neurons[0])
