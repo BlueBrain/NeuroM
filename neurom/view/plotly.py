@@ -75,12 +75,12 @@ def _plotly(neuron, plane, title, inline, **kwargs):
     layout = dict(
         autosize=True,
         title=title,
-        scene=dict(
+        scene=dict(  # This is used for 3D plots
             xaxis=axis, yaxis=axis, zaxis=axis,
             camera=dict(up=dict(x=0, y=0, z=1), eye=dict(x=-1.7428, y=1.0707, z=0.7100,)),
-            aspectratio=dict(x=1, y=1, z=0.7),
-            aspectmode='manual'
+            aspectmode='data'
         ),
+        yaxis=dict(scaleanchor="x"),  # This is used for 2D plots
     )
 
     fig = dict(data=data, layout=layout)
