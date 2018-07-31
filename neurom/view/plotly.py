@@ -4,6 +4,9 @@ morphology using plotly
 '''
 from __future__ import absolute_import  # prevents name clash with local plotly module
 from itertools import chain
+
+import numpy as np
+
 try:
     import plotly.graph_objs as go
     from plotly.offline import plot, iplot, init_notebook_mode
@@ -72,6 +75,43 @@ def _plotly(neuron, plane, title, inline, **kwargs):
         showbackground=True,
         backgroundcolor='rgb(230, 230,230)'
     )
+
+    if plane != '3d':
+        soma_2d = [
+            # filled circle
+            {
+                'type': 'circle',
+                'xref': 'x',
+                'yref': 'y',
+                'fillcolor': 'rgba(50, 171, 96, 0.7)',
+                'x0': neuron.soma.center[0] - neuron.soma.radius,
+                'y0': neuron.soma.center[1] - neuron.soma.radius,
+                'x1': neuron.soma.center[0] + neuron.soma.radius,
+                'y1': neuron.soma.center[1] + neuron.soma.radius,
+
+                'line': {
+                    'color': 'rgba(50, 171, 96, 1)',
+                },
+            },
+        ]
+
+    else:
+        soma_2d = []
+        theta = np.linspace(0, 2 * np.pi, 100)
+        phi = np.linspace(0, np.pi, 100)
+        z = np.outer(np.ones(100), np.cos(phi)) + neuron.soma.center[2]
+        r = neuron.soma.radius
+        data.append(
+            go.Surface(
+                x=(np.outer(np.cos(theta), np.sin(phi)) + neuron.soma.center[0]) * r,
+                y=(np.outer(np.sin(theta), np.sin(phi)) + neuron.soma.center[1]) * r,
+                z=z * r,
+                cauto=False,
+                surfacecolor=['black'] * len(z),
+                showscale=False,
+            )
+        )
+
     layout = dict(
         autosize=True,
         title=title,
@@ -81,6 +121,7 @@ def _plotly(neuron, plane, title, inline, **kwargs):
             aspectmode='data'
         ),
         yaxis=dict(scaleanchor="x"),  # This is used for 2D plots
+        shapes=soma_2d,
     )
 
     fig = dict(data=data, layout=layout)
