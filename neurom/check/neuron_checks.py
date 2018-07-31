@@ -268,6 +268,11 @@ def has_no_narrow_start(neuron, frac=0.9):
 
 def has_no_dangling_branch(neuron):
     '''Check if the neuron has dangling neurites'''
+    if not neuron.soma.points.size:
+        bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
+                   for neurite in iter_neurites(neuron)]
+        return CheckResult(not bad_ids, bad_ids)
+
     soma_center = neuron.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = neuron.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
