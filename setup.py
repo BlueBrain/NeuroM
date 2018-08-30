@@ -34,7 +34,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.8"
+VERSION = "1.4.9"
 
 REQS = ['enum34>=1.0.4;python_version<"3.4"',
         'future>=0.16.0',
