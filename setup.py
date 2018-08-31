@@ -34,9 +34,9 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.9"
+VERSION = "1.4.10"
 
-REQS = ['enum34>=1.0.4;python_version<"3.4"',
+REQS = ['enum34>=1.0.4',
         'future>=0.16.0',
         'h5py>=2.7.1',
         'matplotlib>=1.3.1',
