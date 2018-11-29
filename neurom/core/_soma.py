@@ -167,28 +167,6 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
                 (repr(self._points), self.center, self.radius))
 
 
-class SomaThreePoint(Soma):
-    '''
-    Type B: 3point soma
-    Represented by 3 points.
-
-    Reference:
-        http://neuromorpho.org/SomaFormat.html
-        'The first point constitutes the center of the soma.
-        An equivalent radius (rs) is computed as the average distance
-        of the other two points.'
-    '''
-
-    def __init__(self, points):
-        super(SomaThreePoint, self).__init__(points)
-        self.radius = morphmath.average_points_dist(points[0], (points[1],
-                                                                points[2]))
-
-    def __str__(self):
-        return ('SomaThreePoint(%s) <center: %s, radius: %s>' %
-                (repr(self._points), self.center, self.radius))
-
-
 class SomaSimpleContour(Soma):
     '''
     Type C: multiple points soma
@@ -235,7 +213,6 @@ def _get_type(points, soma_class):
     if soma_class == SOMA_CONTOUR:
         return {0: None,
                 1: SomaSinglePoint,
-                3: SomaThreePoint,
                 2: None}.get(npoints, SomaSimpleContour)
     elif soma_class == SOMA_CYLINDER:
         if(npoints == 3 and

@@ -50,6 +50,7 @@ NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
+SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
 
 def test_soma_surface_area():
@@ -134,7 +135,7 @@ def test_trunk_origin_elevations():
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _nf.trunk_origin_elevations(NRN)
+    _nf.trunk_origin_elevations(SWC_NRN)
 
 
 def test_sholl_crossings_simple():
