@@ -14,12 +14,12 @@ def cli():
     '''The CLI entry point'''
 
 
-@cli.command(short_help='A simple neuron viewer')
+@cli.command()
 @click.argument('input_file')
 @click.option('--plane', type=click.Choice(['3d', 'xy', 'yx', 'yz', 'zy', 'xz', 'zx']),
               default='3d')
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
-              default='plotly')
+              default='matplotlib')
 def view(input_file, plane, backend):
     '''A simple neuron viewer'''
     if backend == 'matplotlib':
