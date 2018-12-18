@@ -36,7 +36,8 @@ from setuptools import find_packages
 
 VERSION = "1.4.10"
 
-REQS = ['enum34>=1.0.4',
+REQS = ['click>=7.0',
+        'enum34>=1.0.4',
         'future>=0.16.0',
         'h5py>=2.7.1',
         'matplotlib>=1.3.1',
@@ -67,6 +68,9 @@ config = {
                 'apps/morph_check',
                 'apps/morph_stats',
                 ],
+    'entry_points':{
+        'console_scripts': ['neurom=apps.__main__:cli']
+    },
     'name': 'neurom',
     'extras_require': {
         'plotly': ['plotly==3.0.0'],
