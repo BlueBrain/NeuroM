@@ -125,13 +125,13 @@ def test_eval_stats_applies_numpy_function():
 def test_extract_stats_single_neuron():
     nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
-    nt.eq_(res.keys(), REF_OUT.keys())
+    nt.eq_(set(res.keys()), set(REF_OUT.keys()))
     #Note: soma radius is calculated from the sphere that gives the area
     # of the cylinders described in Neuron.swc
     nt.assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
 
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
-        nt.eq_(res[k].keys(), REF_OUT[k].keys())
+        nt.eq_(set(res[k].keys()), set(REF_OUT[k].keys()))
         for kk in res[k].keys():
             nt.assert_almost_equal(res[k][kk], REF_OUT[k][kk])
 
@@ -177,4 +177,3 @@ def test_sanitize_config():
     }
     new_config = ms.sanitize_config(full_config)
     nt.eq_(3, len(new_config)) #neurite, neurite_type & neuron
-

@@ -48,6 +48,7 @@ def test_get_version():
 
     with h5py.File(os.path.join(H5V2_PATH, 'Neuron.h5'), mode='r') as v2:
         nt.assert_equal(hdf5.get_version(v2), 'H5V2')
+    nt.assert_equal(hdf5.get_version({}), None)
 
 
 def test_unpack_h5():
