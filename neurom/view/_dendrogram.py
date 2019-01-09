@@ -215,6 +215,7 @@ class Dendrogram(object):
         # set it back to its initial value
         sys.setrecursionlimit(old_depth)
 
+    # pylint: disable=too-many-locals
     def _generate_dendro(self, current_section, spacing, offsets):
         '''Recursive function for dendrogram line computations
         '''

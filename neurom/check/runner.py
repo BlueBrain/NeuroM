@@ -146,6 +146,7 @@ class CheckRunner(object):
 
         LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
 
+        # pylint: disable=logging-not-lazy
         L.log(LOG_LEVELS[ok],
               '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 

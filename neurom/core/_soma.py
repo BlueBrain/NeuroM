@@ -30,10 +30,10 @@
 import logging
 import math
 
+import numpy as np
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-import numpy as np
 
 L = logging.getLogger(__name__)
 
@@ -214,22 +214,22 @@ def _get_type(points, soma_class):
         return {0: None,
                 1: SomaSinglePoint,
                 2: None}.get(npoints, SomaSimpleContour)
-    elif soma_class == SOMA_CYLINDER:
-        if(npoints == 3 and
-           points[0][COLS.P] == -1 and
-           points[1][COLS.P] == 1 and
-           points[2][COLS.P] == 1):
-            L.warning('Using neuromorpho 3-Point soma')
-            # NeuroMorpho is the main provider of morphologies, but they
-            # with SWC as their default file format: they convert all
-            # uploads to SWC.  In the process of conversion, they turn all
-            # somas into their custom 'Three-point soma representation':
-            #  http://neuromorpho.org/SomaFormat.html
 
-            return SomaNeuromorphoThreePointCylinders
+    if(npoints == 3 and
+       points[0][COLS.P] == -1 and
+       points[1][COLS.P] == 1 and
+       points[2][COLS.P] == 1):
+        L.warning('Using neuromorpho 3-Point soma')
+        # NeuroMorpho is the main provider of morphologies, but they
+        # with SWC as their default file format: they convert all
+        # uploads to SWC.  In the process of conversion, they turn all
+        # somas into their custom 'Three-point soma representation':
+        #  http://neuromorpho.org/SomaFormat.html
 
-        return {0: None,
-                1: SomaSinglePoint}.get(npoints, SomaCylinders)
+        return SomaNeuromorphoThreePointCylinders
+
+    return {0: None,
+            1: SomaSinglePoint}.get(npoints, SomaCylinders)
 
 
 def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):

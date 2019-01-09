@@ -29,11 +29,10 @@
 '''Fast neuron IO module'''
 
 import logging
-
 from collections import defaultdict, namedtuple
-from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 
 import numpy as np
+from neurom.core.dataformat import COLS, POINT_TYPE, ROOT_ID
 
 L = logging.getLogger(__name__)
 

@@ -15,15 +15,14 @@ addons:
     - libhdf5-dev
 cache: pip
 install:
-  - pip install 'matplotlib==1.5.2'
+  - pip install 'matplotlib==1.5.2' tox
   - pip install .
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then make -f Makefile test; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then make -f Makefile run_tests; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then make -f Makefile run_tests; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then tox -e py27 -e lint; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then tox -e py35; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then tox -e py36; fi
 after_success:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install codecov; codecov; fi
-after_failure: "cat /home/travis/build/BlueBrain/NeuroM/pylint.txt; cat /home/travis/build/BlueBrain/NeuroM/pycodestyle.txt"
+  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then tox -e coverage; fi
 before_deploy:
   - pip install twine
 deploy:
