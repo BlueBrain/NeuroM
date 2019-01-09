@@ -93,6 +93,9 @@ def assert_features_for_neurite(feat, neurons, expected, exact=True):
 def _stats(seq):
     return np.min(seq), np.max(seq), np.sum(seq), np.mean(seq)
 
+@nt.raises(Exception)
+def test_unknown_feature():
+    fst_get('blabla', POP)
 
 def test_number_of_sections():
     feat = 'number_of_sections'

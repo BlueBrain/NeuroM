@@ -92,9 +92,12 @@ NEURITEFEATURES = {
     'total_area_per_neurite': _nrt.total_area_per_neurite,
 }
 
-NEURONFEATURES = {
+SOMAFEATURES = {
     'soma_radii': _nrn.soma_radii,
     'soma_surface_areas': _nrn.soma_surface_areas,
+}
+
+NEURONFEATURES = {
     'trunk_origin_radii': _nrn.trunk_origin_radii,
     'trunk_origin_azimuths': _nrn.trunk_origin_azimuths,
     'trunk_origin_elevations': _nrn.trunk_origin_elevations,
@@ -135,8 +138,14 @@ def get(feature, obj, **kwargs):
 
     '''
 
-    feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
-               else NEURONFEATURES[feature])
+    if feature in NEURITEFEATURES:
+        feature = NEURITEFEATURES[feature]
+    elif feature in SOMAFEATURES:
+        feature = SOMAFEATURES[feature]
+    elif feature in NEURONFEATURES:
+        feature = NEURONFEATURES[feature]
+    else:
+        raise Exception('Feature: {} not found'.format(feature))
 
     return _np.array(list(feature(obj, **kwargs)))
 
@@ -163,6 +172,10 @@ def _get_doc():
     ret = ['\nNeurite features (neurite, neuron, neuron population):']
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
                for feature, func in sorted(NEURITEFEATURES.items()))
+
+    ret.append('\nSoma features:')
+    ret.extend(_INDENT + '- ' + feature + get_docstring(func)
+               for feature, func in sorted(SOMAFEATURES.items()))
 
     ret.append('\nNeuron features (neuron, neuron population):')
     ret.extend(_INDENT + '- ' + feature + get_docstring(func)
