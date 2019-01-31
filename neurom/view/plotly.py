@@ -67,7 +67,8 @@ def _make_trace(neuron, plane):
         )
 
 
-def _plotly(neuron, plane, title, inline, **kwargs):
+def get_figure(neuron, plane, title):
+    '''Returns the plotly figure containing the neuron'''
     data = list(_make_trace(neuron, plane))
     axis = dict(
         gridcolor='rgb(255, 255, 255)',
@@ -124,7 +125,12 @@ def _plotly(neuron, plane, title, inline, **kwargs):
         shapes=soma_2d,
     )
 
-    fig = dict(data=data, layout=layout)
+    res = dict(data=data, layout=layout)
+    return res
+
+
+def _plotly(neuron, plane, title, inline, **kwargs):
+    fig = get_figure(neuron, plane, title)
 
     plot_fun = iplot if inline else plot
     if inline:
