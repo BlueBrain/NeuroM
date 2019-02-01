@@ -54,8 +54,7 @@ def get_test(stest):
 
     if stest in StatTests:
         return sts[stest]
-    else:
-        raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon, ttest.')
+    raise TypeError('Statistical test not recognized. Choose from ks, wilcoxon, ttest.')
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):

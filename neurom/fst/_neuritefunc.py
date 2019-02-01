@@ -264,6 +264,8 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
     '''Lengths of the segments in a collection of neurites'''
     def _seg_rd(sec, pos):
         '''list of radial distances of all segments of a section'''
+        # TODO: remove this disable when pylint is fixed
+        # pylint: disable=assignment-from-no-return
         mid_pts = np.divide(np.add(sec.points[:-1], sec.points[1:])[:, :3], 2.0)
         return np.sqrt([morphmath.point_dist2(p, pos) for p in mid_pts])
 
