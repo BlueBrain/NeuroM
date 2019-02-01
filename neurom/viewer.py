@@ -64,17 +64,14 @@ _VIEWERS = {
 
 class ViewerError(Exception):
     '''Base class for viewer exceptions'''
-    pass
 
 
 class InvalidDrawModeError(ViewerError):
     '''Exception class to indicate invalid draw mode'''
-    pass
 
 
 class NotDrawableError(Exception):
     '''Exception class for things that aren't drawable'''
-    pass
 
 
 def draw(obj, mode='2d', **kwargs):

@@ -57,7 +57,7 @@ UNWANTED_SECTION_NAMES = [
     'Flower2', 'OpenCircle', 'OpenDiamond', 'OpenDownTriangle', 'OpenSquare', 'OpenStar',
     'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar',
 ]
-UNWANTED_SECTIONS = dict([(name, True) for name in UNWANTED_SECTION_NAMES])
+UNWANTED_SECTIONS = {name: True for name in UNWANTED_SECTION_NAMES}
 L = logging.getLogger(__name__)
 
 
@@ -79,7 +79,7 @@ def _match_section(section, match):
     for i in range(5):
         if i >= len(section):
             return None
-        elif isinstance(section[i], StringType) and section[i] in match:
+        if isinstance(section[i], StringType) and section[i] in match:
             return match[section[i]]
     return None
 

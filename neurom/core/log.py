@@ -35,7 +35,6 @@ class _NullHandler(object):
     '''Backwards compatibility class for python 2.6'''
     def emit(self, _):
         '''do nothing'''
-        pass
 
 
 NullHandler = getattr(logging, 'NullHandler', _NullHandler)

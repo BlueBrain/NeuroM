@@ -111,13 +111,14 @@ class NeuromJSON(json.JSONEncoder):
     def default(self, o):  # pylint: disable=method-hidden
         if isinstance(o, np.floating):
             return float(o)
-        elif isinstance(o, np.integer):
+        if isinstance(o, np.integer):
             return int(o)
-        elif isinstance(o, np.ndarray):
+        if isinstance(o, np.ndarray):
             return o.tolist()
         return json.JSONEncoder.default(self, o)
 
 
+# pylint: disable=comparison-with-callable
 class OrderedEnum(Enum):
     '''Implementation taken here: https://docs.python.org/3/library/enum.html#orderedenum
 
