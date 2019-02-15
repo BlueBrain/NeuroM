@@ -13,13 +13,19 @@ logger.setLevel(logging.INFO)
 def cli():
     '''The CLI entry point'''
 
+try:
+    import plotly
+    DEFAULT_BACKEND = 'plotly'
+except ModuleNotFoundError:
+    DEFAULT_BACKEND = 'matplotlib'
+
 
 @cli.command()
 @click.argument('input_file')
 @click.option('--plane', type=click.Choice(['3d', 'xy', 'yx', 'yz', 'zy', 'xz', 'zx']),
               default='3d')
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
-              default='matplotlib')
+              default=DEFAULT_BACKEND)
 def view(input_file, plane, backend):
     '''A simple neuron viewer'''
     if backend == 'matplotlib':
