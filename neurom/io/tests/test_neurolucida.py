@@ -10,6 +10,9 @@ import neurom.io as io
 import neurom.io.neurolucida as nasc
 from neurom.core.dataformat import COLS
 from neurom.io.datawrapper import DataWrapper
+from neurom import load_neuron
+
+from numpy.testing import assert_array_equal
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -242,6 +245,14 @@ def test_read():
     ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 19)))  # correct ID
     # 3 is ID of end of the soma, 2 sections attach to this
     ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
+
+    neuron = load_neuron(StringIO(MORPH_ASC), reader='asc')
+    assert_array_equal(neuron.neurites[0].root_node.points[:, COLS.XYZ],
+                       [[ 0.,  5.,  0.],
+                        [ 2.,  9.,  0.],
+                        [ 0., 13.,  0.],
+                        [ 2., 13.,  0.],
+                        [ 4., 13.,  0.]])
 
 
 def test_load_neurolucida_ascii():
