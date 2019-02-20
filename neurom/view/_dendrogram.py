@@ -184,7 +184,7 @@ class Dendrogram(object):
             dummy_section.add_child(self._obj.root_node)
             self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
 
-            self._groups.append((0., self._n))
+            self._groups.append((0, self._n))
 
             self._dims.append(self._max_dims)
 
