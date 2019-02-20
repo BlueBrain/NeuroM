@@ -121,6 +121,9 @@ def test_draw_dendrogram():
     viewer.draw(nrn, mode='dendrogram')
     common.plt.close('all')
 
+    viewer.draw(nrn.neurites[0], mode='dendrogram')
+    common.plt.close('all')
+
 
 @nt.raises(viewer.InvalidDrawModeError)
 def test_invalid_draw_mode_raises():
