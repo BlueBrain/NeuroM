@@ -131,7 +131,7 @@ _NEURITE_ACTION = {
     'SWC': _remove_soma_initial_point,
     'H5V1': None,
     'H5V2': None,
-    'NL-ASCII': None,
+    'NL-ASCII': _remove_soma_initial_point,
 }
 
 _SOMA_CONFIG = {
