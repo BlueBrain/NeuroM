@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 
 @cli.command()
 @click.argument('input_file')
-@click.argument('output_image', default=None)
+@click.argument('output_image', default=None, required=False)
 @click.option('--plane', type=click.Choice(['3d', 'xy', 'yx', 'yz', 'zy', 'xz', 'zx']),
               default='3d')
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
