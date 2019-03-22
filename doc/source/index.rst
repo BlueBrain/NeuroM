@@ -48,7 +48,7 @@ Contents
    api
    file_formats
    install
-   neurom_tutorial
+   tutorial
    examples
    issue_reporting
    developer

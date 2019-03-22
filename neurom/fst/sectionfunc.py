@@ -114,13 +114,14 @@ def strahler_order(section):
 
     This implementation is a translation of the three steps described in
     Wikipedia (https://en.wikipedia.org/wiki/Strahler_number):
-     - If the node is a leaf (has no children), its Strahler number is one.
-     - If the node has one child with Strahler number i, and all other children
-       have Strahler numbers less than i, then the Strahler number of the node
-       is i again.
-     - If the node has two or more children with Strahler number i, and no
-       children with greater number, then the Strahler number of the node is
-       i + 1.
+
+       - If the node is a leaf (has no children), its Strahler number is one.
+       - If the node has one child with Strahler number i, and all other children
+         have Strahler numbers less than i, then the Strahler number of the node
+         is i again.
+       - If the node has two or more children with Strahler number i, and no
+         children with greater number, then the Strahler number of the node is
+         i + 1.
 
     No efforts have been invested in making it computationnaly efficient, but
     it computes acceptably fast on tested morphologies (i.e., no waiting time).

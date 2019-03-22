@@ -44,13 +44,15 @@ class memoize(object):
     be hashable.
 
     If a memoized method is invoked directly on its class the result will not
-    be cached. Instead the method will be invoked like a static method:
-    class Obj(object):
-        @memoize
-        def add_to(self, arg):
-            return self + arg
-    Obj.add_to(1) # not enough arguments
-    Obj.add_to(1, 2) # returns 3, result is not cached
+    be cached. Instead the method will be invoked like a static method::
+
+       class Obj(object):
+           @memoize
+           def add_to(self, arg):
+               return self + arg
+
+       Obj.add_to(1) # not enough arguments
+       Obj.add_to(1, 2) # returns 3, result is not cached
     """
 
     def __init__(self, func):

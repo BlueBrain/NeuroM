@@ -1,9 +1,45 @@
-===============
-NeuroM Tutorial
-===============
+========
+Tutorial
+========
 
-1. Installation instructions
+The NeuroM tutorial notebook
 ============================
+
+NeuroM includes tutorial notebooks under the :file:`tutorial` subdirectory
+of the repository. You can launch the tutorials using MyBinder or with
+jupyter.
+
+MyBinder
+--------
+
+To launch the tutorial using MyBinder, click the badge |badge|.
+
+.. |badge| image:: https://mybinder.org/badge_logo.svg
+              :target: https://mybinder.org/v2/gh/BlueBrain/NeuroM/master?filepath=tutorial%2Fneurom_tutorial.ipynb
+
+Jupyter notebooks
+-----------------
+
+For a detailed explanation on installing and running Jupyter/IPython notebooks,
+we refer to the `Jupyter/IPython Notebook Quick Start
+Guide <https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/>`__.
+
+First, install ``jupyter`` in the virtual environment. Second, launch
+the Jupyter Notebook App. Make sure that you launch the application from
+a folder that contains the NeuroM Tutorial notebook.
+
+::
+
+    (nrm)$ pip install jupyter
+    (nrm)$ cd /path/to/dir/containing/notebook
+    (nrm)$ jupyter notebook                    # launch the Jupyter Notebook App
+
+Next, you can select the notebook that you want to open. Now, you can go
+through the tutorial and learn about loading, viewing, and analyzing
+neuronal morphologies!
+
+Installation instructions
+=========================
 
 `NeuroM <http://neurom.readthedocs.io/en/latest/index.html>`__ is a
 Python-based toolkit for the analysis and processing of neuron
@@ -12,8 +48,8 @@ advised to use `VirtualBox <https://www.virtualbox.org/>`__. More
 detailed installation instructions can be found
 `here <http://neurom.readthedocs.io/en/latest/install.html>`__.
 
-1.1 Requirements
-----------------
+Requirements
+------------
 
 It is assumed that the following packages are installed on your system:
 
@@ -39,8 +75,8 @@ NeuroM if not pre-installed in your system:
 - future >= 0.16.0
 - pylru >= 1.0
 
-1.2 Virtual environment set-up
-------------------------------
+Virtual environment set-up
+--------------------------
 
 It is recommended that you install NeuroM into a virtual environment.
 
@@ -58,8 +94,8 @@ de-activate it:
     (nrm)$ deactivate
 
 
-1.3 Installation from source
-----------------------------
+Installation from source
+------------------------
 
 Clone the NeuroM repository and install it:
 
@@ -69,14 +105,14 @@ Clone the NeuroM repository and install it:
     (nrm)$ pip install --upgrade pip           # install newest pip inside virtualenv if version too old
     (nrm)$ pip install -e ./NeuroM             # the -e flag makes source changes immediately effective
 
-2. Applications using NeuroM
-============================
+Applications using NeuroM
+=========================
 
 NeuroM ships with configurable command line applications for commonly
 needed functionality.
 
-2.1 morph_check: check the validity of a morphology file
---------------------------------------------------------
+morph_check: check the validity of a morphology file
+----------------------------------------------------
 
 The application
 `morph_check <http://neurom.readthedocs.io/en/latest/morph_check.html>`__
@@ -93,10 +129,10 @@ morphology and perform the semantic checks:
 
 ::
 
-    (nrm)$ morph_check  path/to/files/filename
+    (nrm)$ morph_check path/to/files/filename
 
-2.2 morph_stats: extract basic morphometrics of a sample morphology
--------------------------------------------------------------------
+morph_stats: extract basic morphometrics of a sample morphology
+---------------------------------------------------------------
 
 The application
 `morph_stats <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__
@@ -111,28 +147,3 @@ documentation <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__.
     (nrm)$ morph_stats path/to/files/filename  # analyze single morphology file
     (nrm)$ morph_stats path/to/files           # analyze many morphology files
 
-3. The NeuroM Tutorial Notebook
-===============================
-
-.. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/haleepfl/NeuroM/master?filepath=tutorial%2Fneurom_tutorial.ipynb
-
-In the NeuroM repository, you will find a folder ``tutorial``, which
-contains a tutorial notebook on NeuroM. For a detailed explanation on
-installing and running Jupyter/IPython notebooks, we refer to `the
-Jupyter/IPython Notebook Quick Start
-Guide <https://jupyter-notebook-beginner-guide.readthedocs.io/en/latest/>`__.
-
-First, install ``jupyter`` in the virtual environment. Second, launch
-the Jupyter Notebook App. Make sure that you launch the application from
-a folder that contains the NeuroM Tutorial notebook.
-
-::
-
-    (nrm)$ pip install jupyter
-    (nrm)$ cd /path/to/dir/containing/notebook
-    (nrm)$ jupyter notebook                    # launch the Jupyter Notebook App
-
-Next, you can select the notebook that you want to open. Now, you can go
-through the tutorial and learn about loading, viewing, and analyzing
-neuronal morphologies!
