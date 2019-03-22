@@ -48,12 +48,12 @@ Contents
    api
    file_formats
    install
+   neurom_tutorial
    examples
    issue_reporting
    developer
    dependencies
    license
-   neurom_tutorial
 
 ----
 
