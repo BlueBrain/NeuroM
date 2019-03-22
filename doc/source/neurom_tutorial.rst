@@ -114,6 +114,9 @@ documentation <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__.
 3. The NeuroM Tutorial Notebook
 ===============================
 
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/haleepfl/NeuroM/master?filepath=tutorial%2Fneurom_tutorial.ipynb
+
 In the NeuroM repository, you will find a folder ``tutorial``, which
 contains a tutorial notebook on NeuroM. For a detailed explanation on
 installing and running Jupyter/IPython notebooks, we refer to `the

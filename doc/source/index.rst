@@ -53,6 +53,7 @@ Contents
    developer
    dependencies
    license
+   neurom_tutorial
 
 ----
 
