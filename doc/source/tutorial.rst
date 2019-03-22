@@ -7,12 +7,12 @@ The NeuroM tutorial notebook
 
 NeuroM includes tutorial notebooks under the :file:`tutorial` subdirectory
 of the repository. You can launch the tutorials using MyBinder or with
-jupyter.
+Jupyter notebooks. Refer to :ref:`installation-label` for help installing.
 
 MyBinder
 --------
 
-To launch the tutorial using MyBinder, click the badge |badge|.
+To launch the tutorial in your browser using MyBinder, click the badge |badge|
 
 .. |badge| image:: https://mybinder.org/badge_logo.svg
               :target: https://mybinder.org/v2/gh/BlueBrain/NeuroM/master?filepath=tutorial%2Fneurom_tutorial.ipynb
@@ -28,7 +28,7 @@ First, install ``jupyter`` in the virtual environment. Second, launch
 the Jupyter Notebook App. Make sure that you launch the application from
 a folder that contains the NeuroM Tutorial notebook.
 
-::
+.. code-block:: bash
 
     (nrm)$ pip install jupyter
     (nrm)$ cd /path/to/dir/containing/notebook
@@ -37,73 +37,6 @@ a folder that contains the NeuroM Tutorial notebook.
 Next, you can select the notebook that you want to open. Now, you can go
 through the tutorial and learn about loading, viewing, and analyzing
 neuronal morphologies!
-
-Installation instructions
-=========================
-
-`NeuroM <http://neurom.readthedocs.io/en/latest/index.html>`__ is a
-Python-based toolkit for the analysis and processing of neuron
-morphologies. It is supported for Linux and OS X. Windows users are
-advised to use `VirtualBox <https://www.virtualbox.org/>`__. More
-detailed installation instructions can be found
-`here <http://neurom.readthedocs.io/en/latest/install.html>`__.
-
-Requirements
-------------
-
-It is assumed that the following packages are installed on your system:
-
-- Python >= 2.7
-- pip >= 8.1.0
-- ipython
-- virtualenv
-
-These are available as packages in most Linux distributions. For OS X,
-please refer to `MacPorts <http://www.macports.org/>`__ if you don't
-already use a different package manager.
-
-The following Python packages will be installed automatically with
-NeuroM if not pre-installed in your system:
-
-- numpy >= 1.8.0
-- scipy >= 0.17.0
-- h5py >= 2.2.1 (optional)
-- matplotlib >= 1.3.1
-- pyyaml >= 3.10
-- enum34 >= 1.0.4
-- tqdm >= 4.8.4
-- future >= 0.16.0
-- pylru >= 1.0
-
-Virtual environment set-up
---------------------------
-
-It is recommended that you install NeuroM into a virtual environment.
-
-::
-
-    $ virtualenv nrm                           # creates a virtualenv called "nrm" in nrm directory
-    $ source nrm/bin/activate                  # activates virtualenv
-    (nrm)$                                     # now we are in the nrm virtualenv
-
-The prompt indicates that the virtual environment has been activated. To
-de-activate it:
-
-::
-
-    (nrm)$ deactivate
-
-
-Installation from source
-------------------------
-
-Clone the NeuroM repository and install it:
-
-::
-
-    (nrm)$ git clone https://github.com/BlueBrain/NeuroM.git
-    (nrm)$ pip install --upgrade pip           # install newest pip inside virtualenv if version too old
-    (nrm)$ pip install -e ./NeuroM             # the -e flag makes source changes immediately effective
 
 Applications using NeuroM
 =========================
@@ -119,7 +52,7 @@ The application
 allows you to apply semantic checks to a morphology file before loading
 it into NeuroM:
 
-::
+.. code-block:: bash
 
     (nrm)$ morph_check -h                      # shows help for morphology checking script
 
@@ -127,7 +60,7 @@ Try it yourself! You can go to
 `NeuroMorpho.Org <http://neuromorpho.org>`__ to download a neuronal
 morphology and perform the semantic checks:
 
-::
+.. code-block:: bash
 
     (nrm)$ morph_check path/to/files/filename
 
@@ -141,7 +74,7 @@ contents can be easily configured via a configuration file, as shown in
 the `online
 documentation <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__.
 
-::
+.. code-block:: bash
 
     (nrm)$ morph_stats -h                      # shows help for the morphometrics extraction script
     (nrm)$ morph_stats path/to/files/filename  # analyze single morphology file
