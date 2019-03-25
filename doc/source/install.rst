@@ -47,12 +47,6 @@ Once the virtualenv is set up, there are three ways to install ``NeuroM``:
     In following code samples, the prompts ``(nrm)$`` and ``$`` are used to indicate
     that the user virtualenv is *activated* or *deactivated* respectively.
 
-.. note::
-
-    In following code samples, the prompt ``>>>`` indicates a python interpreter session
-    started *with the virtualenv activated*. That gives access to the ``neurom``
-    installation.
-
 .. _venv-label:
 
 Virtualenv setup
