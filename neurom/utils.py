@@ -30,7 +30,7 @@
 from enum import Enum
 import json
 import warnings
-from functools import partial, wraps
+from functools import partial, update_wrapper, wraps,
 
 import numpy as np
 
@@ -57,6 +57,7 @@ class memoize(object):
 
     def __init__(self, func):
         self.func = func
+        update_wrapper(self, func)
 
     def __get__(self, obj, objtype=None):
         return partial(self, obj)
