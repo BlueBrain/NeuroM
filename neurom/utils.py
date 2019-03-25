@@ -30,7 +30,7 @@
 from enum import Enum
 import json
 import warnings
-from functools import partial, update_wrapper, wraps,
+from functools import partial, update_wrapper, wraps
 
 import numpy as np
 
