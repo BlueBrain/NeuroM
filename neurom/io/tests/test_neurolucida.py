@@ -260,3 +260,12 @@ def test_load_neurolucida_ascii():
     ascii = io.load_data(f)
     ok_(isinstance(ascii, DataWrapper))
     eq_(len(ascii.data_block), 18)
+
+def test_spine():
+    f = os.path.join(NEUROLUCIDA_PATH, 'spine.asc')
+    n = load_neuron(f)
+
+    assert_array_equal(n.neurites[0].points,
+                       [[ 0. ,  5. ,  0. ,  1. ],
+                        [ 2. ,  9. ,  0. ,  1. ],
+                        [ 0. , 13. ,  0. ,  1. ]])
