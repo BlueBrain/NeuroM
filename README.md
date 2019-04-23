@@ -84,6 +84,14 @@ This installs `NeuroM` into your `virtualenv` in "editable" mode. That means cha
 made to the source code are seen by the installation. To install in read-only mode, omit
 the `-e`.
 
+## Tutorial notebook
+
+To gain an understanding of some of the capabilities of NeuroM, you can launch
+the NeuroM tutorial on MyBinder. Click the badge to launch, no need to download or
+install!
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fneurom_tutorial.ipynb)
+
 ## Examples
 
 - Extract morphometrics from one or many morphology files:

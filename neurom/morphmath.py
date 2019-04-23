@@ -213,6 +213,7 @@ def angle_between_vectors(p1, p2):
     """ Computes the angle in radians between vectors 'p1' and 'p2'
     Normalizes the input vectors and computes the relative angle
     between them.
+
         >>> angle_between((1, 0), (0, 1))
         1.5707963267948966
         >>> angle_between((1, 0), (1, 0))
