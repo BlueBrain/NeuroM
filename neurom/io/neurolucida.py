@@ -93,6 +93,11 @@ def _get_tokens(morph_fd):
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
         squash_token = []  # quoted strings get squashed into one token
+
+        if '<(' in line:  # skip spines, which exist on a single line
+            assert ')>' in line, 'Missing end of spine'
+            continue
+
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
             if squash_token:
                 squash_token.append(token)
