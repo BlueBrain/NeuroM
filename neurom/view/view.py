@@ -139,7 +139,8 @@ def plot_soma(ax, soma, plane='xy',
                                             color=color, alpha=alpha)
     else:
         if soma_outline:
-            ax.add_artist(Circle(soma.center, soma.radius, color=color, alpha=alpha))
+            ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
+                                 color=color, alpha=alpha))
         else:
             plane0, plane1 = _plane2col(plane)
             points = [(p[plane0], p[plane1]) for p in soma.iter()]
