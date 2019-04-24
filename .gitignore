@@ -13,3 +13,5 @@ doc/source/_neurom_build
 dist/*
 .DS_Store
 .ipynb_checkpoints
+.tox
+pip-wheel-metadata

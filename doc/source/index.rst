@@ -48,6 +48,7 @@ Contents
    api
    file_formats
    install
+   tutorial
    examples
    issue_reporting
    developer
