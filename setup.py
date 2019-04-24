@@ -73,7 +73,7 @@ config = {
     },
     'name': 'neurom',
     'extras_require': {
-        'plotly': ['plotly==3.0.0'],
+        'plotly': ['plotly>=3.6.0'],
     },
     'include_package_data': True,
 }
