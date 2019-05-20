@@ -32,6 +32,7 @@ Since the stats module consists of simple wrappers to scipy.stats functions,
 these tests are only sanity checks.
 '''
 
+import sys
 from neurom import stats as st
 from nose import tools as nt
 import numpy as np
@@ -166,11 +167,17 @@ def test_compare_two():
 
     results2 = st.compare_two(data, data_close, test=st.StatTests.ks)
     nt.assert_almost_equal(results2.dist, 0.5)
-    nt.assert_almost_equal(results2.pvalue, 0.5344157, places=5)
+    if sys.version_info[0] == 2:
+        nt.assert_almost_equal(results2.pvalue, 0.5344157192165071, places=5)
+    else:
+        nt.assert_almost_equal(results2.pvalue, 0.7714285714285716, places=5)
 
     results3 = st.compare_two(data, data_far, test=st.StatTests.ks)
     nt.assert_almost_equal(results3.dist, 1.0)
-    nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
+    if sys.version_info[0] == 2:
+        nt.assert_almost_equal(results3.pvalue, 0.020503981704794276, places=5)
+    else:
+        nt.assert_almost_equal(results3.pvalue, 0.05714285714285727, places=5)
 
 distr1 = np.ones(100)
 distr2 = 2*np.ones(100)
@@ -226,5 +233,3 @@ def test_total_score():
 
     score = st.total_score(testList3, p=2)
     nt.assert_almost_equal(score, np.sqrt(2.))
-
-

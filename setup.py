@@ -44,7 +44,7 @@ REQS = ['click>=7.0',
         'numpy>=1.8.0',
         'pylru>=1.0',
         'pyyaml>=3.10',
-        'scipy>=0.17.0',
+        'scipy>=1.2.0',
         'tqdm>=4.8.4',
         'future>=0.16.0',
         ]
