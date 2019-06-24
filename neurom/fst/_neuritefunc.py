@@ -412,7 +412,7 @@ def principal_direction_extents(neurites, neurite_type=NeuriteType.all, directio
         points = neurite.points[:, :3]
         return morphmath.principal_direction_extent(points)[direction]
 
-    return map(_pde, iter_neurites(neurites, filt=is_type(neurite_type)))
+    return [_pde(neurite) for neurite in iter_neurites(neurites, filt=is_type(neurite_type))]
 
 
 def section_strahler_orders(neurites, neurite_type=NeuriteType.all):
