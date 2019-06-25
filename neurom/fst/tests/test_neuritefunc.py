@@ -37,10 +37,8 @@ import neurom as nm
 from neurom.geom import convex_hull
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst.sectionfunc import section_volume
-from neurom.core import tree as tr
-from neurom.core import Section, Neurite, Population
 
-from utils import _close, _equal
+from utils import _close
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -51,6 +49,10 @@ NRN = nm.load_neuron(DATA_PATH)
 
 
 def test_principal_direction_extents():
+    principal_dir = list(_nf.principal_direction_extents(SIMPLE))
+    assert_allclose(principal_dir,
+                    (14.736052694538641, 12.105102672688004))
+
     # test with a realistic neuron
     nrn = nm.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
 
@@ -62,47 +64,22 @@ def test_principal_direction_extents():
     _close(np.array(p), np.array(p_ref))
 
 
-s0 = Section(42)
-s1 = s0.add_child(Section(42))
-s2 = s0.add_child(Section(42))
-s3 = s0.add_child(Section(42))
-s4 = s1.add_child(Section(42))
-s5 = s1.add_child(Section(42))
-s6 = s4.add_child(Section(42))
-s7 = s4.add_child(Section(42))
-
-
 def test_n_bifurcation_points():
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s0)), 2)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s1)), 2)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s2)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s3)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s4)), 1)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s5)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s6)), 0)
-    nt.assert_equal(_nf.n_bifurcation_points(Neurite(s7)), 0)
+    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites[0]), 1)
+    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites[1]), 1)
+    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites), 2)
 
 
 def test_n_forking_points():
-    nt.assert_equal(_nf.n_forking_points(Neurite(s0)), 3)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s1)), 2)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s2)), 0)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s3)), 0)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s4)), 1)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s5)), 0)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s6)), 0)
-    nt.assert_equal(_nf.n_forking_points(Neurite(s7)), 0)
+    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites[0]), 1)
+    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites[1]), 1)
+    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites), 2)
 
 
 def test_n_leaves():
-    nt.assert_equal(_nf.n_leaves(Neurite(s0)), 5)
-    nt.assert_equal(_nf.n_leaves(Neurite(s1)), 3)
-    nt.assert_equal(_nf.n_leaves(Neurite(s2)), 1)
-    nt.assert_equal(_nf.n_leaves(Neurite(s3)), 1)
-    nt.assert_equal(_nf.n_leaves(Neurite(s4)), 2)
-    nt.assert_equal(_nf.n_leaves(Neurite(s5)), 1)
-    nt.assert_equal(_nf.n_leaves(Neurite(s6)), 1)
-    nt.assert_equal(_nf.n_leaves(Neurite(s7)), 1)
+    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites[0]), 2)
+    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites[1]), 2)
+    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites), 4)
 
 
 def test_total_area_per_neurite():
@@ -330,8 +307,3 @@ def test_segment_radial_distances():
     assert_allclose(radial_distances,
                     (2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2),
                      2.0, 5.0, sqrt(2.5**2 + 4**2)))
-
-def test_principal_direction_extents():
-    principal_dir = list(_nf.principal_direction_extents(SIMPLE))
-    assert_allclose(principal_dir,
-                    (14.736052694538641, 12.105102672688004))
