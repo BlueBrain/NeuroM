@@ -2,5 +2,5 @@
 # In this file the order is reversed
  1 1  0  0 0 1. -1
  2 4  0  0 0 1.  1 # apical
- 6 3  0  0 0 1.  1 # basal
- 6 2  0  0 0 1.  1 # axon
+ 3 3  0  0 0 1.  1 # basal
+ 4 2  0  0 0 1.  1 # axon
