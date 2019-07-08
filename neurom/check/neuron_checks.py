@@ -223,6 +223,19 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
+def has_no_root_node_jumps(neuron, radius_multiplier=2):
+    '''
+    Check that the neurites have their first point not further than
+    `radius_multiplier * soma radius` from the soma center'''
+    bad_ids = []
+    for neurite in iter_neurites(neuron):
+        p0 = neurite.root_node.points[0, COLS.XYZ]
+        distance = np.linalg.norm(p0 - neuron.soma.center)
+        if distance > radius_multiplier * neuron.soma.radius:
+            bad_ids.append((neurite.root_node.id, [p0]))
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
 def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     '''Check if leaf points are too large
 
