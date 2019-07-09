@@ -32,6 +32,7 @@ from io import StringIO
 
 from nose import tools as nt
 from nose.tools import assert_equal
+from numpy.testing import assert_array_equal
 
 from neurom import check, load_neuron
 from neurom._compat import range
@@ -307,8 +308,9 @@ def test_has_no_root_node_jumps():
     _, nrn = _load_neuron('root_node_jump.swc')
     check = nrn_chk.has_no_root_node_jumps(nrn)
     nt.ok_(not check.status)
-    assert_equal(check.info[0], 1)
-    assert_array_equal(check.info[1], [0, 3, 0])
+    assert_equal(len(check.info), 1)
+    assert_equal(check.info[0][0], 1)
+    assert_array_equal(check.info[0][1], [[0, 3, 0]])
 
     nt.ok_(nrn_chk.has_no_root_node_jumps(nrn, radius_multiplier=4).status)
 
