@@ -125,8 +125,8 @@ def test_draw_dendrogram():
     common.plt.close('all')
 
 def test_draw_dendrogram_empty_segment():
-    nrn = load_neuron(os.path.join(DATA_PATH, 'empty_segments.swc'))
-    viewer.draw(nrn, mode='dendrogram')
+    neuron = load_neuron(os.path.join(DATA_PATH, 'empty_segments.swc'))
+    viewer.draw(neuron, mode='dendrogram')
     common.plt.close('all')
 
 
