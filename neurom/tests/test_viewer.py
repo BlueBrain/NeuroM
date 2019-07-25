@@ -124,6 +124,12 @@ def test_draw_dendrogram():
     viewer.draw(nrn.neurites[0], mode='dendrogram')
     common.plt.close('all')
 
+def test_draw_dendrogram_empty_segment():
+    neuron = load_neuron(os.path.join(DATA_PATH, 'empty_segments.swc'))
+    viewer.draw(neuron, mode='dendrogram')
+    common.plt.close('all')
+
+
 
 @nt.raises(viewer.InvalidDrawModeError)
 def test_invalid_draw_mode_raises():
