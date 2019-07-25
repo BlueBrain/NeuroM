@@ -233,6 +233,9 @@ class Dendrogram(object):
             seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.XYZ],
                                                      segments[1:, COLS.XYZ]), axis=1)
 
+            if not seg_lengths.size:
+                continue
+
             # segment radii
             radii = np.vstack((segments[:-1, COLS.R], segments[1:, COLS.R])).T \
                 if self._show_diameters else np.zeros((seg_lengths.shape[0], 2))
