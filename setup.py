@@ -79,12 +79,15 @@ config = {
     'include_package_data': True,
 
     'classifiers': [
-        'Development Status :: 6 - Mature'
+        'Development Status :: 6 - Mature',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
     ]
 }
 
