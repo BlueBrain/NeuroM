@@ -34,7 +34,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.15.dev0"
+VERSION = "1.4.15.dev1"
 
 REQS = ['click>=7.0',
         'enum34>=1.0.4',
@@ -77,6 +77,20 @@ config = {
         'plotly': ['plotly>=3.6.0'],
     },
     'include_package_data': True,
+
+    'classifiers': [
+        'Development Status :: 6 - Mature',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+    ]
 }
 
 setup(**config)
