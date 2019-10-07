@@ -801,6 +801,11 @@ def test_soma_surface_areas():
     nt.eq_(fst_get('soma_surface_areas', NEURON), area)
 
 
+def test_soma_volumes():
+    volume = 4. * math.pi * fst_get('soma_radii', NEURON)[0] ** 3 / 3
+    nt.eq_(fst_get('soma_volumes', NEURON), volume)
+
+
 def test_sholl_frequency():
     assert_allclose(fst_get('sholl_frequency', NEURON),
                     [4, 8, 8, 14, 9, 8, 7, 7])

@@ -52,6 +52,13 @@ SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
 SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
+def test_soma_volume():
+    ret = _nf.soma_volume(SIMPLE)
+    nt.eq_(ret, 4.1887902047863905)
+
+def test_soma_volumes():
+    ret = _nf.soma_volumes(SIMPLE)
+    nt.eq_(ret, [4.1887902047863905, ])
 
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
