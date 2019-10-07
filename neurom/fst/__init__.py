@@ -95,6 +95,7 @@ NEURITEFEATURES = {
 NEURONFEATURES = {
     'soma_radii': _nrn.soma_radii,
     'soma_surface_areas': _nrn.soma_surface_areas,
+    'soma_volumes': _nrn.soma_volumes,
     'trunk_origin_radii': _nrn.trunk_origin_radii,
     'trunk_origin_azimuths': _nrn.trunk_origin_azimuths,
     'trunk_origin_elevations': _nrn.trunk_origin_elevations,
