@@ -138,8 +138,8 @@ class SectionTreeBase(object):
     def test_get_soma_surface_area(self):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
 
-    def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
+    def test_get_soma_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn), get('soma_sphere_volumes', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -204,8 +204,8 @@ class TestH5V1(SectionTreeBase):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
-    def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn),
+    def test_get_soma_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn),
                         0.0033147000251481143)
 
 
@@ -225,8 +225,8 @@ class TestH5V2(SectionTreeBase):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
-    def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn),
+    def test_get_soma_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn),
                         0.0033147000251481143)
 
 

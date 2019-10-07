@@ -53,7 +53,7 @@ def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
-def soma_volume(nrn, neurite_type=NeuriteType.soma):
+def soma_sphere_volume(nrn, neurite_type=NeuriteType.soma):
     '''Get the volume of a neuron's soma.
 
     Note:
@@ -77,7 +77,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     return [soma_surface_area(n) for n in nrns]
 
 
-def soma_volumes(nrn_pop, neurite_type=NeuriteType.soma):
+def soma_sphere_volumes(nrn_pop, neurite_type=NeuriteType.soma):
     '''Get the volume of the somata in a population of neurons
 
     Note:
@@ -88,7 +88,7 @@ def soma_volumes(nrn_pop, neurite_type=NeuriteType.soma):
     '''
     nrns = neuron_population(nrn_pop)
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
-    return [soma_volume(n) for n in nrns]
+    return [soma_sphere_volume(n) for n in nrns]
 
 
 def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
