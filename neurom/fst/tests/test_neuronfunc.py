@@ -52,20 +52,20 @@ SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
 SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
-def test_soma_sphere_volume():
-    ret = _nf.soma_sphere_volume(SIMPLE)
+def test_soma_as_sphere_volume():
+    ret = _nf.soma_as_sphere_volume(SIMPLE)
     nt.eq_(ret, 4.1887902047863905)
 
-def test_soma_sphere_volumes():
-    ret = _nf.soma_sphere_volumes(SIMPLE)
+def test_soma_as_sphere_volumes():
+    ret = _nf.soma_as_sphere_volumes(SIMPLE)
     nt.eq_(ret, [4.1887902047863905, ])
 
-def test_soma_surface_area():
-    ret = _nf.soma_surface_area(SIMPLE)
+def test_soma_as_sphere_area():
+    ret = _nf.soma_as_sphere_area(SIMPLE)
     nt.eq_(ret, 12.566370614359172)
 
-def test_soma_surface_areas():
-    ret = _nf.soma_surface_areas(SIMPLE)
+def test_soma_as_sphere_areas():
+    ret = _nf.soma_as_sphere_areas(SIMPLE)
     nt.eq_(ret, [12.566370614359172, ])
 
 def test_soma_radii():

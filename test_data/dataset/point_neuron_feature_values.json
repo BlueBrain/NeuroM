@@ -501,7 +501,7 @@
 		 420.0
 	  ]
    }, 
-   "soma_surface_areas": {
+   "soma_as_sphere_areas": {
 	  "": [
 		 0.366210887655657
 	  ]
@@ -1461,12 +1461,12 @@
 		 420.0
 	  ]
    }, 
-   "soma_surface_areas": {
+   "soma_as_sphere_areas": {
 	  "": [
 		 0.21452136490675905
 	  ]
    }, 
-   "soma_sphere_volumes": {
+   "soma_as_sphere_volumes": {
 	  "": [
 		  0.00934285568539674
 	  ]

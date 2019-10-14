@@ -135,11 +135,11 @@ class SectionTreeBase(object):
     def test_get_soma_radius(self):
         nt.assert_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
 
-    def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
+    def test_get_soma_as_sphere_area(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_area(self.sec_nrn), get('soma_as_sphere_areas', self.ref_nrn)[0])
 
-    def test_get_soma_sphere_volume(self):
-        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn), get('soma_sphere_volumes', self.ref_nrn)[0])
+    def test_get_soma_as_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_volume(self.sec_nrn), get('soma_as_sphere_volumes', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -200,12 +200,12 @@ class TestH5V1(SectionTreeBase):
     def test_get_soma_radius(self):
         nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
-    def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+    def test_get_soma_as_sphere_area(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_area(self.sec_nrn),
                         0.1075095256160432)
 
-    def test_get_soma_sphere_volume(self):
-        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn),
+    def test_get_soma_as_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_volume(self.sec_nrn),
                         0.0033147000251481143)
 
 
@@ -221,12 +221,12 @@ class TestH5V2(SectionTreeBase):
     def test_get_soma_radius(self):
         nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
-    def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+    def test_get_soma_as_sphere_area(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_area(self.sec_nrn),
                         0.1075095256160432)
 
-    def test_get_soma_sphere_volume(self):
-        nt.assert_equal(fst._nrn.soma_sphere_volume(self.sec_nrn),
+    def test_get_soma_as_sphere_volume(self):
+        nt.assert_equal(fst._nrn.soma_as_sphere_volume(self.sec_nrn),
                         0.0033147000251481143)
 
 

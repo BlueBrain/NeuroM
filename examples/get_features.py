@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Get some soma information
     # Soma radius and surface area
     print("Soma radius", nm.get('soma_radii', nrn)[0])
-    print("Soma surface area", nm.get('soma_surface_areas', nrn)[0])
+    print("Soma surface area", nm.get('soma_as_sphere_areas', nrn)[0])
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.

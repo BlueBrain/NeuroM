@@ -796,14 +796,14 @@ def test_soma_radii():
     nt.eq_(fst_get('soma_radii', NEURON)[0], 0.13065629648763766)
 
 
-def test_soma_surface_areas():
+def test_soma_as_sphere_areas():
     area = 4. * math.pi * fst_get('soma_radii', NEURON)[0] ** 2
-    nt.eq_(fst_get('soma_surface_areas', NEURON), area)
+    nt.eq_(fst_get('soma_as_sphere_areas', NEURON), area)
 
 
-def test_soma_sphere_volumes():
+def test_soma_as_sphere_volumes():
     volume = 4. * math.pi * fst_get('soma_radii', NEURON)[0] ** 3 / 3
-    nt.eq_(fst_get('soma_sphere_volumes', NEURON), volume)
+    nt.eq_(fst_get('soma_as_sphere_volumes', NEURON), volume)
 
 
 def test_sholl_frequency():
