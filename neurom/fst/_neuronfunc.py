@@ -68,7 +68,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
 
 
 def soma_volume(nrns, neurite_type=NeuriteType.soma):
-    '''Get the volume of a neuron's soma.'''
+    '''Get soma volumes'''
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return [n.soma.volume for n in nrns]
 
