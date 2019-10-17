@@ -63,6 +63,11 @@ class Soma(object):
         '''Get the set of (x, y, z, r) points this soma'''
         return self._points[:, COLS.XYZR]
 
+    @property
+    def volume(self):
+        '''Get the set of (x, y, z, r) points this soma'''
+        return 4 / 3 * math.pi * self.radius ** 3
+
 
 class SomaSinglePoint(Soma):
     '''
@@ -114,6 +119,12 @@ class SomaCylinders(Soma):
         '''Obtain the center from the first stored point'''
         return self._points[0][COLS.XYZ]
 
+    @property
+    def volume(self):
+        return sum(morphmath.segment_volume((p0, p1))
+                   for p0, p1 in zip(self.points, self.points[1:]))
+
+
     def __str__(self):
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
                 (repr(self._points), self.center, self.radius))
@@ -161,6 +172,11 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
+
+    @property
+    def volume(self):
+        '''Returns the volume of the cylinder'''
+        return 2 * math.pi * self.radius ** 3
 
     def __str__(self):
         return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %

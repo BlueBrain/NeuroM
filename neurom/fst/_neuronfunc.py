@@ -67,6 +67,15 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     return [soma_surface_area(n) for n in nrns]
 
 
+# def soma_volume(nrn):
+#     '''Get the volume of a neuron's soma.
+#     Note:
+#         The volume is calculated by assuming the soma is spherical.
+#     '''
+#     if isinstance(nrn.soma, ())
+#     return 4 * math.pi * nrn.soma.radius ** 3 / 3
+
+
 def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     ''' Get the radii of the somata of a population of neurons
 
