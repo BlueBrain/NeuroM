@@ -27,7 +27,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
-
+<img src="doc/source/logo/NeuroM.png"/>
 # NeuroM
 
 NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.
