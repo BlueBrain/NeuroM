@@ -57,7 +57,7 @@ UNWANTED_SECTION_NAMES = [
     'Flower2', 'OpenCircle', 'OpenDiamond', 'OpenDownTriangle', 'OpenSquare', 'OpenStar',
     'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar',
 ]
-UNWANTED_SECTIONS = dict([(name, True) for name in UNWANTED_SECTION_NAMES])
+UNWANTED_SECTIONS = {name: True for name in UNWANTED_SECTION_NAMES}
 L = logging.getLogger(__name__)
 
 
@@ -79,7 +79,7 @@ def _match_section(section, match):
     for i in range(5):
         if i >= len(section):
             return None
-        elif isinstance(section[i], StringType) and section[i] in match:
+        if isinstance(section[i], StringType) and section[i] in match:
             return match[section[i]]
     return None
 
@@ -93,6 +93,11 @@ def _get_tokens(morph_fd):
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
         squash_token = []  # quoted strings get squashed into one token
+
+        if '<(' in line:  # skip spines, which exist on a single line
+            assert ')>' in line, 'Missing end of spine'
+            continue
+
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
             if squash_token:
                 squash_token.append(token)

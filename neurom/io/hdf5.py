@@ -55,8 +55,9 @@ def get_version(h5file):
     '''
     if 'points' in h5file and 'structure' in h5file:
         return 'H5V1'
-    elif 'neuron1/structure' in h5file:
+    if 'neuron1/structure' in h5file:
         return 'H5V2'
+    return None
 
 
 POINT_DIAMETER = 3

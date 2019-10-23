@@ -1,4 +1,5 @@
 import os
+from numpy.testing import assert_array_almost_equal
 import numpy as np
 from nose import tools as nt
 from neurom.core.types import NeuriteType
@@ -98,11 +99,11 @@ class TestDendrogram(object):
     def test_generate_soma(self):
 
         vrec = self.dnrn.soma
-        trec = np.array([[-0.17071068, -0.34142136],
-                         [-0.17071068,  0.        ],
-                         [ 0.17071068,  0.        ],
-                         [ 0.17071068, -0.34142136]])
-        nt.assert_true(np.allclose(vrec, trec))
+        assert_array_almost_equal(vrec,
+                                  np.array([[-0.092495, -0.18499],
+                                            [-0.092495,  0.],
+                                            [0.092495,  0.],
+                                            [0.092495, -0.18499]]))
 
         vrec = self.dtr.soma
 

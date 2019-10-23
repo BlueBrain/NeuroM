@@ -39,10 +39,19 @@ from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
-from . import NeuriteType, Tree
+from . import NeuriteType, Tree, NeuriteIter
+
+# NRN simulator iteration order
+# See:
+# https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874
+NRN_ORDER = {NeuriteType.soma: 0,
+             NeuriteType.axon: 1,
+             NeuriteType.basal_dendrite: 2,
+             NeuriteType.apical_dendrite: 3,
+             NeuriteType.undefined: 4}
 
 
-def iter_neurites(obj, mapfun=None, filt=None):
+def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
     '''Iterator to a neurite, neuron or neuron population
 
     Applies optional neurite filter and mapping functions.
@@ -51,6 +60,9 @@ def iter_neurites(obj, mapfun=None, filt=None):
         obj: a neurite, neuron or neuron population.
         mapfun: optional neurite mapping function.
         filt: optional neurite filter function.
+        neurite_order (NeuriteIter): order upon which neurites should be iterated
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
 
     Examples:
 
@@ -70,18 +82,34 @@ def iter_neurites(obj, mapfun=None, filt=None):
     '''
     neurites = ((obj,) if isinstance(obj, Neurite) else
                 obj.neurites if hasattr(obj, 'neurites') else obj)
+    if neurite_order == NeuriteIter.NRN:
+        last_position = max(NRN_ORDER.values()) + 1
+        neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
     return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
 
 
-def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
+def iter_sections(neurites,
+                  iterator_type=Tree.ipreorder,
+                  neurite_filter=None,
+                  neurite_order=NeuriteIter.FileOrder):
     '''Iterator to the sections in a neurite, neuron or neuron population.
 
     Parameters:
         neurites: neuron, population, neurite, or iterable containing neurite objects
-        iterator_type: type of the iteration (ipreorder, iupstream, ibifurcation_point)
+        iterator_type: section iteration order within a given neurite. Must be one of:
+            Tree.ipreorder: Depth-first pre-order iteration of tree nodes
+            Tree.ipreorder: Depth-first post-order iteration of tree nodes
+            Tree.iupstream: Iterate from a tree node to the root nodes
+            Tree.ibifurcation_point: Iterator to bifurcation points
+            Tree.ileaf: Iterator to all leaves of a tree
+
         neurite_filter: optional top level filter on properties of neurite neurite objects.
+        neurite_order (NeuriteIter): order upon which neurites should be iterated
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+
 
     Examples:
 
@@ -93,16 +121,20 @@ def iter_sections(neurites, iterator_type=Tree.ipreorder, neurite_filter=None):
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
 
     '''
-    return chain.from_iterable(iterator_type(neurite.root_node)
-                               for neurite in iter_neurites(neurites, filt=neurite_filter))
+    return chain.from_iterable(
+        iterator_type(neurite.root_node) for neurite in
+        iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order))
 
 
-def iter_segments(obj, neurite_filter=None):
+def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
     '''Return an iterator to the segments in a collection of neurites
 
     Parameters:
         obj: neuron, population, neurite, section, or iterable containing neurite objects
         neurite_filter: optional top level filter on properties of neurite neurite objects
+        neurite_order: order upon which neurite should be iterated. Values:
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
 
     Note:
         This is a convenience function provided for generic access to
@@ -110,7 +142,9 @@ def iter_segments(obj, neurite_filter=None):
         segment analysis functions that leverage numpy and section-wise iteration.
     '''
     sections = iter((obj,) if isinstance(obj, Section) else
-                    iter_sections(obj, neurite_filter=neurite_filter))
+                    iter_sections(obj,
+                                  neurite_filter=neurite_filter,
+                                  neurite_order=neurite_order))
 
     return chain.from_iterable(zip(sec.points[:-1], sec.points[1:])
                                for sec in sections)
@@ -218,9 +252,22 @@ class Neurite(object):
 
         return clone
 
-    def iter_sections(self, order=Tree.ipreorder):
-        '''iteration over section nodes'''
-        return iter_sections(self, iterator_type=order)
+    def iter_sections(self, order=Tree.ipreorder, neurite_order=NeuriteIter.FileOrder):
+        '''iteration over section nodes
+
+    Parameters:
+        order: section iteration order within a given neurite. Must be one of:
+            Tree.ipreorder: Depth-first pre-order iteration of tree nodes
+            Tree.ipreorder: Depth-first post-order iteration of tree nodes
+            Tree.iupstream: Iterate from a tree node to the root nodes
+            Tree.ibifurcation_point: Iterator to bifurcation points
+            Tree.ileaf: Iterator to all leaves of a tree
+
+        neurite_order: order upon which neurites should be iterated. Values:
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        '''
+        return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 
     def __deepcopy__(self, memo):
         '''Deep copy of neurite object'''

@@ -298,6 +298,15 @@ def test_angle_3points_collinear_returns_zero():
     nt.assert_equal(angle, 0.0)
 
 
+def test_angle_between_vectors():
+    angle1 = mm.angle_between_vectors((1, 0), (0, 1))
+    nt.assert_equal(angle1, np.pi/2)
+    angle1 = mm.angle_between_vectors((1, 0), (1, 0))
+    nt.assert_equal(angle1, 0.0)
+    angle1 = mm.angle_between_vectors((1, 0), (-1, 0))
+    nt.assert_equal(angle1, np.pi)
+
+
 def soma_points(radius=5,number_points=20):
     phi = uniform(0, 2*pi, number_points)
     costheta = uniform(-1,1, number_points)

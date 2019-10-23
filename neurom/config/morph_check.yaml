@@ -1,0 +1,47 @@
+# Configuration File for morph_check
+
+
+##############################################
+# FORMATTING
+##############################################
+
+color : true
+
+##############################################
+# CHECKS
+##############################################
+
+checks:
+    structural_checks:
+        - is_single_tree
+        - has_soma_points
+        - has_sequential_ids
+        - has_increasing_ids
+        - has_valid_soma
+        - has_valid_neurites
+    neuron_checks:
+        - has_basal_dendrite
+        - has_axon
+        - has_apical_dendrite
+        - has_all_nonzero_segment_lengths
+        - has_all_nonzero_section_lengths
+        - has_all_nonzero_neurite_radii
+        - has_all_monotonic_neurites
+        - has_nonzero_soma_radius
+
+##############################################
+# OPTIONS
+##############################################
+
+options:
+
+    # threshold
+    has_nonzero_soma_radius         : 0.0
+    has_all_nonzero_neurite_radii   : 0.007
+    has_all_nonzero_segment_lengths : 0.01
+    has_all_nonzero_section_lengths : 0.01
+
+    # tolerance/ratio, method
+    has_no_flat_neurites       : [0.1, 'ratio']
+
+    has_all_monotonic_neurites : 1.0e-6

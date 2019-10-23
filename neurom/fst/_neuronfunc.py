@@ -132,12 +132,49 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
         if norm_vector >= np.finfo(type(norm_vector)).eps:
             return np.arcsin(vector[COLS.Y] / norm_vector)
-        else:
-            raise ValueError("Norm of vector between soma center and section is almost zero.")
+        raise ValueError("Norm of vector between soma center and section is almost zero.")
 
     return [_elevation(s.root_node.points, n.soma)
             for n in nrns
             for s in n.neurites if neurite_filter(s)]
+
+
+def trunk_vectors(nrn, neurite_type=NeuriteType.all):
+    '''Calculates the vectors between all the trunks of the neuron
+    and the soma center.
+    '''
+    neurite_filter = is_type(neurite_type)
+    nrns = neuron_population(nrn)
+
+    return np.array([morphmath.vector(s.root_node.points[0], n.soma.center)
+                     for n in nrns
+                     for s in n.neurites if neurite_filter(s)])
+
+
+def trunk_angles(nrn, neurite_type=NeuriteType.all):
+    '''Calculates the angles between all the trunks of the neuron.
+    The angles are defined on the x-y plane and the trees
+    are sorted from the y axis and anticlock-wise.
+    '''
+    vectors = trunk_vectors(nrn, neurite_type=neurite_type)
+    # In order to avoid the failure of the process in case the neurite_type does not exist
+    if not vectors.size:
+        return []
+
+    def _sort_angle(p1, p2):
+        """Angle between p1-p2 to sort vectors"""
+        ang1 = np.arctan2(*p1[::-1])
+        ang2 = np.arctan2(*p2[::-1])
+        return (ang1 - ang2)
+
+    # Sorting angles according to x-y plane
+    order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
+                                 for i in vectors[:, 0:2]]))
+
+    ordered_vectors = vectors[order][:, [COLS.X, COLS.Y]]
+
+    return [morphmath.angle_between_vectors(ordered_vectors[i], ordered_vectors[i - 1])
+            for i, _ in enumerate(ordered_vectors)]
 
 
 def sholl_crossings(neurites, center, radii):

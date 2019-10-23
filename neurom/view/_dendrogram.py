@@ -184,7 +184,7 @@ class Dendrogram(object):
             dummy_section.add_child(self._obj.root_node)
             self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
 
-            self._groups.append((0., self._n))
+            self._groups.append((0, self._n))
 
             self._dims.append(self._max_dims)
 
@@ -215,6 +215,7 @@ class Dendrogram(object):
         # set it back to its initial value
         sys.setrecursionlimit(old_depth)
 
+    # pylint: disable=too-many-locals
     def _generate_dendro(self, current_section, spacing, offsets):
         '''Recursive function for dendrogram line computations
         '''
@@ -231,6 +232,9 @@ class Dendrogram(object):
             # segement lengths
             seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.XYZ],
                                                      segments[1:, COLS.XYZ]), axis=1)
+
+            if not seg_lengths.size:
+                continue
 
             # segment radii
             radii = np.vstack((segments[:-1, COLS.R], segments[1:, COLS.R])).T \

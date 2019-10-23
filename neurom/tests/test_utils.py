@@ -28,41 +28,33 @@
 
 '''Test neurom.utils'''
 import json
-import numpy as np
-
-from neurom import utils as nu
-from nose import tools as nt
 import random
 import warnings
 
+import numpy as np
+from nose import tools as nt
 
-def test_memoize_caches_args():
+from neurom import utils as nu
 
-    @nu.memoize
-    def dummy(x, y=42):
-        return random.random()
 
-    ref1 = dummy(42)
-    ref2 = dummy(42, 43)
+def test_memoize_caches():
+    class A(object):
+        @nu.memoize
+        def dummy(self, x, y=42):
+            return random.random()
+
+    a = A()
+    ref1 = a.dummy(42)
+    ref2 = a.dummy(42, 43)
+    ref3 = a.dummy(42, y=43)
 
     for _ in range(10):
-        nt.assert_equal(dummy(42), ref1)
-        nt.assert_equal(dummy(42, 43), ref2)
-
-
-def test_memoize_does_not_cache_kwargs():
-
-    global ctr
-    ctr = 0
-
-    @nu.memoize
-    def dummy(x, y=42):
-        global ctr
-        ctr += 1
-        return ctr
-
-    for i in range(10):
-        nt.assert_equal(dummy(42, y=43), i + 1)
+        nt.assert_equal(a.dummy(42), ref1)
+        nt.assert_not_equal(A().dummy(42), ref1)
+        nt.assert_equal(a.dummy(42, 43), ref2)
+        nt.assert_not_equal(A().dummy(42, 43), ref2)
+        nt.assert_equal(a.dummy(42, y=43), ref3)
+        nt.assert_not_equal(A().dummy(42, y=43), ref3)
 
 
 def test_deprecated():
@@ -102,3 +94,23 @@ def test_NeuromJSON():
     nt.eq_(enc.default(ex['two']), 2.0)
 
     nt.assert_raises(TypeError, enc.default, 0)
+
+
+def test_ordered_enum():
+    class Grade(nu.OrderedEnum):
+        A = 5
+        B = 4
+        C = 3
+        D = 2
+        F = 1
+
+    nt.ok_(Grade.C < Grade.A)
+    nt.ok_(Grade.C <= Grade.A)
+    nt.ok_(Grade.C <= Grade.C)
+    nt.ok_(not Grade.C > Grade.A)
+    nt.ok_(not Grade.C >= Grade.A)
+    nt.ok_(Grade.C >= Grade.C)
+    nt.assert_raises(NotImplementedError, Grade.__ge__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__le__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__gt__, Grade.A, 1)
+    nt.assert_raises(NotImplementedError, Grade.__lt__, Grade.A, 1)

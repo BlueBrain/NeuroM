@@ -30,7 +30,15 @@
 
 import numpy as np
 from neurom import morphmath
+from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
+
+
+def _raise_if_not_bifurcation(section):
+    n_children = len(section.children)
+    if n_children != 2:
+        raise NeuroMError('A bifurcation point must have exactly 2 children, found {}'.format(
+            n_children))
 
 
 def local_bifurcation_angle(bif_point):
@@ -53,7 +61,7 @@ def local_bifurcation_angle(bif_point):
 
         return cur
 
-    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
+    _raise_if_not_bifurcation(bif_point)
 
     ch0, ch1 = (skip_0_length(bif_point.children[0].points),
                 skip_0_length(bif_point.children[1].points))
@@ -70,7 +78,7 @@ def remote_bifurcation_angle(bif_point):
     The angle is defined as between the bifurcation point and the
     last points in the out-going sections.
     '''
-    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
+    _raise_if_not_bifurcation(bif_point)
 
     return morphmath.angle_3points(bif_point.points[-1],
                                    bif_point.children[0].points[-1],
@@ -84,7 +92,7 @@ def bifurcation_partition(bif_point):
 
     The number of nodes in each child tree is counted. The partition is
     defined as the ratio of the largest number to the smallest number.'''
-    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
+    _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
@@ -95,14 +103,25 @@ def partition_asymmetry(bif_point):
     '''Calculate the partition asymmetry at a bifurcation point
     as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
-    We first ensure that the input point has only two children.
-
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two daughter subtrees
     at each branch point.'''
-    assert len(bif_point.children) == 2, 'A bifurcation point must have exactly 2 children'
+    _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    if n == m:
+        return 0.0
     return abs(n - m) / abs(n + m)
+
+
+def partition_pair(bif_point):
+    '''Calculate the partition pairs at a bifurcation point
+
+    The number of nodes in each child tree is counted. The partition
+    pairs is the number of bifurcations in the two daughter subtrees
+    at each branch point.'''
+    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
+    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    return (n, m)

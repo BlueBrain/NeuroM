@@ -58,8 +58,10 @@ Examples:
 
 '''
 
+import logging as _logging
 from .version import VERSION as __version__
 from .core import iter_neurites, iter_sections, graft_neuron, iter_segments, NeuriteType
+from .core.dataformat import COLS
 from .core.types import NEURITES as NEURITE_TYPES
 from .io.utils import load_neuron, load_neurons, NeuronLoader
 from .fst import get
@@ -70,3 +72,7 @@ BASAL_DENDRITE = NeuriteType.basal_dendrite
 AXON = NeuriteType.axon
 SOMA = NeuriteType.soma
 ANY_NEURITE = NeuriteType.all
+
+# prevent 'No handlers could be found for logger ...' errors
+# https://pythonhosted.org/logutils/libraries.html
+_logging.getLogger(__name__).addHandler(_logging.NullHandler())

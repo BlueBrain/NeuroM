@@ -32,69 +32,64 @@
 import os
 from setuptools import setup
 from setuptools import find_packages
-import pip
-from pip.req import parse_requirements
-from optparse import Option
 
 
-VERSION = "1.4.4"
+VERSION = "1.4.15.dev1"
 
-
-def parse_reqs(reqs_file):
-    ''' parse the requirements '''
-    options = Option('--workaround')
-    options.skip_requirements_regex = None
-    # Hack for old pip versions
-    # Versions greater than 1.x have a required parameter "sessions" in
-    # parse_requierements
-    if pip.__version__.startswith('1.'):
-        install_reqs = parse_requirements(reqs_file, options=options)
-    else:
-        from pip.download import PipSession  # pylint:disable=E0611
-        options.isolated_mode = False
-        install_reqs = parse_requirements(reqs_file,  # pylint:disable=E1123
-                                          options=options,
-                                          session=PipSession)
-
-    return [str(ir.req) for ir in install_reqs]
-
-
-BASEDIR = os.path.dirname(os.path.abspath(__file__))
+REQS = ['click>=7.0',
+        'enum-compat>=0.0.2',
+        'future>=0.16.0',
+        'h5py>=2.7.1',
+        'matplotlib>=1.3.1',
+        'numpy>=1.8.0',
+        'pylru>=1.0',
+        'pyyaml>=3.10',
+        'scipy>=1.2.0',
+        'tqdm>=4.8.4',
+]
 
 # Hack to avoid installation of modules with C extensions
 # in readthedocs documentation building environment.
 if os.environ.get('READTHEDOCS') == 'True':
-    REQS = []
-else:
-    REQS = parse_reqs(os.path.join(BASEDIR, 'requirements.txt'))
-
-EXTRA_REQS_PREFIX = 'requirements_'
-EXTRA_REQS = {}
-
-for file_name in os.listdir(BASEDIR):
-    if not file_name.startswith(EXTRA_REQS_PREFIX):
-        continue
-    base_name = os.path.basename(file_name)
-    (extra, _) = os.path.splitext(base_name)
-    extra = extra[len(EXTRA_REQS_PREFIX):]
-    EXTRA_REQS[extra] = parse_reqs(file_name)
+    REQS = ['future>=0.16.0',
+            'enum34>=1.0.4',
+            'pyyaml>=3.10',
+            ]
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
-    'author': 'BBP Algorithm Development Team',
+    'author': 'BBP Neuroscientific Software Engineering',
     'url': 'http://https://github.com/BlueBrain/NeuroM',
-    'author_email': 'juan.palacios@epfl.ch, lida.kanari@epfl.ch',
     'version': VERSION,
     'install_requires': REQS,
-    'extras_require': EXTRA_REQS,
     'packages': find_packages(),
     'license': 'BSD',
     'scripts': ['apps/raw_data_check',
                 'apps/morph_check',
                 'apps/morph_stats',
                 ],
+    'entry_points':{
+        'console_scripts': ['neurom=apps.__main__:cli']
+    },
     'name': 'neurom',
+    'extras_require': {
+        'plotly': ['plotly>=3.6.0'],
+    },
     'include_package_data': True,
+
+    'classifiers': [
+        'Development Status :: 6 - Mature',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+    ]
 }
 
 setup(**config)

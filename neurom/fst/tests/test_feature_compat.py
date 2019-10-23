@@ -192,6 +192,14 @@ class TestH5V1(SectionTreeBase):
         self.sec_nrn = nm.load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
+    # Overriding soma values as the same soma points in SWC and ASC have different
+    # meanings. Hence leading to different values
+    def test_get_soma_radius(self):
+        nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
+
+    def test_get_soma_surface_area(self):
+        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+                        0.1075095256160432)
 
 class TestH5V2(SectionTreeBase):
 
@@ -199,6 +207,15 @@ class TestH5V2(SectionTreeBase):
         super(TestH5V2, self).setUp()
         self.sec_nrn = nm.load_neuron(os.path.join(H5V2_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
+
+    # Overriding soma values as the same soma points in SWC and ASC have different
+    # meanings. Hence leading to different values
+    def test_get_soma_radius(self):
+        nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
+
+    def test_get_soma_surface_area(self):
+        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+                        0.1075095256160432)
 
 
 class TestSWC(SectionTreeBase):

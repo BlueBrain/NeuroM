@@ -31,30 +31,23 @@
 import argparse
 import json
 import logging
+import os
 import sys
+
+import pkg_resources
+
 import neurom as nm
-from neurom.apps import get_config
-from neurom.apps.morph_stats import (extract_stats,
-                                     sanitize_config,
-                                     get_header,
-                                     generate_flattened_dict)
 from neurom import exceptions
+from neurom.apps import get_config
+from neurom.apps.morph_stats import (extract_stats, generate_flattened_dict,
+                                     get_header, sanitize_config)
 from neurom.io.utils import get_files_by_path
 from neurom.utils import NeuromJSON
 
 L = logging.getLogger(__name__)
 
-_CONFIG = {
-    'neurite': {
-        'section_lengths': ['max', 'total'],
-        'section_volumes': ['total'],
-        'section_branch_orders': ['max'],
-    },
-    'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
-    'neuron': {
-        'soma_radii': ['mean'],
-    },
-}
+CONFIG_PATH = pkg_resources.resource_filename(
+    'neurom', 'config')
 
 IGNORABLE_EXCEPTIONS = {
     'SomaError': exceptions.SomaError,
@@ -63,7 +56,9 @@ IGNORABLE_EXCEPTIONS = {
 
 def get_parser():
     '''Parse command line arguments'''
-    parser = argparse.ArgumentParser(description='Morphology statistics extractor')
+    parser = argparse.ArgumentParser(
+        description='Morphology statistics extractor',
+        epilog='Example config: {}'.format(os.path.join(CONFIG_PATH, 'morph_stats.yaml')))
 
     parser.add_argument('datapath', nargs='?',
                         help='Path to a morphology data file or a directory')
@@ -94,7 +89,7 @@ def get_parser():
 def main(args):
     '''main function'''
     try:
-        config = get_config(args.config, _CONFIG)
+        config = get_config(args.config, os.path.join(CONFIG_PATH, 'morph_stats.yaml'))
         config = sanitize_config(config)
     except exceptions.ConfigError as e:
         L.error(str(e))

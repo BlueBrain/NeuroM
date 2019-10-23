@@ -64,17 +64,14 @@ _VIEWERS = {
 
 class ViewerError(Exception):
     '''Base class for viewer exceptions'''
-    pass
 
 
 class InvalidDrawModeError(ViewerError):
     '''Exception class to indicate invalid draw mode'''
-    pass
 
 
 class NotDrawableError(Exception):
     '''Exception class for things that aren't drawable'''
-    pass
 
 
 def draw(obj, mode='2d', **kwargs):
@@ -103,7 +100,7 @@ def draw(obj, mode='2d', **kwargs):
     '''
 
     if mode not in MODES:
-        raise InvalidDrawModeError('Invalid drawing mode %s', mode)
+        raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
 
     if mode in ('2d', 'dendrogram'):
         fig, ax = common.get_figure()
@@ -117,7 +114,7 @@ def draw(obj, mode='2d', **kwargs):
     elif isinstance(obj, Soma):
         tag = 'soma'
     else:
-        raise NotDrawableError('draw not implemented for %s', obj.__class__)
+        raise NotDrawableError('draw not implemented for %s' % obj.__class__)
 
     viewer = '%s_%s' % (tag, mode)
     try:
