@@ -28,6 +28,7 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
 <img src="doc/source/logo/NeuroM.jpg"/>
+
 # NeuroM
 
 NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.
