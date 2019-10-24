@@ -29,23 +29,27 @@
 import os
 
 from nose import tools as nt
+
 from neurom.apps import get_config
 from neurom.exceptions import ConfigError
 
 
 def test_get_config():
-    #get the default
-    default = {'default': 'config'}
-    config = get_config(None, default)
-    nt.eq_(config, default)
+    # get the default
 
-    #load valid yaml
     test_yaml = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                '../../../apps/config/morph_stats.yaml'))
-    config = get_config(test_yaml, default)
+                                             '../../config/morph_stats.yaml'))
+
+    expected = {'neurite': {'section_lengths': ['max', 'total'], 'section_volumes': ['total'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'neuron': {'soma_radii': ['mean']}}
+
+    config = get_config(None, test_yaml)
+    nt.assert_equal(config, expected)
+
+    config = get_config(test_yaml, '')
+    nt.assert_equal(config, expected)
 
 
 @nt.raises(ConfigError)
 def test_get_config_exception():
-    #current python file isn't a yaml file
+    '''current python file isn't a yaml file'''
     get_config(__file__, {})

@@ -54,7 +54,7 @@ class _Mock(Mock):
     def __getattr__(cls, name):
         return _Mock()
 
-MOCK_MODULES = ['scipy', 'scipy.spatial', 'h5py', 'yaml', 'tqdm']
+MOCK_MODULES = ['scipy', 'scipy.spatial', 'h5py', 'tqdm']
 sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -71,12 +71,12 @@ needs_sphinx = '1.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx_autorun',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.napoleon',
-    'sphinxcontrib.autorun',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

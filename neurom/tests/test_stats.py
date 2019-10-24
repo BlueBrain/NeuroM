@@ -166,11 +166,9 @@ def test_compare_two():
 
     results2 = st.compare_two(data, data_close, test=st.StatTests.ks)
     nt.assert_almost_equal(results2.dist, 0.5)
-    nt.assert_almost_equal(results2.pvalue, 0.5344157, places=5)
 
     results3 = st.compare_two(data, data_far, test=st.StatTests.ks)
     nt.assert_almost_equal(results3.dist, 1.0)
-    nt.assert_almost_equal(results3.pvalue, 0.0205039, places=5)
 
 distr1 = np.ones(100)
 distr2 = 2*np.ones(100)
@@ -226,5 +224,3 @@ def test_total_score():
 
     score = st.total_score(testList3, p=2)
     nt.assert_almost_equal(score, np.sqrt(2.))
-
-

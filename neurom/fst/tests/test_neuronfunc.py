@@ -31,6 +31,7 @@ import tempfile
 from nose import tools as nt
 import os
 import numpy as np
+from numpy.testing import assert_array_equal
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
 from neurom.core import make_soma, Neurite, Section
@@ -48,7 +49,8 @@ NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-
+SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
+SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
 
 
 def test_soma_surface_area():
@@ -74,6 +76,27 @@ def test_trunk_origin_radii():
 def test_trunk_origin_azimuths():
     ret = _nf.trunk_origin_azimuths(SIMPLE)
     nt.eq_(ret, [0.0, 0.0])
+
+def test_trunk_angles():
+    ret = _nf.trunk_angles(SIMPLE_TRUNK)
+    assert_array_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
+    ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
+    assert_array_equal(ret, [np.pi, np.pi])
+    ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    assert_array_equal(ret, [0.0])
+    ret = _nf.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
+    nt.eq_(ret, [])
+
+
+def test_trunk_vectors():
+    ret = _nf.trunk_vectors(SIMPLE_TRUNK)
+    assert_array_equal(ret[0], [0., -1.,  0.])
+    assert_array_equal(ret[1], [1.,  0.,  0.])
+    assert_array_equal(ret[2], [-1.,  0.,  0.])
+    assert_array_equal(ret[3], [0.,  1.,  0.])
+    ret = _nf.trunk_vectors(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    assert_array_equal(ret[0], [0., -1.,  0.])
+
 
 def test_trunk_origin_elevations():
     class Mock(object):
@@ -112,7 +135,7 @@ def test_trunk_origin_elevations():
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _nf.trunk_origin_elevations(NRN)
+    _nf.trunk_origin_elevations(SWC_NRN)
 
 
 def test_sholl_crossings_simple():
@@ -192,5 +215,4 @@ def test_sholl_analysis_custom():
                        ''')
     nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 10, 10])
-    #from neurom.view import view
     #view.neuron(morph_C)[0].savefig('foo.png')

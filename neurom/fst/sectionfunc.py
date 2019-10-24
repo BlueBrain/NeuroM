@@ -61,6 +61,18 @@ def section_tortuosity(section):
     return 1 if len(pts) < 2 else mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
+def section_end_distance(section):
+    '''End to end distance of a section
+
+    The end to end distance of a section is defined as
+    the euclidian distnce between its end points.
+
+    If the section contains less than 2 points, the value 0 is returned.
+    '''
+    pts = section.points
+    return 0 if len(pts) < 2 else mm.point_dist(pts[-1], pts[0])
+
+
 def branch_order(section):
     '''Branching order of a tree section
 
@@ -91,3 +103,43 @@ def section_meander_angles(section):
     p = section.points
     return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
             for i in range(2, len(p))]
+
+
+def strahler_order(section):
+    '''Branching order of a tree section
+
+    The strahler order is the inverse of the branch order,
+    since this is computed from the tips of the tree
+    towards the root.
+
+    This implementation is a translation of the three steps described in
+    Wikipedia (https://en.wikipedia.org/wiki/Strahler_number):
+
+       - If the node is a leaf (has no children), its Strahler number is one.
+       - If the node has one child with Strahler number i, and all other children
+         have Strahler numbers less than i, then the Strahler number of the node
+         is i again.
+       - If the node has two or more children with Strahler number i, and no
+         children with greater number, then the Strahler number of the node is
+         i + 1.
+
+    No efforts have been invested in making it computationnaly efficient, but
+    it computes acceptably fast on tested morphologies (i.e., no waiting time).
+    '''
+    if section.children:
+        child_orders = [strahler_order(child) for child in section.children]
+        max_so_children = max(child_orders)
+        it = iter(co == max_so_children for co in child_orders)
+        #  check if there are *two* or more children w/ the max_so_children
+        any(it)
+        if any(it):
+            return max_so_children + 1
+        return max_so_children
+    return 1
+
+
+def locate_segment_position(section, fraction):
+    '''
+    Segment ID / offset corresponding to a given fraction of section length.
+    '''
+    return mm.path_fraction_id_offset(section.points, fraction)

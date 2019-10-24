@@ -127,7 +127,7 @@ class CheckRunner(object):
             full_result &= result
             full_summary.update(summary)
         except Exception as e:  # pylint: disable=W0703
-            L.error('Check failed:' + str(type(e)) + str(e.args))
+            L.error('Check failed: %s', str(type(e)) + str(e.args))
             full_result = False
 
         full_summary['ALL'] = full_result
@@ -146,6 +146,7 @@ class CheckRunner(object):
 
         LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
 
+        # pylint: disable=logging-not-lazy
         L.log(LOG_LEVELS[ok],
               '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 

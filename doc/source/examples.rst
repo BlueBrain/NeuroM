@@ -29,6 +29,12 @@
 Examples
 ========
 
+.. note::
+
+    In following code samples, the prompt ``>>>`` indicates a python interpreter session
+    started *with the virtualenv activated*. That gives access to the ``neurom``
+    installation.
+
 Fast analysis with :py:mod:`neurom`
 ***********************************
 

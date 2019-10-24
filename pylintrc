@@ -16,7 +16,8 @@
 #W0142 - Used * or ** magic
 #W0622 - redefined-builti
 #C0325 - superfluous-parens
-disable=C0103,R0904,R0903,W0511,W0232,R0922,R0801,R0921,W0141,R0401,I0013,W0142,W0622,C0325
+#R0205 - useless-object-inheritance
+disable=C0103,R0904,R0903,W0511,W0232,R0922,R0801,R0921,W0141,R0401,I0013,W0142,W0622,C0325,R0205
 
 [FORMAT]
 # Maximum number of characters on a single line.
@@ -47,7 +48,7 @@ max-public-methods=60
 # checks for similarities and duplicated code. This computation may be
 # memory / CPU intensive, so you should disable it if you experiments some
 # problems.
-# 
+#
 
 [SIMILARITIES]
 # Minimum lines number of a similarity.
@@ -66,4 +67,4 @@ ignore-docstrings=yes
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis. It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=numpy,numpy.linalg,numpy.random,numpy.testing,scipy.stats,scipy.spatial
+ignored-modules=numpy,numpy.*,scipy.stats,scipy.spatial

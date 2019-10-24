@@ -1,0 +1,26 @@
+# Configuration File for morph_stats application
+
+---
+
+##############################################
+
+neurite:
+    section_lengths:
+        - max
+        - total
+    section_volumes:
+        - total
+    section_branch_orders:
+        - max
+
+neurite_type:
+    - AXON
+    - APICAL_DENDRITE
+    - BASAL_DENDRITE
+    - ALL
+
+neuron:
+    soma_radii:
+        - mean
+
+##############################################

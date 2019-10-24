@@ -27,19 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''visualize morphologies'''
 
-import numpy as np
 from matplotlib.collections import LineCollection, PolyCollection
 from matplotlib.patches import Circle
+from mpl_toolkits.mplot3d.art3d import \
+    Line3DCollection  # pylint: disable=relative-import
 
+import numpy as np
 from neurom import NeuriteType, geom
 from neurom._compat import zip
-from neurom.core import iter_segments
+from neurom.core import iter_neurites, iter_segments
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
+from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
 from neurom.view._dendrogram import Dendrogram
-
-from mpl_toolkits.mplot3d.art3d import Line3DCollection  # pylint: disable=relative-import
 
 from . import common
 
@@ -138,7 +139,8 @@ def plot_soma(ax, soma, plane='xy',
                                             color=color, alpha=alpha)
     else:
         if soma_outline:
-            ax.add_artist(Circle(soma.center, soma.radius, color=color, alpha=alpha))
+            ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
+                                 color=color, alpha=alpha))
         else:
             plane0, plane1 = _plane2col(plane)
             points = [(p[plane0], p[plane1]) for p in soma.iter()]
@@ -156,7 +158,10 @@ def plot_soma(ax, soma, plane='xy',
                                    ignore=False)
 
 
-def plot_neuron(ax, nrn, plane='xy',
+# pylint: disable=too-many-arguments
+def plot_neuron(ax, nrn,
+                neurite_type=NeuriteType.all,
+                plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA):
@@ -164,6 +169,7 @@ def plot_neuron(ax, nrn, plane='xy',
 
     Args:
         ax(matplotlib axes): on what to plot
+        neurite_type(NeuriteType): an optional filter on the neurite type
         nrn(neuron): neuron to be plotted
         soma_outline(bool): should the soma be drawn as an outline
         plane(str): Any pair of 'xyz'
@@ -175,7 +181,7 @@ def plot_neuron(ax, nrn, plane='xy',
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
 
-    for neurite in nrn.neurites:
+    for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
         plot_tree(ax, neurite, plane=plane,
                   diameter_scale=diameter_scale, linewidth=linewidth,
                   color=color, alpha=alpha)
@@ -216,7 +222,7 @@ def plot_tree3d(ax, tree,
     segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type),
+    color = _get_color(color, tree.type)
 
     collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
@@ -249,7 +255,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
     _update_3d_datalim(ax, soma)
 
 
-def plot_neuron3d(ax, nrn,
+def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                   color=None, alpha=_ALPHA):
     '''
@@ -259,6 +265,7 @@ def plot_neuron3d(ax, nrn,
     Args:
         ax(matplotlib axes): on what to plot
         nrn(neuron): neuron to be plotted
+        neurite_type(NeuriteType): an optional filter on the neurite type
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
@@ -266,7 +273,7 @@ def plot_neuron3d(ax, nrn,
     '''
     plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
-    for neurite in nrn.neurites:
+    for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
         plot_tree3d(ax, neurite,
                     diameter_scale=diameter_scale, linewidth=linewidth,
                     color=color, alpha=alpha)

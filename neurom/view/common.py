@@ -219,7 +219,8 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
 
-    ax.set_aspect(aspect_ratio)
+    if ax.name != '3d':
+        ax.set_aspect(aspect_ratio)
 
     if tight:
         fig.set_tight_layout(True)

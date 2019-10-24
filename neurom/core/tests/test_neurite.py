@@ -27,28 +27,29 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import math
+
+import numpy as np
 from nose import tools as nt
+
 import neurom as nm
 from neurom.core import Neurite, Section
-import numpy as np
-
 
 RADIUS = 4.
 POINTS0 = np.array([[0., 0., 0., RADIUS],
-                   [0., 0., 1., RADIUS],
-                   [0., 0., 2., RADIUS],
-                   [0., 0., 3., RADIUS],
-                   [1., 0., 3., RADIUS],
-                   [2., 0., 3., RADIUS],
-                   [3., 0., 3., RADIUS]])
+                    [0., 0., 1., RADIUS],
+                    [0., 0., 2., RADIUS],
+                    [0., 0., 3., RADIUS],
+                    [1., 0., 3., RADIUS],
+                    [2., 0., 3., RADIUS],
+                    [3., 0., 3., RADIUS]])
 
 POINTS1 = np.array([[3., 0., 3., RADIUS],
-                   [3., 0., 4., RADIUS],
-                   [3., 0., 5., RADIUS],
-                   [3., 0., 6., RADIUS],
-                   [4., 0., 6., RADIUS],
-                   [5., 0., 6., RADIUS],
-                   [6., 0., 6., RADIUS]])
+                    [3., 0., 4., RADIUS],
+                    [3., 0., 5., RADIUS],
+                    [3., 0., 6., RADIUS],
+                    [4., 0., 6., RADIUS],
+                    [5., 0., 6., RADIUS],
+                    [6., 0., 6., RADIUS]])
 
 REF_LEN = 12
 
@@ -72,6 +73,10 @@ def test_neurite_type():
     nrt = Neurite(root_node)
     nt.eq_(nrt.type, nm.BASAL_DENDRITE)
 
+    # https://github.com/BlueBrain/NeuroM/issues/697
+    nt.assert_equal(np.array([nm.AXON, nm.BASAL_DENDRITE]).dtype,
+                    np.object)
+
 
 def test_neurite_length():
     nrt = Neurite(ROOT_NODE)
@@ -89,6 +94,12 @@ def test_neurite_volume():
     volume = math.pi * RADIUS * RADIUS * REF_LEN
     nt.assert_almost_equal(nrt.volume, volume)
 
+
 def test_str():
     nrt = Neurite(ROOT_NODE)
     nt.ok_('Neurite' in str(nrt))
+
+
+def test_neurite_hash():
+    nrt = Neurite(ROOT_NODE)
+    nt.eq_(hash(nrt), hash((nrt.type, nrt.root_node)))

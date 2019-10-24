@@ -1,3 +1,5 @@
+:orphan:
+
 A Tour of NeuroM (obsolete)
 ***************************
 

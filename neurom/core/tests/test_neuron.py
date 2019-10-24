@@ -27,14 +27,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from nose import tools as nt
 from copy import deepcopy
 
-import neurom as nm
-from neurom.core import iter_segments, graft_neuron
-from neurom._compat import zip
-
 import numpy as np
+from nose import tools as nt
+
+import neurom as nm
+from neurom._compat import zip
+from neurom.core import graft_neuron, iter_segments
 
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
