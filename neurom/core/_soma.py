@@ -158,17 +158,18 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
-        # make sure the above invariant holds
-        assert (np.isclose(points[0, COLS.R], points[1, COLS.R]) and
-                np.isclose(points[0, COLS.R], points[2, COLS.R])), \
-            'All radii must be the same'
-        # These checks were turned off after https://github.com/BlueBrain/NeuroM/issues/614
-        # assert np.isclose(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
-        #     'The second point must be one radius below 0 on the y-plane'
-        # assert np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
-        #     'The third point must be one radius above 0 on the y-plane'
-
         r = points[0, COLS.R]
+        # make sure the above invariant holds
+        assert (np.isclose(r, points[1, COLS.R]) and np.isclose(r, points[2, COLS.R])), \
+            'All radii must be the same'
+        # only warn users about invalid format
+        if r < 1e-5:
+            L.warning('Zero radius for soma %s', self)
+        if not np.isclose(points[0, COLS.Y] - points[1, COLS.Y], r):
+            L.warning(
+                'The second point must be one radius below 0 on the y-plane for soma %s', self)
+        if not np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -r):
+            L.warning('The third point must be one radius above 0 on the y-plane for soma %s', self)
         h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
