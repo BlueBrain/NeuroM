@@ -110,7 +110,7 @@ def test_neuron3d_no_neurites():
 def test_dendrogram():
     with get_fig_2d() as (fig, ax):
         view.plot_dendrogram(ax, fst_neuron)
-        np.testing.assert_allclose(ax.get_xlim(), (-20., 100.), rtol=0.25)
+        np.testing.assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
 
 
 def test_one_point_branch():

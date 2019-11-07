@@ -27,280 +27,164 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Dendrogram helper functions and class'''
+from collections import namedtuple
 
-from copy import deepcopy
-import sys
 import numpy as np
 
-from neurom.core import Tree, Neurite
+from neurom import NeuriteType
+from neurom.core import Neurite
 from neurom.core.dataformat import COLS
 
 
-def _n_terminations(tree):
-    '''Get the number of terminations in a tree'''
-    return sum(1 for _ in tree.ileaf())
+class Dendrogram:
+    '''Dendrogram'''
 
+    def __init__(self, neurom_section, dendrogram_root=None):
+        '''Dendrogram for NeuroM section tree.
 
-def _max_recursion_depth(obj):
-    ''' Estimate recursion depth, which is defined as the number of nodes in a tree
-    '''
-    neurites = obj.neurites if hasattr(obj, 'neurites') else [obj]
-
-    return max(sum(1 for _ in neu.iter_sections()) for neu in neurites)
-
-
-def _total_rectangles(tree):
-    '''
-    Calculate the total number of segments that are required
-    for the dendrogram. There is a vertical line for each segment
-    and two horizontal line at each branching point
-    '''
-    return sum(len(sec.children) + sec.points.shape[0] - 1
-               for sec in tree.iter_sections())
-
-
-def _n_rectangles(obj):
-    '''
-    Calculate the total number of rectangles with respect to
-    the type of the object
-    '''
-    return sum(_total_rectangles(neu) for neu in obj.neurites) \
-        if hasattr(obj, 'neurites') else _total_rectangles(obj)
-
-
-def _square_segment(radius, origin):
-    '''Vertices for a square
-    '''
-    return np.array(((origin[0] - radius, origin[1] - radius),
-                     (origin[0] - radius, origin[1] + radius),
-                     (origin[0] + radius, origin[1] + radius),
-                     (origin[0] + radius, origin[1] - radius)))
-
-
-def _vertical_segment(old_offs, new_offs, spacing, radii):
-    '''Vertices for a vertical rectangle
-    '''
-    return np.array(((new_offs[0] - radii[0], old_offs[1] + spacing[1]),
-                     (new_offs[0] - radii[1], new_offs[1]),
-                     (new_offs[0] + radii[1], new_offs[1]),
-                     (new_offs[0] + radii[0], old_offs[1] + spacing[1])))
-
-
-def _horizontal_segment(old_offs, new_offs, spacing, diameter):
-    '''Vertices of a horizontal rectangle
-    '''
-    return np.array(((old_offs[0], old_offs[1] + spacing[1]),
-                     (new_offs[0], old_offs[1] + spacing[1]),
-                     (new_offs[0], old_offs[1] + spacing[1] - diameter),
-                     (old_offs[0], old_offs[1] + spacing[1] - diameter)))
-
-
-def _spacingx(node, max_dims, xoffset, xspace):
-    '''Determine the spacing of the current node depending on the number
-       of the leaves of the tree
-    '''
-    x_spacing = _n_terminations(node) * xspace
-
-    if x_spacing > max_dims[0]:
-        max_dims[0] = x_spacing
-
-    return xoffset - x_spacing / 2.
-
-
-def _update_offsets(start_x, spacing, terminations, offsets, length):
-    '''Update the offsets
-    '''
-    return (start_x + spacing[0] * terminations / 2.,
-            offsets[1] + spacing[1] * 2. + length)
-
-
-def _max_diameter(tree):
-    '''Find max diameter in tree
-    '''
-    return 2. * max(max(node.points[:, COLS.R]) for node in tree.ipreorder())
-
-
-class Dendrogram(object):
-    '''Dendrogram
-    '''
-
-    def __init__(self, obj, show_diameters=True):
-        '''Create dendrogram
+        Args:
+            neurom_section: NeuroM section tree.
+            dendrogram_root: root of dendrogram. This is a service arg, please don't set it on
+            your own. It is used to track cycles in ``neurom_section``.
         '''
+        if dendrogram_root is None:
+            dendrogram_root = self
+            dendrogram_root.processed_section_ids = []
+        if neurom_section.id in dendrogram_root.processed_section_ids:
+            raise ValueError('Cycled morphology {}'.format(neurom_section))
+        dendrogram_root.processed_section_ids.append(neurom_section.id)
 
-        # flag for diameters
-        self._show_diameters = show_diameters
+        segments = neurom_section.points
+        segment_lengths = np.linalg.norm(
+            np.subtract(segments[:-1, COLS.XYZ], segments[1:, COLS.XYZ]), axis=1)
+        segment_radii = segments[:, COLS.R]
 
-        # input object, tree, or neuron
-        self._obj = deepcopy(Neurite(obj) if isinstance(obj, Tree) else obj)
+        self.section_id = neurom_section.id
+        self.neurite_type = neurom_section.type
+        self.height = np.sum(segment_lengths)
+        self.width = 2 * np.max(segment_radii)
+        self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
+        self.children = [Dendrogram(child, dendrogram_root) for child in neurom_section.children]
 
-        # counter/index for the storage of the rectangles.
-        # it is updated recursively
-        self._n = 0
+    @staticmethod
+    def get_coords(segment_lengths, segment_radii):
+        """Coordinates of dendrogram as polygon with respect to (0, 0) origin.
 
-        # the maximum lengths in x and y that is occupied
-        # by a neurite. It is updated recursively.
-        self._max_dims = [0., 0.]
+        Args:
+            segment_lengths: lengths of dendrogram segments
+            segment_radii: radii of dendrogram segments
 
-        # stores indices that refer to the _rectangles array
-        # for each neurite
-        self._groups = []
+        Returns:
+            (N,2) array of 2D x,y coordinates of Dendrogram polygon. N is the number of vertices.
+        """
+        y_coords = np.insert(segment_lengths, 0, 0)
+        y_coords = np.cumsum(y_coords)
+        x_left_coords = -segment_radii
+        x_right_coords = segment_radii
+        left_coords = np.hstack((x_left_coords[:, np.newaxis], y_coords[:, np.newaxis]))
+        right_coords = np.hstack((x_right_coords[:, np.newaxis], y_coords[:, np.newaxis]))
+        right_coords = np.flip(right_coords, axis=0)
+        return np.vstack((left_coords, right_coords))
 
-        # dims store the max dimensions for each neurite
-        # essential for the displacement in the plotting
-        self._dims = []
 
-        # initialize the number of rectangles
-        self._rectangles = np.zeros([_n_rectangles(self._obj), 4, 2])
+def create_dendrogram(neuron):
+    '''Creates a dendrogram for neuron
 
-        # determine the maximum recursion depth for the given object
-        # which depends on the tree with the maximum number of nodes
-        self._max_rec_depth = _max_recursion_depth(self._obj)
+    Args:
+        neuron (Neurite|Neuron): Can be a Neurite or a Neuron instance.
 
-    def _generate_soma(self):
-        '''soma'''
-        radius = self._obj.soma.radius
-        return _square_segment(radius, (0., -radius))
+    Returns:
+        Dendrogram of ``neuron``.
+    '''
+    if isinstance(neuron, Neurite):
+        return Dendrogram(neuron.root_node)
+    SomaSection = namedtuple('NeuromSection', ['id', 'type', 'children', 'points'])
+    soma_section = SomaSection(
+        id=-1,
+        type=NeuriteType.soma,
+        children=[neurite.root_node for neurite in neuron.neurites],
+        points=np.array([
+            np.array([0, 0, 0, .5]),
+            np.array([.1, .1, .1, .5]),
+        ])
+    )
+    return Dendrogram(soma_section)
 
-    def generate(self):
-        '''Generate dendrogram
+
+def layout_dendrogram(dendrogram, origin):
+    '''Layouts dendrogram as an aesthetical pleasing tree.
+
+    Args:
+        dendrogram (Dendrogram): dendrogram
+        origin (np.array): xy coordinates of layout origin
+
+    Returns:
+        Dict of positions per each dendrogram node. When placed in those positions, dendrogram nodes
+        will represent a nice tree structure.
+    '''
+
+    class _PositionedDendrogram:
+        '''Wrapper around dendrogram that allows to layout it.
+
+        The layout happens only in X coordinates. Children's Y coordinate is just a parent's Y
+         + parent's height. Algorithm is that we calculate bounding rectangle width of each
+         dendrogram's subtree. This width is a sum of all children widths calculated recursively
+         in `total_width`. After the calculation we start layout. Each child gets its X coordinate
+         as: parent's X + previous sibling children widths + half of this child's width.
         '''
-        offsets = (0., 0.)
+        HORIZONTAL_PADDING = 2
 
-        n_previous = 0
+        def __init__(self, dendrogram):
+            self.dendrogram = dendrogram
+            self.children = [_PositionedDendrogram(child) for child in dendrogram.children]
+            self.origin = np.empty(2)
+            self.total_width = self.dendrogram.width
+            if self.children:
+                children_width = np.sum([child.total_width for child in self.children])
+                children_width += self.HORIZONTAL_PADDING * (len(self.children) - 1)
+                self.total_width = max(self.total_width, children_width)
 
-        # set recursion limit with respect to
-        # the max number of nodes on the trees
-        old_depth = sys.getrecursionlimit()
-        max_depth = old_depth if old_depth > self._max_rec_depth else self._max_rec_depth
-        # TODO: This should be fixed so we don't set sys.setrecursionlimit at all
-        sys.setrecursionlimit(max_depth)
+        def position_at(self, origin):  # pylint: disable=missing-docstring
+            positions = {self.dendrogram: origin}
+            if self.children:
+                end_point = origin + [0, self.dendrogram.height]
+                left_bottom_offset = [-.5 * self.total_width, 0]
+                children_origin = end_point + left_bottom_offset
+                for child in self.children:
+                    child_origin = children_origin + [.5 * child.total_width, 0]
+                    positions.update(child.position_at(child_origin))
+                    children_origin += [child.total_width + self.HORIZONTAL_PADDING, 0]
+            return positions
 
-        if isinstance(self._obj, Neurite):
+    pos_dendrogram = _PositionedDendrogram(dendrogram)
+    return pos_dendrogram.position_at(origin)
 
-            max_diameter = _max_diameter(self._obj.root_node)
 
-            dummy_section = Tree()
-            dummy_section.add_child(self._obj.root_node)
-            self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
+def get_size(positions):
+    '''Get the size of bounding rectangle that embodies positions.
 
-            self._groups.append((0, self._n))
+    Args:
+        positions (dict of Dendrogram: np.array): positions xy coordinates of dendrograms
 
-            self._dims.append(self._max_dims)
+    Returns:
+        Tuple of width and height of bounding rectangle.
+    '''
+    coords = np.array(list(positions.values()))
+    width = np.max(coords[:, 0]) - np.min(coords[:, 0])
+    max_y_list = [dendrogram.height + coords[1] for dendrogram, coords in positions.items()]
+    height = np.max(max_y_list) - np.min(coords[:, 1])
+    return width, height
 
-        else:
 
-            for neurite in self._obj.neurites:
+def move_positions(positions, to_origin):
+    '''Move positions to a new origin.
 
-                neurite = neurite.root_node
-                max_diameter = _max_diameter(neurite)
-                dummy_section = Tree()
+    Args:
+        positions (dict of Dendrogram: np.array): positions
+        to_origin (np.array): where to move. np.array of (2,) shape for x,y coordindates.
 
-                dummy_section.add_child(neurite)
-                self._generate_dendro(dummy_section, (max_diameter, 0.), offsets)
-
-                # store in trees the indices for the slice which corresponds
-                # to the current neurite
-                self._groups.append((n_previous, self._n))
-
-                # store the max dims per neurite for view positioning
-                self._dims.append(self._max_dims)
-
-                # reset the max dimensions for the next tree in line
-                self._max_dims = [0., 0.]
-
-                # keep track of the next tree start index in list
-                n_previous = self._n
-
-        # set it back to its initial value
-        sys.setrecursionlimit(old_depth)
-
-    # pylint: disable=too-many-locals
-    def _generate_dendro(self, current_section, spacing, offsets):
-        '''Recursive function for dendrogram line computations
-        '''
-        max_dims = self._max_dims
-        start_x = _spacingx(current_section, max_dims, offsets[0], spacing[0])
-
-        for child in current_section.children:
-
-            segments = child.points
-
-            # number of leaves in child
-            terminations = _n_terminations(child)
-
-            # segement lengths
-            seg_lengths = np.linalg.norm(np.subtract(segments[:-1, COLS.XYZ],
-                                                     segments[1:, COLS.XYZ]), axis=1)
-
-            if not seg_lengths.size:
-                continue
-
-            # segment radii
-            radii = np.vstack((segments[:-1, COLS.R], segments[1:, COLS.R])).T \
-                if self._show_diameters else np.zeros((seg_lengths.shape[0], 2))
-
-            y_offset = offsets[1]
-            for i, slen in enumerate(seg_lengths):
-
-                # offset update for the vertical segments
-                new_offsets = _update_offsets(start_x, spacing, terminations,
-                                              (offsets[0], y_offset), slen)
-
-                # segments are drawn vertically, thus only y_offset changes from init offsets
-                self._rectangles[self._n] = _vertical_segment((offsets[0], y_offset),
-                                                              new_offsets, spacing, radii[i, :])
-                self._n += 1
-                y_offset = new_offsets[1]
-
-            if y_offset + spacing[1] * 2 + sum(seg_lengths) > max_dims[1]:
-                max_dims[1] = y_offset + spacing[1] * 2. + sum(seg_lengths)
-
-            self._max_dims = max_dims
-            # recursive call to self.
-            self._generate_dendro(child, spacing, new_offsets)
-
-            # update the starting position for the next child
-            start_x += terminations * spacing[0]
-
-            # write the horizontal lines only for bifurcations, where the are actual horizontal
-            # lines and not zero ones
-            if offsets[0] != new_offsets[0]:
-
-                # horizontal segment. Thickness is either 0 if show_diameters is false
-                # or 1. if show_diameters is true
-                self._rectangles[self._n] = _horizontal_segment(offsets, new_offsets, spacing, 0.)
-                self._n += 1
-
-    @property
-    def data(self):
-        ''' Returns the array with the rectangle collection
-        '''
-        return self._rectangles
-
-    @property
-    def groups(self):
-        ''' Returns the list of the indices for the slicing of the
-            rectangle array wich correspond to each neurite
-        '''
-        return self._groups
-
-    @property
-    def dims(self):
-        ''' Returns the list of the max dimensions for each neurite
-        '''
-        return self._dims
-
-    @property
-    def types(self):
-        ''' Returns an iterator over the types of the neurites in the object.
-            If the object is a tree, then one value is returned.
-        '''
-        neurites = self._obj.neurites if hasattr(self._obj, 'neurites') else (self._obj,)
-        return (neu.type for neu in neurites)
-
-    @property
-    def soma(self):
-        ''' Returns soma
-        '''
-        return self._generate_soma() if hasattr(self._obj, 'soma') else None
+    Returns:
+        Moved positions.
+    '''
+    to_origin = np.array(to_origin)
+    return {dendrogram: position + to_origin for dendrogram, position in positions.items()}
