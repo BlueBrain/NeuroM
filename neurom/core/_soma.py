@@ -27,15 +27,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Soma classes and functions'''
-import logging
 import math
+import warnings
 
 import numpy as np
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-
-L = logging.getLogger(__name__)
 
 
 class Soma(object):
@@ -66,7 +64,7 @@ class Soma(object):
     @property
     def volume(self):
         '''Gets soma volume assuming it is a sphere'''
-        L.warning('Approximating soma volume by a sphere. %s', self)
+        warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
         return 4.0 / 3 * math.pi * self.radius ** 3
 
 
@@ -164,12 +162,13 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
             'All radii must be the same'
         # only warn users about invalid format
         if r < 1e-5:
-            L.warning('Zero radius for soma %s', self)
+            warnings.warn('Zero radius for {}'.format(self))
         if not np.isclose(points[0, COLS.Y] - points[1, COLS.Y], r):
-            L.warning(
-                'The second point must be one radius below 0 on the y-plane for soma %s', self)
+            warnings.warn(
+                'The second point must be one radius below 0 on the y-plane for {}'.format(self))
         if not np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -r):
-            L.warning('The third point must be one radius above 0 on the y-plane for soma %s', self)
+            warnings.warn(
+                'The third point must be one radius above 0 on the y-plane for {}'.format(self))
         h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
@@ -235,7 +234,7 @@ def _get_type(points, soma_class):
        points[0][COLS.P] == -1 and
        points[1][COLS.P] == 1 and
        points[2][COLS.P] == 1):
-        L.warning('Using neuromorpho 3-Point soma')
+        warnings.warn('Using neuromorpho 3-Point soma')
         # NeuroMorpho is the main provider of morphologies, but they
         # with SWC as their default file format: they convert all
         # uploads to SWC.  In the process of conversion, they turn all
