@@ -129,8 +129,9 @@ def layout_dendrogram(dendrogram, origin):
         The layout happens only in X coordinates. Children's Y coordinate is just a parent's Y
          + parent's height. Algorithm is that we calculate bounding rectangle width of each
          dendrogram's subtree. This width is a sum of all children widths calculated recursively
-         in `total_width`. After the calculation we start layout. Each child gets its X coordinate
-         as: parent's X + previous sibling children widths + half of this child's width.
+         in `total_width`. If no children then the width is the dendrogram's width. After the
+         calculation we start layout. Each child gets its X coordinate as:
+         parent's X + previous sibling children widths + half of this child's width.
         '''
         HORIZONTAL_PADDING = 2
 
@@ -169,9 +170,9 @@ def get_size(positions):
     Returns:
         Tuple of width and height of bounding rectangle.
     '''
+    max_y_list = [dendrogram.height + coords[1] for dendrogram, coords in positions.items()]
     coords = np.array(list(positions.values()))
     width = np.max(coords[:, 0]) - np.min(coords[:, 0])
-    max_y_list = [dendrogram.height + coords[1] for dendrogram, coords in positions.items()]
     height = np.max(max_y_list) - np.min(coords[:, 1])
     return width, height
 
