@@ -32,34 +32,44 @@ from collections import namedtuple
 import numpy as np
 
 from neurom import NeuriteType
-from neurom.core import Neurite
+from neurom.core import Neurite, Neuron
 from neurom.core.dataformat import COLS
 
 
-class Dendrogram:
+class Dendrogram(object):
     '''Dendrogram'''
 
     def __init__(self, neurom_section, dendrogram_root=None):
         '''Dendrogram for NeuroM section tree.
 
         Args:
-            neurom_section: NeuroM section tree.
+            neurom_section (Neurite|Neuron|Section): tree to build dendrogram for.
             dendrogram_root: root of dendrogram. This is a service arg, please don't set it on
             your own. It is used to track cycles in ``neurom_section``.
         '''
+        if isinstance(neurom_section, Neurite):
+            neurom_section = neurom_section.root_node
+        if isinstance(neurom_section, Neuron):
+            SomaSection = namedtuple('neurom_section', ['id', 'type', 'children', 'points'])
+            neurom_section = SomaSection(
+                id=-1,
+                type=NeuriteType.soma,
+                children=[neurite.root_node for neurite in neurom_section.neurites],
+                points=np.array([
+                    np.array([0, 0, 0, .5]),
+                    np.array([.1, .1, .1, .5]),
+                ])
+            )
         if dendrogram_root is None:
             dendrogram_root = self
             dendrogram_root.processed_section_ids = []
-        if neurom_section.id in dendrogram_root.processed_section_ids:
-            raise ValueError('Cycled morphology {}'.format(neurom_section))
+        assert neurom_section.id not in dendrogram_root.processed_section_ids
         dendrogram_root.processed_section_ids.append(neurom_section.id)
 
         segments = neurom_section.points
-        segment_lengths = np.linalg.norm(
-            np.subtract(segments[:-1, COLS.XYZ], segments[1:, COLS.XYZ]), axis=1)
+        segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
         segment_radii = segments[:, COLS.R]
 
-        self.section_id = neurom_section.id
         self.neurite_type = neurom_section.type
         self.height = np.sum(segment_lengths)
         self.width = 2 * np.max(segment_radii)
@@ -87,32 +97,8 @@ class Dendrogram:
         return np.vstack((left_coords, right_coords))
 
 
-def create_dendrogram(neuron):
-    '''Creates a dendrogram for neuron
-
-    Args:
-        neuron (Neurite|Neuron): Can be a Neurite or a Neuron instance.
-
-    Returns:
-        Dendrogram of ``neuron``.
-    '''
-    if isinstance(neuron, Neurite):
-        return Dendrogram(neuron.root_node)
-    SomaSection = namedtuple('NeuromSection', ['id', 'type', 'children', 'points'])
-    soma_section = SomaSection(
-        id=-1,
-        type=NeuriteType.soma,
-        children=[neurite.root_node for neurite in neuron.neurites],
-        points=np.array([
-            np.array([0, 0, 0, .5]),
-            np.array([.1, .1, .1, .5]),
-        ])
-    )
-    return Dendrogram(soma_section)
-
-
 def layout_dendrogram(dendrogram, origin):
-    '''Layouts dendrogram as an aesthetical pleasing tree.
+    '''Lays out dendrogram as an aesthetical pleasing tree.
 
     Args:
         dendrogram (Dendrogram): dendrogram
@@ -123,14 +109,14 @@ def layout_dendrogram(dendrogram, origin):
         will represent a nice tree structure.
     '''
 
-    class _PositionedDendrogram:
-        '''Wrapper around dendrogram that allows to layout it.
+    class _PositionedDendrogram(object):
+        '''Wrapper around dendrogram that allows to lay it out.
 
         The layout happens only in X coordinates. Children's Y coordinate is just a parent's Y
          + parent's height. Algorithm is that we calculate bounding rectangle width of each
          dendrogram's subtree. This width is a sum of all children widths calculated recursively
          in `total_width`. If no children then the width is the dendrogram's width. After the
-         calculation we start layout. Each child gets its X coordinate as:
+         calculation we start to lay out. Each child gets its X coordinate as:
          parent's X + previous sibling children widths + half of this child's width.
         '''
         HORIZONTAL_PADDING = 2
@@ -138,7 +124,6 @@ def layout_dendrogram(dendrogram, origin):
         def __init__(self, dendrogram):
             self.dendrogram = dendrogram
             self.children = [_PositionedDendrogram(child) for child in dendrogram.children]
-            self.origin = np.empty(2)
             self.total_width = self.dendrogram.width
             if self.children:
                 children_width = np.sum([child.total_width for child in self.children])

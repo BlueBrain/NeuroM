@@ -41,7 +41,7 @@ from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
-from neurom.view._dendrogram import create_dendrogram, layout_dendrogram, get_size, move_positions
+from neurom.view.dendrogram import Dendrogram, layout_dendrogram, get_size, move_positions
 
 from . import common
 
@@ -342,7 +342,7 @@ def plot_dendrogram(ax, obj, show_diameters=True):
         obj (neurom.Neuron, neurom.Tree): neuron or tree
         show_diameters (bool): whether to show node diameters or not
     '''
-    dendrogram = create_dendrogram(obj)
+    dendrogram = Dendrogram(obj)
     positions = layout_dendrogram(dendrogram, np.array([0, 0]))
     w, h = get_size(positions)
     positions = move_positions(positions, np.array([.5 * w, 0]))

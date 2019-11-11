@@ -5,7 +5,7 @@ import numpy as np
 from nose import tools as nt
 from numpy.testing import assert_array_almost_equal
 
-import neurom.view._dendrogram as dm
+import neurom.view.dendrogram as dm
 from neurom import load_neuron, get
 from neurom.core.types import NeuriteType
 
@@ -16,9 +16,8 @@ NEURON_PATH = os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
 
 def test_create_dendrogram_neuron():
     neuron = load_neuron(NEURON_PATH)
-    dendrogram = dm.create_dendrogram(neuron)
+    dendrogram = dm.Dendrogram(neuron)
     nt.assert_equal(NeuriteType.soma, dendrogram.neurite_type)
-    nt.assert_equal(-1, dendrogram.section_id)
     soma_len = np.linalg.norm([.1, .1, .1])
     nt.assert_equal(soma_len, dendrogram.height)
     nt.assert_equal(1.0, dendrogram.width)
@@ -26,8 +25,6 @@ def test_create_dendrogram_neuron():
         [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
         dendrogram.coords)
     nt.assert_equal(len(neuron.neurites), len(dendrogram.children))
-    for i, d in enumerate(dendrogram.children):
-        nt.assert_equal(neuron.neurites[i].root_node.id, d.section_id)
 
 
 def test_dendrogram_get_coords():
@@ -44,14 +41,12 @@ def test_create_dendrogram_neurite():
         nt.assert_equal(len(neurom_section.children), len(dendrogram.children))
         for i, d in enumerate(dendrogram.children):
             section = neurom_section.children[i]
-            nt.assert_equal(section.id, d.section_id)
             nt.assert_equal(section.type, d.neurite_type)
 
     neuron = load_neuron(NEURON_PATH)
     neurite = neuron.neurites[0]
-    dendrogram = dm.create_dendrogram(neurite)
+    dendrogram = dm.Dendrogram(neurite)
     nt.assert_equal(neurite.type, dendrogram.neurite_type)
-    nt.assert_equal(neurite.root_node.id, dendrogram.section_id)
     assert_trees(neurite.root_node, dendrogram)
 
 
@@ -60,9 +55,8 @@ def test_create_cycle_dendrogram():
     neurite = neuron.neurites[0]
     leaf = next(neurite.root_node.ileaf())
     leaf.children.append(neurite.root_node)
-    with nt.assert_raises(ValueError) as cm:
-        dm.create_dendrogram(neurite)
-    nt.assert_in('Cycled morphology', cm.exception.args[0])
+    with nt.assert_raises(AssertionError):
+        dm.Dendrogram(neurite)
 
 
 def test_move_positions():
@@ -100,7 +94,7 @@ def test_layout_dendrogram():
             assert_layout(child)
 
     neuron = load_neuron(NEURON_PATH)
-    dendrogram = dm.create_dendrogram(neuron)
+    dendrogram = dm.Dendrogram(neuron)
     positions = dm.layout_dendrogram(dendrogram, np.array([0, 0]))
     assert_layout(dendrogram)
 
@@ -111,5 +105,5 @@ def test_neuron_not_corrupted():
     # This caused the section path distance calculation
     # to raise a KeyError exception.
     neuron = load_neuron(NEURON_PATH)
-    dm.create_dendrogram(neuron)
+    dm.Dendrogram(neuron)
     nt.assert_greater(get('section_path_distances', neuron).size, 0)
