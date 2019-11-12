@@ -27,8 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Dendrogram helper functions and class'''
-from collections import namedtuple
-
 import numpy as np
 
 from neurom import NeuriteType
@@ -45,28 +43,25 @@ class Dendrogram(object):
         Args:
             neurom_section (Neurite|Neuron|Section): tree to build dendrogram for.
         '''
-        if isinstance(neurom_section, Neurite):
-            neurom_section = neurom_section.root_node
         if isinstance(neurom_section, Neuron):
-            SomaSection = namedtuple('neurom_section', ['type', 'children', 'points'])
-            neurom_section = SomaSection(
-                type=NeuriteType.soma,
-                children=[neurite.root_node for neurite in neurom_section.neurites],
-                points=np.array([
-                    np.array([0, 0, 0, .5]),
-                    np.array([.1, .1, .1, .5]),
-                ])
-            )
+            self.neurite_type = NeuriteType.soma
+            self.height = 1
+            self.width = 1
+            self.coords = self.get_coords(
+                np.array([self.height]), np.array([.5 * self.width, .5 * self.width]))
+            self.children = [Dendrogram(neurite.root_node) for neurite in neurom_section.neurites]
+        else:
+            if isinstance(neurom_section, Neurite):
+                neurom_section = neurom_section.root_node
+            segments = neurom_section.points
+            segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
+            segment_radii = segments[:, COLS.R]
 
-        segments = neurom_section.points
-        segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
-        segment_radii = segments[:, COLS.R]
-
-        self.neurite_type = neurom_section.type
-        self.height = np.sum(segment_lengths)
-        self.width = 2 * np.max(segment_radii)
-        self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
-        self.children = [Dendrogram(child) for child in neurom_section.children]
+            self.neurite_type = neurom_section.type
+            self.height = np.sum(segment_lengths)
+            self.width = 2 * np.max(segment_radii)
+            self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
+            self.children = [Dendrogram(child) for child in neurom_section.children]
 
     @staticmethod
     def get_coords(segment_lengths, segment_radii):

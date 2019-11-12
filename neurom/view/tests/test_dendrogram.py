@@ -18,9 +18,9 @@ def test_create_dendrogram_neuron():
     neuron = load_neuron(NEURON_PATH)
     dendrogram = dm.Dendrogram(neuron)
     nt.assert_equal(NeuriteType.soma, dendrogram.neurite_type)
-    soma_len = np.linalg.norm([.1, .1, .1])
+    soma_len = 1.0
     nt.assert_equal(soma_len, dendrogram.height)
-    nt.assert_equal(1.0, dendrogram.width)
+    nt.assert_equal(soma_len, dendrogram.width)
     assert_array_almost_equal(
         [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
         dendrogram.coords)
