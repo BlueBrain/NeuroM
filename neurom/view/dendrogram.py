@@ -39,20 +39,17 @@ from neurom.core.dataformat import COLS
 class Dendrogram(object):
     '''Dendrogram'''
 
-    def __init__(self, neurom_section, dendrogram_root=None):
+    def __init__(self, neurom_section):
         '''Dendrogram for NeuroM section tree.
 
         Args:
             neurom_section (Neurite|Neuron|Section): tree to build dendrogram for.
-            dendrogram_root: root of dendrogram. This is a service arg, please don't set it on
-            your own. It is used to track cycles in ``neurom_section``.
         '''
         if isinstance(neurom_section, Neurite):
             neurom_section = neurom_section.root_node
         if isinstance(neurom_section, Neuron):
-            SomaSection = namedtuple('neurom_section', ['id', 'type', 'children', 'points'])
+            SomaSection = namedtuple('neurom_section', ['type', 'children', 'points'])
             neurom_section = SomaSection(
-                id=-1,
                 type=NeuriteType.soma,
                 children=[neurite.root_node for neurite in neurom_section.neurites],
                 points=np.array([
@@ -60,11 +57,6 @@ class Dendrogram(object):
                     np.array([.1, .1, .1, .5]),
                 ])
             )
-        if dendrogram_root is None:
-            dendrogram_root = self
-            dendrogram_root.processed_section_ids = []
-        assert neurom_section.id not in dendrogram_root.processed_section_ids
-        dendrogram_root.processed_section_ids.append(neurom_section.id)
 
         segments = neurom_section.points
         segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
@@ -74,7 +66,7 @@ class Dendrogram(object):
         self.height = np.sum(segment_lengths)
         self.width = 2 * np.max(segment_radii)
         self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
-        self.children = [Dendrogram(child, dendrogram_root) for child in neurom_section.children]
+        self.children = [Dendrogram(child) for child in neurom_section.children]
 
     @staticmethod
     def get_coords(segment_lengths, segment_radii):
@@ -142,8 +134,7 @@ def layout_dendrogram(dendrogram, origin):
                     children_origin += [child.total_width + self.HORIZONTAL_PADDING, 0]
             return positions
 
-    pos_dendrogram = _PositionedDendrogram(dendrogram)
-    return pos_dendrogram.position_at(origin)
+    return _PositionedDendrogram(dendrogram).position_at(origin)
 
 
 def get_size(positions):
@@ -172,5 +163,5 @@ def move_positions(positions, to_origin):
     Returns:
         Moved positions.
     '''
-    to_origin = np.array(to_origin)
+    to_origin = np.asarray(to_origin)
     return {dendrogram: position + to_origin for dendrogram, position in positions.items()}

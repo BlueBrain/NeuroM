@@ -50,15 +50,6 @@ def test_create_dendrogram_neurite():
     assert_trees(neurite.root_node, dendrogram)
 
 
-def test_create_cycle_dendrogram():
-    neuron = load_neuron(NEURON_PATH)
-    neurite = neuron.neurites[0]
-    leaf = next(neurite.root_node.ileaf())
-    leaf.children.append(neurite.root_node)
-    with nt.assert_raises(AssertionError):
-        dm.Dendrogram(neurite)
-
-
 def test_move_positions():
     origin = [10, -10]
     positions = {1: [0, 0], 2: [3, -3]}
