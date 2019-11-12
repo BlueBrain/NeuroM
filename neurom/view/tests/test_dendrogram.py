@@ -1,154 +1,100 @@
 import os
-from numpy.testing import assert_array_almost_equal
+from collections import namedtuple
+
 import numpy as np
 from nose import tools as nt
-from neurom.core.types import NeuriteType
-import neurom.view._dendrogram as dm
+from numpy.testing import assert_array_almost_equal
+
+import neurom.view.dendrogram as dm
 from neurom import load_neuron, get
+from neurom.core.types import NeuriteType
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/Neuron.h5')
-NEURON = load_neuron(DATA_PATH)
-NEURITE = NEURON.neurites[0]
-TREE = NEURITE.root_node
-
-OLD_OFFS = [1.2, -1.2]
-NEW_OFFS = [2.3, -2.3]
-SPACING = (40., 0.)
-
-def test_n_rectangles_tree():
-
-    nt.assert_equal(dm._n_rectangles(NEURITE), 230)
+DATA_PATH = os.path.join(_PWD, '../../../test_data/')
+NEURON_PATH = os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
 
 
-def test_n_rectangles_neuron():
-
-    nt.assert_equal(dm._n_rectangles(NEURON), 920)
-
-
-def test_vertical_segment():
-
-    radii = [10., 20.]
-
-    res = np.array([[ -7.7,  -1.2],
-                    [-17.7,  -2.3],
-                    [ 22.3,  -2.3],
-                    [ 12.3,  -1.2]])
-
-    seg = dm._vertical_segment(OLD_OFFS, NEW_OFFS, SPACING, radii)
-
-    nt.assert_true(np.allclose(seg, res))
+def test_create_dendrogram_neuron():
+    neuron = load_neuron(NEURON_PATH)
+    dendrogram = dm.Dendrogram(neuron)
+    nt.assert_equal(NeuriteType.soma, dendrogram.neurite_type)
+    soma_len = 1.0
+    nt.assert_equal(soma_len, dendrogram.height)
+    nt.assert_equal(soma_len, dendrogram.width)
+    assert_array_almost_equal(
+        [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
+        dendrogram.coords)
+    nt.assert_equal(len(neuron.neurites), len(dendrogram.children))
 
 
-def test_horizontal_segment():
-
-    diameter = 10.
-
-    res = np.array([[  1.2,  -1.2],
-                    [  2.3,  -1.2],
-                    [  2.3, -11.2],
-                    [  1.2, -11.2]])
-
-    seg = dm._horizontal_segment(OLD_OFFS, NEW_OFFS, SPACING, diameter)
-
-    nt.assert_true(np.allclose(seg, res))
+def test_dendrogram_get_coords():
+    segment_lengts = np.array([1, 1])
+    segment_radii = np.array([.5, 1, .25])
+    coords = dm.Dendrogram.get_coords(segment_lengts, segment_radii)
+    assert_array_almost_equal(
+        [[-.5, 0], [-1, 1], [-.25, 2], [.25, 2], [1, 1], [.5, 0]],
+        coords)
 
 
-def test_spacingx():
+def test_create_dendrogram_neurite():
+    def assert_trees(neurom_section, dendrogram):
+        nt.assert_equal(len(neurom_section.children), len(dendrogram.children))
+        for i, d in enumerate(dendrogram.children):
+            section = neurom_section.children[i]
+            nt.assert_equal(section.type, d.neurite_type)
 
-    xoffset = 100.
-    xspace = 40.
-    max_dims = [10., 2.]
-
-    spx = dm._spacingx(TREE, max_dims, xoffset, xspace)
-
-    nt.assert_almost_equal(spx, -120.)
-    nt.assert_almost_equal(max_dims[0], 440.)
-
-
-def test_update_offsets():
-
-    start_x = -10.
-    length = 44.
-
-    offs = dm._update_offsets(start_x, SPACING, 2, OLD_OFFS, length)
-
-    nt.assert_almost_equal(offs[0], 30.)
-    nt.assert_almost_equal(offs[1], 42.8)
+    neuron = load_neuron(NEURON_PATH)
+    neurite = neuron.neurites[0]
+    dendrogram = dm.Dendrogram(neurite)
+    nt.assert_equal(neurite.type, dendrogram.neurite_type)
+    assert_trees(neurite.root_node, dendrogram)
 
 
-class TestDendrogram(object):
+def test_move_positions():
+    origin = [10, -10]
+    positions = {1: [0, 0], 2: [3, -3]}
+    moved_positions = dm.move_positions(positions, origin)
+    nt.assert_list_equal(list(positions.keys()), list(moved_positions.keys()))
+    nt.assert_list_equal([10, -10], moved_positions[1].tolist())
+    nt.assert_list_equal([13, -13], moved_positions[2].tolist())
 
-    def setUp(self):
 
-        self.dtr = dm.Dendrogram(NEURITE)
-        self.dnrn = dm.Dendrogram(NEURON)
+def test_get_size():
+    DendrogramMock = namedtuple('Dendrogram', 'height')
+    dendrogram1 = DendrogramMock(10)
+    dendrogram2 = DendrogramMock(1)
+    positions = {dendrogram1: [-1, 0], dendrogram2: [3, 3]}
+    w, h = dm.get_size(positions)
+    nt.assert_equal(4, w)
+    nt.assert_equal(10, h)
 
-        self.dtr.generate()
-        self.dnrn.generate()
 
-    def test_init(self):
+def test_layout_dendrogram():
+    def assert_layout(dendrogram):
+        for i, child in enumerate(dendrogram.children):
+            # child is higher than parent in Y coordinate
+            nt.assert_greater_equal(
+                positions[child][1],
+                positions[dendrogram][1] + dendrogram.height)
+            if i < len(dendrogram.children) - 1:
+                next_child = dendrogram.children[i + 1]
+                # X space between child is enough for their widths
+                nt.assert_greater(
+                    positions[next_child][0] - positions[child][0],
+                    .5 * (next_child.width + child.width))
+            assert_layout(child)
 
-        nt.assert_true(np.allclose(self.dnrn._rectangles.shape, (920, 4, 2)))
+    neuron = load_neuron(NEURON_PATH)
+    dendrogram = dm.Dendrogram(neuron)
+    positions = dm.layout_dendrogram(dendrogram, np.array([0, 0]))
+    assert_layout(dendrogram)
 
-    def test_generate_tree(self):
 
-        nt.assert_true(np.allclose(self.dtr._rectangles.shape, (230, 4, 2)))
-        nt.assert_false(np.all(self.dtr._rectangles == 0.))
-
-    def test_generate_soma(self):
-
-        vrec = self.dnrn.soma
-        assert_array_almost_equal(vrec,
-                                  np.array([[-0.092495, -0.18499],
-                                            [-0.092495,  0.],
-                                            [0.092495,  0.],
-                                            [0.092495, -0.18499]]))
-
-        vrec = self.dtr.soma
-
-        nt.assert_true(vrec == None)
-
-    def test_neuron_not_corrupted(self):
-        # Regression for #492: dendrogram was corrupting
-        # neuron used to construct it.
-        # This caused the section path distance calculation
-        # to raise a KeyError exception.
-        get('section_path_distances', NEURON)
-
-    def test_generate_neuron(self):
-
-        total = 0
-
-        for n0, n1 in self.dnrn._groups:
-
-            group = self.dnrn._rectangles[n0: n1]
-
-            total += group.shape[0]
-
-            nt.assert_false(np.all(group == 0.))
-
-        nt.assert_equal(total, 920)
-
-    def test_data(self):
-
-        nt.assert_false(np.all(self.dnrn.data == 0.))
-        nt.assert_false(np.all(self.dtr.data == 0.))
-
-    def test_groups(self):
-        nt.ok_(self.dnrn.groups)
-        nt.ok_(self.dtr.groups)
-
-    def test_dims(self):
-
-        nt.ok_(self.dnrn.dims)
-        nt.ok_(self.dtr.dims)
-
-    def test_types_tree(self):
-        for ctype in self.dtr.types:
-            nt.eq_(ctype, NeuriteType.apical_dendrite)
-
-    def test_types_neuron(self):
-        types = tuple(self.dnrn.types)
-        nt.eq_(types[0], NeuriteType.apical_dendrite)
-        nt.eq_(types[1], NeuriteType.basal_dendrite)
+def test_neuron_not_corrupted():
+    # Regression for #492: dendrogram was corrupting
+    # neuron used to construct it.
+    # This caused the section path distance calculation
+    # to raise a KeyError exception.
+    neuron = load_neuron(NEURON_PATH)
+    dm.Dendrogram(neuron)
+    nt.assert_greater(get('section_path_distances', neuron).size, 0)
