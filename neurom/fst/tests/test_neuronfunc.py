@@ -51,7 +51,26 @@ SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
 SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+SWC_NRN_3PT = load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
 
+
+def test_soma_volume():
+    # SomaSinglePoint
+    ret = _nf.soma_volume(SIMPLE)
+    nt.eq_(ret, 4.1887902047863905)
+    # SomaCylinders
+    ret = _nf.soma_volume(SWC_NRN)
+    nt.eq_(ret, 0.010726068245337955)
+    # SomaSimpleContour
+    ret = _nf.soma_volume(NRN)
+    nt.eq_(ret, 0.0033147000251481135)
+    # SomaNeuromorphoThreePointCylinders
+    ret = _nf.soma_volume(SWC_NRN_3PT)
+    nt.eq_(ret, 50.26548245743669)
+
+def test_soma_volumes():
+    ret = _nf.soma_volumes(SIMPLE)
+    nt.eq_(ret, [4.1887902047863905, ])
 
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
