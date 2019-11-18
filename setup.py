@@ -34,7 +34,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.15.dev1"
+VERSION = "1.4.15"
 
 REQS = ['click>=7.0',
         'enum-compat>=0.0.2',
