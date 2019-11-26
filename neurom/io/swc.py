@@ -44,7 +44,7 @@ from .datawrapper import DataWrapper
 ID, TYPE, X, Y, Z, R, P = range(7)
 
 
-def read(filename, data_wrapper=DataWrapper, soma_loc = 0):
+def read(filename, data_wrapper=DataWrapper, has_soma = True):
     '''Read an SWC file and return a tuple of data, format.'''
     data = np.loadtxt(filename)
     if len(np.shape(data)) == 1:
@@ -53,7 +53,7 @@ def read(filename, data_wrapper=DataWrapper, soma_loc = 0):
     structures = data[:,4]
 
     
-    # Loading in Mouselight data which does not follow the NeuroMorph convention
+    # Loading in custom data which does not follow the NeuroMorph convention
     # Points not in 1-4 format will be loaded as undefined and cause tuple index errors
     if structures.all() not in range(1,5):
         custom_type = True
@@ -61,7 +61,8 @@ def read(filename, data_wrapper=DataWrapper, soma_loc = 0):
         structures[structures > 4.0] = 0
 
     # Choose a soma point if one is not found
-    if 1 not in structure:
-        structures[soma_loc] = 1
+    if (1 not in structures) and has_soma:
+        print("No soma found, setting soma at first row")
+        structures[0] = 1
 
     return data_wrapper(data, 'SWC', None)
