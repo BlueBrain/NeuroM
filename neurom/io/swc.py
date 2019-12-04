@@ -44,7 +44,7 @@ from .datawrapper import DataWrapper
 ID, TYPE, X, Y, Z, R, P = range(7)
 
 
-def read(filename, data_wrapper=DataWrapper, has_soma = True):
+def read(filename, data_wrapper=DataWrapper):
     '''Read an SWC file and return a tuple of data, format.'''
     data = np.loadtxt(filename)
     if len(np.shape(data)) == 1:
@@ -61,7 +61,7 @@ def read(filename, data_wrapper=DataWrapper, has_soma = True):
         structures[structures > 4.0] = 0
 
     # Choose a soma point if one is not found
-    if (1 not in structures) and has_soma:
+    if (1 not in structures):
         print("No soma found, setting soma at first row")
         structures[0] = 1
 
