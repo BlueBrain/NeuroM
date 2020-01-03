@@ -32,6 +32,7 @@ import json
 import os
 import numpy as np
 from itertools import chain
+import warnings
 
 from nose import tools as nt
 
@@ -91,7 +92,6 @@ class SectionTreeBase(object):
         self.ref_types = REF_NEURITE_TYPES
 
     def test_neurite_type(self):
-
         neurite_types = [n0.type for n0 in self.sec_nrn.neurites]
         nt.assert_equal(neurite_types, self.ref_types)
 
@@ -205,7 +205,8 @@ class TestH5V1(SectionTreeBase):
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+        with warnings.catch_warnings(record=True):
+            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestH5V2(SectionTreeBase):
@@ -225,7 +226,8 @@ class TestH5V2(SectionTreeBase):
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+        with warnings.catch_warnings(record=True):
+            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestSWC(SectionTreeBase):

@@ -28,6 +28,7 @@
 
 '''Test neurom._bifurcationfunc functionality'''
 
+import warnings
 from nose import tools as nt
 from nose.tools import assert_equal, assert_raises
 from neurom.core import Section
@@ -44,8 +45,9 @@ _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
 SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-SIMPLE2 = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'not_too_complex.asc'))
-MULTIFURCATION = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'multifurcation.asc'))
+with warnings.catch_warnings(record=True):
+    SIMPLE2 = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'not_too_complex.asc'))
+    MULTIFURCATION = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'multifurcation.asc'))
 
 
 def test_local_bifurcation_angle():
