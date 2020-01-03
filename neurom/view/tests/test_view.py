@@ -30,11 +30,12 @@ import os
 
 import itertools as it
 import numpy as np
+from numpy.testing import assert_array_almost_equal
 
 from nose import tools as nt
 from neurom import load_neuron
 from neurom.view import view, common
-from neurom.core import Section
+from neurom.core import Section, Neurite
 from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType
 
@@ -46,12 +47,19 @@ simple_neuron = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 
 
 def test_tree():
-    with get_fig_2d() as (fig, ax):
-        tree = fst_neuron.neurites[0]
-        view.plot_tree(ax, tree, color='black', diameter_scale=None, alpha=1., linewidth=1.2)
-        collection = ax.collections[0]
-        nt.eq_(collection.get_linewidth()[0], 1.2)
-        np.testing.assert_allclose(collection.get_color(), np.array([[0., 0., 0., 1.]]))
+    neuron = load_neuron(os.path.join(SWC_PATH, 'simple-different-section-types.swc'))
+    expected_colors = {'black': np.array([[0., 0., 0., 1.] for _ in range(3)]),
+                       None: [[1.      , 0.      , 0.      , 1.],
+                                       [1.      , 0.      , 0.      , 1.],
+                                       [0.501961, 0.      , 0.501961, 1.]]}
+    for input_color, expected_colors in expected_colors.items():
+        with get_fig_2d() as (fig, ax):
+            tree = neuron.neurites[0]
+            view.plot_tree(ax, tree,
+                           color=input_color, diameter_scale=None, alpha=1., linewidth=1.2)
+            collection = ax.collections[0]
+            nt.eq_(collection.get_linewidth()[0], 1.2)
+            assert_array_almost_equal(collection.get_colors(), expected_colors)
 
     with get_fig_2d() as (fig, ax):
         nt.assert_raises(AssertionError, view.plot_tree, ax, tree, plane='wrong')
@@ -114,7 +122,7 @@ def test_dendrogram():
 
 
 def test_one_point_branch():
-    test_section = Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]]))
+    test_section = Neurite(Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]])))
     for diameter_scale, linewidth in it.product((1.0, None),
                                                 (0.0, 1.2)):
         with get_fig_2d() as (fig, ax):

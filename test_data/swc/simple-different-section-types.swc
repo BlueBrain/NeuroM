@@ -1,0 +1,29 @@
+# SWC structure:
+# index, type, x, y, z, radius, parent
+#
+#           (0, 5)
+# (-5, 5)----- ------ (6, 5)
+#             |
+#             |
+#             |
+#             | Type = 3
+#             |
+#             o origin
+#             |
+#             | Type = 2
+#             |
+#             |
+#(-5, -4)----- ------ (6, -4)
+#           (0, -4)
+#
+# all radii are 1, except for end points, which are 0
+
+ 1 1  0  0 0 1. -1
+ 2 3  0  0 0 1.  1
+ 3 3  0  5 0 1.  2
+ 4 3 -5  5 0 0.  3
+ 5 4  6  5 0 0.  3  #  Section with different type than its parent section
+ 6 2  0  0 0 1.  1
+ 7 2  0 -4 0 1.  6
+ 8 2  6 -4 0 0.  7
+ 9 2 -5 -4 0 0.  7
