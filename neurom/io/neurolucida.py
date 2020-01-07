@@ -30,7 +30,6 @@
 Neuroludica
 '''
 
-import logging
 import warnings
 from io import open
 
@@ -58,7 +57,6 @@ UNWANTED_SECTION_NAMES = [
     'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar',
 ]
 UNWANTED_SECTIONS = {name: True for name in UNWANTED_SECTION_NAMES}
-L = logging.getLogger(__name__)
 
 
 def _match_section(section, match):
