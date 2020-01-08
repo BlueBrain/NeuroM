@@ -35,7 +35,7 @@ import sys
 
 from neurom.check import structural_checks as st_chk
 from neurom.io.utils import get_morph_files
-from neurom.io import load_data
+from neurom import load_neuron
 
 DESCRIPTION = '''
 NeuroM Raw Data Checker
@@ -91,14 +91,12 @@ def run(args):
         sys.exit('ERROR: Invalid data path %s' % data_path)
 
     for f in files:
-        raw_data = load_data(f)
+        raw_data = load_neuron(f)
         print('\nCheck file %s...' % f)
         print('Has soma points? %s' % st_chk.has_soma_points(raw_data))
 
-        result = st_chk.has_sequential_ids(raw_data)
-        print('Consecutive indices? {}'.format(result.status))
-        if not result.status:
-            print('Non consecutive IDs detected: {}'.format(result.info))
+        result = st_chk.has_valid_soma(raw_data)
+        print('Valid soma? {}'.format(result.status))
 
 
 if __name__ == '__main__':

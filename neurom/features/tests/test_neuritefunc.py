@@ -36,9 +36,11 @@ from nose import tools as nt
 from numpy.testing import assert_allclose
 
 import neurom as nm
-from neurom.fst import _neuritefunc as _nf
-from neurom.fst.sectionfunc import section_volume
 from neurom.geom import convex_hull
+from neurom.features import neuritefunc as _nf
+from neurom.features.sectionfunc import section_volume
+from neurom.core import Section, Neurite, Population
+
 from utils import _close
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
@@ -106,8 +108,7 @@ def test_total_volume_per_neurite():
 
     # calculate the volumes by hand and compare
     vol2 = [sum(section_volume(s) for s in n.iter_sections())
-			for n in NRN.neurites
-            ]
+			for n in NRN.neurites]
     nt.eq_(vol, vol2)
 
     # regression test
@@ -131,18 +132,18 @@ def test_neurite_volume_density():
 
 
 def test_terminal_path_length_per_neurite():
-    terminal_distances = _nf.terminal_path_lengths_per_neurite(SIMPLE)
+    terminal_distances = sorted(_nf.terminal_path_lengths_per_neurite(SIMPLE))
     assert_allclose(terminal_distances,
-                    (5 + 5., 5 + 6., 4. + 6., 4. + 5))
+                    sorted((5 + 5., 5 + 6., 4. + 6., 4. + 5)))
     terminal_distances = _nf.terminal_path_lengths_per_neurite(SIMPLE,
                                                                neurite_type=nm.AXON)
     assert_allclose(terminal_distances,
                     (4. + 6., 4. + 5.))
 
 def test_total_length_per_neurite():
-    total_lengths = _nf.total_length_per_neurite(SIMPLE)
+    total_lengths = sorted(_nf.total_length_per_neurite(SIMPLE))
     assert_allclose(total_lengths,
-                    (5. + 5. + 6., 4. + 5. + 6.))
+                    sorted((5. + 5. + 6., 4. + 5. + 6.)))
 
 def test_n_segments():
     n_segments = _nf.n_segments(SIMPLE)
@@ -159,16 +160,15 @@ def test_n_sections():
 def test_neurite_volumes():
     #note: cannot use SIMPLE since it lies in a plane
     total_volumes = _nf.total_volume_per_neurite(NRN)
-    assert_allclose(total_volumes,
-                    [271.94122143951864, 281.24754646913954,
-                     274.98039928781355, 276.73860261723024]
-                    )
+    assert_allclose(sorted(total_volumes),
+                    sorted([271.94122143951864, 281.24754646913954,
+                     274.98039928781355, 276.73860261723024]))
 
 def test_section_path_lengths():
     path_lengths = list(_nf.section_path_lengths(SIMPLE))
-    assert_allclose(path_lengths,
-                    (5., 10., 11., # type 3, basal dendrite
-                     4., 10., 9.)) # type 2, axon
+    assert_allclose(sorted(path_lengths),
+                    sorted((5., 10., 11., # type 3, basal dendrite
+                     4., 10., 9.))) # type 2, axon
 
 def test_section_term_lengths():
     term_lengths = list(_nf.section_term_lengths(SIMPLE))
@@ -277,7 +277,7 @@ def test_partition_asymmetry():
 def test_segment_lengths():
     segment_lengths = _nf.segment_lengths(SIMPLE)
     assert_allclose(segment_lengths,
-                    (5.0, 5.0, 6.0,   # type 3, basal dendrite
+                    (5.0, 5.0, 6.0, # type 3, basal dendrite
                      4.0, 6.0, 5.0))  # type 2, axon
 
 def test_segment_areas():
@@ -291,15 +291,15 @@ def test_segment_areas():
                      16.019042])
 
 def test_segment_volumes():
-    expected = [
+    expected = sorted([
         15.70796327,
          5.23598776,
          6.28318531,
         12.56637061,
          6.28318531,
          5.23598776,
-    ]
-    result = _nf.segment_volumes(SIMPLE)
+    ])
+    result = sorted(_nf.segment_volumes(SIMPLE))
     assert_allclose(result, expected)
 
 def test_segment_midpoints():
@@ -310,7 +310,7 @@ def test_segment_midpoints():
                               [ 3. ,  5. ,  0. ],
                               [ 0. , (-4. + 0)/ 2. ,  0. ],  #trunk type 3
                               [ 3. , -4. ,  0. ],
-                              [-2.5, -4. ,  0. ]]))
+                              [-2.5, -4. ,  0. ],]))
 
 def test_segment_radial_distances():
     '''midpoints on segments'''
@@ -318,7 +318,11 @@ def test_segment_radial_distances():
     assert_allclose(radial_distances,
                     [2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2), 2.0, 5.0, sqrt(2.5**2 + 4**2)])
 
-
 def test_segment_path_lengths():
     pathlengths = _nf.segment_path_lengths(SIMPLE)
     assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])
+
+def test_principal_direction_extents():
+    principal_dir = list(_nf.principal_direction_extents(SIMPLE))
+    assert_allclose(principal_dir,
+                    (14.736052694538641, 12.105102672688004))

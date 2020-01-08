@@ -94,22 +94,6 @@ def _generate_neurite(mode):
     return Neurite(tree)
 
 
-def _genetate_tree_non_monotonic_section_boundary():
-
-    tree = Section(np.array([[0, 0, 0, 1.0, 0, 0],
-                             [0, 0, 0, 0.75, 0, 0],
-                             [0, 0, 0, 0.5, 0, 0],
-                             [0, 0, 0, 0.25, 0, 0]]))
-
-    ch0 = Section(np.array([[0, 0, 0, 0.375, 0, 0],
-                            [0, 0, 0, 0.125, 0, 0],
-                            [0, 0, 0, 0.0625, 0, 0]]))
-
-    tree.add_child(ch0)
-    tree.type = NeuriteType.undefined
-    return Neurite(tree)
-
-
 def _generate_back_track_tree(n, dev):
     points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
@@ -138,25 +122,6 @@ def _generate_back_track_tree(n, dev):
     return neuron.neurites[0]
 
 
-def test_is_monotonic():
-
-    # tree with decreasing radii
-    decr_diams = _generate_neurite(0)
-    nt.assert_true(mt.is_monotonic(decr_diams, 1e-6))
-
-    # tree with equal radii
-    equl_diams = _generate_neurite(1)
-    nt.assert_true(mt.is_monotonic(equl_diams, 1e-6))
-
-    # tree with increasing radii
-    incr_diams = _generate_neurite(2)
-    nt.assert_false(mt.is_monotonic(incr_diams, 1e-6))
-
-    # Tree with larger child initial point
-    bad_child = _genetate_tree_non_monotonic_section_boundary()
-    nt.assert_false(mt.is_monotonic(bad_child, 1e-6))
-
-
 def test_is_flat():
 
     neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
@@ -166,9 +131,9 @@ def test_is_flat():
 
 
 def test_is_back_tracking():
-
     # case 1: a back-track falls directly on a previous node
     t = _generate_back_track_tree(1, (0., 0., 0.))
+    # FIXME: this test fails because of https://github.com/BlueBrain/MorphIO/issues/29
     nt.assert_true(mt.is_back_tracking(t))
 
     # case 2: a zigzag is close to another segment
@@ -201,17 +166,6 @@ def test_get_flat_neurites():
 
     nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
     nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 4)
-
-
-def test_get_nonmonotonic_neurites():
-
-    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
-
-    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 4)
-
-    _make_monotonic(n)
-
-    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 0)
 
 
 def test_get_back_tracking_neurites():

@@ -35,19 +35,36 @@ from nose import tools as nt
 
 import neurom as nm
 from neurom._compat import zip
-from neurom.core import graft_neuron, iter_segments
+from neurom.core import iter_segments, iter_neurites, graft_neuron, Neuron
+from morphio.mut import Morphology
+
 
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
 
 
+def test_simple():
+    nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+
 def test_load_neuron_pathlib():
     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
-def test_deep_copy():
-    nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-    nrn2 = deepcopy(nrn1)
-    check_cloned_neuron(nrn1, nrn2)
+def test_for_morphio():
+    morphio_neuron = Morphology(os.path.join(SWC_PATH, 'simple.swc'))
+    Neuron(morphio_neuron)
+
+    Neuron(Morphology())
+
+    neuron = Morphology()
+    neuron.soma.points = [[0,0,0], [1,1,1], [2,2,2]]
+    neuron.soma.diameters = [1, 1, 1]
+
+    Neuron(neuron)
+
+# def test_deep_copy():
+#     nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+#     nrn2 = deepcopy(nrn1)
+#     check_cloned_neuron(nrn1, nrn2)
 
 
 def test_graft_neuron():
@@ -85,10 +102,6 @@ def check_cloned_neuron(nrn1, nrn2):
     # check if changes are propagated between neurons
     nrn2.soma.radius = 10.
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
-
-    nrn2._data.data_block[0, :] = np.zeros_like(nrn2._data.data_block[0, :])
-    nt.ok_(not np.allclose(nrn1._data.data_block[0, :],
-                           nrn2._data.data_block[0, :]))
 
 
 def test_str():

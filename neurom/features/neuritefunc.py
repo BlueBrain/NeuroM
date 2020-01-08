@@ -36,15 +36,13 @@ from neurom import morphmath
 from neurom.core import Tree, iter_neurites, iter_sections, iter_segments, NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.fst import _bifurcationfunc
-from neurom.fst import _neuronfunc
-from neurom.fst import sectionfunc
+from neurom.features import bifurcationfunc, neuronfunc, sectionfunc
 from neurom.geom import convex_hull
 
 
 def total_length(nrn_pop, neurite_type=NeuriteType.all):
     '''Get the total length of all sections in the group of neurons or neurites'''
-    nrns = _neuronfunc.neuron_population(nrn_pop)
+    nrns = neuronfunc.neuron_population(nrn_pop)
     return list(sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns)
 
 
@@ -156,7 +154,7 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
 
 def map_neurons(fun, neurites, neurite_type):
     '''Map `fun` to all the neurites in a single or collection of neurons'''
-    nrns = _neuronfunc.neuron_population(neurites)
+    nrns = neuronfunc.neuron_population(neurites)
     return [fun(n, neurite_type=neurite_type) for n in nrns]
 
 
@@ -296,7 +294,7 @@ def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 
 def local_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of local bifurcation angles in a collection of neurites'''
-    return map_sections(_bifurcationfunc.local_bifurcation_angle,
+    return map_sections(bifurcationfunc.local_bifurcation_angle,
                         neurites,
                         neurite_type=neurite_type,
                         iterator_type=Tree.ibifurcation_point)
@@ -304,7 +302,7 @@ def local_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
 
 def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     '''Get a list of remote bifurcation angles in a collection of neurites'''
-    return map_sections(_bifurcationfunc.remote_bifurcation_angle,
+    return map_sections(bifurcationfunc.remote_bifurcation_angle,
                         neurites,
                         neurite_type=neurite_type,
                         iterator_type=Tree.ibifurcation_point)
@@ -312,7 +310,7 @@ def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
 
 def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
     '''Partition at bifurcation points of a collection of neurites'''
-    return map(_bifurcationfunc.bifurcation_partition,
+    return map(bifurcationfunc.bifurcation_partition,
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
@@ -320,7 +318,7 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
 
 def partition_asymmetries(neurites, neurite_type=NeuriteType.all):
     '''Partition asymmetry at bifurcation points of a collection of neurites'''
-    return map(_bifurcationfunc.partition_asymmetry,
+    return map(bifurcationfunc.partition_asymmetry,
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
@@ -330,7 +328,7 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
     '''Partition pairs at bifurcation points of a collection of neurites.
     Partition pait is defined as the number of bifurcations at the two
     daughters of the bifurcating section'''
-    return map(_bifurcationfunc.partition_pair,
+    return map(bifurcationfunc.partition_pair,
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
