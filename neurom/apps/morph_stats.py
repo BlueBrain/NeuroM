@@ -82,15 +82,16 @@ def extract_stats(neurons, config):
                 stat_name = _stat_name(ns, mode)
                 stat = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
 
+                name = n.name if n is not None else 'all'
                 if stat is None or not stat.shape:
-                    stats[n.name][stat_name] = stat
+                    stats[name][stat_name] = stat
                 else:
                     assert stat.shape in ((3, ), ), \
                         'Statistic must create a 1x3 result'
 
                     for i, suffix in enumerate('XYZ'):
                         compound_stat_name = stat_name + '_' + suffix
-                        stats[n.name][compound_stat_name] = stat[i]
+                        stats[name][compound_stat_name] = stat[i]
 
     for ns, modes in config['neuron'].items():
         for mode in modes:
@@ -132,7 +133,7 @@ _NEURITE_MAP = {
     'AXON': nm.AXON,
     'BASAL_DENDRITE': nm.BASAL_DENDRITE,
     'APICAL_DENDRITE': nm.APICAL_DENDRITE,
-    'ALL': nm.ANY_NEURITE
+    'ALL': None
 }
 
 

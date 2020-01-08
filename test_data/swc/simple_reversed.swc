@@ -17,6 +17,7 @@
 #           (0, -4)
 #
 # all radii are 1, except for end points, which are 0
+# section types: soma=1, axon=2, basal=3, apical=4
 
 #Note, this is the same as 'simple.swc', except w/ leaf nodes before
 #their parents

@@ -57,21 +57,25 @@ Examples:
     >>> n_points = [n for n in nm.iter_neurites(nrns, mapping, filter)]
 
 '''
-
 import logging as _logging
-from .version import VERSION as __version__
-from .core import iter_neurites, iter_sections, graft_neuron, iter_segments, NeuriteType
-from .core.dataformat import COLS
-from .core.types import NEURITES as NEURITE_TYPES
-from .io.utils import load_neuron, load_neurons, NeuronLoader
-from .fst import get
 
+# All MorphIO is imported here so other NeuroM module can refer
+# to the neurom._core._morphio objects and won't need the following pragma:
+# pylint: disable=unused-import,import-error
+from morphio import Morphology, MorphologyVersion, SomaType, SectionType as NeuriteType
+
+
+from neurom.core.dataformat import COLS
+from .core import (iter_neurites, iter_sections, iter_segments, graft_neuron)
+from .core.types import NEURITES as NEURITE_TYPES, NeuriteIter
+from .features import get
+from .io.utils import NeuronLoader, load_neuron, load_neurons
+from .version import VERSION as __version__
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite
 AXON = NeuriteType.axon
 SOMA = NeuriteType.soma
-ANY_NEURITE = NeuriteType.all
 
 # prevent 'No handlers could be found for logger ...' errors
 # https://pythonhosted.org/logutils/libraries.html

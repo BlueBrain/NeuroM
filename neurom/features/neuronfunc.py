@@ -34,28 +34,13 @@ from neurom.geom import bounding_box
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
-from neurom.core._neuron import iter_neurites, iter_segments
+from neurom.core._neuron import iter_neurites, iter_segments, Neuron
 from neurom import morphmath
 
 
 def neuron_population(nrns):
     '''Makes sure `nrns` behaves like a neuron population'''
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
-
-
-def soma_volume(nrn):
-    '''Get the volume of a neuron's soma.'''
-    return nrn.soma.volume
-
-
-def soma_volumes(nrn_pop):
-    '''Get the volume of the somata in a population of neurons
-    Note:
-        If a single neuron is passed, a single element list with the volume
-        of its soma member is returned.
-    '''
-    nrns = neuron_population(nrn_pop)
-    return [soma_volume(n) for n in nrns]
 
 
 def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
@@ -94,20 +79,20 @@ def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     return [n.soma.radius for n in nrns]
 
 
-def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
+def trunk_section_lengths(nrn, neurite_type=None):
     '''list of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [morphmath.section_length(s.root_node.points)
             for s in nrn.neurites if neurite_filter(s)]
 
 
-def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_radii(nrn, neurite_type=None):
     '''radii of the trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
-def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_azimuths(nrn, neurite_type=None):
     '''Get a list of all the trunk origin azimuths of a neuron or population
 
     The azimuth is defined as Angle between x-axis and the vector
@@ -128,7 +113,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
-def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_elevations(nrns, neurite_type=None):
     '''Get a list of all the trunk origin elevations of a neuron or population
 
     The elevation is defined as the angle between x-axis and the
@@ -138,7 +123,9 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     The range of the elevation angle [-pi/2, pi/2] radians
     '''
     neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
+
+    if isinstance(nrns, Neuron):
+        nrns = neuron_population(nrns)
 
     def _elevation(section, soma):
         '''Elevation of a section'''
@@ -154,7 +141,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
-def trunk_vectors(nrn, neurite_type=NeuriteType.all):
+def trunk_vectors(nrn, neurite_type=None):
     '''Calculates the vectors between all the trunks of the neuron
     and the soma center.
     '''
@@ -166,7 +153,7 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
                      for s in n.neurites if neurite_filter(s)])
 
 
-def trunk_angles(nrn, neurite_type=NeuriteType.all):
+def trunk_angles(nrn, neurite_type=None):
     '''Calculates the angles between all the trunks of the neuron.
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
@@ -221,7 +208,7 @@ def sholl_crossings(neurites, center, radii):
                      for r in radii])
 
 
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
+def sholl_frequency(nrn, neurite_type=None, step_size=10):
     '''perform Sholl frequency calculations on a population of neurites
 
     Args:

@@ -27,10 +27,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Type enumerations'''
-
 from enum import unique
 
+
+from neurom import NeuriteType
 from neurom.utils import OrderedEnum
+
+NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
 
 @unique
@@ -44,21 +47,9 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-@unique
-class NeuriteType(OrderedEnum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
-
-
-NEURITES = (NeuriteType.all,
-            NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+NEURITES = (NeuriteType.axon,
+            NeuriteType.apical_dendrite,
+            NeuriteType.basal_dendrite)
 
 ROOT_ID = -1
 
@@ -70,24 +61,28 @@ def tree_type_checker(*ref):
         Functor that takes a tree, and returns true if that tree matches any of
         NeuriteTypes in ref
 
+        tree_type_checker(None) returns an always True functor
+
+
     Ex:
         >>> from neurom.core.types import NeuriteType, tree_type_checker
         >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
         >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
     '''
-    ref = tuple(ref)
-    if NeuriteType.all in ref:
-        def check_tree_type(_):
-            '''Always returns true'''
-            return True
-    else:
-        def check_tree_type(tree):
-            '''Check whether tree has the same type as ref
 
-            Returns:
-                True if ref in the same type as tree.type or ref is NeuriteType.all
-            '''
-            return tree.type in ref
+    # Cannot do the following with pybind enum: ref == (None, )
+    if len(ref) == 1 and ref[0] is None:
+        return lambda x: True
+
+    ref = tuple(ref)
+
+    def check_tree_type(tree):
+        '''Check whether tree has the same type as ref
+
+        Returns:
+            True if ref in the same type as tree.type
+        '''
+        return tree.type in ref
 
     return check_tree_type
 

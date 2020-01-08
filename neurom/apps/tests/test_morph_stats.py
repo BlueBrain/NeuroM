@@ -133,7 +133,7 @@ def test_extract_stats_single_neuron():
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
         nt.eq_(set(res[k].keys()), set(REF_OUT[k].keys()))
         for kk in res[k].keys():
-            nt.assert_almost_equal(res[k][kk], REF_OUT[k][kk])
+            nt.assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
 
 
 def test_get_header():
