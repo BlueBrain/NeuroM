@@ -207,25 +207,24 @@ class TestH5V1(SectionTreeBase):
             assert_almost_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
-class TestH5V2(SectionTreeBase):
+# class TestH5V2(SectionTreeBase):
 
-    def setUp(self):
-        super(TestH5V2, self).setUp()
-        self.sec_nrn = nm.load_neuron(Path(H5V2_DATA_PATH, MORPH_FILENAME))
-        self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
+#     def setUp(self):
+#         super(TestH5V2, self).setUp()
+#         self.sec_nrn = nm.load_neuron(Path(H5V2_DATA_PATH, MORPH_FILENAME))
+#         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
+#     # Overriding soma values as the same soma points in SWC and ASC have different
+#     # meanings. Hence leading to different values
+#     def test_get_soma_radius(self):
+#         assert_almost_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
-    # Overriding soma values as the same soma points in SWC and ASC have different
-    # meanings. Hence leading to different values
-    def test_get_soma_radius(self):
-        assert_almost_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
+#     def test_get_soma_surface_area(self):
+#         assert_almost_equal(_nrn.soma_surface_area(self.sec_nrn),
+#                         0.1075095256160432)
 
-    def test_get_soma_surface_area(self):
-        assert_almost_equal(_nrn.soma_surface_area(self.sec_nrn),
-                        0.1075095256160432)
-
-    def test_get_soma_volume(self):
-        with warnings.catch_warnings(record=True):
-            assert_almost_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+#     def test_get_soma_volume(self):
+#         with warnings.catch_warnings(record=True):
+#             assert_almost_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestSWC(SectionTreeBase):

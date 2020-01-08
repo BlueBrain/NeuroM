@@ -51,15 +51,17 @@ with warnings.catch_warnings(record=True):
 
 
 def test_local_bifurcation_angle():
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
+    leaf = SIMPLE.section(2)
+    assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 
 def test_remote_bifurcation_angle():
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
+    leaf = SIMPLE.section(2)
+    assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 
 def test_bifurcation_partition():

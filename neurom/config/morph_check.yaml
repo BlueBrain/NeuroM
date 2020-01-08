@@ -26,7 +26,6 @@ checks:
         - has_all_nonzero_segment_lengths
         - has_all_nonzero_section_lengths
         - has_all_nonzero_neurite_radii
-        - has_all_monotonic_neurites
         - has_nonzero_soma_radius
 
 ##############################################
@@ -43,5 +42,3 @@ options:
 
     # tolerance/ratio, method
     has_no_flat_neurites       : [0.1, 'ratio']
-
-    has_all_monotonic_neurites : 1.0e-6

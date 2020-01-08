@@ -32,6 +32,7 @@ from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
+
 from neurom import NeuriteType, geom
 from neurom.core import iter_neurites, iter_segments, iter_sections
 from neurom.core._soma import SomaCylinders
@@ -252,6 +253,7 @@ def plot_tree3d(ax, tree,
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
+    colors = (_get_color(color, tree.type),)
 
     collection = Line3DCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
