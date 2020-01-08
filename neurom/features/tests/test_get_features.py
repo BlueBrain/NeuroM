@@ -132,7 +132,7 @@ def test_section_tortuosity_pop():
                     (1.042614577410971,
                      1.6742599832295344,
                      106.5960839640893,
-                     1.239489348419643))
+                     1.239489348419643), rtol=1e-5)
 
 
 def test_section_tortuosity_nrn():
@@ -703,25 +703,25 @@ def test_section_radial_axon():
 
 
 def test_number_of_sections_all():
-    nt.eq_(get_feature('number_of_sections', NEURON)[0], 84)
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.all)[0], 84)
+    assert_allclose(get_feature('number_of_sections', NEURON)[0], 84)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.all)[0], 84)
 
 
 def test_number_of_sections_axon():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.axon)[0], 21)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.axon)[0], 21)
 
 
 def test_number_of_sections_basal():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 42)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 42)
 
 
 def test_n_sections_apical():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 21)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 21)
 
 
 def test_section_number_invalid():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.soma)[0], 0)
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.soma)[0], 0)
+    assert_allclose(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
 
 
 def test_per_neurite_number_of_sections():
@@ -749,13 +749,13 @@ def test_n_sections_per_neurite_apical():
 
 
 def test_neurite_number():
-    nt.eq_(get_feature('number_of_neurites', NEURON)[0], 4)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.all)[0], 4)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.axon)[0], 1)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 2)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 1)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.soma)[0], 0)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
+    assert_allclose(get_feature('number_of_neurites', NEURON)[0], 4)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.all)[0], 4)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.axon)[0], 1)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 2)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 1)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.soma)[0], 0)
+    assert_allclose(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
 
 
 def test_trunk_origin_radii():
@@ -789,12 +789,12 @@ def test_get_trunk_section_lengths():
 
 
 def test_soma_radii():
-    nt.eq_(get_feature('soma_radii', NEURON)[0], 0.13065629648763766)
+    assert_allclose(get_feature('soma_radii', NEURON)[0], 0.13065629648763766)
 
 
 def test_soma_surface_areas():
     area = 4. * math.pi * get_feature('soma_radii', NEURON)[0] ** 2
-    nt.eq_(get_feature('soma_surface_areas', NEURON), area)
+    assert_allclose(get_feature('soma_surface_areas', NEURON), area)
 
 
 def test_sholl_frequency():

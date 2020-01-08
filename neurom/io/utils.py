@@ -34,17 +34,18 @@ import os
 import shutil
 import tempfile
 import uuid
-from functools import partial
-from io import IOBase, open
+import sys
+from io import StringIO, open
+
+import morphio
 
 from pylru import FunctionCacheManager
 
 from neurom._compat import StringType, filter
+from neurom.core._neuron import Neuron
 from neurom.core.population import Population
-from neurom.exceptions import NeuroMError, RawDataError
-from neurom.fst._core import FstNeuron
-from neurom.io import neurolucida, swc, hdf5
-from neurom.io.datawrapper import DataWrapper
+from neurom.exceptions import MorphioError, NeuroMError
+
 
 L = logging.getLogger(__name__)
 
@@ -113,14 +114,51 @@ def get_files_by_path(path):
     raise IOError('Invalid data path %s' % path)
 
 
-def load_neuron(handle, reader=None):
-    '''Build section trees from an h5 or swc file'''
-    rdw = load_data(handle, reader)
-    if isinstance(handle, StringType):
-        name = os.path.splitext(os.path.basename(handle))[0]
-    else:
-        name = None
-    return FstNeuron(rdw, name)
+def load_neuron(neuron, reader=None):
+    '''Build section trees from a neuron or a h5, swc or asc file.
+    Args:
+        neuron (str|Path|Neuron|morphio.Morphology|morphio.mut.Morphology): A neuron representation
+            It can be:
+                - a filename with the h5, swc or asc extension
+                - a NeuroM Neuron object
+                - a morphio mutable or immutable Morphology object
+                - a stream that can be put into a io.StreamIO object.
+                  In this case, the READER argument must be passed with
+                  the corresponding file format (asc, swc and h5)
+        reader (str): Optional, must be provided if neuron is a stream to
+                      specify the file format (asc, swc, h5)
+
+    Returns:
+        A Neuron object
+
+    Examples:
+            neuron = neurom.load_neuron('my_neuron_file.h5')
+
+            neuron = neurom.load_neuron(morphio.Morphology('my_neuron_file.h5'))
+
+            neuron = nm.load_neuron(io.StringIO("""((Dendrite)
+                                                   (3 -4 0 2)
+                                                   (3 -6 0 2)
+                                                   (3 -8 0 2)
+                                                   (3 -10 0 2)
+                                                   (
+                                                     (0 -10 0 2)
+                                                     (-3 -10 0 2)
+                                                     |
+                                                     (6 -10 0 2)
+                                                     (9 -10 0 2)
+                                                   )
+                                                   )"""), reader='asc')
+
+              '''
+    if isinstance(neuron, (Neuron, morphio.Morphology, morphio.mut.Morphology)):
+        return Neuron(neuron)
+
+    if reader:
+        return Neuron(_get_file(neuron, reader))
+
+    name = os.path.splitext(os.path.basename(neuron))[0]
+    return Neuron(neuron, name)
 
 
 def load_neurons(neurons,
@@ -155,7 +193,7 @@ def load_neurons(neurons,
     for f in files:
         try:
             pop.append(neuron_loader(f))
-        except NeuroMError as e:
+        except (NeuroMError, MorphioError) as e:
             if isinstance(e, ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s',
                        e, os.path.basename(f))
@@ -164,50 +202,20 @@ def load_neurons(neurons,
 
     return population_class(pop, name=name)
 
+# TODO: embed this feature directly in morphio
 
-def _get_file(handle):
-    '''Returns the filename of the file to read
 
-    If handle is a stream, a temp file is written on disk first
-    and its filename is returned'''
-    if not isinstance(handle, IOBase):
-        return handle
+def _get_file(stream, extension):
+    '''Returns the filename of the file to read'''
 
-    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()), prefix='neurom-')
+    if isinstance(stream, StringType):
+        if sys.version_info[0] == 2:
+            stream = unicode(stream)  # pylint: disable=undefined-variable
+        stream = StringIO(stream)
+    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.' + extension,
+                                     prefix='neurom-')
     os.close(fd)
     with open(temp_file, 'w') as fd:
-        handle.seek(0)
-        shutil.copyfileobj(handle, fd)
+        stream.seek(0)
+        shutil.copyfileobj(stream, fd)
     return temp_file
-
-
-def load_data(handle, reader=None):
-    '''Unpack data into a raw data wrapper'''
-    if not reader:
-        reader = os.path.splitext(str(handle))[1][1:].lower()
-
-    if reader not in _READERS:
-        raise NeuroMError('Do not have a loader for "%s" extension' % reader)
-
-    filename = _get_file(handle)
-    try:
-        return _READERS[reader](filename)
-    except Exception as e:
-        L.exception('Error reading file %s, using "%s" loader', filename, reader)
-        raise RawDataError('Error reading file %s:\n%s' % (filename, str(e)))
-
-
-def _load_h5(filename):
-    '''Delay loading of h5py until it is needed'''
-    return hdf5.read(filename,
-                     remove_duplicates=False,
-                     data_wrapper=DataWrapper)
-
-
-_READERS = {
-    'swc': partial(swc.read,
-                   data_wrapper=DataWrapper),
-    'h5': _load_h5,
-    'asc': partial(neurolucida.read,
-                   data_wrapper=DataWrapper)
-}

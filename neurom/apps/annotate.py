@@ -55,7 +55,7 @@ def generate_annotation(result, settings):
 
     points = [p for _, _points in result.info for p in _points]
 
-    annotations = ("    ({0} {1} {2} 0.50)   ; MUK_ANNOTATION".format(
+    annotations = ("    ({:10.2f} {:10.2f} {:10.2f} 0.50)   ; MUK_ANNOTATION".format(
         p[COLS.X], p[COLS.Y], p[COLS.Z]) for p in points)
     footer = ")   ; MUK_ANNOTATION\n"
 

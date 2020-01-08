@@ -140,16 +140,16 @@ def test_trunk_origin_elevations():
     """), reader='swc')
 
     pop = Population([n0, n1])
-    assert_array_equal(_nf.trunk_origin_elevations(pop),
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop),
                        [0.0, np.pi/2., -np.pi/2.])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
                        [0.0, np.pi/2., -np.pi/2.])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
                        [])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
 [])
 
 
