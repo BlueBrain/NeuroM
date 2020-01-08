@@ -30,16 +30,12 @@ from math import fabs, pi, sqrt
 
 import numpy as np
 from neurom import morphmath as mm
-from neurom.core.point import Point as PointV1
+from neurom.core.point import Point
 from nose import tools as nt
 from numpy.random import uniform
 from numpy.testing import assert_array_almost_equal
 
 np.random.seed(0)
-
-# Tip to minimize the changes when migrating to v2
-def Point(x, y, z, r):
-    return PointV1(x, y, z, r, 1)
 
 
 def test_vector():

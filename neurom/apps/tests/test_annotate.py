@@ -1,7 +1,7 @@
 from neurom import load_neuron
 from neurom.apps.annotate import annotate, generate_annotation
 from neurom.check import CheckResult
-from neurom.check.neuron_checks import has_no_narrow_start
+from neurom.check.neuron_checks import has_no_narrow_start, has_no_single_children
 from nose import tools as nt
 
 
@@ -25,6 +25,7 @@ def test_generate_annotation():
 )   ; MUK_ANNOTATION
 """
 
+    c = generate_annotation(checker_not_ok, settings)
     nt.assert_equal(generate_annotation(checker_not_ok, settings), correct_result)
 
 
@@ -35,8 +36,7 @@ def test_annotate():
 (Circle1   ; MUK_ANNOTATION
     (Color Blue)   ; MUK_ANNOTATION
     (Name "narrow start")   ; MUK_ANNOTATION
-    (      0.00       0.00       0.00 0.50)   ; MUK_ANNOTATION
-    (      0.00       0.00       0.00 0.50)   ; MUK_ANNOTATION
+    (      0.00       0.00       2.00 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
 """
 
@@ -44,6 +44,38 @@ def test_annotate():
                                       "label": "Circle1",
                                       "color": "Blue"}}
 
-    neuron = load_neuron('test_data/swc/Neuron_zero_radius.swc')
+    neuron = load_neuron('test_data/swc/narrow_start.swc')
     results = [checker(neuron) for checker in checkers.keys()]
     nt.assert_equal(annotate(results, checkers.values()), correct_result)
+
+
+def test_single_children():
+
+    checkers = {has_no_single_children: {"name": "single child",
+                                         "label": "Circle6",
+                                         "color": "Red"}}
+
+    neuron = load_neuron("""
+( (Color Blue)
+  (Axon)
+  (0 5 0 2)
+  (2 9 0 2)
+  (0 13 0 2)
+  (
+    (2 13 0 2)
+    (4 13 0 2)
+    (6 13 0 2)
+  )
+)
+""", "asc")
+
+    results = [checker(neuron) for checker in checkers.keys()]
+    nt.assert_equal(annotate(results, checkers.values()),
+                    """
+
+(Circle6   ; MUK_ANNOTATION
+    (Color Red)   ; MUK_ANNOTATION
+    (Name "single child")   ; MUK_ANNOTATION
+    (      0.00      13.00       0.00 0.50)   ; MUK_ANNOTATION
+)   ; MUK_ANNOTATION
+""")

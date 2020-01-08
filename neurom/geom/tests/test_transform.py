@@ -231,15 +231,6 @@ def test_translate_fst_neuron_swc():
     _check_fst_nrn_translate(nrn, tnrn, t)
 
 
-def test_translate_fst_neurite_swc():
-
-    t = np.array([100., 100., 100.])
-    nrn = load_neuron(SWC_NRN_PATH)
-    nrt_a = nrn.neurites[0]
-    nrt_b = gtr.translate(nrt_a, t)
-    _check_fst_neurite_translate(nrt_a, nrt_b, t)
-
-
 def test_transform_translate_neuron_swc():
     t = np.array([100., 100., 100.])
     nrn = load_neuron(SWC_NRN_PATH)
@@ -254,15 +245,6 @@ def test_translate_fst_neuron_h5():
     tnrn = gtr.translate(nrn, t)
 
     _check_fst_nrn_translate(nrn, tnrn, t)
-
-
-def test_translate_fst_neurite_h5():
-
-    t = np.array([100., 100., 100.])
-    nrn = load_neuron(H5_NRN_PATH)
-    nrt_a = nrn.neurites[0]
-    nrt_b = gtr.translate(nrt_a, t)
-    _check_fst_neurite_translate(nrt_a, nrt_b, t)
 
 
 def test_transform_translate_neuron_h5():
@@ -300,14 +282,6 @@ def test_rotate_neuron_swc():
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
 
 
-def test_rotate_neurite_swc():
-    nrn_a = load_neuron(SWC_NRN_PATH)
-    nrt_a = nrn_a.neurites[0]
-    nrt_b = gtr.rotate(nrt_a, [0, 0, 1], math.pi/2.0)
-    rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_neurite_rotate(nrt_a, nrt_b, rot)
-
-
 def test_transform_rotate_neuron_swc():
     rot = gtr.Rotation(ROT_90)
     nrn_a = load_neuron(SWC_NRN_PATH)
@@ -320,14 +294,6 @@ def test_rotate_neuron_h5():
     nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
-
-
-def test_rotate_neurite_h5():
-    nrn_a = load_neuron(H5_NRN_PATH)
-    nrt_a = nrn_a.neurites[0]
-    nrt_b = gtr.rotate(nrt_a, [0, 0, 1], math.pi/2.0)
-    rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_neurite_rotate(nrt_a, nrt_b, rot)
 
 
 def test_transform_rotate_neuron_h5():

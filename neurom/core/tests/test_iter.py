@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from io import StringIO
+from itertools import chain
 from pathlib import Path
 
 import neurom as nm
@@ -52,7 +53,7 @@ REVERSED_NEURITES = load_neuron(Path(DATA_PATH, 'swc/ordering/reversed_NRN_neuri
 POP = core.Population(NEURONS, name='foo')
 
 # To make transition to morphio easier
-MORPHIO_OFFSET = 0
+MORPHIO_OFFSET = 2
 
 
 def assert_sequence_equal(a, b):
@@ -104,8 +105,8 @@ def test_iter_sections_default_pop():
     ref = [s.id for n in POP.neurites for s in n.iter_sections()]
     assert_sequence_equal(ref, [n.id for n in core.iter_sections(POP)])
 
-def test_iter_sections_filter():
 
+def test_iter_sections_filter():
     for ntyp in nm.NEURITE_TYPES:
         a = [s.id for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
              for s in n.iter_sections()]
@@ -205,7 +206,7 @@ def test_iter_segments_section():
                           (5 6 7 16)
                           (8 7 6 10)
                           (4 3 2 2))
-                       """), reader='asc').sections[1]
+                       """), reader='asc').sections[0]
     ref = [[p1[COLS.XYZR].tolist(), p2[COLS.XYZR].tolist()]
            for p1, p2 in core.iter_segments(sec)]
 

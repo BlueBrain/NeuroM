@@ -31,9 +31,10 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
+from morphio import SomaType
 from neurom import load_neuron
-from neurom.core import Neurite, Section
-from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER
+from neurom.core import Section
+from neurom.core._soma import make_soma
 from neurom.core.types import NeuriteType
 from neurom.view import common, view
 from nose.tools import assert_raises, eq_, ok_
@@ -135,15 +136,6 @@ def test_dendrogram():
         assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
 
 
-def test_one_point_branch():
-    test_section = Neurite(Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]])))
-    for diameter_scale, linewidth in it.product((1.0, None),
-                                                (0.0, 1.2)):
-        with get_fig_2d() as (fig, ax):
-            view.plot_tree(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
-        with get_fig_3d() as (fig, ax):
-            view.plot_tree3d(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
-
 with warnings.catch_warnings(record=True):
     soma0 = fst_neuron.soma
 
@@ -171,7 +163,6 @@ with warnings.catch_warnings(record=True):
 
 def test_soma():
     for s in (soma0,
-              soma_2pt_normal,
               soma_3pt_normal,
               soma_4pt_normal_cylinder,
               soma_4pt_normal_contour):
@@ -186,9 +177,9 @@ def test_soma():
 
 def test_soma3d():
     with get_fig_3d() as (_, ax):
-        view.plot_soma3d(ax, soma_2pt_normal)
-        assert_allclose(ax.get_xlim(), (-10.,  10.), atol=2)
-        assert_allclose(ax.get_ylim(), (0.,  10.), atol=2)
+        view.plot_soma3d(ax, soma_3pt_normal)
+        assert_allclose(ax.get_xlim(), (-11.,  11.), atol=2)
+        assert_allclose(ax.get_ylim(), (-11.,  11.), atol=2)
         assert_allclose(ax.get_zlim(), (-10.,  10.), atol=2)
 
 

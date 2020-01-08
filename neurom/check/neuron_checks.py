@@ -35,10 +35,10 @@ i.e. soma- and neurite-related structural tests pass.
 from itertools import chain, islice
 
 import numpy as np
-
+from morphio import AnnotationType
 from neurom import NeuriteType
 from neurom.check import CheckResult
-from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
+from neurom.check.morphtree import get_flat_neurites
 from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.features import neuritefunc as _nf
@@ -109,19 +109,6 @@ def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
         CheckResult with result
     """
     return CheckResult(len(get_flat_neurites(neuron, tol, method)) == 0)
-
-
-def has_all_monotonic_neurites(neuron, tol=1e-6):
-    """Check that a neuron has only neurites that are monotonic.
-
-    Arguments:
-        neuron(Neuron): The neuron object to test
-        tol(float): tolerance
-
-    Returns:
-        CheckResult with result
-    """
-    return CheckResult(len(get_nonmonotonic_neurites(neuron, tol)) == 0)
 
 
 def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
@@ -356,4 +343,20 @@ def has_multifurcation(neuron):
     """Check if a section has more than 3 children."""
     bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
                if len(section.children) > 3]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_single_children(neuron):
+    """Check if the neuron has sections with only one child section"""
+
+    single_child_annotations = (annot for annot in neuron.annotations
+                                if annot.type == AnnotationType.single_child)
+
+    def first_annotated_point(annotation):
+        """Return the first annotated 4D-point [X,Y,Z,Radius]"""
+        return [annotation.points[0] + [annotation.diameters[0] / 2]]
+
+    bad_ids = [(annot.section_id, first_annotated_point(annot))
+               for annot in single_child_annotations]
+
     return CheckResult(len(bad_ids) == 0, bad_ids)

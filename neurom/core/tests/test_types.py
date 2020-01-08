@@ -52,7 +52,6 @@ def test_tree_type_checker():
     nt.ok_(tree_filter(mock_tree))
 
     tree_filter = tree_type_checker(*NEURITES)
-    nt.ok_(tree_filter('fake_tree'))
     nt.ok_(tree_filter(mock_tree))
 
 

@@ -29,29 +29,14 @@
 """Module containing NeuroM specific exceptions."""
 
 
+# pylint: disable=unused-import, import-error
+from morphio import (IDSequenceError, MissingParentError, MorphioError, MultipleTrees, RawDataError,
+                     SomaError, UnknownFileType)
+
+
 class NeuroMError(Exception):
-    """Base class for all NeuroM exceptions."""
-
-
-class RawDataError(NeuroMError):
-    """Exception class for raw data errors."""
+    """Base class for NeuroM errors"""
 
 
 class ConfigError(NeuroMError):
-    """Exception class for configuration data in apps errors."""
-
-
-class SomaError(NeuroMError):
-    """Exception for soma construction errors."""
-
-
-class IDSequenceError(RawDataError):
-    """Exception for raw data with illegal point ID sequence."""
-
-
-class MultipleTrees(RawDataError):
-    """Exception for raw data with multiple trees."""
-
-
-class MissingParentError(RawDataError):
-    """Exception for raw data with missing parent IDs."""
+    """Exception class for configuration data in apps errors"""

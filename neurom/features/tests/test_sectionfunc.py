@@ -48,7 +48,7 @@ SWC_PATH = Path(DATA_PATH, 'swc/')
 NRN = load_neuron(H5_PATH / 'Neuron.h5')
 
 # Will simplify NeuroM v2 transition
-SECTION_ID = 1
+SECTION_ID = 0
 
 
 def test_total_volume_per_neurite():

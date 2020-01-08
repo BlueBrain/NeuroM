@@ -116,18 +116,6 @@ class TimeChecks:
         self.data_wrapper = neurom.io.load_data(path)
         self.neuron = FstNeuron(self.data_wrapper)
 
-    def time_has_sequential_ids(self):
-        sc.has_sequential_ids(self.data_wrapper)
-
-    def time_no_missing_parents(self):
-        sc.no_missing_parents(self.data_wrapper)
-
-    def time_is_single_tree(self):
-        sc.is_single_tree(self.data_wrapper)
-
-    def time_has_increasing_ids(self):
-        sc.has_increasing_ids(self.data_wrapper)
-
     def time_has_soma_points(self):
         sc.has_soma_points(self.data_wrapper)
 
@@ -151,9 +139,6 @@ class TimeChecks:
 
     def time_has_no_flat_neurites(self):
         nc.has_no_flat_neurites(self.neuron, tol=0.1, method='ratio')
-
-    def time_has_all_monotonic_neurites(self):
-        nc.has_all_monotonic_neurites(self.neuron, tol=1e-6)
 
     def time_has_all_nonzero_segment_lengths(self):
         nc.has_all_nonzero_segment_lengths(self.neuron, threshold=0.0)

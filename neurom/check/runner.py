@@ -33,10 +33,10 @@ import logging
 from collections import OrderedDict
 from importlib import import_module
 
+from neurom import load_neuron
 from neurom.check import check_wrapper
 from neurom.exceptions import ConfigError
-from neurom.fst import _core as fst_core
-from neurom.io import load_data, utils
+from neurom.io import utils
 
 L = logging.getLogger(__name__)
 
@@ -109,19 +109,12 @@ class CheckRunner:
 
         full_result = True
         full_summary = OrderedDict()
-        try:
-            data = load_data(f)
-        except Exception as e:  # pylint: disable=W0703
-            L.error('Failed to load data... skipping tests for this file')
-            L.error(e.args)
-            return False, {f: OrderedDict([('ALL', False)])}
 
         try:
-            result, summary = self._check_loop(data, 'structural_checks')
+            nrn = load_neuron(f)
+            result, summary = self._check_loop(nrn, 'structural_checks')
             full_result &= result
             full_summary.update(summary)
-
-            nrn = fst_core.FstNeuron(data)
             result, summary = self._check_loop(nrn, 'neuron_checks')
             full_result &= result
             full_summary.update(summary)

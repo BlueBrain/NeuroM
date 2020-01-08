@@ -29,9 +29,7 @@
 """ Distribution configuration for neurom
 """
 # pylint: disable=R0801
-from setuptools import setup
-from setuptools import find_packages
-
+from setuptools import find_packages, setup
 
 setup(
     description='NeuroM: a light-weight neuron morphology analysis package',
@@ -39,18 +37,17 @@ setup(
     url='https://github.com/BlueBrain/NeuroM',
     install_requires=[
         'click>=7.0',
-        'h5py>=3.1.0',
         'matplotlib>=3.2.1',
+        'morphio>=2.3.10',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
         'pyyaml>=3.10',
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
-        ],
+    ],
     packages=find_packages(),
     license='BSD',
-    scripts=['apps/raw_data_check',
-             'apps/morph_check',
+    scripts=['apps/morph_check',
              'apps/morph_stats',
              ],
     entry_points={
@@ -72,6 +69,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
-    use_scm_version={"local_scheme": "no-local-version"},
     setup_requires=['setuptools_scm'],
+
+    # 2.0.1 allows for a pip requirement formatted like "neurom>=2.0.0"
+    version="2.0.1.dev8",
 )

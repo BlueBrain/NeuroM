@@ -57,11 +57,28 @@ Examples:
 """
 
 import logging as _logging
+from enum import IntEnum
 
-from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
-                   iter_segments, Neuron)
-from .core.dataformat import COLS
+from morphio import Morphology, SectionType
+
+
+class NeuriteType(IntEnum):
+    axon = int(SectionType.axon)
+    apical_dendrite = int(SectionType.apical_dendrite)
+    basal_dendrite = int(SectionType.basal_dendrite)
+    undefined = int(SectionType.undefined)
+    soma = 31
+    all = 32
+    custom = 5
+
+
+from morphio import SomaType
+
+from neurom.core.dataformat import COLS
+
+from .core import graft_neuron, iter_neurites, iter_sections, iter_segments
 from .core.types import NEURITES as NEURITE_TYPES
+from .core.types import NeuriteIter
 from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons
 

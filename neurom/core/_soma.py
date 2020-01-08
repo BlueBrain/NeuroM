@@ -31,9 +31,8 @@ import math
 import warnings
 
 import numpy as np
-from neurom import morphmath
+from neurom import SomaType, morphmath
 from neurom.core.dataformat import COLS
-from neurom.exceptions import SomaError
 
 
 class Soma:
@@ -43,24 +42,31 @@ class Soma:
     and provides iterator access to them.
     """
 
-    def __init__(self, points):
-        """Initialize a Soma object."""
-        self._points = points
-        self.radius = 0
+    def __init__(self, morphio_soma):
+        self._morphio_soma = morphio_soma
 
     @property
     def center(self):
-        """Obtain the center from the first stored point."""
-        return self._points[0][COLS.XYZ]
+        """Obtain the center from the first stored point"""
+        return self._morphio_soma.points[0]
 
     def iter(self):
-        """Iterator to soma contents."""
-        return iter(self._points)
+        """Iterator to soma contents"""
+        return iter(self.points)
 
     @property
     def points(self):
-        """Get the set of (x, y, z, r) points this soma."""
-        return self._points[:, COLS.XYZR]
+        """Get the set of (x, y, z, r) points this soma"""
+        return np.concatenate((self._morphio_soma.points,
+                               self._morphio_soma.diameters[:, np.newaxis] / 2.),
+                              axis=1)
+
+    @points.setter
+    def points(self, value):
+        """Set the points"""
+        value = np.asarray(value)
+        self._morphio_soma.points = np.copy(value[:, COLS.XYZ])
+        self._morphio_soma.diameters = np.copy(value[:, COLS.R]) * 2
 
     @property
     def volume(self):
@@ -75,15 +81,15 @@ class SomaSinglePoint(Soma):
     Represented by a single point.
     """
 
-    def __init__(self, points):
+    def __init__(self, morphio_soma):
         """Initialize a SomaSinglePoint object."""
-        super().__init__(points)
-        self.radius = points[0][COLS.R]
+        super(SomaSinglePoint, self).__init__(morphio_soma)
+        self.radius = self.points[0][COLS.R]
 
     def __str__(self):
         """Return a string representation."""
         return ('SomaSinglePoint(%s) <center: %s, radius: %s>' %
-                (repr(self._points), self.center, self.radius))
+                (repr(self.points), self.center, self.radius))
 
 
 class SomaCylinders(Soma):
@@ -110,17 +116,17 @@ class SomaCylinders(Soma):
     the area calculation
     """
 
-    def __init__(self, points):
+    def __init__(self, morphio_soma):
         """Initialize a SomaCyliners object."""
-        super().__init__(points)
+        super(SomaCylinders, self).__init__(morphio_soma)
         self.area = sum(morphmath.segment_area((p0, p1))
-                        for p0, p1 in zip(points, points[1:]))
+                        for p0, p1 in zip(self.points, self.points[1:]))
         self.radius = math.sqrt(self.area / (4. * math.pi))
 
     @property
     def center(self):
         """Obtain the center from the first stored point."""
-        return self._points[0][COLS.XYZ]
+        return self.points[0][COLS.XYZ]
 
     @property
     def volume(self):
@@ -131,7 +137,7 @@ class SomaCylinders(Soma):
     def __str__(self):
         """Return a string representation."""
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
-                (repr(self._points), self.center, self.radius))
+                (repr(self.points), self.center, self.radius))
 
 
 class SomaNeuromorphoThreePointCylinders(SomaCylinders):
@@ -154,29 +160,29 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         the surface area of a sphere of radius rs.
     """
 
-    def __init__(self, points):
+    def __init__(self, morphio_soma):
         """Initialize a SomaNeuromorphoThreePointCylinders object."""
-        super().__init__(points)
+        super(SomaNeuromorphoThreePointCylinders, self).__init__(morphio_soma)
 
         # X    Y     Z   R    P
         # xs ys      zs rs   -1
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
-        r = points[0, COLS.R]
+        r = self.points[0, COLS.R]
         # make sure the above invariant holds
-        assert (np.isclose(r, points[1, COLS.R]) and np.isclose(r, points[2, COLS.R])), \
+        assert (np.isclose(r, self.points[1, COLS.R]) and np.isclose(r, self.points[2, COLS.R])), \
             'All radii must be the same'
         # only warn users about invalid format
         if r < 1e-5:
             warnings.warn('Zero radius for {}'.format(self))
-        if not np.isclose(points[0, COLS.Y] - points[1, COLS.Y], r):
+        if not np.isclose(self.points[0, COLS.Y] - self.points[1, COLS.Y], r):
             warnings.warn(
                 'The second point must be one radius below 0 on the y-plane for {}'.format(self))
-        if not np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -r):
+        if not np.isclose(self.points[0, COLS.Y] - self.points[2, COLS.Y], -r):
             warnings.warn(
                 'The third point must be one radius above 0 on the y-plane for {}'.format(self))
-        h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
+        h = morphmath.point_dist(self.points[1, COLS.XYZ], self.points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
 
@@ -188,7 +194,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
     def __str__(self):
         """Return a string representation."""
         return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
-                (repr(self._points), self.center, self.radius))
+                (repr(self.points), self.center, self.radius))
 
 
 class SomaSimpleContour(Soma):
@@ -202,84 +208,35 @@ class SomaSimpleContour(Soma):
     the radii of the points are not taken into account.
     """
 
-    def __init__(self, points):
+    def __init__(self, morphio_soma):
         """Initialize a SomaSimpleContour object."""
-        super().__init__(points)
-        points = np.array(self._points)
+        super(SomaSimpleContour, self).__init__(morphio_soma)
         self.radius = morphmath.average_points_dist(
-            self.center, points[:, COLS.XYZ])
+            self.center, self.points[:, COLS.XYZ])
 
     @property
     def center(self):
         """Obtain the center from the average of all points."""
-        points = np.array(self._points)
-        return np.mean(points[:, COLS.XYZ], axis=0)
+        return np.mean(self.points[:, COLS.XYZ], axis=0)
 
     def __str__(self):
         """Return a string representation."""
         return ('SomaSimpleContour(%s) <center: %s, radius: %s>' %
-                (repr(self._points), self.center, self.radius))
+                (repr(self.points), self.center, self.radius))
 
 
-# classes of somas
-SOMA_CONTOUR = 'contour'
-SOMA_CYLINDER = 'cylinder'
+def make_soma(morphio_soma):
+    """Make a soma object from a set of points
 
-
-def _get_type(points, soma_class):
-    """Get the type of the soma.
-
-    Args:
-        points: Soma points
-        soma_class(str): one of 'contour' or 'cylinder' to specify the type
-    """
-    assert soma_class in (SOMA_CONTOUR, SOMA_CYLINDER)
-
-    npoints = len(points)
-    if soma_class == SOMA_CONTOUR:
-        return {0: None,
-                1: SomaSinglePoint,
-                2: None}.get(npoints, SomaSimpleContour)
-
-    if(npoints == 3 and
-       points[0][COLS.P] == -1 and
-       points[1][COLS.P] == 1 and
-       points[2][COLS.P] == 1):
-        warnings.warn('Using neuromorpho 3-Point soma')
-        # NeuroMorpho is the main provider of morphologies, but they
-        # with SWC as their default file format: they convert all
-        # uploads to SWC.  In the process of conversion, they turn all
-        # somas into their custom 'Three-point soma representation':
-        #  http://neuromorpho.org/SomaFormat.html
-
-        return SomaNeuromorphoThreePointCylinders
-
-    return {0: None,
-            1: SomaSinglePoint}.get(npoints, SomaCylinders)
-
-
-def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
-    """Make a soma object from a set of points.
-
-    Infers the soma type (SomaSinglePoint, SomaSimpleContour)
-    from the points and the 'soma_class'
-
-    Arguments:
+    Parameters:
+        soma_type: the type of soma
         points: collection of points forming a soma.
-        soma_check: optional validation function applied to points. Should
-        raise a SomaError if points not valid.
-        soma_class(str): one of 'contour' or 'cylinder' to specify the type
-
-    Raises:
-        SomaError if no soma points found, points incompatible with soma, or
-        if soma_check(points) fails.
     """
-    if soma_check:
-        soma_check(points)
+    SomaBuilders = {
+        SomaType.SOMA_SINGLE_POINT: SomaSinglePoint,
+        SomaType.SOMA_CYLINDERS: SomaCylinders,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: SomaNeuromorphoThreePointCylinders,
+        SomaType.SOMA_SIMPLE_CONTOUR: SomaSimpleContour,
+    }
 
-    stype = _get_type(points, soma_class)
-
-    if stype is None:
-        raise SomaError('Invalid soma points')
-
-    return stype(points)
+    return SomaBuilders.get(morphio_soma.type, SomaSimpleContour)(morphio_soma)
