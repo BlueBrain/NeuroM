@@ -28,4 +28,4 @@
 
 ''' IO operations module for NeuroM '''
 
-from neurom.io.utils import load_data, load_neuron, load_neurons, NeuronLoader
+from neurom.io.utils import load_neuron, load_neurons, NeuronLoader

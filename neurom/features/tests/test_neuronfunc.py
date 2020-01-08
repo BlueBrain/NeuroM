@@ -26,20 +26,26 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuronfunc functionality'''
-import os
+'''Test neurom.neuronfunc functionality'''
 import tempfile
+from nose import tools as nt
+import os
 import warnings
+from io import StringIO
 
 import numpy as np
-from nose import tools as nt
-from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
-                           assert_array_equal)
+from numpy.testing import assert_array_equal, assert_array_almost_equal, assert_almost_equal
+
+from neurom import load_neuron, NeuriteType
+from neurom.features import neuronfunc as _nf
+from neurom.core import Neurite, Section
+from neurom.core import _soma
+from neurom.core.dataformat import POINT_TYPE
+from neurom.core.population import Population
 
 from neurom import NeuriteType, load_neuron
-from neurom.core import Neurite, Section, make_soma
+from neurom.core import Neurite, Section
 from neurom.core.population import Population
-from neurom.fst import _neuronfunc as _nf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 
@@ -87,8 +93,8 @@ def test_soma_radii():
     nt.eq_(ret, [1., ])
 
 def test_trunk_section_lengths():
-    ret = _nf.trunk_section_lengths(SIMPLE)
-    nt.eq_(ret, [5.0, 4.0])
+    ret = set(_nf.trunk_section_lengths(SIMPLE))
+    nt.eq_(ret, set([5.0, 4.0]))
 
 def test_trunk_origin_radii():
     ret = _nf.trunk_origin_radii(SIMPLE)
@@ -118,45 +124,36 @@ def test_trunk_vectors():
     ret = _nf.trunk_vectors(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
     assert_array_equal(ret[0], [0., -1.,  0.])
 
-
 def test_trunk_origin_elevations():
-    class Mock(object):
-        pass
+    n0 = load_neuron(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 1 0 0 2 1
+    3 3 2 1 1 2 2
+    4 3 0 1 0 2 1
+    5 3 1 2 1 2 4
+    """), reader='swc')
 
-    n0 = Mock()
-    n1 = Mock()
+    n1 = load_neuron(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 0 -1 0 2 1
+    3 3 -1 -2 -1 2 2
+    """), reader='swc')
 
-    s = make_soma([[0, 0, 0, 4]])
-    t0 = Section(((1, 0, 0, 2), (2, 1, 1, 2)))
-    t0.type = NeuriteType.basal_dendrite
-    t1 = Section(((0, 1, 0, 2), (1, 2, 1, 2)))
-    t1.type = NeuriteType.basal_dendrite
-    n0.neurites = [Neurite(t0), Neurite(t1)]
-    n0.soma = s
+    pop = [n0, n1]
+    assert_array_equal(_nf.trunk_origin_elevations(pop),
+                       np.array([0.0, np.pi/2., -np.pi/2.], dtype=np.float32))
 
-    t2 = Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
-    t2.type = NeuriteType.basal_dendrite
-    n1.neurites = [Neurite(t2)]
-    n1.soma = s
-
-    pop = Population([n0, n1])
-    nt.eq_(list(_nf.trunk_origin_elevations(pop)),
-           [0.0, np.pi/2., -np.pi/2.])
-
-    nt.eq_(
-        list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
-        [0.0, np.pi/2., -np.pi/2.])
-
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
-           0)
-
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite)),
-           0)
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
+                       np.array([0.0, np.pi/2., -np.pi/2.], dtype=np.float32))
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
+                       [])
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
+                       [])
 
 
 @nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _nf.trunk_origin_elevations(SWC_NRN)
+    _nf.trunk_origin_elevations(SIMPLE)
 
 
 def test_sholl_crossings_simple():

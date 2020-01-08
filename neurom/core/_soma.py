@@ -31,7 +31,8 @@ import math
 import warnings
 
 import numpy as np
-from neurom import morphmath
+
+from neurom import morphmath, SomaType
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
 
@@ -43,9 +44,9 @@ class Soma(object):
     and provides iterator access to them.
     '''
 
-    def __init__(self, points):
+    def __init__(self, points, radius=0):
         self._points = points
-        self.radius = 0
+        self.radius = radius
 
     @property
     def center(self):
@@ -66,6 +67,12 @@ class Soma(object):
         '''Gets soma volume assuming it is a sphere'''
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
         return 4.0 / 3 * math.pi * self.radius ** 3
+
+    def transform(self, trans):
+        '''Return a copy of this neurite with a 3D transformation applied'''
+        clone = Soma(np.copy(self.points), radius=self.radius)
+        clone.points[:, COLS.XYZ] = trans(clone.points[:, COLS.XYZ])
+        return clone
 
 
 class SomaSinglePoint(Soma):
@@ -210,66 +217,25 @@ class SomaSimpleContour(Soma):
                 (repr(self._points), self.center, self.radius))
 
 
-# classes of somas
-SOMA_CONTOUR = 'contour'
-SOMA_CYLINDER = 'cylinder'
-
-
-def _get_type(points, soma_class):
-    '''get the type of the soma
-
-    Args:
-        points: Soma points
-        soma_class(str): one of 'contour' or 'cylinder' to specify the type
-    '''
-    assert soma_class in (SOMA_CONTOUR, SOMA_CYLINDER)
-
-    npoints = len(points)
-    if soma_class == SOMA_CONTOUR:
-        return {0: None,
-                1: SomaSinglePoint,
-                2: None}.get(npoints, SomaSimpleContour)
-
-    if(npoints == 3 and
-       points[0][COLS.P] == -1 and
-       points[1][COLS.P] == 1 and
-       points[2][COLS.P] == 1):
-        warnings.warn('Using neuromorpho 3-Point soma')
-        # NeuroMorpho is the main provider of morphologies, but they
-        # with SWC as their default file format: they convert all
-        # uploads to SWC.  In the process of conversion, they turn all
-        # somas into their custom 'Three-point soma representation':
-        #  http://neuromorpho.org/SomaFormat.html
-
-        return SomaNeuromorphoThreePointCylinders
-
-    return {0: None,
-            1: SomaSinglePoint}.get(npoints, SomaCylinders)
-
-
-def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
+def make_soma(soma_type, points=None):
     '''Make a soma object from a set of points
 
-    Infers the soma type (SomaSinglePoint, SomaSimpleContour)
-    from the points and the 'soma_class'
-
     Parameters:
+        soma_type: the type of soma
         points: collection of points forming a soma.
-        soma_check: optional validation function applied to points. Should
-        raise a SomaError if points not valid.
-        soma_class(str): one of 'contour' or 'cylinder' to specify the type
-
-    Raises:
-        SomaError if no soma points found, points incompatible with soma, or
-        if soma_check(points) fails.
     '''
 
-    if soma_check:
-        soma_check(points)
+    if points is None:
+        points = dict()
 
-    stype = _get_type(points, soma_class)
-
-    if stype is None:
+    if soma_type == SomaType.SOMA_UNDEFINED:
         raise SomaError('Invalid soma points')
 
-    return stype(points)
+    SomaBuilders = {
+        SomaType.SOMA_SINGLE_POINT: SomaSinglePoint,
+        SomaType.SOMA_CYLINDERS: SomaCylinders,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: SomaNeuromorphoThreePointCylinders,
+        SomaType.SOMA_SIMPLE_CONTOUR: SomaSimpleContour,
+    }
+
+    return SomaBuilders[soma_type](points)

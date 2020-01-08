@@ -27,10 +27,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Type enumerations'''
-
 from enum import unique
 
+
+from neurom import NeuriteType
 from neurom.utils import OrderedEnum
+
+NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
 
 @unique
@@ -44,21 +47,10 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-@unique
-class NeuriteType(OrderedEnum):
-    '''Enum representing valid tree types'''
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
-
-
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+            NeuriteType.apical_dendrite,
+            NeuriteType.basal_dendrite)
 
 ROOT_ID = -1
 

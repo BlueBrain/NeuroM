@@ -33,10 +33,11 @@ from nose.tools import assert_raises, eq_, ok_
 from numpy.testing import assert_allclose, assert_array_almost_equal
 
 from neurom import load_neuron
-from neurom.core import Neurite, Section
-from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER, make_soma
+from neurom.view import view, common
+from neurom.core import Section
+from neurom.core._soma import make_soma
 from neurom.core.types import NeuriteType
-from neurom.view import common, view
+from morphio import SomaType
 
 from .utils import (  # needs to be at top to trigger matplotlib Agg backend
     get_fig_2d, get_fig_3d)
@@ -68,7 +69,7 @@ def test_tree():
     with get_fig_2d() as (fig, ax):
         tree = simple_neuron.neurites[0]
         view.plot_tree(ax, tree)
-        assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=1e-10)
+        np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=5)
 
 
 def test_neuron():
@@ -88,7 +89,7 @@ def test_tree3d():
         tree = simple_neuron.neurites[0]
         view.plot_tree3d(ax, tree)
         xy_bounds = ax.xy_dataLim.bounds
-        assert_allclose(xy_bounds, (-5., 0., 11., 5.))
+        np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.), atol=5)
         zz_bounds = ax.zz_dataLim.bounds
         assert_allclose(zz_bounds, (0., 0., 1., 1.))
 
@@ -122,16 +123,6 @@ def test_dendrogram():
         assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
 
 
-def test_one_point_branch():
-    test_section = Neurite(Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]])))
-    for diameter_scale, linewidth in it.product((1.0, None),
-                                                (0.0, 1.2)):
-        with get_fig_2d() as (fig, ax):
-            view.plot_tree(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
-        with get_fig_3d() as (fig, ax):
-            view.plot_tree3d(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
-
-
 soma0 = fst_neuron.soma
 
 # upright, varying radius
@@ -139,7 +130,7 @@ soma_2pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
     [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
 ])
-soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_2pt_normal = make_soma(SomaType.SOMA_CYLINDERS, soma_2pt_normal_pts)
 
 # upright, uniform radius, multiple cylinders
 soma_3pt_normal_pts = np.array([
@@ -147,7 +138,7 @@ soma_3pt_normal_pts = np.array([
     [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
     [0.0,   10.0, 0.0, 10.0, 1, 3,  2],
 ])
-soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
+soma_3pt_normal = make_soma(SomaType.SOMA_CYLINDERS, soma_3pt_normal_pts)
 
 # increasing radius, multiple cylinders
 soma_4pt_normal_pts = np.array([
@@ -156,8 +147,8 @@ soma_4pt_normal_pts = np.array([
     [0.0,   -10.0, -10.0, 3.0, 1, 3, 2],
     [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
 ])
-soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CYLINDER)
-soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CONTOUR)
+soma_4pt_normal_cylinder = make_soma(SomaType.SOMA_CYLINDERS, soma_4pt_normal_pts)
+soma_4pt_normal_contour = make_soma(SomaType.SOMA_SIMPLE_CONTOUR, soma_4pt_normal_pts)
 
 
 def test_soma():

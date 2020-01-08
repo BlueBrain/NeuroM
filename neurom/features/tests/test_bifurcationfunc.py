@@ -39,7 +39,7 @@ from numpy.testing import assert_raises
 import neurom as nm
 from neurom import load_neuron
 from neurom.exceptions import NeuroMError
-from neurom.fst import _bifurcationfunc as bf
+from neurom.features import bifurcationfunc as bf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/')
@@ -51,14 +51,18 @@ with warnings.catch_warnings(record=True):
 
 
 def test_local_bifurcation_angle():
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.section(0)) == np.pi)
+    nt.ok_(bf.local_bifurcation_angle(SIMPLE.section(3)) == np.pi)
+
+    leaf = SIMPLE.section(2)
+    assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 def test_remote_bifurcation_angle():
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.section(0)) == np.pi)
+    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.section(3)) == np.pi)
+
+    leaf = SIMPLE.section(2)
+    assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 def test_bifurcation_partition():
     root = SIMPLE2.neurites[0].root_node
