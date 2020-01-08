@@ -41,6 +41,7 @@ setup(
         'click>=7.0',
         'h5py>=2.7.1',
         'matplotlib>=3.2.1',
+        'morphio>=2.3.10',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
         'pyyaml>=3.10',
@@ -72,6 +73,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
-    use_scm_version={"local_scheme": "no-local-version"},
     setup_requires=['setuptools_scm'],
+
+    # 2.0.1 allows for a pip requirement formatted like "neurom>=2.0.0"
+    version="2.0.1.dev2",
 )

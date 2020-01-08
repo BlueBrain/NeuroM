@@ -27,23 +27,76 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from copy import deepcopy
+
 from pathlib import Path
+import numpy as np
+from numpy.testing import assert_array_equal
+from nose import tools as nt
 
 import neurom as nm
-import numpy as np
-from neurom.core import graft_neuron, iter_segments
-from nose import tools as nt
+from neurom.core import iter_segments, iter_neurites, graft_neuron, Neuron
+from morphio import Morphology as ImmutMorphology
+from morphio.mut import Morphology
+
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 
 
+def test_simple():
+    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
+
 def test_load_neuron_pathlib():
     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
-def test_deep_copy():
-    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
-    nrn2 = deepcopy(nrn1)
-    check_cloned_neuron(nrn1, nrn2)
+def test_load_neuron_from_other_neurons():
+    filename = Path(SWC_PATH, 'simple.swc')
+
+    expected_points = [[ 0.,  0.,  0.,  1.],
+                       [ 0.,  5.,  0.,  1.],
+                       [ 0.,  5.,  0.,  1.],
+                       [-5.,  5.,  0.,  0.],
+                       [ 0.,  5.,  0.,  1.],
+                       [ 6.,  5.,  0.,  0.],
+                       [ 0.,  0.,  0.,  1.],
+                       [ 0., -4.,  0.,  1.],
+                       [ 0., -4.,  0.,  1.],
+                       [ 6., -4.,  0.,  0.],
+                       [ 0., -4.,  0.,  1.],
+                       [-5., -4.,  0.,  0.]]
+
+    assert_array_equal(nm.load_neuron(nm.load_neuron(filename)).points,
+                       expected_points)
+
+    assert_array_equal(nm.load_neuron(Morphology(filename)).points,
+                       expected_points)
+
+    assert_array_equal(nm.load_neuron(ImmutMorphology(filename)).points,
+                       expected_points)
+
+def test_for_morphio():
+    Neuron(Morphology())
+
+    neuron = Morphology()
+    neuron.soma.points = [[0,0,0], [1,1,1], [2,2,2]]
+    neuron.soma.diameters = [1, 1, 1]
+
+    NeuroM_neuron = Neuron(neuron)
+    assert_array_equal(NeuroM_neuron.soma.points,
+                       [[0., 0., 0., 0.5],
+                        [1., 1., 1., 0.5],
+                        [2., 2., 2., 0.5]])
+
+    NeuroM_neuron.soma.points = [[1, 1, 1, 1],
+                                 [2, 2, 2, 2]]
+    assert_array_equal(NeuroM_neuron.soma.points,
+                       [[1, 1, 1, 1],
+                        [2, 2, 2, 2]])
+
+
+# def test_deep_copy():
+#     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
+#     nrn2 = deepcopy(nrn1)
+#     check_cloned_neuron(nrn1, nrn2)
 
 
 def test_graft_neuron():
@@ -81,10 +134,6 @@ def check_cloned_neuron(nrn1, nrn2):
     # check if changes are propagated between neurons
     nrn2.soma.radius = 10.
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
-
-    nrn2._data.data_block[0, :] = np.zeros_like(nrn2._data.data_block[0, :])
-    nt.ok_(not np.allclose(nrn1._data.data_block[0, :],
-                           nrn2._data.data_block[0, :]))
 
 
 def test_str():

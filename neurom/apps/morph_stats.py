@@ -27,23 +27,23 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Core code for morph_stats application."""
-import os
 import logging
+import multiprocessing
+import os
+import warnings
 from collections import defaultdict
+from functools import partial
 from itertools import product
 from pathlib import Path
-import multiprocessing
-from functools import partial
-import warnings
 
 import numpy as np
 import pandas as pd
 import pkg_resources
 
 import neurom as nm
+from neurom.core._neuron import Neuron
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
-from neurom.fst._core import FstNeuron
 
 L = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ def _stat_name(feat_name, stat_mode):
 
 def _run_extract_stats(nrn, config):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
-    if not isinstance(nrn, FstNeuron):
+    if not isinstance(nrn, Neuron):
         nrn = nm.load_neuron(nrn)
     return nrn.name, extract_stats(nrn, config)
 
@@ -115,7 +115,7 @@ def extract_dataframe(neurons, config, n_workers=1):
 
     {config_path}
     """
-    if isinstance(neurons, FstNeuron):
+    if isinstance(neurons, Neuron):
         neurons = [neurons]
     config = config.copy()
 

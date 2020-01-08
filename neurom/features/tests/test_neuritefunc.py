@@ -33,7 +33,7 @@ from math import pi, sqrt
 
 import numpy as np
 from nose import tools as nt
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_array_almost_equal
 
 import neurom as nm
 
@@ -360,7 +360,7 @@ def test_segment_path_lengths():
     assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])
 
     pathlengths = _nf.segment_path_lengths(NRN)[:5]
-    assert_allclose(pathlengths, [0.1, 1.332525, 2.530149, 3.267878, 4.471462])
+    assert_array_almost_equal(pathlengths, [0.1, 1.332525, 2.530149, 3.267878, 4.471462])
 
 
 def test_principal_direction_extents():

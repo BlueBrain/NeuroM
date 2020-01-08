@@ -30,12 +30,12 @@ from pathlib import Path
 
 import numpy as np
 
-from neurom.core.dataformat import COLS
-from neurom.io import swc
 from neurom import load_neuron, NeuriteType
+from neurom.core.dataformat import COLS
+from numpy.testing import assert_array_equal, assert_equal
 
 from nose import tools as nt
-from nose.tools import assert_equal
+from neurom.exceptions import SomaError, RawDataError
 
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -43,62 +43,118 @@ SWC_PATH = Path(DATA_PATH, 'swc')
 SWC_SOMA_PATH = Path(SWC_PATH, 'soma')
 
 
-def test_read_swc_basic_with_offset_0():
-    """first ID = 0, rare to find."""
-    rdw = swc.read(Path(SWC_PATH, 'sequential_trunk_off_0_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
+@nt.raises(RawDataError)
+def test_repeated_id():
+    n = load_neuron(SWC_PATH / 'repeated_id.swc')
 
 
-def test_read_swc_basic_with_offset_1():
-    """More normal ID numbering, starting at 1."""
-    rdw = swc.read(Path(SWC_PATH, 'sequential_trunk_off_1_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
-
-
-def test_read_swc_basic_with_offset_42():
-    """ID numbering starting at 42."""
-    rdw = swc.read(Path(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
-    nt.eq_(rdw.fmt, 'SWC')
-    nt.eq_(len(rdw.data_block), 16)
-    nt.eq_(np.shape(rdw.data_block), (16, 7))
+@nt.raises(SomaError)
+def test_neurite_followed_by_soma():
+    load_neuron(SWC_PATH / 'soma_with_neurite_parent.swc')
 
 
 def test_read_single_neurite():
-    rdw = swc.read(Path(SWC_PATH, 'point_soma_single_neurite.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [1])
-    nt.eq_(len(rdw.soma_points()), 1)
-    nt.eq_(len(rdw.sections), 2)
+    n = load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
+    nt.eq_(len(n.neurites), 1)
+    nt.eq_(n.neurites[0].root_node.id, 0)
+    assert_array_equal(n.soma.points,
+                       [[0, 0, 0, 3.0]])
+    nt.eq_(len(n.neurites), 1)
+    nt.eq_(len(n.sections), 1)
+    assert_array_equal(n.neurites[0].points,
+                       np.array([[0, 0, 2, 0.5],
+                                 [0, 0, 3, 0.5],
+                                 [0, 0, 4, 0.5],
+                                 [0, 0, 5, 0.5]]))
 
 
 def test_read_split_soma():
-    rdw = swc.read(Path(SWC_PATH, 'split_soma_single_neurites.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [1, 3])
-    nt.eq_(len(rdw.soma_points()), 3)
-    nt.eq_(len(rdw.sections), 4)
+    n = load_neuron(SWC_PATH / 'split_soma_two_neurites.swc')
 
-    ref_ids = [[-1, 0],
-               [0, 1, 2, 3, 4],
-               [0, 5, 6],
-               [6, 7, 8, 9, 10],
-               []]
+    assert_array_equal(n.soma.points,
+                       [[1, 0, 1, 4.0],
+                        [2, 0, 0, 4.0],
+                        [3, 0, 0, 4.0]])
 
-    for s, r in zip(rdw.sections, ref_ids):
-        nt.eq_(s.ids, r)
+    nt.assert_equal(len(n.neurites), 2)
+    assert_array_equal(n.neurites[0].points,
+                       [[0, 0, 2, 0.5],
+                        [0, 0, 3, 0.5],
+                        [0, 0, 4, 0.5],
+                        [0, 0, 5, 0.5]])
+
+    assert_array_equal(n.neurites[1].points,
+                       [[0, 0, 6, 0.5],
+                        [0, 0, 7, 0.5],
+                        [0, 0, 8, 0.5],
+                        [0, 0, 9, 0.5]])
+
+    nt.eq_(len(n.sections), 2)
+
+
+def test_weird_indent():
+
+    n = load_neuron("""
+
+                 # this is the same as simple.swc
+
+# but with a questionable styling
+
+     1 1  0  0 0 1. -1
+ 2 3  0  0 0 1.  1
+
+ 3 3  0  5 0 1.  2
+ 4 3 -5  5 0 0.  3
+
+
+
+ 5 3  6  5 0 0.  3
+     6 2  0  0 0 1.  1
+ 7 2  0 -4 0 1.  6
+
+ 8 2  6 -4 0         0.  7
+ 9 2 -5 -4 0 0.  7
+""", reader='swc')
+
+    simple = load_neuron(SWC_PATH / 'simple.swc')
+    assert_array_equal(simple.points,
+                       n.points)
+
+
+@nt.raises(RawDataError)
+def test_cyclic():
+    load_neuron("""
+    1 1  0  0 0 1. -1
+    2 3  0  0 0 1.  1
+    3 3  0  5 0 1.  2
+    4 3 -5  5 0 0.  3
+    5 3  6  5 0 0.  3
+    6 2  0  0 0 1.  6  # <-- cyclic point
+    7 2  0 -4 0 1.  6
+    8 2  6 -4 0 0.  7
+    9 2 -5 -4 0 0.  7""", reader='swc')
 
 
 def test_simple_reversed():
-    rdw = swc.read(Path(SWC_PATH, 'simple_reversed.swc'))
-    nt.eq_(rdw.neurite_root_section_ids(), [5, 6])
-    nt.eq_(len(rdw.soma_points()), 1)
-    nt.eq_(len(rdw.sections), 7)
+    n = load_neuron(SWC_PATH / 'simple_reversed.swc')
+    assert_array_equal(n.soma.points,
+                       [[0, 0, 0, 1]])
+    nt.assert_equal(len(n.neurites), 2)
+    nt.assert_equal(len(n.neurites[0].points), 4)
+    assert_array_equal(n.neurites[0].points,
+                       [[0, 0, 0, 1],
+                        [0, 5, 0, 1],
+                        [-5, 5, 0, 0],
+                        [6, 5, 0, 0]])
+    assert_array_equal(n.neurites[1].points,
+                       [[0, 0, 0, 1],
+                        [0, -4, 0, 1],
+                        [6, -4, 0, 0],
+                        [-5, -4, 0, 0]])
 
-def test_custom_type():
-    neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
-    assert_equal(neuron.neurites[1].type, NeuriteType.custom)
+# def test_custom_type():
+#     neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
+#     assert_equal(neuron.neurites[1].type, NeuriteType.custom)
 
 def test_undefined_type():
     neuron = load_neuron(Path(SWC_PATH, 'undefined_type.swc'))
