@@ -121,8 +121,8 @@ def translate(obj, t):
 
     try:
         return obj.transform(Translation(t))
-    except AttributeError:
-        raise NotImplementedError
+    except AttributeError as e:
+        raise NotImplementedError(e)
 
 
 def rotate(obj, axis, angle, origin=None):

@@ -34,7 +34,8 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.20"
+# 2.0.1 allows for a requirement like "neurom>=2.0.0"
+VERSION = "2.0.1.dev0"
 
 REQS = ['click>=7.0',
         'enum-compat>=0.0.2',
@@ -46,7 +47,9 @@ REQS = ['click>=7.0',
         'pyyaml>=3.10',
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
-]
+        'future>=0.16.0',
+        'morphio>=2.3.2',
+        ]
 
 # Hack to avoid installation of modules with C extensions
 # in readthedocs documentation building environment.

@@ -29,6 +29,7 @@
 import os
 from io import StringIO
 from os.path import join as joinp
+from itertools import chain
 
 from nose import tools as nt
 from numpy.testing import assert_array_equal
@@ -50,6 +51,7 @@ NEURONS = [NRN1,
            ]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 
+SIMPLE = load_neuron(joinp(DATA_PATH, 'swc/simple.swc'))
 REVERSED_NEURITES = load_neuron(joinp(DATA_PATH, 'swc/ordering/reversed_NRN_neurite_order.swc'))
 
 POP = core.Population(NEURONS, name='foo')
@@ -100,9 +102,12 @@ def test_iter_sections_default():
     assert_sequence_equal(ref,
                           [n for n in core.iter_sections(POP)])
 
+def test_iter_sections_default_pop():
+    ref = [s.id for n in POP.neurites for s in n.iter_sections()]
+    assert_sequence_equal(ref, [n.id for n in core.iter_sections(POP)])
+
 
 def test_iter_sections_filter():
-
     for ntyp in nm.NEURITE_TYPES:
         a = [s.id for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
              for s in n.iter_sections()]
@@ -110,35 +115,61 @@ def test_iter_sections_filter():
         assert_sequence_equal(a, b)
 
 def test_iter_sections_inrnorder():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(neurite_order=NeuriteIter.NRN)],
+    # The + 2 comes from the fact the sequence used to be offset by 2 (only in the case of 3 point soma) in NeuroM v1
+    # TODO: Cleans this up in a second step once Neurom v2 has been merged to master
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(neurite_order=NeuriteIter.NRN)],
                           [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 2, 3, 4])
 
 def test_iter_sections_ipreorder():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(Tree.ipreorder)],
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(Tree.ipreorder)],
                           [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 2, 3, 4])
 
-
 def test_iter_sections_ipostorder():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(Tree.ipostorder)],
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(Tree.ipostorder)],
                           [3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 43, 41, 39, 37, 35, 33, 31, 29, 27, 25, 23, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 64, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 85, 83, 81, 79, 77, 75, 73, 71, 69, 67, 65, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 43, 41, 39, 37, 35, 33, 31, 29, 27, 25, 23, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 64, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 85, 83, 81, 79, 77, 75, 73, 71, 69, 67, 65, 2, 3, 4])
 
 
 def test_iter_sections_ibifurcation():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(Tree.ibifurcation_point)],
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(Tree.ibifurcation_point)],
                           [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83],)
 
 
 def test_iter_sections_iforking():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(Tree.iforking_point)],
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(Tree.iforking_point)],
                           [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83])
 
 
 def test_iter_sections_ileaf():
-    assert_sequence_equal([s.id for n in POP.neurites for s in n.iter_sections(Tree.ileaf)],
+    assert_sequence_equal([s.id + 2 for n in POP.neurites for s in n.iter_sections(Tree.ileaf)],
                           [3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 85, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 63, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 85, 2, 3, 4])
 
 
+def test_iter_section_nrn():
+    ref = list(core.iter_sections(SIMPLE))
+    nt.eq_(len(ref), 6)
+
+    ref = list(core.iter_sections(SIMPLE, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_sections(SIMPLE, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_sections(SIMPLE, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 0)
+
+
 def test_iter_segments_nrn():
+    ref = list(core.iter_segments(SIMPLE))
+    nt.eq_(len(ref), 6)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.AXON))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.BASAL_DENDRITE))
+    nt.eq_(len(ref), 3)
+
+    ref = list(core.iter_segments(SIMPLE, neurite_filter=lambda n: n.type == nm.APICAL_DENDRITE))
+    nt.eq_(len(ref), 0)
 
     ref = list(core.iter_segments(NRN1))
     nt.eq_(len(ref), 840)
@@ -178,7 +209,7 @@ def test_iter_segments_section():
                           (5 6 7 16)
                           (8 7 6 10)
                           (4 3 2 2))
-                       '''), reader='asc').sections[1]
+                       '''), reader='asc').sections[0]
     ref = [[p1[COLS.XYZR].tolist(), p2[COLS.XYZR].tolist()]
            for p1, p2 in core.iter_segments(sec)]
 

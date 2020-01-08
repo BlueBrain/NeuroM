@@ -72,7 +72,7 @@ def test_section_area():
     sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
-                                     (1 0 0 2))"""), reader='asc').sections[1]
+                                     (1 0 0 2))"""), reader='asc').sections[0]
     area = _sf.section_area(sec)
     nt.eq_(math.pi * 1 * 2 * 1, area)
 
@@ -84,7 +84,7 @@ def test_section_tortuosity():
     (0 0 0 2)
     (1 0 0 2)
     (2 0 0 2)
-    (3 0 0 2))"""), reader='asc').sections[1]
+    (3 0 0 2))"""), reader='asc').sections[0]
 
     sec_b = load_neuron(StringIO(u"""
     ((CellBody) (0 0 0 2))
@@ -92,7 +92,7 @@ def test_section_tortuosity():
     (0 0 0 2)
     (1 0 0 2)
     (1 2 0 2)
-    (0 2 0 2))"""), reader='asc').sections[1]
+    (0 2 0 2))"""), reader='asc').sections[0]
 
     nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
     nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
@@ -105,7 +105,7 @@ def test_section_tortuosity():
 def test_setion_tortuosity_single_point():
     sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
                                    ((Dendrite)
-                                    (1 2 3 2))"""), reader='asc').sections[1]
+                                    (1 2 3 2))"""), reader='asc').sections[0]
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
@@ -117,7 +117,7 @@ def test_section_tortuosity_looping_section():
     (1 0 0 2)
     (1 2 0 2)
     (0 2 0 2)
-    (0 0 0 2))"""), reader='asc').sections[1]
+    (0 0 0 2))"""), reader='asc').sections[0]
     with warnings.catch_warnings(record=True):
         nt.eq_(_sf.section_tortuosity(sec), np.inf)
 
@@ -129,7 +129,7 @@ def test_section_meander_angles():
     (1 0 0 2)
     (2 0 0 2)
     (3 0 0 2)
-    (4 0 0 2))"""), reader='asc').sections[1]
+    (4 0 0 2))"""), reader='asc').sections[0]
 
     nt.assert_equal(_sf.section_meander_angles(s0),
                     [math.pi, math.pi, math.pi])
@@ -140,7 +140,7 @@ def test_section_meander_angles():
     (1 0 0 2)
     (1 1 0 2)
     (2 1 0 2)
-    (2 2 0 2))"""), reader='asc').sections[1]
+    (2 2 0 2))"""), reader='asc').sections[0]
 
     nt.assert_equal(_sf.section_meander_angles(s1),
                     [math.pi / 2, math.pi / 2, math.pi / 2])
@@ -150,7 +150,7 @@ def test_section_meander_angles():
     (0 0 0 2)
     (0 0 1 2)
     (0 0 2 2)
-    (0 0 0 2))"""), reader='asc').sections[1]
+    (0 0 0 2))"""), reader='asc').sections[0]
 
     nt.assert_equal(_sf.section_meander_angles(s2),
                     [math.pi, 0.])
@@ -160,7 +160,7 @@ def test_section_meander_angles_single_segment():
     s = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
     ((Dendrite)
     (0 0 0 2)
-    (1 1 1 2))"""), reader='asc').sections[1]
+    (1 1 1 2))"""), reader='asc').sections[0]
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)
 
 
@@ -176,7 +176,7 @@ def test_locate_segment_position():
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
-    (6 4 4 400))"""), reader='asc').sections[1]
+    (6 4 4 400))"""), reader='asc').sections[0]
     nt.assert_equal(
         _sf.locate_segment_position(s, 0.0),
         (0, 0.0)
