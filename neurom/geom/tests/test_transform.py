@@ -29,11 +29,12 @@
 import math
 from pathlib import Path
 
-import neurom.geom.transform as gtr
 import numpy as np
-from neurom import load_neuron
-from neurom.features import neuritefunc as _nf
 from nose import tools as nt
+
+import neurom.geom.transform as gtr
+from neurom import COLS, load_neuron
+from neurom.features import neuritefunc as _nf
 
 TEST_UVEC = np.array([0.01856633,  0.37132666,  0.92831665])
 
@@ -211,7 +212,8 @@ def test_pivot_rotate_points():
 def _check_fst_nrn_translate(nrn_a, nrn_b, t):
 
     # soma points
-    nt.assert_true(np.allclose((nrn_b.soma.points[:, 0:3] - nrn_a.soma.points[:, 0:3]), t))
+    nt.assert_true(np.allclose(
+        (nrn_b.soma.points[:, COLS.XYZ] - nrn_a.soma.points[:, COLS.XYZ]), t))
 
     _check_fst_neurite_translate(nrn_a.neurites, nrn_b.neurites, t)
 
@@ -231,15 +233,6 @@ def test_translate_fst_neuron_swc():
     _check_fst_nrn_translate(nrn, tnrn, t)
 
 
-def test_translate_fst_neurite_swc():
-
-    t = np.array([100., 100., 100.])
-    nrn = load_neuron(SWC_NRN_PATH)
-    nrt_a = nrn.neurites[0]
-    nrt_b = gtr.translate(nrt_a, t)
-    _check_fst_neurite_translate(nrt_a, nrt_b, t)
-
-
 def test_transform_translate_neuron_swc():
     t = np.array([100., 100., 100.])
     nrn = load_neuron(SWC_NRN_PATH)
@@ -256,15 +249,6 @@ def test_translate_fst_neuron_h5():
     _check_fst_nrn_translate(nrn, tnrn, t)
 
 
-def test_translate_fst_neurite_h5():
-
-    t = np.array([100., 100., 100.])
-    nrn = load_neuron(H5_NRN_PATH)
-    nrt_a = nrn.neurites[0]
-    nrt_b = gtr.translate(nrt_a, t)
-    _check_fst_neurite_translate(nrt_a, nrt_b, t)
-
-
 def test_transform_translate_neuron_h5():
     t = np.array([100., 100., 100.])
     nrn = load_neuron(H5_NRN_PATH)
@@ -279,8 +263,8 @@ def _apply_rot(points, rot_mat):
 def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 
     # soma points
-    nt.assert_true(np.allclose(_apply_rot(nrn_a.soma.points[:, 0:3], rot_mat),
-                               nrn_b.soma.points[:, 0:3]))
+    nt.assert_true(np.allclose(_apply_rot(nrn_a.soma.points[:, COLS.XYZ], rot_mat),
+                               nrn_b.soma.points[:, COLS.XYZ]))
 
     # neurite sections
     _check_fst_neurite_rotate(nrn_a.neurites, nrn_b.neurites, rot_mat)
@@ -289,8 +273,8 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
     for sa, sb in zip(_nf.iter_sections(nrt_a),
                       _nf.iter_sections(nrt_b)):
-        nt.assert_true(np.allclose(sb.points[:, 0:3],
-                                   _apply_rot(sa.points[:, 0:3], rot_mat)))
+        nt.assert_true(np.allclose(sb.points[:, COLS.XYZ],
+                                   _apply_rot(sa.points[:, COLS.XYZ], rot_mat)))
 
 
 def test_rotate_neuron_swc():
@@ -298,14 +282,6 @@ def test_rotate_neuron_swc():
     nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
-
-
-def test_rotate_neurite_swc():
-    nrn_a = load_neuron(SWC_NRN_PATH)
-    nrt_a = nrn_a.neurites[0]
-    nrt_b = gtr.rotate(nrt_a, [0, 0, 1], math.pi/2.0)
-    rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_neurite_rotate(nrt_a, nrt_b, rot)
 
 
 def test_transform_rotate_neuron_swc():
@@ -320,14 +296,6 @@ def test_rotate_neuron_h5():
     nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
-
-
-def test_rotate_neurite_h5():
-    nrn_a = load_neuron(H5_NRN_PATH)
-    nrt_a = nrn_a.neurites[0]
-    nrt_b = gtr.rotate(nrt_a, [0, 0, 1], math.pi/2.0)
-    rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_neurite_rotate(nrt_a, nrt_b, rot)
 
 
 def test_transform_rotate_neuron_h5():

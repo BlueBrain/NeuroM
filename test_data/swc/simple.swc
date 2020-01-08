@@ -17,6 +17,8 @@
 #           (0, -4)
 #
 # all radii are 1, except for end points, which are 0
+# section types: soma=1, axon=2, basal=3, apical=4
+
 
  1 1  0  0 0 1. -1
  2 3  0  0 0 1.  1

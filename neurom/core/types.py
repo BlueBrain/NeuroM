@@ -30,7 +30,10 @@
 
 from enum import unique
 
+from neurom import NeuriteType
 from neurom.utils import OrderedEnum
+
+NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
 
 @unique
@@ -44,22 +47,10 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-@unique
-class NeuriteType(OrderedEnum):
-    """Enum representing valid tree types."""
-    undefined = 0
-    soma = 1
-    axon = 2
-    basal_dendrite = 3
-    apical_dendrite = 4
-    custom = 5
-    all = 32
-
-
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+            NeuriteType.apical_dendrite,
+            NeuriteType.basal_dendrite)
 
 ROOT_ID = -1
 

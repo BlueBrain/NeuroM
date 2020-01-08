@@ -18,16 +18,16 @@
 #
 # all radii are 1, except for end points, which are 0
 # section types: soma=1, axon=2, basal=3, apical=4
+#
+# An additional soma at the end
 
-#Note, this is the same as 'simple.swc', except w/ leaf nodes before
-#their parents
-
-1 1  0  0 0 1. -1
-2 3 -5  5 0 0.  7
-3 3  6  5 0 0.  7
-4 2  6 -4 0 0.  9
-5 2 -5 -4 0 0.  9
-6 3  0  0 0 1.  1
-7 3  0  5 0 1.  6
-8 2  0  0 0 1.  1
-9 2  0 -4 0 1.  8
+ 1 1  0  0 0 1. -1
+ 2 3  0  0 0 1.  1
+ 3 3  0  5 0 1.  2
+ 4 3 -5  5 0 0.  3
+ 5 3  6  5 0 0.  3
+ 6 2  0  0 0 1.  1
+ 7 2  0 -4 0 1.  6
+ 8 2  6 -4 0 0.  7
+ 9 2 -5 -4 0 0.  7
+ 10 1 2 0 0 2 -1  # <-- additional somata

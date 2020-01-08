@@ -42,13 +42,13 @@ np.random.seed(0)
 def test_vector():
     vec1 = (12.0, 3, 6.0)
     vec2 = (14.0, 1.0, 6.0)
-    vec = mm.vector(vec1,vec2)
-    nt.ok_(np.all(vec ==(-2.0, 2.0, 0.0)))
+    vec = mm.vector(vec1, vec2)
+    nt.ok_(np.all(vec == (-2.0, 2.0, 0.0)))
 
 
 def test_linear_interpolate():
-    p0 = np.array([-1.,-1.,-1.])
-    p1 = np.array([1.,1.,1.])
+    p0 = np.array([-1., -1., -1.])
+    p1 = np.array([1., 1., 1.])
 
     res = mm.linear_interpolate(p0, p1, 0.0)
     nt.assert_true(np.allclose(res, (-1., -1., -1.)))
@@ -63,12 +63,14 @@ def test_linear_interpolate():
 
 
 def test_interpolate_radius_r1_g_r2():
-    res = mm.interpolate_radius(2.,1.,0.1)
+    res = mm.interpolate_radius(2., 1., 0.1)
     nt.assert_equal(res, 1.9)
+
 
 def test_interpolate_radius_r2_g_r1():
     res = mm.interpolate_radius(1., 2., 0.2)
     nt.assert_equal(res, 1.2)
+
 
 def test_interpolate_radius_extreme_cases():
     res = mm.interpolate_radius(1., 1., 0.2)
@@ -81,14 +83,15 @@ def test_interpolate_radius_extreme_cases():
 
 def test_path_fraction_point_two_points():
 
-    points = [np.array([-1.,-1.,-1.]), np.array([1.,1.,1.])]
+    points = [np.array([-1., -1., -1.]), np.array([1., 1., 1.])]
 
     res = mm.path_fraction_point(points, 0.0)
-    nt.assert_true(np.allclose(res, (-1.,-1.,-1.)))
+    nt.assert_true(np.allclose(res, (-1., -1., -1.)))
     res = mm.path_fraction_point(points, 0.25)
-    nt.assert_true(np.allclose(res, (-0.5,-0.5,-0.5)))
+    nt.assert_true(np.allclose(res, (-0.5, -0.5, -0.5)))
     res = mm.path_fraction_point(points, 1.0)
-    nt.assert_true(np.allclose(res, (1.,1.,1.)))
+    nt.assert_true(np.allclose(res, (1., 1., 1.)))
+
 
 def test_path_fraction_three_symmetric_points():
 
@@ -111,25 +114,29 @@ def test_path_fraction_three_symmetric_points():
     res = mm.path_fraction_point(points, 1.0)
     nt.assert_true(np.allclose(res, (0., 0., 1.)))
 
+
 def test_path_fraction_many_points():
-    x = lambda theta: np.cos(theta)
-    y = lambda theta: np.sin(theta)
-    points = [np.array((x(theta), y(theta), 2.)) for theta in (0., np.pi/4., np.pi/2., 3.*np.pi/4., np.pi)]
+    def x(theta): return np.cos(theta)
+
+    def y(theta): return np.sin(theta)
+    points = [np.array((x(theta), y(theta), 2.))
+              for theta in (0., np.pi / 4., np.pi / 2., 3. * np.pi / 4., np.pi)]
 
     res = mm.path_fraction_point(points, 0.)
     nt.assert_true(np.allclose(res, (x(0.), y(0.), 2.)))
 
     res = mm.path_fraction_point(points, 0.25)
-    nt.assert_true(np.allclose(res, (x(np.pi/4.), y(np.pi/4.), 2.)))
+    nt.assert_true(np.allclose(res, (x(np.pi / 4.), y(np.pi / 4.), 2.)))
 
     res = mm.path_fraction_point(points, 0.5)
-    nt.assert_true(np.allclose(res, (x(np.pi/2.), y(np.pi/2.), 2.)))
+    nt.assert_true(np.allclose(res, (x(np.pi / 2.), y(np.pi / 2.), 2.)))
 
     res = mm.path_fraction_point(points, 0.75)
-    nt.assert_true(np.allclose(res, (x(3.*np.pi/4.), y(3.*np.pi/4.), 2.)))
+    nt.assert_true(np.allclose(res, (x(3. * np.pi / 4.), y(3. * np.pi / 4.), 2.)))
 
     res = mm.path_fraction_point(points, 1.)
     nt.assert_true(np.allclose(res, (x(np.pi), y(np.pi), 2.)))
+
 
 def test_scalar_projection():
     v1 = np.array([4., 1., 0.])
@@ -145,7 +152,7 @@ def test_scalar_projection_collinear():
 
     res = mm.scalar_projection(v1, v2)
 
-    nt.assert_true(np.allclose(res, 20./np.linalg.norm(v2)))
+    nt.assert_true(np.allclose(res, 20. / np.linalg.norm(v2)))
 
 
 def test_scalar_projection_perpendicular():
@@ -179,7 +186,7 @@ def test_vector_projection_perpendicular():
     v2 = np.array([0., 3., 0.])
 
     res = mm.vector_projection(v1, v2)
-    nt.assert_true(np.allclose(res, (0.,0.,0.)))
+    nt.assert_true(np.allclose(res, (0., 0., 0.)))
 
 
 def test_dist_point_line():
@@ -191,33 +198,33 @@ def test_dist_point_line():
     # check the distance of the line 3x - 4y + 1 = 0
     # with parametric form of (t, (4t - 1)/3)
     # two points that satisfy this equation:
-    l1 = np.array([0., 1./4., 0.])
+    l1 = np.array([0., 1. / 4., 0.])
     l2 = np.array([1., 1., 0.])
 
-    p = np.array([2. , 3., 0.])
+    p = np.array([2., 3., 0.])
 
     res = mm.dist_point_line(p, l1, l2)
     nt.assert_equal(res, 1.)
 
 
 def test_point_dist2():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
     dist = mm.point_dist2(p1, p2)
     nt.eq_(dist, 3)
 
 
 def test_segment_length2():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
     dist = mm.segment_length2((p1, p2))
     nt.eq_(dist, 3)
 
 
 def test_point_dist():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
-    dist = mm.point_dist(p1,p2)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
+    dist = mm.point_dist(p1, p2)
     nt.eq_(dist, sqrt(3))
 
 
@@ -263,7 +270,7 @@ def test_angle_3points_three_quarter_pi():
     nt.assert_equal(mm.angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
 
     vec2 = (-3.0, 3.0, 0.0)
-    nt.assert_equal(mm.angle_3points(orig, vec1, vec2), 3* pi / 4.0)
+    nt.assert_equal(mm.angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
 
     vec2 = (-3.0, -3.0, 0.0)
     nt.assert_equal(mm.angle_3points(orig, vec1, vec2), 3 * pi / 4.0)
@@ -287,7 +294,7 @@ def test_angle_3points_opposing_returns_pi():
     orig = (0.0, 0.0, 0.0)
     vec1 = (1.0, 1.0, 1.0)
     vec2 = (-2.0, -2.0, -2.0)
-    angle=mm.angle_3points(orig, vec1, vec2)
+    angle = mm.angle_3points(orig, vec1, vec2)
     nt.assert_equal(angle, pi)
 
 
@@ -295,66 +302,58 @@ def test_angle_3points_collinear_returns_zero():
     orig = (0.0, 0.0, 0.0)
     vec1 = (1.0, 1.0, 1.0)
     vec2 = (2.0, 2.0, 2.0)
-    angle=mm.angle_3points(orig, vec1, vec2)
+    angle = mm.angle_3points(orig, vec1, vec2)
     nt.assert_equal(angle, 0.0)
 
 
-def test_angle_between_vectors():
-    angle1 = mm.angle_between_vectors((1, 0), (0, 1))
-    nt.assert_equal(angle1, np.pi/2)
-    angle1 = mm.angle_between_vectors((1, 0), (1, 0))
-    nt.assert_equal(angle1, 0.0)
-    angle1 = mm.angle_between_vectors((1, 0), (-1, 0))
-    nt.assert_equal(angle1, np.pi)
-
-
-def soma_points(radius=5,number_points=20):
-    phi = uniform(0, 2*pi, number_points)
-    costheta = uniform(-1,1, number_points)
+def soma_points(radius=5, number_points=20):
+    phi = uniform(0, 2 * pi, number_points)
+    costheta = uniform(-1, 1, number_points)
     theta = np.arccos(costheta)
-    x = radius*np.sin(theta)*np.cos(phi)
-    y = radius*np.sin(theta)*np.sin(phi)
-    z = radius*np.cos(theta)
+    x = radius * np.sin(theta) * np.cos(phi)
+    y = radius * np.sin(theta) * np.sin(phi)
+    z = radius * np.cos(theta)
 
-    return [Point(i, j, k, 0.0, 1) for (i, j, k) in zip(x, y, z)]
+    return [Point(i, j, k, 0.0) for (i, j, k) in zip(x, y, z)]
 
 
 def test_polygon_diameter():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
-    p3 = Point(3.0, 6.0, 5.0, 3.0, 1)
-    dia= mm.polygon_diameter([p1,p2,p3])
-    nt.ok_(dia==2.0)
-    surfpoint= soma_points()
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(3.0, 5.0, 5.0, 3.0)
+    p3 = Point(3.0, 6.0, 5.0, 3.0)
+    dia = mm.polygon_diameter([p1, p2, p3])
+    nt.ok_(dia == 2.0)
+    surfpoint = soma_points()
     dia1 = mm.polygon_diameter(surfpoint)
-    nt.ok_(fabs(dia1-10.0) < 0.1)
+    nt.ok_(fabs(dia1 - 10.0) < 0.1)
 
 
 def test_average_points_dist():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(0.0, 0.0, 1.0, 3.0, 1)
-    p2 = Point(0.0, 1.0, 0.0, 3.0, 1)
-    p3 = Point(1.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(0.0, 0.0, 1.0, 3.0)
+    p2 = Point(0.0, 1.0, 0.0, 3.0)
+    p3 = Point(1.0, 0.0, 0.0, 3.0)
     av_dist = mm.average_points_dist(p0, [p1, p2, p3])
     nt.ok_(av_dist == 1.0)
 
+
 def test_path_distance():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
-    p3 = Point(3.0, 6.0, 5.0, 3.0, 1)
-    p4 = Point(3.0, 7.0, 5.0, 3.0, 1)
-    p5 = Point(3.0, 8.0, 5.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(3.0, 5.0, 5.0, 3.0)
+    p3 = Point(3.0, 6.0, 5.0, 3.0)
+    p4 = Point(3.0, 7.0, 5.0, 3.0)
+    p5 = Point(3.0, 8.0, 5.0, 3.0)
     dist = mm.path_distance([p1, p2, p3, p4, p5])
     nt.ok_(dist == 4)
 
 
 def test_segment_area():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
-    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
-    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
-    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
-    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(2.0, 0.0, 0.0, 3.0)
+    p2 = Point(4.0, 0.0, 0.0, 3.0)
+    p3 = Point(4.0, 0.0, 0.0, 6.0)
+    p4 = Point(1.0, 0.0, 0.0, 3.0)
+    p5 = Point(4.0, 0.0, 0.0, 3.0)
 
     a01 = mm.segment_area((p0, p1))
     a02 = mm.segment_area((p0, p2))
@@ -364,19 +363,19 @@ def test_segment_area():
     a05 = mm.segment_area((p0, p5))
 
     nt.assert_almost_equal(a01, 37.6991118, places=6)
-    nt.assert_almost_equal(2*a01, a02)
+    nt.assert_almost_equal(2 * a01, a02)
     nt.assert_almost_equal(a03, 141.3716694, places=6)
     nt.assert_almost_equal(a45, a05 - a04)
     nt.assert_almost_equal(mm.segment_area((p0, p3)), mm.segment_area((p3, p0)))
 
 
 def test_segment_volume():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
-    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
-    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
-    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
-    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(2.0, 0.0, 0.0, 3.0)
+    p2 = Point(4.0, 0.0, 0.0, 3.0)
+    p3 = Point(4.0, 0.0, 0.0, 6.0)
+    p4 = Point(1.0, 0.0, 0.0, 3.0)
+    p5 = Point(4.0, 0.0, 0.0, 3.0)
 
     v01 = mm.segment_volume((p0, p1))
     v02 = mm.segment_volume((p0, p2))
@@ -386,39 +385,41 @@ def test_segment_volume():
     v05 = mm.segment_volume((p0, p5))
 
     nt.assert_almost_equal(v01, 56.5486677, places=6)
-    nt.assert_almost_equal(2*v01, v02)
+    nt.assert_almost_equal(2 * v01, v02)
     nt.assert_almost_equal(v03, 263.8937829, places=6)
     nt.assert_almost_equal(v45, v05 - v04)
     nt.assert_almost_equal(mm.segment_volume((p0, p3)), mm.segment_volume((p3, p0)))
 
 
 def test_segment_length():
-    nt.ok_(mm.segment_length(((0,0,0), (0,0,42))) == 42)
-    nt.ok_(mm.segment_length(((0,0,0), (0,42,0))) == 42)
-    nt.ok_(mm.segment_length(((0,0,0), (42,0,0))) == 42)
+    nt.ok_(mm.segment_length(((0, 0, 0), (0, 0, 42))) == 42)
+    nt.ok_(mm.segment_length(((0, 0, 0), (0, 42, 0))) == 42)
+    nt.ok_(mm.segment_length(((0, 0, 0), (42, 0, 0))) == 42)
 
 
 def test_segment_radius():
-    nt.ok_(mm.segment_radius(((0,0,0,4),(0,0,0,6))) == 5)
+    nt.ok_(mm.segment_radius(((0, 0, 0, 4), (0, 0, 0, 6))) == 5)
 
 
 def test_segment_x_coordinate():
-    nt.ok_(mm.segment_x_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
-    nt.ok_(mm.segment_x_coordinate(((0,0,0,4),(1,0,0,6))) == 0.5)
+    nt.ok_(mm.segment_x_coordinate(((0, 0, 0, 4), (0, 0, 0, 6))) == 0)
+    nt.ok_(mm.segment_x_coordinate(((0, 0, 0, 4), (1, 0, 0, 6))) == 0.5)
+
 
 def test_segment_y_coordinate():
-    nt.ok_(mm.segment_y_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
-    nt.ok_(mm.segment_y_coordinate(((0,0,0,4),(0,1,0,6))) == 0.5)
+    nt.ok_(mm.segment_y_coordinate(((0, 0, 0, 4), (0, 0, 0, 6))) == 0)
+    nt.ok_(mm.segment_y_coordinate(((0, 0, 0, 4), (0, 1, 0, 6))) == 0.5)
+
 
 def test_segment_z_coordinate():
-    nt.ok_(mm.segment_z_coordinate(((0,0,0,4),(0,0,0,6))) == 0)
-    nt.ok_(mm.segment_z_coordinate(((0,0,0,4),(0,0,1,6))) == 0.5)
+    nt.ok_(mm.segment_z_coordinate(((0, 0, 0, 4), (0, 0, 0, 6))) == 0)
+    nt.ok_(mm.segment_z_coordinate(((0, 0, 0, 4), (0, 0, 1, 6))) == 0.5)
 
 
 def test_segment_radial_dist():
-    seg = ((11,11,11), (33, 33, 33))
-    nt.assert_almost_equal(mm.segment_radial_dist(seg, (0,0,0)),
-                           mm.point_dist((0,0,0), (22,22,22)))
+    seg = ((11, 11, 11), (33, 33, 33))
+    nt.assert_almost_equal(mm.segment_radial_dist(seg, (0, 0, 0)),
+                           mm.point_dist((0, 0, 0), (22, 22, 22)))
 
 
 def test_taper_rate():
@@ -440,29 +441,34 @@ def test_segment_taper_rate():
     nt.assert_almost_equal(mm.segment_taper_rate((p0, p2)), 3.0)
     nt.assert_almost_equal(mm.segment_taper_rate((p0, p3)), 2.0)
 
+
 def test_pca():
 
     p = np.array([[4., 2., 0.6],
-                 [4.2, 2.1, 0.59],
-                 [3.9, 2.0, 0.58],
-                 [4.3, 2.1, 0.62],
-                 [4.1, 2.2, 0.63]])
+                  [4.2, 2.1, 0.59],
+                  [3.9, 2.0, 0.58],
+                  [4.3, 2.1, 0.62],
+                  [4.1, 2.2, 0.63]])
 
     RES_COV = np.array([[0.025, 0.0075, 0.00175],
                         [0.0075, 0.0070, 0.00135],
                         [0.00175, 0.00135, 0.00043]])
 
-    RES_EIGV = np.array([[ 0.93676841,  0.34958469, -0.0159843 ],
-                        [ 0.34148069, -0.92313136, -0.1766902 ],
-                        [ 0.0765238 , -0.16005947,  0.98413672]])
+    RES_EIGV = np.array([[0.93676841,  0.34958469, -0.0159843],
+                         [0.34148069, -0.92313136, -0.1766902],
+                         [0.0765238, -0.16005947,  0.98413672]])
 
     RES_EIGS = np.array([0.0278769, 0.00439387, 0.0001592])
     eigs, eigv = mm.pca(p)
 
     nt.assert_true(np.allclose(eigs, RES_EIGS))
-    nt.assert_true(np.allclose(eigv[:,0], RES_EIGV[:,0]) or np.allclose(eigv[:, 0], -1. * RES_EIGV[:, 0]))
-    nt.assert_true(np.allclose(eigv[:,1], RES_EIGV[:,1]) or np.allclose(eigv[:, 1], -1. * RES_EIGV[:, 1]))
-    nt.assert_true(np.allclose(eigv[:,2], RES_EIGV[:,2]) or np.allclose(eigv[:, 2], -1. * RES_EIGV[:, 2]))
+    nt.assert_true(np.allclose(eigv[:, 0], RES_EIGV[:, 0])
+                   or np.allclose(eigv[:, 0], -1. * RES_EIGV[:, 0]))
+    nt.assert_true(np.allclose(eigv[:, 1], RES_EIGV[:, 1])
+                   or np.allclose(eigv[:, 1], -1. * RES_EIGV[:, 1]))
+    nt.assert_true(np.allclose(eigv[:, 2], RES_EIGV[:, 2])
+                   or np.allclose(eigv[:, 2], -1. * RES_EIGV[:, 2]))
+
 
 def test_sphere_area():
     area = mm.sphere_area(0.5)
