@@ -409,3 +409,33 @@ def test_has_single_children():
                       """))
 
     nt.ok_(not nrn_chk.has_no_single_children(nrn).status)
+
+
+def test_has_multifurcation():
+    nrn = load_neuron(('asc', """
+( (Color Blue)
+  (Axon)
+  (0 5 0 2)
+  (2 9 0 2)
+  (0 13 0 2)
+  (
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+  )
+)
+"""))
+
+    check_ = nrn_chk.has_multifurcation(nrn)
+    nt.ok_(not check_.status)
+    info = check_.info
+    assert_array_equal(info[0][0], 0)
+    assert_array_equal(info[0][1], [[0.0, 13.0, 0.0, 1.0]])
