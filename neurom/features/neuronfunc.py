@@ -43,6 +43,21 @@ def neuron_population(nrns):
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
 
+def soma_volume(nrn):
+    '''Get the volume of a neuron's soma.'''
+    return nrn.soma.volume
+
+
+def soma_volumes(nrn_pop):
+    '''Get the volume of the somata in a population of neurons
+    Note:
+        If a single neuron is passed, a single element list with the volume
+        of its soma member is returned.
+    '''
+    nrns = neuron_population(nrn_pop)
+    return [soma_volume(n) for n in nrns]
+
+
 def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
     '''Get the surface area of a neuron's soma.
 
