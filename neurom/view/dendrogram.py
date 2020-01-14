@@ -32,6 +32,7 @@ import numpy as np
 from neurom import NeuriteType
 from neurom.core import Neurite, Neuron
 from neurom.core.dataformat import COLS
+from neurom.morphmath import interval_lengths
 
 
 class Dendrogram(object):
@@ -54,13 +55,13 @@ class Dendrogram(object):
             if isinstance(neurom_section, Neurite):
                 neurom_section = neurom_section.root_node
             segments = neurom_section.points
-            segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
+            lengths = interval_lengths(segments)
             segment_radii = segments[:, COLS.R]
 
             self.neurite_type = neurom_section.type
-            self.height = np.sum(segment_lengths)
+            self.height = np.sum(lengths)
             self.width = 2 * np.max(segment_radii)
-            self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
+            self.coords = Dendrogram.get_coords(lengths, segment_radii)
             self.children = [Dendrogram(child) for child in neurom_section.children]
 
     @staticmethod

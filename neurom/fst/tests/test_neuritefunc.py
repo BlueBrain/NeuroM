@@ -315,5 +315,9 @@ def test_segment_radial_distances():
     '''midpoints on segments'''
     radial_distances = _nf.segment_radial_distances(SIMPLE)
     assert_allclose(radial_distances,
-                    (2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2),
-                     2.0, 5.0, sqrt(2.5**2 + 4**2)))
+                    [2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2), 2.0, 5.0, sqrt(2.5**2 + 4**2)])
+
+
+def test_segment_path_lengths():
+    pathlengths = _nf.segment_path_lengths(SIMPLE)
+    assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])

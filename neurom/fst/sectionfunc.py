@@ -30,6 +30,7 @@
 
 from neurom import morphmath as mm
 from neurom._compat import range
+from neurom.morphmath import interval_lengths
 
 
 def section_path_length(section):
@@ -82,6 +83,11 @@ def branch_order(section):
         The first level has branch order 1.
     '''
     return sum(1 for _ in section.iupstream()) - 1
+
+
+def segment_lengths(section):
+    '''Returns the list of segment lengths within the section'''
+    return interval_lengths(section.points)
 
 
 def section_radial_distance(section, origin):
