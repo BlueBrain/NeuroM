@@ -210,6 +210,15 @@ def segment_lengths(neurites, neurite_type=NeuriteType.all):
     return map_segments(_seg_len, neurites, neurite_type)
 
 
+def segment_areas(neurites, neurite_type=NeuriteType.all):
+    '''Areas of the segments in a collection of neurites'''
+    def _func(sec):
+        '''list of segment areas of a section'''
+        return [morphmath.segment_area(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
+
+    return map_segments(_func, neurites, neurite_type)
+
+
 def segment_volumes(neurites, neurite_type=NeuriteType.all):
     '''Volumes of the segments in a collection of neurites'''
     def _func(sec):

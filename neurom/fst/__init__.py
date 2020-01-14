@@ -82,6 +82,7 @@ NEURITEFEATURES = {
     'partition_pairs': _nrt.partition_pairs,
     'number_of_segments': _nrt.number_of_segments,
     'segment_lengths': _nrt.segment_lengths,
+    'segment_areas': _nrt.segment_areas,
     'segment_volumes': _nrt.segment_volumes,
     'segment_radii': _nrt.segment_radii,
     'segment_midpoints': _nrt.segment_midpoints,

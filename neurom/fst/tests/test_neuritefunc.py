@@ -279,6 +279,16 @@ def test_segment_lengths():
                     (5.0, 5.0, 6.0,   # type 3, basal dendrite
                      4.0, 6.0, 5.0))  # type 2, axon
 
+def test_segment_areas():
+    result = _nf.segment_areas(SIMPLE)
+    assert_allclose(result,
+                    [31.415927,
+                     16.019042,
+                     19.109562,
+                     25.132741,
+                     19.109562,
+                     16.019042])
+
 def test_segment_volumes():
     expected = [
         15.70796327,
