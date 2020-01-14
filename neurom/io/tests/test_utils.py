@@ -30,6 +30,7 @@
 import os
 import sys
 from io import StringIO
+import warnings
 
 import numpy as np
 from nose import tools as nt
@@ -147,7 +148,8 @@ def test_load_bifurcating_soma_points_raises_SomaError():
 
 
 def test_load_neuromorpho_3pt_soma():
-    nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
+    with warnings.catch_warnings(record=True):
+        nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
     nt.eq_(len(nrn.neurites), 4)
     nt.eq_(len(nrn.soma.points), 3)
     nt.eq_(nrn.soma.radius, 2)

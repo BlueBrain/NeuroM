@@ -32,6 +32,7 @@ from nose import tools as nt
 import os
 import math
 import numpy as np
+import warnings
 from numpy.testing import assert_allclose
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
@@ -100,14 +101,8 @@ def test_section_tortuosity_looping_section():
         (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
     ])
 
-    # is infinity
-    nt.eq_(_sf.section_tortuosity(sec), np.inf)
-    nt.ok_(math.isinf(_sf.section_tortuosity(sec)))
-    nt.ok_(np.isinf(_sf.section_tortuosity(sec)))
-
-    # is not NaN
-    nt.ok_(not math.isnan(_sf.section_tortuosity(sec)))
-    nt.ok_(not np.isnan(_sf.section_tortuosity(sec)))
+    with warnings.catch_warnings(record=True):
+        nt.eq_(_sf.section_tortuosity(sec), np.inf)
 
 
 def test_section_meander_angles():

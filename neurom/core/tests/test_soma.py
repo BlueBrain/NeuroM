@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import warnings
 from nose import tools as nt
 from neurom.core import _soma
 from neurom.exceptions import SomaError
@@ -97,7 +98,8 @@ def test_make_Soma_contour():
 
 
 def test_make_Soma_ThreePointCylinder():
-    sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CYLINDER)
+    with warnings.catch_warnings(record=True):
+        sm = _soma.make_soma(SOMA_THREEPOINTS_PTS, soma_class=_soma.SOMA_CYLINDER)
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
@@ -165,7 +167,8 @@ def test_make_Soma_Cylinders():
         [0.0, -10.0,  0.0, 10.0, 1, 2,  1],
         [0.0,   10.0, 0.0, 10.0, 1, 3,  1],
     ])
-    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
+    with warnings.catch_warnings(record=True):
+        s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 1256.6370614)
@@ -178,7 +181,8 @@ def test_make_Soma_Cylinders():
         [-2.0,   6.0,  0.0, 10.0, 1, 2,  1],
         [ 2.0,  -6.0,  0.0, 10.0, 1, 3,  1],
     ])
-    s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
+    with warnings.catch_warnings(record=True):
+        s = _soma.make_soma(soma_3pt_neuromorpho, soma_class=_soma.SOMA_CYLINDER)
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
     nt.assert_almost_equal(s.area, 794.76706126368811)
