@@ -28,7 +28,7 @@ def test_create_dendrogram_neuron():
 
 
 def test_dendrogram_get_coords():
-    segment_lengts = np.array([1, 1])
+    segment_lengts = np.array([0, 1, 1])
     segment_radii = np.array([.5, 1, .25])
     coords = dm.Dendrogram.get_coords(segment_lengts, segment_radii)
     assert_array_almost_equal(

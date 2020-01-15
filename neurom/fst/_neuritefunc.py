@@ -33,7 +33,7 @@ from itertools import chain
 import numpy as np
 
 from neurom import morphmath
-from neurom.core import Tree, iter_neurites, iter_sections, NeuriteType
+from neurom.core import Tree, iter_neurites, iter_sections, iter_segments, NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.fst import _bifurcationfunc
@@ -203,11 +203,13 @@ def map_segments(func, neurites, neurite_type):
 
 def segment_lengths(neurites, neurite_type=NeuriteType.all):
     '''Lengths of the segments in a collection of neurites'''
-    def _seg_len(sec):
-        '''list of segment lengths of a section'''
-        return np.linalg.norm(np.diff(sec.points[:, COLS.XYZ], axis=0), axis=1)
+    return map_segments(sectionfunc.segment_lengths, neurites, neurite_type)
 
-    return map_segments(_seg_len, neurites, neurite_type)
+
+def segment_areas(neurites, neurite_type=NeuriteType.all):
+    '''Areas of the segments in a collection of neurites'''
+    return [morphmath.segment_area(seg) for seg
+            in iter_segments(neurites, is_type(neurite_type))]
 
 
 def segment_volumes(neurites, neurite_type=NeuriteType.all):
@@ -260,19 +262,34 @@ def segment_midpoints(neurites, neurite_type=NeuriteType.all):
     return map_segments(_seg_midpoint, neurites, neurite_type)
 
 
+def segment_path_lengths(neurites, neurite_type=NeuriteType.all):
+    '''Returns pathlengths between all non-root points and their root point'''
+    pathlength = {}
+    neurite_filter = is_type(neurite_type)
+
+    def _get_pathlength(section):
+        if section.id not in pathlength:
+            if section.parent:
+                pathlength[section.id] = section.parent.length + _get_pathlength(section.parent)
+            else:
+                pathlength[section.id] = 0
+        return pathlength[section.id]
+
+    return np.hstack([_get_pathlength(section) + sectionfunc.segment_lengths(section)
+                      for section in iter_sections(neurites, neurite_filter=neurite_filter)])
+
+
 def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
-    '''Lengths of the segments in a collection of neurites'''
-    def _seg_rd(sec, pos):
-        '''list of radial distances of all segments of a section'''
-        # TODO: remove this disable when pylint is fixed
-        # pylint: disable=assignment-from-no-return
-        mid_pts = np.divide(np.add(sec.points[:-1], sec.points[1:])[:, :3], 2.0)
-        return np.sqrt([morphmath.point_dist2(p, pos) for p in mid_pts])
+    '''Returns the list of distances between all segment mid points and origin.'''
+    def _radial_distances(sec, pos):
+        '''list of distances between the mid point of each segment and pos'''
+        mid_pts = 0.5 * (sec.points[:-1, COLS.XYZ] + sec.points[1:, COLS.XYZ])
+        return np.linalg.norm(mid_pts - pos[COLS.XYZ], axis=1)
 
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin
-        dist.extend([s for ss in n.iter_sections() for s in _seg_rd(ss, pos)])
+        dist.extend([s for ss in n.iter_sections() for s in _radial_distances(ss, pos)])
 
     return dist
 

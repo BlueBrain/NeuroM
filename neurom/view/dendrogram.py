@@ -32,6 +32,7 @@ import numpy as np
 from neurom import NeuriteType
 from neurom.core import Neurite, Neuron
 from neurom.core.dataformat import COLS
+from neurom.morphmath import interval_lengths
 
 
 class Dendrogram(object):
@@ -48,19 +49,18 @@ class Dendrogram(object):
             self.height = 1
             self.width = 1
             self.coords = self.get_coords(
-                np.array([self.height]), np.array([.5 * self.width, .5 * self.width]))
+                np.array([0, self.height]), np.array([.5 * self.width, .5 * self.width]))
             self.children = [Dendrogram(neurite.root_node) for neurite in neurom_section.neurites]
         else:
             if isinstance(neurom_section, Neurite):
                 neurom_section = neurom_section.root_node
-            segments = neurom_section.points
-            segment_lengths = np.linalg.norm(np.diff(segments[:, COLS.XYZ], axis=0), axis=1)
-            segment_radii = segments[:, COLS.R]
+            lengths = interval_lengths(neurom_section.points, prepend_zero=True)
+            radii = neurom_section.points[:, COLS.R]
 
             self.neurite_type = neurom_section.type
-            self.height = np.sum(segment_lengths)
-            self.width = 2 * np.max(segment_radii)
-            self.coords = Dendrogram.get_coords(segment_lengths, segment_radii)
+            self.height = np.sum(lengths)
+            self.width = 2 * np.max(radii)
+            self.coords = Dendrogram.get_coords(lengths, radii)
             self.children = [Dendrogram(child) for child in neurom_section.children]
 
     @staticmethod
@@ -74,8 +74,7 @@ class Dendrogram(object):
         Returns:
             (N,2) array of 2D x,y coordinates of Dendrogram polygon. N is the number of vertices.
         """
-        y_coords = np.insert(segment_lengths, 0, 0)
-        y_coords = np.cumsum(y_coords)
+        y_coords = np.cumsum(segment_lengths)
         x_left_coords = -segment_radii
         x_right_coords = segment_radii
         left_coords = np.hstack((x_left_coords[:, np.newaxis], y_coords[:, np.newaxis]))
