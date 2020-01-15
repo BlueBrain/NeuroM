@@ -32,6 +32,7 @@ from neurom import morphmath as mm
 from math import sqrt, pi, fabs
 
 from numpy.random import uniform
+from numpy.testing import assert_array_almost_equal
 import numpy as np
 
 
@@ -466,3 +467,12 @@ def test_pca():
 def test_sphere_area():
     area = mm.sphere_area(0.5)
     nt.assert_almost_equal(area, pi)
+
+
+def test_interval_lengths():
+    assert_array_almost_equal(mm.interval_lengths([[0,0,0], [1,1,0], [2, 11, 0]]),
+                              [1.414214, 10.049876])
+
+    assert_array_almost_equal(mm.interval_lengths([[0,0,0], [1,1,0], [2, 11, 0]],
+                                                  prepend_zero=True),
+                              [0, 1.414214, 10.049876])

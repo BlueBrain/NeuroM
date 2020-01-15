@@ -33,7 +33,7 @@ from itertools import chain
 import numpy as np
 
 from neurom import morphmath
-from neurom.core import Tree, iter_neurites, iter_sections, NeuriteType
+from neurom.core import Tree, iter_neurites, iter_sections, iter_segments, NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.fst import _bifurcationfunc
@@ -208,11 +208,8 @@ def segment_lengths(neurites, neurite_type=NeuriteType.all):
 
 def segment_areas(neurites, neurite_type=NeuriteType.all):
     '''Areas of the segments in a collection of neurites'''
-    def _func(sec):
-        '''list of segment areas of a section'''
-        return [morphmath.segment_area(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
-
-    return map_segments(_func, neurites, neurite_type)
+    return [morphmath.segment_area(seg) for seg
+            in iter_segments(neurites, is_type(neurite_type))]
 
 
 def segment_volumes(neurites, neurite_type=NeuriteType.all):

@@ -81,9 +81,17 @@ def interpolate_radius(r1, r2, fraction):
     return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
 
 
-def interval_lengths(points):
-    '''Returns the list of distances between consecutive points.'''
-    return np.linalg.norm(np.diff(np.asarray(points)[:, COLS.XYZ], axis=0), axis=1)
+def interval_lengths(points, prepend_zero=False):
+    '''Returns the list of distances between consecutive points.
+
+    Args:
+        points: a list of np.array of 3D points
+        prepend_zero (bool): if True, the returned array will start with a zero
+    '''
+    intervals = np.linalg.norm(np.diff(np.asarray(points)[:, COLS.XYZ], axis=0), axis=1)
+    if prepend_zero:
+        return np.insert(intervals, 0, 0)
+    return intervals
 
 
 def path_fraction_id_offset(points, fraction, relative_offset=False):
