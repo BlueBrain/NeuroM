@@ -36,7 +36,7 @@ from mpl_toolkits.mplot3d.art3d import \
 import numpy as np
 from neurom import NeuriteType, geom
 from neurom._compat import zip
-from neurom.core import iter_neurites, iter_segments
+from neurom.core import iter_neurites, iter_segments, iter_sections
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
@@ -102,14 +102,18 @@ def plot_tree(ax, tree, plane='xy',
         since no segments can be constructed.
     '''
     plane0, plane1 = _plane2col(plane)
-    segs = [((s[0][plane0], s[0][plane1]),
-             (s[1][plane0], s[1][plane1]))
-            for s in iter_segments(tree)]
+    section_segment_list = [(section, segment)
+                            for section in iter_sections(tree)
+                            for segment in iter_segments(section)]
+    segs = [((seg[0][plane0], seg[0][plane1]),
+             (seg[1][plane0], seg[1][plane1]))
+            for _, seg in section_segment_list]
+
+    colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type)
 
-    collection = LineCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
+    collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection(collection)
 
 
@@ -220,12 +224,15 @@ def plot_tree3d(ax, tree,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     '''
-    segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
+    section_segment_list = [(section, segment)
+                            for section in iter_sections(tree)
+                            for segment in iter_segments(section)]
+    segs = [(seg[0][COLS.XYZ], seg[1][COLS.XYZ]) for _, seg in section_segment_list]
+    colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type)
 
-    collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
+    collection = Line3DCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
 
     _update_3d_datalim(ax, tree)
