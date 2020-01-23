@@ -257,9 +257,7 @@ def path_distance(points):
     """
     Compute the path distance from given set of points
     """
-    vecs = np.diff(points, axis=0)[:, :3]
-    d2 = [np.dot(p, p) for p in vecs]
-    return np.sum(np.sqrt(d2))
+    return interval_lengths(points).sum()
 
 
 def segment_length(seg):
