@@ -113,7 +113,7 @@ def _genetate_tree_non_monotonic_section_boundary():
 def _generate_back_track_tree(n, dev):
     points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
-    neuron = load_neuron(StringIO('''
+    neuron = load_neuron(StringIO(u'''
     ((CellBody)
      (0 0 0 0.4))
 

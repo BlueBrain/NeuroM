@@ -71,7 +71,7 @@ def test_section_area():
 
 
 def test_section_tortuosity():
-    sec_a = load_neuron(StringIO("""
+    sec_a = load_neuron(StringIO(u"""
 	((CellBody) (0 0 0 2))
 	((Dendrite)
     (0 0 0 2)
@@ -79,7 +79,7 @@ def test_section_tortuosity():
     (2 0 0 2)
     (3 0 0 2))"""), reader='asc').sections[1]
 
-    sec_b = load_neuron(StringIO("""
+    sec_b = load_neuron(StringIO(u"""
     ((CellBody) (0 0 0 2))
     ((Dendrite)
     (0 0 0 2)
@@ -106,7 +106,7 @@ def test_setion_tortuosity_empty_section():
 
 
 def test_section_tortuosity_looping_section():
-    sec = load_neuron(StringIO("""
+    sec = load_neuron(StringIO(u"""
     ((CellBody) (0 0 0 2))
     ((Dendrite)
     (0 0 0 2)

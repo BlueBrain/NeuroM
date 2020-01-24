@@ -172,7 +172,7 @@ def test_iter_segments_pop():
 
 
 def test_iter_segments_section():
-    sec = load_neuron(StringIO('''
+    sec = load_neuron(StringIO(u'''
 	                      ((CellBody)
 	                       (0 0 0 2))
 

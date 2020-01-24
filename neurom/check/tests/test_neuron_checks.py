@@ -415,7 +415,7 @@ def test__bool__():
 
 
 def test_has_multifurcation():
-    nrn = load_neuron(StringIO("""
+    nrn = load_neuron(StringIO(u"""
 	((CellBody) (0 0 0 2))
 ( (Color Blue)
   (Axon)
