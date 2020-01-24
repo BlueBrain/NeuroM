@@ -28,16 +28,17 @@
 
 '''Test neurom._neuritefunc functionality'''
 
-from math import sqrt, pi
-from nose import tools as nt
 import os
+from math import pi, sqrt
+
 import numpy as np
+from nose import tools as nt
 from numpy.testing import assert_allclose
+
 import neurom as nm
-from neurom.geom import convex_hull
 from neurom.fst import _neuritefunc as _nf
 from neurom.fst.sectionfunc import section_volume
-
+from neurom.geom import convex_hull
 from utils import _close
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

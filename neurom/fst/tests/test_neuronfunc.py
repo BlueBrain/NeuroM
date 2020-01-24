@@ -27,21 +27,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Test neurom._neuronfunc functionality'''
-import tempfile
-from nose import tools as nt
 import os
+import tempfile
 import warnings
-import numpy as np
-from numpy.testing import assert_array_equal, assert_almost_equal, assert_array_almost_equal
-from neurom import fst, load_neuron, NeuriteType
-from neurom.fst import _neuronfunc as _nf
-from neurom.core import make_soma, Neurite, Section
-from neurom.core import _soma
-from neurom.core.dataformat import POINT_TYPE
-from neurom.core.population import Population
-from neurom.io.datawrapper import BlockNeuronBuilder
 
-from utils import _close, _equal
+import numpy as np
+from nose import tools as nt
+from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
+                           assert_array_equal)
+
+from neurom import NeuriteType, load_neuron
+from neurom.core import Neurite, Section, make_soma
+from neurom.core.population import Population
+from neurom.fst import _neuronfunc as _nf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 

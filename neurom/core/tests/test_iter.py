@@ -27,19 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from os.path import join as joinp
 from io import StringIO
+from os.path import join as joinp
 
 from nose import tools as nt
-import numpy as np
 from numpy.testing import assert_array_equal
 
 import neurom as nm
-from neurom import load_neuron, COLS
-from neurom import core
-from neurom.core import Tree, NeuriteIter
+from neurom import COLS, core, load_neuron
 from neurom._compat import filter
-
+from neurom.core import NeuriteIter, Tree
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
