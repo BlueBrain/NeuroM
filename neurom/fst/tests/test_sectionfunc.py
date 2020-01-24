@@ -33,6 +33,7 @@ import os
 import math
 import numpy as np
 import warnings
+from io import StringIO
 from numpy.testing import assert_allclose
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
@@ -70,13 +71,21 @@ def test_section_area():
 
 
 def test_section_tortuosity():
-    sec_a = Section([
-        (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
-    ])
+    sec_a = load_neuron(StringIO("""
+	((CellBody) (0 0 0 2))
+	((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (2 0 0 2)
+    (3 0 0 2))"""), reader='asc').sections[1]
 
-    sec_b = Section([
-        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
-    ])
+    sec_b = load_neuron(StringIO("""
+    ((CellBody) (0 0 0 2))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (1 2 0 2)
+    (0 2 0 2))"""), reader='asc').sections[1]
 
     nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
     nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
@@ -97,10 +106,14 @@ def test_setion_tortuosity_empty_section():
 
 
 def test_section_tortuosity_looping_section():
-    sec = Section([
-        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
-    ])
-
+    sec = load_neuron(StringIO("""
+    ((CellBody) (0 0 0 2))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (1 2 0 2)
+    (0 2 0 2)
+    (0 0 0 2))"""), reader='asc').sections[1]
     with warnings.catch_warnings(record=True):
         nt.eq_(_sf.section_tortuosity(sec), np.inf)
 

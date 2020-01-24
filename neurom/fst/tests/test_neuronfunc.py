@@ -32,7 +32,7 @@ from nose import tools as nt
 import os
 import warnings
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal, assert_array_almost_equal
 from neurom import fst, load_neuron, NeuriteType
 from neurom.fst import _neuronfunc as _nf
 from neurom.core import make_soma, Neurite, Section
@@ -60,16 +60,16 @@ def test_soma_volume():
     with warnings.catch_warnings(record=True):
         # SomaSinglePoint
         ret = _nf.soma_volume(SIMPLE)
-        nt.eq_(ret, 4.1887902047863905)
+        assert_almost_equal(ret, 4.1887902047863905)
         # SomaCylinders
         ret = _nf.soma_volume(SWC_NRN)
-        nt.eq_(ret, 0.010726068245337955)
+        assert_almost_equal(ret, 0.010726068245337955)
         # SomaSimpleContour
         ret = _nf.soma_volume(NRN)
-        nt.eq_(ret, 0.0033147000251481135)
+        assert_almost_equal(ret, 0.0033147000251481135)
         # SomaNeuromorphoThreePointCylinders
         ret = _nf.soma_volume(SWC_NRN_3PT)
-        nt.eq_(ret, 50.26548245743669)
+        assert_almost_equal(ret, 50.26548245743669)
 
 def test_soma_volumes():
     with warnings.catch_warnings(record=True):
@@ -102,13 +102,13 @@ def test_trunk_origin_azimuths():
 
 def test_trunk_angles():
     ret = _nf.trunk_angles(SIMPLE_TRUNK)
-    assert_array_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
+    assert_array_almost_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
-    assert_array_equal(ret, [np.pi, np.pi])
+    assert_array_almost_equal(ret, [np.pi, np.pi])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
-    assert_array_equal(ret, [0.0])
+    assert_array_almost_equal(ret, [0.0])
     ret = _nf.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
-    nt.eq_(ret, [])
+    assert_array_almost_equal(ret, [])
 
 
 def test_trunk_vectors():
