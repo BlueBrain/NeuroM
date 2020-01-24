@@ -32,6 +32,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
+from neurom.features import sectionfunc
 
 
 def _raise_if_not_bifurcation(section):
@@ -105,7 +106,7 @@ def partition_asymmetry(bif_point):
 
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
-    of the number of bifurcations in the two daughter subtrees
+    of the number of bifurcations in the two child subtrees
     at each branch point.'''
     _raise_if_not_bifurcation(bif_point)
 
@@ -120,8 +121,54 @@ def partition_pair(bif_point):
     '''Calculate the partition pairs at a bifurcation point
 
     The number of nodes in each child tree is counted. The partition
-    pairs is the number of bifurcations in the two daughter subtrees
+    pairs is the number of bifurcations in the two child subtrees
     at each branch point.'''
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return (n, m)
+
+
+def sibling_ratio(bif_point, method='first'):
+    '''Calculate the sibling ratio of a bifurcation point
+
+    The sibling ratio is the ratio between the diameters of the
+    smallest and the largest child. It is a real number between
+    0 and 1. Method argument allows one to consider mean diameters
+    along the child section instead of diameter of the first point. '''
+    _raise_if_not_bifurcation(bif_point)
+
+    if method not in {'first', 'mean'}:
+        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
+
+    if method == 'first':
+        n = bif_point.children[0].points[0, COLS.R]
+        m = bif_point.children[1].points[0, COLS.R]
+    if method == 'mean':
+        n = sectionfunc.section_mean_radius(bif_point.children[0])
+        m = sectionfunc.section_mean_radius(bif_point.children[1])
+    return min(n, m) / max(n, m)
+
+
+def diameter_power_relation(bif_point, method='first'):
+    '''Calculate the diameter power relation at a bifurcation point
+    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+
+    This quantity gives an indication of how far the branching is from
+    the Rall ratio
+
+    diameter_power_relation==1 means perfect Rall ratio
+    '''
+    _raise_if_not_bifurcation(bif_point)
+
+    if method not in {'first', 'mean'}:
+        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
+
+    if method == 'first':
+        d_child = bif_point.points[-1, COLS.R]
+        d_child1 = bif_point.children[0].points[0, COLS.R]
+        d_child2 = bif_point.children[1].points[0, COLS.R]
+    if method == 'mean':
+        d_child = sectionfunc.section_mean_radius(bif_point)
+        d_child1 = sectionfunc.section_mean_radius(bif_point.children[0])
+        d_child2 = sectionfunc.section_mean_radius(bif_point.children[1])
+    return (d_child / d_child1)**(1.5) + (d_child / d_child2)**(1.5)

@@ -62,21 +62,31 @@ import logging as _logging
 # All MorphIO is imported here so other NeuroM module can refer
 # to the neurom._core._morphio objects and won't need the following pragma:
 # pylint: disable=unused-import,import-error
-from morphio import Morphology, MorphologyVersion, SomaType, SectionType as NeuriteType
+from morphio import Morphology, MorphologyVersion
+from morphio import SectionType as NeuriteType
+
+
 class FakeType:
     '''This is a fake type so that NeuriteType.all behaves like other enums'''
+
     def __init__(self, value, name):
         self.value = value
         self.name = name
+
+
 setattr(NeuriteType, 'all', FakeType(32, 'all'))
 
+from morphio import SomaType
 
 from neurom.core.dataformat import COLS
-from .core import (iter_neurites, iter_sections, iter_segments, graft_neuron)
-from .core.types import NEURITES as NEURITE_TYPES, NeuriteIter
+
+from .core import graft_neuron, iter_neurites, iter_sections, iter_segments
+from .core.types import NEURITES as NEURITE_TYPES
+from .core.types import NeuriteIter
 from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons
 from .version import VERSION as __version__
+
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite

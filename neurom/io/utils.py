@@ -144,9 +144,6 @@ def load_neuron(stream, reader=None):
     return Neuron(stream, name)
 
 
-
-
-
 def load_neurons(neurons,
                  neuron_loader=load_neuron,
                  name=None,
@@ -189,6 +186,8 @@ def load_neurons(neurons,
     return population_class(pop, name=name)
 
 # TODO: embed this feature directly in morphio
+
+
 def _get_file(stream, extension):
     '''Returns the filename of the file to read'''
 

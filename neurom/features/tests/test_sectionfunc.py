@@ -194,3 +194,18 @@ def test_locate_segment_position():
         ValueError,
         _sf.locate_segment_position, s, -0.1
     )
+
+def test_mean_radius():
+    s = load_neuron("""
+    ((CellBody)
+     (0 0 0 1))
+
+    ((Dendrite)
+    (0 0 0 0)
+    (3 0 4 200)
+    (6 4 4 400))""", reader='asc').sections[0]
+
+    nt.assert_equal(
+        _sf.section_mean_radius(s),
+       100.
+    )

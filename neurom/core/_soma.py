@@ -34,7 +34,6 @@ import numpy as np
 
 from neurom import morphmath, SomaType
 from neurom.core.dataformat import COLS
-from neurom.exceptions import SomaError
 
 
 class Soma(object):

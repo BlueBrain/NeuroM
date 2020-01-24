@@ -38,6 +38,7 @@ Examples:
 '''
 
 import re
+from functools import partial
 import numpy as _np
 
 from . import neuritefunc as _nrt
@@ -76,15 +77,21 @@ FEATURES = {
         'remote_bifurcation_angles': _nrt.remote_bifurcation_angles,
         'partition': _nrt.bifurcation_partitions,
         'partition_asymmetry': _nrt.partition_asymmetries,
+        'partition_asymmetry_length': partial(_nrt.partition_asymmetries, variant='length'),
+        'partition_pair': _nrt.partition_pairs,
+        'sibling_ratio': _nrt.sibling_ratios,
+        'diameter_power_relation': _nrt.diameter_power_relations,
         'number_of_segments': _nrt.number_of_segments,
         'segment_lengths': _nrt.segment_lengths,
         'segment_volumes': _nrt.segment_volumes,
         'segment_radii': _nrt.segment_radii,
         'segment_midpoints': _nrt.segment_midpoints,
         'segment_taper_rates': _nrt.segment_taper_rates,
+        'section_taper_rates': _nrt.section_taper_rates,
         'segment_radial_distances': _nrt.segment_radial_distances,
         'segment_meander_angles': _nrt.segment_meander_angles,
         'principal_direction_extents': _nrt.principal_direction_extents,
+        'section_strahler_orders': _nrt.section_strahler_orders,
         'total_area_per_neurite': _nrt.total_area_per_neurite,
     },
 

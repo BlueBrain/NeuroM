@@ -31,8 +31,9 @@
 from collections import deque
 from itertools import chain
 
-import morphio
 import numpy as np
+
+import morphio
 
 from neurom import morphmath
 from neurom._compat import filter, map, zip
