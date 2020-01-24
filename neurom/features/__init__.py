@@ -39,12 +39,12 @@ Examples:
 
 import numpy as _np
 
-from . import neuritefunc as _nrt
-from . import neuronfunc as _nrn
+from neurom.features import neuritefunc as _nrt
+from neurom.features import neuronfunc as _nrn
 from neurom.core import NeuriteType as _ntype
 from neurom.core import iter_neurites as _ineurites
 from neurom.core.types import tree_type_checker as _is_type
-from ..exceptions import NeuroMError
+from neurom.exceptions import NeuroMError
 
 NEURITEFEATURES = {
     'total_length': _nrt.total_length,
