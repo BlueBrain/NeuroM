@@ -411,3 +411,35 @@ def test__bool__():
     c = check.CheckResult(status=True)
     nt.ok_(c.__nonzero__())
     nt.eq_(c.__bool__(), c.__nonzero__())
+
+
+
+def test_has_multifurcation():
+    nrn = load_neuron(StringIO(u"""
+	((CellBody) (0 0 0 2))
+( (Color Blue)
+  (Axon)
+  (0 5 0 2)
+  (2 9 0 2)
+  (0 13 0 2)
+  (
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+    |
+    (0 13 0 2)
+    (4 13 0 2)
+  )
+)
+"""), reader='asc')
+
+    check_ = nrn_chk.has_multifurcation(nrn)
+    nt.ok_(not check_.status)
+    info = check_.info
+    assert_array_equal(info[0][0], 1)
+    assert_array_equal(info[0][1][COLS.XYZR], [0.0, 13.0, 0.0, 1.0])

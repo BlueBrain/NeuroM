@@ -27,14 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from io import StringIO
 from os.path import join as joinp
 
 from nose import tools as nt
+from numpy.testing import assert_array_equal
+
 import neurom as nm
-from neurom import load_neuron
-from neurom import core
-from neurom.core import Tree, NeuriteIter
+from neurom import COLS, core, load_neuron
 from neurom._compat import filter
+from neurom.core import NeuriteIter, Tree
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = joinp(_path, '../../../test_data')
@@ -102,9 +104,9 @@ def test_iter_sections_default():
 def test_iter_sections_filter():
 
     for ntyp in nm.NEURITE_TYPES:
-        a = [s for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
+        a = [s.id for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
              for s in n.iter_sections()]
-        b = [n for n in core.iter_sections(POP, neurite_filter=lambda n: n.type == ntyp)]
+        b = [n.id for n in core.iter_sections(POP, neurite_filter=lambda n: n.type == ntyp)]
         assert_sequence_equal(a, b)
 
 def test_iter_sections_inrnorder():
@@ -167,12 +169,19 @@ def test_iter_segments_pop():
 
 
 def test_iter_segments_section():
-    sec = core.Section([[1, 2, 3, 4],
-                        [5, 6, 7, 8],
-                        [8, 7, 6, 5],
-                        [4, 3, 2, 1],
-                        ])
-    ref = list(core.iter_segments(sec))
-    nt.eq_(ref, [([1, 2, 3, 4], [5, 6, 7, 8]),
-                 ([5, 6, 7, 8], [8, 7, 6, 5]),
-                 ([8, 7, 6, 5], [4, 3, 2, 1])])
+    sec = load_neuron(StringIO(u'''
+	                      ((CellBody)
+	                       (0 0 0 2))
+
+	                      ((Dendrite)
+                          (1 2 3 8)
+                          (5 6 7 16)
+                          (8 7 6 10)
+                          (4 3 2 2))
+                       '''), reader='asc').sections[1]
+    ref = [[p1[COLS.XYZR].tolist(), p2[COLS.XYZR].tolist()]
+           for p1, p2 in core.iter_segments(sec)]
+
+    assert_array_equal(ref, [[[1, 2, 3, 4], [5, 6, 7, 8]],
+                             [[5, 6, 7, 8], [8, 7, 6, 5]],
+                             [[8, 7, 6, 5], [4, 3, 2, 1]]])
