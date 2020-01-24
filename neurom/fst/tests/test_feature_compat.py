@@ -134,10 +134,10 @@ class SectionTreeBase(object):
         nt.assert_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
+        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
 
     def test_get_soma_volume(self):
-        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
+        nt.assert_equal(_nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -174,7 +174,7 @@ class SectionTreeBase(object):
                    get('section_radial_distances', self.ref_nrn, neurite_type=t))
 
     def test_get_trunk_origin_radii(self):
-        _equal(fst._nrn.trunk_origin_radii(self.sec_nrn), get('trunk_origin_radii', self.ref_nrn))
+        _equal(_nrn.trunk_origin_radii(self.sec_nrn), get('trunk_origin_radii', self.ref_nrn))
         for t in NeuriteType:
             _equal(_nrn.trunk_origin_radii(self.sec_nrn, neurite_type=t),
                    get('trunk_origin_radii', self.ref_nrn, neurite_type=t))
@@ -199,12 +199,12 @@ class TestH5V1(SectionTreeBase):
         nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
         with warnings.catch_warnings(record=True):
-            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+            nt.assert_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestH5V2(SectionTreeBase):
@@ -220,12 +220,12 @@ class TestH5V2(SectionTreeBase):
         nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
+        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
         with warnings.catch_warnings(record=True):
-            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+            nt.assert_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestSWC(SectionTreeBase):
