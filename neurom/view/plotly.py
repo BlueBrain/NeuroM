@@ -3,7 +3,6 @@ Define the public 'draw' function to be used to draw
 morphology using plotly
 '''
 from __future__ import absolute_import  # prevents name clash with local plotly module
-from neurom.core import Neuron
 from itertools import chain
 
 import numpy as np
@@ -16,6 +15,7 @@ except ImportError:
         'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]')
 
 from neurom import COLS, iter_segments, iter_neurites
+from neurom.core import Neuron
 from neurom.view.view import TREE_COLOR
 
 
