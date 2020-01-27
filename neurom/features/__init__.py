@@ -32,8 +32,8 @@ Examples:
 
     Obtain some morphometrics
 
-    >>> ap_seg_len = fst.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
-    >>> ax_sec_len = fst.get('section_lengths', nrn, neurite_type=neurom.AXON)
+    >>> ap_seg_len = features.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
+    >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 
 '''
 
