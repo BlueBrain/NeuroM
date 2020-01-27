@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from io import StringIO
 from neurom import load_neuron
 from neurom.check import morphtree as mt
 from neurom.core import Neurite, NeuriteType, Section
@@ -110,28 +111,31 @@ def _genetate_tree_non_monotonic_section_boundary():
 
 
 def _generate_back_track_tree(n, dev):
+    points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
-    tree = Section(np.array([[0., 0., 0., 0.2, 1., 0., 0.],
-                             [0., 1., 0., 0.15, 1., 0., 0.],
-                             [0., 2., 0., 0.14, 1., 0., 0.]]))
+    neuron = load_neuron(StringIO(u'''
+    ((CellBody)
+     (0 0 0 0.4))
 
-    ch0 = Section(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
-                            [1., 3., 0., 0.15, 1., 0., 0.],
-                            [2., 4., 0., 0.11, 1., 0., 0.]]))
+    ((Dendrite)
+    (0 0 0 0.4)
+    (0 1 0 0.3)
+    (0 2 0 0.28)
+    (
+      (0 2 0 0.28)
+      (1 3 0 0.3)
+      (2 4 0 0.22)
+      |
+      (0 2 0 0.28)
+      (1 -3 0 0.3)
+      (2 -4 0 0.24)
+      ({0} {1} {2} 0.52)
+      (3 -5 0 0.2)
+      (4 -6 0 0.2)
+    ))
+    '''.format(*points.tolist())), reader='asc')
 
-    ch1 = Section(np.array([[0., 2., 0., 0.14, 1., 0., 0.],
-                            [1., -3., 0., 0.15, 1., 0., 0.],
-                            [2., -4., 0., 0.12, 1., 0., 0.],
-                            [dev[0], dev[1], dev[2], 0.11, 1., 0., 0.],
-                            [3., -5., 0., 0.1, 1., 0., 0.],
-                            [4., -6., 0., 0.1, 1., 0., 0.]]))
-
-    tree.add_child(ch0)
-    tree.add_child(ch1)
-    tree.children[1].points[3] += tree.children[n].points[1]
-    tree.type = NeuriteType.undefined
-
-    return Neurite(tree)
+    return neuron.neurites[0]
 
 
 def test_is_monotonic():

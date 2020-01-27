@@ -90,3 +90,4 @@ def check_cloned_neuron(nrn1, nrn2):
 def test_str():
     n = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
     nt.ok_('Neuron' in str(n))
+    nt.ok_('Section' in str(n.neurites[0].root_node))

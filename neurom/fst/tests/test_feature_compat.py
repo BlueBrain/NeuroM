@@ -30,21 +30,19 @@ neurom._point_neurite.features'''
 
 import json
 import os
-import numpy as np
-from itertools import chain
 import warnings
+from itertools import chain
 
 from nose import tools as nt
 
 import neurom as nm
-from neurom.core.types import NeuriteType
 from neurom import fst
-from neurom.fst import _neuronfunc as _nrn
-from neurom.fst import _neuritefunc as _nrt
-from neurom.fst import sectionfunc as _sec
-from neurom.fst import _bifurcationfunc as _bf
 from neurom.core import Tree
-
+from neurom.core.types import NeuriteType
+from neurom.fst import _bifurcationfunc as _bf
+from neurom.fst import _neuritefunc as _nrt
+from neurom.fst import _neuronfunc as _nrn
+from neurom.fst import sectionfunc as _sec
 from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

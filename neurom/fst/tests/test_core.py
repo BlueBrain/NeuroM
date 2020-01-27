@@ -28,12 +28,14 @@
 
 '''Test neurom.fst._core module'''
 
+import os
 from copy import deepcopy
+
 import numpy as np
 from nose import tools as nt
-import os
-from neurom.fst import _core
+
 from neurom import io as _io
+from neurom.fst import _core
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_ROOT = os.path.join(_path, '../../../test_data')
