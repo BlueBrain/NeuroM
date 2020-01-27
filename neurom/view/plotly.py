@@ -3,6 +3,7 @@ Define the public 'draw' function to be used to draw
 morphology using plotly
 '''
 from __future__ import absolute_import  # prevents name clash with local plotly module
+from neurom.core import Neuron
 from itertools import chain
 
 import numpy as np
@@ -67,15 +68,10 @@ def _make_trace(neuron, plane):
         )
 
 
-def get_figure(neuron, plane, title):
-    '''Returns the plotly figure containing the neuron'''
-    data = list(_make_trace(neuron, plane))
-    axis = dict(
-        gridcolor='rgb(255, 255, 255)',
-        zerolinecolor='rgb(255, 255, 255)',
-        showbackground=True,
-        backgroundcolor='rgb(230, 230,230)'
-    )
+def _fill_soma_data(neuron, data, plane):
+    '''Fill soma data if 3D plot and returns soma_2d in all cases'''
+    if not isinstance(neuron, Neuron):
+        return []
 
     if plane != '3d':
         soma_2d = [
@@ -112,6 +108,20 @@ def get_figure(neuron, plane, title):
                 showscale=False,
             )
         )
+    return soma_2d
+
+
+def get_figure(neuron, plane, title):
+    '''Returns the plotly figure containing the neuron'''
+    data = list(_make_trace(neuron, plane))
+    axis = dict(
+        gridcolor='rgb(255, 255, 255)',
+        zerolinecolor='rgb(255, 255, 255)',
+        showbackground=True,
+        backgroundcolor='rgb(230, 230,230)'
+    )
+
+    soma_2d = _fill_soma_data(neuron, data, plane)
 
     layout = dict(
         autosize=True,

@@ -70,12 +70,14 @@ def test_plotly_extra_not_installed():
                             'Please install it by doing: pip install neurom[plotly]')
 
 
-def test_plotly_draw_neuron():
-    plotly.draw(nrn, plane='3d', auto_open=False)
-
-
 def test_plotly_draw_neuron3d():
+    plotly.draw(nrn, plane='3d', auto_open=False)
+    plotly.draw(nrn.neurites[0], plane='3d', auto_open=False)
+
+
+def test_plotly_draw_neuron2d():
     plotly.draw(nrn, plane='xy', auto_open=False)
+    plotly.draw(nrn.neurites[0], plane='xy', auto_open=False)
 
 
 def test_draw_neuron():
