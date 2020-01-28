@@ -36,8 +36,8 @@ from nose import tools as nt
 from numpy.testing import assert_allclose
 
 import neurom as nm
-from neurom.fst import _neuritefunc as _nf
-from neurom.fst.sectionfunc import section_volume
+from neurom.features import neuritefunc as _nf
+from neurom.features.sectionfunc import section_volume
 from neurom.geom import convex_hull
 from utils import _close
 

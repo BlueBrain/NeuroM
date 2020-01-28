@@ -39,7 +39,7 @@ from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
 from neurom import NeuriteType, load_neuron
 from neurom.core import Neurite, Section, make_soma
 from neurom.core.population import Population
-from neurom.fst import _neuronfunc as _nf
+from neurom.features import neuronfunc as _nf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 

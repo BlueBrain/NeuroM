@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''compare neurom.fst features with values dumped from the original
+'''compare neurom.features features with values dumped from the original
 neurom._point_neurite.features'''
 
 import json
@@ -36,13 +36,12 @@ from itertools import chain
 from nose import tools as nt
 
 import neurom as nm
-from neurom import fst
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
-from neurom.fst import _bifurcationfunc as _bf
-from neurom.fst import _neuritefunc as _nrt
-from neurom.fst import _neuronfunc as _nrn
-from neurom.fst import sectionfunc as _sec
+from neurom.features import bifurcationfunc as _bf
+from neurom.features import neuritefunc as _nrt
+from neurom.features import neuronfunc as _nrn
+from neurom.features import sectionfunc as _sec
 from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))

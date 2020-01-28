@@ -39,7 +39,7 @@ from numpy.testing import assert_raises
 import neurom as nm
 from neurom import load_neuron
 from neurom.exceptions import NeuroMError
-from neurom.fst import _bifurcationfunc as bf
+from neurom.features import bifurcationfunc as bf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../../test_data/')
