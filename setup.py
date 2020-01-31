@@ -75,6 +75,9 @@ config = {
     'extras_require': {
         'plotly': ['plotly>=3.6.0'],
     },
+    'test_requires': {
+        'pathlib2>=2.3.5',
+    },
     'include_package_data': True,
 
     'classifiers': [
