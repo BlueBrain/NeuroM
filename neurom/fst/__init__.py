@@ -37,6 +37,7 @@ Examples:
 
 '''
 
+from functools import partial
 import numpy as _np
 
 from . import _neuritefunc as _nrt
@@ -80,6 +81,9 @@ NEURITEFEATURES = {
     'partition': _nrt.bifurcation_partitions,
     'partition_asymmetry': _nrt.partition_asymmetries,
     'partition_pairs': _nrt.partition_pairs,
+    'partition_asymmetry_length': partial(_nrt.partition_asymmetries, variant='length'),
+    'sibling_ratio': _nrt.sibling_ratios,
+    'diameter_power_relation': _nrt.diameter_power_relations,
     'number_of_segments': _nrt.number_of_segments,
     'segment_lengths': _nrt.segment_lengths,
     'segment_areas': _nrt.segment_areas,
@@ -88,6 +92,7 @@ NEURITEFEATURES = {
     'segment_midpoints': _nrt.segment_midpoints,
     'segment_taper_rates': _nrt.segment_taper_rates,
     'segment_path_lengths': _nrt.segment_path_lengths,
+    'section_taper_rates': _nrt.section_taper_rates,
     'segment_radial_distances': _nrt.segment_radial_distances,
     'segment_meander_angles': _nrt.segment_meander_angles,
     'principal_direction_extents': _nrt.principal_direction_extents,
