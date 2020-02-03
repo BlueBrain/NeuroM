@@ -29,6 +29,7 @@
 import os
 from copy import deepcopy
 
+from pathlib2 import Path
 import numpy as np
 from nose import tools as nt
 
@@ -39,6 +40,9 @@ from neurom.core import graft_neuron, iter_segments
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
 
+
+def test_load_neuron_pathlib():
+    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
 def test_deep_copy():
     nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))

@@ -92,7 +92,7 @@ To gain an understanding of some of the capabilities of NeuroM, you can launch
 the NeuroM tutorial on MyBinder. Click the badge to launch, no need to download or
 install!
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fneurom_tutorial.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fgetting_started.ipynb)
 
 ## Examples
 

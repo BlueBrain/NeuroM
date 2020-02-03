@@ -275,7 +275,7 @@ def has_no_narrow_start(neuron, frac=0.9):
     '''
     bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
                for neurite in neuron.neurites
-               if neurite.root_node.points[1][COLS.R] < frac * neurite.root_node.points[2][COLS.R]]
+               if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
