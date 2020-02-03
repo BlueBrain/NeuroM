@@ -15,7 +15,7 @@ MyBinder
 To launch the tutorial in your browser using MyBinder, click the badge |badge|
 
 .. |badge| image:: https://mybinder.org/badge_logo.svg
-              :target: https://mybinder.org/v2/gh/BlueBrain/NeuroM/master?filepath=tutorial%2Fneurom_tutorial.ipynb
+              :target: https://mybinder.org/v2/gh/BlueBrain/NeuroM/master?filepath=tutorial%2Fgetting_started.ipynb
 
 Jupyter notebooks
 -----------------
