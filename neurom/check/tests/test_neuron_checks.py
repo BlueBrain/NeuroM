@@ -399,11 +399,11 @@ def test_has_no_narrow_dendritic_section():
 
 def test_has_no_dangling_branch():
     _, nrn = _load_neuron('dangling_axon.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    nrn_chk.has_no_dangling_branch(nrn)
     nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
 
     _, nrn = _load_neuron('dangling_dendrite.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    nrn_chk.has_no_dangling_branch(nrn)
     nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
 
 

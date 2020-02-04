@@ -288,7 +288,7 @@ def has_no_dangling_branch(neuron):
 
     def is_dangling(neurite):
         '''Is the neurite dangling ?'''
-        starting_point = neurite.points[1][COLS.XYZ]
+        starting_point = neurite.points[0][COLS.XYZ]
 
         if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
             return False
