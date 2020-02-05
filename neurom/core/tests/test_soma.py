@@ -41,6 +41,12 @@ SOMA_THREEPOINTS_PTS = np.array([
     [0, +44, 0, 44, 3, 1, 1],
 ])
 
+SOMA_THREEPOINTS_PTS_SMALL_RADIUS = np.array([
+    [0,   0, 0, 1e-8, 1, 1, -1],
+    [0, -44, 0, 1e-8, 2, 1,  1],
+    [0, +44, 0, 1e-8, 3, 1,  1],
+])
+
 SOMA_SIMPLECONTOUR_PTS_4 = [
     [1, 0, 0, 44, 1, 1, -1],
     [0, 1, 0, 44, 2, 1, 1],
@@ -105,6 +111,9 @@ def test_make_Soma_ThreePointCylinder():
     nt.eq_(list(sm.center), [0, 0, 0])
     nt.eq_(sm.radius, 44)
 
+def test_make_Soma_ThreePointCylinder_small_radius():
+    with warnings.catch_warnings(record=True):
+        sm = _soma.make_soma(SOMA_THREEPOINTS_PTS_SMALL_RADIUS, soma_class=_soma.SOMA_CYLINDER)
 
 def check_SomaC(points):
     sm = _soma.make_soma(points)
