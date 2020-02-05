@@ -121,6 +121,10 @@ def test_dendrogram():
         view.plot_dendrogram(ax, fst_neuron)
         assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
 
+    with get_fig_2d() as (fig, ax):
+        view.plot_dendrogram(ax, fst_neuron, show_diameters=False)
+        assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
+
 
 def test_one_point_branch():
     test_section = Neurite(Section(points=np.array([[1., 1., 1., 0.5, 2, 1, 0]])))
