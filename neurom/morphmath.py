@@ -81,6 +81,19 @@ def interpolate_radius(r1, r2, fraction):
     return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
 
 
+def interval_lengths(points, prepend_zero=False):
+    '''Returns the list of distances between consecutive points.
+
+    Args:
+        points: a list of np.array of 3D points
+        prepend_zero (bool): if True, the returned array will start with a zero
+    '''
+    intervals = np.linalg.norm(np.diff(np.asarray(points)[:, COLS.XYZ], axis=0), axis=1)
+    if prepend_zero:
+        return np.insert(intervals, 0, 0)
+    return intervals
+
+
 def path_fraction_id_offset(points, fraction, relative_offset=False):
     '''Find the segment which corresponds to the fraction
     of the path length along the piecewise linear curve which
@@ -97,8 +110,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
     '''
     if not (0. <= fraction <= 1.0):
         raise ValueError("Invalid fraction: %.3f" % fraction)
-    pts = np.array(points)[:, COLS.XYZ]
-    lengths = np.linalg.norm(np.diff(pts, axis=0), axis=1)
+    lengths = interval_lengths(points)
     cum_lengths = np.cumsum(lengths)
     offset = cum_lengths[-1] * fraction
     seg_id = np.argmin(cum_lengths < offset)
@@ -213,6 +225,7 @@ def angle_between_vectors(p1, p2):
     """ Computes the angle in radians between vectors 'p1' and 'p2'
     Normalizes the input vectors and computes the relative angle
     between them.
+
         >>> angle_between((1, 0), (0, 1))
         1.5707963267948966
         >>> angle_between((1, 0), (1, 0))
@@ -244,9 +257,7 @@ def path_distance(points):
     """
     Compute the path distance from given set of points
     """
-    vecs = np.diff(points, axis=0)[:, :3]
-    d2 = [np.dot(p, p) for p in vecs]
-    return np.sum(np.sqrt(d2))
+    return interval_lengths(points).sum()
 
 
 def segment_length(seg):

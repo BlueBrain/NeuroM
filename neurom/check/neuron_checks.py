@@ -223,6 +223,19 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
+def has_no_root_node_jumps(neuron, radius_multiplier=2):
+    '''
+    Check that the neurites have their first point not further than
+    `radius_multiplier * soma radius` from the soma center'''
+    bad_ids = []
+    for neurite in iter_neurites(neuron):
+        p0 = neurite.root_node.points[0, COLS.XYZ]
+        distance = np.linalg.norm(p0 - neuron.soma.center)
+        if distance > radius_multiplier * neuron.soma.radius:
+            bad_ids.append((neurite.root_node.id, [p0]))
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
 def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
     '''Check if leaf points are too large
 
@@ -262,7 +275,7 @@ def has_no_narrow_start(neuron, frac=0.9):
     '''
     bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
                for neurite in neuron.neurites
-               if neurite.root_node.points[1][COLS.R] < frac * neurite.root_node.points[2][COLS.R]]
+               if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
@@ -275,7 +288,7 @@ def has_no_dangling_branch(neuron):
 
     def is_dangling(neurite):
         '''Is the neurite dangling ?'''
-        starting_point = neurite.points[1][COLS.XYZ]
+        starting_point = neurite.points[0][COLS.XYZ]
 
         if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
             return False
@@ -322,4 +335,11 @@ def has_no_narrow_neurite_section(neuron,
 
     bad_ids = [(section.id, section.points[1])
                for section in considered_sections if narrow_section(section)]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_multifurcation(neuron):
+    '''Check if a section has more than 3 children'''
+    bad_ids = [(section.id, section.points[-1]) for section in iter_sections(neuron)
+               if len(section.children) > 3]
     return CheckResult(len(bad_ids) == 0, bad_ids)

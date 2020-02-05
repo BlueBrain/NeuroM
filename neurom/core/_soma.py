@@ -27,15 +27,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Soma classes and functions'''
-import logging
 import math
+import warnings
 
 import numpy as np
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
-
-L = logging.getLogger(__name__)
 
 
 class Soma(object):
@@ -62,6 +60,12 @@ class Soma(object):
     def points(self):
         '''Get the set of (x, y, z, r) points this soma'''
         return self._points[:, COLS.XYZR]
+
+    @property
+    def volume(self):
+        '''Gets soma volume assuming it is a sphere'''
+        warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
+        return 4.0 / 3 * math.pi * self.radius ** 3
 
 
 class SomaSinglePoint(Soma):
@@ -95,7 +99,7 @@ class SomaCylinders(Soma):
                 (|)_____ )
 
       Here we have a 'side-view', with each 'o' representing a point, and the
-      radius is the heigh of a '|' character, and the ')' try and show the
+      radius is the height of a '|' character, and the ')' try and show the
       curvature of the cylinger
 
   Note: when, as in the case above, the cylinder center points don't lie
@@ -113,6 +117,11 @@ class SomaCylinders(Soma):
     def center(self):
         '''Obtain the center from the first stored point'''
         return self._points[0][COLS.XYZ]
+
+    @property
+    def volume(self):
+        return sum(morphmath.segment_volume((p0, p1))
+                   for p0, p1 in zip(self.points, self.points[1:]))
 
     def __str__(self):
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
@@ -147,20 +156,26 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
-        # make sure the above invariant holds
-        assert (np.isclose(points[0, COLS.R], points[1, COLS.R]) and
-                np.isclose(points[0, COLS.R], points[2, COLS.R])), \
-            'All radii must be the same'
-        # These checks were turned off after https://github.com/BlueBrain/NeuroM/issues/614
-        # assert np.isclose(points[0, COLS.Y] - points[1, COLS.Y], points[0, COLS.R]), \
-        #     'The second point must be one radius below 0 on the y-plane'
-        # assert np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -points[0, COLS.R]), \
-        #     'The third point must be one radius above 0 on the y-plane'
-
         r = points[0, COLS.R]
+        # make sure the above invariant holds
+        assert (np.isclose(r, points[1, COLS.R]) and np.isclose(r, points[2, COLS.R])), \
+            'All radii must be the same'
+        # only warn users about invalid format
+        if r < 1e-5:
+            warnings.warn('Zero radius for {}'.format(self))
+        if not np.isclose(points[0, COLS.Y] - points[1, COLS.Y], r):
+            warnings.warn(
+                'The second point must be one radius below 0 on the y-plane for {}'.format(self))
+        if not np.isclose(points[0, COLS.Y] - points[2, COLS.Y], -r):
+            warnings.warn(
+                'The third point must be one radius above 0 on the y-plane for {}'.format(self))
         h = morphmath.point_dist(points[1, COLS.XYZ], points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))
+
+    @property
+    def volume(self):
+        return 2 * math.pi * self.radius ** 3
 
     def __str__(self):
         return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
@@ -219,7 +234,7 @@ def _get_type(points, soma_class):
        points[0][COLS.P] == -1 and
        points[1][COLS.P] == 1 and
        points[2][COLS.P] == 1):
-        L.warning('Using neuromorpho 3-Point soma')
+        warnings.warn('Using neuromorpho 3-Point soma')
         # NeuroMorpho is the main provider of morphologies, but they
         # with SWC as their default file format: they convert all
         # uploads to SWC.  In the process of conversion, they turn all

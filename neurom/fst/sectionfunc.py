@@ -28,8 +28,12 @@
 
 '''Section functions and functional tools'''
 
+import numpy as np
+
 from neurom import morphmath as mm
+from neurom.core.dataformat import COLS
 from neurom._compat import range
+from neurom.morphmath import interval_lengths
 
 
 def section_path_length(section):
@@ -84,6 +88,11 @@ def branch_order(section):
     return sum(1 for _ in section.iupstream()) - 1
 
 
+def segment_lengths(section):
+    '''Returns the list of segment lengths within the section'''
+    return interval_lengths(section.points)
+
+
 def section_radial_distance(section, origin):
     '''Return the radial distances of a tree section to a given origin point
 
@@ -114,13 +123,14 @@ def strahler_order(section):
 
     This implementation is a translation of the three steps described in
     Wikipedia (https://en.wikipedia.org/wiki/Strahler_number):
-     - If the node is a leaf (has no children), its Strahler number is one.
-     - If the node has one child with Strahler number i, and all other children
-       have Strahler numbers less than i, then the Strahler number of the node
-       is i again.
-     - If the node has two or more children with Strahler number i, and no
-       children with greater number, then the Strahler number of the node is
-       i + 1.
+
+       - If the node is a leaf (has no children), its Strahler number is one.
+       - If the node has one child with Strahler number i, and all other children
+         have Strahler numbers less than i, then the Strahler number of the node
+         is i again.
+       - If the node has two or more children with Strahler number i, and no
+         children with greater number, then the Strahler number of the node is
+         i + 1.
 
     No efforts have been invested in making it computationnaly efficient, but
     it computes acceptably fast on tested morphologies (i.e., no waiting time).
@@ -142,3 +152,17 @@ def locate_segment_position(section, fraction):
     Segment ID / offset corresponding to a given fraction of section length.
     '''
     return mm.path_fraction_id_offset(section.points, fraction)
+
+
+def section_mean_radius(section):
+    '''Compute the mean radius of a section weighted by segment lengths'''
+    radii = section.points[:, COLS.R]
+    points = section.points[:, COLS.XYZ]
+    lengths = np.linalg.norm(points[1:] - points[:-1], axis=1)
+    mean_radii = 0.5 * (radii[1:] + radii[:-1])
+    return np.sum(mean_radii * lengths) / np.sum(lengths)
+
+
+def downstream_pathlength(section):
+    '''Compute the total downstream length starting from a section'''
+    return sum(sec.length for sec in section.ipreorder())

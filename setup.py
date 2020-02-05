@@ -34,25 +34,25 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.14.dev1"
+VERSION = "1.4.16.dev0"
 
 REQS = ['click>=7.0',
-        'enum34>=1.0.4',
+        'enum-compat>=0.0.2',
         'future>=0.16.0',
         'h5py>=2.7.1',
         'matplotlib>=1.3.1',
         'numpy>=1.8.0',
         'pylru>=1.0',
         'pyyaml>=3.10',
-        'scipy>=0.17.0',
+        'scipy>=1.2.0',
         'tqdm>=4.8.4',
-        'future>=0.16.0',
-        ]
+]
 
 # Hack to avoid installation of modules with C extensions
 # in readthedocs documentation building environment.
 if os.environ.get('READTHEDOCS') == 'True':
     REQS = ['future>=0.16.0',
+            'enum34>=1.0.4',
             'pyyaml>=3.10',
             ]
 
@@ -73,11 +73,23 @@ config = {
     },
     'name': 'neurom',
     'extras_require': {
-        'plotly': ['plotly>=3.6.0',
-                   'psutil>=5.5.1',  # for plotly image saving
-        ],
+        'plotly': ['plotly>=3.6.0'],
     },
     'include_package_data': True,
+
+    'classifiers': [
+        'Development Status :: 6 - Mature',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+    ]
 }
 
 setup(**config)

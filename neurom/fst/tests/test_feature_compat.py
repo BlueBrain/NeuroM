@@ -30,20 +30,19 @@ neurom._point_neurite.features'''
 
 import json
 import os
-import numpy as np
+import warnings
 from itertools import chain
 
 from nose import tools as nt
 
 import neurom as nm
-from neurom.core.types import NeuriteType
 from neurom import fst
-from neurom.fst import _neuronfunc as _nrn
-from neurom.fst import _neuritefunc as _nrt
-from neurom.fst import sectionfunc as _sec
-from neurom.fst import _bifurcationfunc as _bf
 from neurom.core import Tree
-
+from neurom.core.types import NeuriteType
+from neurom.fst import _bifurcationfunc as _bf
+from neurom.fst import _neuritefunc as _nrt
+from neurom.fst import _neuronfunc as _nrn
+from neurom.fst import sectionfunc as _sec
 from utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
@@ -91,7 +90,6 @@ class SectionTreeBase(object):
         self.ref_types = REF_NEURITE_TYPES
 
     def test_neurite_type(self):
-
         neurite_types = [n0.type for n0 in self.sec_nrn.neurites]
         nt.assert_equal(neurite_types, self.ref_types)
 
@@ -137,6 +135,9 @@ class SectionTreeBase(object):
 
     def test_get_soma_surface_area(self):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
+
+    def test_get_soma_volume(self):
+        nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -201,6 +202,11 @@ class TestH5V1(SectionTreeBase):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
+    def test_get_soma_volume(self):
+        with warnings.catch_warnings(record=True):
+            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+
+
 class TestH5V2(SectionTreeBase):
 
     def setUp(self):
@@ -216,6 +222,10 @@ class TestH5V2(SectionTreeBase):
     def test_get_soma_surface_area(self):
         nt.assert_equal(fst._nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
+
+    def test_get_soma_volume(self):
+        with warnings.catch_warnings(record=True):
+            nt.assert_equal(fst._nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestSWC(SectionTreeBase):

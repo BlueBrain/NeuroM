@@ -32,6 +32,8 @@ from nose import tools as nt
 import os
 import math
 import numpy as np
+import warnings
+from io import StringIO
 from numpy.testing import assert_allclose
 from neurom import load_neuron
 from neurom.fst import sectionfunc as _sf
@@ -69,13 +71,21 @@ def test_section_area():
 
 
 def test_section_tortuosity():
-    sec_a = Section([
-        (0, 0, 0), (1, 0, 0), (2, 0, 0), (3, 0, 0)
-    ])
+    sec_a = load_neuron(StringIO(u"""
+	((CellBody) (0 0 0 2))
+	((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (2 0 0 2)
+    (3 0 0 2))"""), reader='asc').sections[1]
 
-    sec_b = Section([
-        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0)
-    ])
+    sec_b = load_neuron(StringIO(u"""
+    ((CellBody) (0 0 0 2))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (1 2 0 2)
+    (0 2 0 2))"""), reader='asc').sections[1]
 
     nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
     nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
@@ -96,18 +106,16 @@ def test_setion_tortuosity_empty_section():
 
 
 def test_section_tortuosity_looping_section():
-    sec = Section([
-        (0, 0, 0), (1, 0, 0), (1, 2, 0), (0, 2, 0), (0, 0, 0)
-    ])
-
-    # is infinity
-    nt.eq_(_sf.section_tortuosity(sec), np.inf)
-    nt.ok_(math.isinf(_sf.section_tortuosity(sec)))
-    nt.ok_(np.isinf(_sf.section_tortuosity(sec)))
-
-    # is not NaN
-    nt.ok_(not math.isnan(_sf.section_tortuosity(sec)))
-    nt.ok_(not np.isnan(_sf.section_tortuosity(sec)))
+    sec = load_neuron(StringIO(u"""
+    ((CellBody) (0 0 0 2))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (1 2 0 2)
+    (0 2 0 2)
+    (0 0 0 2))"""), reader='asc').sections[1]
+    with warnings.catch_warnings(record=True):
+        nt.eq_(_sf.section_tortuosity(sec), np.inf)
 
 
 def test_section_meander_angles():
@@ -175,4 +183,19 @@ def test_locate_segment_position():
     nt.assert_raises(
         ValueError,
         _sf.locate_segment_position, s, -0.1
+    )
+
+def test_mean_radius():
+    s = load_neuron(StringIO(u"""
+    ((CellBody)
+     (0 0 0 1))
+
+    ((Dendrite)
+    (0 0 0 0)
+    (3 0 4 200)
+    (6 4 4 400))"""), reader='asc').neurites[0]
+
+    nt.assert_equal(
+        _sf.section_mean_radius(s),
+       100.
     )

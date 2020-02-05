@@ -1,14 +1,16 @@
 import os
+import warnings
 import textwrap
 from io import StringIO
 
 import numpy as np
 from mock import patch
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, assert_raises
 
 import neurom.io as io
 import neurom.io.neurolucida as nasc
 from neurom.core.dataformat import COLS
+from neurom.exceptions import RawDataError
 from neurom.io.datawrapper import DataWrapper
 from neurom import load_neuron
 
@@ -238,7 +240,8 @@ MORPH_ASC = textwrap.dedent(
 
 
 def test_read():
-    rdw = io.load_data(StringIO(MORPH_ASC), reader='asc')
+    with warnings.catch_warnings(record=True):
+        rdw = io.load_data(StringIO(MORPH_ASC), reader='asc')
     raw_data = rdw.data_block
 
     eq_(raw_data.shape, (19, 7))
@@ -246,7 +249,8 @@ def test_read():
     # 3 is ID of end of the soma, 2 sections attach to this
     ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
 
-    neuron = load_neuron(StringIO(MORPH_ASC), reader='asc')
+    with warnings.catch_warnings(record=True):
+        neuron = load_neuron(StringIO(MORPH_ASC), reader='asc')
     assert_array_equal(neuron.neurites[0].root_node.points[:, COLS.XYZ],
                        [[ 0.,  5.,  0.],
                         [ 2.,  9.,  0.],
@@ -257,15 +261,20 @@ def test_read():
 
 def test_load_neurolucida_ascii():
     f = os.path.join(NEUROLUCIDA_PATH, 'sample.asc')
-    ascii = io.load_data(f)
+    with warnings.catch_warnings(record=True):
+        ascii = io.load_data(f)
     ok_(isinstance(ascii, DataWrapper))
     eq_(len(ascii.data_block), 18)
 
 def test_spine():
-    f = os.path.join(NEUROLUCIDA_PATH, 'spine.asc')
-    n = load_neuron(f)
+    with warnings.catch_warnings(record=True):
+        n = load_neuron(os.path.join(NEUROLUCIDA_PATH, 'spine.asc'))
 
     assert_array_equal(n.neurites[0].points,
                        [[ 0. ,  5. ,  0. ,  1. ],
                         [ 2. ,  9. ,  0. ,  1. ],
                         [ 0. , 13. ,  0. ,  1. ]])
+
+    # with warnings.catch_warnings(record=True):
+    #     assert_raises(RawDataError,
+    #                   load_neuron, os.path.join(NEUROLUCIDA_PATH, 'broken-spine.asc'))

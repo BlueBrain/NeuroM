@@ -15,12 +15,14 @@ except ImportError:
         'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]')
 
 from neurom import COLS, iter_segments, iter_neurites
+from neurom.core import Neuron
 from neurom.view.view import TREE_COLOR
 
 
 def draw(obj, plane='3d', inline=False, **kwargs):
-    '''Draw the morphology using in the given plane
+    '''Draw the object using the given plane
 
+    obj (neurom.Neuron, neurom.Tree): neuron or tree
     plane (str): a string representing the 2D plane (example: 'xy')
                  or '3d', '3D' for a 3D view
 
@@ -67,15 +69,10 @@ def _make_trace(neuron, plane):
         )
 
 
-def get_figure(neuron, plane, title):
-    '''Returns the plotly figure containing the neuron'''
-    data = list(_make_trace(neuron, plane))
-    axis = dict(
-        gridcolor='rgb(255, 255, 255)',
-        zerolinecolor='rgb(255, 255, 255)',
-        showbackground=True,
-        backgroundcolor='rgb(230, 230,230)'
-    )
+def _fill_soma_data(neuron, data, plane):
+    '''Fill soma data if 3D plot and returns soma_2d in all cases'''
+    if not isinstance(neuron, Neuron):
+        return []
 
     if plane != '3d':
         soma_2d = [
@@ -112,6 +109,20 @@ def get_figure(neuron, plane, title):
                 showscale=False,
             )
         )
+    return soma_2d
+
+
+def get_figure(neuron, plane, title):
+    '''Returns the plotly figure containing the neuron'''
+    data = list(_make_trace(neuron, plane))
+    axis = dict(
+        gridcolor='rgb(255, 255, 255)',
+        zerolinecolor='rgb(255, 255, 255)',
+        showbackground=True,
+        backgroundcolor='rgb(230, 230,230)'
+    )
+
+    soma_2d = _fill_soma_data(neuron, data, plane)
 
     layout = dict(
         autosize=True,

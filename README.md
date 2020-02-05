@@ -27,6 +27,7 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
+![NeuroM Logo](doc/source/logo/NeuroM.jpg)
 
 # NeuroM
 
@@ -34,6 +35,7 @@ NeuroM is a Python toolkit for the analysis and processing of neuron morphologie
 
 
 [![Build Status](https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master)](https://travis-ci.org/BlueBrain/NeuroM)
+[![license](https://img.shields.io/pypi/l/neurom.svg)](https://github.com/BlueBrain/NeuroM/blob/master/LICENSE.txt)
 [![codecov.io](https://codecov.io/github/BlueBrain/NeuroM/coverage.svg?branch=master)](https://codecov.io/github/BlueBrain/NeuroM?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/neurom/badge/?version=latest)](http://neurom.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.209498.svg)](https://doi.org/10.5281/zenodo.209498)
@@ -83,6 +85,14 @@ Clone the repository and install it:
 This installs `NeuroM` into your `virtualenv` in "editable" mode. That means changes
 made to the source code are seen by the installation. To install in read-only mode, omit
 the `-e`.
+
+## Tutorial notebook
+
+To gain an understanding of some of the capabilities of NeuroM, you can launch
+the NeuroM tutorial on MyBinder. Click the badge to launch, no need to download or
+install!
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fgetting_started.ipynb)
 
 ## Examples
 

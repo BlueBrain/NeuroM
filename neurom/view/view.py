@@ -27,20 +27,21 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '''visualize morphologies'''
 
-from matplotlib.collections import LineCollection, PolyCollection
-from matplotlib.patches import Circle
+from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.lines import Line2D
+from matplotlib.patches import Circle, FancyArrowPatch, Polygon
 from mpl_toolkits.mplot3d.art3d import \
     Line3DCollection  # pylint: disable=relative-import
 
 import numpy as np
 from neurom import NeuriteType, geom
 from neurom._compat import zip
-from neurom.core import iter_neurites, iter_segments
+from neurom.core import iter_neurites, iter_segments, iter_sections
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
-from neurom.view._dendrogram import Dendrogram
+from neurom.view.dendrogram import Dendrogram, layout_dendrogram, get_size, move_positions
 
 from . import common
 
@@ -101,14 +102,18 @@ def plot_tree(ax, tree, plane='xy',
         since no segments can be constructed.
     '''
     plane0, plane1 = _plane2col(plane)
-    segs = [((s[0][plane0], s[0][plane1]),
-             (s[1][plane0], s[1][plane1]))
-            for s in iter_segments(tree)]
+    section_segment_list = [(section, segment)
+                            for section in iter_sections(tree)
+                            for segment in iter_segments(section)]
+    segs = [((seg[0][plane0], seg[0][plane1]),
+             (seg[1][plane0], seg[1][plane1]))
+            for _, seg in section_segment_list]
+
+    colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type)
 
-    collection = LineCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
+    collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection(collection)
 
 
@@ -139,7 +144,8 @@ def plot_soma(ax, soma, plane='xy',
                                             color=color, alpha=alpha)
     else:
         if soma_outline:
-            ax.add_artist(Circle(soma.center, soma.radius, color=color, alpha=alpha))
+            ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
+                                 color=color, alpha=alpha))
         else:
             plane0, plane1 = _plane2col(plane)
             points = [(p[plane0], p[plane1]) for p in soma.iter()]
@@ -218,12 +224,15 @@ def plot_tree3d(ax, tree,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     '''
-    segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
+    section_segment_list = [(section, segment)
+                            for section in iter_sections(tree)
+                            for segment in iter_segments(section)]
+    segs = [(seg[0][COLS.XYZ], seg[1][COLS.XYZ]) for _, seg in section_segment_list]
+    colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type)
 
-    collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
+    collection = Line3DCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
 
     _update_3d_datalim(ax, tree)
@@ -280,80 +289,77 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
     ax.set_title(nrn.name)
 
 
-def _generate_collection(group, ax, ctype, colors):
-    '''Render rectangle collection'''
-    color = TREE_COLOR[ctype]
+def _get_dendrogram_legend(dendrogram):
+    '''Generates labels legend for dendrogram.
 
-    # generate segment collection
-    collection = PolyCollection(group, closed=False, antialiaseds=True,
-                                edgecolors='face', facecolors=color)
+    Because dendrogram is rendered as patches, we need to manually label it.
+    Args:
+        dendrogram (Dendrogram): dendrogram
 
-    # add it to the axes
-    ax.add_collection(collection)
+    Returns:
+        List of legend handles.
+    '''
+    def neurite_legend(neurite_type):
+        return Line2D([0], [0], color=TREE_COLOR[neurite_type], lw=2, label=neurite_type.name)
 
-    # dummy plot for the legend
-    if color not in colors:
-        label = str(ctype).replace('NeuriteType.', '').replace('_', ' ').capitalize()
-        ax.plot((0., 0.), (0., 0.), c=color, label=label)
-        colors.add(color)
+    if dendrogram.neurite_type == NeuriteType.soma:
+        handles = {d.neurite_type: neurite_legend(d.neurite_type)
+                   for d in [dendrogram] + dendrogram.children}
+        return handles.values()
+    return [neurite_legend(dendrogram.neurite_type)]
 
 
-def _render_dendrogram(dnd, ax, displacement):
-    '''Renders dendrogram'''
-    # set of unique colors that reflect the set of types of the neurites
-    colors = set()
+def _as_dendrogram_polygon(coords, color):
+    return Polygon(coords, color=color, fill=True)
 
-    for n, (indices, ctype) in enumerate(zip(dnd.groups, dnd.types)):
 
-        # slice rectangles array for the current neurite
-        group = dnd.data[indices[0]:indices[1]]
+def _as_dendrogram_line(start, end, color):
+    return FancyArrowPatch(start, end, arrowstyle='-', color=color, lw=2, shrinkA=0, shrinkB=0)
 
-        if n > 0:
-            # displace the neurites by half of their maximum x dimension
-            # plus half of the previous neurite's maxmimum x dimension
-            displacement += 0.5 * (dnd.dims[n - 1][0] + dnd.dims[n][0])
 
-        # arrange the trees without overlapping with each other
-        group += (displacement, 0.)
+def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
+    '''Generates drawable patches for dendrogram.
 
-        # create the polygonal collection of the dendrogram
-        # segments
-        _generate_collection(group, ax, ctype, colors)
+    Args:
+        dendrogram (Dendrogram): dendrogram
+        positions (dict of Dendrogram: np.array): positions xy coordinates of dendrograms
+        show_diameter (bool): whether to draw shapes with diameter or as plain lines
 
-    soma_square = dnd.soma
-
-    if soma_square is not None:
-
-        _generate_collection((soma_square + (displacement / 2., 0.),), ax, NeuriteType.soma, colors)
-        ax.plot((displacement / 2., displacement), (0., 0.), color='k')
-        ax.plot((0., displacement / 2.), (0., 0.), color='k')
-
-    return displacement
+    Returns:
+        List of matplotlib.patches.
+    '''
+    color = TREE_COLOR[dendrogram.neurite_type]
+    start_point = positions[dendrogram]
+    end_point = start_point + [0, dendrogram.height]
+    if show_diameters:
+        shapes = [_as_dendrogram_polygon(dendrogram.coords + start_point, color)]
+    else:
+        shapes = [_as_dendrogram_line(start_point, end_point, color)]
+    for child in dendrogram.children:
+        shapes.append(_as_dendrogram_line(end_point, positions[child], color))
+        shapes += _get_dendrogram_shapes(child, positions, show_diameters)
+    return shapes
 
 
 def plot_dendrogram(ax, obj, show_diameters=True):
-    '''Dendrogram of `obj`
+    '''Plots Dendrogram of `obj`.
 
     Args:
-        obj: Neuron or tree \
-        neurom.Neuron, neurom.Tree
-        show_diameters : boolean \
-            Determines if node diameters will \
-            be show or not.
+        ax: matplotlib axes
+        obj (neurom.Neuron, neurom.Tree): neuron or tree
+        show_diameters (bool): whether to show node diameters or not
     '''
-    # create dendrogram and generate rectangle collection
-    dnd = Dendrogram(obj, show_diameters=show_diameters)
-    dnd.generate()
-
-    # render dendrogram and take into account neurite displacement which
-    # starts as zero. It is important to avoid overlapping of neurites
-    # and to determine tha limits of the figure.
-
-    _render_dendrogram(dnd, ax, 0.)
-
+    dendrogram = Dendrogram(obj)
+    positions = layout_dendrogram(dendrogram, np.array([0, 0]))
+    w, h = get_size(positions)
+    positions = move_positions(positions, np.array([.5 * w, 0]))
+    ax.set_xlim([-.05 * w, 1.05 * w])
+    ax.set_ylim([-.05 * h, 1.05 * h])
     ax.set_title('Morphology Dendrogram')
     ax.set_xlabel('micrometers (um)')
     ax.set_ylabel('micrometers (um)')
+    shapes = _get_dendrogram_shapes(dendrogram, positions, show_diameters)
+    ax.add_collection(PatchCollection(shapes, match_original=True))
 
     ax.set_aspect('auto')
-    ax.legend()
+    ax.legend(handles=_get_dendrogram_legend(dendrogram))

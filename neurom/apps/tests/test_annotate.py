@@ -37,7 +37,6 @@ def test_annotate():
     (Name "narrow start")   ; MUK_ANNOTATION
     (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
     (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
 """
 

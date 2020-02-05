@@ -27,20 +27,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 '''Test neurom._neuronfunc functionality'''
-import tempfile
-from nose import tools as nt
 import os
-import numpy as np
-from numpy.testing import assert_array_equal
-from neurom import fst, load_neuron, NeuriteType
-from neurom.fst import _neuronfunc as _nf
-from neurom.core import make_soma, Neurite, Section
-from neurom.core import _soma
-from neurom.core.dataformat import POINT_TYPE
-from neurom.core.population import Population
-from neurom.io.datawrapper import BlockNeuronBuilder
+import tempfile
+import warnings
 
-from utils import _close, _equal
+import numpy as np
+from nose import tools as nt
+from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
+                           assert_array_equal)
+
+from neurom import NeuriteType, load_neuron
+from neurom.core import Neurite, Section, make_soma
+from neurom.core.population import Population
+from neurom.fst import _neuronfunc as _nf
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 
@@ -51,7 +50,29 @@ SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
 SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+with warnings.catch_warnings(record=True):
+    SWC_NRN_3PT = load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
 
+
+def test_soma_volume():
+    with warnings.catch_warnings(record=True):
+        # SomaSinglePoint
+        ret = _nf.soma_volume(SIMPLE)
+        assert_almost_equal(ret, 4.1887902047863905)
+        # SomaCylinders
+        ret = _nf.soma_volume(SWC_NRN)
+        assert_almost_equal(ret, 0.010726068245337955)
+        # SomaSimpleContour
+        ret = _nf.soma_volume(NRN)
+        assert_almost_equal(ret, 0.0033147000251481135)
+        # SomaNeuromorphoThreePointCylinders
+        ret = _nf.soma_volume(SWC_NRN_3PT)
+        assert_almost_equal(ret, 50.26548245743669)
+
+def test_soma_volumes():
+    with warnings.catch_warnings(record=True):
+        ret = _nf.soma_volumes(SIMPLE)
+        nt.eq_(ret, [4.1887902047863905, ])
 
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
@@ -79,13 +100,13 @@ def test_trunk_origin_azimuths():
 
 def test_trunk_angles():
     ret = _nf.trunk_angles(SIMPLE_TRUNK)
-    assert_array_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
+    assert_array_almost_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
-    assert_array_equal(ret, [np.pi, np.pi])
+    assert_array_almost_equal(ret, [np.pi, np.pi])
     ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
-    assert_array_equal(ret, [0.0])
+    assert_array_almost_equal(ret, [0.0])
     ret = _nf.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
-    nt.eq_(ret, [])
+    assert_array_almost_equal(ret, [])
 
 
 def test_trunk_vectors():

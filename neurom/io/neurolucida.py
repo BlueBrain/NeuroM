@@ -30,7 +30,6 @@
 Neuroludica
 '''
 
-import logging
 import warnings
 from io import open
 
@@ -58,7 +57,6 @@ UNWANTED_SECTION_NAMES = [
     'OpenUpTriangle', 'Plus', 'ShadedStar', 'Splat', 'TriStar',
 ]
 UNWANTED_SECTIONS = {name: True for name in UNWANTED_SECTION_NAMES}
-L = logging.getLogger(__name__)
 
 
 def _match_section(section, match):
@@ -96,7 +94,9 @@ def _get_tokens(morph_fd):
 
         if '<(' in line:  # skip spines, which exist on a single line
             assert ')>' in line, 'Missing end of spine'
-            continue
+            # The following line is covered but 'tox -e coverage does not see it'
+            # TODO: find out why
+            continue  # pragma: no cover
 
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
             if squash_token:
@@ -262,12 +262,9 @@ def read(morph_file, data_wrapper=DataWrapper):
     suitable to be wrapped by DataWrapper
     '''
 
-    msg = ('This is an experimental reader. '
-           'There are no guarantees regarding ability to parse '
-           'Neurolucida .asc files or correctness of output.')
-
-    warnings.warn(msg)
-    L.warning(msg)
+    warnings.warn('This is an experimental reader. '
+                  'There are no guarantees regarding ability to parse '
+                  'Neurolucida .asc files or correctness of output.')
 
     with open(morph_file, encoding='utf-8', errors='replace') as morph_fd:
         sections = _parse_sections(morph_fd)
