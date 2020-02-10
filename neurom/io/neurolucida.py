@@ -94,7 +94,9 @@ def _get_tokens(morph_fd):
 
         if '<(' in line:  # skip spines, which exist on a single line
             assert ')>' in line, 'Missing end of spine'
-            continue
+            # The following line is covered but 'tox -e coverage does not see it'
+            # TODO: find out why
+            continue  # pragma: no cover
 
         for token in line.replace('(', ' ( ').replace(')', ' ) ').split():
             if squash_token:
