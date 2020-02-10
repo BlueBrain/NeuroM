@@ -44,10 +44,23 @@ from .datawrapper import DataWrapper
 ID, TYPE, X, Y, Z, R, P = range(7)
 
 
-def read(filename, data_wrapper=DataWrapper):
-    '''Read an SWC file and return a tuple of data, format.'''
+def read(filename, data_wrapper=DataWrapper, has_soma=True):
+    '''Read an SWC file and return a tuple of data, format.
+       If a soma point is intended to be there, but is not, create one.
+    '''
+
     data = np.loadtxt(filename)
     if len(np.shape(data)) == 1:
         data = np.reshape(data, (1, -1))
     data = data[:, [X, Y, Z, R, TYPE, ID, P]]
-    return data_wrapper(data, 'SWC', None)
+    structures = data[:, 4]
+
+    if structures.all() in range(1, 5):
+        print("SWC in custom format, reading > 4 as undefined")
+        structures[structures > 4.0] = 0
+
+    if 1 not in structures and has_soma:
+        print("No soma found, setting soma at first row")
+        structures[0] = 1
+
+    return data_wrapper(data, "SWC", None)

@@ -94,3 +94,17 @@ def test_simple_reversed():
     nt.eq_(rdw.neurite_root_section_ids(), [5, 6])
     nt.eq_(len(rdw.soma_points()), 1)
     nt.eq_(len(rdw.sections), 7)
+    
+def test_custom_type():
+    rdw = swc.read(os.path.join(SWC_PATH, 'custom_type.swc'))
+    nt.eq_(rdw.fmt, 'SWC')
+    nt.eq_(len(rdw.data_block), 53)
+    nt.eq_(np.shape(rdw.data_block), (53, 7))
+    nt.ok_(rdw.data_block[:,4].any() <= 4 and rdw.data_block[:,4].any() >= 0)
+
+def test_no_soma():
+    rdw = swc.read(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'), has_soma = False)
+    nt.eq_(rdw.fmt, 'SWC')
+    nt.eq_(len(rdw.data_block), 211)
+    nt.eq_(np.shape(rdw.data_block), (211, 7))
+    nt.assert_not_equal(rdw.data_block[0][4], 0)

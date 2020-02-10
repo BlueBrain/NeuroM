@@ -190,6 +190,8 @@ def load_data(handle, reader=None):
 
     filename = _get_file(handle)
     try:
+        if reader == "swc" and "no_soma" in str(handle):
+            return _READERS[reader](filename, has_soma=False)
         return _READERS[reader](filename)
     except Exception as e:
         L.exception('Error reading file %s, using "%s" loader', filename, reader)
