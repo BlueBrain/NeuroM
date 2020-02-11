@@ -4,23 +4,12 @@ python:
   - 2.7
   - 3.5
   - 3.6
-addons:
-  apt:
-    packages:
-    - libatlas-dev
-    - libatlas-base-dev
-    - liblapack-dev
-    - gfortran
-    - libmpfr-dev
-    - libhdf5-dev
 cache: pip
 install:
-  - pip install 'matplotlib==1.5.2' tox
+  - pip install 'matplotlib==1.5.2' tox-travis
   - pip install .
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then tox -e py27; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then tox -e py35; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then tox -e py36 -e lint -e coverage; fi
+  tox
 before_deploy:
   - pip install twine
 deploy:
