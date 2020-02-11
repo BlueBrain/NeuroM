@@ -2,12 +2,11 @@ dist: trusty
 language: python
 python:
   - 2.7
-  - 3.5
   - 3.6
+  - 3.7
 cache: pip
 install:
-  - pip install 'matplotlib==1.5.2' tox-travis
-  - pip install .
+  - pip install tox-travis
 script:
   tox
 before_deploy:
