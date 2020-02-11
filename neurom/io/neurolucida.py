@@ -159,7 +159,8 @@ def _flatten_subsection(subsection, _type, offset, parent):
         # TODO: Figure out what these correspond to in neurolucida
         if row in ('Low', 'Generated', 'High', ):
             continue
-        elif isinstance(row[0], StringType):
+
+        if isinstance(row[0], StringType):
             if len(row) in (4, 5, ):
                 if len(row) == 5:
                     assert row[4][0] == 'S', \
@@ -215,11 +216,10 @@ def _extract_section(section):
         start = 2
 
     parent = -1 if _type == POINT_TYPE.SOMA else 0
-    subsection_iter = _flatten_subsection(section[start:], _type, offset=0,
-                                          parent=parent)
+    subsections = list(_flatten_subsection(section[start:], _type, offset=0,
+                                           parent=parent))
 
-    ret = np.array([row for row in subsection_iter])
-    return ret
+    return np.array(subsections)
 
 
 def _sections_to_raw_data(sections):
@@ -233,7 +233,8 @@ def _sections_to_raw_data(sections):
         neurite = _extract_section(section)
         if neurite is None:
             continue
-        elif neurite[0][COLS.TYPE] == POINT_TYPE.SOMA:
+
+        if neurite[0][COLS.TYPE] == POINT_TYPE.SOMA:
             assert soma is None, 'Multiple somas defined in file'
             soma = neurite
         else:
