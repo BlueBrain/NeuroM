@@ -274,6 +274,13 @@ def test_partition_asymmetry():
     assert_allclose(partition,
                     (0.0, 0.0))
 
+    partition = list(_nf.partition_asymmetries(SIMPLE, variant='length'))
+    assert_allclose(partition,
+                    (0.0625, 0.06666666666666667))
+
+    nt.assert_raises(ValueError, _nf.partition_asymmetries, SIMPLE, variant='unvalid-variant')
+
+
 def test_segment_lengths():
     segment_lengths = _nf.segment_lengths(SIMPLE)
     assert_allclose(segment_lengths,
@@ -322,3 +329,14 @@ def test_segment_radial_distances():
 def test_segment_path_lengths():
     pathlengths = _nf.segment_path_lengths(SIMPLE)
     assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])
+
+
+def test_principal_direction_extents():
+    principal_dir = list(_nf.principal_direction_extents(SIMPLE))
+    assert_allclose(principal_dir,
+                    (14.736052694538641, 12.105102672688004))
+
+def test_section_taper_rates():
+    assert_allclose(list(_nf.section_taper_rates(SIMPLE)),
+                    [0.0, -0.4, -0.3333, 0.0, -0.3333, -0.4],
+                    atol=1e-4)

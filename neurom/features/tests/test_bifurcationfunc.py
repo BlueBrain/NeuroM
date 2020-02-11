@@ -81,3 +81,38 @@ def test_partition_asymmetry():
 
     multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
     assert_raises(NeuroMError, bf.partition_asymmetry, multifurcation_section)
+
+
+def test_sibling_ratio():
+    root = SIMPLE2.neurites[0].root_node
+    assert_equal(bf.sibling_ratio(root), 1.0)
+    assert_equal(bf.sibling_ratio(root.children[0]), 1.0)
+
+    assert_equal(bf.sibling_ratio(root, method='mean'), 1.0)
+    assert_equal(bf.sibling_ratio(root.children[0], method='mean'), 1.0)
+
+    leaf = root.children[0].children[0]
+    assert_raises(NeuroMError, bf.sibling_ratio, leaf)
+    assert_raises(NeuroMError, bf.sibling_ratio, leaf, method='mean')
+
+    multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
+    assert_raises(NeuroMError, bf.sibling_ratio, multifurcation_section)
+
+    assert_raises(ValueError, bf.sibling_ratio, root, method='unvalid-method')
+
+def test_diameter_power_relation():
+    root = SIMPLE2.neurites[0].root_node
+    assert_equal(bf.diameter_power_relation(root), 2.0)
+    assert_equal(bf.diameter_power_relation(root.children[0]), 2.0)
+
+    assert_equal(bf.diameter_power_relation(root, method='mean'), 2.0)
+    assert_equal(bf.diameter_power_relation(root.children[0], method='mean'), 2.0)
+
+    leaf = root.children[0].children[0]
+    assert_raises(NeuroMError, bf.diameter_power_relation, leaf)
+    assert_raises(NeuroMError, bf.diameter_power_relation, leaf, method='mean')
+
+    multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
+    assert_raises(NeuroMError, bf.diameter_power_relation, multifurcation_section)
+
+    assert_raises(ValueError, bf.diameter_power_relation, root, method='unvalid-method')

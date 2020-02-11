@@ -30,6 +30,7 @@
 import os
 import tempfile
 import warnings
+from io import StringIO
 
 import numpy as np
 from nose import tools as nt
@@ -37,7 +38,6 @@ from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
                            assert_array_equal)
 
 from neurom import NeuriteType, load_neuron
-from neurom.core import Neurite, Section, make_soma
 from neurom.core.population import Population
 from neurom.features import neuronfunc as _nf
 
@@ -120,38 +120,32 @@ def test_trunk_vectors():
 
 
 def test_trunk_origin_elevations():
-    class Mock(object):
-        pass
+    n0 = load_neuron(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 1 0 0 2 1
+    3 3 2 1 1 2 2
+    4 3 0 1 0 2 1
+    5 3 1 2 1 2 4
+    """), reader='swc')
 
-    n0 = Mock()
-    n1 = Mock()
-
-    s = make_soma([[0, 0, 0, 4]])
-    t0 = Section(((1, 0, 0, 2), (2, 1, 1, 2)))
-    t0.type = NeuriteType.basal_dendrite
-    t1 = Section(((0, 1, 0, 2), (1, 2, 1, 2)))
-    t1.type = NeuriteType.basal_dendrite
-    n0.neurites = [Neurite(t0), Neurite(t1)]
-    n0.soma = s
-
-    t2 = Section(((0, -1, 0, 2), (-1, -2, -1, 2)))
-    t2.type = NeuriteType.basal_dendrite
-    n1.neurites = [Neurite(t2)]
-    n1.soma = s
+    n1 = load_neuron(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 0 -1 0 2 1
+    3 3 -1 -2 -1 2 2
+    """), reader='swc')
 
     pop = Population([n0, n1])
-    nt.eq_(list(_nf.trunk_origin_elevations(pop)),
-           [0.0, np.pi/2., -np.pi/2.])
+    assert_array_equal(_nf.trunk_origin_elevations(pop),
+                       [0.0, np.pi/2., -np.pi/2.])
 
-    nt.eq_(
-        list(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite)),
-        [0.0, np.pi/2., -np.pi/2.])
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
+                       [0.0, np.pi/2., -np.pi/2.])
 
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon)),
-           0)
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
+                       [])
 
-    nt.eq_(len(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite)),
-           0)
+    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
+[])
 
 
 @nt.raises(Exception)

@@ -36,10 +36,11 @@ from neurom import morphmath
 from neurom.core import Tree, iter_neurites, iter_sections, iter_segments, NeuriteType
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import bifurcationfunc
-from neurom.features import neuronfunc
-from neurom.features import sectionfunc
+from neurom.features import bifurcationfunc, neuronfunc, sectionfunc
+from neurom.features.sectionfunc import downstream_pathlength
+from neurom.features.bifurcationfunc import partition_asymmetry, partition_pair
 from neurom.geom import convex_hull
+from neurom.morphmath import interval_lengths
 
 
 def total_length(nrn_pop, neurite_type=NeuriteType.all):
@@ -232,7 +233,7 @@ def segment_radii(neurites, neurite_type=NeuriteType.all):
 
 
 def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
-    '''taper rates of the segments in a collection of neurites
+    '''Diameters taper rates of the segments in a collection of neurites
 
     The taper rate is defined as the absolute radii differences divided by length of the section
     '''
@@ -244,6 +245,21 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
         return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
 
     return map_segments(_seg_taper_rates, neurites, neurite_type)
+
+
+def section_taper_rates(neurites, neurite_type=NeuriteType.all):
+    '''Diameters taper rate of the sections in a collection of neurites
+    when going from root to tips. It is expected to be negative
+    for neurons.
+
+    Taper rate is defined here as the linear fit along a section
+    '''
+    def _sec_taper_rate(sec):
+        '''Taper rate from fit along a section'''
+        distances = interval_lengths(sec.points, prepend_zero=True)
+        return np.polynomial.polynomial.polyfit(distances, 2 * sec.points[:, COLS.R], 1)[1]
+
+    return map_sections(_sec_taper_rate, neurites, neurite_type=neurite_type)
 
 
 def segment_meander_angles(neurites, neurite_type=NeuriteType.all):
@@ -318,9 +334,40 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
                              neurite_filter=is_type(neurite_type)))
 
 
-def partition_asymmetries(neurites, neurite_type=NeuriteType.all):
-    '''Partition asymmetry at bifurcation points of a collection of neurites'''
-    return map(bifurcationfunc.partition_asymmetry,
+def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branch-order'):
+    '''Partition asymmetry at bifurcation points of a collection of neurites
+    Variant: length is a different definition, as the absolute difference in
+    downstream path lenghts, relative to the total neurite path length'''
+
+    if variant not in {'branch-order', 'length'}:
+        raise ValueError('Please provide a valid variant for partition asymmetry,\
+                         found %s' % variant)
+
+    if variant == 'branch-order':
+        return map(partition_asymmetry,
+                   iter_sections(neurites,
+                                 iterator_type=Tree.ibifurcation_point,
+                                 neurite_filter=is_type(neurite_type)))
+
+    asymmetries = list()
+    for neurite in iter_neurites(neurites, filt=is_type(neurite_type)):
+        neurite_length = total_length_per_neurite(neurite)[0]
+        for section in iter_sections(neurite,
+                                     iterator_type=Tree.ibifurcation_point,
+                                     neurite_filter=is_type(neurite_type)):
+            pathlength_diff = abs(downstream_pathlength(section.children[0]) -
+                                  downstream_pathlength(section.children[1]))
+            asymmetries.append(pathlength_diff / neurite_length)
+    return asymmetries
+
+
+def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
+    '''Sibling ratios at bifurcation points of a collection of neurites.
+    The sibling ratio is the ratio between the diameters of the
+    smallest and the largest child. It is a real number between
+    0 and 1. Method argument allows one to consider mean diameters
+    along the child section instead of diameter of the first point. '''
+    return map(lambda bif_point: bifurcationfunc.sibling_ratio(bif_point, method),
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
@@ -334,6 +381,18 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
+
+
+def diameter_power_relations(neurites, neurite_type=NeuriteType.all, method='first'):
+    '''Calculate the diameter power relation at a bifurcation point
+    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+
+    This quantity gives an indication of how far the branching is from
+    the Rall ratio (when =1).'''
+    return (bifurcationfunc.diameter_power_relation(bif_point, method)
+            for bif_point in iter_sections(neurites,
+                                           iterator_type=Tree.ibifurcation_point,
+                                           neurite_filter=is_type(neurite_type)))
 
 
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None,

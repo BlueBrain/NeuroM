@@ -28,7 +28,10 @@
 
 '''Section functions and functional tools'''
 
+import numpy as np
+
 from neurom import morphmath as mm
+from neurom.core.dataformat import COLS
 from neurom._compat import range
 from neurom.morphmath import interval_lengths
 
@@ -149,3 +152,17 @@ def locate_segment_position(section, fraction):
     Segment ID / offset corresponding to a given fraction of section length.
     '''
     return mm.path_fraction_id_offset(section.points, fraction)
+
+
+def section_mean_radius(section):
+    '''Compute the mean radius of a section weighted by segment lengths'''
+    radii = section.points[:, COLS.R]
+    points = section.points[:, COLS.XYZ]
+    lengths = np.linalg.norm(points[1:] - points[:-1], axis=1)
+    mean_radii = 0.5 * (radii[1:] + radii[:-1])
+    return np.sum(mean_radii * lengths) / np.sum(lengths)
+
+
+def downstream_pathlength(section):
+    '''Compute the total downstream length starting from a section'''
+    return sum(sec.length for sec in section.ipreorder())
