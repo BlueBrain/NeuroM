@@ -30,8 +30,7 @@
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon
-from mpl_toolkits.mplot3d.art3d import \
-    Line3DCollection  # pylint: disable=relative-import
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
 from neurom import NeuriteType, geom
