@@ -27,14 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import itertools as it
 import os
+import warnings
 
 import numpy as np
 from nose.tools import assert_raises, eq_, ok_
 from numpy.testing import assert_allclose, assert_array_almost_equal
+from io import StringIO
 
 from neurom import load_neuron
 from neurom.core import Neurite, Section
-from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER, make_soma
+from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType
 from neurom.view import common, view
 
@@ -135,33 +137,29 @@ def test_one_point_branch():
         with get_fig_3d() as (fig, ax):
             view.plot_tree3d(ax, test_section, diameter_scale=diameter_scale, linewidth=linewidth)
 
+with warnings.catch_warnings(record=True):
+    soma0 = fst_neuron.soma
 
-soma0 = fst_neuron.soma
+    # upright, varying radius
+    soma_2pt_normal = load_neuron(StringIO(u'''1 1 0  0 0 1  -1
+                                               2 1 0 10 0 10  1'''), reader='swc').soma
 
-# upright, varying radius
-soma_2pt_normal_pts = np.array([
-    [0.0,   0.0,  0.0, 1.0,  1, 1, -1],
-    [0.0,  10.0,  0.0, 10.0, 1, 2,  1],
-])
-soma_2pt_normal = make_soma(soma_2pt_normal_pts, soma_class=SOMA_CYLINDER)
+    # upright, uniform radius, multiple cylinders
+    soma_3pt_normal = load_neuron(StringIO(u'''1 1 0 -10 0 10  -1
+                                               2 1 0   0 0 10   1
+                                               3 1 0  10 0 10   2'''), reader='swc').soma
 
-# upright, uniform radius, multiple cylinders
-soma_3pt_normal_pts = np.array([
-    [0.0, -10.0,  0.0, 10.0, 1, 1, -1],
-    [0.0,   0.0,  0.0, 10.0, 1, 2,  1],
-    [0.0,   10.0, 0.0, 10.0, 1, 3,  2],
-])
-soma_3pt_normal = make_soma(soma_3pt_normal_pts, soma_class=SOMA_CYLINDER)
+    # increasing radius, multiple cylinders
+    soma_4pt_normal_cylinder = load_neuron(StringIO(u'''1 1   0   0   0 1 -1
+                                                       2 1   0 -10   0 2  1
+                                                       3 1   0 -10  10 4  2
+                                                       4 1 -10 -10 -10 4  3'''), reader='swc').soma
 
-# increasing radius, multiple cylinders
-soma_4pt_normal_pts = np.array([
-    [0.0,   0.0,     0.0, 1.0, 1, 1, -1],
-    [0.0,   -10.0,   0.0, 2.0, 1, 2, 1],
-    [0.0,   -10.0, -10.0, 3.0, 1, 3, 2],
-    [-10.0, -10.0, -10.0, 4.0, 1, 4, 3],
-])
-soma_4pt_normal_cylinder = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CYLINDER)
-soma_4pt_normal_contour = make_soma(soma_4pt_normal_pts, soma_class=SOMA_CONTOUR)
+    soma_4pt_normal_contour = load_neuron(StringIO(u'''((CellBody)
+                                                       (0     0   0 1)
+                                                       (0   -10   0 2)
+                                                       (0   -10  10 4)
+                                                       (-10 -10 -10 4))'''), reader='asc').soma
 
 
 def test_soma():
