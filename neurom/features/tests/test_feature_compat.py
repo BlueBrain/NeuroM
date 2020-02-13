@@ -38,6 +38,11 @@ from nose import tools as nt
 import neurom as nm
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
+
+# NOTE: The 'bf' alias is used in the fst/tests modules
+# Do NOT change it.
+# TODO: If other neurom.features are imported,
+# the should use the aliasing used in fst/tests module files
 from neurom.features import bifurcationfunc as _bf
 from neurom.features import neuritefunc as _nrt
 from neurom.features import neuronfunc as _nrn

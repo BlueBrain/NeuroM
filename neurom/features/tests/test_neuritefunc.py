@@ -36,8 +36,13 @@ from nose import tools as nt
 from numpy.testing import assert_allclose
 
 import neurom as nm
+
+# NOTE: The 'bf' alias is used in the fst/tests modules
+# Do NOT change it.
+# TODO: If other neurom.features are imported,
+# the should use the aliasing used in fst/tests module files
 from neurom.features import neuritefunc as _nf
-from neurom.features.sectionfunc import section_volume
+from neurom.features import neuronfunc as _nrn
 from neurom.geom import convex_hull
 from utils import _close
 
@@ -105,7 +110,7 @@ def test_total_volume_per_neurite():
     nt.eq_(len(vol), 4)
 
     # calculate the volumes by hand and compare
-    vol2 = [sum(section_volume(s) for s in n.iter_sections())
+    vol2 = [sum(_nrn.section_volume(s) for s in n.iter_sections())
 			for n in NRN.neurites
             ]
     nt.eq_(vol, vol2)

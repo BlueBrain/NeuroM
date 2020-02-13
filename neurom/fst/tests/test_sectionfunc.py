@@ -26,7 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuritefunc functionality'''
+'''This module runs the feature tests in the neurom/features/tests folder
+
+but as if the user had used the old calling conversion to get the feature.
+It is here to check that the retro-compatibility is preserved.
+
+It works by importing the feature tests and then overriding
+the module from which they are taken (features -> fst)
+'''
 
 from neurom.features.tests.test_sectionfunc import *
 
