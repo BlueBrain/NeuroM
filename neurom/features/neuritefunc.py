@@ -38,7 +38,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import bifurcationfunc, neuronfunc, sectionfunc
 from neurom.features.sectionfunc import downstream_pathlength
-from neurom.features.bifurcationfunc import partition_asymmetry, partition_pair
+from neurom.features.bifurcationfunc import partition_asymmetry
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 

@@ -42,9 +42,9 @@ import neurom as nm
 # TODO: If other neurom.features are imported,
 # the should use the aliasing used in fst/tests module files
 from neurom.features import neuritefunc as _nf
-from neurom.features import neuronfunc as _nrn
+from neurom.features import sectionfunc as sectionfunc
 from neurom.geom import convex_hull
-from utils import _close
+from neurom.features.tests.utils import _close
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
@@ -110,7 +110,7 @@ def test_total_volume_per_neurite():
     nt.eq_(len(vol), 4)
 
     # calculate the volumes by hand and compare
-    vol2 = [sum(_nrn.section_volume(s) for s in n.iter_sections())
+    vol2 = [sum(sectionfunc.section_volume(s) for s in n.iter_sections())
 			for n in NRN.neurites
             ]
     nt.eq_(vol, vol2)

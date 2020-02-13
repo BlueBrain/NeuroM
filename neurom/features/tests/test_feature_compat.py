@@ -47,7 +47,7 @@ from neurom.features import bifurcationfunc as _bf
 from neurom.features import neuritefunc as _nrt
 from neurom.features import neuronfunc as _nrn
 from neurom.features import sectionfunc as _sec
-from utils import _close, _equal
+from neurom.features.tests.utils import _close, _equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
