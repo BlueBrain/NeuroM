@@ -64,7 +64,7 @@ from .core import iter_neurites, iter_sections, graft_neuron, iter_segments, Neu
 from .core.dataformat import COLS
 from .core.types import NEURITES as NEURITE_TYPES
 from .io.utils import load_neuron, load_neurons, NeuronLoader
-from .fst import get
+from .features import get
 
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
