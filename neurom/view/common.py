@@ -32,7 +32,7 @@ import os
 import numpy as np
 from matplotlib.patches import Polygon
 # needed so that projection='3d' works with fig.add_subplot
-from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=relative-import,unused-import
+from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 from scipy.linalg import norm
 from scipy.spatial import ConvexHull
 
@@ -44,7 +44,7 @@ plt = None  # refer to _get_plt()
 def _get_plt():
     '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
     global plt  # pylint: disable=global-statement
-    import matplotlib.pyplot
+    import matplotlib.pyplot  # pylint: disable=import-outside-toplevel
     plt = matplotlib.pyplot
 
 

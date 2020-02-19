@@ -37,11 +37,13 @@ import uuid
 from functools import partial
 from io import IOBase, open
 
+from pylru import FunctionCacheManager
+
 from neurom._compat import StringType, filter
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
 from neurom.fst._core import FstNeuron
-from neurom.io import neurolucida, swc
+from neurom.io import neurolucida, swc, hdf5
 from neurom.io.datawrapper import DataWrapper
 
 L = logging.getLogger(__name__)
@@ -69,7 +71,6 @@ class NeuronLoader(object):
         self.directory = directory
         self.file_ext = file_ext
         if cache_size is not None:
-            from pylru import FunctionCacheManager
             self.get = FunctionCacheManager(self.get, size=cache_size)
 
     def _filepath(self, name):
@@ -198,7 +199,6 @@ def load_data(handle, reader=None):
 
 def _load_h5(filename):
     '''Delay loading of h5py until it is needed'''
-    from neurom.io import hdf5
     return hdf5.read(filename,
                      remove_duplicates=False,
                      data_wrapper=DataWrapper)

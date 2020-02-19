@@ -32,7 +32,7 @@
 import numpy as np
 
 import neurom as nm
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 
 nrn_h5 = nm.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
 nrn_asc = nm.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
