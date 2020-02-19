@@ -31,6 +31,7 @@
 import os
 import math
 import numpy as np
+from io import StringIO
 from numpy.testing import assert_allclose
 from nose import tools as nt
 import neurom as nm
@@ -408,22 +409,17 @@ def test_neurite_density_pop():
 
 
 def test_segment_meander_angles_single_section():
-
-    class Mock(object):
-        pass
-
     feat = 'segment_meander_angles'
 
-    sec = core.Section(np.array([[0, 0, 0],
-                                 [1, 0, 0],
-                                 [1, 1, 0],
-                                 [2, 1, 0],
-                                 [2, 2, 0]]))
+    nrn = nm.load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+                                      ((Dendrite)
+                                       (0 0 0 2)
+                                       (1 0 0 2)
+                                       (1 1 0 2)
+                                       (2 1 0 2)
+                                       (2 2 0 2)))"""), reader='asc')
 
-    nrt = core.Neurite(sec)
-    nrn = Mock()
-    nrn.neurites = [nrt]
-    nrn.soma = None
+    nrt = nrn.neurites[0]
     pop = core.Population([nrn])
 
     ref = [math.pi / 2, math.pi / 2, math.pi / 2]

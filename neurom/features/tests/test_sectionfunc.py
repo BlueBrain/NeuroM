@@ -43,7 +43,6 @@ from neurom import load_neuron
 # the should use the aliasing used in fst/tests module files
 from neurom.features import sectionfunc as _sf
 from neurom.features import neuritefunc as _nf
-from neurom.core import Section
 from neurom import morphmath as mmth
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
@@ -70,7 +69,10 @@ def test_total_volume_per_neurite():
 
 
 def test_section_area():
-    sec = Section(np.array([[0, 0, 0, 1], [1, 0, 0, 1]]))
+    sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
+                                    ((Dendrite)
+                                     (0 0 0 2)
+                                     (1 0 0 2))"""), reader='asc').sections[1]
     area = _sf.section_area(sec)
     nt.eq_(math.pi * 1 * 2 * 1, area)
 
@@ -101,12 +103,9 @@ def test_section_tortuosity():
                                                                s.points[-1]))
 
 def test_setion_tortuosity_single_point():
-    sec = Section([(1, 2, 3)])
-    nt.eq_(_sf.section_tortuosity(sec), 1.0)
-
-
-def test_setion_tortuosity_empty_section():
-    sec = Section([])
+    sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
+                                   ((Dendrite)
+                                    (1 2 3 2))"""), reader='asc').sections[1]
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
@@ -124,35 +123,44 @@ def test_section_tortuosity_looping_section():
 
 
 def test_section_meander_angles():
-    s0 = Section(np.array([[0, 0, 0],
-                           [1, 0, 0],
-                           [2, 0, 0],
-                           [3, 0, 0],
-                           [4, 0, 0]]))
+    s0 = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (2 0 0 2)
+    (3 0 0 2)
+    (4 0 0 2))"""), reader='asc').sections[1]
 
     nt.assert_equal(_sf.section_meander_angles(s0),
                     [math.pi, math.pi, math.pi])
 
-    s1 = Section(np.array([[0, 0, 0],
-                           [1, 0, 0],
-                           [1, 1, 0],
-                           [2, 1, 0],
-                           [2, 2, 0]]))
+    s1 = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 0 0 2)
+    (1 1 0 2)
+    (2 1 0 2)
+    (2 2 0 2))"""), reader='asc').sections[1]
 
     nt.assert_equal(_sf.section_meander_angles(s1),
                     [math.pi / 2, math.pi / 2, math.pi / 2])
 
-    s2 = Section(np.array([[0, 0, 0],
-                           [0, 0, 1],
-                           [0, 0, 2],
-                           [0, 0, 0]]))
+    s2 = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    ((Dendrite)
+    (0 0 0 2)
+    (0 0 1 2)
+    (0 0 2 2)
+    (0 0 0 2))"""), reader='asc').sections[1]
 
     nt.assert_equal(_sf.section_meander_angles(s2),
                     [math.pi, 0.])
 
 
 def test_section_meander_angles_single_segment():
-    s = Section(np.array([[0, 0, 0], [1, 1, 1]]))
+    s = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    ((Dendrite)
+    (0 0 0 2)
+    (1 1 1 2))"""), reader='asc').sections[1]
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)
 
 
@@ -164,7 +172,11 @@ def test_strahler_order():
 
 
 def test_locate_segment_position():
-    s = Section(np.array([[0, 0, 0, 0], [3, 0, 4, 100], [6, 4, 4, 200]]))
+    s = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    ((Dendrite)
+    (0 0 0 0)
+    (3 0 4 200)
+    (6 4 4 400))"""), reader='asc').sections[1]
     nt.assert_equal(
         _sf.locate_segment_position(s, 0.0),
         (0, 0.0)
