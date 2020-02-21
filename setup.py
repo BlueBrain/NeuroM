@@ -52,7 +52,6 @@ REQS = ['click>=7.0',
 # in readthedocs documentation building environment.
 if os.environ.get('READTHEDOCS') == 'True':
     REQS = ['future>=0.16.0',
-            'enum34>=1.0.4',
             'pyyaml>=3.10',
             ]
 
