@@ -36,24 +36,26 @@ from setuptools import find_packages
 
 VERSION = "1.4.19"
 
-REQS = ['click>=7.0',
-        'enum-compat>=0.0.2',
-        'future>=0.16.0',
-        'h5py>=2.7.1',
-        'matplotlib>=1.3.1',
-        'numpy>=1.8.0',
-        'pylru>=1.0',
-        'pyyaml>=3.10',
-        'scipy>=1.2.0',
-        'tqdm>=4.8.4',
+REQS_C = [
+          'h5py>=2.7.1',
+          'matplotlib>=1.3.1',
+          'numpy>=1.8.0',
+          'scipy>=1.2.0',
 ]
 
-# Hack to avoid installation of modules with C extensions
-# in readthedocs documentation building environment.
+REQS_PYTHON = ['click>=7.0',
+               'enum-compat>=0.0.2',
+               'future>=0.16.0',
+               'pylru>=1.0',
+               'pyyaml>=3.10',
+               'tqdm>=4.8.4',
+]
+
+# https://docs.readthedocs.io/en/stable/faq.html#i-get-import-errors-on-libraries-that-depend-on-c-modules
 if os.environ.get('READTHEDOCS') == 'True':
-    REQS = ['future>=0.16.0',
-            'pyyaml>=3.10',
-            ]
+    REQS = REQS_PYTHON
+else:
+    REQS = REQS_PYTHON + REQS_C
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
