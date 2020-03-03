@@ -40,7 +40,7 @@ import neurom as nm
 from neurom import exceptions
 from neurom.apps import get_config
 from neurom.apps.morph_stats import (extract_stats, generate_flattened_dict,
-                                     get_header, sanitize_config)
+                                     get_header, sanitize_config, full_config)
 from neurom.io.utils import get_files_by_path
 from neurom.utils import NeuromJSON
 
@@ -74,6 +74,9 @@ def get_parser():
                         help='If enabled the directory is treated as a population')
 
     parser.add_argument('-C', '--config', help='Configuration File')
+    parser.add_argument('-f', '--full-config', action='store_true', default=False,
+                        help='If passed, compute statistics for all neurite types,'
+                        ' all modes and all features')
 
     parser.add_argument('-o', '--output', dest='output_file',
                         help=('Summary output file name, if it ends in .json, '
@@ -88,12 +91,17 @@ def get_parser():
 
 def main(args):
     '''main function'''
-    try:
-        config = get_config(args.config, os.path.join(CONFIG_PATH, 'morph_stats.yaml'))
-        config = sanitize_config(config)
-    except exceptions.ConfigError as e:
-        L.error(str(e))
-        sys.exit(1)
+
+    if args.full_config:
+        config = full_config()
+        assert args.config is None, '-C, --config must NOT be specified with the -f, --full-config flag'
+    else:
+        try:
+            config = get_config(args.config, os.path.join(CONFIG_PATH, 'morph_stats.yaml'))
+            config = sanitize_config(config)
+        except exceptions.ConfigError as e:
+            L.error(str(e))
+            sys.exit(1)
 
     ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in args.ignored_exceptions)
     neurons = nm.load_neurons(get_files_by_path(args.datapath),

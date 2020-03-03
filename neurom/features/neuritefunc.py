@@ -46,7 +46,7 @@ from neurom.morphmath import interval_lengths
 def total_length(nrn_pop, neurite_type=NeuriteType.all):
     '''Get the total length of all sections in the group of neurons or neurites'''
     nrns = neuronfunc.neuron_population(nrn_pop)
-    return list(sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns)
+    return np.array([sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns])
 
 
 def n_segments(neurites, neurite_type=NeuriteType.all):
@@ -291,8 +291,9 @@ def segment_path_lengths(neurites, neurite_type=NeuriteType.all):
                 pathlength[section.id] = 0
         return pathlength[section.id]
 
-    return np.hstack([_get_pathlength(section) + sectionfunc.segment_lengths(section)
-                      for section in iter_sections(neurites, neurite_filter=neurite_filter)])
+    result = [_get_pathlength(section) + sectionfunc.segment_lengths(section)
+              for section in iter_sections(neurites, neurite_filter=neurite_filter)]
+    return np.hstack(result) if result else np.array([])
 
 
 def segment_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
@@ -375,7 +376,7 @@ def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
 
 def partition_pairs(neurites, neurite_type=NeuriteType.all):
     '''Partition pairs at bifurcation points of a collection of neurites.
-    Partition pait is defined as the number of bifurcations at the two
+    Partition pair is defined as the number of bifurcations at the two
     daughters of the bifurcating section'''
     return map(bifurcationfunc.partition_pair,
                iter_sections(neurites,
