@@ -46,7 +46,7 @@ from neurom.morphmath import interval_lengths
 def total_length(nrn_pop, neurite_type=NeuriteType.all):
     '''Get the total length of all sections in the group of neurons or neurites'''
     nrns = neuronfunc.neuron_population(nrn_pop)
-    return np.array([sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns])
+    return list(sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns)
 
 
 def n_segments(neurites, neurite_type=NeuriteType.all):

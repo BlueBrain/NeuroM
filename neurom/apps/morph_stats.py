@@ -140,7 +140,7 @@ _NEURITE_MAP = {
 
 def full_config():
     '''Returns a config with all features, all modes, all neurite types'''
-    modes = ['min', 'max', 'median', 'mean', 'std', 'raw']
+    modes = ['min', 'max', 'median', 'mean', 'std']
     return {
         'neurite': {feature: modes for feature in NEURITEFEATURES},
         'neuron': {feature: modes for feature in NEURONFEATURES},

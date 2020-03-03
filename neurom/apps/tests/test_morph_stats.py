@@ -163,8 +163,6 @@ def test_full_config():
     assert_equal(set(config.keys()), {'neurite', 'neuron', 'neurite_type'})
     assert_greater_equal(len(list(config['neurite'].keys())), 48)
     assert_greater_equal(len(list(config['neuron'].keys())), 10)
-    print(config)
-    assert_true(False)
 
 
 def test_sanitize_config():
