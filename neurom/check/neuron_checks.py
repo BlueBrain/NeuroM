@@ -273,7 +273,7 @@ def has_no_narrow_start(neuron, frac=0.9):
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
     '''
-    bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
+    bad_ids = [(neurite.root_node.id, neurite.root_node.points[np.newaxis, 1])
                for neurite in neuron.neurites
                if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
@@ -333,13 +333,13 @@ def has_no_narrow_neurite_section(neuron,
         '''Select narrow sections'''
         return section.points[:, COLS.R].mean() < radius_threshold
 
-    bad_ids = [(section.id, section.points[1])
+    bad_ids = [(section.id, section.points[np.newaxis, 1])
                for section in considered_sections if narrow_section(section)]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
 def has_multifurcation(neuron):
     '''Check if a section has more than 3 children'''
-    bad_ids = [(section.id, section.points[-1]) for section in iter_sections(neuron)
+    bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
                if len(section.children) > 3]
     return CheckResult(len(bad_ids) == 0, bad_ids)
