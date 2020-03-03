@@ -189,7 +189,7 @@ The build-time and runtime dependencies of NeuroM are:
 * [h5py](http://www.h5py.org/)
 * [scipy](http://www.scipy.org/)
 * [matplotlib](http://www.matplotlib.org/)
-* [enum34](https://pypi.python.org/pypi/enum34/)
+* [enum-compat](https://pypi.python.org/pypi/enum-compat/)
 * [pyyaml](http://www.pyyaml.org/)
 
 
