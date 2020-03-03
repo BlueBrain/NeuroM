@@ -88,9 +88,9 @@ def branch_order(section):
     return sum(1 for _ in section.iupstream()) - 1
 
 
-def segment_lengths(section):
+def segment_lengths(section, prepend_zero=False):
     '''Returns the list of segment lengths within the section'''
-    return interval_lengths(section.points)
+    return interval_lengths(section.points, prepend_zero=prepend_zero)
 
 
 def section_radial_distance(section, origin):
