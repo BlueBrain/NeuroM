@@ -27,8 +27,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from nose.tools import assert_equal, ok_, assert_true, eq_, assert_almost_equal, assert_dict_equal, assert_raises, assert_greater_equal
+
 import numpy as np
+from nose.tools import (assert_almost_equal, assert_equal,
+                        assert_greater_equal, assert_raises, ok_)
+
 import neurom as nm
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
@@ -101,15 +104,15 @@ def test_name_correction():
 
 
 def test_eval_stats_raw_returns_list():
-    assert_equal(ms.eval_stats(np.array([1,2,3,4]), 'raw'), [1,2,3,4])
+    assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'raw'), [1, 2, 3, 4])
 
 
 def test_eval_stats_empty_input_returns_none():
-    assert_true(ms.eval_stats([], 'min') is None)
+    ok_(ms.eval_stats([], 'min') is None)
 
 
 def test_eval_stats_total_returns_sum():
-    assert_equal(ms.eval_stats(np.array([1,2,3,4]), 'total'), 10)
+    assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'total'), 10)
 
 
 def test_eval_stats_applies_numpy_function():
@@ -118,20 +121,20 @@ def test_eval_stats_applies_numpy_function():
     ref_array = np.arange(1, 10)
 
     for m in modes:
-        eq_(ms.eval_stats(ref_array, m),
-               getattr(np, m)(ref_array))
+        assert_equal(ms.eval_stats(ref_array, m),
+            getattr(np, m)(ref_array))
 
 
 def test_extract_stats_single_neuron():
     nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
-    eq_(set(res.keys()), set(REF_OUT.keys()))
-    #Note: soma radius is calculated from the sphere that gives the area
+    assert_equal(set(res.keys()), set(REF_OUT.keys()))
+    # Note: soma radius is calculated from the sphere that gives the area
     # of the cylinders described in Neuron.swc
     assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
 
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
-        eq_(set(res[k].keys()), set(REF_OUT[k].keys()))
+        assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
         for kk in res[k].keys():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
 
@@ -142,7 +145,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    eq_(1 + 1 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
+    assert_equal(1 + 1 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
     ok_('name' in header)
     ok_('mean_soma_radius' in header)
 
@@ -154,8 +157,8 @@ def test_generate_flattened_dict():
                     }
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
-    eq_(3, len(rows))  # one for fake_name[0-2]
-    eq_(1 + 1 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
+    assert_equal(3, len(rows))  # one for fake_name[0-2]
+    assert_equal(1 + 1 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
 
 
 def test_full_config():
@@ -168,8 +171,8 @@ def test_full_config():
 def test_sanitize_config():
     assert_raises(ConfigError, ms.sanitize_config, {'neurite': []})
 
-    new_config = ms.sanitize_config({}) #empty
-    eq_(2, len(new_config)) #neurite & neuron created
+    new_config = ms.sanitize_config({})  # empty
+    assert_equal(2, len(new_config))  # neurite & neuron created
 
     full_config = {
         'neurite': {
@@ -183,4 +186,4 @@ def test_sanitize_config():
         }
     }
     new_config = ms.sanitize_config(full_config)
-    eq_(3, len(new_config)) #neurite, neurite_type & neuron
+    assert_equal(3, len(new_config))  # neurite, neurite_type & neuron

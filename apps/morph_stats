@@ -93,8 +93,9 @@ def main(args):
     '''main function'''
 
     if args.full_config:
+        assert args.config is None, (
+            '-C, --config must NOT be specified with the' ' -f, --full-config flag')
         config = full_config()
-        assert args.config is None, '-C, --config must NOT be specified with the -f, --full-config flag'
     else:
         try:
             config = get_config(args.config, os.path.join(CONFIG_PATH, 'morph_stats.yaml'))
