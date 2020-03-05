@@ -35,6 +35,7 @@ from nose.tools import (assert_almost_equal, assert_equal,
 import neurom as nm
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
+from neurom.features import NEURITEFEATURES, NEURONFEATURES
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data/swc')
@@ -164,8 +165,9 @@ def test_generate_flattened_dict():
 def test_full_config():
     config = ms.full_config()
     assert_equal(set(config.keys()), {'neurite', 'neuron', 'neurite_type'})
-    assert_greater_equal(len(list(config['neurite'].keys())), 48)
-    assert_greater_equal(len(list(config['neuron'].keys())), 10)
+
+    assert_equal(config['neurite'].keys(), NEURITEFEATURES.keys())
+    assert_equal(config['neuron'].keys(), NEURONFEATURES.keys())
 
 
 def test_sanitize_config():
