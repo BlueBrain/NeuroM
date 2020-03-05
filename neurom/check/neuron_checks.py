@@ -280,7 +280,19 @@ def has_no_narrow_start(neuron, frac=0.9):
 
 
 def has_no_dangling_branch(neuron):
-    '''Check if the neuron has dangling neurites'''
+    '''Check if the neuron has dangling neurites
+
+    Are considered dangling
+    - dendrites whose first point is too far from the soma center
+    - axons whose first point is too far from the soma center AND from
+      any point belonging to a dendrite
+
+    Arguments:
+        neuron(Neuron): The neuron object to test
+
+    Returns:
+        CheckResult with a list of all first segments of dangling neurites
+    '''
     soma_center = neuron.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = neuron.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
