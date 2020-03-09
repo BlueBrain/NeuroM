@@ -166,8 +166,8 @@ def test_full_config():
     config = ms.full_config()
     assert_equal(set(config.keys()), {'neurite', 'neuron', 'neurite_type'})
 
-    assert_equal(config['neurite'].keys(), NEURITEFEATURES.keys())
-    assert_equal(config['neuron'].keys(), NEURONFEATURES.keys())
+    assert_equal(set(config['neurite'].keys()), set(NEURITEFEATURES.keys()))
+    assert_equal(set(config['neuron'].keys()), set(NEURONFEATURES.keys()))
 
 
 def test_sanitize_config():
