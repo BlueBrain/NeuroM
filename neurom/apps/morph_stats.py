@@ -29,6 +29,7 @@
 '''Core code for morph_stats application'''
 import logging
 from collections import defaultdict
+from itertools import product
 import numpy as np
 import neurom as nm
 from neurom.features import NEURONFEATURES, NEURITEFEATURES
@@ -85,13 +86,13 @@ def extract_stats(neurons, config):
                 compound_stat_name = stat_name + '_' + suffix
                 data[compound_stat_name] = stat[i]
 
-    for feature_name, modes in config['neurite'].items():
-        for n in config['neurite_type']:
-            n = _NEURITE_MAP[n]
-            for mode in modes:
-                stat_name = _stat_name(feature_name, mode)
-                stat = eval_stats(nm.get(feature_name, neurons, neurite_type=n), mode)
-                _fill_compoundified(stats[n.name], stat_name, stat)
+    for (feature_name, modes), neurite_type in product(config['neurite'].items(),
+                                                       config['neurite_type']):
+        neurite_type = _NEURITE_MAP[neurite_type]
+        for mode in modes:
+            stat_name = _stat_name(feature_name, mode)
+            stat = eval_stats(nm.get(feature_name, neurons, neurite_type=neurite_type), mode)
+            _fill_compoundified(stats[neurite_type.name], stat_name, stat)
 
     for feature_name, modes in config['neuron'].items():
         for mode in modes:
