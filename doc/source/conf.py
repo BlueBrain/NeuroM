@@ -76,7 +76,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -152,35 +152,12 @@ pygments_style = 'sphinx'
 todo_include_todos = True
 
 autosummary_generate = True
-autodoc_default_flags = ['show-inheritance']
+autodoc_default_options = {
+    'members': True,
+    'show-inheritance': True,
+}
+
 autoclass_content = 'both'
-
-def _pelita_member_filter(parent_name, item_names):
-    """
-    Filter a list of autodoc items for which to generate documentation.
-
-    Include only imports that come from the documented module or its
-    submodules.
-
-    """
-    filtered_names = []
-
-    if parent_name not in sys.modules:
-        return item_names
-    module = sys.modules[parent_name]
-
-    for item_name in item_names:
-        item = getattr(module, item_name, None)
-        location = getattr(item, '__module__', None)
-
-        if location is None or (location + ".").startswith(parent_name + "."):
-            filtered_names.append(item_name)
-
-    return filtered_names
-
-# Using undocumented features of Jinja, not nice...
-from jinja2.defaults import DEFAULT_NAMESPACE
-DEFAULT_NAMESPACE['pelita_member_filter'] = _pelita_member_filter
 
 # -- Options for HTML output ----------------------------------------------
 
