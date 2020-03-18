@@ -9,7 +9,6 @@ sphinx:
   configuration: doc/source/conf.py
 
 python:
-  version: 2
   install:
     - method: pip
       path: .
