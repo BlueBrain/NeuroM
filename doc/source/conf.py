@@ -42,20 +42,9 @@
 
 import sys
 import os
-import shlex
-import neurom
-from neurom.version import VERSION
+from pkg_resources import get_distribution
 
-# Mock out modules depending on 3rd party C libraries
-from mock import Mock
-
-class _Mock(Mock):
-    @classmethod
-    def __getattr__(cls, name):
-        return _Mock()
-
-MOCK_MODULES = ['scipy', 'scipy.spatial', 'h5py', 'tqdm']
-sys.modules.update((mod_name, _Mock()) for mod_name in MOCK_MODULES)
+VERSION = get_distribution('neurom').version
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -156,6 +145,20 @@ autodoc_default_options = {
     'members': True,
     'show-inheritance': True,
 }
+autodoc_mock_imports = [
+    'click',
+    'enum-compat',
+    'future',
+    'h5py',
+    'matplotlib',
+    'mpl_toolkits',
+    'numpy',
+    'pylru',
+    'plotly',
+    'pyyaml',
+    'scipy',
+    'tqdm',
+]
 
 autoclass_content = 'both'
 
