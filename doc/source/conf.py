@@ -148,6 +148,7 @@ autodoc_default_options = {
 autodoc_mock_imports = [
     'click',
     'enum-compat',
+    'enum34',
     'future',
     'h5py',
     'matplotlib',
