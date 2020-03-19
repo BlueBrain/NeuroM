@@ -317,7 +317,9 @@ def test_has_no_root_node_jumps():
 
 def test_has_no_narrow_start():
     _, nrn = _load_neuron('narrow_start.swc')
-    nt.ok_(not nrn_chk.has_no_narrow_start(nrn).status)
+    check = nrn_chk.has_no_narrow_start(nrn)
+    nt.ok_(not check.status)
+    assert_array_equal(check.info[0][1][:, COLS.XYZR], [[0, 0, 2, 2]])
 
     _, nrn = _load_neuron('narrow_start.swc')
     nt.ok_(nrn_chk.has_no_narrow_start(nrn, 0.25).status)
@@ -399,11 +401,11 @@ def test_has_no_narrow_dendritic_section():
 
 def test_has_no_dangling_branch():
     _, nrn = _load_neuron('dangling_axon.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    nrn_chk.has_no_dangling_branch(nrn)
     nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
 
     _, nrn = _load_neuron('dangling_dendrite.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    nrn_chk.has_no_dangling_branch(nrn)
     nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
 
 
@@ -442,4 +444,4 @@ def test_has_multifurcation():
     nt.ok_(not check_.status)
     info = check_.info
     assert_array_equal(info[0][0], 1)
-    assert_array_equal(info[0][1][COLS.XYZR], [0.0, 13.0, 0.0, 1.0])
+    assert_array_equal(info[0][1][:, COLS.XYZR], [[0.0, 13.0, 0.0, 1.0]])

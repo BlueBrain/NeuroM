@@ -42,7 +42,7 @@ from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
 from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
 
 
@@ -273,14 +273,26 @@ def has_no_narrow_start(neuron, frac=0.9):
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
     '''
-    bad_ids = [(neurite.root_node.id, [neurite.root_node.points[1]])
+    bad_ids = [(neurite.root_node.id, neurite.root_node.points[np.newaxis, 1])
                for neurite in neuron.neurites
                if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
 def has_no_dangling_branch(neuron):
-    '''Check if the neuron has dangling neurites'''
+    '''Check if the neuron has dangling neurites
+
+    Are considered dangling
+    - dendrites whose first point is too far from the soma center
+    - axons whose first point is too far from the soma center AND from
+      any point belonging to a dendrite
+
+    Arguments:
+        neuron(Neuron): The neuron object to test
+
+    Returns:
+        CheckResult with a list of all first segments of dangling neurites
+    '''
     soma_center = neuron.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = neuron.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
@@ -288,7 +300,7 @@ def has_no_dangling_branch(neuron):
 
     def is_dangling(neurite):
         '''Is the neurite dangling ?'''
-        starting_point = neurite.points[1][COLS.XYZ]
+        starting_point = neurite.points[0][COLS.XYZ]
 
         if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
             return False
@@ -333,13 +345,13 @@ def has_no_narrow_neurite_section(neuron,
         '''Select narrow sections'''
         return section.points[:, COLS.R].mean() < radius_threshold
 
-    bad_ids = [(section.id, section.points[1])
+    bad_ids = [(section.id, section.points[np.newaxis, 1])
                for section in considered_sections if narrow_section(section)]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
 def has_multifurcation(neuron):
     '''Check if a section has more than 3 children'''
-    bad_ids = [(section.id, section.points[-1]) for section in iter_sections(neuron)
+    bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
                if len(section.children) > 3]
     return CheckResult(len(bad_ids) == 0, bad_ids)

@@ -5,11 +5,12 @@ from io import StringIO
 
 import numpy as np
 from mock import patch
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, assert_raises
 
 import neurom.io as io
 import neurom.io.neurolucida as nasc
 from neurom.core.dataformat import COLS
+from neurom.exceptions import RawDataError
 from neurom.io.datawrapper import DataWrapper
 from neurom import load_neuron
 
@@ -266,11 +267,14 @@ def test_load_neurolucida_ascii():
     eq_(len(ascii.data_block), 18)
 
 def test_spine():
-    f = os.path.join(NEUROLUCIDA_PATH, 'spine.asc')
     with warnings.catch_warnings(record=True):
-        n = load_neuron(f)
+        n = load_neuron(os.path.join(NEUROLUCIDA_PATH, 'spine.asc'))
 
     assert_array_equal(n.neurites[0].points,
                        [[ 0. ,  5. ,  0. ,  1. ],
                         [ 2. ,  9. ,  0. ,  1. ],
                         [ 0. , 13. ,  0. ,  1. ]])
+
+    # with warnings.catch_warnings(record=True):
+    #     assert_raises(RawDataError,
+    #                   load_neuron, os.path.join(NEUROLUCIDA_PATH, 'broken-spine.asc'))

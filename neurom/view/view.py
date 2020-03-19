@@ -30,8 +30,7 @@
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon
-from mpl_toolkits.mplot3d.art3d import \
-    Line3DCollection  # pylint: disable=relative-import
+from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
 from neurom import NeuriteType, geom
@@ -317,7 +316,7 @@ def _as_dendrogram_line(start, end, color):
     return FancyArrowPatch(start, end, arrowstyle='-', color=color, lw=2, shrinkA=0, shrinkB=0)
 
 
-def _get_dendrogram_shapes(dendrogram, positions, show_diameter):
+def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
     '''Generates drawable patches for dendrogram.
 
     Args:
@@ -331,13 +330,13 @@ def _get_dendrogram_shapes(dendrogram, positions, show_diameter):
     color = TREE_COLOR[dendrogram.neurite_type]
     start_point = positions[dendrogram]
     end_point = start_point + [0, dendrogram.height]
-    if show_diameter:
+    if show_diameters:
         shapes = [_as_dendrogram_polygon(dendrogram.coords + start_point, color)]
     else:
         shapes = [_as_dendrogram_line(start_point, end_point, color)]
     for child in dendrogram.children:
         shapes.append(_as_dendrogram_line(end_point, positions[child], color))
-        shapes += _get_dendrogram_shapes(child, positions, show_diameter)
+        shapes += _get_dendrogram_shapes(child, positions, show_diameters)
     return shapes
 
 

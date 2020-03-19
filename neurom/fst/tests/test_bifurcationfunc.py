@@ -26,58 +26,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._bifurcationfunc functionality'''
+'''This module runs the feature tests in the neurom/features/tests folder
 
-import os
-import warnings
+but as if the user had used the old calling conversion to get the feature.
+It is here to check that the retro-compatibility is preserved.
 
-import numpy as np
-from nose import tools as nt
-from nose.tools import assert_equal, assert_raises
-from numpy.testing import assert_raises
+It works by importing the feature tests and then overriding
+the module from which they are taken (features -> fst)
+'''
 
-import neurom as nm
-from neurom import load_neuron
-from neurom.exceptions import NeuroMError
-from neurom.fst import _bifurcationfunc as bf
+from neurom.features.tests.test_bifurcationfunc import *
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data/')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-with warnings.catch_warnings(record=True):
-    SIMPLE2 = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'not_too_complex.asc'))
-    MULTIFURCATION = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'multifurcation.asc'))
-
-
-def test_local_bifurcation_angle():
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
-
-def test_remote_bifurcation_angle():
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
-    assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
-
-def test_bifurcation_partition():
-    root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.bifurcation_partition(root), 3.0)
-    assert_equal(bf.bifurcation_partition(root.children[0]), 1.0)
-
-    leaf = root.children[0].children[0]
-    assert_raises(NeuroMError, bf.bifurcation_partition, leaf)
-
-    multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
-    assert_raises(NeuroMError, bf.bifurcation_partition, multifurcation_section)
-
-def test_partition_asymmetry():
-    root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.partition_asymmetry(root), 0.5)
-    assert_equal(bf.partition_asymmetry(root.children[0]), 0.0)
-
-    leaf = root.children[0].children[0]
-    assert_raises(NeuroMError, bf.partition_asymmetry, leaf)
-
-    multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
-    assert_raises(NeuroMError, bf.partition_asymmetry, multifurcation_section)
+from neurom.fst import _bifurcationfunc as bifurcation
+from neurom.fst import _neuronfunc as neuronfunc
+from neurom.fst import _neuritefunc as _nf
+from neurom.fst import sectionfunc

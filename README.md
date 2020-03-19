@@ -42,8 +42,7 @@ NeuroM is a Python toolkit for the analysis and processing of neuron morphologie
 
 ## Acknowlegments
 
-This work has been partially funded by the European Union Seventh Framework Program (FP7/2007­2013)
-under grant agreement no. 604102 (HBP). For license and authors, see `LICENSE.txt`
+This project/research received funding from the European Unionâ€™s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). For license and authors, see `LICENSE.txt`
 and `AUTHORS.md` respectively.
 
 ## Documentation
@@ -92,7 +91,7 @@ To gain an understanding of some of the capabilities of NeuroM, you can launch
 the NeuroM tutorial on MyBinder. Click the badge to launch, no need to download or
 install!
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fneurom_tutorial.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BlueBrain/NeuroM.git/master?filepath=tutorial%2Fgetting_started.ipynb)
 
 ## Examples
 
@@ -189,7 +188,7 @@ The build-time and runtime dependencies of NeuroM are:
 * [h5py](http://www.h5py.org/)
 * [scipy](http://www.scipy.org/)
 * [matplotlib](http://www.matplotlib.org/)
-* [enum34](https://pypi.python.org/pypi/enum34/)
+* [enum-compat](https://pypi.python.org/pypi/enum-compat/)
 * [pyyaml](http://www.pyyaml.org/)
 
 

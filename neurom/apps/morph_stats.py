@@ -29,8 +29,10 @@
 '''Core code for morph_stats application'''
 import logging
 from collections import defaultdict
+from itertools import product
 import numpy as np
 import neurom as nm
+from neurom.features import NEURONFEATURES, NEURITEFEATURES
 
 from neurom.exceptions import ConfigError
 
@@ -73,29 +75,30 @@ def _stat_name(feat_name, stat_mode):
 
 def extract_stats(neurons, config):
     '''Extract stats from neurons'''
-
     stats = defaultdict(dict)
-    for ns, modes in config['neurite'].items():
-        for n in config['neurite_type']:
-            n = _NEURITE_MAP[n]
-            for mode in modes:
-                stat_name = _stat_name(ns, mode)
-                stat = eval_stats(nm.get(ns, neurons, neurite_type=n), mode)
 
-                if stat is None or not stat.shape:
-                    stats[n.name][stat_name] = stat
-                else:
-                    assert stat.shape in ((3, ), ), \
-                        'Statistic must create a 1x3 result'
+    def _fill_compoundified(data, stat_name, stat):
+        '''Insert the stat in the dict and eventually split it into XYZ components'''
+        if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
+            data[stat_name] = stat
+        else:
+            for i, suffix in enumerate('XYZ'):
+                compound_stat_name = stat_name + '_' + suffix
+                data[compound_stat_name] = stat[i]
 
-                    for i, suffix in enumerate('XYZ'):
-                        compound_stat_name = stat_name + '_' + suffix
-                        stats[n.name][compound_stat_name] = stat[i]
-
-    for ns, modes in config['neuron'].items():
+    for (feature_name, modes), neurite_type in product(config['neurite'].items(),
+                                                       config['neurite_type']):
+        neurite_type = _NEURITE_MAP[neurite_type]
         for mode in modes:
-            stat_name = _stat_name(ns, mode)
-            stats[stat_name] = eval_stats(nm.get(ns, neurons), mode)
+            stat_name = _stat_name(feature_name, mode)
+            stat = eval_stats(nm.get(feature_name, neurons, neurite_type=neurite_type), mode)
+            _fill_compoundified(stats[neurite_type.name], stat_name, stat)
+
+    for feature_name, modes in config['neuron'].items():
+        for mode in modes:
+            stat_name = _stat_name(feature_name, mode)
+            stat = eval_stats(nm.get(feature_name, neurons), mode)
+            _fill_compoundified(stats, stat_name, stat)
 
     return stats
 
@@ -134,6 +137,16 @@ _NEURITE_MAP = {
     'APICAL_DENDRITE': nm.APICAL_DENDRITE,
     'ALL': nm.ANY_NEURITE
 }
+
+
+def full_config():
+    '''Returns a config with all features, all modes, all neurite types'''
+    modes = ['min', 'max', 'median', 'mean', 'std']
+    return {
+        'neurite': {feature: modes for feature in NEURITEFEATURES},
+        'neuron': {feature: modes for feature in NEURONFEATURES},
+        'neurite_type': list(_NEURITE_MAP.keys()),
+    }
 
 
 def sanitize_config(config):
