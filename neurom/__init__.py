@@ -61,8 +61,7 @@ Examples:
 import logging as _logging
 
 from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
-                   iter_segments)
-from .core._neuron import Neuron
+                   iter_segments, Neuron)
 from .core.dataformat import COLS
 from .core.types import NEURITES as NEURITE_TYPES
 from .features import get
