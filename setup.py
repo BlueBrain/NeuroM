@@ -55,7 +55,7 @@ if os.environ.get('READTHEDOCS') == 'True':
 
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
-    'author': 'BBP Neuroscientific Software Engineering',
+    'author': 'Blue Brain Project, EPFL',
     'url': 'http://https://github.com/BlueBrain/NeuroM',
     'version': VERSION,
     'install_requires': REQS,
