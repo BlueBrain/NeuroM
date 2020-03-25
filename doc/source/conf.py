@@ -145,21 +145,6 @@ autodoc_default_options = {
     'members': True,
     'show-inheritance': True,
 }
-autodoc_mock_imports = [
-    'click',
-    'enum-compat',
-    'enum34',
-    'future',
-    'h5py',
-    'matplotlib',
-    'mpl_toolkits',
-    'numpy',
-    'pylru',
-    'plotly',
-    'pyyaml',
-    'scipy',
-    'tqdm',
-]
 
 autoclass_content = 'both'
 
