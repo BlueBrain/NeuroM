@@ -256,8 +256,8 @@ def section_taper_rates(neurites, neurite_type=NeuriteType.all):
     '''
     def _sec_taper_rate(sec):
         '''Taper rate from fit along a section'''
-        distances = interval_lengths(sec.points, prepend_zero=True)
-        return np.polynomial.polynomial.polyfit(distances, 2 * sec.points[:, COLS.R], 1)[1]
+        path_distances = np.cumsum(interval_lengths(sec.points, prepend_zero=True))
+        return np.polynomial.polynomial.polyfit(path_distances, 2 * sec.points[:, COLS.R], 1)[1]
 
     return map_sections(_sec_taper_rate, neurites, neurite_type=neurite_type)
 
