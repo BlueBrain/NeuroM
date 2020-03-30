@@ -141,8 +141,10 @@ pygments_style = 'sphinx'
 todo_include_todos = True
 
 autosummary_generate = True
+autosummary_imported_members = True
 autodoc_default_options = {
     'members': True,
+    'imported-members': True,
     'show-inheritance': True,
 }
 
