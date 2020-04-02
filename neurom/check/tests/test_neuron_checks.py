@@ -418,8 +418,8 @@ def test_has_no_dangling_branch():
                        [0., 49.,  0.])
 
     _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
-    status = nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(status)
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(res.status)
 
 
 
