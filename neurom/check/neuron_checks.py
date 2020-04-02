@@ -298,6 +298,10 @@ def has_no_dangling_branch(neuron):
     radius = np.linalg.norm(recentered_soma, axis=1)
     soma_max_radius = radius.max()
 
+    dendritic_points = np.array(list(chain.from_iterable(n.points
+                                                         for n in iter_neurites(neuron)
+                                                         if n.type != NeuriteType.axon)))
+
     def is_dangling(neurite):
         '''Is the neurite dangling ?'''
         starting_point = neurite.points[0][COLS.XYZ]
@@ -308,14 +312,11 @@ def has_no_dangling_branch(neuron):
         if neurite.type != NeuriteType.axon:
             return True
 
-        all_points = list(chain.from_iterable(n.points[1:]
-                                              for n in iter_neurites(neurite)
-                                              if n.type != NeuriteType.axon))
-        res = [np.linalg.norm(starting_point - p[COLS.XYZ]) >= 2 * p[COLS.R] + 2
-               for p in all_points]
-        return all(res)
+        distance_to_dendrites = np.linalg.norm(dendritic_points[:, COLS.XYZ] - starting_point,
+                                               axis=1)
+        return np.all(distance_to_dendrites >= 2 * dendritic_points[:, COLS.R] + 2)
 
-    bad_ids = [(n.root_node.id, [n.root_node.points[1]])
+    bad_ids = [(n.root_node.id, [n.root_node.points[0]])
                for n in iter_neurites(neuron) if is_dangling(n)]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
