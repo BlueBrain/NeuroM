@@ -48,14 +48,6 @@ REQS = ['click>=7.0',
         'tqdm>=4.8.4',
 ]
 
-# Hack to avoid installation of modules with C extensions
-# in readthedocs documentation building environment.
-if os.environ.get('READTHEDOCS') == 'True':
-    REQS = ['future>=0.16.0',
-            'enum34>=1.0.4',
-            'pyyaml>=3.10',
-            ]
-
 config = {
     'description': 'NeuroM: a light-weight neuron morphology analysis package',
     'author': 'Blue Brain Project, EPFL',
