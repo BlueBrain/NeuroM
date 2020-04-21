@@ -26,6 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' IO operations module for NeuroM '''
+'''IO operations module for NeuroM'''
 
 from neurom.io.utils import load_data, load_neuron, load_neurons, NeuronLoader

@@ -74,7 +74,7 @@ def interpolate_radius(r1, r2, fraction):
     Note: The fraction is assumed from point P1, not from point P2.
     '''
     def f(a, b, c):
-        ''' Returns the length of the interpolated radius calculated
+        '''Returns the length of the interpolated radius calculated
         using similar triangles.
         '''
         return a + c * (b - a)
@@ -222,7 +222,7 @@ def angle_3points(p0, p1, p2):
 
 
 def angle_between_vectors(p1, p2):
-    """ Computes the angle in radians between vectors 'p1' and 'p2'
+    """Computes the angle in radians between vectors 'p1' and 'p2'
     Normalizes the input vectors and computes the relative angle
     between them.
 
@@ -385,7 +385,7 @@ def pca(points):
 
 
 def sphere_area(r):
-    ''' Compute the area of a sphere with radius r
+    '''Compute the area of a sphere with radius r
     '''
     return 4. * math.pi * r ** 2
 

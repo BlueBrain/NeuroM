@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology HDF5 data loading
+'''Module for morphology HDF5 data loading
 
 Data is unpacked into a 2-dimensional raw data block:
 
@@ -99,12 +99,11 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
 
 
 def _remove_duplicate_points(points, groups):
-    ''' Removes the duplicate points from the beginning of a section,
+    '''Removes the duplicate points from the beginning of a section,
     if they are present in points-groups representation.
 
     Returns:
         points, groups with unique points.
-
     '''
 
     group_initial_ids = groups[:, GPFIRST]

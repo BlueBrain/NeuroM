@@ -137,7 +137,7 @@ def section_term_branch_orders(neurites, neurite_type=NeuriteType.all):
 
 
 def section_path_lengths(neurites, neurite_type=NeuriteType.all):
-    '''Path lengths of a collection of neurites '''
+    '''Path lengths of a collection of neurites'''
     # Calculates and stores the section lengths in one pass,
     # then queries the lengths in the path length iterations.
     # This avoids repeatedly calculating the lengths of the

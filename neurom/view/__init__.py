@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' View tools to visualize morphologies '''
+'''View tools to visualize morphologies'''
 from .view import (plot_neuron, plot_neuron3d,
                    plot_tree, plot_tree3d,
                    plot_soma, plot_soma3d,

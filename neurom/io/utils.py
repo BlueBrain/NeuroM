@@ -50,7 +50,7 @@ L = logging.getLogger(__name__)
 
 
 def _is_morphology_file(filepath):
-    """ Check if `filepath` is a file with one of morphology file extensions. """
+    """Check if `filepath` is a file with one of morphology file extensions."""
     return (
         os.path.isfile(filepath) and
         os.path.splitext(filepath)[1].lower() in ('.swc', '.h5', '.asc')
@@ -74,7 +74,7 @@ class NeuronLoader(object):
             self.get = FunctionCacheManager(self.get, size=cache_size)
 
     def _filepath(self, name):
-        """ File path to `name` morphology file. """
+        """File path to `name` morphology file."""
         if self.file_ext is None:
             candidates = glob.glob(os.path.join(self.directory, name + ".*"))
             try:
@@ -86,7 +86,7 @@ class NeuronLoader(object):
 
     # pylint:disable=method-hidden
     def get(self, name):
-        """ Get `name` morphology data. """
+        """Get `name` morphology data."""
         return load_neuron(self._filepath(name))
 
 
@@ -141,7 +141,6 @@ def load_neurons(neurons,
 
     Returns:
         neuron population object
-
     '''
     if isinstance(neurons, (list, tuple)):
         files = neurons

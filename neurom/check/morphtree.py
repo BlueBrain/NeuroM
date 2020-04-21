@@ -89,7 +89,7 @@ def is_flat(neurite, tol, method='tolerance'):
 
 
 def is_back_tracking(neurite):
-    ''' Check if a neurite process backtracks to a previous node. Back-tracking takes place
+    '''Check if a neurite process backtracks to a previous node. Back-tracking takes place
     when a daughter of a branching process goes back and either overlaps with a previous point, or
     lies inside the cylindrical volume of the latter.
 
@@ -102,23 +102,23 @@ def is_back_tracking(neurite):
             2. The geometry of a segment overlaps with a previous one in the section
     '''
     def pair(segs):
-        ''' Pairs the input list into triplets'''
+        '''Pairs the input list into triplets'''
         return zip(segs, segs[1:])
 
     def coords(node):
-        ''' Returns the first three values of the tree that correspond to the x, y, z coordinates'''
+        '''Returns the first three values of the tree that correspond to the x, y, z coordinates'''
         return node[COLS.XYZ]
 
     def max_radius(seg):
-        ''' Returns maximum radius from the two segment endpoints'''
+        '''Returns maximum radius from the two segment endpoints'''
         return max(seg[0][COLS.R], seg[1][COLS.R])
 
     def is_not_zero_seg(seg):
-        ''' Returns True if segment has zero length'''
+        '''Returns True if segment has zero length'''
         return not np.allclose(coords(seg[0]), coords(seg[1]))
 
     def is_in_the_same_verse(seg1, seg2):
-        ''' Checks if the vectors face the same direction. This
+        '''Checks if the vectors face the same direction. This
         is true if their dot product is greater than zero.
         '''
         v1 = coords(seg2[1]) - coords(seg2[0])
@@ -126,7 +126,7 @@ def is_back_tracking(neurite):
         return np.dot(v1, v2) >= 0
 
     def is_seg2_within_seg1_radius(dist, seg1, seg2):
-        ''' Checks whether the orthogonal distance from the point at the end of
+        '''Checks whether the orthogonal distance from the point at the end of
         seg1 to seg2 segment body is smaller than the sum of their radii
         '''
         return dist <= max_radius(seg1) + max_radius(seg2)
@@ -164,7 +164,7 @@ def is_back_tracking(neurite):
         return np.linalg.norm(prj) < 0.55 * np.linalg.norm(S1S2)
 
     def is_inside_cylinder(seg1, seg2):
-        ''' Checks if seg2 approximately lies within a cylindrical volume of seg1.
+        '''Checks if seg2 approximately lies within a cylindrical volume of seg1.
         Two conditions must be satisfied:
             1. The two segments are not facing the same direction  (seg2 comes back to seg1)
             2. seg2 is overlaping with seg1

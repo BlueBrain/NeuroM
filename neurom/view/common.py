@@ -429,7 +429,7 @@ def plot_cylinder(ax, start, end, start_radius, end_radius,
 
 
 def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
-    """ Plots a 3d sphere, given the center and the radius.  """
+    """Plots a 3d sphere, given the center and the radius."""
 
     u = np.linspace(0, 2 * np.pi, linspace_count)
     v = np.linspace(0, np.pi, linspace_count)

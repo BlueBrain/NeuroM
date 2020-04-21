@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Geometrical Operations for NeuroM '''
+'''Geometrical Operations for NeuroM'''
 
 import numpy as np
 from scipy.spatial import ConvexHull

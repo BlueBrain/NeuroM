@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology SWC data loading
+'''Module for morphology SWC data loading
 
 Data is unpacked into a 2-dimensional raw data block:
 
