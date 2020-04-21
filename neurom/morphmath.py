@@ -253,8 +253,7 @@ def average_points_dist(p0, p_list):
 
 
 def path_distance(points):
-    """Compute the path distance from given set of points
-    """
+    """Compute the path distance from given set of points"""
     return interval_lengths(points).sum()
 
 
@@ -382,8 +381,7 @@ def pca(points):
 
 
 def sphere_area(r):
-    '''Compute the area of a sphere with radius r
-    '''
+    '''Compute the area of a sphere with radius r'''
     return 4. * math.pi * r ** 2
 
 
