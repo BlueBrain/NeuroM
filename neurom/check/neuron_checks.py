@@ -225,7 +225,8 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
 
 def has_no_root_node_jumps(neuron, radius_multiplier=2):
     '''Check that the neurites have their first point not further than
-    `radius_multiplier * soma radius` from the soma center'''
+    `radius_multiplier * soma radius` from the soma center
+    '''
     bad_ids = []
     for neurite in iter_neurites(neuron):
         p0 = neurite.root_node.points[0, COLS.XYZ]

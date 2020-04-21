@@ -92,7 +92,8 @@ def bifurcation_partition(bif_point):
     We first ensure that the input point has only two children.
 
     The number of nodes in each child tree is counted. The partition is
-    defined as the ratio of the largest number to the smallest number.'''
+    defined as the ratio of the largest number to the smallest number.
+    '''
     _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
@@ -107,7 +108,8 @@ def partition_asymmetry(bif_point):
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two child subtrees
-    at each branch point.'''
+    at each branch point.
+    '''
     _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
@@ -122,7 +124,8 @@ def partition_pair(bif_point):
 
     The number of nodes in each child tree is counted. The partition
     pairs is the number of bifurcations in the two child subtrees
-    at each branch point.'''
+    at each branch point.
+    '''
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return (n, m)
@@ -134,7 +137,8 @@ def sibling_ratio(bif_point, method='first'):
     The sibling ratio is the ratio between the diameters of the
     smallest and the largest child. It is a real number between
     0 and 1. Method argument allows one to consider mean diameters
-    along the child section instead of diameter of the first point. '''
+    along the child section instead of diameter of the first point.
+    '''
     _raise_if_not_bifurcation(bif_point)
 
     if method not in {'first', 'mean'}:

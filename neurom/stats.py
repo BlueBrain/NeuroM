@@ -28,7 +28,8 @@
 
 '''Statistical analysis helper functions
 
-Nothing fancy. Just commonly used functions using scipy functionality.'''
+Nothing fancy. Just commonly used functions using scipy functionality.
+'''
 
 from collections import namedtuple
 from enum import Enum, unique

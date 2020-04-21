@@ -338,7 +338,8 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
 def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branch-order'):
     '''Partition asymmetry at bifurcation points of a collection of neurites
     Variant: length is a different definition, as the absolute difference in
-    downstream path lenghts, relative to the total neurite path length'''
+    downstream path lenghts, relative to the total neurite path length
+    '''
     if variant not in {'branch-order', 'length'}:
         raise ValueError('Please provide a valid variant for partition asymmetry,\
                          found %s' % variant)
@@ -366,7 +367,8 @@ def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
     The sibling ratio is the ratio between the diameters of the
     smallest and the largest child. It is a real number between
     0 and 1. Method argument allows one to consider mean diameters
-    along the child section instead of diameter of the first point. '''
+    along the child section instead of diameter of the first point.
+    '''
     return map(lambda bif_point: bifurcationfunc.sibling_ratio(bif_point, method),
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
@@ -376,7 +378,8 @@ def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
 def partition_pairs(neurites, neurite_type=NeuriteType.all):
     '''Partition pairs at bifurcation points of a collection of neurites.
     Partition pair is defined as the number of bifurcations at the two
-    daughters of the bifurcating section'''
+    daughters of the bifurcating section
+    '''
     return map(bifurcationfunc.partition_pair,
                iter_sections(neurites,
                              iterator_type=Tree.ibifurcation_point,
@@ -388,7 +391,8 @@ def diameter_power_relations(neurites, neurite_type=NeuriteType.all, method='fir
     as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     This quantity gives an indication of how far the branching is from
-    the Rall ratio (when =1).'''
+    the Rall ratio (when =1).
+    '''
     return (bifurcationfunc.diameter_power_relation(bif_point, method)
             for bif_point in iter_sections(neurites,
                                            iterator_type=Tree.ibifurcation_point,
@@ -399,7 +403,8 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
                              iterator_type=Tree.ipreorder):
     '''Section radial distances in a collection of neurites.
     The iterator_type can be used to select only terminal sections (ileaf)
-    or only bifurcations (ibifurcation_point).'''
+    or only bifurcations (ibifurcation_point).
+    '''
     dist = []
     for n in iter_neurites(neurites, filt=is_type(neurite_type)):
         pos = n.root_node.points[0] if origin is None else origin

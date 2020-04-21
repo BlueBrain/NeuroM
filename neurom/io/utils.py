@@ -167,7 +167,8 @@ def _get_file(handle):
     '''Returns the filename of the file to read
 
     If handle is a stream, a temp file is written on disk first
-    and its filename is returned'''
+    and its filename is returned
+    '''
     if not isinstance(handle, IOBase):
         return handle
 

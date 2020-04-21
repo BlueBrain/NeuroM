@@ -125,7 +125,8 @@ class NeuromJSON(json.JSONEncoder):
 class OrderedEnum(Enum):
     '''Implementation taken here: https://docs.python.org/3/library/enum.html#orderedenum
 
-    Fixes https://github.com/BlueBrain/NeuroM/issues/697'''
+    Fixes https://github.com/BlueBrain/NeuroM/issues/697
+    '''
 
     def __ge__(self, other):
         if self.__class__ is other.__class__:
