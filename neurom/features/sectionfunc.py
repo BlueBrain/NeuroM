@@ -148,8 +148,7 @@ def strahler_order(section):
 
 
 def locate_segment_position(section, fraction):
-    '''
-    Segment ID / offset corresponding to a given fraction of section length.
+    '''Segment ID / offset corresponding to a given fraction of section length.
     '''
     return mm.path_fraction_id_offset(section.points, fraction)
 

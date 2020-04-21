@@ -58,13 +58,12 @@ def _is_morphology_file(filepath):
 
 
 class NeuronLoader(object):
-    """
-        Caching morphology loader.
+    """Caching morphology loader.
 
-        Arguments:
-            directory: path to directory with morphology files
-            file_ext: file extension to look for (if not set, will pick any of .swc|.h5|.asc)
-            cache_size: size of LRU cache (if not set, no caching done)
+    Arguments:
+        directory: path to directory with morphology files
+        file_ext: file extension to look for (if not set, will pick any of .swc|.h5|.asc)
+        cache_size: size of LRU cache (if not set, no caching done)
     """
 
     def __init__(self, directory, file_ext=None, cache_size=None):

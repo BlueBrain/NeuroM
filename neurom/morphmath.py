@@ -246,16 +246,14 @@ def polygon_diameter(points):
 
 
 def average_points_dist(p0, p_list):
-    """
-    Computes the average distance between a list of points
+    """Computes the average distance between a list of points
     and a given point p0.
     """
     return np.mean(list(point_dist(p0, p1) for p1 in p_list))
 
 
 def path_distance(points):
-    """
-    Compute the path distance from given set of points
+    """Compute the path distance from given set of points
     """
     return interval_lengths(points).sum()
 
@@ -372,8 +370,7 @@ def segment_taper_rate(seg):
 
 
 def pca(points):
-    '''
-    Estimate the principal components of the covariance on the given point cloud
+    '''Estimate the principal components of the covariance on the given point cloud
 
     Input
         A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)

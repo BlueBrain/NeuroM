@@ -54,8 +54,7 @@ def dict_if_none(arg):
 
 
 def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
-    """
-    Helper function to define the strings that handle pre-post conventions
+    """Helper function to define the strings that handle pre-post conventions
     for viewing - plotting title and saving options.
 
     Args:
@@ -83,8 +82,7 @@ def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
 
 
 def get_figure(new_fig=True, subplot='111', params=None):
-    """
-    Function to be used for viewing - plotting,
+    """Function to be used for viewing - plotting,
     to initialize the matplotlib figure - axes.
 
     Args:
@@ -334,8 +332,7 @@ def update_plot_limits(ax, white_space):
 
 
 def plot_legend(ax, no_legend=True, legend_arg=None):
-    """
-    Function that defines the legend options
+    """Function that defines the legend options
     of a matplotlib plot.
 
     Args:
