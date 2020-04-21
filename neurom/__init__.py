@@ -29,7 +29,6 @@
 '''NeuroM neurom morphology analysis package
 
 Examples:
-
     Load a neuron
 
     >>> import neurom as nm

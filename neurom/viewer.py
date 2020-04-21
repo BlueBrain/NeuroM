@@ -30,7 +30,6 @@
 '''Tools to visualize neuron morphological objects
 
 Examples:
-
     >>> from neurom import viewer
     >>> nrn = ... # load a neuron
     >>> viewer.draw(nrn)                    # 2d plot
@@ -88,7 +87,6 @@ def draw(obj, mode='2d', **kwargs):
         NotDrawableError if obj type and mode combination is not drawable
 
     Examples:
-
         >>> nrn = ... # load a neuron
         >>> fig, _ = viewer.draw(nrn)             # 2d plot
         >>> fig.show()

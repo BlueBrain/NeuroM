@@ -65,7 +65,6 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
 
     Examples:
-
         Get the number of points in each neurite in a neuron population
 
         >>> from neurom.core import iter_neurites
@@ -112,7 +111,6 @@ def iter_sections(neurites,
 
 
     Examples:
-
         Get the number of points in each section of all the axons in a neuron population
 
         >>> import neurom as nm

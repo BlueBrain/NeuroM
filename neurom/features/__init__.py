@@ -29,7 +29,6 @@
 '''NeuroM, lightweight and fast
 
 Examples:
-
     Obtain some morphometrics
 
     >>> ap_seg_len = features.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
