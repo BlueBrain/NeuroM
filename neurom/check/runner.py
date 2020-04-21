@@ -52,7 +52,6 @@ class CheckRunner(object):
 
     def run(self, path):
         '''Test a bunch of files and return a summary JSON report'''
-
         SEPARATOR = '=' * 40
         summary = {}
         res = True

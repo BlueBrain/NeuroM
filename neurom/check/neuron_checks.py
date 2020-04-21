@@ -338,7 +338,6 @@ def has_no_narrow_neurite_section(neuron,
         CheckResult with result. result.info contains the narrow section ids and their
         first point
     '''
-
     considered_sections = (sec for sec in iter_sections(neuron, neurite_filter=neurite_filter)
                            if sec.length > considered_section_min_length)
 

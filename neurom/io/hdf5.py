@@ -105,7 +105,6 @@ def _remove_duplicate_points(points, groups):
     Returns:
         points, groups with unique points.
     '''
-
     group_initial_ids = groups[:, GPFIRST]
 
     to_be_reduced = np.zeros(len(group_initial_ids))

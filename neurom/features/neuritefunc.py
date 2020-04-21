@@ -339,7 +339,6 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
     '''Partition asymmetry at bifurcation points of a collection of neurites
     Variant: length is a different definition, as the absolute difference in
     downstream path lenghts, relative to the total neurite path length'''
-
     if variant not in {'branch-order', 'length'}:
         raise ValueError('Please provide a valid variant for partition asymmetry,\
                          found %s' % variant)

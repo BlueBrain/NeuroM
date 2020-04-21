@@ -319,7 +319,6 @@ def update_plot_limits(ax, white_space):
 
     Note: This relies on ax.dataLim (in 2d) and ax.[xy, zz]_dataLim being set in 3d
     """
-
     if hasattr(ax, 'zz_dataLim'):
         bounds = ax.xy_dataLim.bounds
         ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
@@ -430,7 +429,6 @@ def plot_cylinder(ax, start, end, start_radius, end_radius,
 
 def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
     """Plots a 3d sphere, given the center and the radius."""
-
     u = np.linspace(0, 2 * np.pi, linspace_count)
     v = np.linspace(0, np.pi, linspace_count)
     sin_v = np.sin(v)

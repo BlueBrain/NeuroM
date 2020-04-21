@@ -262,7 +262,6 @@ def read(morph_file, data_wrapper=DataWrapper):
     '''Return a 'raw_data' np.array with the full neuron, and the format of the file
     suitable to be wrapped by DataWrapper
     '''
-
     warnings.warn('This is an experimental reader. '
                   'There are no guarantees regarding ability to parse '
                   'Neurolucida .asc files or correctness of output.')

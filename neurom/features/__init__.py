@@ -140,7 +140,6 @@ def get(feature, obj, **kwargs):
         features as a 1D or 2D numpy array.
 
     '''
-
     feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
                else NEURONFEATURES[feature])
 

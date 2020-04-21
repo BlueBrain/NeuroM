@@ -96,7 +96,6 @@ def draw(obj, mode='2d', **kwargs):
         >>> dend, _ = viewer.draw(nrn, mode='dendrogram')
 
     '''
-
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
 

@@ -49,7 +49,6 @@ def is_monotonic(neurite, tol):
     Returns:
         True if neurite monotonic
     '''
-
     for node in neurite.iter_sections():
         # check that points in section satisfy monotonicity
         sec = node.points

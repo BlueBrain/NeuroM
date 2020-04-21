@@ -74,7 +74,6 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
     Note:
         Supported fit types: 'norm', 'expon', 'uniform'
     '''
-
     type_map = {'norm': 'normal', 'expon': 'exponential', 'uniform': 'uniform'}
     param_map = {'uniform': lambda p: [('min', p[0]), ('max', p[0] + p[1])],
                  'norm': lambda p: [('mu', p[0]), ('sigma', p[1])],

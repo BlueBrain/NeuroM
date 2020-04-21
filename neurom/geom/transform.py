@@ -114,7 +114,6 @@ def translate(obj, t):
     Returns:
         copy of the object with the applied translation
     '''
-
     try:
         return obj.transform(Translation(t))
     except AttributeError:

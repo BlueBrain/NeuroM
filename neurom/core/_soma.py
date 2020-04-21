@@ -261,7 +261,6 @@ def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
         SomaError if no soma points found, points incompatible with soma, or
         if soma_check(points) fails.
     '''
-
     if soma_check:
         soma_check(points)
 
