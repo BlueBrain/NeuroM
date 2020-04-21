@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''visualize morphologies'''
+'''Visualize morphologies'''
 
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
@@ -55,7 +55,7 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
 
 
 def _plane2col(plane):
-    '''take a string like 'xy', and return the indices from COLS.*'''
+    '''Take a string like 'xy', and return the indices from COLS.*'''
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
     assert plane in planes, 'No such plane found! Please select one of: ' + str(planes)
     return (getattr(COLS, plane[0].capitalize()),
@@ -63,7 +63,7 @@ def _plane2col(plane):
 
 
 def _get_linewidth(tree, linewidth, diameter_scale):
-    '''calculate the desired linewidth based on tree contents
+    '''Calculate the desired linewidth based on tree contents
 
     If diameter_scale exists, it is used to scale the diameter of each of the segments
     in the tree
@@ -76,7 +76,7 @@ def _get_linewidth(tree, linewidth, diameter_scale):
 
 
 def _get_color(treecolor, tree_type):
-    """if treecolor set, it's returned, otherwise tree_type is used to return set colors"""
+    """If treecolor set, it's returned, otherwise tree_type is used to return set colors"""
     if treecolor is not None:
         return treecolor
     return TREE_COLOR.get(tree_type, 'green')
@@ -196,7 +196,7 @@ def plot_neuron(ax, nrn,
 
 
 def _update_3d_datalim(ax, obj):
-    '''unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually'''
+    '''Unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually'''
     min_bounding_box, max_bounding_box = geom.bounding_box(obj)
     xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
                            max_bounding_box[:COLS.Z]))
@@ -265,9 +265,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
 def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                   color=None, alpha=_ALPHA):
-    '''
-    Generates a figure of the neuron,
-    that contains a soma and a list of trees.
+    '''Generates a figure of the neuron, that contains a soma and a list of trees.
 
     Args:
         ax(matplotlib axes): on what to plot

@@ -34,7 +34,7 @@ import logging
 class _NullHandler(object):
     '''Backwards compatibility class for python 2.6'''
     def emit(self, _):
-        '''do nothing'''
+        '''Do nothing'''
 
 
 NullHandler = getattr(logging, 'NullHandler', _NullHandler)

@@ -117,7 +117,7 @@ def get_header(results):
 
 
 def generate_flattened_dict(headers, results):
-    '''extract from results the fields in the headers list'''
+    '''Extract from results the fields in the headers list'''
     for name, values in results.items():
         row = []
         for header in headers:
@@ -150,7 +150,7 @@ def full_config():
 
 
 def sanitize_config(config):
-    '''check that the config has the correct keys, add missing keys if necessary'''
+    '''Check that the config has the correct keys, add missing keys if necessary'''
     if 'neurite' in config:
         if 'neurite_type' not in config:
             raise ConfigError('"neurite_type" missing from config, but "neurite" set')

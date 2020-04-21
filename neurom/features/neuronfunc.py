@@ -83,7 +83,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
 
 
 def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
-    ''' Get the radii of the somata of a population of neurons
+    '''Get the radii of the somata of a population of neurons
 
     Note:
         If a single neuron is passed, a single element list with the
@@ -95,14 +95,14 @@ def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
 
 
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
-    '''list of lengths of trunk sections of neurites in a neuron'''
+    '''List of lengths of trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [morphmath.section_length(s.root_node.points)
             for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
-    '''radii of the trunk sections of neurites in a neuron'''
+    '''Radii of the trunk sections of neurites in a neuron'''
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
@@ -193,7 +193,7 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
 
 
 def sholl_crossings(neurites, center, radii):
-    '''calculate crossings of neurites
+    '''Calculate crossings of neurites
 
     Args:
         nrn(morph): morphology on which to perform Sholl analysis
@@ -204,7 +204,7 @@ def sholl_crossings(neurites, center, radii):
         for the respective radius
     '''
     def _count_crossings(neurite, radius):
-        '''count_crossings of segments in neurite with radius'''
+        '''Used to count_crossings of segments in neurite with radius'''
         r2 = radius ** 2
         count = 0
         for start, end in iter_segments(neurite):
@@ -222,7 +222,7 @@ def sholl_crossings(neurites, center, radii):
 
 
 def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
-    '''perform Sholl frequency calculations on a population of neurites
+    '''Perform Sholl frequency calculations on a population of neurites
 
     Args:
         nrn(morph): nrn or population

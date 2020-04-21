@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM, lightweight and fast
+'''NeuroM, lightweight and fast
 
 Examples:
 
@@ -152,7 +152,7 @@ _INDENT = ' ' * 4
 
 
 def _indent(string, count):
-    '''indent `string` by `count` * INDENT'''
+    '''Indent `string` by `count` * INDENT'''
     indent = _INDENT * count
     ret = indent + string.replace('\n', '\n' + indent)
     return ret.rstrip()
@@ -161,7 +161,7 @@ def _indent(string, count):
 def _get_doc():
     '''Get a description of all the known available features'''
     def get_docstring(func):
-        '''extract doctstring, if possible'''
+        '''Extract doctstring, if possible'''
         docstring = ':\n'
         if func.__doc__:
             docstring += _indent(func.__doc__, 2)

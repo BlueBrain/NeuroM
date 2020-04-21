@@ -55,12 +55,11 @@ class Transform3D(object):
 
 
 class Translation(Transform3D):
-    '''class representing a 3D translation'''
+    '''Class representing a 3D translation'''
     __doc__ += _TRANSFDOC
 
     def __init__(self, translation):
-        '''
-        Parameters:
+        '''Parameters:
             translation: 3-vector of x, y, z
         '''
         self._trans = np.array(translation)
@@ -75,8 +74,7 @@ class Rotation(Transform3D):
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm):
-        '''
-        Parameters:
+        '''Parameters:
             cdm: a 3x3 direction cosine matrix
         '''
         self._dcm = np.array(dcm)
@@ -91,8 +89,7 @@ class PivotRotation(Rotation):
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm, pivot=None):
-        '''
-        Parameters:
+        '''Parameters:
             cdm: a 3x3 direction cosine matrix
             pivot: a 3-vector specifying the origin of rotation
         '''
@@ -108,8 +105,7 @@ class PivotRotation(Rotation):
 
 
 def translate(obj, t):
-    '''
-    Translate object of supported type.
+    '''Translate object of supported type.
 
     Parameters :
         obj : object to be translated. Must implement a transform method.
@@ -126,8 +122,7 @@ def translate(obj, t):
 
 
 def rotate(obj, axis, angle, origin=None):
-    '''
-    Rotation around unit vector following the right hand rule
+    '''Rotation around unit vector following the right hand rule
 
     Parameters:
         obj : obj to be rotated (e.g. neurite, neuron).
@@ -147,13 +142,12 @@ def rotate(obj, axis, angle, origin=None):
 
 
 def _sin(x):
-    '''sine with case for pi multiples'''
+    '''Sine with case for pi multiples'''
     return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
 
 
 def _rodrigues_to_dcm(axis, angle):
-    '''
-    Generates transformation matrix from unit vector
+    '''Generates transformation matrix from unit vector
     and rotation angle. The rotation is applied in the direction
     of the axis which is a unit vector following the right hand rule.
 

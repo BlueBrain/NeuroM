@@ -121,7 +121,7 @@ def _section_end_points(structure_block, id_map):
 
 
 class DataBlockSection(object):
-    '''sections ((ids), type, parent_id)'''
+    '''Sections ((ids), type, parent_id)'''
     def __init__(self, ids=None, ntype=0, pid=-1):
         self.ids = [] if ids is None else ids
         self.ntype = ntype
@@ -159,7 +159,7 @@ def _extract_sections(data_block):
     sections = []
 
     def new_section():
-        '''new_section'''
+        '''A new_section'''
         sections.append(DataBlockSection())
         return sections[-1]
 
@@ -232,7 +232,7 @@ class BlockNeuronBuilder(object):
         self.sections = {}
 
     def add_section(self, id_, parent_id, section_type, points):
-        '''add a section
+        '''Add a section
 
         Args:
             id_(int): identifying number of the section
@@ -277,7 +277,7 @@ class BlockNeuronBuilder(object):
         return datablock, sections
 
     def _check_consistency(self):
-        '''see if the sections have obvious errors'''
+        '''See if the sections have obvious errors'''
         type_count = defaultdict(int)
         for _, section in sorted(self.sections.items()):
             type_count[section.section_type] += 1
@@ -286,7 +286,7 @@ class BlockNeuronBuilder(object):
             L.info('Have %d somas, expected 1', type_count[POINT_TYPE.SOMA])
 
     def get_datawrapper(self, file_format='BlockNeuronBuilder', data_wrapper=DataWrapper):
-        '''returns a DataWrapper'''
+        '''Returns a DataWrapper'''
         self._check_consistency()
         datablock, sections = self._make_datablock()
         return data_wrapper(datablock, file_format, sections)

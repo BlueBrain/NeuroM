@@ -112,7 +112,7 @@ def _remove_soma_initial_point(tree):
 
 
 def _check_soma_topology_swc(points):
-    '''check if points form valid soma
+    '''Check if points form valid soma
 
     Currently checks if there are bifurcations within a soma
     with more than three points.

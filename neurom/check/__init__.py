@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Basic tools to check neuronal morphologies. '''
+'''Basic tools to check neuronal morphologies. '''
 
 from functools import wraps
 
@@ -52,9 +52,9 @@ class CheckResult(object):
         self.title = title
 
     def __nonzero__(self):
-        '''boolean conversion method py2 version'''
+        '''Boolean conversion method py2 version'''
         return self.__bool__()
 
     def __bool__(self):
-        '''boolean conversion method py3 version'''
+        '''Boolean conversion method py3 version'''
         return self.status

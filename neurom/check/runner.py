@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''runner for neuron morphology checks'''
+'''Runner for neuron morphology checks'''
 
 import logging
 from importlib import import_module
@@ -152,7 +152,7 @@ class CheckRunner(object):
 
     @staticmethod
     def _sanitize_config(config):
-        '''check that the config has the correct keys, add missing keys if necessary'''
+        '''Check that the config has the correct keys, add missing keys if necessary'''
         if 'checks' in config:
             checks = config['checks']
             if 'structural_checks' not in checks:

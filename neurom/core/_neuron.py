@@ -253,7 +253,7 @@ class Neurite(object):
         return clone
 
     def iter_sections(self, order=Tree.ipreorder, neurite_order=NeuriteIter.FileOrder):
-        '''iteration over section nodes
+        '''Iteration over section nodes
 
     Parameters:
         order: section iteration order within a given neurite. Must be one of:

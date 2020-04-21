@@ -69,8 +69,7 @@ class Soma(object):
 
 
 class SomaSinglePoint(Soma):
-    '''
-    Type A: 1point soma
+    '''Type A: 1point soma
     Represented by a single point.
     '''
 
@@ -129,7 +128,7 @@ class SomaCylinders(Soma):
 
 
 class SomaNeuromorphoThreePointCylinders(SomaCylinders):
-    ''' NeuroMorpho compatible soma
+    '''NeuroMorpho compatible soma
 
     Reference:
         http://neuromorpho.org/SomaFormat.html
@@ -183,8 +182,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
 
 class SomaSimpleContour(Soma):
-    '''
-    Type C: multiple points soma
+    '''Type C: multiple points soma
     Represented by a contour.
 
     The equivalent radius as the average distance to the center.
@@ -216,7 +214,7 @@ SOMA_CYLINDER = 'cylinder'
 
 
 def _get_type(points, soma_class):
-    '''get the type of the soma
+    '''Get the type of the soma
 
     Args:
         points: Soma points

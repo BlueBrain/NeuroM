@@ -36,7 +36,7 @@ from neurom.core.dataformat import COLS
 
 
 def vector(p1, p2):
-    '''compute vector between two 3D points
+    '''Compute vector between two 3D points
 
     Args:
         p1, p2: indexable objects with
@@ -139,7 +139,7 @@ def path_fraction_point(points, fraction):
 
 
 def scalar_projection(v1, v2):
-    '''compute the scalar projection of v1 upon v2
+    '''Compute the scalar projection of v1 upon v2
 
     Args:
         v1, v2: iterable
@@ -152,7 +152,7 @@ def scalar_projection(v1, v2):
 
 
 def vector_projection(v1, v2):
-    '''compute the vector projection of v1 upon v2
+    '''Compute the vector projection of v1 upon v2
 
     Args:
         v1, v2: iterable
@@ -165,7 +165,7 @@ def vector_projection(v1, v2):
 
 
 def dist_point_line(p, l1, l2):
-    '''compute the orthogonal distance between from the line that goes through
+    '''Compute the orthogonal distance between from the line that goes through
     the points l1, l2 and the point p
 
     Args:
@@ -178,7 +178,7 @@ def dist_point_line(p, l1, l2):
 
 
 def point_dist2(p1, p2):
-    '''compute the square of the euclidian distance between two 3D points
+    '''Compute the square of the euclidian distance between two 3D points
 
     Args:
         p1, p2: indexable objects with
@@ -191,7 +191,7 @@ def point_dist2(p1, p2):
 
 
 def point_dist(p1, p2):
-    '''compute the euclidian distance between two 3D points
+    '''Compute the euclidian distance between two 3D points
 
     Args:
         p1, p2: indexable objects with
@@ -203,7 +203,7 @@ def point_dist(p1, p2):
 
 
 def angle_3points(p0, p1, p2):
-    ''' compute the angle in radians between three 3D points
+    '''Compute the angle in radians between three 3D points
 
     Calculated as the angle between p1-p0 and p2-p0.
 
@@ -239,7 +239,7 @@ def angle_between_vectors(p1, p2):
 
 
 def polygon_diameter(points):
-    ''' Compute the maximun euclidian distance between any two points
+    '''Compute the maximun euclidian distance between any two points
     in a list of points
     '''
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))

@@ -42,14 +42,14 @@ plt = None  # refer to _get_plt()
 
 
 def _get_plt():
-    '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    '''Wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
     global plt  # pylint: disable=global-statement
     import matplotlib.pyplot  # pylint: disable=import-outside-toplevel
     plt = matplotlib.pyplot
 
 
 def dict_if_none(arg):
-    '''return an empty dict if arg is None'''
+    '''Return an empty dict if arg is None'''
     return arg if arg is not None else {}
 
 
@@ -354,7 +354,7 @@ _LINSPACE_COUNT = 300
 
 
 def _get_normals(v):
-    '''get two vectors that form a basis w/ v
+    '''Get two vectors that form a basis w/ v
 
     Note: returned vectors are unit
     '''
@@ -395,7 +395,7 @@ def generate_cylindrical_points(start, end, start_radius, end_radius,
 def project_cylinder_onto_2d(ax, plane,
                              start, end, start_radius, end_radius,
                              color='black', alpha=1.):
-    '''take cylinder defined by start/end, and project it onto the plane
+    '''Take cylinder defined by start/end, and project it onto the plane
 
     Args:
         ax: matplotlib axes
@@ -421,7 +421,7 @@ def project_cylinder_onto_2d(ax, plane,
 
 def plot_cylinder(ax, start, end, start_radius, end_radius,
                   color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
-    '''plot a 3d cylinder'''
+    '''Plot a 3d cylinder'''
     assert not np.all(start == end), 'Cylinder must have length'
     x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
                                           linspace_count=linspace_count)
