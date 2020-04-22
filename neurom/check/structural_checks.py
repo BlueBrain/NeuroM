@@ -49,7 +49,8 @@ def has_sequential_ids(data_wrapper):
 
 
 def no_missing_parents(data_wrapper):
-    '''Check that all points have existing parents
+    '''Check that all points have existing parents.
+
     Point's parent ID must exist and parent must be declared
     before child.
 

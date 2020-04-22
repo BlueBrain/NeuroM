@@ -43,8 +43,7 @@ def _raise_if_not_bifurcation(section):
 
 
 def local_bifurcation_angle(bif_point):
-    '''Return the opening angle between two out-going sections
-    in a bifurcation point
+    '''Return the opening angle between two out-going sections in a bifurcation point
 
     We first ensure that the input point has only two children.
 
@@ -71,8 +70,7 @@ def local_bifurcation_angle(bif_point):
 
 
 def remote_bifurcation_angle(bif_point):
-    '''Return the opening angle between two out-going sections
-    in a bifurcation point
+    '''Return the opening angle between two out-going sections in a bifurcation point
 
     We first ensure that the input point has only two children.
 
@@ -103,7 +101,8 @@ def bifurcation_partition(bif_point):
 
 def partition_asymmetry(bif_point):
     '''Calculate the partition asymmetry at a bifurcation point
-    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+
+    Partition asymmetry is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
@@ -155,7 +154,8 @@ def sibling_ratio(bif_point, method='first'):
 
 def diameter_power_relation(bif_point, method='first'):
     '''Calculate the diameter power relation at a bifurcation point
-    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+
+    The diameter power relation is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     This quantity gives an indication of how far the branching is from
     the Rall ratio

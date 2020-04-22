@@ -70,6 +70,7 @@ class Soma(object):
 
 class SomaSinglePoint(Soma):
     '''Type A: 1point soma
+
     Represented by a single point.
     '''
 
@@ -183,6 +184,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
 class SomaSimpleContour(Soma):
     '''Type C: multiple points soma
+
     Represented by a contour.
 
     The equivalent radius as the average distance to the center.

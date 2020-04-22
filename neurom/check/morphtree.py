@@ -86,7 +86,9 @@ def is_flat(neurite, tol, method='tolerance'):
 
 
 def is_back_tracking(neurite):
-    '''Check if a neurite process backtracks to a previous node. Back-tracking takes place
+    '''Check if a neurite process backtracks to a previous node.
+
+    Back-tracking takes place
     when a daughter of a branching process goes back and either overlaps with a previous point, or
     lies inside the cylindrical volume of the latter.
 
@@ -115,8 +117,9 @@ def is_back_tracking(neurite):
         return not np.allclose(coords(seg[0]), coords(seg[1]))
 
     def is_in_the_same_verse(seg1, seg2):
-        '''Checks if the vectors face the same direction. This
-        is true if their dot product is greater than zero.
+        '''Checks if the vectors face the same direction.
+
+        This is true if their dot product is greater than zero.
         '''
         v1 = coords(seg2[1]) - coords(seg2[0])
         v2 = coords(seg1[1]) - coords(seg1[0])
@@ -162,6 +165,7 @@ def is_back_tracking(neurite):
 
     def is_inside_cylinder(seg1, seg2):
         '''Checks if seg2 approximately lies within a cylindrical volume of seg1.
+
         Two conditions must be satisfied:
             1. The two segments are not facing the same direction  (seg2 comes back to seg1)
             2. seg2 is overlaping with seg1

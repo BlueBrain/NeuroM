@@ -59,7 +59,9 @@ class Translation(Transform3D):
     __doc__ += _TRANSFDOC
 
     def __init__(self, translation):
-        '''Parameters:
+        '''Initialize a 3D translation.
+
+        Parameters:
             translation: 3-vector of x, y, z
         '''
         self._trans = np.array(translation)
@@ -74,7 +76,9 @@ class Rotation(Transform3D):
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm):
-        '''Parameters:
+        '''Initialize a 3D rotation.
+
+        Parameters:
             cdm: a 3x3 direction cosine matrix
         '''
         self._dcm = np.array(dcm)
@@ -89,7 +93,9 @@ class PivotRotation(Rotation):
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm, pivot=None):
-        '''Parameters:
+        '''Initialize a 3D rotation about a pivot point.
+
+        Parameters:
             cdm: a 3x3 direction cosine matrix
             pivot: a 3-vector specifying the origin of rotation
         '''
@@ -146,8 +152,9 @@ def _sin(x):
 
 
 def _rodrigues_to_dcm(axis, angle):
-    '''Generates transformation matrix from unit vector
-    and rotation angle. The rotation is applied in the direction
+    '''Generates transformation matrix from unit vector and rotation angle.
+
+    The rotation is applied in the direction
     of the axis which is a unit vector following the right hand rule.
 
     Inputs :

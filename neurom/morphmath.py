@@ -56,7 +56,9 @@ def linear_interpolate(p1, p2, fraction):
 
 
 def interpolate_radius(r1, r2, fraction):
-    '''Calculate the radius that corresponds to a point P that lies at a fraction of the length
+    '''Interpolate the radius between two values.
+
+    Calculate the radius that corresponds to a point P that lies at a fraction of the length
     of a cut cone P1P2 where P1, P2 are the centers of the circles that bound the shape with radii
     r1 and r2 respectively.
 
@@ -74,9 +76,7 @@ def interpolate_radius(r1, r2, fraction):
     Note: The fraction is assumed from point P1, not from point P2.
     '''
     def f(a, b, c):
-        '''Returns the length of the interpolated radius calculated
-        using similar triangles.
-        '''
+        '''Returns the length of the interpolated radius calculated using similar triangles.'''
         return a + c * (b - a)
     return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
 
@@ -165,8 +165,9 @@ def vector_projection(v1, v2):
 
 
 def dist_point_line(p, l1, l2):
-    '''Compute the orthogonal distance between from the line that goes through
-    the points l1, l2 and the point p
+    '''Compute the orthogonal distance between a line and a point.
+
+    The line is that which passes through the points l1 and l2.
 
     Args:
         p, l1, l2 : iterable
@@ -223,6 +224,7 @@ def angle_3points(p0, p1, p2):
 
 def angle_between_vectors(p1, p2):
     """Computes the angle in radians between vectors 'p1' and 'p2'
+
     Normalizes the input vectors and computes the relative angle
     between them.
 
@@ -239,9 +241,7 @@ def angle_between_vectors(p1, p2):
 
 
 def polygon_diameter(points):
-    '''Compute the maximun euclidian distance between any two points
-    in a list of points
-    '''
+    '''Compute the maximun euclidian distance between any two points in a list of points'''
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))
 
 

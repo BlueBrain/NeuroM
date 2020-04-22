@@ -248,11 +248,10 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
 
 
 def section_taper_rates(neurites, neurite_type=NeuriteType.all):
-    '''Diameters taper rate of the sections in a collection of neurites
-    when going from root to tips. It is expected to be negative
-    for neurons.
+    '''Diameter taper rates of the sections in a collection of neurites from root to tip.
 
-    Taper rate is defined here as the linear fit along a section
+    Taper rate is defined here as the linear fit along a section.
+    It is expected to be negative for neurons.
     '''
     def _sec_taper_rate(sec):
         '''Taper rate from fit along a section'''
@@ -337,6 +336,7 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
 
 def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branch-order'):
     '''Partition asymmetry at bifurcation points of a collection of neurites
+
     Variant: length is a different definition, as the absolute difference in
     downstream path lenghts, relative to the total neurite path length
     '''
@@ -364,6 +364,7 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
 
 def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
     '''Sibling ratios at bifurcation points of a collection of neurites.
+
     The sibling ratio is the ratio between the diameters of the
     smallest and the largest child. It is a real number between
     0 and 1. Method argument allows one to consider mean diameters
@@ -377,6 +378,7 @@ def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
 
 def partition_pairs(neurites, neurite_type=NeuriteType.all):
     '''Partition pairs at bifurcation points of a collection of neurites.
+
     Partition pair is defined as the number of bifurcations at the two
     daughters of the bifurcating section
     '''
@@ -387,8 +389,9 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
 
 
 def diameter_power_relations(neurites, neurite_type=NeuriteType.all, method='first'):
-    '''Calculate the diameter power relation at a bifurcation point
-    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+    '''Calculate the diameter power relation at a bifurcation point.
+
+    Diameter power relation is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     This quantity gives an indication of how far the branching is from
     the Rall ratio (when =1).
@@ -402,6 +405,7 @@ def diameter_power_relations(neurites, neurite_type=NeuriteType.all, method='fir
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None,
                              iterator_type=Tree.ipreorder):
     '''Section radial distances in a collection of neurites.
+
     The iterator_type can be used to select only terminal sections (ileaf)
     or only bifurcations (ibifurcation_point).
     '''

@@ -82,8 +82,7 @@ def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
 
 
 def get_figure(new_fig=True, subplot='111', params=None):
-    """Function to be used for viewing - plotting,
-    to initialize the matplotlib figure - axes.
+    """Function to be used for viewing - plotting, to initialize the matplotlib figure - axes.
 
     Args:
         new_fig(bool): Defines if a new figure will be created, if false current figure is used
@@ -332,8 +331,7 @@ def update_plot_limits(ax, white_space):
 
 
 def plot_legend(ax, no_legend=True, legend_arg=None):
-    """Function that defines the legend options
-    of a matplotlib plot.
+    """Function that defines the legend options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes

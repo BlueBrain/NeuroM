@@ -49,7 +49,8 @@ def soma_volume(nrn):
 
 
 def soma_volumes(nrn_pop):
-    '''Get the volume of the somata in a population of neurons
+    '''Get the volume of the somata in a population of neurons.
+
     Note:
         If a single neuron is passed, a single element list with the volume
         of its soma member is returned.
@@ -155,8 +156,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_vectors(nrn, neurite_type=NeuriteType.all):
-    '''Calculates the vectors between all the trunks of the neuron
-    and the soma center.
+    '''Calculates the vectors between all the trunks of the neuron and the soma center.
     '''
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
@@ -168,6 +168,7 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
 
 def trunk_angles(nrn, neurite_type=NeuriteType.all):
     '''Calculates the angles between all the trunks of the neuron.
+
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
     '''

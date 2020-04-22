@@ -111,8 +111,7 @@ def fit(data, distribution='norm'):
 
 
 def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
-    '''Calculate the parameters of a fit of different distributions to a data set
-       and returns the distribution of the minimal ks-distance.
+    '''Fit multiple distributions to a data set and return the fit with the minimal ks-distance.
 
     Parameters:
         data: array of data points to be fitted

@@ -1,6 +1,4 @@
-'''Define the public 'draw' function to be used to draw
-morphology using plotly
-'''
+'''Define the public 'draw' function to be used to draw morphology using plotly'''
 from __future__ import absolute_import  # prevents name clash with local plotly module
 from itertools import chain
 
@@ -37,9 +35,7 @@ def _plot_neuron(neuron, plane, inline, **kwargs):
 
 
 def _plot_neuron3d(neuron, inline, **kwargs):
-    '''Generates a figure of the neuron,
-    that contains a soma and a list of trees.
-    '''
+    '''Generates a figure of the neuron, that contains a soma and a list of trees.'''
     return _plotly(neuron, plane='3d', title='neuron-3D', inline=inline, **kwargs)
 
 

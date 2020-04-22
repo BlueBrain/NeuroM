@@ -112,9 +112,7 @@ def _get_tokens(morph_fd):
 
 
 def _parse_section(token_iter):
-    '''Take a stream of tokens, and create the tree structure that is defined
-    by the s-expressions
-    '''
+    '''Create a tree structure (defined by the s-expressions) from a stream of tokens.'''
     sexp = []
     for token in token_iter:
         if token == '(':
