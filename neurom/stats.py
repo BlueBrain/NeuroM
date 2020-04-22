@@ -61,7 +61,7 @@ def get_test(stest):
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
     '''Create a JSON-comparable dict from a FitResults object
 
-    Parameters:
+    Arguments:
         fit_results (FitResults): object containing fit parameters,\
             errors and type
         min_bound: optional min value to add to dictionary if min isn't\
@@ -94,7 +94,7 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
 def fit(data, distribution='norm'):
     '''Calculate the parameters of a fit of a distribution to a data set
 
-    Parameters:
+    Arguments:
         data: array of data points to be fitted
 
     Options:
@@ -113,7 +113,7 @@ def fit(data, distribution='norm'):
 def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
     '''Fit multiple distributions to a data set and return the fit with the minimal ks-distance.
 
-    Parameters:
+    Arguments:
         data: array of data points to be fitted
 
     Options:
@@ -133,7 +133,7 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
 def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     '''Calculate the stats from the given numpy functions
 
-    Parameters:
+    Arguments:
         data: array of data points to be used for the stats
 
     Options:
@@ -157,7 +157,7 @@ def compare_two(data1, data2, test=StatTests.ks):
        and a probability they are drawn from the same
        distribution.
 
-    Parameters:
+    Arguments:
         data1: numpy array of dataset 1
         data2: numpy array of dataset 2
         test: Stat_tests\
@@ -182,7 +182,7 @@ def total_score(paired_dats, p=2, test=StatTests.ks):
     '''Calculates the p-norm of the distances that have been calculated from the statistical
     test that has been applied on all the paired datasets.
 
-    Parameters:
+    Arguments:
         paired_dats: a list of tuples or where each tuple
                          contains the paired data lists from two datasets
 

@@ -262,7 +262,7 @@ def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
     Infers the soma type (SomaSinglePoint, SomaSimpleContour)
     from the points and the 'soma_class'
 
-    Parameters:
+    Arguments:
         points: collection of points forming a soma.
         soma_check: optional validation function applied to points. Should
         raise a SomaError if points not valid.

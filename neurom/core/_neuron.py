@@ -56,7 +56,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
 
     Applies optional neurite filter and mapping functions.
 
-    Parameters:
+    Arguments:
         obj: a neurite, neuron or neuron population.
         mapfun: optional neurite mapping function.
         filt: optional neurite filter function.
@@ -95,7 +95,7 @@ def iter_sections(neurites,
                   neurite_order=NeuriteIter.FileOrder):
     '''Iterator to the sections in a neurite, neuron or neuron population.
 
-    Parameters:
+    Arguments:
         neurites: neuron, population, neurite, or iterable containing neurite objects
         iterator_type: section iteration order within a given neurite. Must be one of:
             Tree.ipreorder: Depth-first pre-order iteration of tree nodes
@@ -127,7 +127,7 @@ def iter_sections(neurites,
 def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
     '''Return an iterator to the segments in a collection of neurites
 
-    Parameters:
+    Arguments:
         obj: neuron, population, neurite, section, or iterable containing neurite objects
         neurite_filter: optional top level filter on properties of neurite neurite objects
         neurite_order: order upon which neurite should be iterated. Values:
@@ -256,7 +256,7 @@ class Neurite(object):
     def iter_sections(self, order=Tree.ipreorder, neurite_order=NeuriteIter.FileOrder):
         '''Iteration over section nodes
 
-    Parameters:
+    Arguments:
         order: section iteration order within a given neurite. Must be one of:
             Tree.ipreorder: Depth-first pre-order iteration of tree nodes
             Tree.ipreorder: Depth-first post-order iteration of tree nodes

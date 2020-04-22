@@ -126,6 +126,7 @@ def plot_soma(ax, soma, plane='xy',
         ax(matplotlib axes): on what to plot
         soma(neurom.core.Soma): plotted soma
         plane(str): Any pair of 'xyz'
+        soma_outline(bool): If true, draws the outline of the soma
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice

@@ -70,9 +70,11 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
     * Tries to guess the format and the H5 version.
     * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
 
-    Parameters:
+    Arguments:
+        filename: path to file to be read
         remove_duplicates: boolean, If True removes duplicate points
-        from the beginning of each section.
+            from the beginning of each section.
+        data_wrapper: return class
     '''
     with h5py.File(filename, mode='r') as h5file:
         version = get_version(h5file)

@@ -42,9 +42,9 @@ L = logging.getLogger(__name__)
 def eval_stats(values, mode):
     '''Extract a summary statistic from an array of list of values
 
-    Parameters:
-        values: numpy array of values
-        mode: summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
+    Arguments:
+        values: A numpy array of values
+        mode: A summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
 
     Note: fails silently if values is empty, and None is returned
     '''

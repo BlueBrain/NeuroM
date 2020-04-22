@@ -99,7 +99,7 @@ class Tree(object):
     def iforking_point(self, iter_mode=ipreorder):
         '''Iterator to forking points. Returns a tree object.
 
-        Parameters:
+        Arguments:
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
         '''
@@ -108,7 +108,7 @@ class Tree(object):
     def ibifurcation_point(self, iter_mode=ipreorder):
         '''Iterator to bifurcation points. Returns a tree object.
 
-        Parameters:
+        Arguments:
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
         '''

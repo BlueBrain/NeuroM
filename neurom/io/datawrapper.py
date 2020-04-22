@@ -242,7 +242,7 @@ class BlockNeuronBuilder(object):
             id_(int): identifying number of the section
             parent_id(int): identifying number of the parent of this section
             section_type(int): the section type as defined by POINT_TYPE
-            points is an array of [X, Y, Z, R]
+            points: an array of [X, Y, Z, R]
         '''
         # L.debug('Adding section %d, with parent %d, of type: %d with count: %d',
         #         id_, parent_id, section_type, len(points))

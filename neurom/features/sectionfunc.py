@@ -99,7 +99,7 @@ def section_radial_distance(section, origin):
     The radial distance is the euclidian distance between the
     end-point point of the section and the origin point in question.
 
-    Parameters:
+    Arguments:
         section: neurite section object
         origin: point to which distances are measured. It must have at least 3\
             components. The first 3 components are (x, y, z).

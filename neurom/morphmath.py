@@ -170,9 +170,12 @@ def dist_point_line(p, l1, l2):
     The line is that which passes through the points l1 and l2.
 
     Args:
-        p, l1, l2 : iterable
-        point
-        indices 0, 1, 2 corresponding to cartesian coordinates
+        p: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
+        l1: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
+        l2: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
     '''
     cross_prod = np.cross(l2 - l1, p - l1)
     return np.linalg.norm(cross_prod) / np.linalg.norm(l2 - l1)
@@ -311,7 +314,7 @@ def segment_radial_dist(seg, pos):
     The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
 
-    Parameters:
+    Arguments:
         seg: tree segment
 
         pos: origin to which distances are measured. It must have at lease 3

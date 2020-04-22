@@ -114,7 +114,7 @@ NEURONFEATURES = {
 def register_neurite_feature(name, func):
     '''Register a feature to be applied to neurites
 
-    Parameters:
+    Arguments:
         name: name of the feature, used for access via get() function.
         func: single parameter function of a neurite.
     '''
@@ -131,7 +131,7 @@ def register_neurite_feature(name, func):
 def get(feature, obj, **kwargs):
     '''Obtain a feature from a set of morphology objects
 
-    Parameters:
+    Arguments:
         feature(string): feature to extract
         obj: a neuron, population or neurite tree
         **kwargs: parameters to forward to underlying worker functions

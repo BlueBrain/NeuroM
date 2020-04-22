@@ -61,7 +61,7 @@ class Translation(Transform3D):
     def __init__(self, translation):
         '''Initialize a 3D translation.
 
-        Parameters:
+        Arguments:
             translation: 3-vector of x, y, z
         '''
         self._trans = np.array(translation)
@@ -78,8 +78,8 @@ class Rotation(Transform3D):
     def __init__(self, dcm):
         '''Initialize a 3D rotation.
 
-        Parameters:
-            cdm: a 3x3 direction cosine matrix
+        Arguments:
+            dcm: a 3x3 direction cosine matrix
         '''
         self._dcm = np.array(dcm)
 
@@ -95,8 +95,8 @@ class PivotRotation(Rotation):
     def __init__(self, dcm, pivot=None):
         '''Initialize a 3D rotation about a pivot point.
 
-        Parameters:
-            cdm: a 3x3 direction cosine matrix
+        Arguments:
+            dcm: a 3x3 direction cosine matrix
             pivot: a 3-vector specifying the origin of rotation
         '''
         super(PivotRotation, self).__init__(dcm)
@@ -113,7 +113,7 @@ class PivotRotation(Rotation):
 def translate(obj, t):
     '''Translate object of supported type.
 
-    Parameters :
+    Arguments:
         obj : object to be translated. Must implement a transform method.
         t: translation 3-vector
 
@@ -129,11 +129,12 @@ def translate(obj, t):
 def rotate(obj, axis, angle, origin=None):
     '''Rotation around unit vector following the right hand rule
 
-    Parameters:
+    Arguments:
         obj : obj to be rotated (e.g. neurite, neuron).
             Must implement a transform method.
         axis : unit vector for the axis of rotation
         angle : rotation angle in rads
+        origin : specify the origin about which rotation occurs
 
     Returns:
         A copy of the object with the applied translation.

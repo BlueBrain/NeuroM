@@ -131,7 +131,7 @@ def load_neurons(neurons,
     '''Create a population object from all morphologies in a directory\
         of from morphologies in a list of file names
 
-    Parameters:
+    Arguments:
         neurons: directory path or list of neuron file paths
         neuron_loader: function taking a filename and returning a neuron
         population_class: class representing populations

@@ -285,11 +285,11 @@ def plot_ticks(ax, tick_fontsize=12,
         ax: matplotlib axes
         tick_fontsize (int): Defines the size of the ticks' font
         xticks([list of ticks]): Defines the values of x ticks in the figure
-        xticks_arg(dict):  Passsed into matplotlib as xticks arguments
+        xticks_args(dict):  Passsed into matplotlib as xticks arguments
         yticks([list of ticks]): Defines the values of y ticks in the figure
-        yticks_arg(dict):  Passsed into matplotlib as yticks arguments
+        yticks_args(dict):  Passsed into matplotlib as yticks arguments
         zticks([list of ticks]): Defines the values of z ticks in the figure
-        zticks_arg(dict):  Passsed into matplotlib as zticks arguments
+        zticks_args(dict):  Passsed into matplotlib as zticks arguments
     """
     if xticks is not None:
         ax.set_xticks(xticks)
