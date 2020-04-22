@@ -194,7 +194,7 @@ def number_of_segments(neurites, neurite_type=NeuriteType.all):
 def map_segments(func, neurites, neurite_type):
     '''Map `func` to all the segments in a collection of neurites
 
-        `func` accepts a section and returns list of values corresponding to each segment.
+    `func` accepts a section and returns list of values corresponding to each segment.
     '''
     neurite_filter = is_type(neurite_type)
     return [
