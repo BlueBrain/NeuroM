@@ -37,7 +37,7 @@ L = logging.getLogger(__name__)
 def generate_annotation(result, settings):
     '''Generate the annotation for a given checker
 
-    Arguments
+    Arguments:
         neuron(Neuron): The neuron object
         checker: A tuple where the first item is the checking function (usually from neuron_checks)
                  and the second item is a dictionary of settings for the annotation. It must
