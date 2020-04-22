@@ -74,6 +74,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
+
     Note:
         If a single neuron is passed, a single element list with the surface
         area of its soma member is returned.

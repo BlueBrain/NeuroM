@@ -187,6 +187,7 @@ def point_dist2(p1, p2):
     Args:
         p1, p2: indexable objects with
         indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+
     Returns:
         The square of the euclidian distance between the points.
     '''
@@ -200,6 +201,7 @@ def point_dist(p1, p2):
     Args:
         p1, p2: indexable objects with
         indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+
     Returns:
         The euclidian distance between the points.
     '''
