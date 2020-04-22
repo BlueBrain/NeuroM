@@ -157,8 +157,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_vectors(nrn, neurite_type=NeuriteType.all):
-    '''Calculates the vectors between all the trunks of the neuron and the soma center.
-    '''
+    '''Calculates the vectors between all the trunks of the neuron and the soma center.'''
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
 
