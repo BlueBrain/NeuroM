@@ -56,6 +56,7 @@ class memoize(object):
     """
 
     def __init__(self, func):
+        '''Initialize a memoize object.'''
         self.func = func
         update_wrapper(self, func)
 

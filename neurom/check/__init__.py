@@ -47,6 +47,7 @@ def check_wrapper(fun):
 class CheckResult(object):
     '''Class representing a check result'''
     def __init__(self, status, info=None, title=None):
+        '''Initialize a CheckResult object.'''
         self.status = bool(status)
         self.info = info
         self.title = title

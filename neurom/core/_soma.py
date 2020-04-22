@@ -44,6 +44,7 @@ class Soma(object):
     '''
 
     def __init__(self, points):
+        '''Initialize a Soma object.'''
         self._points = points
         self.radius = 0
 
@@ -75,6 +76,7 @@ class SomaSinglePoint(Soma):
     '''
 
     def __init__(self, points):
+        '''Initialize a SomaSinglePoint object.'''
         super(SomaSinglePoint, self).__init__(points)
         self.radius = points[0][COLS.R]
 
@@ -108,6 +110,7 @@ class SomaCylinders(Soma):
   '''
 
     def __init__(self, points):
+        '''Initialize a SomaCyliners object.'''
         super(SomaCylinders, self).__init__(points)
         self.area = sum(morphmath.segment_area((p0, p1))
                         for p0, p1 in zip(points, points[1:]))
@@ -124,6 +127,7 @@ class SomaCylinders(Soma):
                    for p0, p1 in zip(self.points, self.points[1:]))
 
     def __str__(self):
+        '''Return a string representation.'''
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
@@ -149,6 +153,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
     '''
 
     def __init__(self, points):
+        '''Initialize a SomaNeuromorphoThreePointCylinders object.'''
         super(SomaNeuromorphoThreePointCylinders, self).__init__(points)
 
         # X    Y     Z   R    P
@@ -178,6 +183,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         return 2 * math.pi * self.radius ** 3
 
     def __str__(self):
+        '''Return a string representation.'''
         return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
@@ -194,6 +200,7 @@ class SomaSimpleContour(Soma):
     '''
 
     def __init__(self, points):
+        '''Initialize a SomaSimpleContour object.'''
         super(SomaSimpleContour, self).__init__(points)
         points = np.array(self._points)
         self.radius = morphmath.average_points_dist(
@@ -206,6 +213,7 @@ class SomaSimpleContour(Soma):
         return np.mean(points[:, COLS.XYZ], axis=0)
 
     def __str__(self):
+        '''Return a string representation.'''
         return ('SomaSimpleContour(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 

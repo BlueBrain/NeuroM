@@ -158,6 +158,7 @@ class Section(Tree):
     '''Class representing a neurite section'''
 
     def __init__(self, points, section_id=None, section_type=NeuriteType.undefined):
+        '''Initialize a Section object.'''
         super(Section, self).__init__()
         self.id = section_id
         self.points = points
@@ -200,6 +201,7 @@ class Neurite(object):
     '''Class representing a neurite tree'''
 
     def __init__(self, root_node):
+        '''Initialize a Neurite object.'''
         self.root_node = root_node
         self.type = root_node.type if hasattr(
             root_node, 'type') else NeuriteType.undefined
@@ -292,6 +294,7 @@ class Neuron(object):
     '''Class representing a simple neuron'''
 
     def __init__(self, soma=None, neurites=None, sections=None, name='Neuron'):
+        '''Initialize a Neuron object.'''
         self.soma = soma
         self.name = name
         self.neurites = neurites

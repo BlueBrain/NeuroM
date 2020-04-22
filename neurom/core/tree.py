@@ -35,6 +35,7 @@ from neurom._compat import filter
 class Tree(object):
     '''Simple recursive tree class'''
     def __init__(self):
+        '''Initialize a Tree object.'''
         self.parent = None
         self.children = list()
 

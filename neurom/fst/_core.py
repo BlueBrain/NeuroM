@@ -41,6 +41,7 @@ class FstNeuron(Neuron):
     '''Class representing a neuron'''
 
     def __init__(self, data_wrapper, name='Neuron'):
+        '''Initialize an FstNeuron object.'''
         self._data = data_wrapper
         neurites, sections = make_neurites(self._data)
         soma_check, soma_class = _SOMA_CONFIG[self._data.fmt]

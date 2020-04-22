@@ -123,16 +123,19 @@ def _section_end_points(structure_block, id_map):
 class DataBlockSection(object):
     '''Sections ((ids), type, parent_id)'''
     def __init__(self, ids=None, ntype=0, pid=-1):
+        '''Initialize a DataBlockSection object.'''
         self.ids = [] if ids is None else ids
         self.ntype = ntype
         self.pid = pid
 
     def __eq__(self, other):
+        '''Test for equality.'''
         return (self.ids == other.ids and
                 self.ntype == other.ntype and
                 self.pid == other.pid)
 
     def __str__(self):
+        '''Return a string representation.'''
         return ('%s: ntype=%s, pid=%s: n_ids=%d' %
                 (self.__class__, self.ntype, self.pid, len(self.ids)))
 
@@ -229,6 +232,7 @@ class BlockNeuronBuilder(object):
     BlockSection = namedtuple('BlockSection', 'parent_id section_type points')
 
     def __init__(self):
+        '''Initialize a BlockNeuronBuilder object.'''
         self.sections = {}
 
     def add_section(self, id_, parent_id, section_type, points):

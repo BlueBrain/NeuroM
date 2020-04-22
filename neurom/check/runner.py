@@ -46,6 +46,7 @@ class CheckRunner(object):
     '''Class managing checks, config and output'''
 
     def __init__(self, config):
+        '''Initialize a CheckRunner object.'''
         self._config = CheckRunner._sanitize_config(config)
         self._check_modules = dict((k, import_module('neurom.check.%s' % k))
                                    for k in config['checks'])

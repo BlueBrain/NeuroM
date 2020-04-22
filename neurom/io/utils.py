@@ -67,6 +67,7 @@ class NeuronLoader(object):
     """
 
     def __init__(self, directory, file_ext=None, cache_size=None):
+        '''Initialize a NeuronLoader object.'''
         self.directory = directory
         self.file_ext = file_ext
         if cache_size is not None:
