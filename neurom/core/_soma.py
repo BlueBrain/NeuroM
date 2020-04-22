@@ -124,6 +124,7 @@ class SomaCylinders(Soma):
 
     @property
     def volume(self):
+        '''Return the volume of soma'''
         return sum(morphmath.segment_volume((p0, p1))
                    for p0, p1 in zip(self.points, self.points[1:]))
 
@@ -181,6 +182,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
     @property
     def volume(self):
+        '''Return the volume of the soma'''
         return 2 * math.pi * self.radius ** 3
 
     def __str__(self):

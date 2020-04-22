@@ -65,6 +65,7 @@ class memoize(object):
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
+        '''Callable for decorator'''
         obj = args[0]
         try:
             cache = obj.__cache  # pylint: disable=protected-access
@@ -114,6 +115,7 @@ class NeuromJSON(json.JSONEncoder):
     '''
 
     def default(self, o):  # pylint: disable=method-hidden
+        '''Override default method for numpy types'''
         if isinstance(o, np.floating):
             return float(o)
         if isinstance(o, np.integer):
