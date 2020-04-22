@@ -105,10 +105,10 @@ class SomaCylinders(Soma):
       radius is the height of a '|' character, and the ')' try and show the
       curvature of the cylinger
 
-  Note: when, as in the case above, the cylinder center points don't lie
-  in a line, then the overlap between cylinders isn't taken into account for
-  the area calculation
-  '''
+    Note: when, as in the case above, the cylinder center points don't lie
+    in a line, then the overlap between cylinders isn't taken into account for
+    the area calculation
+    '''
 
     def __init__(self, points):
         '''Initialize a SomaCyliners object.'''

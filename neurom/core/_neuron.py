@@ -256,17 +256,17 @@ class Neurite(object):
     def iter_sections(self, order=Tree.ipreorder, neurite_order=NeuriteIter.FileOrder):
         '''Iteration over section nodes
 
-    Arguments:
-        order: section iteration order within a given neurite. Must be one of:
-            Tree.ipreorder: Depth-first pre-order iteration of tree nodes
-            Tree.ipreorder: Depth-first post-order iteration of tree nodes
-            Tree.iupstream: Iterate from a tree node to the root nodes
-            Tree.ibifurcation_point: Iterator to bifurcation points
-            Tree.ileaf: Iterator to all leaves of a tree
+        Arguments:
+            order: section iteration order within a given neurite. Must be one of:
+                Tree.ipreorder: Depth-first pre-order iteration of tree nodes
+                Tree.ipreorder: Depth-first post-order iteration of tree nodes
+                Tree.iupstream: Iterate from a tree node to the root nodes
+                Tree.ibifurcation_point: Iterator to bifurcation points
+                Tree.ileaf: Iterator to all leaves of a tree
 
-        neurite_order: order upon which neurites should be iterated. Values:
-            - NeuriteIter.FileOrder: order of appearance in the file
-            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+            neurite_order: order upon which neurites should be iterated. Values:
+                - NeuriteIter.FileOrder: order of appearance in the file
+                - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
         '''
         return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 

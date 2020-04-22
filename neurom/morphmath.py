@@ -397,17 +397,17 @@ section_length = path_distance
 def principal_direction_extent(points):
     '''Calculate the extent of a set of 3D points.
 
-   The extent is defined as the maximum distance between
-   the projections on the principal directions of the covariance matrix
-   of the points.
+    The extent is defined as the maximum distance between
+    the projections on the principal directions of the covariance matrix
+    of the points.
 
-   Parameter:
-       points : a 2D numpy array of points
+    Parameter:
+        points : a 2D numpy array of points
 
-   Returns:
-       extents : the extents for each of the eigenvectors of the cov matrix
-       eigs : eigenvalues of the covariance matrix
-       eigv : respective eigenvectors of the covariance matrix
+    Returns:
+        extents : the extents for each of the eigenvectors of the cov matrix
+        eigs : eigenvalues of the covariance matrix
+        eigv : respective eigenvectors of the covariance matrix
     '''
     # center the points around 0.0
     points = np.copy(points)
