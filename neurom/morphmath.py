@@ -95,7 +95,9 @@ def interval_lengths(points, prepend_zero=False):
 
 
 def path_fraction_id_offset(points, fraction, relative_offset=False):
-    '''Find the segment which corresponds to the fraction
+    '''Find segment by fractional offset.
+
+    Find the segment which corresponds to the fraction
     of the path length along the piecewise linear curve which
     is constructed from the set of points.
 
@@ -122,7 +124,9 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
 
 
 def path_fraction_point(points, fraction):
-    '''Computes the point which corresponds to the fraction
+    '''Find coordinates by fractional offset.
+
+    Computes the point which corresponds to the fraction
     of the path length along the piecewise linear curve which
     is constructed from the set of points.
 
@@ -251,9 +255,7 @@ def polygon_diameter(points):
 
 
 def average_points_dist(p0, p_list):
-    """Computes the average distance between a list of points
-    and a given point p0.
-    """
+    """Computes the average distance between a list of points and a given point p0."""
     return np.mean(list(point_dist(p0, p1) for p1 in p_list))
 
 
