@@ -115,6 +115,7 @@ class Tree(object):
         return filter(Tree.is_bifurcation_point, iter_mode(self))
 
     def __nonzero__(self):
+        '''Check non-zero.'''
         return bool(self.children)
 
     __bool__ = __nonzero__

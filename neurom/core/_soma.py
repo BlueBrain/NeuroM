@@ -81,6 +81,7 @@ class SomaSinglePoint(Soma):
         self.radius = points[0][COLS.R]
 
     def __str__(self):
+        '''Return a string representation.'''
         return ('SomaSinglePoint(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 

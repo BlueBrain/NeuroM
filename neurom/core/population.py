@@ -64,4 +64,5 @@ class Population(object):
         return self.neurons[idx]
 
     def __str__(self):
+        '''Return a string representation.'''
         return 'Population <name: %s, nneurons: %d>' % (self.name, len(self.neurons))

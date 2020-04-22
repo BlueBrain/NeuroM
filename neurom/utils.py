@@ -61,6 +61,7 @@ class memoize(object):
         update_wrapper(self, func)
 
     def __get__(self, obj, objtype=None):
+        '''Get the attribute from the object.'''
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
@@ -130,21 +131,25 @@ class OrderedEnum(Enum):
     '''
 
     def __ge__(self, other):
+        '''Check greater than or equal to.'''
         if self.__class__ is other.__class__:
             return self.value >= other.value
         raise NotImplementedError
 
     def __gt__(self, other):
+        '''Check greater than.'''
         if self.__class__ is other.__class__:
             return self.value > other.value
         raise NotImplementedError
 
     def __le__(self, other):
+        '''Check less than or equal to.'''
         if self.__class__ is other.__class__:
             return self.value <= other.value
         raise NotImplementedError
 
     def __lt__(self, other):
+        '''Check less than.'''
         if self.__class__ is other.__class__:
             return self.value < other.value
         raise NotImplementedError

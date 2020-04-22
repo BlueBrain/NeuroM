@@ -191,6 +191,7 @@ class Section(Tree):
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
+        '''Return a string representation.'''
         return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \
             (self.id, self.type, len(self.points), self.parent, len(self.children))
 
@@ -274,17 +275,21 @@ class Neurite(object):
         return Neurite(deepcopy(self.root_node, memo))
 
     def __nonzero__(self):
+        '''Check non-zero.'''
         return bool(self.root_node)
 
     def __eq__(self, other):
+        '''Check equality.'''
         return self.type == other.type and self.root_node == other.root_node
 
     def __hash__(self):
+        '''Return object hash.'''
         return hash((self.type, self.root_node))
 
     __bool__ = __nonzero__
 
     def __str__(self):
+        '''Return a string representation.'''
         return 'Neurite <type: %s>' % self.type
 
     __repr__ = __str__
@@ -301,6 +306,7 @@ class Neuron(object):
         self.sections = sections
 
     def __str__(self):
+        '''Return a string representation.'''
         return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
 
