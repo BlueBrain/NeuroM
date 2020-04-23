@@ -75,7 +75,7 @@ def test_consistency_between_h5_swc():
 
 
 class DataWrapper_Neuron(object):
-    '''Base class for H5 tests'''
+    """Base class for H5 tests."""
 
     end_pts = [1, 775, 393, 524, 142, 655, 273, 22, 795, 413,
                544, 162, 675, 293, 423, 42, 815, 564, 182, 695,
@@ -107,7 +107,7 @@ class DataWrapper_Neuron(object):
 
 
 class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
-    '''Test HDF5 v1 reading'''
+    """Test HDF5 v1 reading."""
     def setup(self):
         self.data = hdf5.read(os.path.join(H5V1_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
@@ -115,7 +115,7 @@ class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 
 
 class TestDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
-    '''Test HDF5 v2 reading'''
+    """Test HDF5 v2 reading."""
     def setup(self):
         self.data = hdf5.read(os.path.join(H5V2_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
@@ -123,7 +123,7 @@ class TestDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
 
 
 class DataWrapper_Neuron_with_duplicates(object):
-    '''Base class for H5 tests'''
+    """Base class for H5 tests."""
 
     end_pts = [1, 386, 133, 782, 529, 914, 276, 661, 23, 408, 155, 925,
                926, 804, 551, 298, 683, 45, 430, 177, 694, 826, 573, 320,

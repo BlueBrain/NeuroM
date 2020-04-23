@@ -13,7 +13,7 @@ def test_generate_annotation():
     settings = {'color': 'blue', 'label': 'circle', 'name': 'dangling'}
     nt.assert_equal(generate_annotation(checker_ok, settings), "")
 
-    correct_result = '''
+    correct_result = """
 
 (circle   ; MUK_ANNOTATION
     (Color blue)   ; MUK_ANNOTATION
@@ -23,7 +23,7 @@ def test_generate_annotation():
     (7 8 9 0.50)   ; MUK_ANNOTATION
     (10 11 12 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
-'''
+"""
 
     nt.assert_equal(generate_annotation(checker_not_ok, settings), correct_result)
 

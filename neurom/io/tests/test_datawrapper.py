@@ -1,4 +1,4 @@
-'''Test neurom.io.utils'''
+"""Test neurom.io.utils."""
 import os
 import numpy as np
 from nose import tools as nt

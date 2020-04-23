@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Geometrical Operations for NeuroM'''
+"""Geometrical Operations for NeuroM."""
 
 import numpy as np
 from scipy.spatial import ConvexHull
@@ -34,20 +34,19 @@ from .transform import translate, rotate
 
 
 def bounding_box(obj):
-    '''Get the (x, y, z) bounding box of an object containing points
+    """Get the (x, y, z) bounding box of an object containing points.
 
     Returns:
         2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
-    '''
+    """
     return np.array([np.min(obj.points[:, 0:3], axis=0),
                      np.max(obj.points[:, 0:3], axis=0)])
 
 
 def convex_hull(obj):
-    '''Get the convex hull of an object containing points
+    """Get the convex hull of an object containing points.
 
     Returns:
         scipy.spatial.ConvexHull object built from obj.points
-
-    '''
+    """
     return ConvexHull(obj.points[:, :3])

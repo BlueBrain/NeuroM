@@ -141,25 +141,25 @@ with warnings.catch_warnings(record=True):
     soma0 = fst_neuron.soma
 
     # upright, varying radius
-    soma_2pt_normal = load_neuron(StringIO(u'''1 1 0  0 0 1  -1
-                                               2 1 0 10 0 10  1'''), reader='swc').soma
+    soma_2pt_normal = load_neuron(StringIO(u"""1 1 0  0 0 1  -1
+                                               2 1 0 10 0 10  1"""), reader='swc').soma
 
     # upright, uniform radius, multiple cylinders
-    soma_3pt_normal = load_neuron(StringIO(u'''1 1 0 -10 0 10  -1
+    soma_3pt_normal = load_neuron(StringIO(u"""1 1 0 -10 0 10  -1
                                                2 1 0   0 0 10   1
-                                               3 1 0  10 0 10   2'''), reader='swc').soma
+                                               3 1 0  10 0 10   2"""), reader='swc').soma
 
     # increasing radius, multiple cylinders
-    soma_4pt_normal_cylinder = load_neuron(StringIO(u'''1 1   0   0   0 1 -1
+    soma_4pt_normal_cylinder = load_neuron(StringIO(u"""1 1   0   0   0 1 -1
                                                        2 1   0 -10   0 2  1
                                                        3 1   0 -10  10 4  2
-                                                       4 1 -10 -10 -10 4  3'''), reader='swc').soma
+                                                       4 1 -10 -10 -10 4  3"""), reader='swc').soma
 
-    soma_4pt_normal_contour = load_neuron(StringIO(u'''((CellBody)
+    soma_4pt_normal_contour = load_neuron(StringIO(u"""((CellBody)
                                                        (0     0   0 1)
                                                        (0   -10   0 2)
                                                        (0   -10  10 4)
-                                                       (-10 -10 -10 4))'''), reader='asc').soma
+                                                       (-10 -10 -10 4))"""), reader='asc').soma
 
 
 def test_soma():

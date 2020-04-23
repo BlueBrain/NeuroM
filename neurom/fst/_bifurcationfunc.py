@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Legacy module, replaced by neurom.features.bifurcationfunc'''
+"""Legacy module, replaced by neurom.features.bifurcationfunc."""
 # pylint: disable=wildcard-import,unused-wildcard-import
 from warnings import warn
 from neurom.features.bifurcationfunc import *

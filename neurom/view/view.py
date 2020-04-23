@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''Visualize morphologies'''
+"""Visualize morphologies."""
 
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
@@ -55,7 +55,7 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
 
 
 def _plane2col(plane):
-    '''Take a string like 'xy', and return the indices from COLS.*'''
+    """Take a string like 'xy', and return the indices from COLS.*."""
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
     assert plane in planes, 'No such plane found! Please select one of: ' + str(planes)
     return (getattr(COLS, plane[0].capitalize()),
@@ -63,12 +63,12 @@ def _plane2col(plane):
 
 
 def _get_linewidth(tree, linewidth, diameter_scale):
-    '''Calculate the desired linewidth based on tree contents
+    """Calculate the desired linewidth based on tree contents.
 
     If diameter_scale exists, it is used to scale the diameter of each of the segments
     in the tree
     If diameter_scale is None, the linewidth is used.
-    '''
+    """
     if diameter_scale is not None and tree:
         linewidth = [2 * segment_radius(s) * diameter_scale
                      for s in iter_segments(tree)]
@@ -76,7 +76,7 @@ def _get_linewidth(tree, linewidth, diameter_scale):
 
 
 def _get_color(treecolor, tree_type):
-    """If treecolor set, it's returned, otherwise tree_type is used to return set colors"""
+    """If treecolor set, it's returned, otherwise tree_type is used to return set colors."""
     if treecolor is not None:
         return treecolor
     return TREE_COLOR.get(tree_type, 'green')
@@ -85,7 +85,7 @@ def _get_color(treecolor, tree_type):
 def plot_tree(ax, tree, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA):
-    '''Plots a 2d figure of the tree's segments
+    """Plots a 2d figure of the tree's segments.
 
     Args:
         ax(matplotlib axes): on what to plot
@@ -99,7 +99,7 @@ def plot_tree(ax, tree, plane='xy',
     Note:
         If the tree contains one single point the plot will be empty
         since no segments can be constructed.
-    '''
+    """
     plane0, plane1 = _plane2col(plane)
     section_segment_list = [(section, segment)
                             for section in iter_sections(tree)
@@ -120,7 +120,7 @@ def plot_soma(ax, soma, plane='xy',
               soma_outline=True,
               linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA):
-    '''Generates a 2d figure of the soma.
+    """Generates a 2d figure of the soma.
 
     Args:
         ax(matplotlib axes): on what to plot
@@ -131,7 +131,7 @@ def plot_soma(ax, soma, plane='xy',
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-    '''
+    """
     plane0, plane1 = _plane2col(plane)
     color = _get_color(color, tree_type=NeuriteType.soma)
 
@@ -170,7 +170,7 @@ def plot_neuron(ax, nrn,
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA):
-    '''Plots a 2D figure of the neuron, that contains a soma and the neurites
+    """Plots a 2D figure of the neuron, that contains a soma and the neurites.
 
     Args:
         ax(matplotlib axes): on what to plot
@@ -182,7 +182,7 @@ def plot_neuron(ax, nrn,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-    '''
+    """
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
 
@@ -197,7 +197,7 @@ def plot_neuron(ax, nrn,
 
 
 def _update_3d_datalim(ax, obj):
-    '''Unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually'''
+    """Unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually."""
     min_bounding_box, max_bounding_box = geom.bounding_box(obj)
     xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
                            max_bounding_box[:COLS.Z]))
@@ -211,7 +211,7 @@ def _update_3d_datalim(ax, obj):
 def plot_tree3d(ax, tree,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA):
-    '''Generates a figure of the tree in 3d.
+    """Generates a figure of the tree in 3d.
 
     If the tree contains one single point the plot will be empty \
     since no segments can be constructed.
@@ -223,7 +223,7 @@ def plot_tree3d(ax, tree,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-    '''
+    """
     section_segment_list = [(section, segment)
                             for section in iter_sections(tree)
                             for segment in iter_segments(section)]
@@ -239,14 +239,14 @@ def plot_tree3d(ax, tree,
 
 
 def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
-    '''Generates a 3d figure of the soma.
+    """Generates a 3d figure of the soma.
 
     Args:
         ax(matplotlib axes): on what to plot
         soma(neurom.core.Soma): plotted soma
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-    '''
+    """
     color = _get_color(color, tree_type=NeuriteType.soma)
 
     if isinstance(soma, SomaCylinders):
@@ -266,7 +266,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
 def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                   color=None, alpha=_ALPHA):
-    '''Generates a figure of the neuron, that contains a soma and a list of trees.
+    """Generates a figure of the neuron, that contains a soma and a list of trees.
 
     Args:
         ax(matplotlib axes): on what to plot
@@ -276,7 +276,7 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-    '''
+    """
     plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
@@ -288,7 +288,7 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
 
 
 def _get_dendrogram_legend(dendrogram):
-    '''Generates labels legend for dendrogram.
+    """Generates labels legend for dendrogram.
 
     Because dendrogram is rendered as patches, we need to manually label it.
     Args:
@@ -296,7 +296,7 @@ def _get_dendrogram_legend(dendrogram):
 
     Returns:
         List of legend handles.
-    '''
+    """
     def neurite_legend(neurite_type):
         return Line2D([0], [0], color=TREE_COLOR[neurite_type], lw=2, label=neurite_type.name)
 
@@ -316,7 +316,7 @@ def _as_dendrogram_line(start, end, color):
 
 
 def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
-    '''Generates drawable patches for dendrogram.
+    """Generates drawable patches for dendrogram.
 
     Args:
         dendrogram (Dendrogram): dendrogram
@@ -325,7 +325,7 @@ def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
 
     Returns:
         List of matplotlib.patches.
-    '''
+    """
     color = TREE_COLOR[dendrogram.neurite_type]
     start_point = positions[dendrogram]
     end_point = start_point + [0, dendrogram.height]
@@ -340,13 +340,13 @@ def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
 
 
 def plot_dendrogram(ax, obj, show_diameters=True):
-    '''Plots Dendrogram of `obj`.
+    """Plots Dendrogram of `obj`.
 
     Args:
         ax: matplotlib axes
         obj (neurom.Neuron, neurom.Tree): neuron or tree
         show_diameters (bool): whether to show node diameters or not
-    '''
+    """
     dendrogram = Dendrogram(obj)
     positions = layout_dendrogram(dendrogram, np.array([0, 0]))
     w, h = get_size(positions)

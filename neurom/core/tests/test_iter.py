@@ -169,7 +169,7 @@ def test_iter_segments_pop():
 
 
 def test_iter_segments_section():
-    sec = load_neuron(StringIO(u'''
+    sec = load_neuron(StringIO(u"""
 	                      ((CellBody)
 	                       (0 0 0 2))
 
@@ -178,7 +178,7 @@ def test_iter_segments_section():
                           (5 6 7 16)
                           (8 7 6 10)
                           (4 3 2 2))
-                       '''), reader='asc').sections[1]
+                       """), reader='asc').sections[1]
     ref = [[p1[COLS.XYZR].tolist(), p2[COLS.XYZR].tolist()]
            for p1, p2 in core.iter_segments(sec)]
 

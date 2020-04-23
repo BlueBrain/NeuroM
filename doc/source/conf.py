@@ -156,12 +156,10 @@ autodoc_default_flags = ['show-inheritance']
 autoclass_content = 'both'
 
 def _pelita_member_filter(parent_name, item_names):
-    """
-    Filter a list of autodoc items for which to generate documentation.
+    """Filter a list of autodoc items for which to generate documentation.
 
     Include only imports that come from the documented module or its
     submodules.
-
     """
     filtered_names = []
 

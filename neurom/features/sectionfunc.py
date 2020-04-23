@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Section functions and functional tools'''
+"""Section functions and functional tools."""
 
 import numpy as np
 
@@ -37,22 +37,22 @@ from neurom.morphmath import interval_lengths
 
 
 def section_path_length(section):
-    '''Path length from section to root'''
+    """Path length from section to root."""
     return sum(s.length for s in section.iupstream())
 
 
 def section_volume(section):
-    '''Volume of a section'''
+    """Volume of a section."""
     return section.volume
 
 
 def section_area(section):
-    '''Surface area of a section'''
+    """Surface area of a section."""
     return section.area
 
 
 def section_tortuosity(section):
-    '''Tortuosity of a section
+    """Tortuosity of a section.
 
     The tortuosity is defined as the ratio of the path length of a section
     and the euclidian distnce between its end points.
@@ -60,41 +60,41 @@ def section_tortuosity(section):
     The path length is the sum of distances between consecutive points.
 
     If the section contains less than 2 points, the value 1 is returned.
-    '''
+    """
     pts = section.points
     return 1 if len(pts) < 2 else mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
 def section_end_distance(section):
-    '''End to end distance of a section
+    """End to end distance of a section.
 
     The end to end distance of a section is defined as
     the euclidian distnce between its end points.
 
     If the section contains less than 2 points, the value 0 is returned.
-    '''
+    """
     pts = section.points
     return 0 if len(pts) < 2 else mm.point_dist(pts[-1], pts[0])
 
 
 def branch_order(section):
-    '''Branching order of a tree section
+    """Branching order of a tree section.
 
     The branching order is defined as the depth of the tree section.
 
     Note:
         The first level has branch order 1.
-    '''
+    """
     return sum(1 for _ in section.iupstream()) - 1
 
 
 def segment_lengths(section, prepend_zero=False):
-    '''Returns the list of segment lengths within the section'''
+    """Returns the list of segment lengths within the section."""
     return interval_lengths(section.points, prepend_zero=prepend_zero)
 
 
 def section_radial_distance(section, origin):
-    '''Return the radial distances of a tree section to a given origin point
+    """Return the radial distances of a tree section to a given origin point.
 
     The radial distance is the euclidian distance between the
     end-point point of the section and the origin point in question.
@@ -103,19 +103,19 @@ def section_radial_distance(section, origin):
         section: neurite section object
         origin: point to which distances are measured. It must have at least 3\
             components. The first 3 components are (x, y, z).
-    '''
+    """
     return mm.point_dist(section.points[-1], origin)
 
 
 def section_meander_angles(section):
-    '''Inter-segment opening angles in a section'''
+    """Inter-segment opening angles in a section."""
     p = section.points
     return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
             for i in range(2, len(p))]
 
 
 def strahler_order(section):
-    '''Branching order of a tree section
+    """Branching order of a tree section.
 
     The strahler order is the inverse of the branch order,
     since this is computed from the tips of the tree
@@ -134,7 +134,7 @@ def strahler_order(section):
 
     No efforts have been invested in making it computationnaly efficient, but
     it computes acceptably fast on tested morphologies (i.e., no waiting time).
-    '''
+    """
     if section.children:
         child_orders = [strahler_order(child) for child in section.children]
         max_so_children = max(child_orders)
@@ -148,12 +148,12 @@ def strahler_order(section):
 
 
 def locate_segment_position(section, fraction):
-    '''Segment ID / offset corresponding to a given fraction of section length.'''
+    """Segment ID / offset corresponding to a given fraction of section length."""
     return mm.path_fraction_id_offset(section.points, fraction)
 
 
 def section_mean_radius(section):
-    '''Compute the mean radius of a section weighted by segment lengths'''
+    """Compute the mean radius of a section weighted by segment lengths."""
     radii = section.points[:, COLS.R]
     points = section.points[:, COLS.XYZ]
     lengths = np.linalg.norm(points[1:] - points[:-1], axis=1)
@@ -162,5 +162,5 @@ def section_mean_radius(section):
 
 
 def downstream_pathlength(section):
-    '''Compute the total downstream length starting from a section'''
+    """Compute the total downstream length starting from a section."""
     return sum(sec.length for sec in section.ipreorder())

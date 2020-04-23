@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Fast neuron IO module'''
+"""Fast neuron IO module."""
 
 import logging
 from collections import defaultdict, namedtuple
@@ -41,10 +41,10 @@ TYPE, ID, PID = 0, 1, 2
 
 
 class DataWrapper(object):
-    '''Class holding a raw data block and section information'''
+    """Class holding a raw data block and section information."""
 
     def __init__(self, data_block, fmt, sections=None):
-        '''Section Data Wrapper
+        """Section Data Wrapper.
 
         data_block is np.array-like with the following columns:
             [X, Y, Z, R, TYPE, ID, P]
@@ -67,30 +67,30 @@ class DataWrapper(object):
             - there is no requirement that the IDs are dense
             - there is no upper bound on the number of rows with the same 'P'arent: in other
               words, multifurcations are allowed
-        '''
+        """
         self.data_block = data_block
         self.fmt = fmt
         # list of DataBlockSection
         self.sections = sections if sections is not None else _extract_sections(data_block)
 
     def neurite_root_section_ids(self):
-        '''Get the section IDs of the intitial neurite sections'''
+        """Get the section IDs of the intitial neurite sections."""
         sec = self.sections
         return [i for i, ss in enumerate(sec)
                 if ss.pid > -1 and (sec[ss.pid].ntype == POINT_TYPE.SOMA and
                                     ss.ntype != POINT_TYPE.SOMA)]
 
     def soma_points(self):
-        '''Get the soma points'''
+        """Get the soma points."""
         db = self.data_block
         return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
 
 
 def _merge_sections(sec_a, sec_b):
-    '''Merge two sections
+    """Merge two sections.
 
     Merges sec_a into sec_b and sets sec_a attributes to default
-    '''
+    """
     sec_b.ids = list(sec_a.ids) + list(sec_b.ids[1:])
     sec_b.ntype = sec_a.ntype
     sec_b.pid = sec_a.pid
@@ -101,7 +101,7 @@ def _merge_sections(sec_a, sec_b):
 
 
 def _section_end_points(structure_block, id_map):
-    '''Get the section end-points'''
+    """Get the section end-points."""
     soma_idx = structure_block[:, TYPE] == POINT_TYPE.SOMA
     soma_ids = structure_block[soma_idx, ID]
     neurite_idx = structure_block[:, TYPE] != POINT_TYPE.SOMA
@@ -121,21 +121,21 @@ def _section_end_points(structure_block, id_map):
 
 
 class DataBlockSection(object):
-    '''Sections ((ids), type, parent_id)'''
+    """Sections ((ids), type, parent_id)."""
     def __init__(self, ids=None, ntype=0, pid=-1):
-        '''Initialize a DataBlockSection object.'''
+        """Initialize a DataBlockSection object."""
         self.ids = [] if ids is None else ids
         self.ntype = ntype
         self.pid = pid
 
     def __eq__(self, other):
-        '''Test for equality.'''
+        """Test for equality."""
         return (self.ids == other.ids and
                 self.ntype == other.ntype and
                 self.pid == other.pid)
 
     def __str__(self):
-        '''Return a string representation.'''
+        """Return a string representation."""
         return ('%s: ntype=%s, pid=%s: n_ids=%d' %
                 (self.__class__, self.ntype, self.pid, len(self.ids)))
 
@@ -143,7 +143,7 @@ class DataBlockSection(object):
 
 
 def _extract_sections(data_block):
-    '''Make a list of sections from an SWC-style data wrapper block'''
+    """Make a list of sections from an SWC-style data wrapper block."""
     structure_block = data_block[:, COLS.TYPE:COLS.COL_COUNT].astype(np.int)
 
     # SWC ID -> structure_block position
@@ -162,7 +162,7 @@ def _extract_sections(data_block):
     sections = []
 
     def new_section():
-        '''A new_section'''
+        """A new_section."""
         sections.append(DataBlockSection())
         return sections[-1]
 
@@ -214,7 +214,7 @@ def _extract_sections(data_block):
 
 
 class BlockNeuronBuilder(object):
-    '''Helper to create DataWrapper for 'block' sections
+    """Helper to create DataWrapper for 'block' sections.
 
     This helps create a new DataWrapper when one already has 'blocks'
     (ie: contiguous points, forming all the segments) of a section, and they
@@ -228,29 +228,29 @@ class BlockNeuronBuilder(object):
 
     Note:
         This will re-number the IDs if they are not 'dense' (ie: have gaps)
-    '''
+    """
     BlockSection = namedtuple('BlockSection', 'parent_id section_type points')
 
     def __init__(self):
-        '''Initialize a BlockNeuronBuilder object.'''
+        """Initialize a BlockNeuronBuilder object."""
         self.sections = {}
 
     def add_section(self, id_, parent_id, section_type, points):
-        '''Add a section
+        """Add a section.
 
         Args:
             id_(int): identifying number of the section
             parent_id(int): identifying number of the parent of this section
             section_type(int): the section type as defined by POINT_TYPE
             points: an array of [X, Y, Z, R]
-        '''
+        """
         # L.debug('Adding section %d, with parent %d, of type: %d with count: %d',
         #         id_, parent_id, section_type, len(points))
         assert id_ not in self.sections, 'id %s already exists in sections' % id_
         self.sections[id_] = BlockNeuronBuilder.BlockSection(parent_id, section_type, points)
 
     def _make_datablock(self):
-        '''Make a data_block and sections list as required by DataWrapper'''
+        """Make a data_block and sections list as required by DataWrapper."""
         section_ids = sorted(self.sections)
 
         # create all insertion id's, this needs to be done ahead of time
@@ -281,7 +281,7 @@ class BlockNeuronBuilder(object):
         return datablock, sections
 
     def _check_consistency(self):
-        '''See if the sections have obvious errors'''
+        """See if the sections have obvious errors."""
         type_count = defaultdict(int)
         for _, section in sorted(self.sections.items()):
             type_count[section.section_type] += 1
@@ -290,7 +290,7 @@ class BlockNeuronBuilder(object):
             L.info('Have %d somas, expected 1', type_count[POINT_TYPE.SOMA])
 
     def get_datawrapper(self, file_format='BlockNeuronBuilder', data_wrapper=DataWrapper):
-        '''Returns a DataWrapper'''
+        """Returns a DataWrapper."""
         self._check_consistency()
         datablock, sections = self._make_datablock()
         return data_wrapper(datablock, file_format, sections)

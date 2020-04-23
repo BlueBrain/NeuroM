@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Functionality for styling plots"""
+"""Functionality for styling plots."""
 import os
 
 import numpy as np
@@ -42,19 +42,21 @@ plt = None  # refer to _get_plt()
 
 
 def _get_plt():
-    '''Wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    """Wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend."""
     global plt  # pylint: disable=global-statement
     import matplotlib.pyplot  # pylint: disable=import-outside-toplevel
     plt = matplotlib.pyplot
 
 
 def dict_if_none(arg):
-    '''Return an empty dict if arg is None'''
+    """Return an empty dict if arg is None."""
     return arg if arg is not None else {}
 
 
 def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
-    """Helper function to define the strings that handle pre-post conventions
+    """Returns a formatted string with the figure name and title.
+
+    Helper function to define the strings that handle pre-post conventions
     for viewing - plotting title and saving options.
 
     Args:
@@ -165,7 +167,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
                aspect_ratio='equal',
                tight=False,
                **_):
-    """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions
+    """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:
         fig(matplotlib figure): figure
@@ -224,7 +226,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
 
 
 def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None):
-    """Set title options of a matplotlib plot
+    """Set title options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes
@@ -248,7 +250,7 @@ def plot_labels(ax, label_fontsize=14,
                 xlabel=None, xlabel_arg=None,
                 ylabel=None, ylabel_arg=None,
                 zlabel=None, zlabel_arg=None):
-    """Sets the labels options of a matplotlib plot
+    """Sets the labels options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes
@@ -348,10 +350,10 @@ _LINSPACE_COUNT = 300
 
 
 def _get_normals(v):
-    '''Get two vectors that form a basis w/ v
+    """Get two vectors that form a basis w/ v.
 
     Note: returned vectors are unit
-    '''
+    """
     not_v = np.array([1, 0, 0])
     if np.all(np.abs(v) == not_v):
         not_v = np.array([0, 1, 0])
@@ -363,10 +365,10 @@ def _get_normals(v):
 
 def generate_cylindrical_points(start, end, start_radius, end_radius,
                                 linspace_count=_LINSPACE_COUNT):
-    '''Generate a 3d mesh of a cylinder with start and end points, and varying radius
+    """Generate a 3d mesh of a cylinder with start and end points, and varying radius.
 
     Based on: http://stackoverflow.com/a/32383775
-    '''
+    """
     v = end - start
     length = norm(v)
     v = v / length
@@ -389,7 +391,7 @@ def generate_cylindrical_points(start, end, start_radius, end_radius,
 def project_cylinder_onto_2d(ax, plane,
                              start, end, start_radius, end_radius,
                              color='black', alpha=1.):
-    '''Take cylinder defined by start/end, and project it onto the plane
+    """Take cylinder defined by start/end, and project it onto the plane.
 
     Args:
         ax: matplotlib axes
@@ -404,7 +406,7 @@ def project_cylinder_onto_2d(ax, plane,
     Note: There are probably more efficient ways of doing this: here the
     3d outline is calculated, the non-used plane coordinates are dropped, a
     tight convex hull is found, and that is used for a filled polygon
-    '''
+    """
     points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
     points = np.vstack([points[plane[0]].ravel(),
                         points[plane[1]].ravel()])
@@ -415,7 +417,7 @@ def project_cylinder_onto_2d(ax, plane,
 
 def plot_cylinder(ax, start, end, start_radius, end_radius,
                   color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
-    '''Plot a 3d cylinder'''
+    """Plot a 3d cylinder."""
     assert not np.all(start == end), 'Cylinder must have length'
     x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
                                           linspace_count=linspace_count)

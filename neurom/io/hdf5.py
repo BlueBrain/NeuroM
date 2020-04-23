@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Module for morphology HDF5 data loading
+"""Module for morphology HDF5 data loading.
 
 Data is unpacked into a 2-dimensional raw data block:
 
@@ -38,8 +38,7 @@ HDF5.V1 Input row format:
             groups: [FIRST_POINT_ID, TYPE, PARENT_GROUP_ID]
 
 There is one such row per measured point.
-
-'''
+"""
 
 import h5py
 import numpy as np
@@ -49,10 +48,10 @@ from .datawrapper import BlockNeuronBuilder, DataWrapper
 
 
 def get_version(h5file):
-    '''Determine whether an HDF5 file is v1 or v2
+    """Determine whether an HDF5 file is v1 or v2.
 
     Return: 'H5V1', 'H5V2' or None
-    '''
+    """
     if 'points' in h5file and 'structure' in h5file:
         return 'H5V1'
     if 'neuron1/structure' in h5file:
@@ -65,7 +64,7 @@ GPFIRST, GTYPE, GPID = range(3)  # groups or structure
 
 
 def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
-    '''Read a file and return a `data_wrapper'd` data
+    """Read a file and return a `data_wrapper'd` data.
 
     * Tries to guess the format and the H5 version.
     * Unpacks the first block it finds out of ('repaired', 'unraveled', 'raw')
@@ -75,7 +74,7 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
         remove_duplicates: boolean, If True removes duplicate points
             from the beginning of each section.
         data_wrapper: return class
-    '''
+    """
     with h5py.File(filename, mode='r') as h5file:
         version = get_version(h5file)
         if version == 'H5V1':
@@ -101,12 +100,13 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
 
 
 def _remove_duplicate_points(points, groups):
-    '''Removes the duplicate points from the beginning of a section,
-    if they are present in points-groups representation.
+    """Removes the duplicate points from the beginning of a section.
+
+    If they are present in points-groups representation.
 
     Returns:
         points, groups with unique points.
-    '''
+    """
     group_initial_ids = groups[:, GPFIRST]
 
     to_be_reduced = np.zeros(len(group_initial_ids))
@@ -130,14 +130,14 @@ def _remove_duplicate_points(points, groups):
 
 
 def _unpack_v1(h5file):
-    '''Unpack groups from HDF5 v1 file'''
+    """Unpack groups from HDF5 v1 file."""
     points = np.array(h5file['points'])
     groups = np.array(h5file['structure'])
     return points, groups
 
 
 def _unpack_v2(h5file, stage):
-    '''Unpack groups from HDF5 v2 file'''
+    """Unpack groups from HDF5 v2 file."""
     points = np.array(h5file['neuron1/%s/points' % stage])
     # from documentation: The /neuron1/structure/unraveled reuses /neuron1/structure/raw
     groups_stage = stage if stage != 'unraveled' else 'raw'

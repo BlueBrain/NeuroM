@@ -26,12 +26,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''NeuroM neuron checking functions.
+"""NeuroM neuron checking functions.
 
 Contains functions for checking validity of neuron neurites and somata.
 Tests assumes neurites and/or soma have been succesfully built where applicable,
 i.e. soma- and neurite-related structural tests pass.
-'''
+"""
 from itertools import chain, islice
 
 import numpy as np
@@ -47,12 +47,12 @@ from neurom.morphmath import section_length, segment_length
 
 
 def _read_neurite_type(neurite):
-    '''Simply read the stored neurite type'''
+    """Simply read the stored neurite type."""
     return neurite.type
 
 
 def has_axon(neuron, treefun=_read_neurite_type):
-    '''Check if a neuron has an axon
+    """Check if a neuron has an axon.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -61,12 +61,12 @@ def has_axon(neuron, treefun=_read_neurite_type):
 
     Returns:
         CheckResult with result
-    '''
+    """
     return CheckResult(NeuriteType.axon in (treefun(n) for n in neuron.neurites))
 
 
 def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
-    '''Check if a neuron has apical dendrites
+    """Check if a neuron has apical dendrites.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -76,13 +76,13 @@ def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
 
     Returns:
         CheckResult with result
-    '''
+    """
     types = [treefun(n) for n in neuron.neurites]
     return CheckResult(types.count(NeuriteType.apical_dendrite) >= min_number)
 
 
 def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
-    '''Check if a neuron has basal dendrites
+    """Check if a neuron has basal dendrites.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -92,13 +92,13 @@ def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
 
     Returns:
         CheckResult with result
-    '''
+    """
     types = [treefun(n) for n in neuron.neurites]
     return CheckResult(types.count(NeuriteType.basal_dendrite) >= min_number)
 
 
 def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
-    '''Check that a neuron has no flat neurites
+    """Check that a neuron has no flat neurites.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -108,12 +108,12 @@ def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
 
     Returns:
         CheckResult with result
-    '''
+    """
     return CheckResult(len(get_flat_neurites(neuron, tol, method)) == 0)
 
 
 def has_all_monotonic_neurites(neuron, tol=1e-6):
-    '''Check that a neuron has only neurites that are monotonic
+    """Check that a neuron has only neurites that are monotonic.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -121,12 +121,12 @@ def has_all_monotonic_neurites(neuron, tol=1e-6):
 
     Returns:
         CheckResult with result
-    '''
+    """
     return CheckResult(len(get_nonmonotonic_neurites(neuron, tol)) == 0)
 
 
 def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
-    '''Check presence of neuron segments with length not above threshold
+    """Check presence of neuron segments with length not above threshold.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -136,7 +136,7 @@ def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
     Returns:
         CheckResult with result including list of (section_id, segment_id)
         of zero length segments
-    '''
+    """
     bad_ids = []
     for sec in _nf.iter_sections(neuron):
         p = sec.points
@@ -148,7 +148,7 @@ def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
 
 
 def has_all_nonzero_section_lengths(neuron, threshold=0.0):
-    '''Check presence of neuron sections with length not above threshold
+    """Check presence of neuron sections with length not above threshold.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -157,7 +157,7 @@ def has_all_nonzero_section_lengths(neuron, threshold=0.0):
 
     Returns:
         CheckResult with result including list of ids of bad sections
-    '''
+    """
     bad_ids = [s.id for s in _nf.iter_sections(neuron.neurites)
                if section_length(s.points) <= threshold]
 
@@ -165,7 +165,7 @@ def has_all_nonzero_section_lengths(neuron, threshold=0.0):
 
 
 def has_all_nonzero_neurite_radii(neuron, threshold=0.0):
-    '''Check presence of neurite points with radius not above threshold
+    """Check presence of neurite points with radius not above threshold.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -174,7 +174,7 @@ def has_all_nonzero_neurite_radii(neuron, threshold=0.0):
     Returns:
         CheckResult with result including list of (section ID, point ID) pairs
         of zero-radius points
-    '''
+    """
     bad_ids = []
     seen_ids = set()
     for s in _nf.iter_sections(neuron):
@@ -188,7 +188,7 @@ def has_all_nonzero_neurite_radii(neuron, threshold=0.0):
 
 
 def has_nonzero_soma_radius(neuron, threshold=0.0):
-    '''Check if soma radius not above threshold
+    """Check if soma radius not above threshold.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -196,12 +196,12 @@ def has_nonzero_soma_radius(neuron, threshold=0.0):
 
     Returns:
         CheckResult with result
-    '''
+    """
     return CheckResult(neuron.soma.radius > threshold)
 
 
 def has_no_jumps(neuron, max_distance=30.0, axis='z'):
-    '''Check if there are jumps (large movements in the `axis`)
+    """Check if there are jumps (large movements in the `axis`).
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -211,7 +211,7 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
 
     Returns:
         CheckResult with result list of ids of bad sections
-    '''
+    """
     bad_ids = []
     axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
     for neurite in iter_neurites(neuron):
@@ -224,9 +224,11 @@ def has_no_jumps(neuron, max_distance=30.0, axis='z'):
 
 
 def has_no_root_node_jumps(neuron, radius_multiplier=2):
-    '''Check that the neurites have their first point not further than
-    `radius_multiplier * soma radius` from the soma center
-    '''
+    """Check that the neurites have no root node jumps.
+
+    Their first point not should not be further than `radius_multiplier * soma radius` from the
+    soma center
+    """
     bad_ids = []
     for neurite in iter_neurites(neuron):
         p0 = neurite.root_node.points[0, COLS.XYZ]
@@ -237,7 +239,7 @@ def has_no_root_node_jumps(neuron, radius_multiplier=2):
 
 
 def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
-    '''Check if leaf points are too large
+    """Check if leaf points are too large.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -252,7 +254,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         A fat end is defined as a leaf segment whose last point is larger
         by a factor of `multiple_of_mean` than the mean of the points in
         `final_point_count`
-    '''
+    """
     bad_ids = []
     for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Tree.ileaf):
         mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
@@ -264,7 +266,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
 
 
 def has_no_narrow_start(neuron, frac=0.9):
-    '''Check if neurites have a narrow start
+    """Check if neurites have a narrow start.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -272,7 +274,7 @@ def has_no_narrow_start(neuron, frac=0.9):
 
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
-    '''
+    """
     bad_ids = [(neurite.root_node.id, neurite.root_node.points[np.newaxis, 1])
                for neurite in neuron.neurites
                if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
@@ -280,7 +282,7 @@ def has_no_narrow_start(neuron, frac=0.9):
 
 
 def has_no_dangling_branch(neuron):
-    '''Check if the neuron has dangling neurites
+    """Check if the neuron has dangling neurites.
 
     Are considered dangling
     - dendrites whose first point is too far from the soma center
@@ -292,7 +294,7 @@ def has_no_dangling_branch(neuron):
 
     Returns:
         CheckResult with a list of all first segments of dangling neurites
-    '''
+    """
     soma_center = neuron.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = neuron.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
@@ -303,7 +305,7 @@ def has_no_dangling_branch(neuron):
                                                          if n.type != NeuriteType.axon)))
 
     def is_dangling(neurite):
-        '''Is the neurite dangling ?'''
+        """Is the neurite dangling ?."""
         starting_point = neurite.points[0][COLS.XYZ]
 
         if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
@@ -325,7 +327,7 @@ def has_no_narrow_neurite_section(neuron,
                                   neurite_filter,
                                   radius_threshold=0.05,
                                   considered_section_min_length=50):
-    '''Check if the neuron has dendrites with narrow sections
+    """Check if the neuron has dendrites with narrow sections.
 
     Arguments:
         neuron(Neuron): The neuron object to test
@@ -337,12 +339,12 @@ def has_no_narrow_neurite_section(neuron,
     Returns:
         CheckResult with result. result.info contains the narrow section ids and their
         first point
-    '''
+    """
     considered_sections = (sec for sec in iter_sections(neuron, neurite_filter=neurite_filter)
                            if sec.length > considered_section_min_length)
 
     def narrow_section(section):
-        '''Select narrow sections'''
+        """Select narrow sections."""
         return section.points[:, COLS.R].mean() < radius_threshold
 
     bad_ids = [(section.id, section.points[np.newaxis, 1])
@@ -351,7 +353,7 @@ def has_no_narrow_neurite_section(neuron,
 
 
 def has_multifurcation(neuron):
-    '''Check if a section has more than 3 children'''
+    """Check if a section has more than 3 children."""
     bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
                if len(section.children) > 3]
     return CheckResult(len(bad_ids) == 0, bad_ids)

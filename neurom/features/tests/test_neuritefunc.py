@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuritefunc functionality'''
+"""Test neurom._neuritefunc functionality."""
 
 import os
 from math import pi, sqrt
@@ -325,7 +325,7 @@ def test_segment_midpoints():
                               [-2.5, -4. ,  0. ]]))
 
 def test_segment_radial_distances():
-    '''midpoints on segments'''
+    """midpoints on segments."""
     radial_distances = _nf.segment_radial_distances(SIMPLE)
     assert_allclose(radial_distances,
                     [2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2), 2.0, 5.0, sqrt(2.5**2 + 4**2)])

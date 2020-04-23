@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Dendrogram helper functions and class'''
+"""Dendrogram helper functions and class."""
 import numpy as np
 
 from neurom import NeuriteType
@@ -36,14 +36,14 @@ from neurom.morphmath import interval_lengths
 
 
 class Dendrogram(object):
-    '''Dendrogram'''
+    """Dendrogram."""
 
     def __init__(self, neurom_section):
-        '''Dendrogram for NeuroM section tree.
+        """Dendrogram for NeuroM section tree.
 
         Args:
             neurom_section (Neurite|Neuron|Section): tree to build dendrogram for.
-        '''
+        """
         if isinstance(neurom_section, Neuron):
             self.neurite_type = NeuriteType.soma
             self.height = 1
@@ -84,7 +84,7 @@ class Dendrogram(object):
 
 
 def layout_dendrogram(dendrogram, origin):
-    '''Lays out dendrogram as an aesthetical pleasing tree.
+    """Lays out dendrogram as an aesthetical pleasing tree.
 
     Args:
         dendrogram (Dendrogram): dendrogram
@@ -93,10 +93,10 @@ def layout_dendrogram(dendrogram, origin):
     Returns:
         Dict of positions per each dendrogram node. When placed in those positions, dendrogram nodes
         will represent a nice tree structure.
-    '''
+    """
 
     class _PositionedDendrogram(object):
-        '''Wrapper around dendrogram that allows to lay it out.
+        """Wrapper around dendrogram that allows to lay it out.
 
         The layout happens only in X coordinates. Children's Y coordinate is just a parent's Y
          + parent's height. Algorithm is that we calculate bounding rectangle width of each
@@ -104,7 +104,7 @@ def layout_dendrogram(dendrogram, origin):
          in `total_width`. If no children then the width is the dendrogram's width. After the
          calculation we start to lay out. Each child gets its X coordinate as:
          parent's X + previous sibling children widths + half of this child's width.
-        '''
+        """
         HORIZONTAL_PADDING = 2
 
         def __init__(self, dendrogram):
@@ -132,14 +132,14 @@ def layout_dendrogram(dendrogram, origin):
 
 
 def get_size(positions):
-    '''Get the size of bounding rectangle that embodies positions.
+    """Get the size of bounding rectangle that embodies positions.
 
     Args:
         positions (dict of Dendrogram: np.array): positions xy coordinates of dendrograms
 
     Returns:
         Tuple of width and height of bounding rectangle.
-    '''
+    """
     max_y_list = [dendrogram.height + coords[1] for dendrogram, coords in positions.items()]
     coords = np.array(list(positions.values()))
     width = np.max(coords[:, 0]) - np.min(coords[:, 0])
@@ -148,7 +148,7 @@ def get_size(positions):
 
 
 def move_positions(positions, to_origin):
-    '''Move positions to a new origin.
+    """Move positions to a new origin.
 
     Args:
         positions (dict of Dendrogram: np.array): positions
@@ -156,6 +156,6 @@ def move_positions(positions, to_origin):
 
     Returns:
         Moved positions.
-    '''
+    """
     to_origin = np.asarray(to_origin)
     return {dendrogram: position + to_origin for dendrogram, position in positions.items()}

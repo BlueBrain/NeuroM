@@ -26,10 +26,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Statistical analysis helper functions
+"""Statistical analysis helper functions.
 
 Nothing fancy. Just commonly used functions using scipy functionality.
-'''
+"""
 
 from collections import namedtuple
 from enum import Enum, unique
@@ -43,14 +43,14 @@ FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
 
 @unique
 class StatTests(Enum):
-    '''Enum representing valid statistical tests of scipy'''
+    """Enum representing valid statistical tests of scipy."""
     ks = 1
     wilcoxon = 2
     ttest = 3
 
 
 def get_test(stest):
-    '''Returns the correct stat test'''
+    """Returns the correct stat test."""
     sts = {StatTests.ks: 'ks_2samp', StatTests.wilcoxon: 'wilcoxon', StatTests.ttest: 'ttest_ind'}
 
     if stest in StatTests:
@@ -59,7 +59,7 @@ def get_test(stest):
 
 
 def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
-    '''Create a JSON-comparable dict from a FitResults object
+    """Create a JSON-comparable dict from a FitResults object.
 
     Arguments:
         fit_results (FitResults): object containing fit parameters,\
@@ -74,7 +74,7 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
 
     Note:
         Supported fit types: 'norm', 'expon', 'uniform'
-    '''
+    """
     type_map = {'norm': 'normal', 'expon': 'exponential', 'uniform': 'uniform'}
     param_map = {'uniform': lambda p: [('min', p[0]), ('max', p[0] + p[1])],
                  'norm': lambda p: [('mu', p[0]), ('sigma', p[1])],
@@ -92,7 +92,7 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
 
 
 def fit(data, distribution='norm'):
-    '''Calculate the parameters of a fit of a distribution to a data set
+    """Calculate the parameters of a fit of a distribution to a data set.
 
     Arguments:
         data: array of data points to be fitted
@@ -105,13 +105,13 @@ def fit(data, distribution='norm'):
 
     Note:
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
-    '''
+    """
     params = getattr(_st, distribution).fit(data)
     return FitResults(params, _st.kstest(data, distribution, params), distribution)
 
 
 def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
-    '''Fit multiple distributions to a data set and return the fit with the minimal ks-distance.
+    """Fit multiple distributions to a data set and return the fit with the minimal ks-distance.
 
     Arguments:
         data: array of data points to be fitted
@@ -125,13 +125,13 @@ def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
 
     Note:
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
-    '''
+    """
     fit_results = [fit(data, d) for d in distr_to_check]
     return min(fit_results, key=lambda fit: fit.errs[0])
 
 
 def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
-    '''Calculate the stats from the given numpy functions
+    """Calculate the stats from the given numpy functions.
 
     Arguments:
         data: array of data points to be used for the stats
@@ -142,7 +142,7 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     Returns:
         Dictionary with the name of the function as key and the result
         as the respective value
-    '''
+    """
     stats = {}
     for func in functions:
 
@@ -152,10 +152,11 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
 
 
 def compare_two(data1, data2, test=StatTests.ks):
-    '''Compares two distributions of data
-       and assess two scores: a distance between them
-       and a probability they are drawn from the same
-       distribution.
+    """Compares two distributions of data.
+
+    And assess two scores: a distance between them
+    and a probability they are drawn from the same
+    distribution.
 
     Arguments:
         data1: numpy array of dataset 1
@@ -171,7 +172,7 @@ def compare_two(data1, data2, test=StatTests.ks):
         p-value: float\
             Small numbers define high probability the data come from\
             same dataset.
-    '''
+    """
     results = getattr(_st, get_test(test))(data1, data2)
     Stats = namedtuple('Stats', ['dist', 'pvalue'])
 
@@ -179,7 +180,9 @@ def compare_two(data1, data2, test=StatTests.ks):
 
 
 def total_score(paired_dats, p=2, test=StatTests.ks):
-    '''Calculates the p-norm of the distances that have been calculated from the statistical
+    """Calculates the p-norm of the distances.
+
+    that have been calculated from the statistical
     test that has been applied on all the paired datasets.
 
     Arguments:
@@ -196,6 +199,6 @@ def total_score(paired_dats, p=2, test=StatTests.ks):
     Returns:
         A float corresponding to the p-norm of the distances that have
         been calculated. 0 corresponds to high similarity while 1 to low.
-    '''
+    """
     scores = np.array([compare_two(fL1, fL2, test=test).dist for fL1, fL2 in paired_dats])
     return np.linalg.norm(scores, p)

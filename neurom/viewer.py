@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Tools to visualize neuron morphological objects
+"""Tools to visualize neuron morphological objects.
 
 Examples:
     >>> from neurom import viewer
@@ -36,8 +36,7 @@ Examples:
     >>> viewer.draw(nrn, mode='3d')         # 3d plot
     >>> viewer.draw(nrn.neurites[0])        # 2d plot of neurite tree
     >>> viewer.draw(nrn, mode='dendrogram') # dendrogram plot
-
-'''
+"""
 
 from .view import (plot_neuron, plot_neuron3d,
                    plot_tree, plot_tree3d,
@@ -62,19 +61,19 @@ _VIEWERS = {
 
 
 class ViewerError(Exception):
-    '''Base class for viewer exceptions'''
+    """Base class for viewer exceptions."""
 
 
 class InvalidDrawModeError(ViewerError):
-    '''Exception class to indicate invalid draw mode'''
+    """Exception class to indicate invalid draw mode."""
 
 
 class NotDrawableError(Exception):
-    '''Exception class for things that aren't drawable'''
+    """Exception class for things that aren't drawable."""
 
 
 def draw(obj, mode='2d', **kwargs):
-    '''Draw a morphology object
+    """Draw a morphology object.
 
     Arguments:
         obj: morphology object to be drawn (neuron, tree, soma).
@@ -94,8 +93,7 @@ def draw(obj, mode='2d', **kwargs):
         >>> fig3d.show()
         >>> fig, _ = viewer.draw(nrn.neurites[0]) # 2d plot of neurite tree
         >>> dend, _ = viewer.draw(nrn, mode='dendrogram')
-
-    '''
+    """
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
 

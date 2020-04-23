@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Python module of NeuroM to check neuronal trees.'''
+"""Python module of NeuroM to check neuronal trees."""
 
 import numpy as np
 from neurom.core.dataformat import COLS
@@ -36,7 +36,7 @@ from neurom._compat import range, filter
 
 
 def is_monotonic(neurite, tol):
-    '''Check if neurite tree is monotonic
+    """Check if neurite tree is monotonic.
 
     If each child has smaller or equal diameters from its parent
 
@@ -46,7 +46,7 @@ def is_monotonic(neurite, tol):
 
     Returns:
         True if neurite monotonic
-    '''
+    """
     for node in neurite.iter_sections():
         # check that points in section satisfy monotonicity
         sec = node.points
@@ -62,7 +62,7 @@ def is_monotonic(neurite, tol):
 
 
 def is_flat(neurite, tol, method='tolerance'):
-    '''Check if neurite is flat using the given method
+    """Check if neurite is flat using the given method.
 
     Args:
         neurite(Neurite): neurite to operate on
@@ -75,7 +75,7 @@ def is_flat(neurite, tol, method='tolerance'):
 
     Returns:
         True if neurite is flat
-    '''
+    """
     ext = principal_direction_extent(neurite.points[:, COLS.XYZ])
 
     assert method in ('tolerance', 'ratio'), "Method must be one of 'tolerance', 'ratio'"
@@ -86,7 +86,7 @@ def is_flat(neurite, tol, method='tolerance'):
 
 
 def is_back_tracking(neurite):
-    '''Check if a neurite process backtracks to a previous node.
+    """Check if a neurite process backtracks to a previous node.
 
     Back-tracking takes place
     when a daughter of a branching process goes back and either overlaps with a previous point, or
@@ -99,40 +99,38 @@ def is_back_tracking(neurite):
         True Under the following scenaria:
             1. A segment endpoint falls back and overlaps with a previous segment's point
             2. The geometry of a segment overlaps with a previous one in the section
-    '''
+    """
     def pair(segs):
-        '''Pairs the input list into triplets'''
+        """Pairs the input list into triplets."""
         return zip(segs, segs[1:])
 
     def coords(node):
-        '''Returns the first three values of the tree that correspond to the x, y, z coordinates'''
+        """Returns the first three values of the tree that correspond to the x, y, z coordinates."""
         return node[COLS.XYZ]
 
     def max_radius(seg):
-        '''Returns maximum radius from the two segment endpoints'''
+        """Returns maximum radius from the two segment endpoints."""
         return max(seg[0][COLS.R], seg[1][COLS.R])
 
     def is_not_zero_seg(seg):
-        '''Returns True if segment has zero length'''
+        """Returns True if segment has zero length."""
         return not np.allclose(coords(seg[0]), coords(seg[1]))
 
     def is_in_the_same_verse(seg1, seg2):
-        '''Checks if the vectors face the same direction.
+        """Checks if the vectors face the same direction.
 
         This is true if their dot product is greater than zero.
-        '''
+        """
         v1 = coords(seg2[1]) - coords(seg2[0])
         v2 = coords(seg1[1]) - coords(seg1[0])
         return np.dot(v1, v2) >= 0
 
     def is_seg2_within_seg1_radius(dist, seg1, seg2):
-        '''Checks whether the orthogonal distance from the point at the end of
-        seg1 to seg2 segment body is smaller than the sum of their radii
-        '''
+        """Checks if both segment are within the sum of their radii from one another."""
         return dist <= max_radius(seg1) + max_radius(seg2)
 
     def is_seg1_overlapping_with_seg2(seg1, seg2):
-        '''Checks if a segment is in proximity of another one upstream'''
+        """Checks if a segment is in proximity of another one upstream."""
         # get the coordinates of seg2 (from the origin)
         s1 = coords(seg2[0])
         s2 = coords(seg2[1])
@@ -164,12 +162,12 @@ def is_back_tracking(neurite):
         return np.linalg.norm(prj) < 0.55 * np.linalg.norm(S1S2)
 
     def is_inside_cylinder(seg1, seg2):
-        '''Checks if seg2 approximately lies within a cylindrical volume of seg1.
+        """Checks if seg2 approximately lies within a cylindrical volume of seg1.
 
         Two conditions must be satisfied:
             1. The two segments are not facing the same direction  (seg2 comes back to seg1)
             2. seg2 is overlaping with seg1
-        '''
+        """
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
@@ -189,7 +187,7 @@ def is_back_tracking(neurite):
 
 
 def get_flat_neurites(neuron, tol=0.1, method='ratio'):
-    '''Check if a neuron has neurites that are flat within a tolerance
+    """Check if a neuron has neurites that are flat within a tolerance.
 
     Args:
         neurite(Neurite): neurite to operate on
@@ -199,12 +197,12 @@ def get_flat_neurites(neuron, tol=0.1, method='ratio'):
     Returns:
         Bool list corresponding to the flatness check for each neurite
         in neuron neurites with respect to the given criteria
-    '''
+    """
     return [n for n in neuron.neurites if is_flat(n, tol, method)]
 
 
 def get_nonmonotonic_neurites(neuron, tol=1e-6):
-    '''Get neurites that are not monotonic
+    """Get neurites that are not monotonic.
 
     Args:
         neurite(Neurite): neurite to operate on
@@ -212,12 +210,12 @@ def get_nonmonotonic_neurites(neuron, tol=1e-6):
 
     Returns:
         list of neurites that do not satisfy monotonicity test
-    '''
+    """
     return [n for n in neuron.neurites if not is_monotonic(n, tol)]
 
 
 def get_back_tracking_neurites(neuron):
-    '''Get neurites that have back-tracks.
+    """Get neurites that have back-tracks.
 
     A back-track is the placement of a point near a previous segment during
     the reconstruction, causing a zigzag jump in the morphology which can
@@ -228,5 +226,5 @@ def get_back_tracking_neurites(neuron):
 
     Returns:
         List of neurons with backtracks
-    '''
+    """
     return [n for n in neuron.neurites if is_back_tracking(n)]

@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Runner for neuron morphology checks'''
+"""Runner for neuron morphology checks."""
 
 import logging
 from importlib import import_module
@@ -43,16 +43,16 @@ L = logging.getLogger(__name__)
 
 
 class CheckRunner(object):
-    '''Class managing checks, config and output'''
+    """Class managing checks, config and output."""
 
     def __init__(self, config):
-        '''Initialize a CheckRunner object.'''
+        """Initialize a CheckRunner object."""
         self._config = CheckRunner._sanitize_config(config)
         self._check_modules = dict((k, import_module('neurom.check.%s' % k))
                                    for k in config['checks'])
 
     def run(self, path):
-        '''Test a bunch of files and return a summary JSON report'''
+        """Test a bunch of files and return a summary JSON report."""
         SEPARATOR = '=' * 40
         summary = {}
         res = True
@@ -71,7 +71,7 @@ class CheckRunner(object):
         return {'files': summary, 'STATUS': status}
 
     def _do_check(self, obj, check_module, check_str):
-        '''Run a check function on obj'''
+        """Run a check function on obj."""
         opts = self._config['options']
         if check_str in opts:
             fargs = opts[check_str]
@@ -92,7 +92,7 @@ class CheckRunner(object):
         return out
 
     def _check_loop(self, obj, check_mod_str):
-        '''Run all the checks in a check_module'''
+        """Run all the checks in a check_module."""
         check_module = self._check_modules[check_mod_str]
         checks = self._config['checks'][check_mod_str]
         result = True
@@ -105,7 +105,7 @@ class CheckRunner(object):
         return result, summary
 
     def _check_file(self, f):
-        '''Run tests on a morphology file'''
+        """Run tests on a morphology file."""
         L.info('File: %s', f)
 
         full_result = True
@@ -138,7 +138,7 @@ class CheckRunner(object):
         return full_result, {f: full_summary}
 
     def _log_msg(self, msg, ok):
-        '''Helper to log message to the right level'''
+        """Helper to log message to the right level."""
         if self._config['color']:
             CGREEN, CRED, CEND = '\033[92m', '\033[91m', '\033[0m'
         else:
@@ -152,7 +152,7 @@ class CheckRunner(object):
 
     @staticmethod
     def _sanitize_config(config):
-        '''Check that the config has the correct keys, add missing keys if necessary'''
+        """Check that the config has the correct keys, add missing keys if necessary."""
         if 'checks' in config:
             checks = config['checks']
             if 'structural_checks' not in checks:

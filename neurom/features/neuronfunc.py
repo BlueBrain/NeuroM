@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Morphometrics functions for neurons or neuron populations'''
+"""Morphometrics functions for neurons or neuron populations."""
 
 import math
 import numpy as np
@@ -39,38 +39,38 @@ from neurom import morphmath
 
 
 def neuron_population(nrns):
-    '''Makes sure `nrns` behaves like a neuron population'''
+    """Makes sure `nrns` behaves like a neuron population."""
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
 
 def soma_volume(nrn):
-    '''Get the volume of a neuron's soma.'''
+    """Get the volume of a neuron's soma."""
     return nrn.soma.volume
 
 
 def soma_volumes(nrn_pop):
-    '''Get the volume of the somata in a population of neurons.
+    """Get the volume of the somata in a population of neurons.
 
     Note:
         If a single neuron is passed, a single element list with the volume
         of its soma member is returned.
-    '''
+    """
     nrns = neuron_population(nrn_pop)
     return [soma_volume(n) for n in nrns]
 
 
 def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
-    '''Get the surface area of a neuron's soma.
+    """Get the surface area of a neuron's soma.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
-    '''
+    """
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
 def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
-    '''Get the surface areas of the somata in a population of neurons
+    """Get the surface areas of the somata in a population of neurons.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
@@ -78,50 +78,50 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     Note:
         If a single neuron is passed, a single element list with the surface
         area of its soma member is returned.
-    '''
+    """
     nrns = neuron_population(nrn_pop)
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return [soma_surface_area(n) for n in nrns]
 
 
 def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
-    '''Get the radii of the somata of a population of neurons
+    """Get the radii of the somata of a population of neurons.
 
     Note:
         If a single neuron is passed, a single element list with the
         radius of its soma member is returned.
-    '''
+    """
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     nrns = neuron_population(nrn_pop)
     return [n.soma.radius for n in nrns]
 
 
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
-    '''List of lengths of trunk sections of neurites in a neuron'''
+    """List of lengths of trunk sections of neurites in a neuron."""
     neurite_filter = is_type(neurite_type)
     return [morphmath.section_length(s.root_node.points)
             for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
-    '''Radii of the trunk sections of neurites in a neuron'''
+    """Radii of the trunk sections of neurites in a neuron."""
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
 def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
-    '''Get a list of all the trunk origin azimuths of a neuron or population
+    """Get a list of all the trunk origin azimuths of a neuron or population.
 
     The azimuth is defined as Angle between x-axis and the vector
     defined by (initial tree point - soma center) on the x-z plane.
 
     The range of the azimuth angle [-pi, pi] radians
-    '''
+    """
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
 
     def _azimuth(section, soma):
-        '''Azimuth of a section'''
+        """Azimuth of a section."""
         vector = morphmath.vector(section[0], soma.center)
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
@@ -131,19 +131,19 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
-    '''Get a list of all the trunk origin elevations of a neuron or population
+    """Get a list of all the trunk origin elevations of a neuron or population.
 
     The elevation is defined as the angle between x-axis and the
     vector defined by (initial tree point - soma center)
     on the x-y half-plane.
 
     The range of the elevation angle [-pi/2, pi/2] radians
-    '''
+    """
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
 
     def _elevation(section, soma):
-        '''Elevation of a section'''
+        """Elevation of a section."""
         vector = morphmath.vector(section[0], soma.center)
         norm_vector = np.linalg.norm(vector)
 
@@ -157,7 +157,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_vectors(nrn, neurite_type=NeuriteType.all):
-    '''Calculates the vectors between all the trunks of the neuron and the soma center.'''
+    """Calculates the vectors between all the trunks of the neuron and the soma center."""
     neurite_filter = is_type(neurite_type)
     nrns = neuron_population(nrn)
 
@@ -167,18 +167,18 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
 
 
 def trunk_angles(nrn, neurite_type=NeuriteType.all):
-    '''Calculates the angles between all the trunks of the neuron.
+    """Calculates the angles between all the trunks of the neuron.
 
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
-    '''
+    """
     vectors = trunk_vectors(nrn, neurite_type=neurite_type)
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if not vectors.size:
         return []
 
     def _sort_angle(p1, p2):
-        """Angle between p1-p2 to sort vectors"""
+        """Angle between p1-p2 to sort vectors."""
         ang1 = np.arctan2(*p1[::-1])
         ang2 = np.arctan2(*p2[::-1])
         return (ang1 - ang2)
@@ -194,7 +194,7 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
 
 
 def sholl_crossings(neurites, center, radii):
-    '''Calculate crossings of neurites
+    """Calculate crossings of neurites.
 
     Args:
         nrn(morph): morphology on which to perform Sholl analysis
@@ -203,9 +203,9 @@ def sholl_crossings(neurites, center, radii):
     Returns:
         Array of same length as radii, with a count of the number of crossings
         for the respective radius
-    '''
+    """
     def _count_crossings(neurite, radius):
-        '''Used to count_crossings of segments in neurite with radius'''
+        """Used to count_crossings of segments in neurite with radius."""
         r2 = radius ** 2
         count = 0
         for start, end in iter_segments(neurite):
@@ -223,7 +223,7 @@ def sholl_crossings(neurites, center, radii):
 
 
 def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
-    '''Perform Sholl frequency calculations on a population of neurites
+    """Perform Sholl frequency calculations on a population of neurites.
 
     Args:
         nrn(morph): nrn or population
@@ -238,7 +238,7 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
         distance.  Finally, each segment of the neuron is tested, so a neurite that
         bends back on itself, and crosses the same Sholl radius will get counted as
         having crossed multiple times.
-    '''
+    """
     nrns = neuron_population(nrn)
     neurite_filter = is_type(neurite_type)
 

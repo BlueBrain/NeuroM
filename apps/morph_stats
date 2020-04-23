@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Examples of extracting basic statistics'''
+"""Examples of extracting basic statistics."""
 import argparse
 import json
 import logging
@@ -55,7 +55,7 @@ IGNORABLE_EXCEPTIONS = {
 
 
 def get_parser():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Morphology statistics extractor',
         epilog='Example config: {}'.format(os.path.join(CONFIG_PATH, 'morph_stats.yaml')))
@@ -90,7 +90,7 @@ def get_parser():
 
 
 def main(args):
-    '''main function'''
+    """main function."""
 
     if args.full_config:
         assert args.config is None, (

@@ -26,12 +26,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Transformation functions for morphology objects'''
+"""Transformation functions for morphology objects."""
 
 import numpy as np
 
 
-_TRANSFDOC = '''
+_TRANSFDOC = """
 
     The transformation can be applied to [x, y, z] points via a call operator
     with the following properties:
@@ -42,68 +42,68 @@ _TRANSFDOC = '''
 
     Returns:
         2D numpy array of transformed points
-'''
+"""
 
 
 class Transform3D(object):
-    '''Class representing a generic 3D transformation'''
+    """Class representing a generic 3D transformation."""
     __doc__ += _TRANSFDOC
 
     def __call__(self, points):
-        '''Apply a 3D transformation to a set of points'''
+        """Apply a 3D transformation to a set of points."""
         raise NotImplementedError
 
 
 class Translation(Transform3D):
-    '''Class representing a 3D translation'''
+    """Class representing a 3D translation."""
     __doc__ += _TRANSFDOC
 
     def __init__(self, translation):
-        '''Initialize a 3D translation.
+        """Initialize a 3D translation.
 
         Arguments:
             translation: 3-vector of x, y, z
-        '''
+        """
         self._trans = np.array(translation)
 
     def __call__(self, points):
-        '''Apply a 3D translation to a set of points'''
+        """Apply a 3D translation to a set of points."""
         return points + self._trans
 
 
 class Rotation(Transform3D):
-    '''Class representing a 3D rotation'''
+    """Class representing a 3D rotation."""
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm):
-        '''Initialize a 3D rotation.
+        """Initialize a 3D rotation.
 
         Arguments:
             dcm: a 3x3 direction cosine matrix
-        '''
+        """
         self._dcm = np.array(dcm)
 
     def __call__(self, points):
-        '''Apply a 3D rotation to a set of points'''
+        """Apply a 3D rotation to a set of points."""
         return np.dot(self._dcm, np.array(points).T).T
 
 
 class PivotRotation(Rotation):
-    '''Class representing a 3D rotation about a pivot point'''
+    """Class representing a 3D rotation about a pivot point."""
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm, pivot=None):
-        '''Initialize a 3D rotation about a pivot point.
+        """Initialize a 3D rotation about a pivot point.
 
         Arguments:
             dcm: a 3x3 direction cosine matrix
             pivot: a 3-vector specifying the origin of rotation
-        '''
+        """
         super(PivotRotation, self).__init__(dcm)
         self._origin = np.zeros(3) if pivot is None else np.array(pivot)
 
     def __call__(self, points):
-        '''Apply a 3D pivoted rotation to a set of points'''
+        """Apply a 3D pivoted rotation to a set of points."""
         points = points - self._origin
         points = np.dot(self._dcm, np.array(points).T).T
         points += self._origin
@@ -111,7 +111,7 @@ class PivotRotation(Rotation):
 
 
 def translate(obj, t):
-    '''Translate object of supported type.
+    """Translate object of supported type.
 
     Arguments:
         obj : object to be translated. Must implement a transform method.
@@ -119,7 +119,7 @@ def translate(obj, t):
 
     Returns:
         copy of the object with the applied translation
-    '''
+    """
     try:
         return obj.transform(Translation(t))
     except AttributeError:
@@ -127,7 +127,7 @@ def translate(obj, t):
 
 
 def rotate(obj, axis, angle, origin=None):
-    '''Rotation around unit vector following the right hand rule
+    """Rotation around unit vector following the right hand rule.
 
     Arguments:
         obj : obj to be rotated (e.g. neurite, neuron).
@@ -138,7 +138,7 @@ def rotate(obj, axis, angle, origin=None):
 
     Returns:
         A copy of the object with the applied translation.
-    '''
+    """
     R = _rodrigues_to_dcm(axis, angle)
 
     try:
@@ -148,12 +148,12 @@ def rotate(obj, axis, angle, origin=None):
 
 
 def _sin(x):
-    '''Sine with case for pi multiples'''
+    """Sine with case for pi multiples."""
     return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
 
 
 def _rodrigues_to_dcm(axis, angle):
-    '''Generates transformation matrix from unit vector and rotation angle.
+    """Generates transformation matrix from unit vector and rotation angle.
 
     The rotation is applied in the direction
     of the axis which is a unit vector following the right hand rule.
@@ -164,7 +164,7 @@ def _rodrigues_to_dcm(axis, angle):
         angle : angle of rotation in rads
 
     Returns : 3x3 Rotation matrix
-    '''
+    """
     ux, uy, uz = axis / np.linalg.norm(axis)
 
     uxx = ux * ux

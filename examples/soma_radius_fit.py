@@ -28,9 +28,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Extract a distribution for the soma radii of the population (list) of neurons.
+"""Extract a distribution for the soma radii of the population (list) of neurons.
    for the soma radii of the population (list) of neurons.
-   '''
+   """
 
 import argparse
 
@@ -39,7 +39,7 @@ from neurom import stats as st
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Morphology fit distribution extractor',
         epilog='Note: Prints the optimal distribution and corresponding parameters.')
@@ -51,9 +51,9 @@ def parse_args():
 
 
 def test_multiple_distr(filepath):
-    '''Runs the distribution fit for multiple distributions and returns
+    """Runs the distribution fit for multiple distributions and returns
        the optimal distribution along with the corresponding parameters.
-    '''
+    """
     #  load a neuron from an SWC file
     population = nm.load_neurons(filepath)
 

@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuronfunc functionality'''
+"""Test neurom._neuronfunc functionality."""
 import os
 import tempfile
 import warnings
@@ -189,16 +189,16 @@ def test_sholl_analysis_custom():
     #http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
     radii = np.arange(10, 81, 10)
     center = 0, 0, 0
-    morph_A = load_swc('''\
+    morph_A = load_swc("""\
  1 1   0  0  0 1. -1
  2 3   0  0  0 1.  1
  3 3  80  0  0 1.  2
  4 4   0  0  0 1.  1
- 5 4 -80  0  0 1.  4''')
+ 5 4 -80  0  0 1.  4""")
     nt.eq_(list(_nf.sholl_crossings(morph_A, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 2, 2])
 
-    morph_B = load_swc('''\
+    morph_B = load_swc("""\
  1 1   0   0  0 1. -1
  2 3   0   0  0 1.  1
  3 3  35   0  0 1.  2
@@ -213,11 +213,11 @@ def test_sholl_analysis_custom():
 12 4 -51   0  0 1.  9
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
-                       ''')
+                       """)
     nt.eq_(list(_nf.sholl_crossings(morph_B, center, radii=radii)),
            [2, 2, 2, 10, 10, 0, 0, 0])
 
-    morph_C = load_swc('''\
+    morph_C = load_swc("""\
  1 1   0   0  0 1. -1
  2 3   0   0  0 1.  1
  3 3  65   0  0 1.  2
@@ -232,7 +232,7 @@ def test_sholl_analysis_custom():
 12 4  85   0  0 1.  9
 13 4  85  -5  0 1.  9
 14 4  85 -10  0 1.  9
-                       ''')
+                       """)
     nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 10, 10])
     #view.neuron(morph_C)[0].savefig('foo.png')
