@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Module for morphology SWC data loading
+"""Module for morphology SWC data loading.
 
 Data is unpacked into a 2-dimensional raw data block:
 
@@ -36,7 +36,7 @@ SWC format:
     [ID, TYPE, X, Y, Z, R, PARENT_ID]
 
 There is one such row per measured point.
-'''
+"""
 import numpy as np
 from .datawrapper import DataWrapper
 
@@ -45,7 +45,7 @@ ID, TYPE, X, Y, Z, R, P = range(7)
 
 
 def read(filename, data_wrapper=DataWrapper):
-    '''Read an SWC file and return a tuple of data, format.'''
+    """Read an SWC file and return a tuple of data, format."""
     data = np.loadtxt(filename)
     if len(np.shape(data)) == 1:
         data = np.reshape(data, (1, -1))

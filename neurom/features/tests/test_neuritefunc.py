@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom._neuritefunc functionality'''
+"""Test neurom._neuritefunc functionality."""
 
 import os
 from math import pi, sqrt
@@ -325,7 +325,7 @@ def test_segment_midpoints():
                               [-2.5, -4. ,  0. ]]))
 
 def test_segment_radial_distances():
-    '''midpoints on segments'''
+    """midpoints on segments."""
     radial_distances = _nf.segment_radial_distances(SIMPLE)
     assert_allclose(radial_distances,
                     [2.5, sqrt(2.5**2 + 5**2), sqrt(3**2 + 5**2), 2.0, 5.0, sqrt(2.5**2 + 4**2)])
@@ -342,6 +342,15 @@ def test_principal_direction_extents():
                     (14.736052694538641, 12.105102672688004))
 
 def test_section_taper_rates():
-    assert_allclose(list(_nf.section_taper_rates(SIMPLE)),
-                    [0.0, -0.4, -0.3333, 0.0, -0.3333, -0.4],
+    assert_allclose(list(_nf.section_taper_rates(NRN.neurites[0]))[:10],
+                    [0.06776235492169848,
+                     0.0588716599404923,
+                     0.03791571485186163,
+                     0.04674653812192691,
+                     -0.026399800285566058,
+                     -0.026547582897720887,
+                     -0.045038414440432537,
+                     0.02083822978267914,
+                     -0.0027721371791201038,
+                     0.0803069042861474],
                     atol=1e-4)

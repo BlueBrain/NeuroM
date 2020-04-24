@@ -26,10 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''NeuroM neurom morphology analysis package
+"""NeuroM neurom morphology analysis package.
 
 Examples:
-
     Load a neuron
 
     >>> import neurom as nm
@@ -55,8 +54,7 @@ Examples:
     >>> filter = lambda n : n.type == nm.AXON
     >>> mapping = lambda n : len(n.points)
     >>> n_points = [n for n in nm.iter_neurites(nrns, mapping, filter)]
-
-'''
+"""
 
 import logging as _logging
 

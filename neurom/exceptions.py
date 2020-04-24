@@ -26,32 +26,32 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Module containing NeuroM specific exceptions'''
+"""Module containing NeuroM specific exceptions."""
 
 
 class NeuroMError(Exception):
-    '''Base class for all NeuroM exceptions'''
+    """Base class for all NeuroM exceptions."""
 
 
 class RawDataError(NeuroMError):
-    '''Exception class for raw data errors'''
+    """Exception class for raw data errors."""
 
 
 class ConfigError(NeuroMError):
-    '''Exception class for configuration data in apps errors'''
+    """Exception class for configuration data in apps errors."""
 
 
 class SomaError(NeuroMError):
-    '''Exception for soma construction errors'''
+    """Exception for soma construction errors."""
 
 
 class IDSequenceError(RawDataError):
-    '''Exception for raw data with illegal point ID sequence'''
+    """Exception for raw data with illegal point ID sequence."""
 
 
 class MultipleTrees(RawDataError):
-    '''Exception for raw data with multiple trees'''
+    """Exception for raw data with multiple trees."""
 
 
 class MissingParentError(RawDataError):
-    '''Exception for raw data with missing parent IDs'''
+    """Exception for raw data with missing parent IDs."""

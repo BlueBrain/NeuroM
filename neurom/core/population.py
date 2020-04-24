@@ -26,43 +26,43 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Neuron Population Classes and Functions
-'''
+"""Neuron Population Classes and Functions."""
 
 from itertools import chain
 
 
 class Population(object):
-    '''Neuron Population Class
+    """Neuron Population Class.
 
     Features:
         - flattened collection of neurites.
         - collection of somas, neurons.
         - iterable-like iteration over neurons.
-    '''
+    """
     def __init__(self, neurons, name='Population'):
-        '''Construct a neuron population
+        """Construct a neuron population.
 
         Arguments:
             neurons: iterable of neuron objects.
             name: Optional name for this Population.
-        '''
+        """
         self.neurons = tuple(neurons)
         self.somata = tuple(neu.soma for neu in neurons)
         self.neurites = tuple(chain.from_iterable(neu.neurites for neu in neurons))
         self.name = name
 
     def __iter__(self):
-        '''Iterator to populations's neurons'''
+        """Iterator to populations's neurons."""
         return iter(self.neurons)
 
     def __len__(self):
-        '''Length of neuron collection'''
+        """Length of neuron collection."""
         return len(self.neurons)
 
     def __getitem__(self, idx):
-        '''Get neuron at index idx'''
+        """Get neuron at index idx."""
         return self.neurons[idx]
 
     def __str__(self):
+        """Return a string representation."""
         return 'Population <name: %s, nneurons: %d>' % (self.name, len(self.neurons))

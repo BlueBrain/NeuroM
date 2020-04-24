@@ -1,4 +1,4 @@
-'''Legacy module, replaced by neurom.features'''
+"""Legacy module, replaced by neurom.features."""
 from warnings import warn
 from neurom.features import neuritefunc as _neuritefunc
 from neurom.features import neuronfunc as _neuronfunc

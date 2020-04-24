@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Fast neuron IO module'''
+"""Fast neuron IO module."""
 
 from copy import deepcopy
 
@@ -38,9 +38,10 @@ from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
 
 class FstNeuron(Neuron):
-    '''Class representing a neuron'''
+    """Class representing a neuron."""
 
     def __init__(self, data_wrapper, name='Neuron'):
+        """Initialize an FstNeuron object."""
         self._data = data_wrapper
         neurites, sections = make_neurites(self._data)
         soma_check, soma_class = _SOMA_CONFIG[self._data.fmt]
@@ -50,7 +51,7 @@ class FstNeuron(Neuron):
 
     @property
     def points(self):
-        '''Return unordered array with all the points in this neuron'''
+        """Return unordered array with all the points in this neuron."""
         if self._points is None:
             _points = self.soma.points.tolist()
             for n in self.neurites:
@@ -60,23 +61,23 @@ class FstNeuron(Neuron):
         return self._points
 
     def transform(self, trans):
-        '''Return a copy of this neuron with a 3D transformation applied'''
+        """Return a copy of this neuron with a 3D transformation applied."""
         _data = deepcopy(self._data)
         _data.data_block[:, 0:3] = trans(_data.data_block[:, 0:3])
         return FstNeuron(_data, self.name)
 
     def __deepcopy__(self, memo):
-        '''Deep-copy neuron object
+        """Deep-copy neuron object.
 
         Note:
             Efficient copying is performed by deep-copying the internal
             data block and building a neuron from it
-        '''
+        """
         return FstNeuron(deepcopy(self._data, memo), self.name)
 
 
 def make_neurites(rdw):
-    '''Build neurite trees from a raw data wrapper'''
+    """Build neurite trees from a raw data wrapper."""
     post_action = _NEURITE_ACTION[rdw.fmt]
     trunks = rdw.neurite_root_section_ids()
     if not trunks:
@@ -106,17 +107,17 @@ def make_neurites(rdw):
 
 
 def _remove_soma_initial_point(tree):
-    '''Remove tree's initial point if soma'''
+    """Remove tree's initial point if soma."""
     if tree.points[0][COLS.TYPE] == POINT_TYPE.SOMA:
         tree.points = tree.points[1:]
 
 
 def _check_soma_topology_swc(points):
-    '''check if points form valid soma
+    """Check if points form valid soma.
 
     Currently checks if there are bifurcations within a soma
     with more than three points.
-    '''
+    """
     if len(points) == 3:
         return
 

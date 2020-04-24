@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Functionality for styling plots"""
+"""Functionality for styling plots."""
 import os
 
 import numpy as np
@@ -42,19 +42,20 @@ plt = None  # refer to _get_plt()
 
 
 def _get_plt():
-    '''wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend'''
+    """Wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend."""
     global plt  # pylint: disable=global-statement
     import matplotlib.pyplot  # pylint: disable=import-outside-toplevel
     plt = matplotlib.pyplot
 
 
 def dict_if_none(arg):
-    '''return an empty dict if arg is None'''
+    """Return an empty dict if arg is None."""
     return arg if arg is not None else {}
 
 
 def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
-    """
+    """Returns a formatted string with the figure name and title.
+
     Helper function to define the strings that handle pre-post conventions
     for viewing - plotting title and saving options.
 
@@ -83,9 +84,7 @@ def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
 
 
 def get_figure(new_fig=True, subplot='111', params=None):
-    """
-    Function to be used for viewing - plotting,
-    to initialize the matplotlib figure - axes.
+    """Function to be used for viewing - plotting, to initialize the matplotlib figure - axes.
 
     Args:
         new_fig(bool): Defines if a new figure will be created, if false current figure is used
@@ -168,7 +167,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
                aspect_ratio='equal',
                tight=False,
                **_):
-    """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions
+    """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:
         fig(matplotlib figure): figure
@@ -227,7 +226,7 @@ def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
 
 
 def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None):
-    """Set title options of a matplotlib plot
+    """Set title options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes
@@ -251,7 +250,7 @@ def plot_labels(ax, label_fontsize=14,
                 xlabel=None, xlabel_arg=None,
                 ylabel=None, ylabel_arg=None,
                 zlabel=None, zlabel_arg=None):
-    """Sets the labels options of a matplotlib plot
+    """Sets the labels options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes
@@ -288,11 +287,11 @@ def plot_ticks(ax, tick_fontsize=12,
         ax: matplotlib axes
         tick_fontsize (int): Defines the size of the ticks' font
         xticks([list of ticks]): Defines the values of x ticks in the figure
-        xticks_arg(dict):  Passsed into matplotlib as xticks arguments
+        xticks_args(dict):  Passsed into matplotlib as xticks arguments
         yticks([list of ticks]): Defines the values of y ticks in the figure
-        yticks_arg(dict):  Passsed into matplotlib as yticks arguments
+        yticks_args(dict):  Passsed into matplotlib as yticks arguments
         zticks([list of ticks]): Defines the values of z ticks in the figure
-        zticks_arg(dict):  Passsed into matplotlib as zticks arguments
+        zticks_args(dict):  Passsed into matplotlib as zticks arguments
     """
     if xticks is not None:
         ax.set_xticks(xticks)
@@ -319,7 +318,6 @@ def update_plot_limits(ax, white_space):
 
     Note: This relies on ax.dataLim (in 2d) and ax.[xy, zz]_dataLim being set in 3d
     """
-
     if hasattr(ax, 'zz_dataLim'):
         bounds = ax.xy_dataLim.bounds
         ax.set_xlim(bounds[0] - white_space, bounds[0] + bounds[2] + white_space)
@@ -335,9 +333,7 @@ def update_plot_limits(ax, white_space):
 
 
 def plot_legend(ax, no_legend=True, legend_arg=None):
-    """
-    Function that defines the legend options
-    of a matplotlib plot.
+    """Function that defines the legend options of a matplotlib plot.
 
     Args:
         ax: matplotlib axes
@@ -354,10 +350,10 @@ _LINSPACE_COUNT = 300
 
 
 def _get_normals(v):
-    '''get two vectors that form a basis w/ v
+    """Get two vectors that form a basis w/ v.
 
     Note: returned vectors are unit
-    '''
+    """
     not_v = np.array([1, 0, 0])
     if np.all(np.abs(v) == not_v):
         not_v = np.array([0, 1, 0])
@@ -369,10 +365,10 @@ def _get_normals(v):
 
 def generate_cylindrical_points(start, end, start_radius, end_radius,
                                 linspace_count=_LINSPACE_COUNT):
-    '''Generate a 3d mesh of a cylinder with start and end points, and varying radius
+    """Generate a 3d mesh of a cylinder with start and end points, and varying radius.
 
     Based on: http://stackoverflow.com/a/32383775
-    '''
+    """
     v = end - start
     length = norm(v)
     v = v / length
@@ -395,7 +391,7 @@ def generate_cylindrical_points(start, end, start_radius, end_radius,
 def project_cylinder_onto_2d(ax, plane,
                              start, end, start_radius, end_radius,
                              color='black', alpha=1.):
-    '''take cylinder defined by start/end, and project it onto the plane
+    """Take cylinder defined by start/end, and project it onto the plane.
 
     Args:
         ax: matplotlib axes
@@ -410,7 +406,7 @@ def project_cylinder_onto_2d(ax, plane,
     Note: There are probably more efficient ways of doing this: here the
     3d outline is calculated, the non-used plane coordinates are dropped, a
     tight convex hull is found, and that is used for a filled polygon
-    '''
+    """
     points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
     points = np.vstack([points[plane[0]].ravel(),
                         points[plane[1]].ravel()])
@@ -421,7 +417,7 @@ def project_cylinder_onto_2d(ax, plane,
 
 def plot_cylinder(ax, start, end, start_radius, end_radius,
                   color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
-    '''plot a 3d cylinder'''
+    """Plot a 3d cylinder."""
     assert not np.all(start == end), 'Cylinder must have length'
     x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
                                           linspace_count=linspace_count)
@@ -429,8 +425,7 @@ def plot_cylinder(ax, start, end, start_radius, end_radius,
 
 
 def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
-    """ Plots a 3d sphere, given the center and the radius.  """
-
+    """Plots a 3d sphere, given the center and the radius."""
     u = np.linspace(0, 2 * np.pi, linspace_count)
     v = np.linspace(0, np.pi, linspace_count)
     sin_v = np.sin(v)

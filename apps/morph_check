@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Examples of basic data checks'''
+"""Examples of basic data checks."""
 import argparse
 import json
 import logging
@@ -43,12 +43,12 @@ from neurom.exceptions import ConfigError
 
 CONFIG_PATH = pkg_resources.resource_filename('neurom', 'config')
 
-DESCRIPTION = '''
+DESCRIPTION = """
 NeuroM Morphology Checker
 =========================
-'''
+"""
 
-EPILOG = '''
+EPILOG = """
 Description
 -----------
 
@@ -113,7 +113,7 @@ morph_check --help               # print this help
 morph_check some/path/neuron.h5  # Process an HDF5 file
 morph_check some/path/neuron.swc # Process an SWC file
 morph_check some/path/           # Process all HDF5 and SWC files found in directory
-'''
+"""
 
 L = logging.getLogger(__name__)
 
@@ -137,7 +137,7 @@ def _setup_logging(debug, log_file):
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(description=DESCRIPTION,
                                      formatter_class=argparse.RawTextHelpFormatter,
                                      epilog=EPILOG)
@@ -160,7 +160,7 @@ def parse_args():
 
 
 def main(args):
-    '''Run all the checks'''
+    """Run all the checks."""
     _setup_logging(args.debug, args.log_file)
 
     try:

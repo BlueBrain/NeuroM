@@ -1,7 +1,4 @@
-'''
-Define the public 'draw' function to be used to draw
-morphology using plotly
-'''
+"""Define the public 'draw' function to be used to draw morphology using plotly."""
 from __future__ import absolute_import  # prevents name clash with local plotly module
 from itertools import chain
 
@@ -20,14 +17,14 @@ from neurom.view.view import TREE_COLOR
 
 
 def draw(obj, plane='3d', inline=False, **kwargs):
-    '''Draw the object using the given plane
+    """Draw the object using the given plane.
 
     obj (neurom.Neuron, neurom.Tree): neuron or tree
     plane (str): a string representing the 2D plane (example: 'xy')
                  or '3d', '3D' for a 3D view
 
     inline (bool): must be set to True for interactive ipython notebook plotting
-    '''
+    """
     if plane.lower() == '3d':
         return _plot_neuron3d(obj, inline, **kwargs)
     return _plot_neuron(obj, plane, inline, **kwargs)
@@ -38,15 +35,12 @@ def _plot_neuron(neuron, plane, inline, **kwargs):
 
 
 def _plot_neuron3d(neuron, inline, **kwargs):
-    '''
-    Generates a figure of the neuron,
-    that contains a soma and a list of trees.
-    '''
+    """Generates a figure of the neuron, that contains a soma and a list of trees."""
     return _plotly(neuron, plane='3d', title='neuron-3D', inline=inline, **kwargs)
 
 
 def _make_trace(neuron, plane):
-    '''Create the trace to be plotted'''
+    """Create the trace to be plotted."""
     for neurite in iter_neurites(neuron):
         segments = list(iter_segments(neurite))
 
@@ -70,7 +64,7 @@ def _make_trace(neuron, plane):
 
 
 def _fill_soma_data(neuron, data, plane):
-    '''Fill soma data if 3D plot and returns soma_2d in all cases'''
+    """Fill soma data if 3D plot and returns soma_2d in all cases."""
     if not isinstance(neuron, Neuron):
         return []
 
@@ -113,7 +107,7 @@ def _fill_soma_data(neuron, data, plane):
 
 
 def get_figure(neuron, plane, title):
-    '''Returns the plotly figure containing the neuron'''
+    """Returns the plotly figure containing the neuron."""
     data = list(_make_trace(neuron, plane))
     axis = dict(
         gridcolor='rgb(255, 255, 255)',

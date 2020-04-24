@@ -43,6 +43,7 @@ from neurom.core.types import dendrite_filter
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 SWC_PATH = os.path.join(DATA_PATH, 'swc')
+ASC_PATH = os.path.join(DATA_PATH, 'neurolucida')
 H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
 
 
@@ -51,6 +52,8 @@ def _load_neuron(name):
         path = os.path.join(SWC_PATH, name)
     elif name.endswith('.h5'):
         path = os.path.join(H5V1_PATH, name)
+    else:
+        path = os.path.join(ASC_PATH, name)
     return name, load_neuron(path)
 
 
@@ -401,12 +404,23 @@ def test_has_no_narrow_dendritic_section():
 
 def test_has_no_dangling_branch():
     _, nrn = _load_neuron('dangling_axon.swc')
-    nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not res.status)
+    nt.assert_equal(len(res.info), 1)
+    assert_array_equal(res.info[0][1][0][COLS.XYZ],
+                       [0., 49.,  0.])
 
     _, nrn = _load_neuron('dangling_dendrite.swc')
-    nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(not nrn_chk.has_no_dangling_branch(nrn).status)
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(not res.status)
+    nt.assert_equal(len(res.info), 1)
+    assert_array_equal(res.info[0][1][0][COLS.XYZ],
+                       [0., 49.,  0.])
+
+    _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
+    res = nrn_chk.has_no_dangling_branch(nrn)
+    nt.ok_(res.status)
+
 
 
 def test__bool__():

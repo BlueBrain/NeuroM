@@ -26,7 +26,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''Plot a selection of features from a morphology population'''
+"""Plot a selection of features from a morphology population."""
 
 from collections import defaultdict
 from collections import namedtuple
@@ -110,7 +110,7 @@ FEATURES = ('segment_lengths',
 
 
 def load_neurite_features(filepath):
-    '''Unpack relevant data into megadict'''
+    """Unpack relevant data into megadict."""
     stuff = defaultdict(lambda: defaultdict(list))
     nrns = nm.load_neurons(filepath)
     # unpack data into arrays
@@ -127,7 +127,7 @@ Plot = namedtuple('Plot', 'fig, ax')
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Morphology feature plotter',
         epilog='Note: Makes plots of various features and superimposes\
@@ -148,7 +148,7 @@ def parse_args():
 
 
 def main(data_dir, mtype_file):  # pylint: disable=too-many-locals
-    '''Run the stuff'''
+    """Run the stuff."""
     # data structure to store results
     stuff = load_neurite_features(data_dir)
     sim_params = json.load(open(mtype_file))

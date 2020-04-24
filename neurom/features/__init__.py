@@ -26,16 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' NeuroM, lightweight and fast
+"""NeuroM, lightweight and fast.
 
 Examples:
-
     Obtain some morphometrics
 
     >>> ap_seg_len = features.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
-
-'''
+"""
 
 from functools import partial
 import numpy as _np
@@ -113,35 +111,33 @@ NEURONFEATURES = {
 
 
 def register_neurite_feature(name, func):
-    '''Register a feature to be applied to neurites
+    """Register a feature to be applied to neurites.
 
-    Parameters:
+    Arguments:
         name: name of the feature, used for access via get() function.
         func: single parameter function of a neurite.
-    '''
+    """
     if name in NEURITEFEATURES:
         raise NeuroMError('Attempt to hide registered feature %s' % name)
 
     def _fun(neurites, neurite_type=_ntype.all):
-        '''Wrap neurite function from outer scope and map into list'''
+        """Wrap neurite function from outer scope and map into list."""
         return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
 
     NEURONFEATURES[name] = _fun
 
 
 def get(feature, obj, **kwargs):
-    '''Obtain a feature from a set of morphology objects
+    """Obtain a feature from a set of morphology objects.
 
-    Parameters:
+    Arguments:
         feature(string): feature to extract
         obj: a neuron, population or neurite tree
         **kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D or 2D numpy array.
-
-    '''
-
+    """
     feature = (NEURITEFEATURES[feature] if feature in NEURITEFEATURES
                else NEURONFEATURES[feature])
 
@@ -152,16 +148,16 @@ _INDENT = ' ' * 4
 
 
 def _indent(string, count):
-    '''indent `string` by `count` * INDENT'''
+    """Indent `string` by `count` * INDENT."""
     indent = _INDENT * count
     ret = indent + string.replace('\n', '\n' + indent)
     return ret.rstrip()
 
 
 def _get_doc():
-    '''Get a description of all the known available features'''
+    """Get a description of all the known available features."""
     def get_docstring(func):
-        '''extract doctstring, if possible'''
+        """Extract doctstring, if possible."""
         docstring = ':\n'
         if func.__doc__:
             docstring += _indent(func.__doc__, 2)

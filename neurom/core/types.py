@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Type enumerations'''
+"""Type enumerations."""
 
 from enum import unique
 
@@ -35,7 +35,7 @@ from neurom.utils import OrderedEnum
 
 @unique
 class NeuriteIter(OrderedEnum):
-    '''Neurite iteration orders'''
+    """Neurite iteration orders."""
     FileOrder = 1  # Order in which neurites appear in the file
 
     # NRN simulator order: soma -> axon -> basal -> apical
@@ -46,7 +46,7 @@ class NeuriteIter(OrderedEnum):
 
 @unique
 class NeuriteType(OrderedEnum):
-    '''Enum representing valid tree types'''
+    """Enum representing valid tree types."""
     undefined = 1
     soma = 2
     axon = 3
@@ -64,7 +64,7 @@ ROOT_ID = -1
 
 
 def tree_type_checker(*ref):
-    '''Tree type checker functor
+    """Tree type checker functor.
 
     Returns:
         Functor that takes a tree, and returns true if that tree matches any of
@@ -74,29 +74,29 @@ def tree_type_checker(*ref):
         >>> from neurom.core.types import NeuriteType, tree_type_checker
         >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
         >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
-    '''
+    """
     ref = tuple(ref)
     if NeuriteType.all in ref:
         def check_tree_type(_):
-            '''Always returns true'''
+            """Always returns true."""
             return True
     else:
         def check_tree_type(tree):
-            '''Check whether tree has the same type as ref
+            """Check whether tree has the same type as ref.
 
             Returns:
                 True if ref in the same type as tree.type or ref is NeuriteType.all
-            '''
+            """
             return tree.type in ref
 
     return check_tree_type
 
 
 def dendrite_filter(n):
-    '''Select only dendrites'''
+    """Select only dendrites."""
     return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite
 
 
 def axon_filter(n):
-    '''Select only axons'''
+    """Select only axons."""
     return n.type == NeuriteType.axon

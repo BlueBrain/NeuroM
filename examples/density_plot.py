@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Example for generating density plots'''
+"""Example for generating density plots."""
 
 import pylab as plt
 import numpy as np
@@ -37,9 +37,9 @@ from neurom.core.types import NeuriteType
 
 
 def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.basal_dendrite):
-    '''Extracts the 2d histogram of the center
+    """Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
-    '''
+    """
     segment_midpoints = get_feat('segment_midpoints', population, neurite_type=neurite_type)
     horiz = segment_midpoints[:, 'xyz'.index(plane[0])]
     vert = segment_midpoints[:, 'xyz'.index(plane[1])]
@@ -51,9 +51,9 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
                  colorlabel='Nodes per unit area', labelfontsize=16,
                  color_map='Reds', no_colorbar=False, threshold=0.01,
                  neurite_type=NeuriteType.basal_dendrite, **kwargs):
-    '''Plots the 2d histogram of the center
+    """Plots the 2d histogram of the center
        coordinates of segments in the selected plane.
-    '''
+    """
     fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
 
     H1, xedges1, yedges1 = extract_density(population, plane=plane, bins=bins,
@@ -85,10 +85,10 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
                            colorlabel='Nodes per unit area', labelfontsize=16,
                            color_map='Reds', no_colorbar=False, threshold=0.01,
                            neurite_type=NeuriteType.basal_dendrite, **kwargs):
-    '''Plots the 2d histogram of the center
+    """Plots the 2d histogram of the center
        coordinates of segments in the selected plane
        and superimposes the view of the first neurite of the collection.
-    '''
+    """
     _, ax = common.get_figure(new_fig=new_fig)
 
     view.plot_tree(ax, population.neurites[0])

@@ -26,11 +26,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Test neurom.stats
+"""Test neurom.stats
 
 Since the stats module consists of simple wrappers to scipy.stats functions,
 these tests are only sanity checks.
-'''
+"""
 
 from neurom import stats as st
 from nose import tools as nt

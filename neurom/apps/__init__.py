@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Helper code for neurom applications'''
+"""Helper code for neurom applications."""
 import logging
 
 import yaml
@@ -34,7 +34,7 @@ from neurom.exceptions import ConfigError
 
 
 def get_config(config, default_config):
-    '''Load configuration from file if in config, else use default'''
+    """Load configuration from file if in config, else use default."""
     if not config:
         logging.warning('Using default config: %s', default_config)
         config = default_config

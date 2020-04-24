@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Get sections and segments by ID'''
+"""Get sections and segments by ID."""
 
 import neurom as nm
 from neurom import morphmath as mm
@@ -35,11 +35,11 @@ from neurom.core.dataformat import COLS
 
 
 def get_segment(neuron, section_id, segment_id):
-    '''Get a segment given a section and segment id
+    """Get a segment given a section and segment id
 
     Returns:
         array of two [x, y, z, r] points defining segment
-    '''
+    """
     sec = neuron.sections[section_id]
     return sec.points[segment_id:segment_id + 2][:, COLS.XYZR]
 

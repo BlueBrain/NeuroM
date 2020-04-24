@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Core code for morph_stats application'''
+"""Core code for morph_stats application."""
 import logging
 from collections import defaultdict
 from itertools import product
@@ -40,14 +40,14 @@ L = logging.getLogger(__name__)
 
 
 def eval_stats(values, mode):
-    '''Extract a summary statistic from an array of list of values
+    """Extract a summary statistic from an array of list of values.
 
-    Parameters:
-        values: numpy array of values
-        mode: summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
+    Arguments:
+        values: A numpy array of values
+        mode: A summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
 
     Note: fails silently if values is empty, and None is returned
-    '''
+    """
     if mode == 'raw':
         return values.tolist()
     if mode == 'total':
@@ -62,7 +62,7 @@ def eval_stats(values, mode):
 
 
 def _stat_name(feat_name, stat_mode):
-    '''Set stat name based on feature name and stat mode'''
+    """Set stat name based on feature name and stat mode."""
     if feat_name[-1] == 's':
         feat_name = feat_name[:-1]
     if feat_name == 'soma_radii':
@@ -74,11 +74,11 @@ def _stat_name(feat_name, stat_mode):
 
 
 def extract_stats(neurons, config):
-    '''Extract stats from neurons'''
+    """Extract stats from neurons."""
     stats = defaultdict(dict)
 
     def _fill_compoundified(data, stat_name, stat):
-        '''Insert the stat in the dict and eventually split it into XYZ components'''
+        """Insert the stat in the dict and eventually split it into XYZ components."""
         if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
             data[stat_name] = stat
         else:
@@ -104,7 +104,7 @@ def extract_stats(neurons, config):
 
 
 def get_header(results):
-    '''Extracts the headers, using the first value in the dict as the template'''
+    """Extracts the headers, using the first value in the dict as the template."""
     ret = ['name', ]
     values = next(iter(results.values()))
     for k, v in values.items():
@@ -117,7 +117,7 @@ def get_header(results):
 
 
 def generate_flattened_dict(headers, results):
-    '''extract from results the fields in the headers list'''
+    """Extract from results the fields in the headers list."""
     for name, values in results.items():
         row = []
         for header in headers:
@@ -140,7 +140,7 @@ _NEURITE_MAP = {
 
 
 def full_config():
-    '''Returns a config with all features, all modes, all neurite types'''
+    """Returns a config with all features, all modes, all neurite types."""
     modes = ['min', 'max', 'median', 'mean', 'std']
     return {
         'neurite': {feature: modes for feature in NEURITEFEATURES},
@@ -150,7 +150,7 @@ def full_config():
 
 
 def sanitize_config(config):
-    '''check that the config has the correct keys, add missing keys if necessary'''
+    """Check that the config has the correct keys, add missing keys if necessary."""
     if 'neurite' in config:
         if 'neurite_type' not in config:
             raise ConfigError('"neurite_type" missing from config, but "neurite" set')

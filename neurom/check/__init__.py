@@ -26,16 +26,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-''' Basic tools to check neuronal morphologies. '''
+"""Basic tools to check neuronal morphologies."""
 
 from functools import wraps
 
 
 def check_wrapper(fun):
-    '''Decorate a checking function'''
+    """Decorate a checking function."""
     @wraps(fun)
     def _wrapper(*args, **kwargs):
-        '''Sets the title property of the result of running a checker'''
+        """Sets the title property of the result of running a checker."""
         title = fun.__name__.replace('_', ' ').capitalize()
         result = fun(*args, **kwargs)
         result.title = title
@@ -45,16 +45,17 @@ def check_wrapper(fun):
 
 
 class CheckResult(object):
-    '''Class representing a check result'''
+    """Class representing a check result."""
     def __init__(self, status, info=None, title=None):
+        """Initialize a CheckResult object."""
         self.status = bool(status)
         self.info = info
         self.title = title
 
     def __nonzero__(self):
-        '''boolean conversion method py2 version'''
+        """Boolean conversion method py2 version."""
         return self.__bool__()
 
     def __bool__(self):
-        '''boolean conversion method py3 version'''
+        """Boolean conversion method py3 version."""
         return self.status
