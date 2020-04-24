@@ -26,14 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Data format definitions'''
+"""Data format definitions."""
 
 
 _COL_COUNT = 7
 
 
 class COLS(object):
-    '''Column labels for internal data representation'''
+    """Column labels for internal data representation."""
     COL_COUNT = _COL_COUNT
     (X, Y, Z, R, TYPE, ID, P) = range(_COL_COUNT)
     XY = slice(0, 2)
@@ -44,10 +44,10 @@ class COLS(object):
 
 
 class POINT_TYPE(object):
-    '''Point types.
+    """Point types.
 
     These follow SWC specification.
-    '''
+    """
     (UNDEFINED, SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE,
      FORK_POINT, END_POINT, CUSTOM) = range(8)
 

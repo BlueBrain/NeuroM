@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Bifurcation point functions'''
+"""Bifurcation point functions."""
 
 import numpy as np
 from neurom import morphmath
@@ -43,16 +43,15 @@ def _raise_if_not_bifurcation(section):
 
 
 def local_bifurcation_angle(bif_point):
-    '''Return the opening angle between two out-going sections
-    in a bifurcation point
+    """Return the opening angle between two out-going sections in a bifurcation point.
 
     We first ensure that the input point has only two children.
 
     The bifurcation angle is defined as the angle between the first non-zero
     length segments of a bifurcation point.
-    '''
+    """
     def skip_0_length(sec):
-        '''Return the first point with non-zero distance to first point'''
+        """Return the first point with non-zero distance to first point."""
         p0 = sec[0]
         cur = sec[1]
         for i, p in enumerate(sec[1:]):
@@ -71,14 +70,13 @@ def local_bifurcation_angle(bif_point):
 
 
 def remote_bifurcation_angle(bif_point):
-    '''Return the opening angle between two out-going sections
-    in a bifurcation point
+    """Return the opening angle between two out-going sections in a bifurcation point.
 
     We first ensure that the input point has only two children.
 
     The angle is defined as between the bifurcation point and the
     last points in the out-going sections.
-    '''
+    """
     _raise_if_not_bifurcation(bif_point)
 
     return morphmath.angle_3points(bif_point.points[-1],
@@ -87,12 +85,13 @@ def remote_bifurcation_angle(bif_point):
 
 
 def bifurcation_partition(bif_point):
-    '''Calculate the partition at a bifurcation point
+    """Calculate the partition at a bifurcation point.
 
     We first ensure that the input point has only two children.
 
     The number of nodes in each child tree is counted. The partition is
-    defined as the ratio of the largest number to the smallest number.'''
+    defined as the ratio of the largest number to the smallest number.
+    """
     _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
@@ -101,13 +100,15 @@ def bifurcation_partition(bif_point):
 
 
 def partition_asymmetry(bif_point):
-    '''Calculate the partition asymmetry at a bifurcation point
-    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+    """Calculate the partition asymmetry at a bifurcation point.
+
+    Partition asymmetry is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
     of the number of bifurcations in the two child subtrees
-    at each branch point.'''
+    at each branch point.
+    """
     _raise_if_not_bifurcation(bif_point)
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
@@ -118,23 +119,25 @@ def partition_asymmetry(bif_point):
 
 
 def partition_pair(bif_point):
-    '''Calculate the partition pairs at a bifurcation point
+    """Calculate the partition pairs at a bifurcation point.
 
     The number of nodes in each child tree is counted. The partition
     pairs is the number of bifurcations in the two child subtrees
-    at each branch point.'''
+    at each branch point.
+    """
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
     return (n, m)
 
 
 def sibling_ratio(bif_point, method='first'):
-    '''Calculate the sibling ratio of a bifurcation point
+    """Calculate the sibling ratio of a bifurcation point.
 
     The sibling ratio is the ratio between the diameters of the
     smallest and the largest child. It is a real number between
     0 and 1. Method argument allows one to consider mean diameters
-    along the child section instead of diameter of the first point. '''
+    along the child section instead of diameter of the first point.
+    """
     _raise_if_not_bifurcation(bif_point)
 
     if method not in {'first', 'mean'}:
@@ -150,14 +153,15 @@ def sibling_ratio(bif_point, method='first'):
 
 
 def diameter_power_relation(bif_point, method='first'):
-    '''Calculate the diameter power relation at a bifurcation point
-    as defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+    """Calculate the diameter power relation at a bifurcation point.
+
+    The diameter power relation is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     This quantity gives an indication of how far the branching is from
     the Rall ratio
 
     diameter_power_relation==1 means perfect Rall ratio
-    '''
+    """
     _raise_if_not_bifurcation(bif_point)
 
     if method not in {'first', 'mean'}:

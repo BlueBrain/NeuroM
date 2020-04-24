@@ -26,45 +26,46 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Generic tree class and iteration functions'''
+"""Generic tree class and iteration functions."""
 from collections import deque
 
 from neurom._compat import filter
 
 
 class Tree(object):
-    '''Simple recursive tree class'''
+    """Simple recursive tree class."""
     def __init__(self):
+        """Initialize a Tree object."""
         self.parent = None
         self.children = list()
 
     def add_child(self, tree):
-        '''Add a child to the list of this tree's children
+        """Add a child to the list of this tree's children.
 
         This tree becomes the added tree's parent
-        '''
+        """
         tree.parent = self
         self.children.append(tree)
         return tree
 
     def is_forking_point(self):
-        '''Is tree a forking point?'''
+        """Is tree a forking point?."""
         return len(self.children) > 1
 
     def is_bifurcation_point(self):
-        '''Is tree a bifurcation point?'''
+        """Is tree a bifurcation point?."""
         return len(self.children) == 2
 
     def is_leaf(self):
-        '''Is tree a leaf?'''
+        """Is tree a leaf?."""
         return len(self.children) == 0
 
     def is_root(self):
-        '''Is tree the root node?'''
+        """Is tree the root node?."""
         return self.parent is None
 
     def ipreorder(self):
-        '''Depth-first pre-order iteration of tree nodes'''
+        """Depth-first pre-order iteration of tree nodes."""
         children = deque((self, ))
         while children:
             cur_node = children.pop()
@@ -72,7 +73,7 @@ class Tree(object):
             yield cur_node
 
     def ipostorder(self):
-        '''Depth-first post-order iteration of tree nodes'''
+        """Depth-first post-order iteration of tree nodes."""
         children = [self, ]
         seen = set()
         while children:
@@ -85,35 +86,36 @@ class Tree(object):
                 yield cur_node
 
     def iupstream(self):
-        '''Iterate from a tree node to the root nodes'''
+        """Iterate from a tree node to the root nodes."""
         t = self
         while t is not None:
             yield t
             t = t.parent
 
     def ileaf(self):
-        '''Iterator to all leaves of a tree'''
+        """Iterator to all leaves of a tree."""
         return filter(Tree.is_leaf, self.ipreorder())
 
     def iforking_point(self, iter_mode=ipreorder):
-        '''Iterator to forking points. Returns a tree object.
+        """Iterator to forking points. Returns a tree object.
 
-        Parameters:
+        Arguments:
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
-        '''
+        """
         return filter(Tree.is_forking_point, iter_mode(self))
 
     def ibifurcation_point(self, iter_mode=ipreorder):
-        '''Iterator to bifurcation points. Returns a tree object.
+        """Iterator to bifurcation points. Returns a tree object.
 
-        Parameters:
+        Arguments:
             tree: the tree over which to iterate
             iter_mode: iteration mode. Default: ipreorder.
-        '''
+        """
         return filter(Tree.is_bifurcation_point, iter_mode(self))
 
     def __nonzero__(self):
+        """Check non-zero."""
         return bool(self.children)
 
     __bool__ = __nonzero__

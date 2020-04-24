@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''NeuroM helper utilities'''
+"""NeuroM helper utilities."""
 from enum import Enum
 import json
 import warnings
@@ -36,7 +36,7 @@ import numpy as np
 
 
 class memoize(object):
-    """cache the return value of a method
+    """cache the return value of a method.
 
     This class is meant to be used as a decorator of methods. The return value
     from a given method invocation will be cached on the instance whose method
@@ -56,13 +56,16 @@ class memoize(object):
     """
 
     def __init__(self, func):
+        """Initialize a memoize object."""
         self.func = func
         update_wrapper(self, func)
 
     def __get__(self, obj, objtype=None):
+        """Get the attribute from the object."""
         return partial(self, obj)
 
     def __call__(self, *args, **kw):
+        """Callable for decorator."""
         obj = args[0]
         try:
             cache = obj.__cache  # pylint: disable=protected-access
@@ -77,19 +80,19 @@ class memoize(object):
 
 
 def _warn_deprecated(msg):
-    '''Issue a deprecation warning'''
+    """Issue a deprecation warning."""
     warnings.simplefilter('always', DeprecationWarning)
     warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
     warnings.simplefilter('default', DeprecationWarning)
 
 
 def deprecated(fun_name=None, msg=""):
-    '''Issue a deprecation warning for a function'''
+    """Issue a deprecation warning for a function."""
     def _deprecated(fun):
-        '''Issue a deprecation warning for a function'''
+        """Issue a deprecation warning for a function."""
         @wraps(fun)
         def _wrapper(*args, **kwargs):
-            '''Issue deprecation warning and forward arguments to fun'''
+            """Issue deprecation warning and forward arguments to fun."""
             name = fun_name if fun_name is not None else fun.__name__
             _warn_deprecated('Call to deprecated function %s. %s' % (name, msg))
             return fun(*args, **kwargs)
@@ -100,18 +103,19 @@ def deprecated(fun_name=None, msg=""):
 
 
 def deprecated_module(mod_name, msg=""):
-    '''Issue a deprecation warning for a module'''
+    """Issue a deprecation warning for a module."""
     _warn_deprecated('Module %s is deprecated. %s' % (mod_name, msg))
 
 
 class NeuromJSON(json.JSONEncoder):
-    '''JSON encoder that handles numpy types
+    """JSON encoder that handles numpy types.
 
-    In python3, numpy.dtypes don't serialize to correctly, so a custom converter
-    is needed.
-    '''
+    In python3, numpy.dtypes don't serialize to correctly, so a custom
+    converter is needed.
+    """
 
     def default(self, o):  # pylint: disable=method-hidden
+        """Override default method for numpy types."""
         if isinstance(o, np.floating):
             return float(o)
         if isinstance(o, np.integer):
@@ -123,26 +127,33 @@ class NeuromJSON(json.JSONEncoder):
 
 # pylint: disable=comparison-with-callable
 class OrderedEnum(Enum):
-    '''Implementation taken here: https://docs.python.org/3/library/enum.html#orderedenum
+    """An ordered enum class.
 
-    Fixes https://github.com/BlueBrain/NeuroM/issues/697'''
+    Implementation taken here https://docs.python.org/3/library/enum.html#orderedenum
+
+    Fixes https://github.com/BlueBrain/NeuroM/issues/697
+    """
 
     def __ge__(self, other):
+        """Check greater than or equal to."""
         if self.__class__ is other.__class__:
             return self.value >= other.value
         raise NotImplementedError
 
     def __gt__(self, other):
+        """Check greater than."""
         if self.__class__ is other.__class__:
             return self.value > other.value
         raise NotImplementedError
 
     def __le__(self, other):
+        """Check less than or equal to."""
         if self.__class__ is other.__class__:
             return self.value <= other.value
         raise NotImplementedError
 
     def __lt__(self, other):
+        """Check less than."""
         if self.__class__ is other.__class__:
             return self.value < other.value
         raise NotImplementedError

@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Load and view multiple somas'''
+"""Load and view multiple somas."""
 
 import os
 from neurom import load_neuron
@@ -41,12 +41,12 @@ SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
 def random_color():
-    '''Random color generation'''
+    """Random color generation."""
     return np.random.rand(3, 1)
 
 
 def plot_somas(somas):
-    '''Plot set of somas on same figure as spheres, each with different color'''
+    """Plot set of somas on same figure as spheres, each with different color."""
     _, ax = common.get_figure(new_fig=True, subplot=111,
                               params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:

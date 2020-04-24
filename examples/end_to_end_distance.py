@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Calculate and plot end-to-end distance of neurites.'''
+"""Calculate and plot end-to-end distance of neurites."""
 
 import neurom as nm
 from neurom import morphmath
@@ -36,19 +36,19 @@ import matplotlib.pyplot as plt
 
 
 def path_end_to_end_distance(neurite):
-    '''Calculate and return end-to-end-distance of a given neurite.'''
+    """Calculate and return end-to-end-distance of a given neurite."""
     trunk = neurite.root_node.points[0]
     return max(morphmath.point_dist(l.points[-1], trunk)
                for l in neurite.root_node.ileaf())
 
 
 def mean_end_to_end_dist(neurites):
-    '''Calculate mean end to end distance for set of neurites.'''
+    """Calculate mean end to end distance for set of neurites."""
     return np.mean([path_end_to_end_distance(n) for n in neurites])
 
 
 def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type):
-    '''Plot end-to-end distance vs number of segments'''
+    """Plot end-to-end distance vs number of segments."""
     plt.figure()
     plt.plot(nb_segments, end_to_end_distance)
     plt.title(neurite_type)
@@ -58,12 +58,12 @@ def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type
 
 
 def calculate_and_plot_end_to_end_distance(neurite):
-    '''Calculate and plot the end-to-end distance vs the number of segments for
+    """Calculate and plot the end-to-end distance vs the number of segments for
     an increasingly larger part of a given neurite.
 
-    Note that the plots are not very meaningful for bifurcating trees.'''
+    Note that the plots are not very meaningful for bifurcating trees."""
     def _dist(seg):
-        '''Distance between segmenr end and trunk'''
+        """Distance between segmenr end and trunk."""
         return morphmath.point_dist(seg[1], neurite.root_node.points[0])
 
     end_to_end_distance = [_dist(s) for s in nm.iter_segments(neurite)]

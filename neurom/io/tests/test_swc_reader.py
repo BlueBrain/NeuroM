@@ -43,7 +43,7 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 
 
 def test_read_swc_basic_with_offset_0():
-    '''first ID = 0, rare to find'''
+    """first ID = 0, rare to find."""
     rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_0_16pt.swc'))
     nt.eq_(rdw.fmt, 'SWC')
     nt.eq_(len(rdw.data_block), 16)
@@ -51,7 +51,7 @@ def test_read_swc_basic_with_offset_0():
 
 
 def test_read_swc_basic_with_offset_1():
-    '''More normal ID numbering, starting at 1'''
+    """More normal ID numbering, starting at 1."""
     rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_1_16pt.swc'))
     nt.eq_(rdw.fmt, 'SWC')
     nt.eq_(len(rdw.data_block), 16)
@@ -59,7 +59,7 @@ def test_read_swc_basic_with_offset_1():
 
 
 def test_read_swc_basic_with_offset_42():
-    '''ID numbering starting at 42'''
+    """ID numbering starting at 42."""
     rdw = swc.read(os.path.join(SWC_PATH, 'sequential_trunk_off_42_16pt.swc'))
     nt.eq_(rdw.fmt, 'SWC')
     nt.eq_(len(rdw.data_block), 16)

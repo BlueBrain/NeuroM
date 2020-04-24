@@ -27,18 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-'''Tools to visualize neuron morphological objects
+"""Tools to visualize neuron morphological objects.
 
 Examples:
-
     >>> from neurom import viewer
     >>> nrn = ... # load a neuron
     >>> viewer.draw(nrn)                    # 2d plot
     >>> viewer.draw(nrn, mode='3d')         # 3d plot
     >>> viewer.draw(nrn.neurites[0])        # 2d plot of neurite tree
     >>> viewer.draw(nrn, mode='dendrogram') # dendrogram plot
-
-'''
+"""
 
 from .view import (plot_neuron, plot_neuron3d,
                    plot_tree, plot_tree3d,
@@ -63,21 +61,21 @@ _VIEWERS = {
 
 
 class ViewerError(Exception):
-    '''Base class for viewer exceptions'''
+    """Base class for viewer exceptions."""
 
 
 class InvalidDrawModeError(ViewerError):
-    '''Exception class to indicate invalid draw mode'''
+    """Exception class to indicate invalid draw mode."""
 
 
 class NotDrawableError(Exception):
-    '''Exception class for things that aren't drawable'''
+    """Exception class for things that aren't drawable."""
 
 
 def draw(obj, mode='2d', **kwargs):
-    '''Draw a morphology object
+    """Draw a morphology object.
 
-    Parameters:
+    Arguments:
         obj: morphology object to be drawn (neuron, tree, soma).
         mode (Optional[str]): drawing mode ('2d', '3d', 'dendrogram'). Defaults to '2d'.
         **kwargs: keyword arguments for underlying neurom.view.view functions.
@@ -88,7 +86,6 @@ def draw(obj, mode='2d', **kwargs):
         NotDrawableError if obj type and mode combination is not drawable
 
     Examples:
-
         >>> nrn = ... # load a neuron
         >>> fig, _ = viewer.draw(nrn)             # 2d plot
         >>> fig.show()
@@ -96,9 +93,7 @@ def draw(obj, mode='2d', **kwargs):
         >>> fig3d.show()
         >>> fig, _ = viewer.draw(nrn.neurites[0]) # 2d plot of neurite tree
         >>> dend, _ = viewer.draw(nrn, mode='dendrogram')
-
-    '''
-
+    """
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
 

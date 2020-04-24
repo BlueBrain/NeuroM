@@ -1,4 +1,4 @@
-'''The morph-tool command line launcher'''
+"""The morph-tool command line launcher."""
 import logging
 
 import click
@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 @click.group()
 def cli():
-    '''The CLI entry point'''
+    """The CLI entry point."""
 
 
 @cli.command()
@@ -21,7 +21,7 @@ def cli():
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
               default='matplotlib')
 def view(input_file, plane, backend):
-    '''A simple neuron viewer'''
+    """A simple neuron viewer."""
     if backend == 'matplotlib':
         from neurom.viewer import draw
         kwargs = {

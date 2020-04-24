@@ -27,12 +27,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Easy analysis examples
+"""Easy analysis examples
 
 These examples highlight most of the pre-packaged neurom.nm.get
 morphometrics functionality.
 
-'''
+"""
 
 from __future__ import print_function
 from pprint import pprint
@@ -41,12 +41,12 @@ import neurom as nm
 
 
 def stats(data):
-    '''Dictionary with summary stats for data
+    """Dictionary with summary stats for data
 
     Returns:
         dicitonary with length, mean, sum, standard deviation,\
             min and max of data
-    '''
+    """
     return {'len': len(data),
             'mean': np.mean(data),
             'sum': np.sum(data),
@@ -56,7 +56,7 @@ def stats(data):
 
 
 def pprint_stats(data):
-    '''Pretty print summary stats for data'''
+    """Pretty print summary stats for data."""
     pprint(stats(data))
 
 

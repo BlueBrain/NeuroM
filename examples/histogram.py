@@ -27,8 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Simple Histogram function for multiple neurons
-'''
+"""Simple Histogram function for multiple neurons."""
 from itertools import chain
 
 import numpy as np
@@ -36,7 +35,7 @@ from neurom.view import common
 
 
 def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
-    '''
+    """
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
@@ -69,7 +68,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
             generate the figure. The final item is text used in report generation
             as a figure legend. This text needs to be manually entered in each
             figure file.
-    '''
+    """
 
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
@@ -94,8 +93,8 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
 
 
 def population_feature_values(pops, feature):
-    '''Extracts feature values per population
-    '''
+    """Extracts feature values per population
+    """
     pops_feature_values = []
 
     for pop in pops:
@@ -113,7 +112,7 @@ def population_feature_values(pops, feature):
 
 
 def population_histogram(pops, feature, new_fig=True, normed=False, subplot=False, **kwargs):
-    '''
+    """
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
@@ -145,7 +144,7 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
             generate the figure. The final item is text used in report generation
             as a figure legend. This text needs to be manually entered in each
             figure file.
-    '''
+    """
 
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)

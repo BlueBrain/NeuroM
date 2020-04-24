@@ -27,8 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Example for comparison of the same feature of multiple cells
-'''
+"""Example for comparison of the same feature of multiple cells."""
 import argparse
 
 import pylab as pl
@@ -37,7 +36,7 @@ from neurom.io.utils import get_morph_files
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Feature Comparison Between Different Cells')
 
     parser.add_argument('-d',
@@ -58,14 +57,14 @@ def parse_args():
 
 
 def stylize(ax, name, feature):
-    '''Stylization modifications to the plots
-    '''
+    """Stylization modifications to the plots
+    """
     ax.set_ylabel(feature)
     ax.set_title(name, fontsize='small')
 
 
 def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
-    '''
+    """
     Plot a histogram of the selected feature for the population of neurons.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
@@ -84,7 +83,7 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
 
         ax : axes object
             the axes in which the plot is taking place
-    '''
+    """
 
     feature_values = nm.get(feature, neuron)
     # generate histogram
@@ -92,8 +91,8 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
 
 
 def plot_feature(feature, cell):
-    '''Plot a feature
-    '''
+    """Plot a feature
+    """
     fig = pl.figure()
     ax = fig.add_subplot(111)
 

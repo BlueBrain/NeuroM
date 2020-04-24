@@ -28,12 +28,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Extract the optimal distributions for the following features of the population of neurons:
+"""Extract the optimal distributions for the following features of the population of neurons:
    soma: radius
    basal dendrites: n_neurites
    apical dendrites: n_neurites
    axons: n_neurites
-'''
+"""
 
 import argparse
 from collections import OrderedDict
@@ -74,13 +74,13 @@ PARAM_MAP = {
 
 
 def extract_data(neurons, feature, params=None):
-    '''Extracts feature from a list of neurons
+    """Extracts feature from a list of neurons
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution and corresponding parameters.
        Normal distribution params (mean, std)
        Exponential distribution params (loc, scale)
        Uniform distribution params (min, range)
-    '''
+    """
     if params is None:
         params = {}
 
@@ -90,8 +90,8 @@ def extract_data(neurons, feature, params=None):
 
 
 def transform_header(mtype_name):
-    '''Add header to json output to wrap around distribution data.
-    '''
+    """Add header to json output to wrap around distribution data.
+    """
     head_dict = OrderedDict()
 
     head_dict["m-type"] = mtype_name
@@ -101,10 +101,10 @@ def transform_header(mtype_name):
 
 
 def transform_package(mtype, files, components):
-    '''Put together header and list of data into one json output.
+    """Put together header and list of data into one json output.
        feature_list contains all the information about the data to be extracted:
        features, feature_names, feature_components, feature_min, feature_max
-    '''
+    """
     data_dict = transform_header(mtype)
     neurons = load_neurons(files)
 
@@ -129,18 +129,18 @@ def transform_package(mtype, files, components):
 
 
 def get_mtype_from_filename(filename, sep='_'):
-    '''Get mtype of a morphology file from file name
+    """Get mtype of a morphology file from file name
 
     Assumes file name has structure 'a/b/c/d/mtype_xyx.abc'
-    '''
+    """
     return os.path.basename(filename).split(sep)[0]
 
 
 def get_mtype_from_directory(filename):
-    '''Get mtype of a morphology file from file's parent directory name
+    """Get mtype of a morphology file from file's parent directory name
 
     Assumes file name has structure 'a/b/c/mtype/xyx.abc'
-    '''
+    """
     return os.path.split(os.path.dirname(filename))[-1]
 
 
@@ -151,7 +151,7 @@ MTYPE_GETTERS = {
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Morphology fit distribution extractor',
         epilog='Note: Outputs json of the optimal distribution \

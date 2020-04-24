@@ -28,9 +28,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Extract a distribution for the selected feature of the population of neurons among
+"""Extract a distribution for the selected feature of the population of neurons among
    the exponential, normal and uniform distribution, according to the minimum ks distance.
-   '''
+   """
 
 from itertools import chain
 import argparse
@@ -41,7 +41,7 @@ from neurom import stats
 
 
 def parse_args():
-    '''Parse command line arguments'''
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(
         description='Morphology fit distribution extractor',
         epilog='Note: Outputs json of the optimal distribution \
@@ -57,11 +57,11 @@ def parse_args():
 
 
 def extract_data(data_path, feature):
-    '''Loads a list of neurons, extracts feature
+    """Loads a list of neurons, extracts feature
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution, corresponding parameters,
        minimun and maximum values.
-    '''
+    """
     population = nm.load_neurons(data_path)
 
     feature_data = [nm.get(feature, n) for n in population]

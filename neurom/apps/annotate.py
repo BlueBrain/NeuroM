@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''Anomaly and artefact detection and annotation generation'''
+"""Anomaly and artefact detection and annotation generation."""
 import logging
 from itertools import chain
 
@@ -35,16 +35,14 @@ L = logging.getLogger(__name__)
 
 
 def generate_annotation(result, settings):
-    '''Generate the annotation for a given checker
+    """Generate the annotation for a given checker.
 
-    Arguments
-        neuron(Neuron): The neuron object
-        checker: A tuple where the first item is the checking function (usually from neuron_checks)
-                 and the second item is a dictionary of settings for the annotation. It must
-                 contain the keys name, label and color
+    Arguments:
+        result: the result of the checker
+        settings: the display settings for NeuroLucida
     Returns
         An S-expression-like string representing the annotation
-    '''
+    """
     if result.status:
         return ""
 
@@ -63,7 +61,7 @@ def generate_annotation(result, settings):
 
 
 def annotate(results, settings):
-    '''Concatenate the annotations of all checkers'''
+    """Concatenate the annotations of all checkers."""
     annotations = (generate_annotation(result, setting)
                    for result, setting in zip(results, settings))
     return '\n'.join(annot for annot in annotations if annot)

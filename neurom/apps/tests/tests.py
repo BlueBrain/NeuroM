@@ -51,5 +51,5 @@ def test_get_config():
 
 @nt.raises(ConfigError)
 def test_get_config_exception():
-    '''current python file isn't a yaml file'''
+    """current python file isn't a yaml file."""
     get_config(__file__, {})

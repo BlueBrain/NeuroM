@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Mathematical and geometrical functions used to compute morphometrics'''
+"""Mathematical and geometrical functions used to compute morphometrics."""
 import math
 from itertools import combinations
 
@@ -36,7 +36,7 @@ from neurom.core.dataformat import COLS
 
 
 def vector(p1, p2):
-    '''compute vector between two 3D points
+    """Compute vector between two 3D points.
 
     Args:
         p1, p2: indexable objects with
@@ -44,19 +44,21 @@ def vector(p1, p2):
 
     Returns:
         3-vector from p1 - p2
-    '''
+    """
     return np.subtract(p1[COLS.XYZ], p2[COLS.XYZ])
 
 
 def linear_interpolate(p1, p2, fraction):
-    '''Returns the point p satisfying: p1 + fraction * (p2 - p1)'''
+    """Returns the point p satisfying: p1 + fraction * (p2 - p1)."""
     return np.array((p1[0] + fraction * (p2[0] - p1[0]),
                      p1[1] + fraction * (p2[1] - p1[1]),
                      p1[2] + fraction * (p2[2] - p1[2])))
 
 
 def interpolate_radius(r1, r2, fraction):
-    '''Calculate the radius that corresponds to a point P that lies at a fraction of the length
+    """Interpolate the radius between two values.
+
+    Calculate the radius that corresponds to a point P that lies at a fraction of the length
     of a cut cone P1P2 where P1, P2 are the centers of the circles that bound the shape with radii
     r1 and r2 respectively.
 
@@ -72,22 +74,20 @@ def interpolate_radius(r1, r2, fraction):
         The interpolated radius.
 
     Note: The fraction is assumed from point P1, not from point P2.
-    '''
+    """
     def f(a, b, c):
-        ''' Returns the length of the interpolated radius calculated
-        using similar triangles.
-        '''
+        """Returns the length of the interpolated radius calculated using similar triangles."""
         return a + c * (b - a)
     return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
 
 
 def interval_lengths(points, prepend_zero=False):
-    '''Returns the list of distances between consecutive points.
+    """Returns the list of distances between consecutive points.
 
     Args:
         points: a list of np.array of 3D points
         prepend_zero (bool): if True, the returned array will start with a zero
-    '''
+    """
     intervals = np.linalg.norm(np.diff(np.asarray(points)[:, COLS.XYZ], axis=0), axis=1)
     if prepend_zero:
         return np.insert(intervals, 0, 0)
@@ -95,7 +95,9 @@ def interval_lengths(points, prepend_zero=False):
 
 
 def path_fraction_id_offset(points, fraction, relative_offset=False):
-    '''Find the segment which corresponds to the fraction
+    """Find segment by fractional offset.
+
+    Find the segment which corresponds to the fraction
     of the path length along the piecewise linear curve which
     is constructed from the set of points.
 
@@ -107,7 +109,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
 
     Returns:
         (segment ID, segment offset) pair.
-    '''
+    """
     if not (0. <= fraction <= 1.0):
         raise ValueError("Invalid fraction: %.3f" % fraction)
     lengths = interval_lengths(points)
@@ -122,7 +124,9 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
 
 
 def path_fraction_point(points, fraction):
-    '''Computes the point which corresponds to the fraction
+    """Find coordinates by fractional offset.
+
+    Computes the point which corresponds to the fraction
     of the path length along the piecewise linear curve which
     is constructed from the set of points.
 
@@ -133,13 +137,13 @@ def path_fraction_point(points, fraction):
 
     Returns:
         The 3D coordinates of the aforementioned point
-    '''
+    """
     seg_id, offset = path_fraction_id_offset(points, fraction, relative_offset=True)
     return linear_interpolate(points[seg_id], points[seg_id + 1], offset)
 
 
 def scalar_projection(v1, v2):
-    '''compute the scalar projection of v1 upon v2
+    """Compute the scalar projection of v1 upon v2.
 
     Args:
         v1, v2: iterable
@@ -147,12 +151,12 @@ def scalar_projection(v1, v2):
 
     Returns:
         3-vector of the projection of point p onto the direction of v
-    '''
+    """
     return np.dot(v1, v2) / np.linalg.norm(v2)
 
 
 def vector_projection(v1, v2):
-    '''compute the vector projection of v1 upon v2
+    """Compute the vector projection of v1 upon v2.
 
     Args:
         v1, v2: iterable
@@ -160,50 +164,56 @@ def vector_projection(v1, v2):
 
     Returns:
         3-vector of the projection of point p onto the direction of v
-    '''
+    """
     return scalar_projection(v1, v2) * v2 / np.linalg.norm(v2)
 
 
 def dist_point_line(p, l1, l2):
-    '''compute the orthogonal distance between from the line that goes through
-    the points l1, l2 and the point p
+    """Compute the orthogonal distance between a line and a point.
+
+    The line is that which passes through the points l1 and l2.
 
     Args:
-        p, l1, l2 : iterable
-        point
-        indices 0, 1, 2 corresponding to cartesian coordinates
-    '''
+        p: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
+        l1: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
+        l2: iterable
+            indices 0, 1, 2 correspond to cartesian coordinates
+    """
     cross_prod = np.cross(l2 - l1, p - l1)
     return np.linalg.norm(cross_prod) / np.linalg.norm(l2 - l1)
 
 
 def point_dist2(p1, p2):
-    '''compute the square of the euclidian distance between two 3D points
+    """Compute the square of the euclidian distance between two 3D points.
 
     Args:
         p1, p2: indexable objects with
         indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+
     Returns:
         The square of the euclidian distance between the points.
-    '''
+    """
     v = vector(p1, p2)
     return np.dot(v, v)
 
 
 def point_dist(p1, p2):
-    '''compute the euclidian distance between two 3D points
+    """Compute the euclidian distance between two 3D points.
 
     Args:
         p1, p2: indexable objects with
         indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+
     Returns:
         The euclidian distance between the points.
-    '''
+    """
     return np.sqrt(point_dist2(p1, p2))
 
 
 def angle_3points(p0, p1, p2):
-    ''' compute the angle in radians between three 3D points
+    """Compute the angle in radians between three 3D points.
 
     Calculated as the angle between p1-p0 and p2-p0.
 
@@ -214,7 +224,7 @@ def angle_3points(p0, p1, p2):
     Returns:
         Angle in radians between (p1-p0) and (p2-p0).
         0.0 if p0==p1 or p0==p2.
-    '''
+    """
     vec1 = vector(p1, p0)
     vec2 = vector(p2, p0)
     return math.atan2(np.linalg.norm(np.cross(vec1, vec2)),
@@ -222,7 +232,8 @@ def angle_3points(p0, p1, p2):
 
 
 def angle_between_vectors(p1, p2):
-    """ Computes the angle in radians between vectors 'p1' and 'p2'
+    """Computes the angle in radians between vectors 'p1' and 'p2'.
+
     Normalizes the input vectors and computes the relative angle
     between them.
 
@@ -239,96 +250,89 @@ def angle_between_vectors(p1, p2):
 
 
 def polygon_diameter(points):
-    ''' Compute the maximun euclidian distance between any two points
-    in a list of points
-    '''
+    """Compute the maximun euclidian distance between any two points in a list of points."""
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))
 
 
 def average_points_dist(p0, p_list):
-    """
-    Computes the average distance between a list of points
-    and a given point p0.
-    """
+    """Computes the average distance between a list of points and a given point p0."""
     return np.mean(list(point_dist(p0, p1) for p1 in p_list))
 
 
 def path_distance(points):
-    """
-    Compute the path distance from given set of points
-    """
+    """Compute the path distance from given set of points."""
     return interval_lengths(points).sum()
 
 
 def segment_length(seg):
-    '''Return the length of a segment.
+    """Return the length of a segment.
 
     Returns: Euclidian distance between centres of points in seg
-    '''
+    """
     return point_dist(seg[0], seg[1])
 
 
 def segment_length2(seg):
-    '''Return the square of the length of a segment.
+    """Return the square of the length of a segment.
 
     Returns: Square of Euclidian distance between centres of points in seg
-    '''
+    """
     return point_dist2(seg[0], seg[1])
 
 
 def segment_radius(seg):
-    '''Return the mean radius of a segment
+    """Return the mean radius of a segment.
 
     Returns: arithmetic mean of the radii of the points in seg
-    '''
+    """
     return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
 
 
 def segment_x_coordinate(seg):
-    '''Return the mean x coordinate of a segment
+    """Return the mean x coordinate of a segment.
 
     Returns: arithmetic mean of the x coordinates of the points in seg
-    '''
+    """
     return (seg[0][COLS.X] + seg[1][COLS.X]) / 2.
 
 
 def segment_y_coordinate(seg):
-    '''Return the mean y coordinate of a segment
+    """Return the mean y coordinate of a segment.
 
     Returns: arithmetic mean of the y coordinates of the points in seg
-    '''
+    """
     return (seg[0][COLS.Y] + seg[1][COLS.Y]) / 2.
 
 
 def segment_z_coordinate(seg):
-    '''Return the mean z coordinate of a segment
+    """Return the mean z coordinate of a segment.
 
     Returns: arithmetic mean of the z coordinates of the points in seg
-    '''
+    """
     return (seg[0][COLS.Z] + seg[1][COLS.Z]) / 2.
 
 
 def segment_radial_dist(seg, pos):
-    '''Return the radial distance of a tree segment to a given point
+    """Return the radial distance of a tree segment to a given point.
 
     The radial distance is the euclidian distance between the mid-point of
     the segment and the point in question.
 
-    Parameters:
+    Arguments:
         seg: tree segment
 
         pos: origin to which distances are measured. It must have at lease 3
         components. The first 3 components are (x, y, z).
-    '''
+    """
     return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))
 
 
 def segment_area(seg):
-    '''Compute the surface area of a segment.
+    """Compute the surface area of a segment.
 
     Approximated as a conical frustum. Does not include the surface area
     of the bounding circles.
-    '''
+    """
     r0 = seg[0][COLS.R]
     r1 = seg[1][COLS.R]
     h2 = point_dist2(seg[0], seg[1])
@@ -336,10 +340,10 @@ def segment_area(seg):
 
 
 def segment_volume(seg):
-    '''Compute the volume of a segment.
+    """Compute the volume of a segment.
 
     Approximated as a conical frustum.
-    '''
+    """
     r0 = seg[0][COLS.R]
     r1 = seg[1][COLS.R]
     h = point_dist(seg[0], seg[1])
@@ -347,7 +351,7 @@ def segment_volume(seg):
 
 
 def taper_rate(p0, p1):
-    '''Compute the taper rate between points p0 and p1
+    """Compute the taper rate between points p0 and p1.
 
     Args:
         p0, p1: iterables with first 4 components containing (x, y, z, r)
@@ -356,37 +360,35 @@ def taper_rate(p0, p1):
         The taper rate, defined as the absolute value of the difference in
         the diameters of p0 and p1 divided by the euclidian distance
         between them.
-    '''
+    """
     return 2 * abs(p0[COLS.R] - p1[COLS.R]) / point_dist(p0, p1)
 
 
 def segment_taper_rate(seg):
-    '''Compute the taper rate of a segment
+    """Compute the taper rate of a segment.
 
     Returns:
         The taper rate, defined as the absolute value of the difference in
         the diameters of the segment's two points divided by the euclidian
         distance between them.
-    '''
+    """
     return taper_rate(seg[0], seg[1])
 
 
 def pca(points):
-    '''
-    Estimate the principal components of the covariance on the given point cloud
+    """Estimate the principal components of the covariance on the given point cloud.
 
     Input
         A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
 
     Ouptut
         Eigenvalues and respective eigenvectors
-    '''
+    """
     return np.linalg.eig(np.cov(points.transpose()))
 
 
 def sphere_area(r):
-    ''' Compute the area of a sphere with radius r
-    '''
+    """Compute the area of a sphere with radius r."""
     return 4. * math.pi * r ** 2
 
 
@@ -395,20 +397,20 @@ section_length = path_distance
 
 
 def principal_direction_extent(points):
-    '''Calculate the extent of a set of 3D points.
+    """Calculate the extent of a set of 3D points.
 
-   The extent is defined as the maximum distance between
-   the projections on the principal directions of the covariance matrix
-   of the points.
+    The extent is defined as the maximum distance between
+    the projections on the principal directions of the covariance matrix
+    of the points.
 
-   Parameter:
-       points : a 2D numpy array of points
+    Parameter:
+        points : a 2D numpy array of points
 
-   Returns:
-       extents : the extents for each of the eigenvectors of the cov matrix
-       eigs : eigenvalues of the covariance matrix
-       eigv : respective eigenvectors of the covariance matrix
-    '''
+    Returns:
+        extents : the extents for each of the eigenvectors of the cov matrix
+        eigs : eigenvalues of the covariance matrix
+        eigv : respective eigenvectors of the covariance matrix
+    """
     # center the points around 0.0
     points = np.copy(points)
     points -= np.mean(points, axis=0)

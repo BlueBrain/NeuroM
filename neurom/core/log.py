@@ -26,15 +26,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Utilities for logging'''
+"""Utilities for logging."""
 
 import logging
 
 
 class _NullHandler(object):
-    '''Backwards compatibility class for python 2.6'''
+    """Backwards compatibility class for python 2.6."""
     def emit(self, _):
-        '''do nothing'''
+        """Do nothing."""
 
 
 NullHandler = getattr(logging, 'NullHandler', _NullHandler)

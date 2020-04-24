@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Point classes and functions'''
+"""Point classes and functions."""
 
 from collections import namedtuple
 from neurom.core.dataformat import COLS
@@ -36,6 +36,6 @@ Point = namedtuple('Point', ('x', 'y', 'z', 'r', 't'))
 
 
 def as_point(row):
-    '''Create a Point from a data block row'''
+    """Create a Point from a data block row."""
     return Point(row[COLS.X], row[COLS.Y], row[COLS.Z],
                  row[COLS.R], int(row[COLS.TYPE]))

@@ -27,12 +27,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Advanced analysis examples
+"""Advanced analysis examples
 
 These examples highlight more advanced neurom
 morphometrics functionality using iterators.
 
-'''
+"""
 
 from __future__ import print_function
 from neurom.core.dataformat import COLS
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     # Get of all neurites in cell by iterating over sections,
     # and summing the section lengths
     def sec_len(sec):
-        '''Return the length of a section'''
+        """Return the length of a section."""
         return mm.section_length(sec.points)
 
     print('Total neurite length (sections):',
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     # get total number of neurite points in cell.
     def n_points(sec):
-        '''number of points in a section'''
+        """number of points in a section."""
         n = len(sec.points)
         # Non-root sections have duplicate first point
         return n if sec.parent is None else n - 1

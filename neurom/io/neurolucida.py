@@ -26,9 +26,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Reader for Neurolucida .ASC files, v3, reversed engineered from looking at output from
-Neuroludica
-'''
+"""Reader for Neurolucida .ASC files, v3.
+
+reversed engineered from looking at output from Neuroludica
+"""
 
 import warnings
 from io import open
@@ -60,7 +61,7 @@ UNWANTED_SECTIONS = {name: True for name in UNWANTED_SECTION_NAMES}
 
 
 def _match_section(section, match):
-    '''checks whether the `type` of section is in the `match` dictionary
+    """Checks whether the `type` of section is in the `match` dictionary.
 
     Works around the unknown ordering of s-expressions in each section.
     For instance, the `type` is the 3-rd one in for CellBodies
@@ -72,7 +73,7 @@ def _match_section(section, match):
 
     Returns:
         value associated with match[section_type], None if no match
-    '''
+    """
     # TODO: rewrite this so it is more clear, and handles sets & dictionaries for matching
     for i in range(5):
         if i >= len(section):
@@ -83,10 +84,10 @@ def _match_section(section, match):
 
 
 def _get_tokens(morph_fd):
-    '''split a file-like into tokens: split on whitespace
+    """Split a file-like into tokens: split on whitespace.
 
     Note: this also strips newlines and comments
-    '''
+    """
     for line in morph_fd:
         line = line.rstrip()   # remove \r\n
         line = line.split(';', 1)[0]  # strip comments
@@ -112,9 +113,7 @@ def _get_tokens(morph_fd):
 
 
 def _parse_section(token_iter):
-    '''take a stream of tokens, and create the tree structure that is defined
-    by the s-expressions
-    '''
+    """Create a tree structure (defined by the s-expressions) from a stream of tokens."""
     sexp = []
     for token in token_iter:
         if token == '(':
@@ -129,10 +128,10 @@ def _parse_section(token_iter):
 
 
 def _parse_sections(morph_fd):
-    '''returns array of all the sections that exist
+    """Returns array of all the sections that exist.
 
     The format is nested lists that correspond to the s-expressions
-    '''
+    """
     sections = []
     token_iter = _get_tokens(morph_fd)
     for token in token_iter:
@@ -144,7 +143,7 @@ def _parse_sections(morph_fd):
 
 
 def _flatten_subsection(subsection, _type, offset, parent):
-    '''Flatten a subsection from its nested version
+    """Flatten a subsection from its nested version.
 
     Args:
         subsection: Nested subsection as produced by _parse_section, except one level in
@@ -154,7 +153,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
 
     Returns:
         Generator of values corresponding to [X, Y, Z, R, TYPE, ID, PARENT_ID]
-    '''
+    """
     for row in subsection:
         # TODO: Figure out what these correspond to in neurolucida
         if row in ('Low', 'Generated', 'High', ):
@@ -189,13 +188,13 @@ def _flatten_subsection(subsection, _type, offset, parent):
 
 
 def _extract_section(section):
-    '''Find top level sections, and get their flat contents, and append them all
+    """Find top level sections, and get their flat contents, and append them all.
 
     Returns a numpy array with the row format:
         [X, Y, Z, R, TYPE, ID, PARENT_ID]
 
     Note: PARENT_ID starts at -1 for soma and 0 for neurites
-    '''
+    """
     # sections with only one element will be skipped,
     if len(section) == 1:
         assert section[0] == 'Sections', \
@@ -223,10 +222,10 @@ def _extract_section(section):
 
 
 def _sections_to_raw_data(sections):
-    '''convert list of sections into the `raw_data` format used in neurom
+    """Convert list of sections into the `raw_data` format used in neurom.
 
     This finds the soma, and attaches the neurites
-    '''
+    """
     soma = None
     neurites = []
     for section in sections:
@@ -259,10 +258,11 @@ def _sections_to_raw_data(sections):
 
 
 def read(morph_file, data_wrapper=DataWrapper):
-    '''return a 'raw_data' np.array with the full neuron, and the format of the file
-    suitable to be wrapped by DataWrapper
-    '''
+    """Return a DataWrapper object.
 
+    It is 'raw_data' np.array with the full neuron, and the format of the file
+    suitable to be wrapped by DataWrapper
+    """
     warnings.warn('This is an experimental reader. '
                   'There are no guarantees regarding ability to parse '
                   'Neurolucida .asc files or correctness of output.')

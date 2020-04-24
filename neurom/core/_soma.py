@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Soma classes and functions'''
+"""Soma classes and functions."""
 import math
 import warnings
 
@@ -37,54 +37,57 @@ from neurom.exceptions import SomaError
 
 
 class Soma(object):
-    '''Base class for a soma.
+    """Base class for a soma.
 
     Holds a list of raw data rows corresponding to soma points
     and provides iterator access to them.
-    '''
+    """
 
     def __init__(self, points):
+        """Initialize a Soma object."""
         self._points = points
         self.radius = 0
 
     @property
     def center(self):
-        '''Obtain the center from the first stored point'''
+        """Obtain the center from the first stored point."""
         return self._points[0][COLS.XYZ]
 
     def iter(self):
-        '''Iterator to soma contents'''
+        """Iterator to soma contents."""
         return iter(self._points)
 
     @property
     def points(self):
-        '''Get the set of (x, y, z, r) points this soma'''
+        """Get the set of (x, y, z, r) points this soma."""
         return self._points[:, COLS.XYZR]
 
     @property
     def volume(self):
-        '''Gets soma volume assuming it is a sphere'''
+        """Gets soma volume assuming it is a sphere."""
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
         return 4.0 / 3 * math.pi * self.radius ** 3
 
 
 class SomaSinglePoint(Soma):
-    '''
-    Type A: 1point soma
+    """Type A: 1point soma.
+
     Represented by a single point.
-    '''
+    """
 
     def __init__(self, points):
+        """Initialize a SomaSinglePoint object."""
         super(SomaSinglePoint, self).__init__(points)
         self.radius = points[0][COLS.R]
 
     def __str__(self):
+        """Return a string representation."""
         return ('SomaSinglePoint(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
 
 class SomaCylinders(Soma):
-    '''Soma composed of cylinders (like in SWC)
+    """Soma composed of cylinders (like in SWC).
 
     points describe the locations of the cylinder start/end points, with
     their respective radii, much like how neurites are described:
@@ -102,12 +105,13 @@ class SomaCylinders(Soma):
       radius is the height of a '|' character, and the ')' try and show the
       curvature of the cylinger
 
-  Note: when, as in the case above, the cylinder center points don't lie
-  in a line, then the overlap between cylinders isn't taken into account for
-  the area calculation
-  '''
+    Note: when, as in the case above, the cylinder center points don't lie
+    in a line, then the overlap between cylinders isn't taken into account for
+    the area calculation
+    """
 
     def __init__(self, points):
+        """Initialize a SomaCyliners object."""
         super(SomaCylinders, self).__init__(points)
         self.area = sum(morphmath.segment_area((p0, p1))
                         for p0, p1 in zip(points, points[1:]))
@@ -115,21 +119,23 @@ class SomaCylinders(Soma):
 
     @property
     def center(self):
-        '''Obtain the center from the first stored point'''
+        """Obtain the center from the first stored point."""
         return self._points[0][COLS.XYZ]
 
     @property
     def volume(self):
+        """Return the volume of soma."""
         return sum(morphmath.segment_volume((p0, p1))
                    for p0, p1 in zip(self.points, self.points[1:]))
 
     def __str__(self):
+        """Return a string representation."""
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
 
 class SomaNeuromorphoThreePointCylinders(SomaCylinders):
-    ''' NeuroMorpho compatible soma
+    """NeuroMorpho compatible soma.
 
     Reference:
         http://neuromorpho.org/SomaFormat.html
@@ -146,9 +152,10 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         first point. The y coordinates of the second and third points are shifted by -rs
         and +rs, respectively (Figure 2). The surface area of this soma cylinder equals
         the surface area of a sphere of radius rs.
-    '''
+    """
 
     def __init__(self, points):
+        """Initialize a SomaNeuromorphoThreePointCylinders object."""
         super(SomaNeuromorphoThreePointCylinders, self).__init__(points)
 
         # X    Y     Z   R    P
@@ -175,25 +182,28 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
     @property
     def volume(self):
+        """Return the volume of the soma."""
         return 2 * math.pi * self.radius ** 3
 
     def __str__(self):
+        """Return a string representation."""
         return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
 
 class SomaSimpleContour(Soma):
-    '''
-    Type C: multiple points soma
+    """Type C: multiple points soma.
+
     Represented by a contour.
 
     The equivalent radius as the average distance to the center.
 
     Note: This doesn't currently check to see if the contour is in a plane. Also
     the radii of the points are not taken into account.
-    '''
+    """
 
     def __init__(self, points):
+        """Initialize a SomaSimpleContour object."""
         super(SomaSimpleContour, self).__init__(points)
         points = np.array(self._points)
         self.radius = morphmath.average_points_dist(
@@ -201,11 +211,12 @@ class SomaSimpleContour(Soma):
 
     @property
     def center(self):
-        '''Obtain the center from the average of all points'''
+        """Obtain the center from the average of all points."""
         points = np.array(self._points)
         return np.mean(points[:, COLS.XYZ], axis=0)
 
     def __str__(self):
+        """Return a string representation."""
         return ('SomaSimpleContour(%s) <center: %s, radius: %s>' %
                 (repr(self._points), self.center, self.radius))
 
@@ -216,12 +227,12 @@ SOMA_CYLINDER = 'cylinder'
 
 
 def _get_type(points, soma_class):
-    '''get the type of the soma
+    """Get the type of the soma.
 
     Args:
         points: Soma points
         soma_class(str): one of 'contour' or 'cylinder' to specify the type
-    '''
+    """
     assert soma_class in (SOMA_CONTOUR, SOMA_CYLINDER)
 
     npoints = len(points)
@@ -248,12 +259,12 @@ def _get_type(points, soma_class):
 
 
 def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
-    '''Make a soma object from a set of points
+    """Make a soma object from a set of points.
 
     Infers the soma type (SomaSinglePoint, SomaSimpleContour)
     from the points and the 'soma_class'
 
-    Parameters:
+    Arguments:
         points: collection of points forming a soma.
         soma_check: optional validation function applied to points. Should
         raise a SomaError if points not valid.
@@ -262,8 +273,7 @@ def make_soma(points, soma_check=None, soma_class=SOMA_CONTOUR):
     Raises:
         SomaError if no soma points found, points incompatible with soma, or
         if soma_check(points) fails.
-    '''
-
+    """
     if soma_check:
         soma_check(points)
 

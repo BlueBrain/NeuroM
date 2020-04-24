@@ -51,7 +51,7 @@ nrn = load_neuron(MORPH_FILENAME)
 
 
 def _reload_module(module):
-    '''Force module reload'''
+    """Force module reload."""
     if sys.version_info >= (3,):
         import importlib
         importlib.reload(module)
