@@ -148,7 +148,7 @@ autodoc_default_options = {
     'show-inheritance': True,
 }
 
-autoclass_content = 'both'
+#autoclass_content = 'both'
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -328,3 +328,11 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+def allow_only_neurom(app, what, name, obj, skip, options):
+    """Check that the member is part of neurom, exlude otherwise."""
+    if what in {"module", "class", "function"} and hasattr(obj, "__module__") and "neurom" not in obj.__module__:
+        return True
+
+def setup(app):
+    app.connect('autodoc-skip-member', allow_only_neurom)
