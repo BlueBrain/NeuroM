@@ -166,7 +166,8 @@ def _get_scaled_linewidth(ax, scale_with=None):
 
     Args:
         ax(matplotlib axes): on what to plot
-        scale_diameter_with(str): axis along which to scale diameter for correct unit (None, 'x' or 'y')
+        scale_diameter_with(str): axis along which to scale diameter for
+                                  correct unit (None, 'x' or 'y')
 
     Returns: flaot
 """
@@ -201,7 +202,8 @@ def plot_neuron(ax, nrn,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-        scale_diameter_with(str): axis along which to scale diameter for correct unit (None, 'x' or 'y')
+        scale_diameter_with(str): axis along which to scale diameter for
+                                  correct unit (None, 'x' or 'y')
     '''
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
