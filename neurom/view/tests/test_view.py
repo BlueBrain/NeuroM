@@ -64,6 +64,15 @@ def test_tree():
             eq_(collection.get_linewidth()[0], 1.2)
             assert_array_almost_equal(collection.get_colors(), expected_colors)
 
+        with get_fig_2d() as (fig, ax):
+            tree = neuron.neurites[0]
+            view.plot_tree(ax, tree,
+                           color=input_color, alpha=1., linewidth=1.2, scale_with_axis=True)
+            collection = ax.collections[0]
+            eq_(collection.get_linewidth()[0], 1.2)
+            assert_array_almost_equal(collection.get_colors(), expected_colors)
+
+
     with get_fig_2d() as (fig, ax):
         assert_raises(AssertionError, view.plot_tree, ax, tree, plane='wrong')
 
