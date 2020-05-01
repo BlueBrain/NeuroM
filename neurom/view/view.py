@@ -73,7 +73,7 @@ def _scale_linewidth_with_axis(ax, linewidth, scale_with_axis=False):
         scale_with_axis(bool): rescale
     Returns (float): rescaled linewidth
     """
-    if scale_with_axis is None:
+    if not scale_with_axis:
         return linewidth
     # this is done after first add_collection, but we need it here
     ax._unstale_viewLim()  # pylint: disable=protected-access
