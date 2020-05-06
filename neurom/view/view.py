@@ -62,7 +62,7 @@ def _plane2col(plane):
             getattr(COLS, plane[1].capitalize()), )
 
 
-def _scale_linewidth_with_axis(ax, linewidth, scale_with_axis=False):
+def _scale_linewidth_with_axis(ax, linewidth):
     """Get linewidth to scale diameters according to the axis of current figure.
 
     WARNING: this rescaling is not dynamic.
@@ -70,13 +70,14 @@ def _scale_linewidth_with_axis(ax, linewidth, scale_with_axis=False):
     Args:
         ax(matplotlib axes): on what to plot
         linewidth (float):  linewidth in data coordinates
-        scale_with_axis(bool): rescale
     Returns (float): rescaled linewidth
     """
-    if not scale_with_axis:
-        return linewidth
-    # this is done after first add_collection, but we need it here
-    ax._unstale_viewLim()  # pylint: disable=protected-access
+    try:
+        # this is done after first add_collection, but we need it here for latest matplotlib
+        ax._unstale_viewLim()  # pylint: disable=protected-access
+    except:
+        pass
+
     return (
         np.diff(ax.transData.transform([(0, 0), (linewidth, linewidth)]), axis=0).mean()
         * 72.0
@@ -84,23 +85,20 @@ def _scale_linewidth_with_axis(ax, linewidth, scale_with_axis=False):
     )
 
 
-def _get_linewidth(tree, linewidth, diameter_scale, ax=None, scale_with_axis=False):
+def _get_linewidth(tree, linewidth, diameter_scale, ax=None, realistic_diameters=False):
     """Calculate the desired linewidth based on tree contents.
 
     If diameter_scale exists, it is used to scale the diameter of each of the segments
     in the tree
     If diameter_scale is None, the linewidth is used.
-    If ax is not None, scale_with_axis is True and diameter_scale is not None,
+    If ax is not None, realistic_diameters is True and diameter_scale is not None,
         data coordinate will be used
     """
     if diameter_scale is not None and tree:
         linewidth = [2 * segment_radius(s) * diameter_scale
                      for s in iter_segments(tree)]
-        if ax is not None:
-            return [
-                _scale_linewidth_with_axis(ax, lw, scale_with_axis=scale_with_axis)
-                for lw in linewidth
-            ]
+        if ax is not None and realistic_diameters:
+            return [_scale_linewidth_with_axis(ax, lw) for lw in linewidth]
     return linewidth
 
 
@@ -113,7 +111,7 @@ def _get_color(treecolor, tree_type):
 
 def plot_tree(ax, tree, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA, scale_with_axis=False):
+              color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2d figure of the tree's segments.
 
     Args:
@@ -124,7 +122,7 @@ def plot_tree(ax, tree, plane='xy',
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-        scale_with_axis(bool): scale linewidths with axis data coordinates
+        realistic_diameters(bool): scale linewidths with axis data coordinates
 
     Note:
         If the tree contains one single point the plot will be empty
@@ -145,7 +143,7 @@ def plot_tree(ax, tree, plane='xy',
         diameter_scale=diameter_scale,
         linewidth=linewidth,
         ax=ax,
-        scale_with_axis=scale_with_axis,
+        realistic_diameters=realistic_diameters,
     )
     collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection(collection)
@@ -181,8 +179,9 @@ def plot_soma(ax, soma, plane='xy',
                                  color=color, alpha=alpha))
         else:
             points = [[p[plane0], p[plane1]] for p in soma.iter()]
-            points.append(points[0])  # close the loop
-            ax.plot(*list(np.array(points).T), color=color, alpha=alpha, linewidth=linewidth)
+            if points:
+                points.append(points[0])  # close the loop
+                ax.plot(*list(np.array(points).T), color=color, alpha=alpha, linewidth=linewidth)
 
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
@@ -199,7 +198,7 @@ def plot_neuron(ax, nrn,
                 plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA, scale_with_axis=False):
+                color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2D figure of the neuron, that contains a soma and the neurites.
 
     Args:
@@ -212,7 +211,7 @@ def plot_neuron(ax, nrn,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
-        scale_with_axis(bool): scale linewidths with axis data coordinates
+        realistic_diameters(bool): scale linewidths with axis data coordinates
     """
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
@@ -220,7 +219,7 @@ def plot_neuron(ax, nrn,
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
         plot_tree(ax, neurite, plane=plane,
                   diameter_scale=diameter_scale, linewidth=linewidth,
-                  color=color, alpha=alpha, scale_with_axis=scale_with_axis)
+                  color=color, alpha=alpha, realistic_diameters=realistic_diameters)
 
     ax.set_title(nrn.name)
     ax.set_xlabel(plane[0])
