@@ -20,12 +20,16 @@ def cli():
               default='3d')
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
               default='matplotlib')
-def view(input_file, plane, backend):
+@click.option('-r', '--realistic/--no-realistic', default=False,
+              help='Scale diameters according to the plot axis\n'
+              'Warning: Only works with the matplotlib backend')
+def view(input_file, plane, backend, realistic):
     """A simple neuron viewer."""
     if backend == 'matplotlib':
         from neurom.viewer import draw
         kwargs = {
             'mode': '3d' if plane == '3d' else '2d',
+            'scale_with_axis': realistic,
         }
         if plane != '3d':
             kwargs['plane'] = plane
