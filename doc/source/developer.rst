@@ -103,4 +103,4 @@ Then, run the tests manually in the ``virtualenv``. For example,
 Python compatibility
 --------------------
 
-We test the code against Python 2.7, 3.5 and 3.6.
+We test the code against Python 3.6 and 3.7.

@@ -66,6 +66,7 @@ setup(
         'plotly': ['plotly>=3.6.0'],
     },
     include_package_data=True,
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 6 - Mature',
         'Intended Audience :: Education',
