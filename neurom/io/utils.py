@@ -34,10 +34,8 @@ import os
 import shutil
 import tempfile
 import uuid
-from functools import partial
+from functools import partial, lru_cache
 from io import IOBase, open
-
-from pylru import FunctionCacheManager
 
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
@@ -70,7 +68,7 @@ class NeuronLoader(object):
         self.directory = directory
         self.file_ext = file_ext
         if cache_size is not None:
-            self.get = FunctionCacheManager(self.get, size=cache_size)
+            self.get = lru_cache(maxsize=cache_size)(self.get)
 
     def _filepath(self, name):
         """File path to `name` morphology file."""
