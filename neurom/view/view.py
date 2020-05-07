@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
-
+import sys
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon
@@ -71,12 +71,9 @@ def _scale_linewidth_with_axis(ax, linewidth):
         linewidth (float):  linewidth in data coordinates
     Returns (float): rescaled linewidth
     """
-    try:
+    if sys.version_info.major == 3:
         # this is done after first add_collection, but we need it here for latest matplotlib
         ax._unstale_viewLim()  # pylint: disable=protected-access
-    except:
-        pass
-
     return (
         np.diff(ax.transData.transform([(0, 0), (linewidth, linewidth)]), axis=0).mean()
         * 72.0
