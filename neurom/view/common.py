@@ -36,7 +36,6 @@ from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 from scipy.linalg import norm
 from scipy.spatial import ConvexHull
 
-from neurom._compat import map  # pylint: disable=ungrouped-imports
 
 plt = None  # refer to _get_plt()
 

@@ -34,7 +34,6 @@ from itertools import chain
 import numpy as np
 
 from neurom import morphmath
-from neurom._compat import filter, map, zip
 from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize

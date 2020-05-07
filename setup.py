@@ -35,10 +35,8 @@ from setuptools import find_packages
 
 
 REQS = ['click>=7.0',
-        'enum-compat>=0.0.2',
-        'future>=0.16.0',
         'h5py>=2.7.1',
-        'matplotlib>=1.3.1',
+        'matplotlib>=3.2.1',
         'numpy>=1.8.0',
         'pylru>=1.0',
         'pyyaml>=3.10',

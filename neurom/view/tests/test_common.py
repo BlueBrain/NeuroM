@@ -58,17 +58,17 @@ def test_get_figure():
     fig_old = plt.figure()
     fig, ax = get_figure(new_fig=False)
     nt.eq_(fig, fig_old)
-    nt.eq_(ax.colNum, 0)
-    nt.eq_(ax.rowNum, 0)
+    nt.eq_(ax.get_subplotspec().colspan.start, 0)
+    nt.eq_(ax.get_subplotspec().rowspan.start, 0)
 
     fig1, ax1 = get_figure(new_fig=True, subplot=224)
     nt.ok_(fig1 != fig_old)
-    nt.eq_(ax1.colNum, 1)
-    nt.eq_(ax1.rowNum, 1)
+    nt.eq_(ax1.get_subplotspec().colspan.start, 1)
+    nt.eq_(ax1.get_subplotspec().rowspan.start, 1)
 
     fig2, ax2 = get_figure(new_fig=True, subplot=[1, 1, 1])
-    nt.eq_(ax2.colNum, 0)
-    nt.eq_(ax2.rowNum, 0)
+    nt.eq_(ax2.get_subplotspec().colspan.start, 0)
+    nt.eq_(ax2.get_subplotspec().rowspan.start, 0)
     plt.close('all')
 
     fig = plt.figure()

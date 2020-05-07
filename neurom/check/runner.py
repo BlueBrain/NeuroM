@@ -29,10 +29,9 @@
 
 """Runner for neuron morphology checks."""
 
-import logging
+from collections import OrderedDict
 from importlib import import_module
-
-from future.moves.collections import OrderedDict
+import logging
 
 from neurom.check import check_wrapper
 from neurom.exceptions import ConfigError

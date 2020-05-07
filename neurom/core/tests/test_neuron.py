@@ -34,7 +34,6 @@ import numpy as np
 from nose import tools as nt
 
 import neurom as nm
-from neurom._compat import zip
 from neurom.core import graft_neuron, iter_segments
 
 _path = os.path.dirname(os.path.abspath(__file__))

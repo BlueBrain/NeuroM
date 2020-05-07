@@ -36,7 +36,6 @@ from io import open
 
 import numpy as np
 
-from neurom._compat import StringType
 from neurom.core.dataformat import COLS, POINT_TYPE
 
 from .datawrapper import DataWrapper
@@ -78,7 +77,7 @@ def _match_section(section, match):
     for i in range(5):
         if i >= len(section):
             return None
-        if isinstance(section[i], StringType) and section[i] in match:
+        if isinstance(section[i], str) and section[i] in match:
             return match[section[i]]
     return None
 
@@ -159,7 +158,7 @@ def _flatten_subsection(subsection, _type, offset, parent):
         if row in ('Low', 'Generated', 'High', ):
             continue
 
-        if isinstance(row[0], StringType):
+        if isinstance(row[0], str):
             if len(row) in (4, 5, ):
                 if len(row) == 5:
                     assert row[4][0] == 'S', \

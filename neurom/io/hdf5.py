@@ -40,9 +40,10 @@ HDF5.V1 Input row format:
 There is one such row per measured point.
 """
 
+from itertools import zip_longest
+
 import h5py
 import numpy as np
-from future.moves.itertools import zip_longest
 
 from .datawrapper import BlockNeuronBuilder, DataWrapper
 

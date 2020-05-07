@@ -31,7 +31,6 @@ import neurom.geom.transform as gtr
 from neurom import load_neuron
 from neurom.fst import _neuritefunc as _nf
 from nose import tools as nt
-from neurom._compat import zip
 
 import numpy as np
 import os

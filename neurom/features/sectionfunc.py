@@ -32,7 +32,6 @@ import numpy as np
 
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
-from neurom._compat import range
 from neurom.morphmath import interval_lengths
 
 

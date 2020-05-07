@@ -28,8 +28,6 @@
 
 """Test neurom._neuritefunc functionality."""
 
-from neurom.features.tests.test_feature_compat import *
-
 from neurom.fst import _bifurcationfunc as bifurcation
 from neurom.fst import _neuronfunc as neuronfunc
 from neurom.fst import _neuritefunc as _nf

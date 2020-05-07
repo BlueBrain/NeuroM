@@ -39,7 +39,6 @@ from io import IOBase, open
 
 from pylru import FunctionCacheManager
 
-from neurom._compat import StringType, filter
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
 from neurom.fst._core import FstNeuron
@@ -116,7 +115,7 @@ def get_files_by_path(path):
 def load_neuron(handle, reader=None):
     """Build section trees from an h5 or swc file."""
     rdw = load_data(handle, reader)
-    if isinstance(handle, StringType):
+    if isinstance(handle, str):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:
         name = None
@@ -146,7 +145,7 @@ def load_neurons(neurons,
     if isinstance(neurons, (list, tuple)):
         files = neurons
         name = name if name is not None else 'Population'
-    elif isinstance(neurons, StringType):
+    elif isinstance(neurons, str):
         files = get_files_by_path(neurons)
         name = name if name is not None else os.path.basename(neurons)
 
