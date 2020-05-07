@@ -72,7 +72,12 @@ def _scale_linewidth_with_axis(ax, linewidth):
     Returns (float): rescaled linewidth
     """
     if sys.version_info.major == 3:
-        # this is done after first add_collection, but we need it here for latest matplotlib
+        # for matplotlib with python3, there seems to be an issue with internal
+        # state of the figure, called stale. To ensure that the scaling we apply
+        # is always correct, we need to reset the stale poperty by hand.
+        # This hidden function is in general not needed, as called internally with
+        # functions such as ax.get_xlim/ax.set_xlim/ax.add_collection, but it may not
+        # always be called at this point, depending on how the user sets up his figure.
         ax._unstale_viewLim()  # pylint: disable=protected-access
     return (
         np.diff(ax.transData.transform([(0, 0), (linewidth, linewidth)]), axis=0).mean()
