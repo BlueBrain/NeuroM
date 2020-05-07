@@ -28,8 +28,8 @@
 
 import os
 from copy import deepcopy
+from pathlib import Path
 
-from pathlib2 import Path
 import numpy as np
 from nose import tools as nt
 
