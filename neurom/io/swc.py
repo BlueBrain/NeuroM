@@ -50,4 +50,8 @@ def read(filename, data_wrapper=DataWrapper):
     if len(np.shape(data)) == 1:
         data = np.reshape(data, (1, -1))
     data = data[:, [X, Y, Z, R, TYPE, ID, P]]
+    # Setting all type ids > 4 to 5 (custom section type)
+    custom_types = data[:, 4] > 4
+    data[custom_types, 4] = 5
+
     return data_wrapper(data, 'SWC', None)

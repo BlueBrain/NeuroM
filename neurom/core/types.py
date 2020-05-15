@@ -47,12 +47,13 @@ class NeuriteIter(OrderedEnum):
 @unique
 class NeuriteType(OrderedEnum):
     """Enum representing valid tree types."""
-    undefined = 1
-    soma = 2
-    axon = 3
-    basal_dendrite = 4
-    apical_dendrite = 5
-    all = 32
+    undefined = 0
+    soma = 1
+    axon = 2
+    basal_dendrite = 3
+    apical_dendrite = 4
+    custom = 5
+    all = -9999
 
 
 NEURITES = (NeuriteType.all,
