@@ -53,7 +53,7 @@ class NeuriteType(OrderedEnum):
     basal_dendrite = 3
     apical_dendrite = 4
     custom = 5
-    all = -9999
+    all = 32
 
 
 NEURITES = (NeuriteType.all,
