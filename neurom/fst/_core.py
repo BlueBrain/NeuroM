@@ -86,7 +86,7 @@ def make_neurites(rdw):
     # One pass over sections to build nodes
     nodes = tuple(Section(section_id=i,
                           points=rdw.data_block[sec.ids],
-                          section_type=_TREE_TYPES.get(sec.ntype, NeuriteType.undefined))
+                          section_type=_TREE_TYPES[sec.ntype])
                   for i, sec in enumerate(rdw.sections))
 
     # One pass over nodes to connect children to parents
@@ -126,7 +126,7 @@ def _check_soma_topology_swc(points):
         raise SomaError("Bifurcating soma")
 
 
-_TREE_TYPES = {type.value: type for type in NeuriteType}
+_TREE_TYPES = tuple(NeuriteType)
 
 _NEURITE_ACTION = {
     'SWC': _remove_soma_initial_point,
