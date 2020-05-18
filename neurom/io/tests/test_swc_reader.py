@@ -32,8 +32,10 @@ import numpy as np
 
 from neurom.core.dataformat import COLS
 from neurom.io import swc
+from neurom import load_neuron, NeuriteType
 
 from nose import tools as nt
+from nose.tools import assert_equal
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -94,3 +96,11 @@ def test_simple_reversed():
     nt.eq_(rdw.neurite_root_section_ids(), [5, 6])
     nt.eq_(len(rdw.soma_points()), 1)
     nt.eq_(len(rdw.sections), 7)
+
+def test_custom_type():
+    neuron = load_neuron(os.path.join(SWC_PATH, 'custom_type.swc'))
+    assert_equal(neuron.neurites[1].type, NeuriteType.custom)
+
+def test_undefined_type():
+    neuron = load_neuron(os.path.join(SWC_PATH, 'undefined_type.swc'))
+    assert_equal(neuron.neurites[1].type, NeuriteType.undefined)

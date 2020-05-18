@@ -32,7 +32,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError,)
+from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError)
 from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
 from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
