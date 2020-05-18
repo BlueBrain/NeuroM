@@ -26,7 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
-import sys
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
@@ -103,7 +102,6 @@ def plot_tree(ax, tree, plane='xy',
     """
     plane0, plane1 = _plane2col(plane)
 
-
     section_segment_list = [(section, segment)
                             for section in iter_sections(tree)
                             for segment in iter_segments(section)]
@@ -114,14 +112,15 @@ def plot_tree(ax, tree, plane='xy',
             """Draw  a rectangle to represent a secgment."""
             x, y = np.array(x), np.array(y)
             diff = y - x
-            length =  np.linalg.norm(diff)
-            angle_rad = np.arctan2(diff[1], diff[0]) % (2 * np.pi)
-            linewidth_shift = linewidth / 2. * np.array([-np.sin(angle_rad), np.cos(angle_rad)])
-            return Rectangle(x - linewidth_shift, length, linewidth, np.rad2deg(angle_rad))
+            angle = np.arctan2(diff[1], diff[0]) % (2 * np.pi)
+            return Rectangle(x - linewidth / 2. * np.array([-np.sin(angle), np.cos(angle)]),
+                             np.linalg.norm(diff),
+                             linewidth,
+                             np.rad2deg(angle))
 
         segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
-                 (seg[1][plane0], seg[1][plane1]),
-                 2 * segment_radius(seg))
+                               (seg[1][plane0], seg[1][plane1]),
+                               2 * segment_radius(seg))
                 for _, seg in section_segment_list]
 
         collection = PatchCollection(segs, alpha=alpha, facecolors=colors)
@@ -131,7 +130,7 @@ def plot_tree(ax, tree, plane='xy',
                  (seg[1][plane0], seg[1][plane1]))
                 for _, seg in section_segment_list]
 
-        linewidths = _get_linewidth(
+        linewidth = _get_linewidth(
             tree,
             diameter_scale=diameter_scale,
             linewidth=linewidth,
