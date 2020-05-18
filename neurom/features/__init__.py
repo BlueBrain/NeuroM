@@ -133,7 +133,7 @@ def get(feature, obj, **kwargs):
     Arguments:
         feature(string): feature to extract
         obj: a neuron, population or neurite tree
-        **kwargs: parameters to forward to underlying worker functions
+        kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D or 2D numpy array.
@@ -148,7 +148,7 @@ _INDENT = ' ' * 4
 
 
 def _indent(string, count):
-    """Indent `string` by `count` * INDENT."""
+    """Indent `string` by `count` \* INDENT."""
     indent = _INDENT * count
     ret = indent + string.replace('\n', '\n' + indent)
     return ret.rstrip()

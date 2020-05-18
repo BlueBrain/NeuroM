@@ -55,7 +55,7 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
 
 
 def _plane2col(plane):
-    """Take a string like 'xy', and return the indices from COLS.*."""
+    """Take a string like 'xy', and return the indices from COLS.\*."""
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
     assert plane in planes, 'No such plane found! Please select one of: ' + str(planes)
     return (getattr(COLS, plane[0].capitalize()),
