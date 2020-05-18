@@ -91,15 +91,14 @@ def _fill_soma_data(neuron, data, plane):
         soma_2d = []
         theta = np.linspace(0, 2 * np.pi, 100)
         phi = np.linspace(0, np.pi, 100)
-        z = np.outer(np.ones(100), np.cos(phi)) + neuron.soma.center[2]
         r = neuron.soma.radius
         data.append(
             go.Surface(
-                x=(np.outer(np.cos(theta), np.sin(phi)) + neuron.soma.center[0]) * r,
-                y=(np.outer(np.sin(theta), np.sin(phi)) + neuron.soma.center[1]) * r,
-                z=z * r,
+                x=r * np.outer(np.cos(theta), np.sin(phi)) + neuron.soma.center[0],
+                y=r * np.outer(np.sin(theta), np.sin(phi)) + neuron.soma.center[1],
+                z=r * np.outer(np.ones(100), np.cos(phi)) + neuron.soma.center[2],
                 cauto=False,
-                surfacecolor=['black'] * len(z),
+                surfacecolor=['black'] * len(phi),
                 showscale=False,
             )
         )
