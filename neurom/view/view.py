@@ -29,7 +29,7 @@
 import sys
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
-from matplotlib.patches import Circle, FancyArrowPatch, Polygon
+from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
@@ -61,45 +61,16 @@ def _plane2col(plane):
             getattr(COLS, plane[1].capitalize()), )
 
 
-def _scale_linewidth_with_axis(ax, linewidth):
-    """Get linewidth to scale diameters according to the axis of current figure.
-
-    WARNING: this rescaling is not dynamic.
-
-    Args:
-        ax(matplotlib axes): on what to plot
-        linewidth (float):  linewidth in data coordinates
-    Returns (float): rescaled linewidth
-    """
-    if sys.version_info.major == 3:
-        # for matplotlib with python3, there seems to be an issue with internal
-        # state of the figure, called stale. To ensure that the scaling we apply
-        # is always correct, we need to reset the stale poperty by hand.
-        # This hidden function is in general not needed, as called internally with
-        # functions such as ax.get_xlim/ax.set_xlim/ax.add_collection, but it may not
-        # always be called at this point, depending on how the user sets up his figure.
-        ax._unstale_viewLim()  # pylint: disable=protected-access
-    return (
-        np.diff(ax.transData.transform([(0, 0), (linewidth, linewidth)]), axis=0).mean()
-        * 72.0
-        / ax.get_figure().dpi
-    )
-
-
-def _get_linewidth(tree, linewidth, diameter_scale, ax=None, realistic_diameters=False):
+def _get_linewidth(tree, linewidth, diameter_scale):
     """Calculate the desired linewidth based on tree contents.
 
     If diameter_scale exists, it is used to scale the diameter of each of the segments
     in the tree
     If diameter_scale is None, the linewidth is used.
-    If ax is not None, realistic_diameters is True and diameter_scale is not None,
-        data coordinate will be used
     """
     if diameter_scale is not None and tree:
         linewidth = [2 * segment_radius(s) * diameter_scale
                      for s in iter_segments(tree)]
-        if ax is not None and realistic_diameters:
-            return [_scale_linewidth_with_axis(ax, lw) for lw in linewidth]
     return linewidth
 
 
@@ -130,23 +101,42 @@ def plot_tree(ax, tree, plane='xy',
         since no segments can be constructed.
     """
     plane0, plane1 = _plane2col(plane)
+
+
     section_segment_list = [(section, segment)
                             for section in iter_sections(tree)
                             for segment in iter_segments(section)]
-    segs = [((seg[0][plane0], seg[0][plane1]),
-             (seg[1][plane0], seg[1][plane1]))
-            for _, seg in section_segment_list]
-
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
-    linewidth = _get_linewidth(
-        tree,
-        diameter_scale=diameter_scale,
-        linewidth=linewidth,
-        ax=ax,
-        realistic_diameters=realistic_diameters,
-    )
-    collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
+    if realistic_diameters:
+        def _get_rectangle(x, y, linewidth):
+            """Draw  a rectangle to represent a secgment."""
+            x, y = np.array(x), np.array(y)
+            diff = y - x
+            length =  np.linalg.norm(diff)
+            angle_rad = np.arctan2(diff[1], diff[0]) % (2 * np.pi)
+            linewidth_shift = linewidth / 2. * np.array([-np.sin(angle_rad), np.cos(angle_rad)])
+            return Rectangle(x - linewidth_shift, length, linewidth, np.rad2deg(angle_rad))
+
+        segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
+                 (seg[1][plane0], seg[1][plane1]),
+                 2 * segment_radius(seg))
+                for _, seg in section_segment_list]
+
+        collection = PatchCollection(segs, alpha=alpha, facecolors=colors)
+
+    else:
+        segs = [((seg[0][plane0], seg[0][plane1]),
+                 (seg[1][plane0], seg[1][plane1]))
+                for _, seg in section_segment_list]
+
+        linewidths = _get_linewidth(
+            tree,
+            diameter_scale=diameter_scale,
+            linewidth=linewidth,
+        )
+        collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
+
     ax.add_collection(collection)
 
 

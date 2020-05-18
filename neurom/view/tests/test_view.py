@@ -69,8 +69,8 @@ def test_tree():
             view.plot_tree(ax, tree,
                            color=input_color, alpha=1., linewidth=1.2, realistic_diameters=True)
             collection = ax.collections[0]
-            eq_(collection.get_linewidth()[0], 623.232)
-            assert_array_almost_equal(collection.get_colors(), expected_colors)
+            eq_(collection.get_linewidth()[0], 1.0)
+            assert_array_almost_equal(collection.get_facecolors(), expected_colors)
 
 
     with get_fig_2d() as (fig, ax):
