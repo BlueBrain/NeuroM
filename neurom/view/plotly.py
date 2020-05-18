@@ -89,7 +89,7 @@ def _fill_soma_data(neuron, data, plane):
 
     else:
         soma_2d = []
-        point_count = 100 #  Enough points so that the surface looks like a sphere
+        point_count = 100  # Enough points so that the surface looks like a sphere
         theta = np.linspace(0, 2 * np.pi, point_count)
         phi = np.linspace(0, np.pi, point_count)
         r = neuron.soma.radius
