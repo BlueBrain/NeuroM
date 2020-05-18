@@ -34,8 +34,6 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = "1.4.20"
-
 REQS = ['click>=7.0',
         'enum-compat>=0.0.2',
         'future>=0.16.0',
@@ -46,30 +44,29 @@ REQS = ['click>=7.0',
         'pyyaml>=3.10',
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
-]
+        ]
 
-config = {
-    'description': 'NeuroM: a light-weight neuron morphology analysis package',
-    'author': 'Blue Brain Project, EPFL',
-    'url': 'http://https://github.com/BlueBrain/NeuroM',
-    'version': VERSION,
-    'install_requires': REQS,
-    'packages': find_packages(),
-    'license': 'BSD',
-    'scripts': ['apps/raw_data_check',
-                'apps/morph_check',
+
+setup(
+    description='NeuroM: a light-weight neuron morphology analysis package',
+    author='Blue Brain Project, EPFL',
+    url='http://https://github.com/BlueBrain/NeuroM',
+    install_requires=REQS,
+    packages=find_packages(),
+    license='BSD',
+    scripts=['apps/raw_data_check',
+             'apps/morph_check',
                 'apps/morph_stats',
-                ],
-    'entry_points':{
+             ],
+    entry_points={
         'console_scripts': ['neurom=apps.__main__:cli']
     },
-    'name': 'neurom',
-    'extras_require': {
+    name='neurom',
+    extras_require={
         'plotly': ['plotly>=3.6.0'],
     },
-    'include_package_data': True,
-
-    'classifiers': [
+    include_package_data=True,
+    classifiers=[
         'Development Status :: 6 - Mature',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
@@ -81,7 +78,7 @@ config = {
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
-    ]
-}
-
-setup(**config)
+    ],
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
+)
