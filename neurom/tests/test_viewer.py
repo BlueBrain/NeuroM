@@ -41,7 +41,7 @@ from neurom.view import common, plotly
 from neurom import load_neuron, viewer, NeuriteType
 
 from nose import tools as nt
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_array_almost_equal
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
@@ -74,6 +74,15 @@ def test_plotly_draw_neuron3d():
     plotly.draw(nrn, plane='3d', auto_open=False)
     plotly.draw(nrn.neurites[0], plane='3d', auto_open=False)
 
+    fig = plotly.draw(load_neuron(os.path.join(DATA_PATH, 'simple-different-soma.swc')),
+                      auto_open=False)
+    x, y, z = [fig['data'][2][key] for key in str('xyz')]
+    assert_allclose(x[0, 0], 2)
+    assert_allclose(x[33, 33], -1.8971143170299758)
+    assert_allclose(y[0, 0], 3)
+    assert_allclose(y[33, 33], 9.75)
+    assert_allclose(z[0, 0], 13)
+    assert_allclose(z[33, 33], 8.5)
 
 def test_plotly_draw_neuron2d():
     plotly.draw(nrn, plane='xy', auto_open=False)
