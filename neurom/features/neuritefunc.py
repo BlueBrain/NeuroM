@@ -290,7 +290,7 @@ def segment_path_lengths(neurites, neurite_type=NeuriteType.all):
                 pathlength[section.id] = 0
         return pathlength[section.id]
 
-    result = [_get_pathlength(section) + sectionfunc.segment_lengths(section)
+    result = [_get_pathlength(section) + np.cumsum(sectionfunc.segment_lengths(section))
               for section in iter_sections(neurites, neurite_filter=neurite_filter)]
     return np.hstack(result) if result else np.array([])
 
