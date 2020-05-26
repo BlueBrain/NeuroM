@@ -39,5 +39,6 @@ user interactivity upon launch, and do not require access to a display.
 .. toctree::
    :hidden:
 
+   Introduction <self>
    morph_check
    morph_stats

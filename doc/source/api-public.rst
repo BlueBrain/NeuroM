@@ -32,7 +32,13 @@ Public API
 The public API is the stable, minimal set of entry points for end-users and developers
 who build code on top of NeuroM.
 
+.. toctree::
+   :hidden:
+
+   Introduction <self>
+
 .. autosummary::
+   :nosignatures:
    :toctree: _neurom_build
 
    neurom

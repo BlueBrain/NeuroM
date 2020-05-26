@@ -26,26 +26,6 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Code Documentation
-==================
-
-Public API
-----------
-
-The public API is the stable, minimal set of entry points for end-users and developers
-who build code on top of NeuroM.
-
-.. autosummary::
-   :toctree: _neurom_build
-
-   neurom
-   neurom.viewer
-   neurom.core
-   neurom.io
-   neurom.check
-   neurom.stats
-   neurom.exceptions
-
 Developer API
 -------------
 
@@ -53,7 +33,13 @@ The developer API consists of implementation code supporting the public API, as 
 as rough experimental code that is not stable enough to be made public. This is intended
 for developers of NeuroM itself.
 
+.. toctree::
+   :hidden:
+
+   Introduction <self>
+
 .. autosummary::
+   :nosignatures:
    :toctree: _neurom_build
 
    neurom.morphmath
