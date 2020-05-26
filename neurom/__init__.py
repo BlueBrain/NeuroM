@@ -64,7 +64,6 @@ from .core.dataformat import COLS
 from .core.types import NEURITES as NEURITE_TYPES
 from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons
-from .version import VERSION as __version__
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite

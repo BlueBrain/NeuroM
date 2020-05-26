@@ -48,10 +48,9 @@ from neurom.features.tests.utils import _close
 
 _PWD = os.path.dirname(os.path.abspath(__file__))
 H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
 SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
 SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-NRN = nm.load_neuron(DATA_PATH)
+NRN = nm.load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
 
 
 def test_principal_direction_extents():
@@ -94,7 +93,7 @@ def test_total_area_per_neurite():
 
     basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
     ret = _nf.total_area_per_neurite(SIMPLE,
-            neurite_type=nm.BASAL_DENDRITE)
+                                     neurite_type=nm.BASAL_DENDRITE)
     nt.assert_almost_equal(ret[0], basal_area)
 
     axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
@@ -111,7 +110,7 @@ def test_total_volume_per_neurite():
 
     # calculate the volumes by hand and compare
     vol2 = [sum(sectionfunc.section_volume(s) for s in n.iter_sections())
-			for n in NRN.neurites
+            for n in NRN.neurites
             ]
     nt.eq_(vol, vol2)
 
@@ -144,56 +143,67 @@ def test_terminal_path_length_per_neurite():
     assert_allclose(terminal_distances,
                     (4. + 6., 4. + 5.))
 
+
 def test_total_length_per_neurite():
     total_lengths = _nf.total_length_per_neurite(SIMPLE)
     assert_allclose(total_lengths,
                     (5. + 5. + 6., 4. + 5. + 6.))
 
+
 def test_n_segments():
     n_segments = _nf.n_segments(SIMPLE)
     nt.eq_(n_segments, 6)
+
 
 def test_n_neurites():
     n_neurites = _nf.n_neurites(SIMPLE)
     nt.eq_(n_neurites, 2)
 
+
 def test_n_sections():
     n_sections = _nf.n_sections(SIMPLE)
     nt.eq_(n_sections, 6)
 
+
 def test_neurite_volumes():
-    #note: cannot use SIMPLE since it lies in a plane
+    # note: cannot use SIMPLE since it lies in a plane
     total_volumes = _nf.total_volume_per_neurite(NRN)
     assert_allclose(total_volumes,
                     [271.94122143951864, 281.24754646913954,
                      274.98039928781355, 276.73860261723024]
                     )
 
+
 def test_section_path_lengths():
     path_lengths = list(_nf.section_path_lengths(SIMPLE))
     assert_allclose(path_lengths,
-                    (5., 10., 11., # type 3, basal dendrite
-                     4., 10., 9.)) # type 2, axon
+                    (5., 10., 11.,  # type 3, basal dendrite
+                     4., 10., 9.))  # type 2, axon
+
 
 def test_section_term_lengths():
     term_lengths = list(_nf.section_term_lengths(SIMPLE))
     assert_allclose(term_lengths,
                     (5., 6., 6., 5.))
 
+
 def test_section_bif_lengths():
     bif_lengths = list(_nf.section_bif_lengths(SIMPLE))
     assert_allclose(bif_lengths,
                     (5.,  4.))
+
 
 def test_section_end_distances():
     end_dist = list(_nf.section_end_distances(SIMPLE))
     assert_allclose(end_dist,
                     [5.0, 5.0, 6.0, 4.0, 6.0, 5.0])
 
+
 def test_section_partition_pairs():
     part_pairs = list(_nf.partition_pairs(SIMPLE))
     assert_allclose(part_pairs,
                     [(1.0, 1.0), (1.0, 1.0)])
+
 
 def test_section_bif_radial_distances():
     bif_rads = list(_nf.section_bif_radial_distances(SIMPLE))
@@ -211,6 +221,7 @@ def test_section_bif_radial_distances():
                      59.427722328770955,
                      66.25222507299583,
                      74.05119754074926])
+
 
 def test_section_term_radial_distances():
     trm_rads = list(_nf.section_term_radial_distances(SIMPLE))
@@ -230,28 +241,33 @@ def test_section_term_radial_distances():
                      97.25246040544428,
                      99.58945832481642])
 
+
 def test_number_of_sections_per_neurite():
     sections = _nf.number_of_sections_per_neurite(SIMPLE)
     assert_allclose(sections,
                     (3, 3))
 
+
 def test_section_branch_orders():
     branch_orders = list(_nf.section_branch_orders(SIMPLE))
     assert_allclose(branch_orders,
                     (0, 1, 1,  # type 3, basal dendrite
-                     0, 1, 1)) # type 2, axon
+                     0, 1, 1))  # type 2, axon
+
 
 def test_section_bif_branch_orders():
     bif_branch_orders = list(_nf.section_bif_branch_orders(SIMPLE))
     assert_allclose(bif_branch_orders,
                     (0,  # type 3, basal dendrite
-                     0)) # type 2, axon
+                     0))  # type 2, axon
+
 
 def test_section_term_branch_orders():
     term_branch_orders = list(_nf.section_term_branch_orders(SIMPLE))
     assert_allclose(term_branch_orders,
                     (1, 1,  # type 3, basal dendrite
-                     1, 1)) # type 2, axon
+                     1, 1))  # type 2, axon
+
 
 def test_section_radial_distances():
     radial_distances = _nf.section_radial_distances(SIMPLE)
@@ -259,20 +275,24 @@ def test_section_radial_distances():
                     (5.0, sqrt(5**2 + 5**2), sqrt(6**2 + 5**2),   # type 3, basal dendrite
                      4.0, sqrt(6**2 + 4**2), sqrt(5**2 + 4**2)))  # type 2, axon
 
+
 def test_local_bifurcation_angles():
     local_bif_angles = list(_nf.local_bifurcation_angles(SIMPLE))
     assert_allclose(local_bif_angles,
                     (pi, pi))
+
 
 def test_remote_bifurcation_angles():
     remote_bif_angles = list(_nf.remote_bifurcation_angles(SIMPLE))
     assert_allclose(remote_bif_angles,
                     (pi, pi))
 
+
 def test_partition():
     partition = list(_nf.bifurcation_partitions(SIMPLE))
     assert_allclose(partition,
                     (1.0, 1.0))
+
 
 def test_partition_asymmetry():
     partition = list(_nf.partition_asymmetries(SIMPLE))
@@ -292,6 +312,7 @@ def test_segment_lengths():
                     (5.0, 5.0, 6.0,   # type 3, basal dendrite
                      4.0, 6.0, 5.0))  # type 2, axon
 
+
 def test_segment_areas():
     result = _nf.segment_areas(SIMPLE)
     assert_allclose(result,
@@ -302,27 +323,30 @@ def test_segment_areas():
                      19.109562,
                      16.019042])
 
+
 def test_segment_volumes():
     expected = [
         15.70796327,
-         5.23598776,
-         6.28318531,
+        5.23598776,
+        6.28318531,
         12.56637061,
-         6.28318531,
-         5.23598776,
+        6.28318531,
+        5.23598776,
     ]
     result = _nf.segment_volumes(SIMPLE)
     assert_allclose(result, expected)
 
+
 def test_segment_midpoints():
     midpoints = np.array(_nf.segment_midpoints(SIMPLE))
     assert_allclose(midpoints,
-                    np.array([[ 0. ,  (5. + 0) / 2,  0. ],  #trunk type 2
-                              [-2.5,  5. ,  0. ],
-                              [ 3. ,  5. ,  0. ],
-                              [ 0. , (-4. + 0)/ 2. ,  0. ],  #trunk type 3
-                              [ 3. , -4. ,  0. ],
-                              [-2.5, -4. ,  0. ]]))
+                    np.array([[0.,  (5. + 0) / 2,  0.],  # trunk type 2
+                              [-2.5,  5.,  0.],
+                              [3.,  5.,  0.],
+                              [0., (-4. + 0) / 2.,  0.],  # trunk type 3
+                              [3., -4.,  0.],
+                              [-2.5, -4.,  0.]]))
+
 
 def test_segment_radial_distances():
     """midpoints on segments."""
@@ -335,11 +359,15 @@ def test_segment_path_lengths():
     pathlengths = _nf.segment_path_lengths(SIMPLE)
     assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])
 
+    pathlengths = _nf.segment_path_lengths(NRN)[:5]
+    assert_allclose(pathlengths, [0.1, 1.332525, 2.530149, 3.267878, 4.471462])
+
 
 def test_principal_direction_extents():
     principal_dir = list(_nf.principal_direction_extents(SIMPLE))
     assert_allclose(principal_dir,
                     (14.736052694538641, 12.105102672688004))
+
 
 def test_section_taper_rates():
     assert_allclose(list(_nf.section_taper_rates(NRN.neurites[0]))[:10],

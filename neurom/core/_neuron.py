@@ -98,7 +98,7 @@ def iter_sections(neurites,
         neurites: neuron, population, neurite, or iterable containing neurite objects
         iterator_type: section iteration order within a given neurite. Must be one of:
             Tree.ipreorder: Depth-first pre-order iteration of tree nodes
-            Tree.ipreorder: Depth-first post-order iteration of tree nodes
+            Tree.ipostorder: Depth-first post-order iteration of tree nodes
             Tree.iupstream: Iterate from a tree node to the root nodes
             Tree.ibifurcation_point: Iterator to bifurcation points
             Tree.ileaf: Iterator to all leaves of a tree

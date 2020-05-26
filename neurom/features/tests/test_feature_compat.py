@@ -102,7 +102,8 @@ class SectionTreeBase(object):
                         get('number_of_sections', self.ref_nrn)[0])
 
         for t in NeuriteType:
-            nt.assert_equal(_nrt.n_sections(self.sec_nrn, neurite_type=t),
+            actual = _nrt.n_sections(self.sec_nrn, neurite_type=t)
+            nt.assert_equal(actual,
                             get('number_of_sections', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_number_of_sections_per_neurite(self):
