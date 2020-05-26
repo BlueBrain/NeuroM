@@ -27,5 +27,5 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 sphinx>=2.0.0
-sphinx_rtd_theme
+sphinx-bluebrain-theme
 sphinx-autorun

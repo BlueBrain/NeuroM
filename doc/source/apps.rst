@@ -37,7 +37,7 @@ configuration scripts. These command-line tools are installed as executable scri
 user interactivity upon launch, and do not require access to a display.
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
    morph_check
    morph_stats

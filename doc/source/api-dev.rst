@@ -26,27 +26,51 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Code Documentation
+==================
 
-.. image:: /logo/NeuroM.jpg
+Public API
+----------
 
-NeuroM
-======
+The public API is the stable, minimal set of entry points for end-users and developers
+who build code on top of NeuroM.
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+.. autosummary::
+   :toctree: _neurom_build
 
-.. toctree::
-   :hidden:
+   neurom
+   neurom.viewer
+   neurom.core
+   neurom.io
+   neurom.check
+   neurom.stats
+   neurom.exceptions
 
-   quickstart
-   apps
-   definitions
-   api
-   file_formats
-   install
-   tutorial
-   examples
-   issue_reporting
-   developer
-   dependencies
-   license
+Developer API
+-------------
+
+The developer API consists of implementation code supporting the public API, as well
+as rough experimental code that is not stable enough to be made public. This is intended
+for developers of NeuroM itself.
+
+.. autosummary::
+   :toctree: _neurom_build
+
+   neurom.morphmath
+   neurom.fst
+   neurom.fst.sectionfunc
+   neurom.check.morphtree
+   neurom.check.structural_checks
+   neurom.check.neuron_checks
+   neurom.core.types
+   neurom.core.tree
+   neurom.core._neuron
+   neurom.core._soma
+   neurom.core.point
+   neurom.core.dataformat
+   neurom.io.utils
+   neurom.io.swc
+   neurom.io.hdf5
+   neurom.view
+   neurom.view.common
+   neurom.view.view

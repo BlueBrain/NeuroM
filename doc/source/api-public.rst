@@ -26,9 +26,19 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+Public API
+----------
 
-Introduction
-============
+The public API is the stable, minimal set of entry points for end-users and developers
+who build code on top of NeuroM.
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+.. autosummary::
+   :toctree: _neurom_build
 
+   neurom
+   neurom.viewer
+   neurom.core
+   neurom.io
+   neurom.check
+   neurom.stats
+   neurom.exceptions
