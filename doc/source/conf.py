@@ -139,7 +139,7 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
-
+suppress_warnings = ["ref.python"]
 autosummary_generate = True
 autosummary_imported_members = True
 autodoc_default_options = {
@@ -331,7 +331,7 @@ texinfo_documents = [
 
 def allow_only_neurom(app, what, name, obj, skip, options):
     """Check that the member is part of neurom, exlude otherwise."""
-    if what in {"module", "class", "function"} and hasattr(obj, "__module__") and "neurom" not in obj.__module__:
+    if what in {"module", "class", "exception", "function"} and "neurom" not in getattr(obj, "__module__", ""):
         return True
 
 def setup(app):
