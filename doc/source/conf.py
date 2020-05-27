@@ -330,6 +330,21 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+from sphinx.ext.autosummary import Autosummary
+
+class AutosummaryOverride(Autosummary):
+    """Extends Autosummary to ensure the nosignatures option is set."""
+
+    def run(self):
+        """Wrap the autodoc output in a div with autodoc class."""
+        self.options["nosignatures"] = self.options.get("nosignatures", True)
+        result = super(AutosummaryOverride, self).run()
+        return result
+
+def add_autosummary_override(app):
+    """Override the autosummary definition to ensure no signatures."""
+    if "sphinx.ext.autosummary" in app.extensions:
+        app.add_directive("autosummary", AutosummaryOverride, override=True)
 
 def allow_only_neurom(app, what, name, obj, skip, options):
     """Check that the member is part of neurom, exlude otherwise."""
@@ -337,4 +352,5 @@ def allow_only_neurom(app, what, name, obj, skip, options):
         return True
 
 def setup(app):
+    app.connect('builder-inited', add_autosummary_override)
     app.connect('autodoc-skip-member', allow_only_neurom)
