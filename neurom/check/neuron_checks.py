@@ -285,6 +285,7 @@ def has_no_dangling_branch(neuron):
     """Check if the neuron has dangling neurites.
 
     Are considered dangling
+
     - dendrites whose first point is too far from the soma center
     - axons whose first point is too far from the soma center AND from
       any point belonging to a dendrite

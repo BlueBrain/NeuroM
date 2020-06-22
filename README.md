@@ -40,7 +40,7 @@ NeuroM is a Python toolkit for the analysis and processing of neuron morphologie
 [![Documentation Status](https://readthedocs.org/projects/neurom/badge/?version=latest)](http://neurom.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.209498.svg)](https://doi.org/10.5281/zenodo.209498)
 
-## Acknowlegments
+## Acknowledgements
 
 This project/research received funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). For license and authors, see `LICENSE.txt`
 and `AUTHORS.md` respectively.

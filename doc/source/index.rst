@@ -28,20 +28,17 @@
 
 .. NeuroM documentation master file
 
-NeuroM |version|
-********************
+.. image:: /logo/NeuroM.jpg
 
-.. include:: about.rst
-    :start-after: ============
+NeuroM
+======
 
-----
-
-Contents
-========
+NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
+   Home <self>
    quickstart
    apps
    definitions
@@ -54,13 +51,3 @@ Contents
    developer
    dependencies
    license
-
-----
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

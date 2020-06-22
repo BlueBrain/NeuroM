@@ -29,48 +29,8 @@
 Code Documentation
 ==================
 
-Public API
-----------
+.. toctree::
+   :hidden:
 
-The public API is the stable, minimal set of entry points for end-users and developers
-who build code on top of NeuroM.
-
-.. autosummary::
-   :toctree: _neurom_build
-
-   neurom
-   neurom.viewer
-   neurom.core
-   neurom.io
-   neurom.check
-   neurom.stats
-   neurom.exceptions
-
-Developer API
--------------
-
-The developer API consists of implementation code supporting the public API, as well
-as rough experimental code that is not stable enough to be made public. This is intended
-for developers of NeuroM itself.
-
-.. autosummary::
-   :toctree: _neurom_build
-
-   neurom.morphmath
-   neurom.fst
-   neurom.fst.sectionfunc
-   neurom.check.morphtree
-   neurom.check.structural_checks
-   neurom.check.neuron_checks
-   neurom.core.types
-   neurom.core.tree
-   neurom.core._neuron
-   neurom.core._soma
-   neurom.core.point
-   neurom.core.dataformat
-   neurom.io.utils
-   neurom.io.swc
-   neurom.io.hdf5
-   neurom.view
-   neurom.view.common
-   neurom.view.view
+   api-public
+   api-dev

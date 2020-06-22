@@ -5,6 +5,7 @@
 .coverage
 *venv*
 *egg-info*
+.eggs
 test-reports
 pep8.txt
 pylint.txt

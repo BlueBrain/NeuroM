@@ -26,31 +26,37 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-{{ fullname }}
-{{ underline }}
+Developer API
+-------------
 
-.. currentmodule:: {{ module }}
+The developer API consists of implementation code supporting the public API, as well
+as rough experimental code that is not stable enough to be made public. This is intended
+for developers of NeuroM itself.
 
-.. autoclass:: {{ objname }}
+.. toctree::
+   :hidden:
 
-   {% if methods %}
-   .. rubric:: Methods
+   Introduction <self>
 
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-   {% for item in methods %}
-      ~{{ name }}.{{ item }}
-   {%- endfor %}
-   {% endif %}
+.. autosummary::
+   :nosignatures:
+   :toctree: _neurom_build
 
-   {% if attributes %}
-   .. rubric:: Attributes
-
-   .. autosummary::
-      :toctree:
-      :nosignatures:
-   {% for item in attributes %}
-      ~{{ name }}.{{ item }}
-   {%- endfor %}
-   {% endif %}
+   neurom.morphmath
+   neurom.fst
+   neurom.fst.sectionfunc
+   neurom.check.morphtree
+   neurom.check.structural_checks
+   neurom.check.neuron_checks
+   neurom.core.types
+   neurom.core.tree
+   neurom.core._neuron
+   neurom.core._soma
+   neurom.core.point
+   neurom.core.dataformat
+   neurom.io.utils
+   neurom.io.swc
+   neurom.io.hdf5
+   neurom.view
+   neurom.view.common
+   neurom.view.view

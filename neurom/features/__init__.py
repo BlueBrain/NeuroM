@@ -35,7 +35,7 @@ Examples:
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 """
 
-from functools import partial
+from functools import partial, update_wrapper
 import numpy as _np
 
 from neurom.features import neuritefunc as _nrt
@@ -44,6 +44,9 @@ from neurom.core import NeuriteType as _ntype
 from neurom.core import iter_neurites as _ineurites
 from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
+
+_partition_asymmetry_length = partial(_nrt.partition_asymmetries, variant='length')
+update_wrapper(_partition_asymmetry_length, _nrt.partition_asymmetries)
 
 NEURITEFEATURES = {
     'total_length': _nrt.total_length,
@@ -78,7 +81,7 @@ NEURITEFEATURES = {
     'partition': _nrt.bifurcation_partitions,
     'partition_asymmetry': _nrt.partition_asymmetries,
     'partition_pairs': _nrt.partition_pairs,
-    'partition_asymmetry_length': partial(_nrt.partition_asymmetries, variant='length'),
+    'partition_asymmetry_length': _partition_asymmetry_length,
     'sibling_ratio': _nrt.sibling_ratios,
     'diameter_power_relation': _nrt.diameter_power_relations,
     'number_of_segments': _nrt.number_of_segments,
@@ -133,7 +136,7 @@ def get(feature, obj, **kwargs):
     Arguments:
         feature(string): feature to extract
         obj: a neuron, population or neurite tree
-        **kwargs: parameters to forward to underlying worker functions
+        kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D or 2D numpy array.

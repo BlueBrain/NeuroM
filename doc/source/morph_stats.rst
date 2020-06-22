@@ -116,7 +116,7 @@ or ``-h`` option.
     morph_stats --help
 
 Features
-********
+--------
 
 .. runblock:: console
 
