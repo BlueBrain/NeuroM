@@ -59,7 +59,7 @@ Examples:
 import logging as _logging
 
 from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
-                   iter_segments, Neuron)
+                   iter_segments, Neuron, sample_morph_points)
 from .core.dataformat import COLS
 from .core.types import NEURITES as NEURITE_TYPES
 from .features import get

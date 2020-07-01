@@ -32,5 +32,6 @@ from .tree import Tree
 from .types import NeuriteType, NeuriteIter
 from ._soma import Soma, make_soma, SomaError
 from ._neuron import (Section, Neurite, Neuron, iter_neurites,
-                      iter_sections, iter_segments, graft_neuron)
+                      iter_sections, iter_segments, graft_neuron,
+                      sample_morph_points)
 from .population import Population
