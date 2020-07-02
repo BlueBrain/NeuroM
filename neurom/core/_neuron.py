@@ -154,21 +154,27 @@ def graft_neuron(root_section):
     return Neuron(soma=Soma(root_section.points[:1]), neurites=[Neurite(root_section)])
 
 
-def sample_morph_points(morph, sample_distance):
+def sample_morph_points(morph, neurite_type, sample_distance):
     """Sample points along the morphology.
 
     Args:
         morph (neurom.FstNeuron): morphology
+        neurite_type: (neurom.NeuriteType): filter by this type of neurite
         sample_distance (int in um): points sampling distance
 
     Returns:
-        Dict: sampled points per neurite. Points are of shape (N, 3) where N is the number of
+        np.array: sampled points for the neurites.
+        Points are of shape (N, 3) where N is the number of
         sampled points.
     """
     # map of section to its remaining offset
     section_offsets = {}
-    morph_points = defaultdict(list)
-    for section in iter_sections(morph):
+    points = []
+
+    def neurite_filter(s):
+        return s.type == neurite_type
+
+    for section in iter_sections(morph, neurite_filter=neurite_filter):
         if section.parent is None:
             parent_section_offset = 0
         else:
@@ -179,16 +185,15 @@ def sample_morph_points(morph, sample_distance):
             if segment_offset + segment_len < sample_distance:
                 segment_offset += segment_len
             elif segment_offset + segment_len == sample_distance:
-                morph_points[section.type].append(segment[1][COLS.XYZ])
+                points.append(segment[1][COLS.XYZ])
                 segment_offset = 0
             else:
                 offsets = np.arange(sample_distance - segment_offset, segment_len, sample_distance)
                 for offset in offsets:
-                    morph_points[section.type].append(
-                        morphmath.linear_interpolate(*segment, offset / segment_len))
+                    points.append(morphmath.linear_interpolate(*segment, offset / segment_len))
                 segment_offset = segment_len - offsets[-1]
         section_offsets[section.id] = segment_offset
-    return {neurite: np.vstack(points) for neurite, points in morph_points.items()}
+    return np.vstack(points)
 
 
 class Section(Tree):
