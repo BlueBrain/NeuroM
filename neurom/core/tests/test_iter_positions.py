@@ -5,8 +5,9 @@ import neurom as nm
 _path = os.path.dirname(os.path.abspath(__file__))
 TEST_DATA_PATH = os.path.join(_path, "../../../test_data/")
 
-def test_sample_morph_points():
-    morph_path = os.path.join(TEST_DATA_PATH, 'sample_morph_points.asc')
+
+def test_iter_positions():
+    morph_path = os.path.join(TEST_DATA_PATH, 'iter_positions.asc')
     morph = nm.load_neuron(morph_path)
     expected_basal = np.array([
         [0., 11., 0., ],
@@ -17,10 +18,14 @@ def test_sample_morph_points():
         [0., 41., 0., ],
         [1.38485692, 30.30600158, 0., ],
         [11., 0., 0., ]])
+    basal_filter = lambda s: s.type == nm.NeuriteType.basal_dendrite
     assert np.allclose(
         expected_basal,
-        nm.sample_morph_points(morph, nm.NeuriteType.basal_dendrite, 10))
+        np.array(list(
+            nm.iter_positions(morph, basal_filter, 10))))
     expected_axon = np.array([[0., -11., 0., ]])
+    axon_filter = lambda s: s.type == nm.NeuriteType.axon
     assert np.allclose(
         expected_axon,
-        nm.sample_morph_points(morph, nm.NeuriteType.axon, 10))
+        np.array(list(
+            nm.iter_positions(morph, axon_filter, 10))))

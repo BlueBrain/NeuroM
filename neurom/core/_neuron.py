@@ -154,25 +154,24 @@ def graft_neuron(root_section):
     return Neuron(soma=Soma(root_section.points[:1]), neurites=[Neurite(root_section)])
 
 
-def sample_morph_points(morph, neurite_type, sample_distance):
-    """Sample points along the morphology.
+def iter_positions(morph, neurite_filter, sample_distance):
+    """
+    Iterator for positions in space of points every <sample_distance> um
 
     Args:
         morph (neurom.FstNeuron): morphology
         neurite_type: (neurom.NeuriteType): filter by this type of neurite
         sample_distance (int in um): points sampling distance
 
-    Returns:
-        np.array: sampled points for the neurites.
-        Points are of shape (N, 3) where N is the number of
-        sampled points.
+    Yields:
+        sampled points for the neurites. each point is a (3,) numpy array
+
+    Assumptions:
+        segment linearity: curvature between the start and end of segments
+            is negligible
     """
     # map of section to its remaining offset
     section_offsets = {}
-    points = []
-
-    def neurite_filter(s):
-        return s.type == neurite_type
 
     for section in iter_sections(morph, neurite_filter=neurite_filter):
         if section.parent is None:
@@ -185,15 +184,15 @@ def sample_morph_points(morph, neurite_type, sample_distance):
             if segment_offset + segment_len < sample_distance:
                 segment_offset += segment_len
             elif segment_offset + segment_len == sample_distance:
-                points.append(segment[1][COLS.XYZ])
+                yield segment[1][COLS.XYZ]
                 segment_offset = 0
             else:
                 offsets = np.arange(sample_distance - segment_offset, segment_len, sample_distance)
                 for offset in offsets:
-                    points.append(morphmath.linear_interpolate(*segment, offset / segment_len))
+                    yield morphmath.linear_interpolate(*segment, offset / segment_len)
                 segment_offset = segment_len - offsets[-1]
         section_offsets[section.id] = segment_offset
-    return np.vstack(points)
+
 
 
 class Section(Tree):
