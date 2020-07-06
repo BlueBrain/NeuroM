@@ -107,7 +107,7 @@ def fit(data, distribution='norm'):
         Uses Kolmogorov-Smirnov test to estimate distance and p-value.
     """
     params = getattr(_st, distribution).fit(data)
-    return FitResults(params, _st.kstest(data, distribution, params), distribution)
+    return FitResults(params, _st.kstest(data, distribution, params, mode='asymp'), distribution)
 
 
 def optimal_distribution(data, distr_to_check=('norm', 'expon', 'uniform')):
