@@ -113,6 +113,16 @@ def get_files_by_path(path):
 
 def load_neuron(handle, reader=None):
     """Build section trees from an h5 or swc file."""
+    if isinstance(handle, (morphio.Morphology, morphio.mut.Morphology)):
+        fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.h5', prefix='neurom-')
+        os.close(fd)
+
+        # TODO: make a better morphio loader that does not require a tempfile
+        if isinstance(handle, morphio.Morphology):
+            handle = handle.as_mutable()
+        handle.write(temp_file)
+        handle, reader = temp_file, None
+
     rdw = load_data(handle, reader)
     if isinstance(handle, str):
         name = os.path.splitext(os.path.basename(handle))[0]

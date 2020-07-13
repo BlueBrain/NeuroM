@@ -33,6 +33,7 @@ from io import StringIO
 from pathlib import Path
 import warnings
 
+import morphio
 import numpy as np
 from nose import tools as nt
 
@@ -41,6 +42,8 @@ from neurom.core import Neuron, SomaError
 from neurom.exceptions import NeuroMError, RawDataError, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom.io import utils
+
+from numpy.testing import assert_array_equal
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
@@ -158,6 +161,21 @@ def test_load_neuron():
 """
     utils.load_neuron(StringIO(neuron_str), reader='swc')
 
+
+def test_load_neuron_morphio():
+    filename = os.path.join(DATA_PATH, 'swc', 'simple.swc')
+    for Morpho in (morphio.Morphology, morphio.mut.Morphology):
+        m = utils.load_neuron(Morpho(filename))
+        assert_array_equal(m.points,
+                           [[ 0.,  0.,  0.,  1.],
+                            [ 0.,  0.,  0.,  1.],
+                            [ 0.,  5.,  0.,  1.],
+                            [-5.,  5.,  0.,  0.],
+                            [ 6.,  5.,  0.,  0.],
+                            [ 0.,  0.,  0.,  1.],
+                            [ 0., -4.,  0.,  1.],
+                            [ 6., -4.,  0.,  0.],
+                            [-5., -4.,  0.,  0.]])
 
 def test_neuron_name():
 

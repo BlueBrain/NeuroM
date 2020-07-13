@@ -41,6 +41,7 @@ setup(
         'click>=7.0',
         'h5py>=2.7.1',
         'matplotlib>=3.2.1',
+        'morphio>=2.3.10',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
         'pyyaml>=3.10',
