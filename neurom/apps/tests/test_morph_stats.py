@@ -31,14 +31,18 @@ import os
 import numpy as np
 from nose.tools import (assert_almost_equal, assert_equal,
                         assert_greater_equal, assert_raises, ok_)
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 import neurom as nm
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
 
+
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data/swc')
+DATA_PATH = os.path.join(_path, '../../../test_data')
+SWC_PATH = os.path.join(DATA_PATH, 'swc')
 
 
 REF_CONFIG = {
@@ -127,7 +131,7 @@ def test_eval_stats_applies_numpy_function():
 
 
 def test_extract_stats_single_neuron():
-    nrn = nm.load_neuron(os.path.join(DATA_PATH, 'Neuron.swc'))
+    nrn = nm.load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
     assert_equal(set(res.keys()), set(REF_OUT.keys()))
     # Note: soma radius is calculated from the sphere that gives the area
@@ -138,6 +142,14 @@ def test_extract_stats_single_neuron():
         assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
         for kk in res[k].keys():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
+
+
+def test_extract_stats_single_as_frame():
+    nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
+                            for name in ['Neuron.swc', 'simple.swc']])
+    actual = ms.extract_stats(nrns, REF_CONFIG, as_frame=True)
+    expected = pd.read_csv(os.path.join(DATA_PATH, 'extracted-stats.csv'), index_col=0)
+    assert_frame_equal(actual, expected)
 
 
 def test_get_header():

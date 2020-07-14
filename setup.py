@@ -42,6 +42,7 @@ setup(
         'h5py>=2.7.1',
         'matplotlib>=3.2.1',
         'numpy>=1.8.0',
+        'pandas>=1.0.5',
         'pyyaml>=3.10',
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
