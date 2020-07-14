@@ -29,3 +29,43 @@ def test_iter_positions():
         expected_axon,
         np.array(list(
             nm.iter_positions(morph, axon_filter, 10))))
+
+
+def test_iter_positions_no_skips_branch_points():
+    morph = nm.load_neuron(os.path.join(TEST_DATA_PATH, 'swc', 'simple.swc'))
+    points = nm.iter_positions(morph, None, 1)
+    exp_points = np.array([
+        [0, 1, 0],
+        [0, 2, 0],
+        [0, 3, 0],
+        [0, 4, 0],
+        [0, 5, 0],
+        [-1, 5, 0],
+        [-2, 5, 0],
+        [-3, 5, 0],
+        [-4, 5, 0],
+        [-5, 5, 0],
+        [1, 5, 0],
+        [2, 5, 0],
+        [3, 5, 0],
+        [4, 5, 0],
+        [5, 5, 0],
+        [6, 5, 0],
+        [0, -1, 0],
+        [0, -2, 0],
+        [0, -3, 0],
+        [0, -4, 0],
+        [1, -4, 0],
+        [2, -4, 0],
+        [3, -4, 0],
+        [4, -4, 0],
+        [5, -4, 0],
+        [6, -4, 0],
+        [-1, -4, 0],
+        [-2, -4, 0],
+        [-3, -4, 0],
+        [-4, -4, 0],
+        [-5, -4, 0]
+    ])
+
+    np.testing.assert_almost_equal(exp_points, np.array(list(points)))

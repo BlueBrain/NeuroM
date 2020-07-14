@@ -191,6 +191,10 @@ def iter_positions(morph, neurite_filter, sample_distance):
                 for offset in offsets:
                     yield morphmath.linear_interpolate(*segment, offset / segment_len)
                 segment_offset = segment_len - offsets[-1]
+                if segment_offset == sample_distance:
+                    segment_offset = 0
+                    yield segment[1][COLS.XYZ]
+
         section_offsets[section.id] = segment_offset
 
 
