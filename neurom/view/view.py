@@ -120,7 +120,7 @@ def plot_tree(ax, tree, plane='xy',
 
         segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
                                (seg[1][plane0], seg[1][plane1]),
-                               2 * segment_radius(seg))
+                               2 * segment_radius(seg) * diameter_scale)
                 for _, seg in section_segment_list]
 
         collection = PatchCollection(segs, alpha=alpha, facecolors=colors)
