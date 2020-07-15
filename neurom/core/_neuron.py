@@ -161,7 +161,7 @@ def iter_positions(morph, neurite_filter, sample_distance):
     Args:
         morph (neurom.FstNeuron): morphology
         neurite_type: (neurom.NeuriteType): filter by this type of neurite
-        sample_distance (int in um): points sampling distance
+        sample_distance (int): points sampling distance (in um)
 
     Yields:
         sampled points for the neurites. each point is a (3,) numpy array
