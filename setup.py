@@ -60,7 +60,7 @@ setup(
         'plotly': ['plotly>=3.6.0'],
     },
     include_package_data=True,
-    python_requires='>=3.6',
+    python_requires='>=3.5',
     classifiers=[
         'Development Status :: 6 - Mature',
         'Intended Audience :: Education',
