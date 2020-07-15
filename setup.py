@@ -29,34 +29,28 @@
 """ Distribution configuration for neurom
 """
 # pylint: disable=R0801
-import os
 from setuptools import setup
 from setuptools import find_packages
-
-
-REQS = ['click>=7.0',
-        'enum-compat>=0.0.2',
-        'future>=0.16.0',
-        'h5py>=2.7.1',
-        'matplotlib>=1.3.1',
-        'numpy>=1.8.0',
-        'pylru>=1.0',
-        'pyyaml>=3.10',
-        'scipy>=1.2.0',
-        'tqdm>=4.8.4',
-        ]
 
 
 setup(
     description='NeuroM: a light-weight neuron morphology analysis package',
     author='Blue Brain Project, EPFL',
     url='http://https://github.com/BlueBrain/NeuroM',
-    install_requires=REQS,
+    install_requires=[
+        'click>=7.0',
+        'h5py>=2.7.1',
+        'matplotlib>=3.2.1',
+        'numpy>=1.8.0',
+        'pyyaml>=3.10',
+        'scipy>=1.2.0',
+        'tqdm>=4.8.4',
+        ],
     packages=find_packages(),
     license='BSD',
     scripts=['apps/raw_data_check',
              'apps/morph_check',
-                'apps/morph_stats',
+             'apps/morph_stats',
              ],
     entry_points={
         'console_scripts': ['neurom=apps.__main__:cli']
@@ -66,17 +60,15 @@ setup(
         'plotly': ['plotly>=3.6.0'],
     },
     include_package_data=True,
+    python_requires='>=3.5',
     classifiers=[
         'Development Status :: 6 - Mature',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     use_scm_version={"local_scheme": "no-local-version"},

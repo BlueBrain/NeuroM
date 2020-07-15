@@ -35,7 +35,6 @@ from numpy.testing import assert_array_equal
 
 import neurom as nm
 from neurom import COLS, core, load_neuron
-from neurom._compat import filter
 from neurom.core import NeuriteIter, Tree
 
 _path = os.path.dirname(os.path.abspath(__file__))

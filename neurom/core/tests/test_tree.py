@@ -29,7 +29,6 @@
 import sys
 from nose import tools as nt
 from neurom.core.tree import Tree
-from neurom._compat import range
 
 REF_TREE = Tree()
 T11 = REF_TREE.add_child(Tree())

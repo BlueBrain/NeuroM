@@ -35,7 +35,6 @@ from nose.tools import assert_equal
 from numpy.testing import assert_array_equal
 
 from neurom import check, load_neuron
-from neurom._compat import range
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter

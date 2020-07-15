@@ -34,7 +34,6 @@ from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
 from neurom import NeuriteType, geom
-from neurom._compat import zip
 from neurom.core import iter_neurites, iter_segments, iter_sections
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS

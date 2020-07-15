@@ -29,8 +29,6 @@
 """Generic tree class and iteration functions."""
 from collections import deque
 
-from neurom._compat import filter
-
 
 class Tree(object):
     """Simple recursive tree class."""
