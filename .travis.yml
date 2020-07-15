@@ -1,8 +1,9 @@
 language: python
 python:
-  - "2.7"
   - "3.6"
   - "3.7"
+  - "3.8"
+
 cache: pip
 install:
   - pip install tox-travis
@@ -18,4 +19,4 @@ deploy:
   on:
     tags: true
     branch: master
-    condition: "$TRAVIS_PYTHON_VERSION == 2.7"
+    condition: "$TRAVIS_PYTHON_VERSION == 3.7"

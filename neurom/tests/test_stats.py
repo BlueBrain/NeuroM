@@ -68,7 +68,7 @@ def test_fit_normal_regression():
     nt.assert_almost_equal(fit_.params[0], 10.019332055822, 12)
     nt.assert_almost_equal(fit_.params[1], 0.978726207747, 12)
     nt.assert_almost_equal(fit_.errs[0], 0.021479979161, 12)
-    nt.assert_almost_equal(fit_.errs[1], 0.745431659944, 12)
+    nt.assert_almost_equal(fit_.errs[1], 0.7369569123250506, 12)
 
 
 def test_fit_default_is_normal():
