@@ -82,16 +82,6 @@ def _stat_name(feat_name, stat_mode):
     return '%s_%s' % (stat_mode, feat_name)
 
 
-def _fill_compoundified(data, stat_name, stat):
-    """Insert the stat in the dict and eventually split it into XYZ components."""
-    if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
-        data[stat_name] = stat
-    else:
-        for i, suffix in enumerate('XYZ'):
-            compound_stat_name = stat_name + '_' + suffix
-            data[compound_stat_name] = stat[i]
-
-
 def extract_stats(neurons, config, as_frame=False):
     """Extract stats from neurons.
 
@@ -102,7 +92,7 @@ def extract_stats(neurons, config, as_frame=False):
             - neurite: a dictionary {neurite_feature: mode} where:
                 - neurite_feature is a string from NEURITEFEATURES
                 - mode is an aggregation operation provided as a string such as:
-                  ['min', 'max', 'median', 'mean', 'std', 'raw']
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
         as_frame (bool): if yes, returns a dataframe, else a dict
 
     Returns:
@@ -133,6 +123,19 @@ def _extract_stats_as_frame(neurons, config):
 
 def _extract_stats_as_dict(neurons, config):
     """Extract stats from neurons."""
+
+    def _fill_stats_dict(data, stat_name, stat):
+        """Insert the stat data in the dict.
+
+        And if the stats is a 3D array, splits it into XYZ components.
+        """
+        if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
+            data[stat_name] = stat
+        else:
+            for i, suffix in enumerate('XYZ'):
+                compound_stat_name = stat_name + '_' + suffix
+                data[compound_stat_name] = stat[i]
+
     stats = defaultdict(dict)
 
     for (feature_name, modes), neurite_type in product(config['neurite'].items(),
@@ -141,13 +144,13 @@ def _extract_stats_as_dict(neurons, config):
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(nm.get(feature_name, neurons, neurite_type=neurite_type), mode)
-            _fill_compoundified(stats[neurite_type.name], stat_name, stat)
+            _fill_stats_dict(stats[neurite_type.name], stat_name, stat)
 
     for feature_name, modes in config.get('neuron', {}).items():
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(nm.get(feature_name, neurons), mode)
-            _fill_compoundified(stats, stat_name, stat)
+            _fill_stats_dict(stats, stat_name, stat)
 
     return dict(stats)
 
