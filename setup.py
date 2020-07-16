@@ -53,7 +53,7 @@ setup(
              'apps/morph_stats',
              ],
     entry_points={
-        'console_scripts': ['neurom=apps.__main__:cli']
+        'console_scripts': ['neurom=neurom.apps.cli:cli']
     },
     name='neurom',
     extras_require={
