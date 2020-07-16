@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
+from warnings import warn
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
@@ -171,7 +172,7 @@ def plot_soma(ax, soma, plane='xy',
             points = [[p[plane0], p[plane1]] for p in soma.iter()]
             if points:
                 points.append(points[0])  # close the loop
-                ax.plot(*list(np.array(points).T), color=color, alpha=alpha, linewidth=linewidth)
+                ax.plot(*np.array(points).T, color=color, alpha=alpha, linewidth=linewidth)
 
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
@@ -298,7 +299,7 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
         alpha(float): Transparency of plotted values
     """
     if realistic_diameters:
-        print("Warning: realistic_diameters option not implemented for 3d plots.")
+        warn("Option 'realistic_diameters' not implemented for 3d plots.")
 
     plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
