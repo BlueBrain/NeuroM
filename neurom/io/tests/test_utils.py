@@ -108,7 +108,6 @@ def test_load_neurons():
     nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, _get_name(FILES[i]))
-    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
     # Single string
     nrns = utils.load_neurons(FILES[0], neuron_loader=_mock_load_neuron)
@@ -123,13 +122,11 @@ def test_load_neurons():
     nrns = utils.load_neurons(iter_file, neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, _get_name(FILES[i]))
-    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
     # sequence of Path objects
     nrns = utils.load_neurons(map(Path, FILES), neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, _get_name(FILES[i]))
-    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
     # string path to a directory
     nrns = utils.load_neurons(SWC_PATH, neuron_loader=_mock_load_neuron)
@@ -141,6 +138,7 @@ def test_load_neurons():
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
     nt.assert_true({_get_name(f) for f in FILES}.issubset({nrn.name for nrn in nrns}))
 
+    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
 def test_load_neuron():
     nrn = utils.load_neuron(FILENAMES[0])
