@@ -28,6 +28,7 @@ def cli():
               help='Scale diameters according to the plot axis\n'
               'Warning: Only works with the matplotlib backend')
 def view(input_file, plane, backend, realistic_diameters):
+
     """A simple neuron viewer."""
     if backend == 'matplotlib':
         kwargs = {

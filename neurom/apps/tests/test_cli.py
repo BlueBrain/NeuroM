@@ -23,13 +23,14 @@ def test_viewer_matplotlib():
 
 @patch('neurom.view.plotly.plot', MagicMock())
 def test_viewer_plotly():
+
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')
 
     result = runner.invoke(cli, ['view', filename,
                                  '--backend', 'plotly'])
     assert_equal(result.exit_code, 0)
-
+    
     result = runner.invoke(cli, ['view', filename,
                                  '--backend', 'plotly',
                                  '--plane', 'xy'])
