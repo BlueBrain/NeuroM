@@ -26,10 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
-
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
-from matplotlib.patches import Circle, FancyArrowPatch, Polygon
+from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
 import numpy as np
@@ -83,7 +82,7 @@ def _get_color(treecolor, tree_type):
 
 def plot_tree(ax, tree, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA):
+              color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2d figure of the tree's segments.
 
     Args:
@@ -94,24 +93,49 @@ def plot_tree(ax, tree, plane='xy',
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
+        realistic_diameters(bool): scale linewidths with axis data coordinates
 
     Note:
         If the tree contains one single point the plot will be empty
         since no segments can be constructed.
     """
     plane0, plane1 = _plane2col(plane)
+
     section_segment_list = [(section, segment)
                             for section in iter_sections(tree)
                             for segment in iter_segments(section)]
-    segs = [((seg[0][plane0], seg[0][plane1]),
-             (seg[1][plane0], seg[1][plane1]))
-            for _, seg in section_segment_list]
-
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
-    linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
+    if realistic_diameters:
+        def _get_rectangle(x, y, linewidth):
+            """Draw  a rectangle to represent a secgment."""
+            x, y = np.array(x), np.array(y)
+            diff = y - x
+            angle = np.arctan2(diff[1], diff[0]) % (2 * np.pi)
+            return Rectangle(x - linewidth / 2. * np.array([-np.sin(angle), np.cos(angle)]),
+                             np.linalg.norm(diff),
+                             linewidth,
+                             np.rad2deg(angle))
 
-    collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
+        segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
+                               (seg[1][plane0], seg[1][plane1]),
+                               2 * segment_radius(seg) * diameter_scale)
+                for _, seg in section_segment_list]
+
+        collection = PatchCollection(segs, alpha=alpha, facecolors=colors)
+
+    else:
+        segs = [((seg[0][plane0], seg[0][plane1]),
+                 (seg[1][plane0], seg[1][plane1]))
+                for _, seg in section_segment_list]
+
+        linewidth = _get_linewidth(
+            tree,
+            diameter_scale=diameter_scale,
+            linewidth=linewidth,
+        )
+        collection = LineCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
+
     ax.add_collection(collection)
 
 
@@ -125,8 +149,7 @@ def plot_soma(ax, soma, plane='xy',
         ax(matplotlib axes): on what to plot
         soma(neurom.core.Soma): plotted soma
         plane(str): Any pair of 'xyz'
-        soma_outline(bool): If true, draws the outline of the soma
-        diameter_scale(float): Scale factor multiplied with segment diameters before plotting
+        soma_outline(bool): should the soma be drawn as an outline
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
@@ -135,7 +158,6 @@ def plot_soma(ax, soma, plane='xy',
     color = _get_color(color, tree_type=NeuriteType.soma)
 
     if isinstance(soma, SomaCylinders):
-        plane0, plane1 = _plane2col(plane)
         for start, end in zip(soma.points, soma.points[1:]):
             common.project_cylinder_onto_2d(ax, (plane0, plane1),
                                             start=start[COLS.XYZ], end=end[COLS.XYZ],
@@ -146,12 +168,11 @@ def plot_soma(ax, soma, plane='xy',
             ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
                                  color=color, alpha=alpha))
         else:
-            plane0, plane1 = _plane2col(plane)
-            points = [(p[plane0], p[plane1]) for p in soma.iter()]
-
+            points = [[p[plane0], p[plane1]] for p in soma.iter()]
             if points:
                 points.append(points[0])  # close the loop
-                ax.plot(points, color=color, alpha=alpha, linewidth=linewidth)
+                x, y = tuple(np.array(points).T)
+                ax.plot(x, y, color=color, alpha=alpha, linewidth=linewidth)
 
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
@@ -168,7 +189,7 @@ def plot_neuron(ax, nrn,
                 plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA):
+                color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2D figure of the neuron, that contains a soma and the neurites.
 
     Args:
@@ -181,6 +202,7 @@ def plot_neuron(ax, nrn,
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
+        realistic_diameters(bool): scale linewidths with axis data coordinates
     """
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
@@ -188,7 +210,7 @@ def plot_neuron(ax, nrn,
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
         plot_tree(ax, neurite, plane=plane,
                   diameter_scale=diameter_scale, linewidth=linewidth,
-                  color=color, alpha=alpha)
+                  color=color, alpha=alpha, realistic_diameters=realistic_diameters)
 
     ax.set_title(nrn.name)
     ax.set_xlabel(plane[0])
