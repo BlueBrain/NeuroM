@@ -38,6 +38,7 @@ import numpy as np
 import pandas as pd
 
 import neurom as nm
+from neurom.fst._core import FstNeuron
 from neurom.features import NEURONFEATURES, NEURITEFEATURES
 from neurom.exceptions import ConfigError
 
@@ -82,18 +83,18 @@ def _stat_name(feat_name, stat_mode):
     return '%s_%s' % (stat_mode, feat_name)
 
 
-def extract_stats(neurons, config, as_frame=False):
+def extract_dataframe(neurons, config):
     """Extract stats from neurons.
 
     Arguments:
         neurons: a neuron, population or neurite tree
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
+              If not provided, all neurite_type will be used
             - neurite: a dictionary {neurite_feature: mode} where:
                 - neurite_feature is a string from NEURITEFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-        as_frame (bool): if yes, returns a dataframe, else a dict
 
     Returns:
         The extracted statistics
@@ -101,16 +102,12 @@ def extract_stats(neurons, config, as_frame=False):
     Note:
         An example config can be found at:
     """
-    if as_frame:
-        return _extract_stats_as_frame(neurons, config)
-    return _extract_stats_as_dict(neurons, config)
+    if isinstance(neurons, FstNeuron):
+        neurons = [neurons]
+    config = config.copy()
+    if 'neuron' in config:
+        del config['neuron']
 
-
-extract_stats.__doc__ = extract_stats.__doc__ + EXAMPLE_CONFIG + '\n'
-
-
-def _extract_stats_as_frame(neurons, config):
-    del config['neuron']
     stats = {nrn.name: extract_stats(nrn, config) for nrn in neurons}
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
@@ -121,8 +118,28 @@ def _extract_stats_as_frame(neurons, config):
                         data=rows)
 
 
-def _extract_stats_as_dict(neurons, config):
-    """Extract stats from neurons."""
+extract_dataframe.__doc__ = extract_dataframe.__doc__ + EXAMPLE_CONFIG + '\n'
+
+
+def extract_stats(neurons, config):
+    """Extract stats from neurons.
+
+    Arguments:
+        neurons: a neuron, population or neurite tree
+        config (dict): configuration dict. The keys are:
+            - neurite_type: a list of neurite types for which features are extracted
+              If not provided, all neurite_type will be used
+            - neurite: a dictionary {neurite_feature: mode} where:
+                - neurite_feature is a string from NEURITEFEATURES
+                - mode is an aggregation operation provided as a string such as:
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+
+    Returns:
+        The extracted statistics
+
+    Note:
+        An example config can be found at:
+    """
 
     def _fill_stats_dict(data, stat_name, stat):
         """Insert the stat data in the dict.
@@ -139,7 +156,8 @@ def _extract_stats_as_dict(neurons, config):
     stats = defaultdict(dict)
 
     for (feature_name, modes), neurite_type in product(config['neurite'].items(),
-                                                       config['neurite_type']):
+                                                       config.get('neurite_type',
+                                                                  _NEURITE_MAP.keys())):
         neurite_type = _NEURITE_MAP[neurite_type]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
@@ -153,6 +171,9 @@ def _extract_stats_as_dict(neurons, config):
             _fill_stats_dict(stats, stat_name, stat)
 
     return dict(stats)
+
+
+extract_stats.__doc__ = extract_stats.__doc__ + EXAMPLE_CONFIG + '\n'
 
 
 def get_header(results):

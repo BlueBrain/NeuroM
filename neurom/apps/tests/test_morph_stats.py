@@ -144,12 +144,61 @@ def test_extract_stats_single_neuron():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
 
 
-def test_extract_stats_single_as_frame():
+def test_extract_dataframe():
+    # Vanilla test
     nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
-    actual = ms.extract_stats(nrns, REF_CONFIG, as_frame=True)
+    actual = ms.extract_dataframe(nrns, REF_CONFIG)
     expected = pd.read_csv(os.path.join(DATA_PATH, 'extracted-stats.csv'), index_col=0)
     assert_frame_equal(actual, expected)
+
+    # Test with a single neuron in the population
+    nrns = nm.load_neurons(os.path.join(SWC_PATH, 'Neuron.swc'))
+    actual = ms.extract_dataframe(nrns, REF_CONFIG)
+    assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
+
+    # Test with a config with the 'neuron' key
+    nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
+                            for name in ['Neuron.swc', 'simple.swc']])
+    config = {'neurite': {'total_length_per_neurite': ['total']},
+              'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE']}
+    actual = ms.extract_dataframe(nrns, config)
+    expected = pd.DataFrame(
+        columns=['name', 'neurite_type', 'total_total_length_per_neurite'],
+        data=[['Neuron', 'axon', 207.879752],
+              ['Neuron', 'apical_dendrite', 214.373046],
+              ['Neuron', 'basal_dendrite', 418.432416],
+              ['simple', 'axon', 15.000000],
+              ['simple',  'apical_dendrite', 0.000000],
+              ['simple', 'basal_dendrite', 16.000000],])
+    assert_frame_equal(actual, expected)
+
+    # Test with a FstNeuron argument
+    nrn = nm.load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    actual = ms.extract_dataframe(nrn, config)
+    assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
+
+    # Test with a List[FstNeuron] argument
+    nrns = [nm.load_neuron(os.path.join(SWC_PATH, name))
+            for name in ['Neuron.swc', 'simple.swc']]
+    actual = ms.extract_dataframe(nrns, config)
+    assert_frame_equal(actual, expected)
+
+    # Test without any neurite_type keys, it should pick the defaults
+    config = {'neurite': {'total_length_per_neurite': ['total']}}
+    actual = ms.extract_dataframe(nrns, config)
+    expected = pd.DataFrame(
+        columns=['name', 'neurite_type', 'total_total_length_per_neurite'],
+        data=[['Neuron', 'axon', 207.879752],
+              ['Neuron', 'basal_dendrite', 418.432416],
+              ['Neuron', 'apical_dendrite', 214.373046],
+              ['Neuron', 'all', 840.685214],
+              ['simple', 'axon', 15.000000],
+              ['simple', 'basal_dendrite', 16.000000],
+              ['simple', 'apical_dendrite', 0.000000],
+              ['simple', 'all', 31.000000]])
+    assert_frame_equal(actual, expected)
+
 
 
 def test_get_header():
