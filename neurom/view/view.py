@@ -285,7 +285,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
 
 def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                  color=None, alpha=_ALPHA):
+                  color=None, alpha=_ALPHA, realistic_diameters=False):
     """Generates a figure of the neuron, that contains a soma and a list of trees.
 
     Args:
@@ -297,6 +297,9 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
+    if realistic_diameters:
+        print("Warning: realistic_diameters option not implemented for 3d plots.")
+
     plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
