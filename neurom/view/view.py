@@ -26,7 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
-from warnings import warn
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
@@ -286,7 +285,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
 
 def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                  color=None, alpha=_ALPHA, realistic_diameters=False):
+                  color=None, alpha=_ALPHA):
     """Generates a figure of the neuron, that contains a soma and a list of trees.
 
     Args:
@@ -298,9 +297,6 @@ def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
-    if realistic_diameters:
-        warn("Option 'realistic_diameters' not implemented for 3d plots.")
-
     plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
 
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):

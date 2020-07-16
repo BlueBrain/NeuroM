@@ -97,6 +97,12 @@ def draw(obj, mode='2d', **kwargs):
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
 
+    if 'realistic_diameters' in kwargs and mode == '3d':
+        if kwargs['realistic_diameters']:
+            raise NotImplementedError('Option realistic_diameter not implemented for 3D plots')
+        else:
+            del kwargs['realistic_diameters']
+
     if mode in ('2d', 'dendrogram'):
         fig, ax = common.get_figure()
     else:
