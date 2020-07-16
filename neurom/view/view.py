@@ -171,7 +171,7 @@ def plot_soma(ax, soma, plane='xy',
             points = [[p[plane0], p[plane1]] for p in soma.iter()]
             if points:
                 points.append(points[0])  # close the loop
-                x, y = np.array(points).T  # pylint: disable=unpacking-non-sequence
+                x, y = tuple(np.array(points).T)
                 ax.plot(x, y, color=color, alpha=alpha, linewidth=linewidth)
 
     ax.set_xlabel(plane[0])

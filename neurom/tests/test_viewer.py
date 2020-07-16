@@ -107,6 +107,8 @@ def test_draw_neuron3d():
     viewer.draw(nrn, mode='3d')
     common.plt.close('all')
 
+    nt.assert_raises(NotImplementedError, viewer.draw, nrn, mode='3d', realistic_diameters=True)
+
 
 def test_draw_tree():
     viewer.draw(nrn.neurites[0])
