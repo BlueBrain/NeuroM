@@ -36,6 +36,7 @@ import tempfile
 import uuid
 from functools import partial, lru_cache
 from io import IOBase, open
+from pathlib import Path
 
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
@@ -140,12 +141,12 @@ def load_neurons(neurons,
     Returns:
         neuron population object
     """
-    if isinstance(neurons, (list, tuple)):
-        files = neurons
-        name = name if name is not None else 'Population'
-    elif isinstance(neurons, str):
+    if isinstance(neurons, (str, Path)):
         files = get_files_by_path(neurons)
         name = name if name is not None else os.path.basename(neurons)
+    else:
+        files = neurons
+        name = name if name is not None else 'Population'
 
     ignored_exceptions = tuple(ignored_exceptions)
     pop = []

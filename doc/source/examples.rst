@@ -102,5 +102,4 @@ on this.  An example of setting up a handler is:
     >>> logger.addHandler(sh)
 
 For more information on logging, it is recommended to read the official Python
-logging HOWTOs: `Python 2 <https://docs.python.org/2/howto/logging.html>`_ and
-`Python 3 <https://docs.python.org/3/howto/logging.html>`_.
+logging HOWTOs: `Python 3 <https://docs.python.org/3/howto/logging.html>`_.

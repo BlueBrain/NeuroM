@@ -30,6 +30,7 @@
 import os
 import sys
 from io import StringIO
+from pathlib import Path
 import warnings
 
 import numpy as np
@@ -92,13 +93,6 @@ def _check_neurites_have_no_parent(nrn):
         nt.assert_true(n.root_node.parent is None)
 
 
-def test_load_neurons():
-    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
-    for i, nrn in enumerate(nrns):
-        nt.assert_equal(nrn.name, _get_name(FILES[i]))
-    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
-
-
 def test_get_morph_files():
     ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5', 'Neuron_slice.h5',
                'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
@@ -109,18 +103,50 @@ def test_get_morph_files():
     nt.assert_equal(ref, files)
 
 
+def test_load_neurons():
+    # List of strings
+    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
+    for i, nrn in enumerate(nrns):
+        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
+
+    # Single string
+    nrns = utils.load_neurons(FILES[0], neuron_loader=_mock_load_neuron)
+    nt.assert_equal(nrns[0].name, _get_name(FILES[0]))
+
+    # Single Path
+    nrns = utils.load_neurons(Path(FILES[0]), neuron_loader=_mock_load_neuron)
+    nt.assert_equal(nrns[0].name, _get_name(FILES[0]))
+
+    # sequence of strings
+    iter_file = (f for f in FILES)
+    nrns = utils.load_neurons(iter_file, neuron_loader=_mock_load_neuron)
+    for i, nrn in enumerate(nrns):
+        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
+
+    # sequence of Path objects
+    nrns = utils.load_neurons(map(Path, FILES), neuron_loader=_mock_load_neuron)
+    for i, nrn in enumerate(nrns):
+        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+    nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
+
+    # string path to a directory
+    nrns = utils.load_neurons(SWC_PATH, neuron_loader=_mock_load_neuron)
+    # is subset so that if new morpho are added to SWC_PATH, the test does not break
+    nt.assert_true({_get_name(f) for f in FILES}.issubset({nrn.name for nrn in nrns}))
+
+    # Path path to a directory
+    nrns = utils.load_neurons(Path(SWC_PATH), neuron_loader=_mock_load_neuron)
+    # is subset so that if new morpho are added to SWC_PATH, the test does not break
+    nt.assert_true({_get_name(f) for f in FILES}.issubset({nrn.name for nrn in nrns}))
+
+
 def test_load_neuron():
     nrn = utils.load_neuron(FILENAMES[0])
     nt.assert_true(isinstance(NRN, Neuron))
     nt.assert_equal(NRN.name, 'Neuron')
     _check_neurites_have_no_parent(nrn)
-
-    # python2 only test, for unicode strings
-    if sys.version_info < (3, 0):
-        nrn = utils.load_neuron(unicode(FILENAMES[0]))
-        nt.assert_true(isinstance(NRN, Neuron))
-        nt.assert_equal(NRN.name, 'Neuron')
-        _check_neurites_have_no_parent(nrn)
 
     neuron_str = u""" 1 1  0  0 0 1. -1
  2 3  0  0 0 1.  1
