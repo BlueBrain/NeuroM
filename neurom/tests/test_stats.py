@@ -31,12 +31,10 @@
 Since the stats module consists of simple wrappers to scipy.stats functions,
 these tests are only sanity checks.
 """
-import sys
 
+import numpy as np
 from neurom import stats as st
 from nose import tools as nt
-import numpy as np
-import random
 
 np.random.seed(42)
 

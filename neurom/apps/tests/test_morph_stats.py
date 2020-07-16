@@ -157,20 +157,13 @@ def test_extract_dataframe():
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
     assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
 
-    # Test with a config with the 'neuron' key
+    # Test with a config without the 'neuron' key
     nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
-    config = {'neurite': {'total_length_per_neurite': ['total']},
-              'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE']}
+    config = {'neurite': {'section_lengths': ['total']},
+              'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
     actual = ms.extract_dataframe(nrns, config)
-    expected = pd.DataFrame(
-        columns=['name', 'neurite_type', 'total_total_length_per_neurite'],
-        data=[['Neuron', 'axon', 207.879752],
-              ['Neuron', 'apical_dendrite', 214.373046],
-              ['Neuron', 'basal_dendrite', 418.432416],
-              ['simple', 'axon', 15.000000],
-              ['simple',  'apical_dendrite', 0.000000],
-              ['simple', 'basal_dendrite', 16.000000],])
+    expected = expected[['name', 'neurite_type', 'total_section_length']]
     assert_frame_equal(actual, expected)
 
     # Test with a FstNeuron argument

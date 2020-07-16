@@ -84,7 +84,7 @@ def _stat_name(feat_name, stat_mode):
 
 
 def extract_dataframe(neurons, config):
-    """Extract stats from neurons.
+    """Extract stats grouped by neurite type from neurons.
 
     Arguments:
         neurons: a neuron, population or neurite tree
@@ -105,6 +105,9 @@ def extract_dataframe(neurons, config):
     if isinstance(neurons, FstNeuron):
         neurons = [neurons]
     config = config.copy()
+
+    # Only NEURITEFEATURES are considered since the dataframe is built by neurite_type
+    # NEURONFEATURES are discarded
     if 'neuron' in config:
         del config['neuron']
 
@@ -116,9 +119,6 @@ def extract_dataframe(neurons, config):
             for neurite_type, features in data.items()]
     return pd.DataFrame(columns=['name', 'neurite_type'] + columns,
                         data=rows)
-
-
-extract_dataframe.__doc__ = extract_dataframe.__doc__ + EXAMPLE_CONFIG + '\n'
 
 
 def extract_stats(neurons, config):
@@ -171,9 +171,6 @@ def extract_stats(neurons, config):
             _fill_stats_dict(stats, stat_name, stat)
 
     return dict(stats)
-
-
-extract_stats.__doc__ = extract_stats.__doc__ + EXAMPLE_CONFIG + '\n'
 
 
 def get_header(results):
@@ -234,3 +231,7 @@ def sanitize_config(config):
         config['neuron'] = {}
 
     return config
+
+
+extract_stats.__doc__ += EXAMPLE_CONFIG + '\n'
+extract_dataframe.__doc__ += EXAMPLE_CONFIG + '\n'
