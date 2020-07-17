@@ -28,6 +28,7 @@
 
 """Utility functions and for loading neurons."""
 
+from contextlib import contextmanager
 import glob
 import logging
 import os
@@ -37,6 +38,8 @@ import uuid
 from functools import partial, lru_cache
 from io import IOBase, open
 from pathlib import Path
+
+import morphio
 
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
@@ -114,16 +117,14 @@ def get_files_by_path(path):
 def load_neuron(handle, reader=None):
     """Build section trees from an h5 or swc file."""
     if isinstance(handle, (morphio.Morphology, morphio.mut.Morphology)):
-        fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.h5', prefix='neurom-')
-        os.close(fd)
-
-        # TODO: make a better morphio loader that does not require a tempfile
-        if isinstance(handle, morphio.Morphology):
-            handle = handle.as_mutable()
-        handle.write(temp_file)
-        handle, reader = temp_file, None
-
-    rdw = load_data(handle, reader)
+        with tempfile.NamedTemporaryFile(mode='w+b', suffix='.h5') as f:
+            # TODO: make a better morphio loader that does not require a tempfile
+            if isinstance(handle, morphio.Morphology):
+                handle = handle.as_mutable()
+            handle.write(f.name)
+            rdw = load_data(f.name, None)
+    else:
+        rdw = load_data(handle, reader)
     if isinstance(handle, str):
         name = os.path.splitext(os.path.basename(handle))[0]
     else:
@@ -173,21 +174,22 @@ def load_neurons(neurons,
     return population_class(pop, name=name)
 
 
+@contextmanager
 def _get_file(handle):
-    """Returns the filename of the file to read.
+    """Yields the filename of the file to read.
 
     If handle is a stream, a temp file is written on disk first
-    and its filename is returned
+    and its filename is yield. The file is deleted before exiting the context.
     """
     if not isinstance(handle, IOBase):
-        return handle
-
-    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()), prefix='neurom-')
-    os.close(fd)
-    with open(temp_file, 'w') as fd:
-        handle.seek(0)
-        shutil.copyfileobj(handle, fd)
-    return temp_file
+        yield handle
+    else:
+        fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()), prefix='neurom-')
+        os.close(fd)
+        with open(temp_file, 'w') as fd:
+            handle.seek(0)
+            shutil.copyfileobj(handle, fd)
+        yield temp_file
 
 
 def load_data(handle, reader=None):
@@ -198,12 +200,12 @@ def load_data(handle, reader=None):
     if reader not in _READERS:
         raise NeuroMError('Do not have a loader for "%s" extension' % reader)
 
-    filename = _get_file(handle)
-    try:
-        return _READERS[reader](filename)
-    except Exception as e:
-        L.exception('Error reading file %s, using "%s" loader', filename, reader)
-        raise RawDataError('Error reading file %s:\n%s' % (filename, str(e)))
+    with _get_file(handle) as filename:
+        try:
+            return _READERS[reader](filename)
+        except Exception as e:
+            L.exception('Error reading file %s, using "%s" loader', filename, reader)
+            raise RawDataError('Error reading file %s:\n%s' % (filename, str(e)))
 
 
 def _load_h5(filename):

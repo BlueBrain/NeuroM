@@ -26,12 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-""" Distribution configuration for neurom
-"""
-# pylint: disable=R0801
-from setuptools import setup
-from setuptools import find_packages
-
+"""Distribution configuration for neurom."""
+from setuptools import find_packages, setup
 
 setup(
     description='NeuroM: a light-weight neuron morphology analysis package',
