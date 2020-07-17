@@ -32,10 +32,9 @@ Since the stats module consists of simple wrappers to scipy.stats functions,
 these tests are only sanity checks.
 """
 
+import numpy as np
 from neurom import stats as st
 from nose import tools as nt
-import numpy as np
-import random
 
 np.random.seed(42)
 
@@ -69,7 +68,6 @@ def test_fit_normal_regression():
     nt.assert_almost_equal(fit_.params[1], 0.978726207747, 12)
     nt.assert_almost_equal(fit_.errs[0], 0.021479979161, 12)
     nt.assert_almost_equal(fit_.errs[1], 0.7369569123250506, 12)
-
 
 def test_fit_default_is_normal():
     fit0_ = st.fit(NORMAL)

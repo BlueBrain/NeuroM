@@ -30,13 +30,22 @@
 import logging
 from collections import defaultdict
 from itertools import product
-import numpy as np
-import neurom as nm
-from neurom.features import NEURONFEATURES, NEURITEFEATURES
+import os
+import pkg_resources
 
+
+import numpy as np
+import pandas as pd
+
+import neurom as nm
+from neurom.fst._core import FstNeuron
+from neurom.features import NEURONFEATURES, NEURITEFEATURES
 from neurom.exceptions import ConfigError
 
 L = logging.getLogger(__name__)
+
+EXAMPLE_CONFIG = os.path.join(pkg_resources.resource_filename(
+    'neurom', 'config'), 'morph_stats.yaml')
 
 
 def eval_stats(values, mode):
@@ -44,7 +53,8 @@ def eval_stats(values, mode):
 
     Arguments:
         values: A numpy array of values
-        mode: A summary stat to extract. One of ['min', 'max', 'median', 'mean', 'std', 'raw']
+        mode: A summary stat to extract. One of:
+            ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
 
     Note: fails silently if values is empty, and None is returned
     """
@@ -73,12 +83,73 @@ def _stat_name(feat_name, stat_mode):
     return '%s_%s' % (stat_mode, feat_name)
 
 
-def extract_stats(neurons, config):
-    """Extract stats from neurons."""
-    stats = defaultdict(dict)
+def extract_dataframe(neurons, config):
+    """Extract stats grouped by neurite type from neurons.
 
-    def _fill_compoundified(data, stat_name, stat):
-        """Insert the stat in the dict and eventually split it into XYZ components."""
+    Arguments:
+        neurons: a neuron, population or neurite tree
+        config (dict): configuration dict. The keys are:
+            - neurite_type: a list of neurite types for which features are extracted
+              If not provided, all neurite_type will be used
+            - neurite: a dictionary {{neurite_feature: mode}} where:
+                - neurite_feature is a string from NEURITEFEATURES
+                - mode is an aggregation operation provided as a string such as:
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+
+    Returns:
+        The extracted statistics
+
+    Note:
+        An example config can be found at:
+
+    {config_path}
+    """
+    if isinstance(neurons, FstNeuron):
+        neurons = [neurons]
+    config = config.copy()
+
+    # Only NEURITEFEATURES are considered since the dataframe is built by neurite_type
+    # NEURONFEATURES are discarded
+    if 'neuron' in config:
+        del config['neuron']
+
+    stats = {nrn.name: extract_stats(nrn, config) for nrn in neurons}
+    columns = list(next(iter(next(iter(stats.values())).values())).keys())
+
+    rows = [[name, neurite_type] + list(features.values())
+            for name, data in stats.items()
+            for neurite_type, features in data.items()]
+    return pd.DataFrame(columns=['name', 'neurite_type'] + columns,
+                        data=rows)
+
+
+def extract_stats(neurons, config):
+    """Extract stats from neurons.
+
+    Arguments:
+        neurons: a neuron, population or neurite tree
+        config (dict): configuration dict. The keys are:
+            - neurite_type: a list of neurite types for which features are extracted
+              If not provided, all neurite_type will be used
+            - neurite: a dictionary {{neurite_feature: mode}} where:
+                - neurite_feature is a string from NEURITEFEATURES
+                - mode is an aggregation operation provided as a string such as:
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+
+    Returns:
+        The extracted statistics
+
+    Note:
+        An example config can be found at:
+
+    {config_path}
+    """
+
+    def _fill_stats_dict(data, stat_name, stat):
+        """Insert the stat data in the dict.
+
+        And if the stats is a 3D array, splits it into XYZ components.
+        """
         if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
             data[stat_name] = stat
         else:
@@ -86,21 +157,24 @@ def extract_stats(neurons, config):
                 compound_stat_name = stat_name + '_' + suffix
                 data[compound_stat_name] = stat[i]
 
+    stats = defaultdict(dict)
+
     for (feature_name, modes), neurite_type in product(config['neurite'].items(),
-                                                       config['neurite_type']):
+                                                       config.get('neurite_type',
+                                                                  _NEURITE_MAP.keys())):
         neurite_type = _NEURITE_MAP[neurite_type]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(nm.get(feature_name, neurons, neurite_type=neurite_type), mode)
-            _fill_compoundified(stats[neurite_type.name], stat_name, stat)
+            _fill_stats_dict(stats[neurite_type.name], stat_name, stat)
 
-    for feature_name, modes in config['neuron'].items():
+    for feature_name, modes in config.get('neuron', {}).items():
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(nm.get(feature_name, neurons), mode)
-            _fill_compoundified(stats, stat_name, stat)
+            _fill_stats_dict(stats, stat_name, stat)
 
-    return stats
+    return dict(stats)
 
 
 def get_header(results):
@@ -161,3 +235,7 @@ def sanitize_config(config):
         config['neuron'] = {}
 
     return config
+
+
+extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
+extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
