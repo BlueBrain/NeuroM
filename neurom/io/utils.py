@@ -190,6 +190,7 @@ def _get_file(handle):
             handle.seek(0)
             shutil.copyfileobj(handle, fd)
         yield temp_file
+        os.remove(temp_file)
 
 
 def load_data(handle, reader=None):
