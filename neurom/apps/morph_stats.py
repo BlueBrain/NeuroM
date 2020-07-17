@@ -91,7 +91,7 @@ def extract_dataframe(neurons, config):
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
-            - neurite: a dictionary {neurite_feature: mode} where:
+            - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
@@ -101,6 +101,8 @@ def extract_dataframe(neurons, config):
 
     Note:
         An example config can be found at:
+
+    {config_path}
     """
     if isinstance(neurons, FstNeuron):
         neurons = [neurons]
@@ -129,7 +131,7 @@ def extract_stats(neurons, config):
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
-            - neurite: a dictionary {neurite_feature: mode} where:
+            - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
@@ -139,6 +141,8 @@ def extract_stats(neurons, config):
 
     Note:
         An example config can be found at:
+
+    {config_path}
     """
 
     def _fill_stats_dict(data, stat_name, stat):
@@ -233,5 +237,5 @@ def sanitize_config(config):
     return config
 
 
-extract_stats.__doc__ += EXAMPLE_CONFIG + '\n'
-extract_dataframe.__doc__ += EXAMPLE_CONFIG + '\n'
+extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
+extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
