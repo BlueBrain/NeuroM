@@ -26,31 +26,28 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
 from copy import deepcopy
 from pathlib import Path
 
+import neurom as nm
 import numpy as np
+from neurom.core import graft_neuron, iter_segments
 from nose import tools as nt
 
-import neurom as nm
-from neurom.core import graft_neuron, iter_segments
-
-_path = os.path.dirname(os.path.abspath(__file__))
-SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
+SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 
 
 def test_load_neuron_pathlib():
     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
 def test_deep_copy():
-    nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
     nrn2 = deepcopy(nrn1)
     check_cloned_neuron(nrn1, nrn2)
 
 
 def test_graft_neuron():
-    nrn1 = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
     basal_dendrite = nrn1.neurites[0]
     nrn2 = graft_neuron(basal_dendrite.root_node)
     nt.assert_equal(len(nrn2.neurites), 1)
@@ -91,6 +88,6 @@ def check_cloned_neuron(nrn1, nrn2):
 
 
 def test_str():
-    n = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+    n = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
     nt.ok_('Neuron' in str(n))
     nt.ok_('Section' in str(n.neurites[0].root_node))

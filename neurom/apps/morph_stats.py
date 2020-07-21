@@ -30,21 +30,20 @@
 import logging
 from collections import defaultdict
 from itertools import product
-import os
-import pkg_resources
-
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pkg_resources
 
 import neurom as nm
-from neurom.fst._core import FstNeuron
-from neurom.features import NEURONFEATURES, NEURITEFEATURES
 from neurom.exceptions import ConfigError
+from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from neurom.fst._core import FstNeuron
 
 L = logging.getLogger(__name__)
 
-EXAMPLE_CONFIG = os.path.join(pkg_resources.resource_filename(
+EXAMPLE_CONFIG = Path(pkg_resources.resource_filename(
     'neurom', 'config'), 'morph_stats.yaml')
 
 

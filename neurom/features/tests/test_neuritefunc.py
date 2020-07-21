@@ -28,7 +28,7 @@
 
 """Test neurom._neuritefunc functionality."""
 
-import os
+from pathlib import Path
 from math import pi, sqrt
 
 import numpy as np
@@ -46,11 +46,11 @@ from neurom.features import sectionfunc as sectionfunc
 from neurom.geom import convex_hull
 from neurom.features.tests.utils import _close
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
-SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-NRN = nm.load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+H5_PATH = DATA_PATH / 'h5/v1'
+SWC_PATH = DATA_PATH / 'swc'
+SIMPLE = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
+NRN = nm.load_neuron(Path(H5_PATH, 'Neuron.h5'))
 
 
 def test_principal_direction_extents():
@@ -59,7 +59,7 @@ def test_principal_direction_extents():
                     (14.736052694538641, 12.105102672688004))
 
     # test with a realistic neuron
-    nrn = nm.load_neuron(os.path.join(H5_PATH, 'bio_neuron-000.h5'))
+    nrn = nm.load_neuron(Path(H5_PATH, 'bio_neuron-000.h5'))
 
     p_ref = [1672.9694359427331, 142.43704397865031, 226.45895382204986,
              415.50612748523838, 429.83008974193206, 165.95410536922873,

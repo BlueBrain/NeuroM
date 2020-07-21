@@ -26,19 +26,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
-
-from nose import tools as nt
+from pathlib import Path
 
 from neurom.apps import get_config
 from neurom.exceptions import ConfigError
+from nose import tools as nt
 
 
 def test_get_config():
     # get the default
 
-    test_yaml = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             '../../config/morph_stats.yaml'))
+    test_yaml = Path(__file__).parent.parent.parent / 'config/morph_stats.yaml'
 
     expected = {'neurite': {'section_lengths': ['max', 'total'], 'section_volumes': ['total'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'neuron': {'soma_radii': ['mean']}}
 

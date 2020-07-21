@@ -32,11 +32,10 @@
 import argparse
 import json
 import logging
-import os
 import sys
+from pathlib import Path
 
 import pkg_resources
-
 from neurom.apps import get_config
 from neurom.check.runner import CheckRunner
 from neurom.exceptions import ConfigError
@@ -164,7 +163,7 @@ def main(args):
     _setup_logging(args.debug, args.log_file)
 
     try:
-        config = get_config(args.config, os.path.join(CONFIG_PATH, 'morph_check.yaml'))
+        config = get_config(args.config, Path(CONFIG_PATH, 'morph_check.yaml'))
         checker = CheckRunner(config)
     except ConfigError as e:
         L.error(str(e))

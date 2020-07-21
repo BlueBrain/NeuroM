@@ -94,8 +94,8 @@ def get_morph_files(directory):
     Returns:
         list with all files with extensions '.swc' , 'h5' or '.asc' (case insensitive)
     """
-    lsdir = (os.path.join(directory, m) for m in os.listdir(directory))
-    return list(filter(_is_morphology_file, lsdir))
+    directory = Path(directory)
+    return [Path(directory, m) for m in directory.iterdir() if _is_morphology_file(m)]
 
 
 def get_files_by_path(path):
@@ -103,9 +103,10 @@ def get_files_by_path(path):
 
     Return list of files with path
     """
-    if os.path.isfile(path):
+    path = Path(path)
+    if path.is_file():
         return [path]
-    if os.path.isdir(path):
+    if path.is_dir():
         return get_morph_files(path)
 
     raise IOError('Invalid data path %s' % path)
@@ -113,11 +114,11 @@ def get_files_by_path(path):
 
 def load_neuron(handle, reader=None):
     """Build section trees from an h5 or swc file."""
-    rdw = load_data(handle, reader)
     if isinstance(handle, str):
-        name = os.path.splitext(os.path.basename(handle))[0]
-    else:
-        name = None
+        handle = Path(handle)
+
+    rdw = load_data(handle, reader)
+    name = handle.stem if isinstance(handle, Path) else None
     return FstNeuron(rdw, name)
 
 
@@ -141,12 +142,15 @@ def load_neurons(neurons,
     Returns:
         neuron population object
     """
-    if isinstance(neurons, (str, Path)):
+    if isinstance(neurons, str):
+        neurons = Path(neurons)
+
+    if isinstance(neurons, Path):
         files = get_files_by_path(neurons)
-        name = name if name is not None else os.path.basename(neurons)
+        name = name or neurons.name
     else:
         files = neurons
-        name = name if name is not None else 'Population'
+        name = name or 'Population'
 
     ignored_exceptions = tuple(ignored_exceptions)
     pop = []

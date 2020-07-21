@@ -29,8 +29,8 @@
 neurom._point_neurite.features"""
 
 import json
-import os
 import warnings
+from pathlib import Path
 from itertools import chain
 
 from nose import tools as nt
@@ -49,18 +49,17 @@ from neurom.features import neuronfunc as _nrn
 from neurom.features import sectionfunc as _sec
 from neurom.features.tests.utils import _close, _equal
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
-H5V1_DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v1')
-H5V2_DATA_PATH = os.path.join(_PWD, '../../../test_data/h5/v2')
+DATA_PATH =  Path(__file__).parent.parent.parent.parent / 'test_data'
+SWC_DATA_PATH = DATA_PATH / 'swc'
+H5V1_DATA_PATH = DATA_PATH / 'h5/v1'
+H5V2_DATA_PATH = DATA_PATH / 'h5/v2'
 MORPH_FILENAME = 'Neuron.h5'
 SWC_MORPH_FILENAME = 'Neuron.swc'
 
 REF_NEURITE_TYPES = [NeuriteType.apical_dendrite, NeuriteType.basal_dendrite,
                      NeuriteType.basal_dendrite, NeuriteType.axon]
 
-json_data = json.load(open(
-    os.path.join(_PWD, '../../../test_data/dataset/point_neuron_feature_values.json')))
+json_data = json.load(open(Path(DATA_PATH, 'dataset/point_neuron_feature_values.json')))
 
 
 def get(feat, neurite_format, **kwargs):
@@ -195,7 +194,7 @@ class TestH5V1(SectionTreeBase):
 
     def setUp(self):
         super(TestH5V1, self).setUp()
-        self.sec_nrn = nm.load_neuron(os.path.join(H5V1_DATA_PATH, MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(Path(H5V1_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
     # Overriding soma values as the same soma points in SWC and ASC have different
@@ -216,7 +215,7 @@ class TestH5V2(SectionTreeBase):
 
     def setUp(self):
         super(TestH5V2, self).setUp()
-        self.sec_nrn = nm.load_neuron(os.path.join(H5V2_DATA_PATH, MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(Path(H5V2_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
     # Overriding soma values as the same soma points in SWC and ASC have different
@@ -237,7 +236,7 @@ class TestSWC(SectionTreeBase):
 
     def setUp(self):
         self.ref_nrn = 'swc'
-        self.sec_nrn = nm.load_neuron(os.path.join(SWC_DATA_PATH, SWC_MORPH_FILENAME))
+        self.sec_nrn = nm.load_neuron(Path(SWC_DATA_PATH, SWC_MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
         self.ref_types = [NeuriteType.axon,
                           NeuriteType.basal_dendrite,

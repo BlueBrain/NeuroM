@@ -28,32 +28,35 @@
 
 """Test neurom.features_get features."""
 
-import os
 import math
-import numpy as np
 from io import StringIO
-from numpy.testing import assert_allclose
-from nose import tools as nt
+from pathlib import Path
+
 import neurom as nm
-from neurom.core.types import NeuriteType
+import numpy as np
+from neurom import (core, features, iter_neurites, iter_sections, load_neuron,
+                    load_neurons)
 from neurom.core.population import Population
-from neurom import (core, load_neurons, iter_neurites, iter_sections,
-                    load_neuron, features)
-from neurom.features import get as get_feature
-from neurom.features import NEURITEFEATURES
-from neurom.features import neuritefunc as nf
+from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
+from neurom.features import NEURITEFEATURES
+from neurom.features import get as get_feature
+from neurom.features import neuritefunc as nf
+from nose import tools as nt
+from numpy.testing import assert_allclose
 
-
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data')
-NRN_FILES = [os.path.join(DATA_PATH, 'h5/v1', f)
+DATA_PATH = Path(__file__).parent / '../../../test_data'
+NRN_FILES = [Path(DATA_PATH, 'h5/v1', f)
              for f in ('Neuron.h5', 'Neuron_2_branch.h5', 'bio_neuron-001.h5')]
 
 NRNS = load_neurons(NRN_FILES)
 NRN = NRNS[0]
 POP = Population(NRNS)
+
+SWC_PATH = Path(DATA_PATH, 'swc')
+NEURON_PATH = Path(SWC_PATH, 'Neuron.swc')
+NEURON = load_neuron(NEURON_PATH)
 
 NEURITES = (NeuriteType.axon,
             NeuriteType.apical_dendrite,
@@ -232,30 +235,31 @@ def test_total_length_pop():
                 }
     assert_features_for_neurite(feat, POP, expected, exact=False)
 
+
 def test_segment_radii_pop():
 
     feat = 'segment_radii'
 
     assert_allclose(_stats(get_feature(feat, POP)),
-                       (0.079999998211860657,
+                    (0.079999998211860657,
                         1.2150000333786011,
                         1301.9191725363567,
                         0.20222416473071708))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
-                       (0.079999998211860657,
+                    (0.079999998211860657,
                         1.2150000333786011,
                         1301.9191725363567,
                         0.20222416473071708))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.13142434507608414,
+                    (0.13142434507608414,
                         1.0343990325927734,
                         123.41135908663273,
                         0.58767313850777492))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.079999998211860657,
+                    (0.079999998211860657,
                         1.2150000333786011,
                         547.43900821779164,
                         0.42078324997524336))
@@ -266,25 +270,25 @@ def test_segment_radii_nrn():
     feat = 'segment_radii'
 
     assert_allclose(_stats(get_feature(feat, NRN)),
-                       (0.12087134271860123,
+                    (0.12087134271860123,
                         1.0343990325927734,
                         507.01994501426816,
                         0.60359517263603357))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.all)),
-                       (0.12087134271860123,
+                    (0.12087134271860123,
                         1.0343990325927734,
                         507.01994501426816,
                         0.60359517263603357))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.13142434507608414,
+                    (0.13142434507608414,
                         1.0343990325927734,
                         123.41135908663273,
                         0.58767313850777492))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.14712842553853989,
+                    (0.14712842553853989,
                         1.0215770602226257,
                         256.71241207793355,
                         0.61122002875698467))
@@ -295,16 +299,16 @@ def test_segment_meander_angles_pop():
     feat = 'segment_meander_angles'
 
     assert_allclose(_stats(get_feature(feat, POP)),
-                       (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
+                    (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
-                       (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
+                    (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884))
+                    (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.0, 3.1415926535897931, 2926.2411975307768, 2.4084289691611334))
+                    (0.0, 3.1415926535897931, 2926.2411975307768, 2.4084289691611334))
 
 
 def test_segment_meander_angles_nrn():
@@ -312,16 +316,16 @@ def test_segment_meander_angles_nrn():
     feat = 'segment_meander_angles'
 
     assert_allclose(_stats(get_feature(feat, NRN)),
-                       (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562))
+                    (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.all)),
-                       (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562))
+                    (0.326101999292573, 3.129961675751181, 1842.351779156608, 2.4369732528526562))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884))
+                    (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.47318725279312024, 3.129961675751181, 926.33847274926438, 2.4506308802890593))
+                    (0.47318725279312024, 3.129961675751181, 926.33847274926438, 2.4506308802890593))
 
 
 def test_neurite_volumes_nrn():
@@ -329,43 +333,39 @@ def test_neurite_volumes_nrn():
     feat = 'neurite_volumes'
 
     assert_allclose(_stats(get_feature(feat, NRN)),
-                       (271.94122143951864, 281.24754646913954, 1104.9077698137021, 276.22694245342552))
+                    (271.94122143951864, 281.24754646913954, 1104.9077698137021, 276.22694245342552))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.all)),
-                       (271.94122143951864, 281.24754646913954, 1104.9077698137021, 276.22694245342552))
+                    (271.94122143951864, 281.24754646913954, 1104.9077698137021, 276.22694245342552))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.axon)),
-                       (276.73860261723024, 276.73860261723024, 276.73860261723024, 276.73860261723024))
-
+                    (276.73860261723024, 276.73860261723024, 276.73860261723024, 276.73860261723024))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                       (274.98039928781355, 281.24754646913954, 556.22794575695309, 278.11397287847655))
-
+                    (274.98039928781355, 281.24754646913954, 556.22794575695309, 278.11397287847655))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                       (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864))
+                    (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864))
 
 
 def test_neurite_volumes_pop():
 
     feat = 'neurite_volumes'
 
-
     assert_allclose(_stats(get_feature(feat, POP)),
-                       (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
+                    (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
-                       (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
+                    (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.axon)),
-                       (276.58135508666612, 277.5357232437392, 830.85568094763551, 276.95189364921185))
-
+                    (276.58135508666612, 277.5357232437392, 830.85568094763551, 276.95189364921185))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (28.356406629821159, 281.24754646913954, 1146.6644894516851, 191.1107482419475))
+                    (28.356406629821159, 281.24754646913954, 1146.6644894516851, 191.1107482419475))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864))
+                    (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864))
 
 
 def test_neurite_density_nrn():
@@ -373,19 +373,19 @@ def test_neurite_density_nrn():
     feat = 'neurite_volume_density'
 
     assert_allclose(_stats(get_feature(feat, NRN)),
-                       (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704))
+                    (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.all)),
-                       (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704))
+                    (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.axon)),
-                       (0.26289304906104355, 0.26289304906104355, 0.26289304906104355, 0.26289304906104355))
+                    (0.26289304906104355, 0.26289304906104355, 0.26289304906104355, 0.26289304906104355))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469))
+                    (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469))
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519))
+                    (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519))
 
 
 def test_neurite_density_pop():
@@ -393,19 +393,19 @@ def test_neurite_density_pop():
     feat = 'neurite_volume_density'
 
     assert_allclose(_stats(get_feature(feat, POP)),
-                       (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539))
+                    (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
-                       (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539))
+                    (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.axon)),
-                       (6.1847539631150784e-06, 0.26465213325053372, 0.5275513670655404, 0.17585045568851346))
+                    (6.1847539631150784e-06, 0.26465213325053372, 0.5275513670655404, 0.17585045568851346))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                       (0.00034968816544949771, 0.52464681266899216, 1.0116620531455183, 0.16861034219091972))
+                    (0.00034968816544949771, 0.52464681266899216, 1.0116620531455183, 0.16861034219091972))
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                       (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519))
+                    (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519))
 
 
 def test_segment_meander_angles_single_section():
@@ -436,7 +436,7 @@ def test_neurite_features_accept_single_tree():
     for f in features:
         ret = get_feature(f, NRN.neurites[0])
         nt.ok_(ret.dtype.kind in ('i', 'f'))
-        nt.ok_(len(ret) or len(ret) == 0) #  make sure that len() resolves
+        nt.ok_(len(ret) or len(ret) == 0)  # make sure that len() resolves
 
 
 def test_register_neurite_feature_nrns():
@@ -505,14 +505,6 @@ def test_register_neurite_feature_pop():
 @nt.raises(NeuroMError)
 def test_register_existing_feature_raises():
     features.register_neurite_feature('total_length', lambda n: None)
-
-
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data')
-
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-NEURON_PATH = os.path.join(SWC_PATH, 'Neuron.swc')
-NEURON = load_neuron(NEURON_PATH)
 
 
 def test_section_lengths():
@@ -628,7 +620,8 @@ def test_remote_bifurcation_angles():
     remote_bifangles = get_feature('remote_bifurcation_angles', NEURON)
     nt.eq_(len(remote_bifangles), 40)
     assert_allclose(remote_bifangles, ref_remote_bifangles)
-    remote_bifangles = get_feature('remote_bifurcation_angles', NEURON, neurite_type=NeuriteType.all)
+    remote_bifangles = get_feature('remote_bifurcation_angles',
+                                   NEURON, neurite_type=NeuriteType.all)
     nt.eq_(len(remote_bifangles), 40)
     assert_allclose(remote_bifangles, ref_remote_bifangles)
 
@@ -661,7 +654,7 @@ def test_segment_radial_distances_origin():
     nt.ok_(np.all(rad_dists_origin == ref_segs_origin))
     nt.ok_(np.all(rad_dists_origin != ref_segs))
 
-    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+    nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
     rad_dist_nrns = []
@@ -681,7 +674,7 @@ def test_section_radial_distances_endpoint():
     nt.eq_(len(rad_dists), 84)
     nt.ok_(np.all(rad_dists == ref_sec_rad_dist))
 
-    nrns = [nm.load_neuron(os.path.join(SWC_PATH, f)) for
+    nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
     rad_dist_nrns = [nm.get('section_radial_distances', nrn) for nrn in nrns]
@@ -712,11 +705,13 @@ def test_number_of_sections_axon():
 
 
 def test_number_of_sections_basal():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 42)
+    nt.eq_(get_feature('number_of_sections', NEURON,
+                       neurite_type=NeuriteType.basal_dendrite)[0], 42)
 
 
 def test_n_sections_apical():
-    nt.eq_(get_feature('number_of_sections', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 21)
+    nt.eq_(get_feature('number_of_sections', NEURON,
+                       neurite_type=NeuriteType.apical_dendrite)[0], 21)
 
 
 def test_section_number_invalid():
@@ -737,13 +732,15 @@ def test_per_neurite_number_of_sections_axon():
 
 
 def test_n_sections_per_neurite_basal():
-    nsecs = get_feature('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite)
+    nsecs = get_feature('number_of_sections_per_neurite', NEURON,
+                        neurite_type=NeuriteType.basal_dendrite)
     nt.eq_(len(nsecs), 2)
     nt.ok_(np.all(nsecs == [21, 21]))
 
 
 def test_n_sections_per_neurite_apical():
-    nsecs = get_feature('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite)
+    nsecs = get_feature('number_of_sections_per_neurite', NEURON,
+                        neurite_type=NeuriteType.apical_dendrite)
     nt.eq_(len(nsecs), 1)
     nt.ok_(np.all(nsecs == [21]))
 
@@ -753,7 +750,8 @@ def test_neurite_number():
     nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.all)[0], 4)
     nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.axon)[0], 1)
     nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.basal_dendrite)[0], 2)
-    nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.apical_dendrite)[0], 1)
+    nt.eq_(get_feature('number_of_neurites', NEURON,
+                       neurite_type=NeuriteType.apical_dendrite)[0], 1)
     nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.soma)[0], 0)
     nt.eq_(get_feature('number_of_neurites', NEURON, neurite_type=NeuriteType.undefined)[0], 0)
 
@@ -824,6 +822,7 @@ def test_section_path_distances_endpoint():
     nt.eq_(len(path_lengths), 84)
     nt.ok_(np.all(path_lengths == ref_sec_path_len))
 
+
 @nt.nottest  # test_get_segment_lengths is disabled in test_get_features
 def test_section_path_distances_start_point():
 
@@ -832,19 +831,22 @@ def test_section_path_distances_start_point():
     nt.eq_(len(path_lengths), 84)
     nt.ok_(np.all(path_lengths == ref_sec_path_len_start))
 
+
 def test_partition():
-    nt.ok_(np.all(get_feature('partition', NRNS)[:10] == np.array([ 19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.])))
+    nt.ok_(np.all(get_feature('partition', NRNS)[:10] == np.array(
+        [19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.])))
+
 
 def test_partition_asymmetry():
     assert_allclose(get_feature('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,
-                                                                            0.85714286, 0.83333333,
+                                                                             0.85714286, 0.83333333,
 
-                                                                            0.8, 0.75,  0.66666667,
-                                                                            0.5,  0.]))
+                                                                             0.8, 0.75,  0.66666667,
+                                                                             0.5,  0.]))
 
 
 def test_section_strahler_orders():
-    path = os.path.join(SWC_PATH, 'strahler.swc')
+    path = Path(SWC_PATH, 'strahler.swc')
     n = nm.load_neuron(path)
     assert_allclose(get_feature('section_strahler_orders', n),
                     [4, 1, 4, 3, 2, 1, 1, 2, 1, 1, 3, 1, 3, 2, 1, 1, 2, 1, 1])

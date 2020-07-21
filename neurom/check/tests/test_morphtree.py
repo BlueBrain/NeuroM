@@ -26,19 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from copy import deepcopy
 from io import StringIO
+from pathlib import Path
+
+import numpy as np
 from neurom import load_neuron
 from neurom.check import morphtree as mt
 from neurom.core import Neurite, NeuriteType, Section
 from neurom.core.dataformat import COLS
 from nose import tools as nt
-import numpy as np
-import os
-from copy import deepcopy
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+SWC_PATH = DATA_PATH / 'swc'
 
 
 def _make_flat(neuron):
@@ -158,7 +158,7 @@ def test_is_monotonic():
 
 def test_is_flat():
 
-    neu_tree = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc')).neurites[0]
+    neu_tree = load_neuron(Path(SWC_PATH, 'Neuron.swc')).neurites[0]
 
     nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
     nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
@@ -191,7 +191,7 @@ def test_is_back_tracking():
 
 def test_get_flat_neurites():
 
-    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
 
     nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
     nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 0)
@@ -204,7 +204,7 @@ def test_get_flat_neurites():
 
 def test_get_nonmonotonic_neurites():
 
-    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
 
     nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 4)
 
@@ -215,5 +215,5 @@ def test_get_nonmonotonic_neurites():
 
 def test_get_back_tracking_neurites():
 
-    n = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     nt.assert_equal(len(mt.get_back_tracking_neurites(n)), 4)

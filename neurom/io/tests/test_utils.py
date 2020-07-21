@@ -42,14 +42,13 @@ from neurom.exceptions import NeuroMError, RawDataError, SomaError
 from neurom.fst import _neuritefunc as _nf
 from neurom.io import utils
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-VALID_DATA_PATH = os.path.join(_path, DATA_PATH, 'valid_set')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+SWC_PATH = DATA_PATH / 'swc'
+VALID_DATA_PATH = DATA_PATH / 'valid_set'
 
 NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
 
-FILES = [os.path.join(SWC_PATH, f)
+FILES = [Path(SWC_PATH, f)
          for f in ['Neuron.swc',
                    'Single_apical_no_soma.swc',
                    'Single_apical.swc',
@@ -60,21 +59,17 @@ FILES = [os.path.join(SWC_PATH, f)
                    'sequential_trunk_off_42_16pt.swc',
                    'Neuron_no_missing_ids_no_zero_segs.swc']]
 
-FILENAMES = [os.path.join(VALID_DATA_PATH, f)
+FILENAMES = [Path(VALID_DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
-NO_SOMA_FILE = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+NO_SOMA_FILE = Path(SWC_PATH, 'Single_apical_no_soma.swc')
 
-DISCONNECTED_POINTS_FILE = os.path.join(SWC_PATH, 'Neuron_disconnected_components.swc')
+DISCONNECTED_POINTS_FILE = Path(SWC_PATH, 'Neuron_disconnected_components.swc')
 
-MISSING_PARENTS_FILE = os.path.join(SWC_PATH, 'Neuron_missing_parents.swc')
+MISSING_PARENTS_FILE = Path(SWC_PATH, 'Neuron_missing_parents.swc')
 
-INVALID_ID_SEQUENCE_FILE = os.path.join(SWC_PATH,
+INVALID_ID_SEQUENCE_FILE = Path(SWC_PATH,
                                         'non_increasing_trunk_off_1_16pt.swc')
-
-
-def _get_name(filename):
-    return os.path.splitext(os.path.basename(filename))[0]
 
 
 def _mock_load_neuron(filename):
@@ -84,7 +79,7 @@ def _mock_load_neuron(filename):
             self.neurites = list()
             self.name = name
 
-    return MockNeuron(_get_name(filename))
+    return MockNeuron(Path(filename).stem)
 
 
 def _check_neurites_have_no_parent(nrn):
@@ -97,46 +92,43 @@ def test_get_morph_files():
     ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5', 'Neuron_slice.h5',
                'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
 
-    FILE_PATH = os.path.abspath(os.path.join(DATA_PATH, 'valid_set'))
-    files = set(os.path.basename(f) for f in utils.get_morph_files(FILE_PATH))
-
+    files = set(f.name for f in utils.get_morph_files(VALID_DATA_PATH))
     nt.assert_equal(ref, files)
 
 
 def test_load_neurons():
     # List of strings
-    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(map(str, FILES), neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
-        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+        nt.assert_equal(nrn.name, FILES[i].stem)
 
     # Single string
-    nrns = utils.load_neurons(FILES[0], neuron_loader=_mock_load_neuron)
-    nt.assert_equal(nrns[0].name, _get_name(FILES[0]))
+    nrns = utils.load_neurons(str(FILES[0]), neuron_loader=_mock_load_neuron)
+    nt.assert_equal(nrns[0].name, FILES[0].stem)
 
     # Single Path
-    nrns = utils.load_neurons(Path(FILES[0]), neuron_loader=_mock_load_neuron)
-    nt.assert_equal(nrns[0].name, _get_name(FILES[0]))
+    nrns = utils.load_neurons(FILES[0], neuron_loader=_mock_load_neuron)
+    nt.assert_equal(nrns[0].name, FILES[0].stem)
 
     # sequence of strings
-    iter_file = (f for f in FILES)
-    nrns = utils.load_neurons(iter_file, neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(map(str, FILES), neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
-        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+        nt.assert_equal(nrn.name, FILES[i].stem)
 
     # sequence of Path objects
-    nrns = utils.load_neurons(map(Path, FILES), neuron_loader=_mock_load_neuron)
-    for i, nrn in enumerate(nrns):
-        nt.assert_equal(nrn.name, _get_name(FILES[i]))
+    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
+    for nrn, file in zip(nrns, FILES):
+        nt.assert_equal(nrn.name, file.stem)
 
     # string path to a directory
-    nrns = utils.load_neurons(SWC_PATH, neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(str(SWC_PATH), neuron_loader=_mock_load_neuron)
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    nt.assert_true({_get_name(f) for f in FILES}.issubset({nrn.name for nrn in nrns}))
+    nt.assert_true({f.stem for f in FILES}.issubset({nrn.name for nrn in nrns}))
 
     # Path path to a directory
-    nrns = utils.load_neurons(Path(SWC_PATH), neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(SWC_PATH, neuron_loader=_mock_load_neuron)
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    nt.assert_true({_get_name(f) for f in FILES}.issubset({nrn.name for nrn in nrns}))
+    nt.assert_true({f.stem for f in FILES}.issubset({nrn.name for nrn in nrns}))
 
     nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
 
@@ -168,12 +160,12 @@ def test_neuron_name():
 
 @nt.raises(SomaError)
 def test_load_bifurcating_soma_points_raises_SomaError():
-    utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'bifurcating_soma.swc'))
+    utils.load_neuron(Path(SWC_PATH, 'soma', 'bifurcating_soma.swc'))
 
 
 def test_load_neuromorpho_3pt_soma():
     with warnings.catch_warnings(record=True):
-        nrn = utils.load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
+        nrn = utils.load_neuron(Path(SWC_PATH, 'soma', 'three_pt_soma.swc'))
     nt.eq_(len(nrn.neurites), 4)
     nt.eq_(len(nrn.soma.points), 3)
     nt.eq_(nrn.soma.radius, 2)
@@ -217,7 +209,7 @@ def test_neuron_sections_are_connected():
 
 def test_load_neuron_soma_only():
 
-    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'swc', 'Soma_origin.swc'))
+    nrn = utils.load_neuron(Path(DATA_PATH, 'swc', 'Soma_origin.swc'))
     nt.eq_(len(nrn.neurites), 0)
     nt.assert_equal(nrn.name, 'Soma_origin')
 
@@ -273,8 +265,8 @@ def test_load_neurons_filenames():
         nt.assert_equal(nrn.name, name)
 
 
-SWC_ORD_PATH = os.path.join(DATA_PATH, 'swc', 'ordering')
-SWC_ORD_REF = utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample.swc'))
+SWC_ORD_PATH = Path(DATA_PATH, 'swc', 'ordering')
+SWC_ORD_REF = utils.load_neuron(Path(SWC_ORD_PATH, 'sample.swc'))
 
 
 def assert_items_equal(a, b):
@@ -282,7 +274,7 @@ def assert_items_equal(a, b):
 
 
 def test_load_neuron_mixed_tree_swc():
-    nrn_mix = utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
+    nrn_mix = utils.load_neuron(Path(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
 
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
@@ -296,7 +288,7 @@ def test_load_neuron_mixed_tree_swc():
 
 
 def test_load_neuron_section_order_break_swc():
-    nrn_mix = utils.load_neuron(os.path.join(SWC_ORD_PATH, 'sample_disordered.swc'))
+    nrn_mix = utils.load_neuron(Path(SWC_ORD_PATH, 'sample_disordered.swc'))
 
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
 
@@ -310,12 +302,12 @@ def test_load_neuron_section_order_break_swc():
                        get('total_length', SWC_ORD_REF))
 
 
-H5_PATH = os.path.join(DATA_PATH, 'h5', 'v1', 'ordering')
-H5_ORD_REF = utils.load_neuron(os.path.join(H5_PATH, 'sample.h5'))
+H5_PATH = Path(DATA_PATH, 'h5', 'v1', 'ordering')
+H5_ORD_REF = utils.load_neuron(Path(H5_PATH, 'sample.h5'))
 
 
 def test_load_neuron_mixed_tree_h5():
-    nrn_mix = utils.load_neuron(os.path.join(H5_PATH, 'sample_mixed_tree_sections.h5'))
+    nrn_mix = utils.load_neuron(Path(H5_PATH, 'sample_mixed_tree_sections.h5'))
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                        get('number_of_sections_per_neurite', H5_ORD_REF))
@@ -326,7 +318,7 @@ def test_load_h5_trunk_points_regression():
     # implementing PR #479, related to H5 unpacking
     # of files with non-standard soma structure.
     # See #480.
-    nrn = utils.load_neuron(os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
+    nrn = utils.load_neuron(Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
     nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1],
                        [0., 0., 0.1, 0.31646374, 4., 4., 3.]))
 
@@ -345,7 +337,7 @@ def test_load_unknown_type():
 
 
 def test_NeuronLoader():
-    dirpath = os.path.join(DATA_PATH, 'h5', 'v2')
+    dirpath = Path(DATA_PATH, 'h5', 'v2')
     loader = utils.NeuronLoader(dirpath, file_ext='.h5', cache_size=5)
     nrn = loader.get('Neuron')
     nt.ok_(isinstance(nrn, Neuron))
@@ -355,8 +347,7 @@ def test_NeuronLoader():
 
 
 def test_NeuronLoader_mixed_file_extensions():
-    dirpath = os.path.join(DATA_PATH, 'valid_set')
-    loader = utils.NeuronLoader(dirpath)
+    loader = utils.NeuronLoader(VALID_DATA_PATH)
     loader.get('Neuron')
     loader.get('Neuron_h5v1')
     nt.assert_raises(NeuroMError, loader.get, 'NoSuchNeuron')
@@ -378,4 +369,4 @@ def test_get_files_by_path():
     neuron_dir = utils.get_files_by_path(VALID_DATA_PATH)
     nt.eq_(len(neuron_dir), 6)
 
-    nt.assert_raises(IOError, utils.get_files_by_path, 'this/is/a/fake/path')
+    nt.assert_raises(IOError, utils.get_files_by_path, Path('this/is/a/fake/path'))

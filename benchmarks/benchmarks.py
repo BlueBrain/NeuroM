@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import neurom as nm
 import neurom.io
@@ -6,27 +6,26 @@ import neurom.fst._core
 from neurom.check import neuron_checks as nc
 from neurom.check import structural_checks as sc
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                        '../test_data/')
+DATA_DIR = Path(__file__).parent.parent / 'test_data/'
 
 
 class TimeLoadMorphology(object):
     def time_swc(self):
-        path = os.path.join(DATA_DIR, 'swc/Neuron.swc')
+        path = Path(DATA_DIR, 'swc/Neuron.swc')
         nm.load_neuron(path)
 
     def time_neurolucida_asc(self):
-        path = os.path.join(DATA_DIR, 'neurolucida/bio_neuron-000.asc')
+        path = Path(DATA_DIR, 'neurolucida/bio_neuron-000.asc')
         nm.load_neuron(path)
 
     def time_h5(self):
-        path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
+        path = Path(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         nm.load_neuron(path)
 
 
 class TimeFeatures(object):
     def setup(self):
-        path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
+        path = Path(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.neuron = nm.load_neuron(path)
 
     def time_total_length(self):
@@ -113,7 +112,7 @@ class TimeFeatures(object):
 
 class TimeChecks:
     def setup(self):
-        path = os.path.join(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
+        path = Path(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.data_wrapper = neurom.io.load_data(path)
         self.neuron = neurom.fst._core.FstNeuron(self.data_wrapper)
 

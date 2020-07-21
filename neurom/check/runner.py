@@ -58,7 +58,7 @@ class CheckRunner(object):
 
         for _f in utils.get_files_by_path(path):
             L.info(SEPARATOR)
-            status, summ = self._check_file(_f)
+            status, summ = self._check_file(str(_f))
             res &= status
             if summ is not None:
                 summary.update(summ)
