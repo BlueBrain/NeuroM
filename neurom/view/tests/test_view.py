@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import itertools as it
-import os
+from pathlib import Path
 import warnings
 
 import numpy as np
@@ -44,13 +44,13 @@ from .utils import (  # needs to be at top to trigger matplotlib Agg backend
     get_fig_2d, get_fig_3d)
 
 DATA_PATH = './test_data'
-SWC_PATH = os.path.join(DATA_PATH, 'swc/')
-fst_neuron = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
-simple_neuron = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+SWC_PATH = Path(DATA_PATH, 'swc/')
+fst_neuron = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+simple_neuron = load_neuron(Path(SWC_PATH, 'simple.swc'))
 
 
 def test_tree():
-    neuron = load_neuron(os.path.join(SWC_PATH, 'simple-different-section-types.swc'))
+    neuron = load_neuron(Path(SWC_PATH, 'simple-different-section-types.swc'))
     expected_colors = {'black': np.array([[0., 0., 0., 1.] for _ in range(3)]),
                        None: [[1.      , 0.      , 0.      , 1.],
                               [1.      , 0.      , 0.      , 1.],
@@ -116,13 +116,13 @@ def test_neuron3d():
 
 
 def test_neuron_no_neurites():
-    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+    filename = Path(SWC_PATH, 'point_soma.swc')
     with get_fig_2d() as (fig, ax):
         view.plot_neuron(ax, load_neuron(filename))
 
 
 def test_neuron3d_no_neurites():
-    filename = os.path.join(SWC_PATH, 'point_soma.swc')
+    filename = Path(SWC_PATH, 'point_soma.swc')
     with get_fig_3d() as (fig, ax):
         view.plot_neuron3d(ax, load_neuron(filename))
 

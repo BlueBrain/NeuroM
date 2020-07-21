@@ -26,9 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+from pathlib import Path
 from io import StringIO
-from os.path import join as joinp
 
 from nose import tools as nt
 from numpy.testing import assert_array_equal
@@ -37,19 +36,18 @@ import neurom as nm
 from neurom import COLS, core, load_neuron
 from neurom.core import NeuriteIter, Tree
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = joinp(_path, '../../../test_data')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 
-NRN1 = load_neuron(joinp(DATA_PATH, 'swc/Neuron.swc'))
+NRN1 = load_neuron(Path(DATA_PATH, 'swc/Neuron.swc'))
 
 NEURONS = [NRN1,
-           load_neuron(joinp(DATA_PATH, 'swc/Single_basal.swc')),
-           load_neuron(joinp(DATA_PATH, 'swc/Neuron_small_radius.swc')),
-           load_neuron(joinp(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc')),
+           load_neuron(Path(DATA_PATH, 'swc/Single_basal.swc')),
+           load_neuron(Path(DATA_PATH, 'swc/Neuron_small_radius.swc')),
+           load_neuron(Path(DATA_PATH, 'swc/Neuron_3_random_walker_branches.swc')),
            ]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 
-REVERSED_NEURITES = load_neuron(joinp(DATA_PATH, 'swc/ordering/reversed_NRN_neurite_order.swc'))
+REVERSED_NEURITES = load_neuron(Path(DATA_PATH, 'swc/ordering/reversed_NRN_neurite_order.swc'))
 
 POP = core.Population(NEURONS, name='foo')
 

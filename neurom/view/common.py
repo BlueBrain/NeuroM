@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Functionality for styling plots."""
-import os
+from pathlib import Path
 
 import numpy as np
 from matplotlib.patches import Polygon
@@ -124,13 +124,11 @@ def save_plot(fig, prefile='', postfile='', output_path='./', output_name='Figur
         dpi(int): Define the DPI (Dots per Inch) of the figure
         transparent(bool): If True the saved figure will have a transparent background
     """
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)  # Make output directory if non-exsiting
+    output_path = Path(output_path)
+    output_path.mkdir(parents=True, exist_ok=True)
 
-    output = os.path.join(output_path,
-                          prefile + output_name + postfile + "." + output_format)
-
-    fig.savefig(output, dpi=dpi, transparent=transparent)
+    fig.savefig(Path(output_path, prefile + output_name + postfile + "." + output_format),
+                dpi=dpi, transparent=transparent)
 
 
 def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals

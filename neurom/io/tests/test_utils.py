@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Test neurom.io.utils."""
-import os
+from pathlib import Path
 import sys
 from io import StringIO
 from pathlib import Path
@@ -333,7 +333,7 @@ def test_load_h5_trunk_points_regression():
 
 
 def test_load_unknown_type():
-    nt.assert_raises(NeuroMError, utils.load_data, 'fake.file')
+    nt.assert_raises(NeuroMError, utils.load_data, Path('fake.file'))
 
 
 def test_NeuronLoader():

@@ -28,7 +28,6 @@
 
 """Utility functions and for loading neurons."""
 
-import glob
 import logging
 import os
 import shutil
@@ -49,10 +48,7 @@ L = logging.getLogger(__name__)
 
 def _is_morphology_file(filepath):
     """Check if `filepath` is a file with one of morphology file extensions."""
-    return (
-        os.path.isfile(filepath) and
-        os.path.splitext(filepath)[1].lower() in ('.swc', '.h5', '.asc')
-    )
+    return filepath.is_file() and filepath.suffix.lower() in {'.swc', '.h5', '.asc'}
 
 
 class NeuronLoader(object):
@@ -66,7 +62,7 @@ class NeuronLoader(object):
 
     def __init__(self, directory, file_ext=None, cache_size=None):
         """Initialize a NeuronLoader object."""
-        self.directory = directory
+        self.directory = Path(directory)
         self.file_ext = file_ext
         if cache_size is not None:
             self.get = lru_cache(maxsize=cache_size)(self.get)
@@ -74,13 +70,13 @@ class NeuronLoader(object):
     def _filepath(self, name):
         """File path to `name` morphology file."""
         if self.file_ext is None:
-            candidates = glob.glob(os.path.join(self.directory, name + ".*"))
+            candidates = self.directory.glob(name + ".*")
             try:
                 return next(filter(_is_morphology_file, candidates))
             except StopIteration:
                 raise NeuroMError("Can not find morphology file for '%s' " % name)
         else:
-            return os.path.join(self.directory, name + self.file_ext)
+            return Path(self.directory, name + self.file_ext)
 
     # pylint:disable=method-hidden
     def get(self, name):
@@ -160,7 +156,7 @@ def load_neurons(neurons,
         except NeuroMError as e:
             if isinstance(e, ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s',
-                       e, os.path.basename(f))
+                       e, f.name)
                 continue
             raise
 
@@ -187,7 +183,7 @@ def _get_file(handle):
 def load_data(handle, reader=None):
     """Unpack data into a raw data wrapper."""
     if not reader:
-        reader = os.path.splitext(str(handle))[1][1:].lower()
+        reader = handle.suffix[1:].lower()
 
     if reader not in _READERS:
         raise NeuroMError('Do not have a loader for "%s" extension' % reader)

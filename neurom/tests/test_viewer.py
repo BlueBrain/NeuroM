@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from pathlib import Path
 import shutil
 import tempfile
 import mock
@@ -43,9 +44,8 @@ from neurom import load_neuron, viewer, NeuriteType
 from nose import tools as nt
 from numpy.testing import assert_allclose, assert_array_almost_equal
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../test_data/swc')
-MORPH_FILENAME = os.path.join(DATA_PATH, 'Neuron.swc')
+DATA_PATH = Path(__file__).parent.parent.parent / 'test_data/swc'
+MORPH_FILENAME = Path(DATA_PATH, 'Neuron.swc')
 
 nrn = load_neuron(MORPH_FILENAME)
 
@@ -71,7 +71,7 @@ def test_plotly_draw_neuron3d():
     plotly.draw(nrn, plane='3d', auto_open=False)
     plotly.draw(nrn.neurites[0], plane='3d', auto_open=False)
 
-    fig = plotly.draw(load_neuron(os.path.join(DATA_PATH, 'simple-different-soma.swc')),
+    fig = plotly.draw(load_neuron(Path(DATA_PATH, 'simple-different-soma.swc')),
                       auto_open=False)
     x, y, z = [fig['data'][2][key] for key in str('xyz')]
     assert_allclose(x[0, 0], 2)
@@ -135,7 +135,7 @@ def test_draw_dendrogram():
     common.plt.close('all')
 
 def test_draw_dendrogram_empty_segment():
-    neuron = load_neuron(os.path.join(DATA_PATH, 'empty_segments.swc'))
+    neuron = load_neuron(Path(DATA_PATH, 'empty_segments.swc'))
     viewer.draw(neuron, mode='dendrogram')
     common.plt.close('all')
 
@@ -159,15 +159,8 @@ def test_invalid_combo_raises():
 
 
 def test_writing_output():
-    fig_name = 'Figure.png'
-
-    tempdir = tempfile.mkdtemp('test_viewer')
-    try:
-        old_dir = os.getcwd()
-        os.chdir(tempdir)
-        viewer.draw(nrn, mode='2d', output_path='subdir')
-        nt.ok_(os.path.isfile(os.path.join(tempdir, 'subdir', fig_name)))
-    finally:
-        os.chdir(old_dir)
-        shutil.rmtree(tempdir)
+    with tempfile.TemporaryDirectory() as folder:
+        output_dir = Path(folder, 'subdir')
+        viewer.draw(nrn, mode='2d', output_path=output_dir)
+        nt.ok_((output_dir / 'Figure.png').is_file())
         common.plt.close('all')
