@@ -37,12 +37,12 @@ from pathlib import Path
 
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
-NRN_PATH_0 = Path(SWC_PATH, 'Neuron.swc')
-NRN_PATH_1 = Path(SWC_PATH, 'Neuron_zero_length_sections.swc')
-NRN_PATH_2 = Path(SWC_PATH, 'Single_apical.swc')
-NRN_PATH_3 = Path(SWC_PATH, 'Single_basal.swc')
-NRN_PATH_4 = Path(SWC_PATH, 'Single_axon.swc')
-NRN_PATH_5 = Path(SWC_PATH, 'Single_apical_no_soma.swc')
+NRN_PATH_0 = str(Path(SWC_PATH, 'Neuron.swc'))
+NRN_PATH_1 = str(Path(SWC_PATH, 'Neuron_zero_length_sections.swc'))
+NRN_PATH_2 = str(Path(SWC_PATH, 'Single_apical.swc'))
+NRN_PATH_3 = str(Path(SWC_PATH, 'Single_basal.swc'))
+NRN_PATH_4 = str(Path(SWC_PATH, 'Single_axon.swc'))
+NRN_PATH_5 = str(Path(SWC_PATH, 'Single_apical_no_soma.swc'))
 
 CONFIG = {
     'checks': {
@@ -77,7 +77,7 @@ CONFIG_COLOR['color'] = True
 
 REF_0 = {
     'files': {
-        str(NRN_PATH_0): {
+        NRN_PATH_0: {
             "Is single tree": True,
             "Has soma points": True,
             "Has sequential ids": True,
@@ -99,7 +99,7 @@ REF_0 = {
 
 REF_1 = {
     'files': {
-        str(NRN_PATH_1): {
+        NRN_PATH_1: {
             "Is single tree": True,
             "Has soma points": True,
             "Has sequential ids": True,
@@ -121,7 +121,7 @@ REF_1 = {
 
 REF_2 = {
     'files': {
-        str(NRN_PATH_2): {
+        NRN_PATH_2: {
             "Is single tree": True,
             "Has soma points": True,
             "Has sequential ids": True,
@@ -143,7 +143,7 @@ REF_2 = {
 
 REF_3 = {
     'files': {
-        str(NRN_PATH_3): {
+        NRN_PATH_3: {
             "Is single tree": True,
             "Has soma points": True,
             "Has sequential ids": True,
@@ -165,7 +165,7 @@ REF_3 = {
 
 REF_4 = {
     'files': {
-        str(NRN_PATH_4): {
+        NRN_PATH_4: {
             "Is single tree": True,
             "Has soma points": True,
             "Has sequential ids": True,
@@ -188,7 +188,7 @@ REF_4 = {
 
 REF_5 = {
     'files': {
-        str(NRN_PATH_5): {
+        NRN_PATH_5: {
             "Is single tree": True,
             "Has soma points": False,
             "Has sequential ids": True,
@@ -247,8 +247,8 @@ def test_single_apical_no_soma():
 def test_directory_input():
     checker = CheckRunner(CONFIG)
     summ = checker.run(SWC_PATH)
-    nt.eq_(summ['files'][str(NRN_PATH_0)]['Has axon'], True)
-    nt.eq_(summ['files'][str(NRN_PATH_2)]['Has axon'], False)
+    nt.eq_(summ['files'][NRN_PATH_0]['Has axon'], True)
+    nt.eq_(summ['files'][NRN_PATH_2]['Has axon'], False)
 
 
 @nt.raises(IOError)
