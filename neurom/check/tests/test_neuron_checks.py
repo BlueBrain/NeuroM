@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+from pathlib import Path
 from copy import deepcopy
 from io import StringIO
 
@@ -39,20 +39,19 @@ from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-ASC_PATH = os.path.join(DATA_PATH, 'neurolucida')
-H5V1_PATH = os.path.join(DATA_PATH, 'h5/v1')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+SWC_PATH = Path(DATA_PATH, 'swc')
+ASC_PATH = Path(DATA_PATH, 'neurolucida')
+H5V1_PATH = Path(DATA_PATH, 'h5/v1')
 
 
 def _load_neuron(name):
     if name.endswith('.swc'):
-        path = os.path.join(SWC_PATH, name)
+        path = Path(SWC_PATH, name)
     elif name.endswith('.h5'):
-        path = os.path.join(H5V1_PATH, name)
+        path = Path(H5V1_PATH, name)
     else:
-        path = os.path.join(ASC_PATH, name)
+        path = Path(ASC_PATH, name)
     return name, load_neuron(path)
 
 
@@ -281,13 +280,13 @@ def test_nonzero_section_lengths_threshold():
 
 def test_has_nonzero_soma_radius():
 
-    nrn = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nrn = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
 
 
 def test_has_nonzero_soma_radius_bad_data():
 
-    nrn = load_neuron(os.path.join(SWC_PATH, 'Single_basal.swc'))
+    nrn = load_neuron(Path(SWC_PATH, 'Single_basal.swc'))
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
 
 

@@ -1,5 +1,5 @@
 """Test neurom.io.utils."""
-import os
+from pathlib import Path
 import numpy as np
 from nose import tools as nt
 

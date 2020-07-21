@@ -28,7 +28,7 @@
 
 """Test neurom.fst._core module."""
 
-import os
+from pathlib import Path
 from copy import deepcopy
 
 import numpy as np
@@ -37,10 +37,9 @@ from nose import tools as nt
 from neurom import io as _io
 from neurom.fst import _core
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_ROOT = os.path.join(_path, '../../../test_data')
-DATA_PATH = os.path.join(_path, '../../../test_data/valid_set')
-FILENAMES = [os.path.join(DATA_PATH, f)
+DATA_ROOT = Path(__file__).parent.parent.parent.parent / 'test_data'
+DATA_PATH = Path(DATA_ROOT, 'valid_set')
+FILENAMES = [Path(DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
 

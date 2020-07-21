@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from .utils import get_fig_2d, get_fig_3d # needs to be at top to trigger matplotlib Agg backend
 
-import os
+from pathlib import Path
 from nose import tools as nt
 import shutil
 import tempfile
@@ -80,25 +80,13 @@ def test_get_figure():
 
 
 def test_save_plot():
-    fig_name = 'Figure.png'
-
-    tempdir = tempfile.mkdtemp('test_common')
-    try:
-        old_dir = os.getcwd()
-        os.chdir(tempdir)
-
+    with tempfile.TemporaryDirectory() as folder:
         fig_old = plt.figure()
-        fig = save_plot(fig_old)
-        nt.ok_(os.path.isfile(fig_name))
-
-        os.remove(fig_name)
-
-        fig = save_plot(fig_old, output_path='subdir')
-        nt.ok_(os.path.isfile(os.path.join(tempdir, 'subdir', fig_name)))
-    finally:
-        os.chdir(old_dir)
-        shutil.rmtree(tempdir)
+        output_path = Path(folder, 'subdir')
+        fig = save_plot(fig_old, output_path=output_path)
+        nt.ok_(Path(output_path, 'Figure.png').is_file())
         plt.close('all')
+
 
 
 def test_plot_title():

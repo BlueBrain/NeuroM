@@ -1,24 +1,20 @@
-import os
-import warnings
 import textwrap
+import warnings
 from io import StringIO
-
-import numpy as np
-from mock import patch
-from nose.tools import eq_, ok_, assert_raises
+from pathlib import Path
 
 import neurom.io as io
 import neurom.io.neurolucida as nasc
-from neurom.core.dataformat import COLS
-from neurom.exceptions import RawDataError
-from neurom.io.datawrapper import DataWrapper
+import numpy as np
+from mock import patch
 from neurom import load_neuron
-
+from neurom.core.dataformat import COLS
+from neurom.io.datawrapper import DataWrapper
+from nose.tools import eq_, ok_
 from numpy.testing import assert_array_equal
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-NEUROLUCIDA_PATH = os.path.join(DATA_PATH, 'neurolucida')
+DATA_PATH = Path(Path(__file__).parent, '../../../test_data')
+NEUROLUCIDA_PATH = Path(DATA_PATH, 'neurolucida')
 
 
 def test__match_section():
@@ -260,7 +256,7 @@ def test_read():
 
 
 def test_load_neurolucida_ascii():
-    f = os.path.join(NEUROLUCIDA_PATH, 'sample.asc')
+    f = Path(NEUROLUCIDA_PATH, 'sample.asc')
     with warnings.catch_warnings(record=True):
         ascii = io.load_data(f)
     ok_(isinstance(ascii, DataWrapper))
@@ -268,7 +264,7 @@ def test_load_neurolucida_ascii():
 
 def test_spine():
     with warnings.catch_warnings(record=True):
-        n = load_neuron(os.path.join(NEUROLUCIDA_PATH, 'spine.asc'))
+        n = load_neuron(Path(NEUROLUCIDA_PATH, 'spine.asc'))
 
     assert_array_equal(n.neurites[0].points,
                        [[ 0. ,  5. ,  0. ,  1. ],
@@ -277,4 +273,4 @@ def test_spine():
 
     # with warnings.catch_warnings(record=True):
     #     assert_raises(RawDataError,
-    #                   load_neuron, os.path.join(NEUROLUCIDA_PATH, 'broken-spine.asc'))
+    #                   load_neuron, Path(NEUROLUCIDA_PATH, 'broken-spine.asc'))

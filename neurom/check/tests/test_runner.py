@@ -26,22 +26,23 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+from pathlib import Path
 from copy import copy
 
 from nose import tools as nt
 
 from neurom.check.runner import CheckRunner
 from neurom.exceptions import ConfigError
+from pathlib import Path
 
-_path = os.path.dirname(os.path.abspath(__file__))
-SWC_PATH = os.path.join(_path, '../../../test_data/swc/')
-NRN_PATH_0 = os.path.join(SWC_PATH, 'Neuron.swc')
-NRN_PATH_1 = os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc')
-NRN_PATH_2 = os.path.join(SWC_PATH, 'Single_apical.swc')
-NRN_PATH_3 = os.path.join(SWC_PATH, 'Single_basal.swc')
-NRN_PATH_4 = os.path.join(SWC_PATH, 'Single_axon.swc')
-NRN_PATH_5 = os.path.join(SWC_PATH, 'Single_apical_no_soma.swc')
+
+SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
+NRN_PATH_0 = str(Path(SWC_PATH, 'Neuron.swc'))
+NRN_PATH_1 = str(Path(SWC_PATH, 'Neuron_zero_length_sections.swc'))
+NRN_PATH_2 = str(Path(SWC_PATH, 'Single_apical.swc'))
+NRN_PATH_3 = str(Path(SWC_PATH, 'Single_basal.swc'))
+NRN_PATH_4 = str(Path(SWC_PATH, 'Single_axon.swc'))
+NRN_PATH_5 = str(Path(SWC_PATH, 'Single_apical_no_soma.swc'))
 
 CONFIG = {
     'checks': {

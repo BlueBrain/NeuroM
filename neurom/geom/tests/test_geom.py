@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+from pathlib import Path
 import numpy as np
 import neurom as nm
 from neurom import fst
@@ -34,9 +34,8 @@ from neurom import geom
 
 from nose import tools as nt
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-SWC_DATA_PATH = os.path.join(_PWD, '../../../test_data/swc')
-NRN = nm.load_neuron(os.path.join(SWC_DATA_PATH, 'Neuron.swc'))
+SWC_DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc'
+NRN = nm.load_neuron(Path(SWC_DATA_PATH, 'Neuron.swc'))
 
 
 class PointObj(object):
@@ -58,8 +57,8 @@ def test_bounding_box():
 
 def test_bounding_box_neuron():
 
-    ref = np.array([[-40.32853516, -57.600172  , 0.],
-                    [ 64.74726272, 48.51626225, 54.20408797]])
+    ref = np.array([[-40.32853516, -57.600172, 0.],
+                    [64.74726272, 48.51626225, 54.20408797]])
 
     nt.assert_true(np.allclose(geom.bounding_box(NRN), ref))
 

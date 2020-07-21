@@ -134,7 +134,7 @@ class CheckRunner(object):
         for m, s in full_summary.items():
             self._log_msg(m, s)
 
-        return full_result, {f: full_summary}
+        return full_result, {str(f): full_summary}
 
     def _log_msg(self, msg, ok):
         """Helper to log message to the right level."""

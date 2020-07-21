@@ -29,7 +29,7 @@
 """Test neurom.sectionfunc functionality."""
 
 from nose import tools as nt
-import os
+from pathlib import Path
 import math
 import numpy as np
 import warnings
@@ -45,12 +45,11 @@ from neurom.features import sectionfunc as _sf
 from neurom.features import neuritefunc as _nf
 from neurom import morphmath as mmth
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-DATA_PATH = os.path.join(H5_PATH, 'Neuron.h5')
-SWC_PATH = os.path.join(_PWD, '../../../test_data/swc/')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+H5_PATH = Path(DATA_PATH, 'h5/v1/')
+SWC_PATH = Path(DATA_PATH, 'swc/')
 
-NRN = load_neuron(DATA_PATH)
+NRN = load_neuron(H5_PATH / 'Neuron.h5')
 
 
 def test_total_volume_per_neurite():
@@ -165,7 +164,7 @@ def test_section_meander_angles_single_segment():
 
 
 def test_strahler_order():
-    path = os.path.join(SWC_PATH, 'strahler.swc')
+    path = Path(SWC_PATH, 'strahler.swc')
     n = load_neuron(path)
     strahler_order = _sf.strahler_order(n.neurites[0].root_node)
     nt.eq_(strahler_order, 4)

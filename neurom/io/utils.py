@@ -28,7 +28,6 @@
 
 """Utility functions and for loading neurons."""
 
-import glob
 import logging
 import os
 import shutil
@@ -49,10 +48,7 @@ L = logging.getLogger(__name__)
 
 def _is_morphology_file(filepath):
     """Check if `filepath` is a file with one of morphology file extensions."""
-    return (
-        os.path.isfile(filepath) and
-        os.path.splitext(filepath)[1].lower() in ('.swc', '.h5', '.asc')
-    )
+    return filepath.is_file() and filepath.suffix.lower() in {'.swc', '.h5', '.asc'}
 
 
 class NeuronLoader(object):
@@ -66,7 +62,7 @@ class NeuronLoader(object):
 
     def __init__(self, directory, file_ext=None, cache_size=None):
         """Initialize a NeuronLoader object."""
-        self.directory = directory
+        self.directory = Path(directory)
         self.file_ext = file_ext
         if cache_size is not None:
             self.get = lru_cache(maxsize=cache_size)(self.get)
@@ -74,13 +70,13 @@ class NeuronLoader(object):
     def _filepath(self, name):
         """File path to `name` morphology file."""
         if self.file_ext is None:
-            candidates = glob.glob(os.path.join(self.directory, name + ".*"))
+            candidates = self.directory.glob(name + ".*")
             try:
                 return next(filter(_is_morphology_file, candidates))
             except StopIteration:
                 raise NeuroMError("Can not find morphology file for '%s' " % name)
         else:
-            return os.path.join(self.directory, name + self.file_ext)
+            return Path(self.directory, name + self.file_ext)
 
     # pylint:disable=method-hidden
     def get(self, name):
@@ -94,8 +90,8 @@ def get_morph_files(directory):
     Returns:
         list with all files with extensions '.swc' , 'h5' or '.asc' (case insensitive)
     """
-    lsdir = (os.path.join(directory, m) for m in os.listdir(directory))
-    return list(filter(_is_morphology_file, lsdir))
+    directory = Path(directory)
+    return list(filter(_is_morphology_file, directory.iterdir()))
 
 
 def get_files_by_path(path):
@@ -103,9 +99,10 @@ def get_files_by_path(path):
 
     Return list of files with path
     """
-    if os.path.isfile(path):
+    path = Path(path)
+    if path.is_file():
         return [path]
-    if os.path.isdir(path):
+    if path.is_dir():
         return get_morph_files(path)
 
     raise IOError('Invalid data path %s' % path)
@@ -113,11 +110,11 @@ def get_files_by_path(path):
 
 def load_neuron(handle, reader=None):
     """Build section trees from an h5 or swc file."""
-    rdw = load_data(handle, reader)
     if isinstance(handle, str):
-        name = os.path.splitext(os.path.basename(handle))[0]
-    else:
-        name = None
+        handle = Path(handle)
+
+    rdw = load_data(handle, reader)
+    name = handle.stem if isinstance(handle, Path) else None
     return FstNeuron(rdw, name)
 
 
@@ -141,12 +138,15 @@ def load_neurons(neurons,
     Returns:
         neuron population object
     """
-    if isinstance(neurons, (str, Path)):
+    if isinstance(neurons, str):
+        neurons = Path(neurons)
+
+    if isinstance(neurons, Path):
         files = get_files_by_path(neurons)
-        name = name if name is not None else os.path.basename(neurons)
+        name = name or neurons.name
     else:
         files = neurons
-        name = name if name is not None else 'Population'
+        name = name or 'Population'
 
     ignored_exceptions = tuple(ignored_exceptions)
     pop = []
@@ -156,7 +156,7 @@ def load_neurons(neurons,
         except NeuroMError as e:
             if isinstance(e, ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s',
-                       e, os.path.basename(f))
+                       e, f.name)
                 continue
             raise
 
@@ -183,7 +183,7 @@ def _get_file(handle):
 def load_data(handle, reader=None):
     """Unpack data into a raw data wrapper."""
     if not reader:
-        reader = os.path.splitext(str(handle))[1][1:].lower()
+        reader = handle.suffix[1:].lower()
 
     if reader not in _READERS:
         raise NeuroMError('Do not have a loader for "%s" extension' % reader)

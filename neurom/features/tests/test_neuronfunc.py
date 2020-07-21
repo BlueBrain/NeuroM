@@ -27,7 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Test neurom._neuronfunc functionality."""
-import os
+from pathlib import Path
 import tempfile
 import warnings
 from io import StringIO
@@ -46,17 +46,16 @@ from neurom.core.population import Population
 # the should use the aliasing used in fst/tests module files
 from neurom.features import neuronfunc as _nf
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+H5_PATH = DATA_PATH / 'h5/v1'
+NRN = load_neuron(Path(H5_PATH, 'Neuron.h5'))
 
-H5_PATH = os.path.join(_PWD, '../../../test_data/h5/v1/')
-NRN = load_neuron(os.path.join(H5_PATH, 'Neuron.h5'))
-
-SWC_PATH = os.path.join(_PWD, '../../../test_data/swc')
-SIMPLE = load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
-SIMPLE_TRUNK = load_neuron(os.path.join(SWC_PATH, 'simple_trunk.swc'))
-SWC_NRN = load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+SWC_PATH = DATA_PATH / 'swc'
+SIMPLE = load_neuron(Path(SWC_PATH, 'simple.swc'))
+SIMPLE_TRUNK = load_neuron(Path(SWC_PATH, 'simple_trunk.swc'))
+SWC_NRN = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
 with warnings.catch_warnings(record=True):
-    SWC_NRN_3PT = load_neuron(os.path.join(SWC_PATH, 'soma', 'three_pt_soma.swc'))
+    SWC_NRN_3PT = load_neuron(Path(SWC_PATH, 'soma', 'three_pt_soma.swc'))
 
 
 def test_soma_volume():
@@ -74,34 +73,42 @@ def test_soma_volume():
         ret = _nf.soma_volume(SWC_NRN_3PT)
         assert_almost_equal(ret, 50.26548245743669)
 
+
 def test_soma_volumes():
     with warnings.catch_warnings(record=True):
         ret = _nf.soma_volumes(SIMPLE)
         nt.eq_(ret, [4.1887902047863905, ])
 
+
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
     nt.eq_(ret, 12.566370614359172)
+
 
 def test_soma_surface_areas():
     ret = _nf.soma_surface_areas(SIMPLE)
     nt.eq_(ret, [12.566370614359172, ])
 
+
 def test_soma_radii():
     ret = _nf.soma_radii(SIMPLE)
     nt.eq_(ret, [1., ])
+
 
 def test_trunk_section_lengths():
     ret = _nf.trunk_section_lengths(SIMPLE)
     nt.eq_(ret, [5.0, 4.0])
 
+
 def test_trunk_origin_radii():
     ret = _nf.trunk_origin_radii(SIMPLE)
     nt.eq_(ret, [1.0, 1.0])
 
+
 def test_trunk_origin_azimuths():
     ret = _nf.trunk_origin_azimuths(SIMPLE)
     nt.eq_(ret, [0.0, 0.0])
+
 
 def test_trunk_angles():
     ret = _nf.trunk_angles(SIMPLE_TRUNK)
@@ -150,7 +157,7 @@ def test_trunk_origin_elevations():
                        [])
 
     assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
-[])
+                       [])
 
 
 @nt.raises(Exception)
@@ -185,8 +192,8 @@ def load_swc(string):
 
 
 def test_sholl_analysis_custom():
-    #recreate morphs from Fig 2 of
-    #http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
+    # recreate morphs from Fig 2 of
+    # http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
     radii = np.arange(10, 81, 10)
     center = 0, 0, 0
     morph_A = load_swc("""\
@@ -235,4 +242,4 @@ def test_sholl_analysis_custom():
                        """)
     nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
            [2, 2, 2, 2, 2, 2, 10, 10])
-    #view.neuron(morph_C)[0].savefig('foo.png')
+    # view.neuron(morph_C)[0].savefig('foo.png')

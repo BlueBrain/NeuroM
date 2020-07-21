@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from collections import namedtuple
 
 import numpy as np
@@ -9,9 +9,8 @@ import neurom.view.dendrogram as dm
 from neurom import load_neuron, get
 from neurom.core.types import NeuriteType
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data/')
-NEURON_PATH = os.path.join(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+NEURON_PATH = Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
 
 
 def test_create_dendrogram_neuron():

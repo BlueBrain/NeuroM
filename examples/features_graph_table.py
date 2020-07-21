@@ -29,6 +29,7 @@
 
 """Example for comparison of the same feature of multiple cells."""
 import argparse
+from pathlib import Path
 
 import pylab as pl
 import neurom as nm
@@ -106,8 +107,6 @@ def plot_feature(feature, cell):
 
 
 if __name__ == '__main__':
-    import os
-
     args = parse_args()
 
     for morph_file in get_morph_files(args.datapath):
@@ -116,5 +115,5 @@ if __name__ == '__main__':
         for _feature in args.features:
             f = plot_feature(_feature, nrn)
             figname = "{0}_{1}.eps".format(_feature, nrn.name)
-            f.savefig(os.path.join(args.odir, figname))
+            f.savefig(Path(args.odir, figname))
             pl.close(f)

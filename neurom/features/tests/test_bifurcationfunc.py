@@ -28,7 +28,7 @@
 
 """Test neurom._bifurcationfunc functionality."""
 
-import os
+from pathlib import Path
 import warnings
 
 import numpy as np
@@ -46,13 +46,12 @@ from neurom.exceptions import NeuroMError
 # the should use the aliasing used in fst/tests module files
 from neurom.features import bifurcationfunc as bf
 
-_PWD = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_PWD, '../../../test_data/')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-SIMPLE = nm.load_neuron(os.path.join(SWC_PATH, 'simple.swc'))
+DATA_PATH = Path(__file__).parent / '../../../test_data/'
+SWC_PATH = Path(DATA_PATH, 'swc')
+SIMPLE = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 with warnings.catch_warnings(record=True):
-    SIMPLE2 = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'not_too_complex.asc'))
-    MULTIFURCATION = load_neuron(os.path.join(DATA_PATH, 'neurolucida', 'multifurcation.asc'))
+    SIMPLE2 = load_neuron(Path(DATA_PATH, 'neurolucida', 'not_too_complex.asc'))
+    MULTIFURCATION = load_neuron(Path(DATA_PATH, 'neurolucida', 'multifurcation.asc'))
 
 
 def test_local_bifurcation_angle():
@@ -60,10 +59,12 @@ def test_local_bifurcation_angle():
     nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
     assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
 
+
 def test_remote_bifurcation_angle():
     nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[1]) == np.pi)
     nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[4]) == np.pi)
     assert_raises(NeuroMError, bf.local_bifurcation_angle, SIMPLE.sections[0])
+
 
 def test_bifurcation_partition():
     root = SIMPLE2.neurites[0].root_node
@@ -75,6 +76,7 @@ def test_bifurcation_partition():
 
     multifurcation_section = MULTIFURCATION.neurites[0].root_node.children[0]
     assert_raises(NeuroMError, bf.bifurcation_partition, multifurcation_section)
+
 
 def test_partition_asymmetry():
     root = SIMPLE2.neurites[0].root_node
@@ -104,6 +106,7 @@ def test_sibling_ratio():
     assert_raises(NeuroMError, bf.sibling_ratio, multifurcation_section)
 
     assert_raises(ValueError, bf.sibling_ratio, root, method='unvalid-method')
+
 
 def test_diameter_power_relation():
     root = SIMPLE2.neurites[0].root_node

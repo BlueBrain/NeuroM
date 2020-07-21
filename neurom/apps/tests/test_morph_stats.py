@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+from pathlib import Path
 
 import numpy as np
 from nose.tools import (assert_almost_equal, assert_equal,
@@ -40,9 +40,8 @@ from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
 
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
+SWC_PATH = DATA_PATH / 'swc'
 
 
 REF_CONFIG = {
@@ -131,7 +130,7 @@ def test_eval_stats_applies_numpy_function():
 
 
 def test_extract_stats_single_neuron():
-    nrn = nm.load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
     assert_equal(set(res.keys()), set(REF_OUT.keys()))
     # Note: soma radius is calculated from the sphere that gives the area
@@ -146,19 +145,19 @@ def test_extract_stats_single_neuron():
 
 def test_extract_dataframe():
     # Vanilla test
-    nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
+    nrns = nm.load_neurons([Path(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
-    expected = pd.read_csv(os.path.join(DATA_PATH, 'extracted-stats.csv'), index_col=0)
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0)
     assert_frame_equal(actual, expected)
 
     # Test with a single neuron in the population
-    nrns = nm.load_neurons(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nrns = nm.load_neurons(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
     assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
 
     # Test with a config without the 'neuron' key
-    nrns = nm.load_neurons([os.path.join(SWC_PATH, name)
+    nrns = nm.load_neurons([Path(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
     config = {'neurite': {'section_lengths': ['total']},
               'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
@@ -167,12 +166,12 @@ def test_extract_dataframe():
     assert_frame_equal(actual, expected)
 
     # Test with a FstNeuron argument
-    nrn = nm.load_neuron(os.path.join(SWC_PATH, 'Neuron.swc'))
+    nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrn, config)
     assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
 
     # Test with a List[FstNeuron] argument
-    nrns = [nm.load_neuron(os.path.join(SWC_PATH, name))
+    nrns = [nm.load_neuron(Path(SWC_PATH, name))
             for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(nrns, config)
     assert_frame_equal(actual, expected)

@@ -29,15 +29,15 @@
 
 """Load and view multiple somas."""
 
-import os
+from pathlib import Path
+
 from neurom import load_neuron
 import neurom.view.common as common
 import matplotlib.pyplot as plt
 import numpy as np
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
+DATA_PATH = Path(__file__).parent.parent / 'test_data'
+SWC_PATH = Path(DATA_PATH, 'swc')
 
 
 def random_color():
@@ -56,7 +56,7 @@ def plot_somas(somas):
 
 if __name__ == '__main__':
     #  define set of files containing relevant neurons
-    file_nms = [os.path.join(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
+    file_nms = [Path(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
                                                                 'Soma_translated_1.swc',
                                                                 'Soma_translated_2.swc']]
 
