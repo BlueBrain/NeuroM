@@ -30,7 +30,7 @@
 
 """Examples of basic data checks."""
 import argparse
-import os
+from pathlib import Path
 import sys
 
 from neurom.check import structural_checks as st_chk
@@ -81,10 +81,10 @@ def parse_args():
 
 def run(args):
     """Check if all files have a soma points and sequential ids."""
-    data_path = args.datapath
-    if os.path.isfile(data_path):
+    data_path = Path(args.datapath)
+    if data_path.is_file():
         files = [data_path]
-    elif os.path.isdir(data_path):
+    elif data_path.is_dir():
         print('Checking files in directory', data_path)
         files = get_morph_files(data_path)
     else:

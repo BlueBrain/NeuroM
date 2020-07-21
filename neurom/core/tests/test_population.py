@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pathlib import Path
-from os.path import join as joinp
 
 from nose import tools as nt
 from neurom.core.population import Population
