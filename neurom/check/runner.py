@@ -58,7 +58,7 @@ class CheckRunner(object):
 
         for _f in utils.get_files_by_path(path):
             L.info(SEPARATOR)
-            status, summ = self._check_file(str(_f))
+            status, summ = self._check_file(_f)
             res &= status
             if summ is not None:
                 summary.update(summ)
@@ -134,7 +134,7 @@ class CheckRunner(object):
         for m, s in full_summary.items():
             self._log_msg(m, s)
 
-        return full_result, {f: full_summary}
+        return full_result, {str(f): full_summary}
 
     def _log_msg(self, msg, ok):
         """Helper to log message to the right level."""
