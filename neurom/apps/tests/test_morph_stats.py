@@ -177,6 +177,11 @@ def test_extract_dataframe():
     actual = ms.extract_dataframe(nrns, config)
     assert_frame_equal(actual, expected)
 
+    # Test with a List[Path] argument
+    nrns = [Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']]
+    actual = ms.extract_dataframe(nrns, config)
+    assert_frame_equal(actual, expected)
+
     # Test without any neurite_type keys, it should pick the defaults
     config = {'neurite': {'total_length_per_neurite': ['total']}}
     actual = ms.extract_dataframe(nrns, config)
@@ -192,6 +197,16 @@ def test_extract_dataframe():
               ['simple', 'all', 31.000000]])
     assert_frame_equal(actual, expected)
 
+
+def test_extract_dataframe_multiproc():
+    nrns = nm.load_neurons([Path(SWC_PATH, name)
+                            for name in ['Neuron.swc', 'simple.swc']])
+    actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=2)
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0)
+
+    # Compare sorted DataFrame since Pool.imap_unordered disrupted the order
+    assert_frame_equal(actual.sort_values(by=['name']).reset_index(drop=True),
+                       expected.sort_values(by=['name']).reset_index(drop=True))
 
 
 def test_get_header():

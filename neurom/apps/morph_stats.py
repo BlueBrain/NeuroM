@@ -32,7 +32,7 @@ from collections import defaultdict
 from itertools import product
 from pathlib import Path
 import multiprocessing
-from tqdm import tqdm
+from functools import partial
 
 import numpy as np
 import pandas as pd
@@ -84,6 +84,13 @@ def _stat_name(feat_name, stat_mode):
     return '%s_%s' % (stat_mode, feat_name)
 
 
+def _run_extract_stats(nrn, config):
+    """The function to be called by multiprocessing.Pool.imap_unordered."""
+    if not isinstance(nrn, FstNeuron):
+        nrn = nm.load_neuron(nrn)
+    return nrn.name, extract_stats(nrn, config)
+
+
 def extract_dataframe(neurons, config, n_workers=1):
     """Extract stats grouped by neurite type from neurons.
 
@@ -115,21 +122,12 @@ def extract_dataframe(neurons, config, n_workers=1):
     if 'neuron' in config:
         del config['neuron']
 
+    func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
-        mapper = map
+        stats = dict(map(func, neurons))
     else:
-        pool = multiprocessing.Pool(n_workers)
-        mapper = pool.imap
-
-    def _compute(nrn):
-        if not isinstance(nrn, FstNeuron):
-            nrn = nm.load_neuron(nrn)
-        return nrn.name, extract_stats(nrn, config=config)
-
-    stats = dict(tqdm(mapper(_compute, neurons), total=len(neurons)))
-
-    if n_workers > 1:
-        pool.close()
+        with multiprocessing.Pool(n_workers) as pool:
+            stats = dict(pool.imap_unordered(func, neurons))
 
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
