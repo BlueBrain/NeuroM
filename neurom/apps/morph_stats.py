@@ -30,7 +30,6 @@
 import logging
 from collections import defaultdict
 from itertools import product
-from functools import partial
 from pathlib import Path
 import multiprocessing
 from tqdm import tqdm
@@ -122,13 +121,13 @@ def extract_dataframe(neurons, config, n_workers=1):
         pool = multiprocessing.Pool(n_workers)
         mapper = pool.imap
 
-    stats = {nrn if isinstance(nrn, str) else nrn.name:
-             stat for nrn, stat in tqdm(zip(neurons,
-                                            mapper(partial(extract_stats, config=config), neurons)
-                                            ),
-                                        total=len(neurons)
-                                        )
-             }
+    def _compute(nrn):
+        if not isinstance(nrn, FstNeuron):
+            nrn = nm.load_neuron(nrn)
+        return nrn.name, extract_stats(nrn, config=config)
+
+    stats = dict(tqdm(mapper(_compute, neurons), total=len(neurons)))
+
     if n_workers > 1:
         pool.close()
 
