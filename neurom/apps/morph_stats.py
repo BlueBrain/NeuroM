@@ -31,6 +31,9 @@ import logging
 from collections import defaultdict
 from itertools import product
 from pathlib import Path
+import multiprocessing
+from tqdm import tqdm
+from functools import partial
 
 import numpy as np
 import pandas as pd
@@ -82,11 +85,11 @@ def _stat_name(feat_name, stat_mode):
     return '%s_%s' % (stat_mode, feat_name)
 
 
-def extract_dataframe(neurons, config):
+def extract_dataframe(neurons, config, n_workers=1):
     """Extract stats grouped by neurite type from neurons.
 
     Arguments:
-        neurons: a neuron, population or neurite tree
+        neurons: a neuron, population, neurite tree or list of neuron paths
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
@@ -94,7 +97,7 @@ def extract_dataframe(neurons, config):
                 - neurite_feature is a string from NEURITEFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-
+        n_workers (int): number of workers for multiprocessing (on collection of neurons)
     Returns:
         The extracted statistics
 
@@ -112,7 +115,14 @@ def extract_dataframe(neurons, config):
     if 'neuron' in config:
         del config['neuron']
 
-    stats = {nrn.name: extract_stats(nrn, config) for nrn in neurons}
+    with multiprocessing.Pool(n_workers) as pool:
+        stats = {nrn if isinstance(nrn, str) else nrn.name:
+                 stat for nrn, stat in tqdm(zip(neurons,
+                                                pool.imap(partial(extract_stats, config=config),
+                                                          neurons)
+                                                ), total=len(neurons)
+                                            )
+                 }
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
     rows = [[name, neurite_type] + list(features.values())
@@ -126,7 +136,7 @@ def extract_stats(neurons, config):
     """Extract stats from neurons.
 
     Arguments:
-        neurons: a neuron, population or neurite tree
+        neurons: a neuron, population, neurite tree or list of neuron paths/str
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
@@ -143,6 +153,10 @@ def extract_stats(neurons, config):
 
     {config_path}
     """
+    from neurom import load_neurons
+    if isinstance(neurons, (str, Path)) or (isinstance(neurons, list) and
+                                            all(isinstance(nrn, (str, Path)) for nrn in neurons)):
+        neurons = load_neurons(neurons)
 
     def _fill_stats_dict(data, stat_name, stat):
         """Insert the stat data in the dict.
@@ -162,15 +176,17 @@ def extract_stats(neurons, config):
                                                        config.get('neurite_type',
                                                                   _NEURITE_MAP.keys())):
         neurite_type = _NEURITE_MAP[neurite_type]
+        feature = nm.get(feature_name, neurons, neurite_type=neurite_type)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(nm.get(feature_name, neurons, neurite_type=neurite_type), mode)
+            stat = eval_stats(feature, mode)
             _fill_stats_dict(stats[neurite_type.name], stat_name, stat)
 
     for feature_name, modes in config.get('neuron', {}).items():
+        feature = nm.get(feature_name, neurons)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(nm.get(feature_name, neurons), mode)
+            stat = eval_stats(feature, mode)
             _fill_stats_dict(stats, stat_name, stat)
 
     return dict(stats)
