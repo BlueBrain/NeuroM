@@ -116,14 +116,22 @@ def extract_dataframe(neurons, config, n_workers=1):
     if 'neuron' in config:
         del config['neuron']
 
-    with multiprocessing.Pool(n_workers) as pool:
-        stats = {nrn if isinstance(nrn, str) else nrn.name:
-                 stat for nrn, stat in tqdm(zip(neurons,
-                                                pool.imap(partial(extract_stats, config=config),
-                                                          neurons)
-                                                ), total=len(neurons)
-                                            )
-                 }
+    if n_workers == 1:
+        mapper = map
+    else:
+        pool = multiprocessing.Pool(n_workers)
+        mapper = pool.imap
+
+    stats = {nrn if isinstance(nrn, str) else nrn.name:
+             stat for nrn, stat in tqdm(zip(neurons,
+                                            mapper(partial(extract_stats, config=config), neurons)
+                                            ),
+                                        total=len(neurons)
+                                        )
+             }
+    if n_workers > 1:
+        pool.close()
+
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
     rows = [[name, neurite_type] + list(features.values())
