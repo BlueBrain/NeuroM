@@ -121,9 +121,9 @@ def extract_dataframe(neurons, config, n_workers=1):
                  stat for nrn, stat in tqdm(zip(neurons,
                                                 pool.imap(partial(extract_stats, config=config),
                                                           neurons)
-                                               ), total=len(neurons)
-                                           )
-                }
+                                                ), total=len(neurons)
+                                            )
+                 }
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
     rows = [[name, neurite_type] + list(features.values())
@@ -154,10 +154,9 @@ def extract_stats(neurons, config):
 
     {config_path}
     """
-    from neurom import load_neurons
     if isinstance(neurons, (str, Path)) or (isinstance(neurons, list) and
                                             all(isinstance(nrn, (str, Path)) for nrn in neurons)):
-        neurons = load_neurons(neurons)
+        neurons = nm.load_neurons(neurons)
 
     def _fill_stats_dict(data, stat_name, stat):
         """Insert the stat data in the dict.
