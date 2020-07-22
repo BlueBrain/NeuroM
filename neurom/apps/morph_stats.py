@@ -30,10 +30,10 @@
 import logging
 from collections import defaultdict
 from itertools import product
+from functools import partial
 from pathlib import Path
 import multiprocessing
 from tqdm import tqdm
-from functools import partial
 
 import numpy as np
 import pandas as pd
@@ -98,6 +98,7 @@ def extract_dataframe(neurons, config, n_workers=1):
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
         n_workers (int): number of workers for multiprocessing (on collection of neurons)
+
     Returns:
         The extracted statistics
 
@@ -120,9 +121,9 @@ def extract_dataframe(neurons, config, n_workers=1):
                  stat for nrn, stat in tqdm(zip(neurons,
                                                 pool.imap(partial(extract_stats, config=config),
                                                           neurons)
-                                                ), total=len(neurons)
-                                            )
-                 }
+                                               ), total=len(neurons)
+                                           )
+                }
     columns = list(next(iter(next(iter(stats.values())).values())).keys())
 
     rows = [[name, neurite_type] + list(features.values())
