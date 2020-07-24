@@ -131,6 +131,20 @@ def test_eval_stats_applies_numpy_function():
             getattr(np, m)(ref_array))
 
 
+def test_extract_stats_single_neuron():
+    nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+    res = ms.extract_stats(nrn, REF_CONFIG)
+    assert_equal(set(res.keys()), set(REF_OUT.keys()))
+    # Note: soma radius is calculated from the sphere that gives the area
+    # of the cylinders described in Neuron.swc
+    assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
+
+    for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
+        assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
+        for kk in res[k].keys():
+            assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
+
+
 def test_extract_dataframe():
     # Vanilla test
     nrns = nm.load_neurons([Path(SWC_PATH, name)
