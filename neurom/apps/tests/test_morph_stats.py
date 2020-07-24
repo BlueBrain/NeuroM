@@ -26,7 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 from pathlib import Path
+import warnings
 
 import numpy as np
 from nose.tools import (assert_almost_equal, assert_equal,
@@ -129,21 +131,6 @@ def test_eval_stats_applies_numpy_function():
             getattr(np, m)(ref_array))
 
 
-def test_extract_stats_single_neuron():
-    path = SWC_PATH / 'Neuron.swc'
-    for nrn in (nm.load_neuron(path), path, str(path)):
-        res = ms.extract_stats(nrn, REF_CONFIG)
-        assert_equal(set(res.keys()), set(REF_OUT.keys()))
-        # Note: soma radius is calculated from the sphere that gives the area
-        # of the cylinders described in Neuron.swc
-        assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
-
-        for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
-            assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
-            for kk in res[k].keys():
-                assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
-
-
 def test_extract_dataframe():
     # Vanilla test
     nrns = nm.load_neurons([Path(SWC_PATH, name)
@@ -201,12 +188,20 @@ def test_extract_dataframe():
 def test_extract_dataframe_multiproc():
     nrns = nm.load_neurons([Path(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
-    actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=2)
+    with warnings.catch_warnings(record=True) as w:
+        actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=2)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0)
 
     # Compare sorted DataFrame since Pool.imap_unordered disrupted the order
     assert_frame_equal(actual.sort_values(by=['name']).reset_index(drop=True),
                        expected.sort_values(by=['name']).reset_index(drop=True))
+
+    with warnings.catch_warnings(record=True) as w:
+        actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=os.cpu_count() + 1)
+        assert_equal(len(w), 1, "Warning not emitted")
+    assert_frame_equal(actual.sort_values(by=['name']).reset_index(drop=True),
+                       expected.sort_values(by=['name']).reset_index(drop=True))
+
 
 
 def test_get_header():

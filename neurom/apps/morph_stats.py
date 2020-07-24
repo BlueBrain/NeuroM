@@ -27,12 +27,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Core code for morph_stats application."""
+import os
 import logging
 from collections import defaultdict
 from itertools import product
 from pathlib import Path
 import multiprocessing
 from functools import partial
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -126,6 +128,8 @@ def extract_dataframe(neurons, config, n_workers=1):
     if n_workers == 1:
         stats = dict(map(func, neurons))
     else:
+        if n_workers > os.cpu_count():
+            warnings.warn(f'n_workers ({n_workers}) > os.cpu_count() ({os.cpu_count()}))')
         with multiprocessing.Pool(n_workers) as pool:
             stats = dict(pool.imap_unordered(func, neurons))
 
@@ -159,9 +163,6 @@ def extract_stats(neurons, config):
 
     {config_path}
     """
-    if isinstance(neurons, (str, Path)) or (isinstance(neurons, list) and
-                                            all(isinstance(nrn, (str, Path)) for nrn in neurons)):
-        neurons = nm.load_neurons(neurons)
 
     def _fill_stats_dict(data, stat_name, stat):
         """Insert the stat data in the dict.
