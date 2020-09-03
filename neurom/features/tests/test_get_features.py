@@ -109,6 +109,17 @@ def test_number_of_sections():
     assert_features_for_neurite(feat, POP, expected)
 
 
+def test_max_radial_distances():
+    feat = 'max_radial_distances'
+    expected = {
+        None: [99.58945832, 94.43342439, 1053.77939245],
+        NeuriteType.all: [99.58945832, 94.43342439, 1053.77939245],
+        NeuriteType.axon: [82.442545, 82.442545, 1053.779392],
+        NeuriteType.basal_dendrite: [94.43342563, 94.43342439, 207.56977859],
+    }
+    assert_features_for_neurite(feat, POP, expected, exact=False)
+
+
 def test_section_tortuosity_pop():
 
     feat = 'section_tortuosity'
