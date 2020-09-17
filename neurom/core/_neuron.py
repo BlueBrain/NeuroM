@@ -156,7 +156,7 @@ class Section(Tree):
 
     def __init__(self, points, section_id=None, section_type=NeuriteType.undefined):
         """Initialize a Section object."""
-        super(Section, self).__init__()
+        super().__init__()
         self.id = section_id
         self.points = points
         self.type = section_type

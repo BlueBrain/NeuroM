@@ -7,9 +7,10 @@ import numpy as np
 try:
     import plotly.graph_objs as go
     from plotly.offline import plot, iplot, init_notebook_mode
-except ImportError:
+except ImportError as e:
     raise ImportError(
-        'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]')
+        'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]'
+    ) from e
 
 from neurom import COLS, iter_segments, iter_neurites
 from neurom.core import Neuron
