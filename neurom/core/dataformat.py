@@ -41,7 +41,7 @@ class _COLS(object):
 class _PublicColumns(object):
     """Column labels for internal data representation."""
     COL_COUNT = _COL_COUNT
-    (X, Y, Z, R, _TYPE, _ID, _P) = range(COL_COUNT)
+    (X, Y, Z, R) = range(4)
     XY = slice(0, 2)
     XZ = slice(0, 3, 2)
     YZ = slice(1, 3)
@@ -52,17 +52,17 @@ class _PublicColumns(object):
     def TYPE(self):
         warnings.warn('Using _COLS.TYPE is now deprecated. '
                       'Please consider using "section.type" to get the type of a section.')
-        return __COLS.TYPE
+        return _COLS.TYPE
 
     @property
     def ID(self):
         warnings.warn('Using _COLS.ID is now deprecated')
-        return __COLS.ID
+        return _COLS.ID
 
     @property
     def P(self):
         warnings.warn('Using _COLS.P is now deprecated')
-        return __COLS.P
+        return _COLS.P
 
 
 COLS = _PublicColumns()

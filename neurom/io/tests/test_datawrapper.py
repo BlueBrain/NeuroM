@@ -1,10 +1,10 @@
 """Test neurom.io.utils."""
-from pathlib import Path
-import numpy as np
-from nose import tools as nt
+import warnings
 
+import numpy as np
+from neurom.core.dataformat import COLS, POINT_TYPE, ROOT_ID
 from neurom.io import datawrapper as dw
-from neurom.core.dataformat import POINT_TYPE, ROOT_ID
+from nose import tools as nt
 
 
 def test__merge_sections():
@@ -61,3 +61,23 @@ def test_BlockNeuronBuilder():
                   [ 1., 0., 0., 1., 2., 1.,  0.],
                   [ 2., 0., 0., 1., 4., 2.,  0.],
                   [10., 0., 0., 1., 4., 3.,  2.]]))
+
+
+def test_deprecated_columns():
+    with warnings.catch_warnings(record=True) as w:
+        COLS.TYPE
+        nt.eq_(len(w), 1)
+        nt.eq_(str(w[0].message),
+            'Using _COLS.TYPE is now deprecated. Please consider using "section.type" to get the type of a section.')
+
+    with warnings.catch_warnings(record=True) as w:
+        COLS.ID
+        nt.eq_(len(w), 1)
+        nt.eq_(str(w[0].message),
+               'Using _COLS.ID is now deprecated')
+
+    with warnings.catch_warnings(record=True) as w:
+        COLS.P
+        nt.eq_(len(w), 1)
+        nt.eq_(str(w[0].message),
+               'Using _COLS.P is now deprecated')
