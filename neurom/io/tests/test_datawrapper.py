@@ -68,7 +68,8 @@ def test_deprecated_columns():
         COLS.TYPE
         nt.eq_(len(w), 1)
         nt.eq_(str(w[0].message),
-            'Using _COLS.TYPE is now deprecated. Please consider using "section.type" to get the type of a section.')
+               'Using _COLS.TYPE is now deprecated. '
+               'Please consider using "section.type" to get the type of a section.')
 
     with warnings.catch_warnings(record=True) as w:
         COLS.ID
