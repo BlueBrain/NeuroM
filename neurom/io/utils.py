@@ -73,8 +73,8 @@ class NeuronLoader(object):
             candidates = self.directory.glob(name + ".*")
             try:
                 return next(filter(_is_morphology_file, candidates))
-            except StopIteration:
-                raise NeuroMError("Can not find morphology file for '%s' " % name)
+            except StopIteration as e:
+                raise NeuroMError("Can not find morphology file for '%s' " % name) from e
         else:
             return Path(self.directory, name + self.file_ext)
 
@@ -193,7 +193,7 @@ def load_data(handle, reader=None):
         return _READERS[reader](filename)
     except Exception as e:
         L.exception('Error reading file %s, using "%s" loader', filename, reader)
-        raise RawDataError('Error reading file %s:\n%s' % (filename, str(e)))
+        raise RawDataError('Error reading file %s:\n%s' % (filename, str(e))) from e
 
 
 def _load_h5(filename):

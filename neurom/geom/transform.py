@@ -99,7 +99,7 @@ class PivotRotation(Rotation):
             dcm: a 3x3 direction cosine matrix
             pivot: a 3-vector specifying the origin of rotation
         """
-        super(PivotRotation, self).__init__(dcm)
+        super().__init__(dcm)
         self._origin = np.zeros(3) if pivot is None else np.array(pivot)
 
     def __call__(self, points):
@@ -122,8 +122,8 @@ def translate(obj, t):
     """
     try:
         return obj.transform(Translation(t))
-    except AttributeError:
-        raise NotImplementedError
+    except AttributeError as e:
+        raise NotImplementedError from e
 
 
 def rotate(obj, axis, angle, origin=None):
@@ -143,8 +143,8 @@ def rotate(obj, axis, angle, origin=None):
 
     try:
         return obj.transform(PivotRotation(R, origin))
-    except AttributeError:
-        raise NotImplementedError
+    except AttributeError as e:
+        raise NotImplementedError from e
 
 
 def _sin(x):

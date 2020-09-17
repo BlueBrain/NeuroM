@@ -77,7 +77,7 @@ class SomaSinglePoint(Soma):
 
     def __init__(self, points):
         """Initialize a SomaSinglePoint object."""
-        super(SomaSinglePoint, self).__init__(points)
+        super().__init__(points)
         self.radius = points[0][COLS.R]
 
     def __str__(self):
@@ -112,7 +112,7 @@ class SomaCylinders(Soma):
 
     def __init__(self, points):
         """Initialize a SomaCyliners object."""
-        super(SomaCylinders, self).__init__(points)
+        super().__init__(points)
         self.area = sum(morphmath.segment_area((p0, p1))
                         for p0, p1 in zip(points, points[1:]))
         self.radius = math.sqrt(self.area / (4. * math.pi))
@@ -156,7 +156,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
     def __init__(self, points):
         """Initialize a SomaNeuromorphoThreePointCylinders object."""
-        super(SomaNeuromorphoThreePointCylinders, self).__init__(points)
+        super().__init__(points)
 
         # X    Y     Z   R    P
         # xs ys      zs rs   -1
@@ -204,7 +204,7 @@ class SomaSimpleContour(Soma):
 
     def __init__(self, points):
         """Initialize a SomaSimpleContour object."""
-        super(SomaSimpleContour, self).__init__(points)
+        super().__init__(points)
         points = np.array(self._points)
         self.radius = morphmath.average_points_dist(
             self.center, points[:, COLS.XYZ])

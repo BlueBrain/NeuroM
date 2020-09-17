@@ -46,7 +46,7 @@ class FstNeuron(Neuron):
         neurites, sections = make_neurites(self._data)
         soma_check, soma_class = _SOMA_CONFIG[self._data.fmt]
         soma = make_soma(self._data.soma_points(), soma_check, soma_class)
-        super(FstNeuron, self).__init__(soma, neurites, sections, name)
+        super().__init__(soma, neurites, sections, name)
         self._points = None
 
     @property
