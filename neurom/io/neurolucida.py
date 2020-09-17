@@ -36,7 +36,7 @@ from io import open
 
 import numpy as np
 
-from neurom.core.dataformat import COLS, POINT_TYPE
+from neurom.core.dataformat import _COLS, COLS, POINT_TYPE
 
 from .datawrapper import DataWrapper
 
@@ -232,7 +232,7 @@ def _sections_to_raw_data(sections):
         if neurite is None:
             continue
 
-        if neurite[0][COLS.TYPE] == POINT_TYPE.SOMA:
+        if neurite[0][_COLS.TYPE] == POINT_TYPE.SOMA:
             assert soma is None, 'Multiple somas defined in file'
             soma = neurite
         else:
@@ -247,10 +247,10 @@ def _sections_to_raw_data(sections):
     for neurite in neurites:
         end = pos + len(neurite)
         ret[pos:end, :] = neurite
-        ret[pos:end, COLS.P] += pos
-        ret[pos:end, COLS.ID] += pos
+        ret[pos:end, _COLS.P] += pos
+        ret[pos:end, _COLS.ID] += pos
         # TODO: attach the neurite at the closest point on the soma
-        ret[pos, COLS.P] = len(soma) - 1
+        ret[pos, _COLS.P] = len(soma) - 1
         pos = end
 
     return ret

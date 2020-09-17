@@ -30,7 +30,7 @@ from pathlib import Path
 
 import h5py
 import numpy as np
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import COLS, _COLS
 from neurom.io import hdf5, swc
 from nose import tools as nt
 
@@ -110,7 +110,7 @@ class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 
     def setup(self):
         self.data = hdf5.read(Path(H5V1_PATH, 'Neuron.h5'))
-        self.first_id = int(self.data.data_block[0][COLS.ID])
+        self.first_id = int(self.data.data_block[0][_COLS.ID])
         self.rows = len(self.data.data_block)
 
 
@@ -119,7 +119,7 @@ class TestDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
 
     def setup(self):
         self.data = hdf5.read(Path(H5V2_PATH, 'Neuron.h5'))
-        self.first_id = int(self.data.data_block[0][COLS.ID])
+        self.first_id = int(self.data.data_block[0][_COLS.ID])
         self.rows = len(self.data.data_block)
 
 

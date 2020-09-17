@@ -8,7 +8,7 @@ import neurom.io.neurolucida as nasc
 import numpy as np
 from mock import patch
 from neurom import load_neuron
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import COLS, _COLS
 from neurom.io.datawrapper import DataWrapper
 from nose.tools import eq_, ok_
 from numpy.testing import assert_array_equal
@@ -91,8 +91,8 @@ def test__flatten_section():
                   ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     # correct parents
-    ok_(np.allclose(ret[:, COLS.P], np.arange(-1, 4)))
-    ok_(np.allclose(ret[:, COLS.ID], np.arange(0, 5)))
+    ok_(np.allclose(ret[:, _COLS.P], np.arange(-1, 4)))
+    ok_(np.allclose(ret[:, _COLS.ID], np.arange(0, 5)))
 
     subsection = [['-1', '-1', '-1', '-1'],
                   [['0', '0', '0', '0'],
@@ -109,10 +109,10 @@ def test__flatten_section():
                   ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     # correct parents
-    eq_(ret[0, COLS.P], -1.)
-    eq_(ret[1, COLS.P], 0.0)
-    eq_(ret[6, COLS.P], 0.0)
-    ok_(np.allclose(ret[:, COLS.ID], np.arange(0, 11)))  # correct ID
+    eq_(ret[0, _COLS.P], -1.)
+    eq_(ret[1, _COLS.P], 0.0)
+    eq_(ret[6, _COLS.P], 0.0)
+    ok_(np.allclose(ret[:, _COLS.ID], np.arange(0, 11)))  # correct ID
 
     # Try a non-standard bifurcation, ie: missing '|' separator
     subsection = [['-1', '-1', '-1', '-1'],
@@ -135,11 +135,11 @@ def test__flatten_section():
                   ]
     ret = np.array([row for row in nasc._flatten_subsection(subsection, 0, offset=0, parent=-1)])
     # correct parents
-    eq_(ret[0, COLS.P], -1.)
-    eq_(ret[1, COLS.P], 0.0)
-    eq_(ret[3, COLS.P], 0.0)
-    eq_(ret[5, COLS.P], 0.0)
-    ok_(np.allclose(ret[:, COLS.ID], np.arange(0, 7)))  # correct ID
+    eq_(ret[0, _COLS.P], -1.)
+    eq_(ret[1, _COLS.P], 0.0)
+    eq_(ret[3, _COLS.P], 0.0)
+    eq_(ret[5, _COLS.P], 0.0)
+    ok_(np.allclose(ret[:, _COLS.ID], np.arange(0, 7)))  # correct ID
 
 
 def test__extract_section():
@@ -190,9 +190,9 @@ def test_sections_to_raw_data():
     sections = [soma, fake_neurite, axon, dendrite, ]
     raw_data = nasc._sections_to_raw_data(sections)
     eq_(raw_data.shape, (15, 7))
-    ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 15)))  # correct ID
+    ok_(np.allclose(raw_data[:, _COLS.ID], np.arange(0, 15)))  # correct ID
     # 3 is ID of end of the soma, 2 sections attach to this
-    ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
+    ok_(np.count_nonzero(raw_data[:, _COLS.P] == 3),  2)
 
 
 # what I think the
@@ -241,9 +241,9 @@ def test_read():
     raw_data = rdw.data_block
 
     eq_(raw_data.shape, (19, 7))
-    ok_(np.allclose(raw_data[:, COLS.ID], np.arange(0, 19)))  # correct ID
+    ok_(np.allclose(raw_data[:, _COLS.ID], np.arange(0, 19)))  # correct ID
     # 3 is ID of end of the soma, 2 sections attach to this
-    ok_(np.count_nonzero(raw_data[:, COLS.P] == 3),  2)
+    ok_(np.count_nonzero(raw_data[:, _COLS.P] == 3),  2)
 
     with warnings.catch_warnings(record=True):
         neuron = load_neuron(StringIO(MORPH_ASC), reader='asc')

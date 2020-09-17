@@ -32,7 +32,7 @@ import logging
 from collections import defaultdict, namedtuple
 
 import numpy as np
-from neurom.core.dataformat import COLS, POINT_TYPE, ROOT_ID
+from neurom.core.dataformat import COLS, _COLS, POINT_TYPE, ROOT_ID
 
 L = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class DataWrapper(object):
     def soma_points(self):
         """Get the soma points."""
         db = self.data_block
-        return db[db[:, COLS.TYPE] == POINT_TYPE.SOMA]
+        return db[db[:, _COLS.TYPE] == POINT_TYPE.SOMA]
 
 
 def _merge_sections(sec_a, sec_b):
@@ -144,7 +144,7 @@ class DataBlockSection(object):
 
 def _extract_sections(data_block):
     """Make a list of sections from an SWC-style data wrapper block."""
-    structure_block = data_block[:, COLS.TYPE:COLS.COL_COUNT].astype(np.int)
+    structure_block = data_block[:, _COLS.TYPE:COLS.COL_COUNT].astype(np.int)
 
     # SWC ID -> structure_block position
     id_map = {-1: -1}
@@ -262,8 +262,8 @@ class BlockNeuronBuilder(object):
             id_to_insert_id[section_id] = row_count - 1
 
         datablock = np.empty((row_count, COLS.COL_COUNT), dtype=np.float)
-        datablock[:, COLS.ID] = np.arange(len(datablock))
-        datablock[:, COLS.P] = datablock[:, COLS.ID] - 1
+        datablock[:, _COLS.ID] = np.arange(len(datablock))
+        datablock[:, _COLS.P] = datablock[:, _COLS.ID] - 1
 
         sections = []
         insert_index = 0
@@ -273,8 +273,8 @@ class BlockNeuronBuilder(object):
 
             idx = slice(insert_index, insert_index + len(points))
             datablock[idx, COLS.XYZR] = points
-            datablock[idx, COLS.TYPE] = section_type
-            datablock[idx.start, COLS.P] = id_to_insert_id.get(parent_id, ROOT_ID)
+            datablock[idx, _COLS.TYPE] = section_type
+            datablock[idx.start, _COLS.P] = id_to_insert_id.get(parent_id, ROOT_ID)
             sections.append(DataBlockSection(idx, section_type, parent_id))
             insert_index = idx.stop
 

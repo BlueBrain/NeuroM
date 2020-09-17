@@ -33,7 +33,7 @@ from copy import deepcopy
 import numpy as np
 
 from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError)
-from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
+from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID, _COLS
 from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
 
 
@@ -108,7 +108,7 @@ def make_neurites(rdw):
 
 def _remove_soma_initial_point(tree):
     """Remove tree's initial point if soma."""
-    if tree.points[0][COLS.TYPE] == POINT_TYPE.SOMA:
+    if tree.points[0][_COLS.TYPE] == POINT_TYPE.SOMA:
         tree.points = tree.points[1:]
 
 
@@ -121,7 +121,7 @@ def _check_soma_topology_swc(points):
     if len(points) == 3:
         return
 
-    parents = tuple(p[COLS.P] for p in points if p[COLS.P] != ROOT_ID)
+    parents = tuple(p[_COLS.P] for p in points if p[_COLS.P] != ROOT_ID)
     if len(parents) > len(set(parents)):
         raise SomaError("Bifurcating soma")
 

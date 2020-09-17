@@ -32,7 +32,7 @@ import warnings
 
 import numpy as np
 from neurom import morphmath
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import COLS, _COLS
 from neurom.exceptions import SomaError
 
 
@@ -242,9 +242,9 @@ def _get_type(points, soma_class):
                 2: None}.get(npoints, SomaSimpleContour)
 
     if(npoints == 3 and
-       points[0][COLS.P] == -1 and
-       points[1][COLS.P] == 1 and
-       points[2][COLS.P] == 1):
+       points[0][_COLS.P] == -1 and
+       points[1][_COLS.P] == 1 and
+       points[2][_COLS.P] == 1):
         warnings.warn('Using neuromorpho 3-Point soma')
         # NeuroMorpho is the main provider of morphologies, but they
         # with SWC as their default file format: they convert all

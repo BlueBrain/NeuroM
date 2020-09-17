@@ -29,7 +29,7 @@
 """Module with consistency/validity checks for raw data  blocks."""
 import numpy as np
 from neurom.check import CheckResult
-from neurom.core.dataformat import COLS
+from neurom.core.dataformat import COLS, _COLS
 from neurom.core.dataformat import POINT_TYPE
 from neurom.core import make_soma
 from neurom.fst._core import make_neurites
@@ -43,7 +43,7 @@ def has_sequential_ids(data_wrapper):
     with their predecessor)
     """
     db = data_wrapper.data_block
-    ids = db[:, COLS.ID]
+    ids = db[:, _COLS.ID]
     steps = ids[np.where(np.diff(ids) != 1)[0] + 1].astype(int)
     return CheckResult(len(steps) == 0, steps)
 
@@ -58,7 +58,7 @@ def no_missing_parents(data_wrapper):
         CheckResult with result and list of IDs that have no parent
     """
     db = data_wrapper.data_block
-    ids = np.setdiff1d(db[:, COLS.P], db[:, COLS.ID])[1:]
+    ids = np.setdiff1d(db[:, _COLS.P], db[:, _COLS.ID])[1:]
     return CheckResult(len(ids) == 0, ids.astype(np.int) + 1)
 
 
@@ -74,7 +74,7 @@ def is_single_tree(data_wrapper):
         This assumes no_missing_parents passed.
     """
     db = data_wrapper.data_block
-    bad_ids = db[db[:, COLS.P] == -1][1:, COLS.ID]
+    bad_ids = db[db[:, _COLS.P] == -1][1:, _COLS.ID]
     return CheckResult(len(bad_ids) == 0, bad_ids.tolist())
 
 
@@ -86,7 +86,7 @@ def has_increasing_ids(data_wrapper):
         with their predecessor
     """
     db = data_wrapper.data_block
-    ids = db[:, COLS.ID]
+    ids = db[:, _COLS.ID]
     steps = ids[np.where(np.diff(ids) <= 0)[0] + 1].astype(int)
     return CheckResult(len(steps) == 0, steps)
 
@@ -98,7 +98,7 @@ def has_soma_points(data_wrapper):
         CheckResult with result
     """
     db = data_wrapper.data_block
-    return CheckResult(POINT_TYPE.SOMA in db[:, COLS.TYPE], None)
+    return CheckResult(POINT_TYPE.SOMA in db[:, _COLS.TYPE], None)
 
 
 def has_all_finite_radius_neurites(data_wrapper, threshold=0.0):
@@ -108,9 +108,9 @@ def has_all_finite_radius_neurites(data_wrapper, threshold=0.0):
         CheckResult with result and list of IDs of neurite points with zero radius
     """
     db = data_wrapper.data_block
-    neurite_ids = np.in1d(db[:, COLS.TYPE], POINT_TYPE.NEURITES)
+    neurite_ids = np.in1d(db[:, _COLS.TYPE], POINT_TYPE.NEURITES)
     zero_radius_ids = db[:, COLS.R] <= threshold
-    bad_pts = np.array(db[neurite_ids & zero_radius_ids][:, COLS.ID],
+    bad_pts = np.array(db[neurite_ids & zero_radius_ids][:, _COLS.ID],
                        dtype=int).tolist()
     return CheckResult(len(bad_pts) == 0, bad_pts)
 

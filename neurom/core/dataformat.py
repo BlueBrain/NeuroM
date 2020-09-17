@@ -27,20 +27,45 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Data format definitions."""
+import warnings
 
 
 _COL_COUNT = 7
 
 
-class COLS(object):
+class _COLS(object):
+    """A class for internal columns."""
+    TYPE, ID, P = 4, 5, 6
+
+
+class _PublicColumns(object):
     """Column labels for internal data representation."""
     COL_COUNT = _COL_COUNT
-    (X, Y, Z, R, TYPE, ID, P) = range(_COL_COUNT)
+    (X, Y, Z, R, _TYPE, _ID, _P) = range(COL_COUNT)
     XY = slice(0, 2)
     XZ = slice(0, 3, 2)
     YZ = slice(1, 3)
     XYZ = slice(0, 3)
     XYZR = slice(0, 4)
+
+    @property
+    def TYPE(self):
+        warnings.warn('Using _COLS.TYPE is now deprecated. '
+                      'Please consider using "section.type" to get the type of a section.')
+        return __COLS.TYPE
+
+    @property
+    def ID(self):
+        warnings.warn('Using _COLS.ID is now deprecated')
+        return __COLS.ID
+
+    @property
+    def P(self):
+        warnings.warn('Using _COLS.P is now deprecated')
+        return __COLS.P
+
+
+COLS = _PublicColumns()
 
 
 class POINT_TYPE(object):
