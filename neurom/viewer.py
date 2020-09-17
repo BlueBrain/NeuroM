@@ -117,8 +117,8 @@ def draw(obj, mode='2d', **kwargs):
     viewer = '%s_%s' % (tag, mode)
     try:
         plotter = _VIEWERS[viewer]
-    except KeyError:
-        raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode))
+    except KeyError as e:
+        raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode)) from e
 
     output_path = kwargs.pop('output_path', None)
     plotter(ax, obj, **kwargs)

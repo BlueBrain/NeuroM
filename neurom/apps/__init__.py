@@ -45,4 +45,4 @@ def get_config(config, default_config):
     except (yaml.reader.ReaderError,
             yaml.parser.ParserError,
             yaml.scanner.ScannerError) as e:
-        raise ConfigError('Invalid yaml file: \n %s' % str(e))
+        raise ConfigError('Invalid yaml file: \n %s' % str(e)) from e
