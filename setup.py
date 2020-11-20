@@ -39,7 +39,7 @@ setup(
     url='http://https://github.com/BlueBrain/NeuroM',
     install_requires=[
         'click>=7.0',
-        'h5py>=2.7.1',
+        'h5py>=2.7.1,<3.0.0',
         'matplotlib>=3.2.1',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
