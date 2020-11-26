@@ -2,7 +2,7 @@ from pathlib import Path
 
 import neurom as nm
 import neurom.io
-import neurom.fst._core
+from neurom.fst._core import FstNeuron
 from neurom.check import neuron_checks as nc
 from neurom.check import structural_checks as sc
 
@@ -114,7 +114,7 @@ class TimeChecks:
     def setup(self):
         path = Path(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.data_wrapper = neurom.io.load_data(path)
-        self.neuron = neurom.fst._core.FstNeuron(self.data_wrapper)
+        self.neuron = FstNeuron(self.data_wrapper)
 
     def time_has_sequential_ids(self):
         sc.has_sequential_ids(self.data_wrapper)

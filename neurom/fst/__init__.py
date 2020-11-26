@@ -1,9 +1,5 @@
-"""Legacy module, replaced by neurom.features."""
-from warnings import warn
-from neurom.features import neuritefunc as _neuritefunc
-from neurom.features import neuronfunc as _neuronfunc
-from neurom.features import sectionfunc
+"""This module used to have all fst related function that were deprecated and now removed.
 
-from neurom.features import NEURITEFEATURES, NEURONFEATURES, get, register_neurite_feature
-warn('neurom.fst is being deprecated and will be removed in NeuroM v1.5.0,'
-     ' replace it by neurom.features', DeprecationWarning)
+The class FstNeuron is still here and has not been moved to a better
+suited plane since moving it would imply a breaking change.
+"""

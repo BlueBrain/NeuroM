@@ -39,7 +39,7 @@ from nose import tools as nt
 from neurom import get
 from neurom.core import Neuron, SomaError
 from neurom.exceptions import NeuroMError, RawDataError, SomaError
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 from neurom.io import utils
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'

@@ -32,7 +32,7 @@ from pathlib import Path
 import neurom.geom.transform as gtr
 import numpy as np
 from neurom import load_neuron
-from neurom.fst import _neuritefunc as _nf
+from neurom.features import neuritefunc as _nf
 from nose import tools as nt
 
 TEST_UVEC = np.array([0.01856633,  0.37132666,  0.92831665])
