@@ -478,7 +478,7 @@ def test_register_neurite_feature_pop():
     def vol(neurite):
         return neurite.volume
 
-    features.register_neurite_feature('foo', npts)
+    features.register_neurite_feature('foo2', npts)
 
     n_points_ref = [len(n.points) for n in iter_neurites(POP)]
     n_points = get_feature('foo', POP)
@@ -490,7 +490,7 @@ def test_register_neurite_feature_pop():
     n_points = get_feature('foo', POP, neurite_type=NeuriteType.basal_dendrite)
     assert_items_equal(n_points, n_points_ref)
 
-    features.register_neurite_feature('bar', vol)
+    features.register_neurite_feature('bar2', vol)
 
     n_volume_ref = [n.volume for n in iter_neurites(POP)]
     n_volume = get_feature('bar', POP)
