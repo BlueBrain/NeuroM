@@ -30,7 +30,7 @@
 import os
 import logging
 from collections import defaultdict
-from itertools import product
+from itertools import product, chain
 from pathlib import Path
 import multiprocessing
 from functools import partial
@@ -124,20 +124,25 @@ def extract_dataframe(neurons, config, n_workers=1):
 
     func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
-        stats = dict(map(func, neurons))
+        stats = list(map(func, neurons))
     else:
         if n_workers > os.cpu_count():
             warnings.warn(f'n_workers ({n_workers}) > os.cpu_count() ({os.cpu_count()}))')
         with multiprocessing.Pool(n_workers) as pool:
-            stats = dict(pool.imap_unordered(func, neurons))
+            stats = list(pool.imap(func, neurons))
 
-    columns = list(next(iter(next(iter(stats.values())).values())).keys())
+    columns = list(next(iter(stats[0][1].values())).keys())
 
-    rows = [[name, neurite_type] + list(features.values())
-            for name, data in stats.items()
-            for neurite_type, features in data.items()]
-    return pd.DataFrame(columns=['name', 'neurite_type'] + columns,
-                        data=rows)
+    rows = [[name] + list(chain.from_iterable(features.values() for features in data.values()))
+            for name, data in stats]
+
+    columns = list(chain.from_iterable(
+        [[('neuron', 'name')],
+         product(map(lambda x: x.lower(), config.get('neurite_type', _NEURITE_MAP.keys())),
+                 columns)]))
+    columns = pd.MultiIndex.from_tuples(columns)
+
+    return pd.DataFrame(columns=columns, data=rows)
 
 
 def extract_stats(neurons, config):

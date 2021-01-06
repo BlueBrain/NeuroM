@@ -46,6 +46,7 @@ setup(
         'pyyaml>=3.10',
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
+        'more_itertools>=8.6.0',
         ],
     packages=find_packages(),
     license='BSD',
