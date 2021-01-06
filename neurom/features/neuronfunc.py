@@ -38,25 +38,25 @@ from neurom.core._neuron import iter_neurites, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features.register import feature
-from neurom.features import Shape
+from neurom.features import feature
 
 from neurom.geom import bounding_box
 
 feature = partial(feature, namespace='NEURONFEATURES')
+
 
 def neuron_population(nrns):
     """Makes sure `nrns` behaves like a neuron population."""
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
 
-@feature(shape=[1], namespace='NEURONFEATURES')
+@feature(shape=())
 def soma_volume(nrn):
     """Get the volume of a neuron's soma."""
     return nrn.soma.volume
 
 
-@feature(shape=[Shape.OnePerNeuron])
+@feature(shape=(...,))
 def soma_volumes(nrn_pop):
     """Get the volume of the somata in a population of neurons.
 
@@ -68,7 +68,7 @@ def soma_volumes(nrn_pop):
     return [soma_volume(n) for n in nrns]
 
 
-@feature(shape=[1])
+@feature(shape=())
 def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
     """Get the surface area of a neuron's soma.
 
@@ -79,7 +79,7 @@ def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
     return 4 * math.pi * nrn.soma.radius ** 2
 
 
-@feature(shape=[Shape.OnePerNeuron])
+@feature(shape=(...,))
 def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     """Get the surface areas of the somata in a population of neurons.
 
@@ -95,7 +95,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
     return [soma_surface_area(n) for n in nrns]
 
 
-@feature(shape=[Shape.OnePerNeuron])
+@feature(shape=(...,))
 def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     """Get the radii of the somata of a population of neurons.
 
@@ -108,7 +108,7 @@ def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
     return [n.soma.radius for n in nrns]
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
     """List of lengths of trunk sections of neurites in a neuron."""
     neurite_filter = is_type(neurite_type)
@@ -116,14 +116,14 @@ def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
             for s in nrn.neurites if neurite_filter(s)]
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
     """Radii of the trunk sections of neurites in a neuron."""
     neurite_filter = is_type(neurite_type)
     return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin azimuths of a neuron or population.
 
@@ -145,7 +145,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin elevations of a neuron or population.
 
@@ -172,7 +172,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
             for s in n.neurites if neurite_filter(s)]
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_vectors(nrn, neurite_type=NeuriteType.all):
     """Calculates the vectors between all the trunks of the neuron and the soma center."""
     neurite_filter = is_type(neurite_type)
@@ -183,7 +183,7 @@ def trunk_vectors(nrn, neurite_type=NeuriteType.all):
                      for s in n.neurites if neurite_filter(s)])
 
 
-@feature(shape=[Shape.OnePerNeurite])
+@feature(shape=(...,))
 def trunk_angles(nrn, neurite_type=NeuriteType.all):
     """Calculates the angles between all the trunks of the neuron.
 
@@ -211,7 +211,7 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
             for i, _ in enumerate(ordered_vectors)]
 
 
-@feature(shape=[Shape.Any])
+@feature(shape=(...,))
 def sholl_crossings(neurites, center, radii):
     """Calculate crossings of neurites.
 
@@ -241,7 +241,7 @@ def sholl_crossings(neurites, center, radii):
                      for r in radii])
 
 
-@feature(shape=[Shape.Any])
+@feature(shape=(...,))
 def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
     """Perform Sholl frequency calculations on a population of neurites.
 

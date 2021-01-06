@@ -133,7 +133,7 @@ if __name__ == '__main__':
                                logging.DEBUG)[min(_args.verbose, 2)])
 
     if _args.list:
-        print(nm.fst._get_doc())  # pylint: disable=W0212
+        print(nm.features._get_doc())  # pylint: disable=W0212
         sys.exit(0)
     elif not _args.datapath:
         get_parser().print_usage()

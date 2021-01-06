@@ -43,8 +43,10 @@ for developers of NeuroM itself.
    :toctree: _neurom_build
 
    neurom.morphmath
-   neurom.fst
-   neurom.fst.sectionfunc
+   neurom.features
+   neurom.features.neuritefunc
+   neurom.features.sectionfunc
+   neurom.features.bifurcationfunc
    neurom.check.morphtree
    neurom.check.structural_checks
    neurom.check.neuron_checks
