@@ -67,7 +67,7 @@ def register_neurite_feature(name, func):
         """Wrap neurite function from outer scope and map into list."""
         return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
 
-    _register_feature('NEURITEFEATURES', name, _fun, shape=(...))
+    _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
 
 
 def get(feature_name, obj, **kwargs):
@@ -81,9 +81,9 @@ def get(feature_name, obj, **kwargs):
     Returns:
         features as a 1D or 2D numpy array.
     """
-    for feature_list in (NEURITEFEATURES, NEURONFEATURES):
-        if feature_name in feature_list:
-            feat = feature_list[feature_name]
+    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
+        if feature_name in feature_dict:
+            feat = feature_dict[feature_name]
             break
     else:
         raise NeuroMError(f'Unable to find feature: {feature_name}')
@@ -139,11 +139,11 @@ def _register_feature(namespace, name, func, shape):
     setattr(func, 'shape', shape)
 
     assert namespace in {'NEURITEFEATURES', 'NEURONFEATURES'}
-    feature_list = globals()[namespace]
+    feature_dict = globals()[namespace]
 
-    if name in feature_list:
+    if name in feature_dict:
         raise NeuroMError('Attempt to hide registered feature %s' % name)
-    feature_list[name] = func
+    feature_dict[name] = func
 
 
 def feature(shape, namespace=None, name=None):
