@@ -541,11 +541,9 @@ def neurite_volume_density(neurites, neurite_type=NeuriteType.all):
         """Volume density of a single neurite."""
         try:
             volume = convex_hull(neurite).volume
-        except scipy.spatial.qhull.QhullError as e:
+        except scipy.spatial.qhull.QhullError:
             L.exception('Failure to compute neurite volume using the convex hull. '
-                        'Feature `neurite_volume_density` will return `np.nan`.\n'
-                        'Caught stacktrace:\n %s',
-                        e)
+                        'Feature `neurite_volume_density` will return `np.nan`.\n')
             return np.nan
 
         return neurite.volume / volume

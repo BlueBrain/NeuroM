@@ -42,7 +42,7 @@ import pkg_resources
 
 import neurom as nm
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_and_shape
+from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
 from neurom.fst._core import FstNeuron
 
 L = logging.getLogger(__name__)
@@ -167,10 +167,11 @@ def extract_stats(neurons, config):
 
         If the feature is 2-dimensional, the feature is flattened on its last axis
         """
-        assert len(shape) <= 2, f'Wrong shape: {shape}'
         if len(shape) == 2:
             for i in range(shape[1]):
                 data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
+        elif len(shape) > 2:
+            raise ValueError(f'Feature with wrong shape: {shape}')
         else:
             data[stat_name] = stat
 
@@ -180,14 +181,15 @@ def extract_stats(neurons, config):
                                                        config.get('neurite_type',
                                                                   _NEURITE_MAP.keys())):
         neurite_type = _NEURITE_MAP[neurite_type]
-        feature, func = _get_feature_and_shape(feature_name, neurons, neurite_type=neurite_type)
+        feature, func = _get_feature_value_and_func(feature_name, neurons,
+                                                    neurite_type=neurite_type)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
             _fill_stats_dict(stats[neurite_type.name], stat_name, stat, func.shape)
 
     for feature_name, modes in config.get('neuron', {}).items():
-        feature, func = _get_feature_and_shape(feature_name, neurons)
+        feature, func = _get_feature_value_and_func(feature_name, neurons)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
