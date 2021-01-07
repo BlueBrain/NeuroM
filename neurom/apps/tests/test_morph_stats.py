@@ -40,6 +40,7 @@ import neurom as nm
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from numpy.testing import assert_array_equal
 
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -119,6 +120,12 @@ def test_eval_stats_empty_input_returns_none():
 
 def test_eval_stats_total_returns_sum():
     assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'total'), 10)
+
+
+def test_eval_stats_on_empty_stat():
+    assert_equal(ms.eval_stats(np.array([]), 'mean'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'std'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'median'), None)
 
 
 def test_eval_stats_applies_numpy_function():
@@ -267,3 +274,22 @@ def test_sanitize_config():
     }
     new_config = ms.sanitize_config(full_config)
     assert_equal(3, len(new_config))  # neurite, neurite_type & neuron
+
+def test_fix_issue_858():
+    '''Features should be split into X/Y/Z parts even when
+    they are None
+
+    The following neuron has no axon but the axon feature segment_midpoints for
+    the axon should still be made of 3 values (X, Y and Z)
+
+    Cf: https://github.com/BlueBrain/NeuroM/issues/859
+    '''
+    neuron = nm.load_neuron(Path(SWC_PATH, 'no-axon.swc'))
+
+    config = {'neurite': {'segment_midpoints': ['max']},
+              'neurite_type': ['AXON']}
+    actual = ms.extract_dataframe(neuron, config)
+    assert_array_equal(actual[['max_segment_midpoint_X',
+                               'max_segment_midpoint_Y',
+                               'max_segment_midpoint_Z']].values,
+                       [[None, None, None]])

@@ -70,6 +70,14 @@ def register_neurite_feature(name, func):
     _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
 
 
+def _find_feature_func(feature_name):
+    """Returns the python function used when getting a feature with `neurom.get(feature_name)`."""
+    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
+        if feature_name in feature_dict:
+            return feature_dict[feature_name]
+    raise NeuroMError(f'Unable to find feature: {feature_name}')
+
+
 def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
@@ -81,12 +89,7 @@ def get(feature_name, obj, **kwargs):
     Returns:
         features as a 1D or 2D numpy array.
     """
-    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
-        if feature_name in feature_dict:
-            feat = feature_dict[feature_name]
-            break
-    else:
-        raise NeuroMError(f'Unable to find feature: {feature_name}')
+    feat = _find_feature_func(feature_name)
 
     return np.array(list(feat(obj, **kwargs)))
 

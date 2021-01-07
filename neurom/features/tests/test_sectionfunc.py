@@ -37,10 +37,6 @@ from io import StringIO
 from numpy.testing import assert_allclose
 from neurom import load_neuron
 
-# NOTE: The 'bf' alias is used in the fst/tests modules
-# Do NOT change it.
-# TODO: If other neurom.features are imported,
-# the should use the aliasing used in fst/tests module files
 from neurom.features import sectionfunc as _sf
 from neurom.features import neuritefunc as _nf
 from neurom import morphmath as mmth

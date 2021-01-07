@@ -28,22 +28,26 @@
 
 """Neurite functions."""
 
+import logging
 from functools import partial, update_wrapper
 from itertools import chain
 
 import numpy as np
-
+import scipy
 from neurom import morphmath
-from neurom.core import Tree, iter_neurites, iter_sections, iter_segments, NeuriteType
+from neurom.core import (NeuriteType, Tree, iter_neurites, iter_sections,
+                         iter_segments)
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import bifurcationfunc, neuronfunc, sectionfunc, feature, _register_feature
-from neurom.features.sectionfunc import downstream_pathlength
+from neurom.features import _register_feature, bifurcationfunc, feature, neuronfunc, sectionfunc
 from neurom.features.bifurcationfunc import partition_asymmetry
+from neurom.features.sectionfunc import downstream_pathlength
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
 feature = partial(feature, namespace='NEURITEFEATURES')
+
+L = logging.getLogger(__name__)
 
 
 def _map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreorder):
@@ -533,7 +537,13 @@ def neurite_volume_density(neurites, neurite_type=NeuriteType.all):
     """
     def vol_density(neurite):
         """Volume density of a single neurite."""
-        return neurite.volume / convex_hull(neurite).volume
+        try:
+            volume = convex_hull(neurite).volume
+        except scipy.spatial.qhull.QhullError as e:
+            L.warning(e)
+            return np.nan
+
+        return neurite.volume / volume
 
     return list(vol_density(n)
                 for n in iter_neurites(neurites, filt=is_type(neurite_type)))

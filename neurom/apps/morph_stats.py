@@ -42,7 +42,7 @@ import pkg_resources
 
 import neurom as nm
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from neurom.features import NEURITEFEATURES, NEURONFEATURES, _find_feature_func
 from neurom.fst._core import FstNeuron
 
 L = logging.getLogger(__name__)
@@ -65,6 +65,8 @@ def eval_stats(values, mode):
         return values.tolist()
     if mode == 'total':
         mode = 'sum'
+    if mode in {'median', 'mean', 'std'} and len(values) == 0:
+        return None
 
     try:
         return getattr(np, mode)(values, axis=0)
@@ -164,17 +166,17 @@ def extract_stats(neurons, config):
     {config_path}
     """
 
-    def _fill_stats_dict(data, stat_name, stat):
+    def _fill_stats_dict(data, stat_name, stat, feature_name):
         """Insert the stat data in the dict.
 
         And if the stats is a 3D array, splits it into XYZ components.
         """
-        if stat is None or not isinstance(stat, np.ndarray) or stat.shape not in ((3, ), ):
-            data[stat_name] = stat
-        else:
+        if _find_feature_func(feature_name).shape[-1] == 3:
             for i, suffix in enumerate('XYZ'):
                 compound_stat_name = stat_name + '_' + suffix
-                data[compound_stat_name] = stat[i]
+                data[compound_stat_name] = stat[i] if stat is not None else None
+        else:
+            data[stat_name] = stat
 
     stats = defaultdict(dict)
 
@@ -186,14 +188,14 @@ def extract_stats(neurons, config):
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats[neurite_type.name], stat_name, stat)
+            _fill_stats_dict(stats[neurite_type.name], stat_name, stat, feature_name)
 
     for feature_name, modes in config.get('neuron', {}).items():
         feature = nm.get(feature_name, neurons)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats, stat_name, stat)
+            _fill_stats_dict(stats, stat_name, stat, feature_name)
 
     return dict(stats)
 

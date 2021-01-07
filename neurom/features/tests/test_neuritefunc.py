@@ -30,17 +30,16 @@
 
 from pathlib import Path
 from math import pi, sqrt
+from mock import patch, Mock
+
 
 import numpy as np
 from nose import tools as nt
 from numpy.testing import assert_allclose
+import scipy
 
 import neurom as nm
 
-# NOTE: The 'bf' alias is used in the fst/tests modules
-# Do NOT change it.
-# TODO: If other neurom.features are imported,
-# the should use the aliasing used in fst/tests module files
 from neurom.features import neuritefunc as _nf
 from neurom.features import sectionfunc as sectionfunc
 from neurom.geom import convex_hull
@@ -132,6 +131,11 @@ def test_neurite_volume_density():
     ref_density = [0.43756606998299519, 0.52464681266899216,
                    0.24068543213643726, 0.26289304906104355]
     assert_allclose(vol_density, ref_density)
+
+    with patch('neurom.features.neuritefunc.convex_hull',
+               side_effect=scipy.spatial.qhull.QhullError('boom')):
+        vol_density = _nf.neurite_volume_density(NRN)
+        nt.ok_(vol_density, np.nan)
 
 
 def test_terminal_path_length_per_neurite():

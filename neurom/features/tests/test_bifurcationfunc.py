@@ -40,10 +40,6 @@ import neurom as nm
 from neurom import load_neuron
 from neurom.exceptions import NeuroMError
 
-# NOTE: The 'bf' alias is used in the fst/tests modules
-# Do NOT change it.
-# TODO: If other neurom.features are imported,
-# the should use the aliasing used in fst/tests module files
 from neurom.features import bifurcationfunc as bf
 
 DATA_PATH = Path(__file__).parent / '../../../test_data/'
