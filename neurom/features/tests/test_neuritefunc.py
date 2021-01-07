@@ -132,6 +132,7 @@ def test_neurite_volume_density():
                    0.24068543213643726, 0.26289304906104355]
     assert_allclose(vol_density, ref_density)
 
+def test_neurite_volume_density_failed_convex_hull():
     with patch('neurom.features.neuritefunc.convex_hull',
                side_effect=scipy.spatial.qhull.QhullError('boom')):
         vol_density = _nf.neurite_volume_density(NRN)

@@ -42,7 +42,7 @@ import pkg_resources
 
 import neurom as nm
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES, _find_feature_func
+from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_and_shape
 from neurom.fst._core import FstNeuron
 
 L = logging.getLogger(__name__)
@@ -59,21 +59,17 @@ def eval_stats(values, mode):
         mode: A summary stat to extract. One of:
             ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
 
-    Note: fails silently if values is empty, and None is returned
+    .. note:: If values is empty, mode `raw` returns `[]`, `total` returns `0.0`
+    and the other modes return `None`.
     """
     if mode == 'raw':
         return values.tolist()
     if mode == 'total':
         mode = 'sum'
-    if mode in {'median', 'mean', 'std'} and len(values) == 0:
+    if len(values) == 0 and mode not in {'raw', 'sum'}:
         return None
 
-    try:
-        return getattr(np, mode)(values, axis=0)
-    except ValueError:
-        pass
-
-    return None
+    return getattr(np, mode)(values, axis=0)
 
 
 def _stat_name(feat_name, stat_mode):
@@ -166,15 +162,15 @@ def extract_stats(neurons, config):
     {config_path}
     """
 
-    def _fill_stats_dict(data, stat_name, stat, feature_name):
+    def _fill_stats_dict(data, stat_name, stat, shape):
         """Insert the stat data in the dict.
 
-        And if the stats is a 3D array, splits it into XYZ components.
+        If the feature is 2-dimensional, the feature is flattened on its last axis
         """
-        if _find_feature_func(feature_name).shape[-1] == 3:
-            for i, suffix in enumerate('XYZ'):
-                compound_stat_name = stat_name + '_' + suffix
-                data[compound_stat_name] = stat[i] if stat is not None else None
+        assert len(shape) <= 2, f'Wrong shape: {shape}'
+        if len(shape) == 2:
+            for i in range(shape[1]):
+                data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
         else:
             data[stat_name] = stat
 
@@ -184,18 +180,18 @@ def extract_stats(neurons, config):
                                                        config.get('neurite_type',
                                                                   _NEURITE_MAP.keys())):
         neurite_type = _NEURITE_MAP[neurite_type]
-        feature = nm.get(feature_name, neurons, neurite_type=neurite_type)
+        feature, func = _get_feature_and_shape(feature_name, neurons, neurite_type=neurite_type)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats[neurite_type.name], stat_name, stat, feature_name)
+            _fill_stats_dict(stats[neurite_type.name], stat_name, stat, func.shape)
 
     for feature_name, modes in config.get('neuron', {}).items():
-        feature = nm.get(feature_name, neurons)
+        feature, func = _get_feature_and_shape(feature_name, neurons)
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats, stat_name, stat, feature_name)
+            _fill_stats_dict(stats, stat_name, stat, func.shape)
 
     return dict(stats)
 
