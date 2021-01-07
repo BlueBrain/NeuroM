@@ -1,8 +1,9 @@
 from pathlib import Path
+from subprocess import check_output
 
 from click.testing import CliRunner
 from mock import MagicMock, patch
-from nose.tools import assert_equal
+from nose.tools import assert_equal, ok_
 
 from neurom.apps.cli import cli
 
@@ -40,3 +41,6 @@ def test_viewer_plotly(mock):
                                  '--plane', 'xy'])
     assert_equal(result.exit_code, 0)
     mock.assert_called_once()
+
+def test_morph_stat():
+    check_output(['morph_stats', '-l'])

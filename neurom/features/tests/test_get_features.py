@@ -32,6 +32,8 @@ import math
 from io import StringIO
 from pathlib import Path
 
+from mock import patch
+
 import neurom as nm
 import numpy as np
 from neurom import (core, features, iter_neurites, iter_sections, load_neuron,
@@ -430,15 +432,13 @@ def test_segment_meander_angles_single_section():
 
 
 def test_neurite_features_accept_single_tree():
-
-    features = NEURITEFEATURES.keys()
-
-    for f in features:
+    for f in NEURITEFEATURES:
         ret = get_feature(f, NRN.neurites[0])
         nt.ok_(ret.dtype.kind in ('i', 'f'))
         nt.ok_(len(ret) > 0)
 
 
+@patch.dict(NEURITEFEATURES)
 def test_register_neurite_feature_nrns():
 
     def npts(neurite):
@@ -470,6 +470,7 @@ def test_register_neurite_feature_nrns():
     assert_items_equal(n_volume, n_volume_ref)
 
 
+@patch.dict(NEURITEFEATURES)
 def test_register_neurite_feature_pop():
 
     def npts(neurite):
@@ -532,7 +533,7 @@ def test_section_lengths_apical():
 def test_total_length_per_neurite_axon():
     tl = get_feature('total_length_per_neurite', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (207.87975221))
+    assert_allclose(tl, (207.87975221,))
 
 
 def test_total_length_per_neurite_basal():
@@ -544,25 +545,25 @@ def test_total_length_per_neurite_basal():
 def test_total_length_per_neurite_apical():
     tl = get_feature('total_length_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (214.37304578))
+    assert_allclose(tl, (214.37304578,))
 
 
 def test_total_length_axon():
     tl = get_feature('total_length', NEURON, neurite_type=NeuriteType.axon)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (207.87975221))
+    assert_allclose(tl, (207.87975221,))
 
 
 def test_total_length_basal():
     tl = get_feature('total_length', NEURON, neurite_type=NeuriteType.basal_dendrite)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (418.43241644))
+    assert_allclose(tl, (418.43241644,))
 
 
 def test_total_length_apical():
     tl = get_feature('total_length', NEURON, neurite_type=NeuriteType.apical_dendrite)
     nt.eq_(len(tl), 1)
-    assert_allclose(tl, (214.37304578))
+    assert_allclose(tl, (214.37304578,))
 
 
 def test_section_lengths_invalid():
@@ -843,6 +844,10 @@ def test_partition_asymmetry():
 
                                                                              0.8, 0.75,  0.66666667,
                                                                              0.5,  0.]))
+
+
+def test_partition_asymmetry_length():
+    assert_allclose(get_feature('partition_asymmetry_length', NRNS)[:1], np.array([0.853925]))
 
 
 def test_section_strahler_orders():
