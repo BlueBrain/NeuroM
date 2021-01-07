@@ -481,24 +481,24 @@ def test_register_neurite_feature_pop():
     features.register_neurite_feature('foo2', npts)
 
     n_points_ref = [len(n.points) for n in iter_neurites(POP)]
-    n_points = get_feature('foo', POP)
+    n_points = get_feature('foo2', POP)
     assert_items_equal(n_points, n_points_ref)
 
     # test neurite type filtering
     n_points_ref = [len(n.points) for n in iter_neurites(POP,
                                                          filt=_is_type(NeuriteType.basal_dendrite))]
-    n_points = get_feature('foo', POP, neurite_type=NeuriteType.basal_dendrite)
+    n_points = get_feature('foo2', POP, neurite_type=NeuriteType.basal_dendrite)
     assert_items_equal(n_points, n_points_ref)
 
     features.register_neurite_feature('bar2', vol)
 
     n_volume_ref = [n.volume for n in iter_neurites(POP)]
-    n_volume = get_feature('bar', POP)
+    n_volume = get_feature('bar2', POP)
     assert_items_equal(n_volume, n_volume_ref)
 
     # test neurite type filtering
     n_volume_ref = [n.volume for n in iter_neurites(POP, filt=_is_type(NeuriteType.basal_dendrite))]
-    n_volume = get_feature('bar', POP, neurite_type=NeuriteType.basal_dendrite)
+    n_volume = get_feature('bar2', POP, neurite_type=NeuriteType.basal_dendrite)
     assert_items_equal(n_volume, n_volume_ref)
 
 

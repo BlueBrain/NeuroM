@@ -53,7 +53,7 @@ NEURONFEATURES = dict()
 def register_neurite_feature(name, func):
     """Register a feature to be applied to neurites.
 
-    .. deprecated:: 1.6.0
+    .. warning:: This feature has been deprecated in 1.6.0
 
     Arguments:
         name: name of the feature, used for access via get() function.
