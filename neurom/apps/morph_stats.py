@@ -171,7 +171,7 @@ def extract_stats(neurons, config):
             for i in range(shape[1]):
                 data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
         elif len(shape) > 2:
-            raise ValueError(f'Feature with wrong shape: {shape}')
+            raise ValueError(f'Feature with wrong shape: {shape}')  # pragma: no cover
         else:
             data[stat_name] = stat
 

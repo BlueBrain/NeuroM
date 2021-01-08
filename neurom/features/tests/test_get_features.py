@@ -502,6 +502,10 @@ def test_register_neurite_feature_pop():
     n_volume = get_feature('bar', POP, neurite_type=NeuriteType.basal_dendrite)
     assert_items_equal(n_volume, n_volume_ref)
 
+@nt.raises(NeuroMError)
+def test_get_raises():
+    get_feature('ahah-I-do-not-exist!', lambda n: None)
+
 
 @nt.raises(NeuroMError)
 def test_register_existing_feature_raises():
