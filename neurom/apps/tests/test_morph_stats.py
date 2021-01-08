@@ -40,6 +40,7 @@ import neurom as nm
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from numpy.testing import assert_array_equal
 
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -66,36 +67,36 @@ REF_OUT = {
         'max_section_length': 11.018460736176685,
         'max_section_branch_order': 10,
         'total_section_volume': 276.73857657289523,
-        'max_segment_midpoint_X': 0.0,
-        'max_segment_midpoint_Y': 0.0,
-        'max_segment_midpoint_Z': 49.520305964149998,
+        'max_segment_midpoint_0': 0.0,
+        'max_segment_midpoint_1': 0.0,
+        'max_segment_midpoint_2': 49.520305964149998,
     },
     'all': {
         'total_section_length': 840.68521442251949,
         'max_section_length': 11.758281556059444,
         'max_section_branch_order': 10,
         'total_section_volume': 1104.9077419665782,
-        'max_segment_midpoint_X': 64.401674984050004,
-        'max_segment_midpoint_Y': 48.48197694465,
-        'max_segment_midpoint_Z': 53.750947521650005,
+        'max_segment_midpoint_0': 64.401674984050004,
+        'max_segment_midpoint_1': 48.48197694465,
+        'max_segment_midpoint_2': 53.750947521650005,
     },
     'apical_dendrite': {
         'total_section_length': 214.37304577550353,
         'max_section_length': 11.758281556059444,
         'max_section_branch_order': 10,
         'total_section_volume': 271.9412385728449,
-        'max_segment_midpoint_X': 64.401674984050004,
-        'max_segment_midpoint_Y': 0.0,
-        'max_segment_midpoint_Z': 53.750947521650005,
+        'max_segment_midpoint_0': 64.401674984050004,
+        'max_segment_midpoint_1': 0.0,
+        'max_segment_midpoint_2': 53.750947521650005,
     },
     'basal_dendrite': {
         'total_section_length': 418.43241643793476,
         'max_section_length': 11.652508126101711,
         'max_section_branch_order': 10,
         'total_section_volume': 556.22792682083821,
-        'max_segment_midpoint_X': 64.007872333250006,
-        'max_segment_midpoint_Y': 48.48197694465,
-        'max_segment_midpoint_Z': 51.575580778049996,
+        'max_segment_midpoint_0': 64.007872333250006,
+        'max_segment_midpoint_1': 48.48197694465,
+        'max_segment_midpoint_2': 51.575580778049996,
     },
 }
 
@@ -120,6 +121,16 @@ def test_eval_stats_empty_input_returns_none():
 def test_eval_stats_total_returns_sum():
     assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'total'), 10)
 
+
+def test_eval_stats_on_empty_stat():
+    assert_equal(ms.eval_stats(np.array([]), 'mean'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'std'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'median'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'min'), None)
+    assert_equal(ms.eval_stats(np.array([]), 'max'), None)
+
+    assert_equal(ms.eval_stats(np.array([]), 'raw'), [])
+    assert_equal(ms.eval_stats(np.array([]), 'total'), 0.0)
 
 def test_eval_stats_applies_numpy_function():
     modes = ('min', 'max', 'mean', 'median', 'std')
@@ -267,3 +278,33 @@ def test_sanitize_config():
     }
     new_config = ms.sanitize_config(full_config)
     assert_equal(3, len(new_config))  # neurite, neurite_type & neuron
+
+def test_multidimensional_features():
+    '''Features should be split into sub-features when they
+    are multidimensional.
+
+
+    This should be the case even when the feature is `None` or `[]`
+    The following neuron has no axon but the axon feature segment_midpoints for
+    the axon should still be made of 3 values (X, Y and Z)
+
+    Cf: https://github.com/BlueBrain/NeuroM/issues/859
+    '''
+    neuron = nm.load_neuron(Path(SWC_PATH, 'no-axon.swc'))
+
+    config = {'neurite': {'segment_midpoints': ['max']},
+              'neurite_type': ['AXON']}
+    actual = ms.extract_dataframe(neuron, config)
+    assert_array_equal(actual[['max_segment_midpoint_0',
+                               'max_segment_midpoint_1',
+                               'max_segment_midpoint_2']].values,
+                       [[None, None, None]])
+
+    config = {'neurite': {'partition_pairs': ['max']}}
+    actual = ms.extract_dataframe(neuron, config)
+    assert_array_equal(actual[['max_partition_pair_0',
+                               'max_partition_pair_1']].values,
+                       [[np.nan, np.nan],
+                        [1.0, 1.0],
+                        [1.0, 1.0],
+                        [1.0, 1.0]])

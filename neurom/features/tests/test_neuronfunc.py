@@ -40,10 +40,6 @@ from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
 from neurom import NeuriteType, load_neuron
 from neurom.core.population import Population
 
-# NOTE: The 'bf' alias is used in the fst/tests modules
-# Do NOT change it.
-# TODO: If other neurom.features are imported,
-# the should use the aliasing used in fst/tests module files
 from neurom.features import neuronfunc as _nf
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'

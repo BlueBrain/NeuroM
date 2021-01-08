@@ -70,6 +70,30 @@ def register_neurite_feature(name, func):
     _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
 
 
+def _find_feature_func(feature_name):
+    """Returns the python function used when getting a feature with `neurom.get(feature_name)`."""
+    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
+        if feature_name in feature_dict:
+            return feature_dict[feature_name]
+    raise NeuroMError(f'Unable to find feature: {feature_name}')
+
+
+def _get_feature_value_and_func(feature_name, obj, **kwargs):
+    """Obtain a feature from a set of morphology objects.
+
+    Arguments:
+        feature(string): feature to extract
+        obj: a neuron, population or neurite tree
+        kwargs: parameters to forward to underlying worker functions
+
+    Returns:
+        A tuple (feature, func) of the feature value and its function
+    """
+    feat = _find_feature_func(feature_name)
+
+    return np.array(list(feat(obj, **kwargs))), feat
+
+
 def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
@@ -79,16 +103,9 @@ def get(feature_name, obj, **kwargs):
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
-        features as a 1D or 2D numpy array.
+        features as a 1D, 2D or 3D numpy array.
     """
-    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
-        if feature_name in feature_dict:
-            feat = feature_dict[feature_name]
-            break
-    else:
-        raise NeuroMError(f'Unable to find feature: {feature_name}')
-
-    return np.array(list(feat(obj, **kwargs)))
+    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
 
 
 _INDENT = ' ' * 4
