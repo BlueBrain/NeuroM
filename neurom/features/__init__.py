@@ -60,9 +60,6 @@ def register_neurite_feature(name, func):
         func: single parameter function of a neurite.
 
     """
-    if name in NEURITEFEATURES:
-        raise NeuroMError('Attempt to hide registered feature %s' % name)
-
     def _fun(neurites, neurite_type=_ntype.all):
         """Wrap neurite function from outer scope and map into list."""
         return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
@@ -138,9 +135,6 @@ def _get_doc():
     return '\n'.join(ret)
 
 
-get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(), 2)  # pylint: disable=no-member
-
-
 def _register_feature(namespace, name, func, shape):
     """Register a feature to be applied.
 
@@ -182,3 +176,6 @@ def feature(shape, namespace=None, name=None):
 
 # These imports are necessary in order to register the features
 from neurom.features import neuritefunc, neuronfunc  # noqa, pylint: disable=wrong-import-position
+
+# This must be done after all features have been registered
+get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(), 2)  # pylint: disable=no-member
