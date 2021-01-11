@@ -161,13 +161,13 @@ def test_extract_dataframe():
     nrns = nm.load_neurons([Path(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
-    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0)
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
     assert_frame_equal(actual, expected)
 
     # Test with a single neuron in the population
     nrns = nm.load_neurons(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
-    assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
+    assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
     # Test with a config without the 'neuron' key
     nrns = nm.load_neurons([Path(SWC_PATH, name)
@@ -175,13 +175,14 @@ def test_extract_dataframe():
     config = {'neurite': {'section_lengths': ['total']},
               'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
     actual = ms.extract_dataframe(nrns, config)
-    expected = expected[['name', 'neurite_type', 'total_section_length']]
+    idx = pd.IndexSlice
+    expected = expected.loc[:, idx[:, ['name', 'total_section_length']]]
     assert_frame_equal(actual, expected)
 
     # Test with a FstNeuron argument
     nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrn, config)
-    assert_frame_equal(actual, expected[expected.name == 'Neuron'], check_dtype=False)
+    assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
     # Test with a List[FstNeuron] argument
     nrns = [nm.load_neuron(Path(SWC_PATH, name))
@@ -197,16 +198,16 @@ def test_extract_dataframe():
     # Test without any neurite_type keys, it should pick the defaults
     config = {'neurite': {'total_length_per_neurite': ['total']}}
     actual = ms.extract_dataframe(nrns, config)
+    expected_columns = pd.MultiIndex.from_tuples(
+        [('neuron', 'name'),
+         ('axon', 'total_total_length_per_neurite'),
+         ('basal_dendrite', 'total_total_length_per_neurite'),
+         ('apical_dendrite', 'total_total_length_per_neurite'),
+         ('all', 'total_total_length_per_neurite')])
     expected = pd.DataFrame(
-        columns=['name', 'neurite_type', 'total_total_length_per_neurite'],
-        data=[['Neuron', 'axon', 207.879752],
-              ['Neuron', 'basal_dendrite', 418.432416],
-              ['Neuron', 'apical_dendrite', 214.373046],
-              ['Neuron', 'all', 840.685214],
-              ['simple', 'axon', 15.000000],
-              ['simple', 'basal_dendrite', 16.000000],
-              ['simple', 'apical_dendrite', 0.000000],
-              ['simple', 'all', 31.000000]])
+        columns=expected_columns,
+        data=[['Neuron', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
+              ['simple', 15.,          16.,           0.,          31.,        ]])
     assert_frame_equal(actual, expected)
 
 
@@ -215,17 +216,14 @@ def test_extract_dataframe_multiproc():
                             for name in ['Neuron.swc', 'simple.swc']])
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=2)
-    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0)
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
 
-    # Compare sorted DataFrame since Pool.imap_unordered disrupted the order
-    assert_frame_equal(actual.sort_values(by=['name']).reset_index(drop=True),
-                       expected.sort_values(by=['name']).reset_index(drop=True))
+    assert_frame_equal(actual, expected)
 
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=os.cpu_count() + 1)
         assert_equal(len(w), 1, "Warning not emitted")
-    assert_frame_equal(actual.sort_values(by=['name']).reset_index(drop=True),
-                       expected.sort_values(by=['name']).reset_index(drop=True))
+    assert_frame_equal(actual, expected)
 
 
 
@@ -295,16 +293,13 @@ def test_multidimensional_features():
     config = {'neurite': {'segment_midpoints': ['max']},
               'neurite_type': ['AXON']}
     actual = ms.extract_dataframe(neuron, config)
-    assert_array_equal(actual[['max_segment_midpoint_0',
-                               'max_segment_midpoint_1',
-                               'max_segment_midpoint_2']].values,
+    assert_array_equal(actual['axon'][['max_segment_midpoint_0',
+                                       'max_segment_midpoint_1',
+                                       'max_segment_midpoint_2']].values,
                        [[None, None, None]])
 
     config = {'neurite': {'partition_pairs': ['max']}}
     actual = ms.extract_dataframe(neuron, config)
-    assert_array_equal(actual[['max_partition_pair_0',
-                               'max_partition_pair_1']].values,
-                       [[np.nan, np.nan],
-                        [1.0, 1.0],
-                        [1.0, 1.0],
-                        [1.0, 1.0]])
+    assert_array_equal(actual['axon'][['max_partition_pair_0',
+                                       'max_partition_pair_1']].values,
+                       [[None, None]])
