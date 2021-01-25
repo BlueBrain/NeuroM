@@ -304,6 +304,10 @@ def has_no_dangling_branch(neuron):
                                                          for n in iter_neurites(neuron)
                                                          if n.type != NeuriteType.axon)))
 
+    if not len(dendritic_points) > 0:
+        # returns True if no dendrites are present
+        return CheckResult(True)
+
     def is_dangling(neurite):
         """Is the neurite dangling ?."""
         starting_point = neurite.points[0][COLS.XYZ]
