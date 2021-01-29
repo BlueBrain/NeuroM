@@ -30,20 +30,19 @@ neurom._point_neurite.features"""
 
 import json
 import warnings
-from pathlib import Path
 from itertools import chain
-
-from nose import tools as nt
+from pathlib import Path
 
 import neurom as nm
 from neurom.core import Tree
 from neurom.core.types import NeuriteType
-
 from neurom.features import bifurcationfunc as _bf
 from neurom.features import neuritefunc as _nrt
 from neurom.features import neuronfunc as _nrn
 from neurom.features import sectionfunc as _sec
 from neurom.features.tests.utils import _close, _equal
+from nose import tools as nt
+from numpy.testing import assert_almost_equal
 
 DATA_PATH =  Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_DATA_PATH = DATA_PATH / 'swc'
@@ -131,13 +130,13 @@ class SectionTreeBase(object):
         _close(pl, get('section_path_distances', self.ref_nrn))
 
     def test_get_soma_radius(self):
-        nt.assert_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
+        assert_almost_equal(self.sec_nrn.soma.radius, get('soma_radii', self.ref_nrn)[0])
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
+        assert_almost_equal(_nrn.soma_surface_area(self.sec_nrn), get('soma_surface_areas', self.ref_nrn)[0])
 
     def test_get_soma_volume(self):
-        nt.assert_equal(_nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
+        assert_almost_equal(_nrn.soma_volume(self.sec_nrn), get('soma_volumes', self.ref_nrn)[0])
 
     def test_get_local_bifurcation_angles(self):
         _close(_nrt.local_bifurcation_angles(self.sec_nrn),
@@ -174,10 +173,11 @@ class SectionTreeBase(object):
                    get('section_radial_distances', self.ref_nrn, neurite_type=t))
 
     def test_get_trunk_origin_radii(self):
-        _equal(_nrn.trunk_origin_radii(self.sec_nrn), get('trunk_origin_radii', self.ref_nrn))
+        assert_almost_equal(_nrn.trunk_origin_radii(self.sec_nrn),
+                            get('trunk_origin_radii', self.ref_nrn))
         for t in NeuriteType:
-            _equal(_nrn.trunk_origin_radii(self.sec_nrn, neurite_type=t),
-                   get('trunk_origin_radii', self.ref_nrn, neurite_type=t))
+            assert_almost_equal(_nrn.trunk_origin_radii(self.sec_nrn, neurite_type=t),
+                                get('trunk_origin_radii', self.ref_nrn, neurite_type=t))
 
     def test_get_trunk_section_lengths(self):
         _close(_nrn.trunk_section_lengths(self.sec_nrn), get('trunk_section_lengths', self.ref_nrn))
@@ -196,15 +196,15 @@ class TestH5V1(SectionTreeBase):
     # Overriding soma values as the same soma points in SWC and ASC have different
     # meanings. Hence leading to different values
     def test_get_soma_radius(self):
-        nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
+        assert_almost_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn),
+        assert_almost_equal(_nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
         with warnings.catch_warnings(record=True):
-            nt.assert_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+            assert_almost_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestH5V2(SectionTreeBase):
@@ -217,15 +217,15 @@ class TestH5V2(SectionTreeBase):
     # Overriding soma values as the same soma points in SWC and ASC have different
     # meanings. Hence leading to different values
     def test_get_soma_radius(self):
-        nt.assert_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
+        assert_almost_equal(self.sec_nrn.soma.radius, 0.09249506049313666)
 
     def test_get_soma_surface_area(self):
-        nt.assert_equal(_nrn.soma_surface_area(self.sec_nrn),
+        assert_almost_equal(_nrn.soma_surface_area(self.sec_nrn),
                         0.1075095256160432)
 
     def test_get_soma_volume(self):
         with warnings.catch_warnings(record=True):
-            nt.assert_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
+            assert_almost_equal(_nrn.soma_volume(self.sec_nrn), 0.0033147000251481135)
 
 
 class TestSWC(SectionTreeBase):
