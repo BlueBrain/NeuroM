@@ -40,15 +40,6 @@ NeuroM is a Python toolkit for the analysis and processing of neuron morphologie
 [![Documentation Status](https://readthedocs.org/projects/neurom/badge/?version=latest)](http://neurom.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.209498.svg)](https://doi.org/10.5281/zenodo.209498)
 
-## Acknowledgements
-
-This project/research received funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). 
-This research was supported by the EBRAINS research infrastructure, funded from the European
-Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant
-Agreement No. 945539 (Human Brain Project SGA3).
-
-For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.
-
 ## Documentation
 
 NeuroM documentation is built and hosted on [readthedocs](https://readthedocs.org/).
@@ -206,3 +197,15 @@ with a minimal but self-contained code sample that reproduces the issue, the obs
 expected output, and if possible, the commit ID of the version used. If reporting a
 regression, the commit ID of the change that introduced the problem is also extremely valuable
 information.
+
+## Funding & Acknowledgements
+
+This project/research received funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). 
+This research was supported by the EBRAINS research infrastructure, funded from the European
+Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant
+Agreement No. 945539 (Human Brain Project SGA3).
+The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology.
+
+For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.
+
+COPYRIGHT 2015–2021, Blue Brain Project/EPFL
