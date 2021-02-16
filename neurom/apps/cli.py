@@ -27,12 +27,16 @@ def cli():
 @click.option('-r', '--realistic-diameters/--no-realistic-diameters', default=False,
               help='Scale diameters according to the plot axis\n'
               'Warning: Only works with the matplotlib backend')
-def view(input_file, plane, backend, realistic_diameters):
+@click.option('--nrn-secid/--no-nrn-secid', default=False,
+              help='Annotate section with NEURON sections ids\n'
+              'Warning: Only works with the matplotlib backend')
+def view(input_file, plane, backend, realistic_diameters, nrn_secid):
     """A simple neuron viewer."""
     if backend == 'matplotlib':
         kwargs = {
             'mode': '3d' if plane == '3d' else '2d',
             'realistic_diameters': realistic_diameters,
+            'nrn_secid': nrn_secid,
         }
         if plane != '3d':
             kwargs['plane'] = plane
