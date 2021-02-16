@@ -185,7 +185,7 @@ def plot_soma(ax, soma, plane='xy',
 
 
 def _get_isec_map(nrn):
-    """get NEURON isec"""
+    """Get NEURON isec from nrn morphology."""
     from morph_tool import nrnhines
     import tempfile
 
@@ -236,7 +236,7 @@ def plot_neuron(ax, nrn,
 
     if nrn_secid:
         for pos, isec in _get_isec_map(nrn):
-            ax.text(pos[0], pos[1], isec, fontsize=2)
+            ax.text(pos[0], pos[1], isec, fontsize=5)
 
     ax.set_title(nrn.name)
     ax.set_xlabel(plane[0])
