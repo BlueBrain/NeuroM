@@ -36,7 +36,7 @@ from setuptools import find_packages
 setup(
     description='NeuroM: a light-weight neuron morphology analysis package',
     author='Blue Brain Project, EPFL',
-    url='http://https://github.com/BlueBrain/NeuroM',
+    url='https://github.com/BlueBrain/NeuroM',
     install_requires=[
         'click>=7.0',
         'h5py>=3.1.0',
