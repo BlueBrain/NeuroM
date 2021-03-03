@@ -235,7 +235,7 @@ def sholl_crossings(neurites, center, radii):
 
         return count
 
-    if hasattr(neurites, 'neurites'):
+    if hasattr(neurites, 'neurites') or hasattr(neurites, 'points'):
         neurites = list(iter_neurites(neurites))
     else:
         neurites = list(neurites)
