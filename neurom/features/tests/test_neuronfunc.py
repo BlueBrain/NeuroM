@@ -176,6 +176,9 @@ def test_sholl_crossings_simple():
     nt.eq_([2, 4, 5],
            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
+    nt.eq_([2, 2, 2],
+           list(_nf.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
+
 
 def load_swc(string):
     with tempfile.NamedTemporaryFile(prefix='test_neuron_func', mode='w', suffix='.swc') as fd:
