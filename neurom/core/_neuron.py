@@ -120,7 +120,7 @@ def iter_sections(neurites,
         iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order))
 
 
-def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder, section_filter=None):
+def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
     """Return an iterator to the segments in a collection of neurites.
 
     Arguments:
@@ -139,11 +139,9 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder,
                     iter_sections(obj,
                                   neurite_filter=neurite_filter,
                                   neurite_order=neurite_order))
-    if section_filter is None:
-        section_filter = lambda section: True
 
     return chain.from_iterable(zip(sec.points[:-1], sec.points[1:])
-                               for sec in sections if section_filter(sec))
+                               for sec in sections)
 
 
 def graft_neuron(root_section):

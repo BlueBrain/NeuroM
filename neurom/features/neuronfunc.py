@@ -212,11 +212,11 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_crossings(neurites, center, radii, section_filter=None):
+def sholl_crossings(neurites, center, radii):
     """Calculate crossings of neurites.
 
     Args:
-        nrn(morph): morphology on which to perform Sholl analysis
+        nrn(morph): morphology on which to perform Sholl analysis, or list of sections
         radii(iterable of floats): radii for which crossings will be counted
 
     Returns:
@@ -227,22 +227,26 @@ def sholl_crossings(neurites, center, radii, section_filter=None):
         """Used to count_crossings of segments in neurite with radius."""
         r2 = radius ** 2
         count = 0
-        for start, end in iter_segments(neurite, section_filter=section_filter):
+        for start, end in iter_segments(neurite):
             start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
                                       morphmath.point_dist2(center, end))
-
             count += int(start_dist2 <= r2 <= end_dist2 or
                          end_dist2 <= r2 <= start_dist2)
 
         return count
 
+    if hasattr(neurites, 'neurites'):
+        neurites = list(iter_neurites(neurites))
+    else:
+        neurites = list(neurites)
+
     return np.array([sum(_count_crossings(neurite, r)
-                         for neurite in iter_neurites(neurites))
+                         for neurite in neurites)
                      for r in radii])
 
 
 @feature(shape=(...,))
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, section_filter=None):
+def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
     """Perform Sholl frequency calculations on a population of neurites.
 
     Args:
@@ -271,13 +275,11 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, section_fil
                               if neurite_filter(neurites)))
 
         min_soma_edge = min(min_soma_edge, neuron.soma.radius)
-        max_radii = max(max_radii,
-            max(np.max(np.abs(bounding_box(neurite))) for neurite in iter_neurites(neuron)
-            if neurite_filter(neurite)))
+        max_radii = max(max_radii, np.max(np.abs(bounding_box(neuron))))
 
     radii = np.arange(min_soma_edge, max_radii + step_size, step_size)
     ret = np.zeros_like(radii)
     for neurites, center in neurites_list:
-        ret += sholl_crossings(neurites, center, radii, section_filter=section_filter)
+        ret += sholl_crossings(neurites, center, radii)
 
     return ret
