@@ -27,20 +27,17 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Test neurom._neuronfunc functionality."""
-from pathlib import Path
 import tempfile
 import warnings
 from io import StringIO
+from pathlib import Path
 
 import numpy as np
-from nose import tools as nt
-from numpy.testing import (assert_almost_equal, assert_array_almost_equal,
-                           assert_array_equal)
-
 from neurom import NeuriteType, load_neuron
 from neurom.core.population import Population
-
 from neurom.features import neuronfunc as _nf
+from nose import tools as nt
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -143,17 +140,17 @@ def test_trunk_origin_elevations():
     """), reader='swc')
 
     pop = Population([n0, n1])
-    assert_array_equal(_nf.trunk_origin_elevations(pop),
-                       [0.0, np.pi/2., -np.pi/2.])
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop),
+                              [0.0, np.pi/2., -np.pi/2.])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
-                       [0.0, np.pi/2., -np.pi/2.])
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
+                              [0.0, np.pi/2., -np.pi/2.])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
-                       [])
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
+                              [])
 
-    assert_array_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
-                       [])
+    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
+                              [])
 
 
 @nt.raises(Exception)

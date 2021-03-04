@@ -28,24 +28,27 @@
 
 """Test neurom.sectionfunc functionality."""
 
-from nose import tools as nt
-from pathlib import Path
 import math
-import numpy as np
 import warnings
 from io import StringIO
-from numpy.testing import assert_allclose
-from neurom import load_neuron
+from pathlib import Path
 
-from neurom.features import sectionfunc as _sf
-from neurom.features import neuritefunc as _nf
+import numpy as np
+from neurom import load_neuron
 from neurom import morphmath as mmth
+from neurom.features import neuritefunc as _nf
+from neurom.features import sectionfunc as _sf
+from nose import tools as nt
+from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = Path(DATA_PATH, 'h5/v1/')
 SWC_PATH = Path(DATA_PATH, 'swc/')
 
 NRN = load_neuron(H5_PATH / 'Neuron.h5')
+
+# Will simplify NeuroM v2 transition
+SECTION_ID = 1
 
 
 def test_total_volume_per_neurite():
@@ -67,7 +70,7 @@ def test_section_area():
     sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
-                                     (1 0 0 2))"""), reader='asc').sections[1]
+                                     (1 0 0 2))"""), reader='asc').sections[SECTION_ID]
     area = _sf.section_area(sec)
     nt.eq_(math.pi * 1 * 2 * 1, area)
 
@@ -79,7 +82,7 @@ def test_section_tortuosity():
     (0 0 0 2)
     (1 0 0 2)
     (2 0 0 2)
-    (3 0 0 2))"""), reader='asc').sections[1]
+    (3 0 0 2))"""), reader='asc').sections[SECTION_ID]
 
     sec_b = load_neuron(StringIO(u"""
     ((CellBody) (0 0 0 2))
@@ -87,7 +90,7 @@ def test_section_tortuosity():
     (0 0 0 2)
     (1 0 0 2)
     (1 2 0 2)
-    (0 2 0 2))"""), reader='asc').sections[1]
+    (0 2 0 2))"""), reader='asc').sections[SECTION_ID]
 
     nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
     nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
@@ -100,7 +103,7 @@ def test_section_tortuosity():
 def test_setion_tortuosity_single_point():
     sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
                                    ((Dendrite)
-                                    (1 2 3 2))"""), reader='asc').sections[1]
+                                    (1 2 3 2))"""), reader='asc').sections[SECTION_ID]
     nt.eq_(_sf.section_tortuosity(sec), 1.0)
 
 
@@ -112,7 +115,7 @@ def test_section_tortuosity_looping_section():
     (1 0 0 2)
     (1 2 0 2)
     (0 2 0 2)
-    (0 0 0 2))"""), reader='asc').sections[1]
+    (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
     with warnings.catch_warnings(record=True):
         nt.eq_(_sf.section_tortuosity(sec), np.inf)
 
@@ -124,7 +127,7 @@ def test_section_meander_angles():
     (1 0 0 2)
     (2 0 0 2)
     (3 0 0 2)
-    (4 0 0 2))"""), reader='asc').sections[1]
+    (4 0 0 2))"""), reader='asc').sections[SECTION_ID]
 
     nt.assert_equal(_sf.section_meander_angles(s0),
                     [math.pi, math.pi, math.pi])
@@ -135,7 +138,7 @@ def test_section_meander_angles():
     (1 0 0 2)
     (1 1 0 2)
     (2 1 0 2)
-    (2 2 0 2))"""), reader='asc').sections[1]
+    (2 2 0 2))"""), reader='asc').sections[SECTION_ID]
 
     nt.assert_equal(_sf.section_meander_angles(s1),
                     [math.pi / 2, math.pi / 2, math.pi / 2])
@@ -145,7 +148,7 @@ def test_section_meander_angles():
     (0 0 0 2)
     (0 0 1 2)
     (0 0 2 2)
-    (0 0 0 2))"""), reader='asc').sections[1]
+    (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
 
     nt.assert_equal(_sf.section_meander_angles(s2),
                     [math.pi, 0.])
@@ -155,7 +158,7 @@ def test_section_meander_angles_single_segment():
     s = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
     ((Dendrite)
     (0 0 0 2)
-    (1 1 1 2))"""), reader='asc').sections[1]
+    (1 1 1 2))"""), reader='asc').sections[SECTION_ID]
     nt.assert_equal(len(_sf.section_meander_angles(s)), 0)
 
 
@@ -171,7 +174,7 @@ def test_locate_segment_position():
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
-    (6 4 4 400))"""), reader='asc').sections[1]
+    (6 4 4 400))"""), reader='asc').sections[SECTION_ID]
     nt.assert_equal(
         _sf.locate_segment_position(s, 0.0),
         (0, 0.0)

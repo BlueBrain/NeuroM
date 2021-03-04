@@ -26,14 +26,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module with consistency/validity checks for raw data  blocks."""
+"""Module with consistency/validity checks for raw data blocks."""
 import numpy as np
 from neurom.check import CheckResult
-from neurom.core.dataformat import COLS
-from neurom.core.dataformat import POINT_TYPE
 from neurom.core import make_soma
-from neurom.fst._core import make_neurites
+from neurom.core.dataformat import COLS, POINT_TYPE
 from neurom.exceptions import SomaError
+from neurom.fst._core import make_neurites
 
 
 def has_sequential_ids(data_wrapper):

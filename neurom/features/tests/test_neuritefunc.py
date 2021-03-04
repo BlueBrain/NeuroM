@@ -28,22 +28,19 @@
 
 """Test neurom._neuritefunc functionality."""
 
-from pathlib import Path
 from math import pi, sqrt
-from mock import patch, Mock
-
-
-import numpy as np
-from nose import tools as nt
-from numpy.testing import assert_allclose
-import scipy
+from pathlib import Path
 
 import neurom as nm
-
+import numpy as np
+import scipy
+from mock import Mock, patch
 from neurom.features import neuritefunc as _nf
 from neurom.features import sectionfunc as sectionfunc
-from neurom.geom import convex_hull
 from neurom.features.tests.utils import _close
+from neurom.geom import convex_hull
+from nose import tools as nt
+from numpy.testing import assert_allclose, assert_array_almost_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -131,6 +128,7 @@ def test_neurite_volume_density():
     ref_density = [0.43756606998299519, 0.52464681266899216,
                    0.24068543213643726, 0.26289304906104355]
     assert_allclose(vol_density, ref_density)
+
 
 def test_neurite_volume_density_failed_convex_hull():
     with patch('neurom.features.neuritefunc.convex_hull',
@@ -365,7 +363,7 @@ def test_segment_path_lengths():
     assert_allclose(pathlengths, [5., 10., 11., 4., 10., 9.])
 
     pathlengths = _nf.segment_path_lengths(NRN)[:5]
-    assert_allclose(pathlengths, [0.1, 1.332525, 2.530149, 3.267878, 4.471462])
+    assert_array_almost_equal(pathlengths, [0.1, 1.332525, 2.530149, 3.267878, 4.471462])
 
 
 def test_principal_direction_extents():

@@ -32,12 +32,10 @@ import math
 from io import StringIO
 from pathlib import Path
 
-from mock import patch
-
 import neurom as nm
 import numpy as np
-from neurom import (core, features, iter_neurites, iter_sections, load_neuron,
-                    load_neurons)
+from mock import patch
+from neurom import core, features, iter_neurites, iter_sections, load_neuron, load_neurons
 from neurom.core.population import Population
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as _is_type
@@ -117,54 +115,62 @@ def test_section_tortuosity_pop():
 
     assert_allclose(_stats(get_feature(feat, POP)),
                     (1.0,
-                     4.6571118550276704,
-                     440.40884450374455,
-                     1.3427098917797089))
+                     4.657,
+                     440.408,
+                     1.342),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
                     (1.0,
-                     4.6571118550276704,
-                     440.40884450374455,
-                     1.3427098917797089))
+                     4.657,
+                     440.408,
+                     1.342),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                    (1.0702760052031615,
-                     1.5732825321954913,
-                     26.919574286670883,
-                     1.2818844898414707))
+                    (1.070,
+                     1.573,
+                     26.919,
+                     1.281),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                    (1.042614577410971,
-                     1.6742599832295344,
-                     106.5960839640893,
-                     1.239489348419643))
+                    (1.042,
+                     1.674,
+                     106.596,
+                     1.239),
+                    rtol=1e-3)
 
 
 def test_section_tortuosity_nrn():
     feat = 'section_tortuosity'
     assert_allclose(_stats(get_feature(feat, NRN)),
-                    (1.0702760052031612,
-                     1.5732825321954911,
-                     106.42449427885093,
-                     1.2669582652244158))
+                    (1.070,
+                     1.573,
+                     106.424,
+                     1.266),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.all)),
-                    (1.0702760052031612,
-                     1.5732825321954911,
-                     106.42449427885093,
-                     1.2669582652244158))
+                    (1.070,
+                     1.573,
+                     106.424,
+                     1.266),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.apical_dendrite)),
-                    (1.0702760052031612,
-                     1.5732825321954911,
-                     26.919574286670883,
-                     1.2818844898414707))
+                    (1.070,
+                     1.573,
+                     26.919,
+                     1.281),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, NRN, neurite_type=NeuriteType.basal_dendrite)),
-                    (1.0788578286296124,
-                     1.5504287518256337,
-                     51.540901640170489,
-                     1.227164324765964))
+                    (1.078,
+                     1.550,
+                     51.540,
+                     1.227),
+                    rtol=1e-3)
 
 
 def test_number_of_segments():
@@ -301,16 +307,20 @@ def test_segment_meander_angles_pop():
     feat = 'segment_meander_angles'
 
     assert_allclose(_stats(get_feature(feat, POP)),
-                    (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
+                    (0.0, 3.1415, 14637.9776, 2.3957),
+                    rtol=1e-4)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
-                    (0.0, 3.1415926535897931, 14637.977670710961, 2.3957410263029395))
+                    (0.0, 3.1415, 14637.9776, 2.3957),
+                    rtol=1e-4)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
-                    (0.326101999292573, 3.0939261437163492, 461.98168732359414, 2.4443475519766884))
+                    (0.3261, 3.0939, 461.9816, 2.4443),
+                    rtol=1e-4)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.basal_dendrite)),
-                    (0.0, 3.1415926535897931, 2926.2411975307768, 2.4084289691611334))
+                    (0.0, 3.1415, 2926.2411, 2.4084),
+                    rtol=1e-4)
 
 
 def test_segment_meander_angles_nrn():
@@ -792,12 +802,12 @@ def test_get_trunk_section_lengths():
 
 
 def test_soma_radii():
-    nt.eq_(get_feature('soma_radii', NEURON)[0], 0.13065629648763766)
+    assert_allclose(get_feature('soma_radii', NEURON)[0], 0.13065629648763766)
 
 
 def test_soma_surface_areas():
     area = 4. * math.pi * get_feature('soma_radii', NEURON)[0] ** 2
-    nt.eq_(get_feature('soma_surface_areas', NEURON), area)
+    assert_allclose(get_feature('soma_surface_areas', NEURON), area)
 
 
 def test_sholl_frequency():

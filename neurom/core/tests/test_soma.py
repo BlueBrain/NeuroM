@@ -26,16 +26,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from io import StringIO
-import warnings
-
-from nose import tools as nt
-from neurom.core import _soma
-from neurom.exceptions import SomaError, RawDataError
-from neurom import load_neuron
-import numpy as np
-from numpy.testing import assert_array_equal
 import math
+import warnings
+from io import StringIO
+
+import numpy as np
+from neurom import load_neuron
+from neurom.core import _soma
+from neurom.exceptions import RawDataError, SomaError
+from nose import tools as nt
+from numpy.testing import assert_array_equal
 
 
 def test_Soma_SinglePoint():
@@ -82,7 +82,7 @@ def check_SomaC(stream):
     sm = load_neuron(StringIO(stream), reader='asc').soma
     nt.ok_('SomaSimpleContour' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaSimpleContour))
-    np.testing.assert_allclose(sm.center, (0., 0., 0.), atol=1e-16)
+    np.testing.assert_almost_equal(sm.center, [0., 0., 0.])
     nt.assert_almost_equal(sm.radius, 1.0)
 
 
@@ -186,7 +186,7 @@ def test_Soma_Cylinders():
 
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(s))
     nt.eq_(list(s.center), [0., 0., 0.])
-    nt.assert_almost_equal(s.area, 794.76706126368811)
+    nt.assert_almost_equal(s.area, 794.76706126368811, places=4)
 
     s = load_neuron(StringIO(u"""
                 1 1 0  0 0  0 -1

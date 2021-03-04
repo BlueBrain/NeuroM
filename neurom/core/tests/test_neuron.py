@@ -37,6 +37,9 @@ from nose import tools as nt
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 
 
+def test_simple():
+    nrn1 = nm.load_neuron(str(Path(SWC_PATH, 'simple.swc')))
+
 def test_load_neuron_pathlib():
     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
@@ -81,10 +84,6 @@ def check_cloned_neuron(nrn1, nrn2):
     # check if changes are propagated between neurons
     nrn2.soma.radius = 10.
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
-
-    nrn2._data.data_block[0, :] = np.zeros_like(nrn2._data.data_block[0, :])
-    nt.ok_(not np.allclose(nrn1._data.data_block[0, :],
-                           nrn2._data.data_block[0, :]))
 
 
 def test_str():

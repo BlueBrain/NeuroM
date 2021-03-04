@@ -31,7 +31,7 @@ from pathlib import Path
 
 import neurom.geom.transform as gtr
 import numpy as np
-from neurom import load_neuron
+from neurom import COLS, load_neuron
 from neurom.features import neuritefunc as _nf
 from nose import tools as nt
 
@@ -211,8 +211,8 @@ def test_pivot_rotate_points():
 def _check_fst_nrn_translate(nrn_a, nrn_b, t):
 
     # soma points
-    nt.assert_true(np.allclose((nrn_b.soma.points[:, 0:3] - nrn_a.soma.points[:, 0:3]), t))
-
+    nt.assert_true(np.allclose(
+        (nrn_b.soma.points[:, COLS.XYZ] - nrn_a.soma.points[:, COLS.XYZ]), t))
     _check_fst_neurite_translate(nrn_a.neurites, nrn_b.neurites, t)
 
 
@@ -220,7 +220,7 @@ def _check_fst_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
     for sa, sb in zip(_nf.iter_sections(nrts_a),
                       _nf.iter_sections(nrts_b)):
-        nt.assert_true(np.allclose((sb.points[:, 0:3] - sa.points[:, 0:3]), t))
+        nt.assert_true(np.allclose((sb.points[:, COLS.XYZ] - sa.points[:, COLS.XYZ]), t))
 
 
 def test_translate_fst_neuron_swc():
@@ -279,8 +279,8 @@ def _apply_rot(points, rot_mat):
 def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 
     # soma points
-    nt.assert_true(np.allclose(_apply_rot(nrn_a.soma.points[:, 0:3], rot_mat),
-                               nrn_b.soma.points[:, 0:3]))
+    nt.assert_true(np.allclose(_apply_rot(nrn_a.soma.points[:, COLS.XYZ], rot_mat),
+                               nrn_b.soma.points[:, COLS.XYZ]))
 
     # neurite sections
     _check_fst_neurite_rotate(nrn_a.neurites, nrn_b.neurites, rot_mat)
@@ -289,8 +289,8 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
     for sa, sb in zip(_nf.iter_sections(nrt_a),
                       _nf.iter_sections(nrt_b)):
-        nt.assert_true(np.allclose(sb.points[:, 0:3],
-                                   _apply_rot(sa.points[:, 0:3], rot_mat)))
+        nt.assert_true(np.allclose(sb.points[:, COLS.XYZ],
+                                   _apply_rot(sa.points[:, COLS.XYZ], rot_mat)))
 
 
 def test_rotate_neuron_swc():

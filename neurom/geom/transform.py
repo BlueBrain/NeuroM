@@ -30,7 +30,6 @@
 
 import numpy as np
 
-
 _TRANSFDOC = """
 
     The transformation can be applied to [x, y, z] points via a call operator
