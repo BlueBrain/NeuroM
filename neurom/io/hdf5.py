@@ -62,7 +62,7 @@ def get_version(h5file):
     if 'neuron1/structure' in h5file:
         raise RawDataError(
             f'Error in {h5file}\n'
-            'h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2');
+            'h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2')
     return None
 
 
@@ -86,10 +86,6 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
         version = get_version(h5file)
         if version == 'H5V1':
             points, groups = _unpack_v1(h5file)
-        elif version == 'H5V2':
-            stg = next(s for s in ('repaired', 'unraveled', 'raw')
-                       if s in h5file['neuron1'])
-            points, groups = _unpack_v2(h5file, stage=stg)
 
     if remove_duplicates:
         points, groups = _remove_duplicate_points(points, groups)
@@ -140,16 +136,4 @@ def _unpack_v1(h5file):
     """Unpack groups from HDF5 v1 file."""
     points = np.array(h5file['points'])
     groups = np.array(h5file['structure'])
-    return points, groups
-
-
-def _unpack_v2(h5file, stage):
-    """Unpack groups from HDF5 v2 file."""
-    points = np.array(h5file['neuron1/%s/points' % stage])
-    # from documentation: The /neuron1/structure/unraveled reuses /neuron1/structure/raw
-    groups_stage = stage if stage != 'unraveled' else 'raw'
-    groups = np.array(h5file['neuron1/structure/%s' % groups_stage])
-    stypes = np.array(h5file['neuron1/structure/sectiontype'])
-    groups = np.hstack([groups, stypes])
-    groups[:, [1, 2]] = groups[:, [2, 1]]
     return points, groups
