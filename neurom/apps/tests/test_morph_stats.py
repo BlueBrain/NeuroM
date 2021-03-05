@@ -275,7 +275,7 @@ def test_sanitize_config():
 
 
 def test_multidimensional_features():
-    '''Features should be split into sub-features when they
+    """Features should be split into sub-features when they
     are multidimensional.
 
 
@@ -284,7 +284,7 @@ def test_multidimensional_features():
     the axon should still be made of 3 values (X, Y and Z)
 
     Cf: https://github.com/BlueBrain/NeuroM/issues/859
-    '''
+    """
     neuron = nm.load_neuron(Path(SWC_PATH, 'no-axon.swc'))
 
     config = {'neurite': {'segment_midpoints': ['max']},

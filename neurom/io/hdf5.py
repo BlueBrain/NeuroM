@@ -44,6 +44,7 @@ from itertools import zip_longest
 
 import h5py
 import numpy as np
+from neurom.exceptions import RawDataError
 
 from .datawrapper import BlockNeuronBuilder, DataWrapper
 
@@ -51,12 +52,17 @@ from .datawrapper import BlockNeuronBuilder, DataWrapper
 def get_version(h5file):
     """Determine whether an HDF5 file is v1 or v2.
 
-    Return: 'H5V1', 'H5V2' or None
+    Return: 'H5V1' or None
+
+    Raises:
+        RawDataError: if h5v2 is detected. See https://github.com/BlueBrain/MorphIO#H5v2
     """
     if 'points' in h5file and 'structure' in h5file:
         return 'H5V1'
     if 'neuron1/structure' in h5file:
-        return 'H5V2'
+        raise RawDataError(
+            f'Error in {h5file}\n'
+            'h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2');
     return None
 
 

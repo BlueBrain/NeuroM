@@ -31,10 +31,9 @@
 from copy import deepcopy
 
 import numpy as np
-
-from neurom.core import (Section, Neurite, Neuron, NeuriteType, SomaError)
-from neurom.core.dataformat import POINT_TYPE, COLS, ROOT_ID
-from neurom.core._soma import make_soma, SOMA_CONTOUR, SOMA_CYLINDER
+from neurom.core import Neurite, NeuriteType, Neuron, Section, SomaError
+from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER, make_soma
+from neurom.core.dataformat import COLS, POINT_TYPE, ROOT_ID
 
 
 class FstNeuron(Neuron):
@@ -131,7 +130,6 @@ _TREE_TYPES = tuple(NeuriteType)
 _NEURITE_ACTION = {
     'SWC': _remove_soma_initial_point,
     'H5V1': None,
-    'H5V2': None,
     'NL-ASCII': _remove_soma_initial_point,
 }
 
@@ -154,6 +152,5 @@ _SOMA_CONFIG = {
     # that the SWC format uses cylinders to represent the soma.
     'SWC': (_check_soma_topology_swc, SOMA_CYLINDER),
     'H5V1': (None, SOMA_CONTOUR),
-    'H5V2': (None, SOMA_CONTOUR),
     'NL-ASCII': (None, SOMA_CONTOUR),
 }
