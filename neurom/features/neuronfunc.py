@@ -279,3 +279,33 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10):
         ret += sholl_crossings(neurites, center, radii)
 
     return ret
+
+
+def _dendrite_bbox(neuron, neurite_type=None):
+    """Compute the bbox around dendrite of neurite_type."""
+    bbox = np.array([[1e10, 1e10, 1e10], [-1e10, -1e10, -1e10]])
+    neurite_filter = is_type(neurite_type)
+    for neurite in neuron.neurites:
+        if neurite_filter(neurite):
+            _bbox = bounding_box(neurite)
+            bbox[0] = np.vstack([_bbox[0], bbox[0]]).min(axis=0)
+            bbox[1] = np.vstack([_bbox[1], bbox[1]]).max(axis=0)
+    return bbox
+
+
+@feature(shape=())
+def volume_dendrite_bbox(neuron, neurite_type=None):
+    """Compute volume of bounding box around neurites."""
+    return np.prod(np.diff(_dendrite_bbox(neuron, neurite_type), axis=0))
+
+
+@feature(shape=())
+def lateral_dendrite_bbox(neuron, neurite_type=None):
+    """Compute lateral (x-direction) extend of bounding box around neurites."""
+    return np.diff(_dendrite_bbox(neuron, neurite_type), axis=0)[0][0]
+
+
+@feature(shape=())
+def vertical_dendrite_bbox(neuron, neurite_type=None):
+    """Compute vertical (y-direction) extend of bounding box around neurites."""
+    return np.diff(_dendrite_bbox(neuron, neurite_type), axis=0)[0][1]

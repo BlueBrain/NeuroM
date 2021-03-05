@@ -87,8 +87,13 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
         A tuple (feature, func) of the feature value and its function
     """
     feat = _find_feature_func(feature_name)
+    res = feat(obj, **kwargs)
+    if len(feat.shape) == 0:
+        res_list = [res]
+    else:
+        res_list = list(res)
 
-    return np.array(list(feat(obj, **kwargs))), feat
+    return np.array(res_list), feat
 
 
 def get(feature_name, obj, **kwargs):
