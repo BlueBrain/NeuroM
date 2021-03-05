@@ -42,6 +42,8 @@ DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
 ASC_PATH = DATA_PATH / 'neurolucida'
 H5V1_PATH = DATA_PATH / 'h5/v1'
+MORPHIO_OFFSET = 0
+
 
 
 def _load_neuron(name):
@@ -221,13 +223,12 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    morphio_offset = 0
     bad_ids = [[2, 23, 44, 65], [2], [2], [2], [2]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
         nt.assert_equal(ids.info,
-                        [(id + morphio_offset, 0) for id in bad_ids[i]])
+                        [(id + MORPHIO_OFFSET, 0) for id in bad_ids[i]])
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -240,9 +241,8 @@ def test_nonzero_segment_lengths_threshold():
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
 
     bad_ids = [(2, 0), (23, 0), (38, 9), (44, 0), (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)]
-    morphio_offset = 0
     nt.assert_equal(ids.info,
-                    [(id + morphio_offset, val) for id, val in bad_ids])
+                    [(id + MORPHIO_OFFSET, val) for id, val in bad_ids])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -263,7 +263,7 @@ def test_nonzero_section_lengths_bad_data():
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
     nt.ok_(not ids.status)
-    nt.assert_equal(ids.info, [15])
+    nt.assert_equal(ids.info, [15 + MORPHIO_OFFSET])
 
 
 def test_nonzero_section_lengths_threshold():
@@ -285,8 +285,7 @@ def test_has_nonzero_soma_radius():
 
 
 def test_has_nonzero_soma_radius_bad_data():
-
-    nrn = load_neuron(SWC_PATH / 'Single_basal.swc')
+    nrn = load_neuron(SWC_PATH / 'soma_zero_radius.swc')
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
 
 
@@ -394,6 +393,7 @@ def test_has_no_narrow_dendritic_section():
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
 """)
+    nrn = load_neuron(swc_content, reader='swc')
     res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
