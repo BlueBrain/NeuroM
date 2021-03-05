@@ -26,32 +26,31 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pathlib import Path
 from copy import deepcopy
 from io import StringIO
-
-from nose import tools as nt
-from nose.tools import assert_equal
-from numpy.testing import assert_array_equal
+from pathlib import Path
 
 from neurom import check, load_neuron
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
+from nose import tools as nt
+from nose.tools import assert_equal
+from numpy.testing import assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
-SWC_PATH = Path(DATA_PATH, 'swc')
-ASC_PATH = Path(DATA_PATH, 'neurolucida')
-H5V1_PATH = Path(DATA_PATH, 'h5/v1')
+SWC_PATH = DATA_PATH / 'swc'
+ASC_PATH = DATA_PATH / 'neurolucida'
+H5V1_PATH = DATA_PATH / 'h5/v1'
 
 
 def _load_neuron(name):
     if name.endswith('.swc'):
-        path = Path(SWC_PATH, name)
+        path = SWC_PATH / name
     elif name.endswith('.h5'):
-        path = Path(H5V1_PATH, name)
+        path = H5V1_PATH / name
     else:
-        path = Path(ASC_PATH, name)
+        path = ASC_PATH / name
     return name, load_neuron(path)
 
 
@@ -222,15 +221,13 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    bad_ids = [[(2, 0), (23, 0), (44, 0), (65, 0)],
-               [(2, 0)],
-               [(2, 0)],
-               [(2, 0)],
-               [(2, 0)]]
+    morphio_offset = 0
+    bad_ids = [[2, 23, 44, 65], [2], [2], [2], [2]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
-        nt.assert_equal(ids.info, bad_ids[i])
+        nt.assert_equal(ids.info,
+                        [(id + morphio_offset, 0) for id in bad_ids[i]])
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -241,8 +238,11 @@ def test_nonzero_segment_lengths_threshold():
     nt.assert_equal(len(ids.info), 0)
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
-    nt.assert_equal(ids.info, [(2, 0), (23, 0), (38, 9), (44, 0),
-                               (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)])
+
+    bad_ids = [(2, 0), (23, 0), (38, 9), (44, 0), (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)]
+    morphio_offset = 0
+    nt.assert_equal(ids.info,
+                    [(id + morphio_offset, val) for id, val in bad_ids])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -280,13 +280,13 @@ def test_nonzero_section_lengths_threshold():
 
 def test_has_nonzero_soma_radius():
 
-    nrn = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+    nrn = load_neuron(SWC_PATH / 'Neuron.swc')
     nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
 
 
 def test_has_nonzero_soma_radius_bad_data():
 
-    nrn = load_neuron(Path(SWC_PATH, 'Single_basal.swc'))
+    nrn = load_neuron(SWC_PATH / 'Single_basal.swc')
     nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
 
 
@@ -418,7 +418,6 @@ def test_has_no_dangling_branch():
     _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
     res = nrn_chk.has_no_dangling_branch(nrn)
     nt.ok_(res.status)
-
 
 
 def test__bool__():

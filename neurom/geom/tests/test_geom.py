@@ -27,16 +27,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pathlib import Path
-import numpy as np
-import neurom as nm
-from neurom import fst
-from neurom import geom
 
+import neurom as nm
+import numpy as np
+from neurom import fst, geom
 from nose import tools as nt
 
 SWC_DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc'
 NRN = nm.load_neuron(Path(SWC_DATA_PATH, 'Neuron.swc'))
-
+SIMPLE = nm.load_neuron(SWC_DATA_PATH / 'simple.swc')
 
 class PointObj(object):
     pass
@@ -69,10 +68,9 @@ def test_bounding_box_soma():
 
 
 def test_bounding_box_neurite():
-    nrt = NRN.neurites[0]
-    ref = np.array([[-33.25305769, -57.600172, 0.], [0., 0., 49.70137991]])
-    nt.assert_true(np.allclose(geom.bounding_box(nrt), ref))
-
+    nrt = SIMPLE.neurites[0]
+    ref = np.array([[-5.,  0.,  0.], [ 6.,  5.,  0.]])
+    np.testing.assert_allclose(geom.bounding_box(nrt), ref)
 
 def test_convex_hull_points():
 

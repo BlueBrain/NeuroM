@@ -26,19 +26,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
+import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
-
-import numpy as np
 from neurom import NeuriteType, geom
-from neurom.core import iter_neurites, iter_segments, iter_sections
+from neurom.core import iter_neurites, iter_sections, iter_segments
 from neurom.core._soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
-from neurom.view.dendrogram import Dendrogram, layout_dendrogram, get_size, move_positions
+from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
 
 from . import common
 

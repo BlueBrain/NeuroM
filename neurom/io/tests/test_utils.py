@@ -27,20 +27,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Test neurom.io.utils."""
-from pathlib import Path
 import sys
+import warnings
 from io import StringIO
 from pathlib import Path
-import warnings
 
 import numpy as np
-from nose import tools as nt
-
-from neurom import get
+from neurom import COLS, get
 from neurom.core import Neuron, SomaError
 from neurom.exceptions import NeuroMError, RawDataError, SomaError
 from neurom.features import neuritefunc as _nf
 from neurom.io import utils
+from nose import tools as nt
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
@@ -62,14 +60,15 @@ FILES = [Path(SWC_PATH, f)
 FILENAMES = [Path(VALID_DATA_PATH, f)
              for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
 
+NRN = utils.load_neuron(Path(VALID_DATA_PATH, 'Neuron.swc'))
+
 NO_SOMA_FILE = Path(SWC_PATH, 'Single_apical_no_soma.swc')
 
 DISCONNECTED_POINTS_FILE = Path(SWC_PATH, 'Neuron_disconnected_components.swc')
 
 MISSING_PARENTS_FILE = Path(SWC_PATH, 'Neuron_missing_parents.swc')
 
-INVALID_ID_SEQUENCE_FILE = Path(SWC_PATH,
-                                        'non_increasing_trunk_off_1_16pt.swc')
+INVALID_ID_SEQUENCE_FILE = Path(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
 
 def _mock_load_neuron(filename):
@@ -139,20 +138,19 @@ def test_load_neuron():
     _check_neurites_have_no_parent(nrn)
 
     neuron_str = u""" 1 1  0  0 0 1. -1
- 2 3  0  0 0 1.  1
- 3 3  0  5 0 1.  2
- 4 3 -5  5 0 0.  3
- 5 3  6  5 0 0.  3
- 6 2  0  0 0 1.  1
- 7 2  0 -4 0 1.  6
- 8 2  6 -4 0 0.  7
- 9 2 -5 -4 0 0.  7
-"""
+                      2 3  0  0 0 1.  1
+                      3 3  0  5 0 1.  2
+                      4 3 -5  5 0 0.  3
+                      5 3  6  5 0 0.  3
+                      6 2  0  0 0 1.  1
+                      7 2  0 -4 0 1.  6
+                      8 2  6 -4 0 0.  7
+                      9 2 -5 -4 0 0.  7
+                     """
     utils.load_neuron(StringIO(neuron_str), reader='swc')
 
 
 def test_neuron_name():
-
     for fn, nn in zip(FILENAMES, NRN_NAMES):
         nrn = utils.load_neuron(fn)
         nt.eq_(nrn.name, nn)
@@ -170,16 +168,6 @@ def test_load_neuromorpho_3pt_soma():
     nt.eq_(len(nrn.soma.points), 3)
     nt.eq_(nrn.soma.radius, 2)
     _check_neurites_have_no_parent(nrn)
-
-
-NRN = utils.load_neuron(FILENAMES[0])
-
-
-def test_neuron_section_ids():
-
-    # check section IDs
-    for i, sec in enumerate(NRN.sections):
-        nt.eq_(i, sec.id)
 
 
 def test_neurites_have_no_parent():
@@ -319,17 +307,17 @@ def test_load_h5_trunk_points_regression():
     # of files with non-standard soma structure.
     # See #480.
     nrn = utils.load_neuron(Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
-    nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1],
-                       [0., 0., 0.1, 0.31646374, 4., 4., 3.]))
+    nt.ok_(np.allclose(nrn.neurites[0].root_node.points[1, COLS.XYZR],
+                       [0., 0., 0.1, 0.31646374]))
 
-    nt.ok_(np.allclose(nrn.neurites[1].root_node.points[1],
-                       [0., 0., 0.1, 1.84130445e-01, 3.0, 235., 234.]))
+    nt.ok_(np.allclose(nrn.neurites[1].root_node.points[1, COLS.XYZR],
+                       [0., 0., 0.1, 1.84130445e-01]))
 
-    nt.ok_(np.allclose(nrn.neurites[2].root_node.points[1],
-                       [0., 0., 0.1, 5.62225521e-01, 3., 466, 465]))
+    nt.ok_(np.allclose(nrn.neurites[2].root_node.points[1, COLS.XYZR],
+                       [0., 0., 0.1, 5.62225521e-01]))
 
-    nt.ok_(np.allclose(nrn.neurites[3].root_node.points[1],
-                       [0., 0., 0.1, 7.28555262e-01, 2., 697, 696]))
+    nt.ok_(np.allclose(nrn.neurites[3].root_node.points[1, COLS.XYZR],
+                       [0., 0., 0.1, 7.28555262e-01]))
 
 
 def test_load_unknown_type():

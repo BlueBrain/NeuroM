@@ -66,7 +66,7 @@ class Soma(object):
     def volume(self):
         """Gets soma volume assuming it is a sphere."""
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
-        return 4.0 / 3 * math.pi * self.radius ** 3
+        return 4. / 3 * math.pi * self.radius ** 3
 
 
 class SomaSinglePoint(Soma):

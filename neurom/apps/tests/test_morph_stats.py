@@ -27,21 +27,18 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from pathlib import Path
 import warnings
-
-import numpy as np
-from nose.tools import (assert_almost_equal, assert_equal,
-                        assert_greater_equal, assert_raises, ok_)
-import pandas as pd
-from pandas.testing import assert_frame_equal
+from pathlib import Path
 
 import neurom as nm
+import numpy as np
+import pandas as pd
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from nose.tools import assert_almost_equal, assert_equal, assert_greater_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
-
+from pandas.testing import assert_frame_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
@@ -139,7 +136,7 @@ def test_eval_stats_applies_numpy_function():
 
     for m in modes:
         assert_equal(ms.eval_stats(ref_array, m),
-            getattr(np, m)(ref_array))
+                     getattr(np, m)(ref_array))
 
 
 def test_extract_stats_single_neuron():
@@ -207,7 +204,7 @@ def test_extract_dataframe():
     expected = pd.DataFrame(
         columns=expected_columns,
         data=[['Neuron', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
-              ['simple', 15.,          16.,           0.,          31.,        ]])
+              ['simple', 15.,          16.,           0.,          31., ]])
     assert_frame_equal(actual, expected)
 
 
@@ -224,7 +221,6 @@ def test_extract_dataframe_multiproc():
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=os.cpu_count() + 1)
         assert_equal(len(w), 1, "Warning not emitted")
     assert_frame_equal(actual, expected)
-
 
 
 def test_get_header():
@@ -276,6 +272,7 @@ def test_sanitize_config():
     }
     new_config = ms.sanitize_config(full_config)
     assert_equal(3, len(new_config))  # neurite, neurite_type & neuron
+
 
 def test_multidimensional_features():
     '''Features should be split into sub-features when they

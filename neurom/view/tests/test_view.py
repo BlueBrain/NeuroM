@@ -26,22 +26,20 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import itertools as it
-from pathlib import Path
 import warnings
+from io import StringIO
+from pathlib import Path
 
 import numpy as np
-from nose.tools import assert_raises, eq_, ok_
-from numpy.testing import assert_allclose, assert_array_almost_equal
-from io import StringIO
-
 from neurom import load_neuron
 from neurom.core import Neurite, Section
 from neurom.core._soma import SOMA_CONTOUR, SOMA_CYLINDER
 from neurom.core.types import NeuriteType
 from neurom.view import common, view
+from nose.tools import assert_raises, eq_, ok_
+from numpy.testing import assert_allclose, assert_array_almost_equal
 
-from .utils import (  # needs to be at top to trigger matplotlib Agg backend
-    get_fig_2d, get_fig_3d)
+from .utils import get_fig_2d, get_fig_3d  # needs to be at top to trigger matplotlib Agg backend
 
 DATA_PATH = './test_data'
 SWC_PATH = Path(DATA_PATH, 'swc/')
@@ -79,7 +77,7 @@ def test_tree():
     with get_fig_2d() as (fig, ax):
         tree = simple_neuron.neurites[0]
         view.plot_tree(ax, tree)
-        assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.), atol=1e-10)
+        np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.))
 
 
 def test_neuron():
@@ -99,9 +97,9 @@ def test_tree3d():
         tree = simple_neuron.neurites[0]
         view.plot_tree3d(ax, tree)
         xy_bounds = ax.xy_dataLim.bounds
-        assert_allclose(xy_bounds, (-5., 0., 11., 5.))
+        np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
         zz_bounds = ax.zz_dataLim.bounds
-        assert_allclose(zz_bounds, (0., 0., 1., 1.))
+        np.testing.assert_allclose(zz_bounds, (0., 0., 1., 1.))
 
 
 def test_neuron3d():

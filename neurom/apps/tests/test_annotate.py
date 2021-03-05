@@ -18,10 +18,10 @@ def test_generate_annotation():
 (circle   ; MUK_ANNOTATION
     (Color blue)   ; MUK_ANNOTATION
     (Name "dangling")   ; MUK_ANNOTATION
-    (1 2 3 0.50)   ; MUK_ANNOTATION
-    (4 5 6 0.50)   ; MUK_ANNOTATION
-    (7 8 9 0.50)   ; MUK_ANNOTATION
-    (10 11 12 0.50)   ; MUK_ANNOTATION
+    (      1.00       2.00       3.00 0.50)   ; MUK_ANNOTATION
+    (      4.00       5.00       6.00 0.50)   ; MUK_ANNOTATION
+    (      7.00       8.00       9.00 0.50)   ; MUK_ANNOTATION
+    (     10.00      11.00      12.00 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
 """
 
@@ -35,8 +35,8 @@ def test_annotate():
 (Circle1   ; MUK_ANNOTATION
     (Color Blue)   ; MUK_ANNOTATION
     (Name "narrow start")   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
-    (0.0 0.0 0.0 0.50)   ; MUK_ANNOTATION
+    (      0.00       0.00       0.00 0.50)   ; MUK_ANNOTATION
+    (      0.00       0.00       0.00 0.50)   ; MUK_ANNOTATION
 )   ; MUK_ANNOTATION
 """
 
