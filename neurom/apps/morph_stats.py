@@ -199,11 +199,8 @@ def get_header(results):
     ret = ['name', ]
     values = next(iter(results.values()))
     for k, v in values.items():
-        if isinstance(v, dict):
-            for metric in v.keys():
-                ret.append('%s:%s' % (k, metric))
-        else:
-            ret.append(k)
+        for metric in v.keys():
+            ret.append('%s:%s' % (k, metric))
     return ret
 
 
