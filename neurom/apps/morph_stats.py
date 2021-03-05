@@ -100,9 +100,11 @@ def extract_dataframe(neurons, config, n_workers=1):
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
             - neurite: a dictionary {{neurite_feature: mode}} where:
-                - neurite_feature is a string from NEURITEFEATURES
+                - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+            - neuron: same as neurite entry, but it will not be run on each neurite_type,
+              but only once on the whole neuron.
         n_workers (int): number of workers for multiprocessing (on collection of neurons)
 
     Returns:
