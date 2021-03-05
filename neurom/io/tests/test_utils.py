@@ -202,6 +202,11 @@ def test_load_neuron_soma_only():
     nt.assert_equal(nrn.name, 'Soma_origin')
 
 
+@nt.raises(SomaError)
+def test_load_neuron_no_soma_raises_SomaError():
+    utils.load_neuron(NO_SOMA_FILE)
+
+
 # TODO: decide if we want to check for this in fst.
 @nt.nottest
 @nt.raises(RawDataError)
