@@ -150,6 +150,7 @@ def extract_stats(neurons, config):
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
             - neuron: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole neuron.
+
     Returns:
         The extracted statistics
 
@@ -211,11 +212,9 @@ def generate_flattened_dict(headers, results):
         for header in headers:
             if header == 'name':
                 row.append(name)
-            elif ':' in header:
+            else:
                 neurite_type, metric = header.split(':')
                 row.append(values[neurite_type][metric])
-            else:
-                row.append(values[header])
         yield row
 
 
