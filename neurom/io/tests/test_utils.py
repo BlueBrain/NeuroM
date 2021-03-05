@@ -72,7 +72,7 @@ INVALID_ID_SEQUENCE_FILE = Path(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
 
 def _mock_load_neuron(filename):
-    class MockNeuron(object):
+    class MockNeuron:
         def __init__(self, name):
             self.soma = 42
             self.neurites = list()
@@ -99,6 +99,14 @@ def test_load_neurons():
     nrns = utils.load_neurons(map(str, FILES), neuron_loader=_mock_load_neuron)
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, FILES[i].stem)
+
+    nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+
+
+def test_ignore_exceptions():
+    nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+    pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=[RawDataError])
+    nt.eq_(len(pop), 0)
 
     # Single string
     nrns = utils.load_neurons(str(FILES[0]), neuron_loader=_mock_load_neuron)

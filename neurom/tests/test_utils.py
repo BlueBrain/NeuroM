@@ -32,13 +32,12 @@ import random
 import warnings
 
 import numpy as np
-from nose import tools as nt
-
 from neurom import utils as nu
+from nose import tools as nt
 
 
 def test_memoize_caches():
-    class A(object):
+    class A:
         @nu.memoize
         def dummy(self, x, y=42):
             return random.random()

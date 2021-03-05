@@ -251,6 +251,7 @@ def plot_tree3d(ax, tree,
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
+    colors = (_get_color(color, tree.type),)
 
     collection = Line3DCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)

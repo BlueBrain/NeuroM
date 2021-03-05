@@ -32,12 +32,13 @@ import neurom as nm
 import numpy as np
 from neurom import fst, geom
 from nose import tools as nt
+from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc'
 NRN = nm.load_neuron(Path(SWC_DATA_PATH, 'Neuron.swc'))
 SIMPLE = nm.load_neuron(SWC_DATA_PATH / 'simple.swc')
 
-class PointObj(object):
+class PointObj:
     pass
 
 
@@ -85,4 +86,4 @@ def test_convex_hull_volume():
     # This leverages scipy ConvexHull and we don't want
     # to re-test scipy, so simply regression test the volume
     hull = geom.convex_hull(NRN)
-    nt.assert_almost_equal(hull.volume, 208641.65, places=3)
+    assert_almost_equal(hull.volume, 208641, decimal=0)

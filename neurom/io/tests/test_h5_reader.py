@@ -57,7 +57,7 @@ def test_consistency_between_h5_swc():
     nt.ok_(np.allclose(h5_data.data_block.shape, swc_data.data_block.shape))
 
 
-class DataWrapper_Neuron(object):
+class DataWrapper_Neuron:
     """Base class for H5 tests."""
 
     end_pts = [1, 775, 393, 524, 142, 655, 273, 22, 795, 413,
@@ -98,7 +98,7 @@ class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
         self.rows = len(self.data.data_block)
 
 
-class DataWrapper_Neuron_with_duplicates(object):
+class DataWrapper_Neuron_with_duplicates:
     """Base class for H5 tests."""
 
     end_pts = [1, 386, 133, 782, 529, 914, 276, 661, 23, 408, 155, 925,

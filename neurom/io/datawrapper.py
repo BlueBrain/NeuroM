@@ -40,7 +40,7 @@ L = logging.getLogger(__name__)
 TYPE, ID, PID = 0, 1, 2
 
 
-class DataWrapper(object):
+class DataWrapper:
     """Class holding a raw data block and section information."""
 
     def __init__(self, data_block, fmt, sections=None):
@@ -120,7 +120,7 @@ def _section_end_points(structure_block, id_map):
     return end_pts.union(soma_end_pts)
 
 
-class DataBlockSection(object):
+class DataBlockSection:
     """Sections ((ids), type, parent_id)."""
     def __init__(self, ids=None, ntype=0, pid=-1):
         """Initialize a DataBlockSection object."""
@@ -213,7 +213,7 @@ def _extract_sections(data_block):
     return sections
 
 
-class BlockNeuronBuilder(object):
+class BlockNeuronBuilder:
     """Helper to create DataWrapper for 'block' sections.
 
     This helps create a new DataWrapper when one already has 'blocks'

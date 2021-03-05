@@ -100,6 +100,9 @@ def test_iter_sections_default():
     assert_sequence_equal(ref,
                           [n for n in core.iter_sections(POP)])
 
+def test_iter_sections_default_pop():
+    ref = [s.id for n in POP.neurites for s in n.iter_sections()]
+    assert_sequence_equal(ref, [n.id for n in core.iter_sections(POP)])
 
 def test_iter_sections_filter():
 

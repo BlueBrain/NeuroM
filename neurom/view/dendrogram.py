@@ -28,14 +28,13 @@
 
 """Dendrogram helper functions and class."""
 import numpy as np
-
 from neurom import NeuriteType
 from neurom.core import Neurite, Neuron
 from neurom.core.dataformat import COLS
 from neurom.morphmath import interval_lengths
 
 
-class Dendrogram(object):
+class Dendrogram:
     """Dendrogram."""
 
     def __init__(self, neurom_section):
@@ -95,7 +94,7 @@ def layout_dendrogram(dendrogram, origin):
         will represent a nice tree structure.
     """
 
-    class _PositionedDendrogram(object):
+    class _PositionedDendrogram:
         """Wrapper around dendrogram that allows to lay it out.
 
         The layout happens only in X coordinates. Children's Y coordinate is just a parent's Y

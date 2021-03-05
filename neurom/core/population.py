@@ -31,7 +31,7 @@
 from itertools import chain
 
 
-class Population(object):
+class Population:
     """Neuron Population Class.
 
     Features:

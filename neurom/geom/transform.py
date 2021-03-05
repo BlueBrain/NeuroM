@@ -44,7 +44,7 @@ _TRANSFDOC = """
 """
 
 
-class Transform3D(object):
+class Transform3D:
     """Class representing a generic 3D transformation."""
     __doc__ += _TRANSFDOC
 

@@ -32,13 +32,12 @@ from copy import deepcopy
 from itertools import chain
 
 import numpy as np
-
 from neurom import morphmath
 from neurom.core._soma import Soma
 from neurom.core.dataformat import COLS
 from neurom.utils import memoize
 
-from . import NeuriteType, Tree, NeuriteIter
+from . import NeuriteIter, NeuriteType, Tree
 
 # NRN simulator iteration order
 # See:
@@ -195,7 +194,7 @@ class Section(Tree):
     __repr__ = __str__
 
 
-class Neurite(object):
+class Neurite:
     """Class representing a neurite tree."""
 
     def __init__(self, root_node):
@@ -292,7 +291,7 @@ class Neurite(object):
     __repr__ = __str__
 
 
-class Neuron(object):
+class Neuron:
     """Class representing a simple neuron."""
 
     def __init__(self, soma=None, neurites=None, sections=None, name='Neuron'):

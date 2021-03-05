@@ -27,15 +27,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from collections import namedtuple
+
 from neurom.check import check_wrapper
 from nose import tools as nt
-
 
 MockResult = namedtuple('MockResult', 'status')
 
 
 def test_check_wrapper_title():
-    class Mock(object):
+    class Mock:
         pass
 
     def mock_fun():

@@ -30,7 +30,7 @@
 from collections import deque
 
 
-class Tree(object):
+class Tree:
     """Simple recursive tree class."""
     def __init__(self):
         """Initialize a Tree object."""

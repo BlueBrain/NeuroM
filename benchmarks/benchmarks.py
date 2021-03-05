@@ -2,14 +2,14 @@ from pathlib import Path
 
 import neurom as nm
 import neurom.io
-from neurom.fst._core import FstNeuron
 from neurom.check import neuron_checks as nc
 from neurom.check import structural_checks as sc
+from neurom.fst._core import FstNeuron
 
 DATA_DIR = Path(__file__).parent.parent / 'test_data/'
 
 
-class TimeLoadMorphology(object):
+class TimeLoadMorphology:
     def time_swc(self):
         path = Path(DATA_DIR, 'swc/Neuron.swc')
         nm.load_neuron(path)
@@ -23,7 +23,7 @@ class TimeLoadMorphology(object):
         nm.load_neuron(path)
 
 
-class TimeFeatures(object):
+class TimeFeatures:
     def setup(self):
         path = Path(DATA_DIR, 'h5/v1/bio_neuron-000.h5')
         self.neuron = nm.load_neuron(path)

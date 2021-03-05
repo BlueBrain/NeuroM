@@ -32,7 +32,7 @@
 _COL_COUNT = 7
 
 
-class COLS(object):
+class COLS:
     """Column labels for internal data representation."""
     COL_COUNT = _COL_COUNT
     (X, Y, Z, R, TYPE, ID, P) = range(_COL_COUNT)
@@ -43,7 +43,7 @@ class COLS(object):
     XYZR = slice(0, 4)
 
 
-class POINT_TYPE(object):
+class POINT_TYPE:
     """Point types.
 
     These follow SWC specification.
