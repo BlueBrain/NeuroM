@@ -166,12 +166,8 @@ def test_single_basal_neuron():
 
 def test_single_axon_neuron():
     expected = dict([
-                  # "Is single tree": True,
                   ("Has soma points", True),
-                  # "Has sequential ids": True,
-                  # "Has increasing ids": True,
                   ("Has valid soma", True),
-                  # "Has valid neurites": True,
                   ("Has basal dendrite", False),
                   ("Has axon", True),
                   ("Has apical dendrite", False),
