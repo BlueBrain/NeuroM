@@ -58,7 +58,9 @@ REF_CONFIG = {
 }
 
 REF_OUT = {
-    'mean_soma_radius': 0.13065629648763766,
+    'neuron': {
+        'mean_soma_radius': 0.13065629648763766,
+    },
     'axon': {
         'total_section_length': 207.87975220908129,
         'max_section_length': 11.018460736176685,
@@ -145,7 +147,7 @@ def test_extract_stats_single_neuron():
     assert_equal(set(res.keys()), set(REF_OUT.keys()))
     # Note: soma radius is calculated from the sphere that gives the area
     # of the cylinders described in Neuron.swc
-    assert_almost_equal(res['mean_soma_radius'], REF_OUT['mean_soma_radius'])
+    assert_almost_equal(res['neuron']['mean_soma_radius'], REF_OUT['neuron']['mean_soma_radius'])
 
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
         assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
@@ -196,7 +198,7 @@ def test_extract_dataframe():
     config = {'neurite': {'total_length_per_neurite': ['total']}}
     actual = ms.extract_dataframe(nrns, config)
     expected_columns = pd.MultiIndex.from_tuples(
-        [('neuron', 'name'),
+        [('property', 'name'),
          ('axon', 'total_total_length_per_neurite'),
          ('basal_dendrite', 'total_total_length_per_neurite'),
          ('apical_dendrite', 'total_total_length_per_neurite'),
@@ -231,7 +233,7 @@ def test_get_header():
     header = ms.get_header(fake_results)
     assert_equal(1 + 1 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
     ok_('name' in header)
-    ok_('mean_soma_radius' in header)
+    ok_('neuron:mean_soma_radius' in header)
 
 
 def test_generate_flattened_dict():
