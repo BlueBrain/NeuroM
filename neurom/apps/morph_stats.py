@@ -117,11 +117,6 @@ def extract_dataframe(neurons, config, n_workers=1):
         neurons = [neurons]
     config = config.copy()
 
-    # Only NEURITEFEATURES are considered since the dataframe is built by neurite_type
-    # NEURONFEATURES are discarded
-    if 'neuron' in config:
-        del config['neuron']
-
     func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
         stats = list(map(func, neurons))
@@ -131,18 +126,10 @@ def extract_dataframe(neurons, config, n_workers=1):
         with multiprocessing.Pool(n_workers) as pool:
             stats = list(pool.imap(func, neurons))
 
-    columns = list(next(iter(stats[0][1].values())).keys())
-
+    columns = [('property', 'name')] + [(key1, key2) for key1, data in stats[0][1].items() for key2 in data]
     rows = [[name] + list(chain.from_iterable(features.values() for features in data.values()))
             for name, data in stats]
-
-    columns = list(chain.from_iterable(
-        [[('neuron', 'name')],
-         product(map(lambda x: x.lower(), config.get('neurite_type', _NEURITE_MAP.keys())),
-                 columns)]))
-    columns = pd.MultiIndex.from_tuples(columns)
-
-    return pd.DataFrame(columns=columns, data=rows)
+    return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
 def extract_stats(neurons, config):
@@ -152,12 +139,13 @@ def extract_stats(neurons, config):
         neurons: a neuron, population, neurite tree or list of neuron paths/str
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
-              If not provided, all neurite_type will be used
+              If not provided, all neurite_type will be used.
             - neurite: a dictionary {{neurite_feature: mode}} where:
-                - neurite_feature is a string from NEURITEFEATURES
+                - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-
+            - neuron: same as neurite entry, but it will not be run on each neurite_type,
+              but only once on the whole neuron.
     Returns:
         The extracted statistics
 
@@ -198,8 +186,7 @@ def extract_stats(neurons, config):
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats, stat_name, stat, func.shape)
-
+            _fill_stats_dict(stats['neuron'], stat_name, stat, func.shape)
     return dict(stats)
 
 
