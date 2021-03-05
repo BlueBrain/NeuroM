@@ -44,6 +44,7 @@ from itertools import zip_longest
 
 import h5py
 import numpy as np
+from neurom.exceptions import RawDataError
 
 from .datawrapper import BlockNeuronBuilder, DataWrapper
 
@@ -51,12 +52,17 @@ from .datawrapper import BlockNeuronBuilder, DataWrapper
 def get_version(h5file):
     """Determine whether an HDF5 file is v1 or v2.
 
-    Return: 'H5V1', 'H5V2' or None
+    Return: 'H5V1' or None
+
+    Raises:
+        RawDataError: if h5v2 is detected. See https://github.com/BlueBrain/MorphIO#H5v2
     """
     if 'points' in h5file and 'structure' in h5file:
         return 'H5V1'
     if 'neuron1/structure' in h5file:
-        return 'H5V2'
+        raise RawDataError(
+            f'Error in {h5file}\n'
+            'h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2')
     return None
 
 
@@ -80,10 +86,6 @@ def read(filename, remove_duplicates=False, data_wrapper=DataWrapper):
         version = get_version(h5file)
         if version == 'H5V1':
             points, groups = _unpack_v1(h5file)
-        elif version == 'H5V2':
-            stg = next(s for s in ('repaired', 'unraveled', 'raw')
-                       if s in h5file['neuron1'])
-            points, groups = _unpack_v2(h5file, stage=stg)
 
     if remove_duplicates:
         points, groups = _remove_duplicate_points(points, groups)
@@ -134,16 +136,4 @@ def _unpack_v1(h5file):
     """Unpack groups from HDF5 v1 file."""
     points = np.array(h5file['points'])
     groups = np.array(h5file['structure'])
-    return points, groups
-
-
-def _unpack_v2(h5file, stage):
-    """Unpack groups from HDF5 v2 file."""
-    points = np.array(h5file['neuron1/%s/points' % stage])
-    # from documentation: The /neuron1/structure/unraveled reuses /neuron1/structure/raw
-    groups_stage = stage if stage != 'unraveled' else 'raw'
-    groups = np.array(h5file['neuron1/structure/%s' % groups_stage])
-    stypes = np.array(h5file['neuron1/structure/sectiontype'])
-    groups = np.hstack([groups, stypes])
-    groups[:, [1, 2]] = groups[:, [2, 1]]
     return points, groups

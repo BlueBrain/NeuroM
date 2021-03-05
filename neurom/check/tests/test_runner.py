@@ -76,8 +76,8 @@ CONFIG_COLOR['color'] = True
 
 
 def _run_test(path, ref, config=CONFIG, should_pass=False):
-    '''Run checkers with the passed "config" on file "path"
-    and compare the results to "ref"'''
+    """Run checkers with the passed "config" on file "path"
+    and compare the results to 'ref'"""
     results = CheckRunner(config).run(path)
     nt.assert_dict_equal(dict(results['files'][path]), ref)
     nt.assert_equal(results['STATUS'],

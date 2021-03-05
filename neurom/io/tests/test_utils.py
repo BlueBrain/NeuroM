@@ -44,7 +44,7 @@ DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
 VALID_DATA_PATH = DATA_PATH / 'valid_set'
 
-NRN_NAMES = ('Neuron', 'Neuron_h5v1', 'Neuron_h5v2')
+NRN_NAMES = ('Neuron', 'Neuron_h5v1')
 
 FILES = [Path(SWC_PATH, f)
          for f in ['Neuron.swc',
@@ -58,7 +58,7 @@ FILES = [Path(SWC_PATH, f)
                    'Neuron_no_missing_ids_no_zero_segs.swc']]
 
 FILENAMES = [Path(VALID_DATA_PATH, f)
-             for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
+             for f in ['Neuron.swc', 'Neuron_h5v1.h5']]
 
 NRN = utils.load_neuron(Path(VALID_DATA_PATH, 'Neuron.swc'))
 
@@ -88,8 +88,7 @@ def _check_neurites_have_no_parent(nrn):
 
 
 def test_get_morph_files():
-    ref = set(['Neuron_h5v2.h5', 'Neuron_2_branch_h5v2.h5', 'Neuron_slice.h5',
-               'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
+    ref = set(['Neuron_slice.h5', 'Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_2_branch_h5v1.h5'])
 
     files = set(f.name for f in utils.get_morph_files(VALID_DATA_PATH))
     nt.assert_equal(ref, files)
@@ -228,8 +227,8 @@ def test_load_neuron_invalid_id_sequence_raises():
 
 def test_load_neurons_directory():
     pop = utils.load_neurons(VALID_DATA_PATH)
-    nt.assert_equal(len(pop.neurons), 6)
-    nt.assert_equal(len(pop), 6)
+    nt.assert_equal(len(pop.neurons), 4)
+    nt.assert_equal(len(pop), 4)
     nt.assert_equal(pop.name, 'valid_set')
     for nrn in pop:
         nt.assert_true(isinstance(nrn, Neuron))
@@ -237,8 +236,8 @@ def test_load_neurons_directory():
 
 def test_load_neurons_directory_name():
     pop = utils.load_neurons(VALID_DATA_PATH, name='test123')
-    nt.assert_equal(len(pop.neurons), 6)
-    nt.assert_equal(len(pop), 6)
+    nt.assert_equal(len(pop.neurons), 4)
+    nt.assert_equal(len(pop), 4)
     nt.assert_equal(pop.name, 'test123')
     for nrn in pop:
         nt.assert_true(isinstance(nrn, Neuron))
@@ -246,7 +245,7 @@ def test_load_neurons_directory_name():
 
 def test_load_neurons_filenames():
     pop = utils.load_neurons(FILENAMES, name='test123')
-    nt.assert_equal(len(pop.neurons), 3)
+    nt.assert_equal(len(pop.neurons), 2)
     nt.assert_equal(pop.name, 'test123')
     for nrn, name in zip(pop.neurons, NRN_NAMES):
         nt.assert_true(isinstance(nrn, Neuron))
@@ -325,7 +324,7 @@ def test_load_unknown_type():
 
 
 def test_NeuronLoader():
-    dirpath = Path(DATA_PATH, 'h5', 'v2')
+    dirpath = Path(DATA_PATH, 'h5', 'v1')
     loader = utils.NeuronLoader(dirpath, file_ext='.h5', cache_size=5)
     nrn = loader.get('Neuron')
     nt.ok_(isinstance(nrn, Neuron))
@@ -355,6 +354,9 @@ def test_get_files_by_path():
     nt.eq_(len(single_neurom), 1)
 
     neuron_dir = utils.get_files_by_path(VALID_DATA_PATH)
-    nt.eq_(len(neuron_dir), 6)
+    nt.eq_(len(neuron_dir), 4)
 
     nt.assert_raises(IOError, utils.get_files_by_path, Path('this/is/a/fake/path'))
+
+def test_h5v2_raises():
+    nt.assert_raises(RawDataError, utils.load_neuron, DATA_PATH / 'h5/v2/Neuron.h5')

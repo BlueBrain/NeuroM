@@ -37,34 +37,18 @@ from nose import tools as nt
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = Path(DATA_PATH, 'h5')
 H5V1_PATH = Path(H5_PATH, 'v1')
-H5V2_PATH = Path(H5_PATH, 'v2')
 SWC_PATH = Path(DATA_PATH, 'swc')
 
 
 def test_get_version():
     with h5py.File(Path(H5V1_PATH, 'Neuron.h5'), mode='r') as v1:
         nt.assert_equal(hdf5.get_version(v1), 'H5V1')
-
-    with h5py.File(Path(H5V2_PATH, 'Neuron.h5'), mode='r') as v2:
-        nt.assert_equal(hdf5.get_version(v2), 'H5V2')
     nt.assert_equal(hdf5.get_version({}), None)
 
 
 def test_unpack_h5():
     with h5py.File(Path(H5V1_PATH, 'Neuron.h5'), mode='r') as v1:
         pts1, grp1 = hdf5._unpack_v1(v1)
-
-    with h5py.File(Path(H5V2_PATH, 'Neuron.h5'), mode='r') as v2:
-        pts2, grp2 = hdf5._unpack_v2(v2, stage='raw')
-
-    nt.assert_true(np.all(pts1 == pts2))
-    nt.assert_true(np.all(grp1 == grp2))
-
-
-def test_consistency_between_v1_v2():
-    v1_data = hdf5.read(Path(H5V1_PATH, 'Neuron.h5'))
-    v2_data = hdf5.read(Path(H5V2_PATH, 'Neuron.h5'))
-    nt.ok_(np.allclose(v1_data.data_block, v2_data.data_block))
 
 
 def test_consistency_between_h5_swc():
@@ -110,15 +94,6 @@ class TestDataWrapper_Neuron_H5V1(DataWrapper_Neuron):
 
     def setup(self):
         self.data = hdf5.read(Path(H5V1_PATH, 'Neuron.h5'))
-        self.first_id = int(self.data.data_block[0][COLS.ID])
-        self.rows = len(self.data.data_block)
-
-
-class TestDataWrapper_Neuron_H5V2(DataWrapper_Neuron):
-    """Test HDF5 v2 reading."""
-
-    def setup(self):
-        self.data = hdf5.read(Path(H5V2_PATH, 'Neuron.h5'))
         self.first_id = int(self.data.data_block[0][COLS.ID])
         self.rows = len(self.data.data_block)
 

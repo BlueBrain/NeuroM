@@ -28,19 +28,18 @@
 
 """Test neurom.fst._core module."""
 
-from pathlib import Path
 from copy import deepcopy
+from pathlib import Path
 
 import numpy as np
-from nose import tools as nt
-
 from neurom import io as _io
 from neurom.fst import _core
+from nose import tools as nt
 
 DATA_ROOT = Path(__file__).parent.parent.parent.parent / 'test_data'
 DATA_PATH = Path(DATA_ROOT, 'valid_set')
 FILENAMES = [Path(DATA_PATH, f)
-             for f in ['Neuron.swc', 'Neuron_h5v1.h5', 'Neuron_h5v2.h5']]
+             for f in ['Neuron.swc', 'Neuron_h5v1.h5']]
 
 
 def test_neuron_name():
