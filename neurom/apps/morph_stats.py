@@ -126,7 +126,9 @@ def extract_dataframe(neurons, config, n_workers=1):
         with multiprocessing.Pool(n_workers) as pool:
             stats = list(pool.imap(func, neurons))
 
-    columns = [('property', 'name')] + [(key1, key2) for key1, data in stats[0][1].items() for key2 in data]
+    columns = [('property', 'name')] + [
+        (key1, key2) for key1, data in stats[0][1].items() for key2 in data
+    ]
     rows = [[name] + list(chain.from_iterable(features.values() for features in data.values()))
             for name, data in stats]
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
