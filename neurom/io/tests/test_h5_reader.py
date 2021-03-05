@@ -43,6 +43,7 @@ SWC_PATH = Path(DATA_PATH, 'swc')
 def test_get_version():
     with h5py.File(Path(H5V1_PATH, 'Neuron.h5'), mode='r') as v1:
         nt.assert_equal(hdf5.get_version(v1), 'H5V1')
+    nt.assert_equal(hdf5.get_version({}), None)
 
 
 def test_unpack_h5():
