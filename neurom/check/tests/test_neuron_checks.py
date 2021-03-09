@@ -68,7 +68,7 @@ def _make_monotonic(neuron):
 
 def _make_flat(neuron):
 
-    class Flattenizer(object):
+    class Flattenizer:
         def __call__(self, points):
             points = deepcopy(points)
             points[:, COLS.Z] = 0.;
@@ -330,7 +330,7 @@ def test_has_no_narrow_start():
 
 def test_has_nonzero_soma_radius_threshold():
 
-    class Dummy(object):
+    class Dummy:
         pass
 
     nrn = Dummy()

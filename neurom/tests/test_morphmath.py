@@ -30,12 +30,16 @@ from math import fabs, pi, sqrt
 
 import numpy as np
 from neurom import morphmath as mm
-from neurom.core.point import Point
+from neurom.core.point import Point as PointV1
 from nose import tools as nt
 from numpy.random import uniform
 from numpy.testing import assert_array_almost_equal
 
 np.random.seed(0)
+
+# Tip to minimize the changes when migrating to v2
+def Point(x, y, z, r):
+    return PointV1(x, y, z, r, 1)
 
 
 def test_vector():
@@ -124,13 +128,13 @@ def test_path_fraction_many_points():
     nt.assert_true(np.allclose(res, (x(0.), y(0.), 2.)))
 
     res = mm.path_fraction_point(points, 0.25)
-    nt.assert_true(np.allclose(res, (x(np.pi/4.), y(np.pi/4.), 2.)))
+    nt.assert_true(np.allclose(res, (x(np.pi / 4.), y(np.pi / 4.), 2.)))
 
     res = mm.path_fraction_point(points, 0.5)
-    nt.assert_true(np.allclose(res, (x(np.pi/2.), y(np.pi/2.), 2.)))
+    nt.assert_true(np.allclose(res, (x(np.pi / 2.), y(np.pi / 2.), 2.)))
 
     res = mm.path_fraction_point(points, 0.75)
-    nt.assert_true(np.allclose(res, (x(3.*np.pi/4.), y(3.*np.pi/4.), 2.)))
+    nt.assert_true(np.allclose(res, (x(3. * np.pi / 4.), y(3. * np.pi / 4.), 2.)))
 
     res = mm.path_fraction_point(points, 1.)
     nt.assert_true(np.allclose(res, (x(np.pi), y(np.pi), 2.)))
@@ -150,7 +154,7 @@ def test_scalar_projection_collinear():
 
     res = mm.scalar_projection(v1, v2)
 
-    nt.assert_true(np.allclose(res, 20./np.linalg.norm(v2)))
+    nt.assert_true(np.allclose(res, 20. / np.linalg.norm(v2)))
 
 
 def test_scalar_projection_perpendicular():
@@ -196,7 +200,7 @@ def test_dist_point_line():
     # check the distance of the line 3x - 4y + 1 = 0
     # with parametric form of (t, (4t - 1)/3)
     # two points that satisfy this equation:
-    l1 = np.array([0., 1./4., 0.])
+    l1 = np.array([0., 1. / 4., 0.])
     l2 = np.array([1., 1., 0.])
 
     p = np.array([2., 3., 0.])
@@ -206,22 +210,22 @@ def test_dist_point_line():
 
 
 def test_point_dist2():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
     dist = mm.point_dist2(p1, p2)
     nt.eq_(dist, 3)
 
 
 def test_segment_length2():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
     dist = mm.segment_length2((p1, p2))
     nt.eq_(dist, 3)
 
 
 def test_point_dist():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(4.0, 5.0, 6.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(4.0, 5.0, 6.0, 3.0)
     dist = mm.point_dist(p1, p2)
     nt.eq_(dist, sqrt(3))
 
@@ -317,17 +321,17 @@ def soma_points(radius=5, number_points=20):
     phi = uniform(0, 2*pi, number_points)
     costheta = uniform(-1, 1, number_points)
     theta = np.arccos(costheta)
-    x = radius*np.sin(theta)*np.cos(phi)
-    y = radius*np.sin(theta)*np.sin(phi)
-    z = radius*np.cos(theta)
+    x = radius * np.sin(theta) * np.cos(phi)
+    y = radius * np.sin(theta) * np.sin(phi)
+    z = radius * np.cos(theta)
 
-    return [Point(i, j, k, 0.0, 1) for (i, j, k) in zip(x, y, z)]
+    return [Point(i, j, k, 0.0) for (i, j, k) in zip(x, y, z)]
 
 
 def test_polygon_diameter():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
-    p3 = Point(3.0, 6.0, 5.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(3.0, 5.0, 5.0, 3.0)
+    p3 = Point(3.0, 6.0, 5.0, 3.0)
     dia = mm.polygon_diameter([p1, p2, p3])
     nt.ok_(dia == 2.0)
     surfpoint = soma_points()
@@ -336,31 +340,31 @@ def test_polygon_diameter():
 
 
 def test_average_points_dist():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(0.0, 0.0, 1.0, 3.0, 1)
-    p2 = Point(0.0, 1.0, 0.0, 3.0, 1)
-    p3 = Point(1.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(0.0, 0.0, 1.0, 3.0)
+    p2 = Point(0.0, 1.0, 0.0, 3.0)
+    p3 = Point(1.0, 0.0, 0.0, 3.0)
     av_dist = mm.average_points_dist(p0, [p1, p2, p3])
     nt.ok_(av_dist == 1.0)
 
 
 def test_path_distance():
-    p1 = Point(3.0, 4.0, 5.0, 3.0, 1)
-    p2 = Point(3.0, 5.0, 5.0, 3.0, 1)
-    p3 = Point(3.0, 6.0, 5.0, 3.0, 1)
-    p4 = Point(3.0, 7.0, 5.0, 3.0, 1)
-    p5 = Point(3.0, 8.0, 5.0, 3.0, 1)
+    p1 = Point(3.0, 4.0, 5.0, 3.0)
+    p2 = Point(3.0, 5.0, 5.0, 3.0)
+    p3 = Point(3.0, 6.0, 5.0, 3.0)
+    p4 = Point(3.0, 7.0, 5.0, 3.0)
+    p5 = Point(3.0, 8.0, 5.0, 3.0)
     dist = mm.path_distance([p1, p2, p3, p4, p5])
     nt.ok_(dist == 4)
 
 
 def test_segment_area():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
-    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
-    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
-    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
-    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(2.0, 0.0, 0.0, 3.0)
+    p2 = Point(4.0, 0.0, 0.0, 3.0)
+    p3 = Point(4.0, 0.0, 0.0, 6.0)
+    p4 = Point(1.0, 0.0, 0.0, 3.0)
+    p5 = Point(4.0, 0.0, 0.0, 3.0)
 
     a01 = mm.segment_area((p0, p1))
     a02 = mm.segment_area((p0, p2))
@@ -370,19 +374,19 @@ def test_segment_area():
     a05 = mm.segment_area((p0, p5))
 
     nt.assert_almost_equal(a01, 37.6991118, places=6)
-    nt.assert_almost_equal(2*a01, a02)
+    nt.assert_almost_equal(2 * a01, a02)
     nt.assert_almost_equal(a03, 141.3716694, places=6)
     nt.assert_almost_equal(a45, a05 - a04)
     nt.assert_almost_equal(mm.segment_area((p0, p3)), mm.segment_area((p3, p0)))
 
 
 def test_segment_volume():
-    p0 = Point(0.0, 0.0, 0.0, 3.0, 1)
-    p1 = Point(2.0, 0.0, 0.0, 3.0, 1)
-    p2 = Point(4.0, 0.0, 0.0, 3.0, 1)
-    p3 = Point(4.0, 0.0, 0.0, 6.0, 1)
-    p4 = Point(1.0, 0.0, 0.0, 3.0, 1)
-    p5 = Point(4.0, 0.0, 0.0, 3.0, 1)
+    p0 = Point(0.0, 0.0, 0.0, 3.0)
+    p1 = Point(2.0, 0.0, 0.0, 3.0)
+    p2 = Point(4.0, 0.0, 0.0, 3.0)
+    p3 = Point(4.0, 0.0, 0.0, 6.0)
+    p4 = Point(1.0, 0.0, 0.0, 3.0)
+    p5 = Point(4.0, 0.0, 0.0, 3.0)
 
     v01 = mm.segment_volume((p0, p1))
     v02 = mm.segment_volume((p0, p2))
@@ -392,7 +396,7 @@ def test_segment_volume():
     v05 = mm.segment_volume((p0, p5))
 
     nt.assert_almost_equal(v01, 56.5486677, places=6)
-    nt.assert_almost_equal(2*v01, v02)
+    nt.assert_almost_equal(2 * v01, v02)
     nt.assert_almost_equal(v03, 263.8937829, places=6)
     nt.assert_almost_equal(v45, v05 - v04)
     nt.assert_almost_equal(mm.segment_volume((p0, p3)), mm.segment_volume((p3, p0)))

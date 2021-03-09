@@ -36,7 +36,7 @@ from neurom.core.dataformat import COLS
 from neurom.exceptions import SomaError
 
 
-class Soma(object):
+class Soma:
     """Base class for a soma.
 
     Holds a list of raw data rows corresponding to soma points

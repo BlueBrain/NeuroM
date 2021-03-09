@@ -37,7 +37,7 @@ SWC_PATH = Path(DATA_PATH, 'swc')
 H5V1_PATH = Path(DATA_PATH, 'h5/v1')
 
 
-class TestIOCheckFST(object):
+class TestIOCheckFST:
     def setup(self):
         self.load_data = io.load_data
 

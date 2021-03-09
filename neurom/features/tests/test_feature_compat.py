@@ -80,7 +80,7 @@ def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None
     return chain_it if mapping is None else map(mapping, chain_it)
 
 
-class SectionTreeBase(object):
+class SectionTreeBase:
     """Base class for section tree tests."""
 
     def setUp(self):

@@ -28,10 +28,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from mock import Mock
+from neurom.core.types import NEURITES, NeuriteType, axon_filter, dendrite_filter, tree_type_checker
 from nose import tools as nt
-
-from neurom.core.types import (NEURITES, NeuriteType, axon_filter,
-                               dendrite_filter, tree_type_checker)
 
 
 def test_tree_type_checker():
@@ -55,6 +53,19 @@ def test_tree_type_checker():
 
     tree_filter = tree_type_checker(*NEURITES)
     nt.ok_(tree_filter('fake_tree'))
+    nt.ok_(tree_filter(mock_tree))
+
+
+# FIXME: https://github.com/BlueBrain/NeuroM/issues/804
+@nt.nottest
+def test_tree_type_checker_broken():
+    tree_filter = tree_type_checker(NeuriteType.all)
+    mock_tree = Mock()
+    mock_tree.type = NeuriteType.soma
+    nt.ok_(not tree_filter(mock_tree))
+
+    mock_tree.type = NeuriteType.undefined
+    nt.ok_(not tree_filter(mock_tree))
 
 
 def test_type_filters():

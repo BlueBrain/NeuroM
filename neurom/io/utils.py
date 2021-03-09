@@ -33,14 +33,14 @@ import os
 import shutil
 import tempfile
 import uuid
-from functools import partial, lru_cache
+from functools import lru_cache, partial
 from io import IOBase, open
 from pathlib import Path
 
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError, RawDataError
 from neurom.fst._core import FstNeuron
-from neurom.io import neurolucida, swc, hdf5
+from neurom.io import hdf5, neurolucida, swc
 from neurom.io.datawrapper import DataWrapper
 
 L = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ def _is_morphology_file(filepath):
     return filepath.is_file() and filepath.suffix.lower() in {'.swc', '.h5', '.asc'}
 
 
-class NeuronLoader(object):
+class NeuronLoader:
     """Caching morphology loader.
 
     Arguments:

@@ -29,9 +29,9 @@
 
 """Runner for neuron morphology checks."""
 
+import logging
 from collections import OrderedDict
 from importlib import import_module
-import logging
 
 from neurom.check import check_wrapper
 from neurom.exceptions import ConfigError
@@ -41,7 +41,7 @@ from neurom.io import load_data, utils
 L = logging.getLogger(__name__)
 
 
-class CheckRunner(object):
+class CheckRunner:
     """Class managing checks, config and output."""
 
     def __init__(self, config):

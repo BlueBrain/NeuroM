@@ -43,7 +43,7 @@ SWC_PATH = DATA_PATH / 'swc'
 
 def _make_flat(neuron):
 
-    class Flattenizer(object):
+    class Flattenizer:
         def __call__(self, points):
             points = deepcopy(points)
             points[:, COLS.Z] = 0.;

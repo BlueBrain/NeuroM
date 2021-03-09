@@ -27,20 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from pathlib import Path
 import shutil
-import tempfile
-import mock
 import sys
+import tempfile
+from pathlib import Path
 
 import matplotlib
+import mock
+
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
 import neurom
+from neurom import NeuriteType, load_neuron, viewer
 from neurom.view import common, plotly
-from neurom import load_neuron, viewer, NeuriteType
-
 from nose import tools as nt
 from numpy.testing import assert_allclose, assert_array_almost_equal
 
@@ -148,7 +148,7 @@ def test_invalid_draw_mode_raises():
 
 @nt.raises(viewer.NotDrawableError)
 def test_invalid_object_raises():
-    class Dummy(object):
+    class Dummy:
         pass
     viewer.draw(Dummy())
 
