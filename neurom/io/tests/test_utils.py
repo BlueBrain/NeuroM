@@ -102,12 +102,6 @@ def test_load_neurons():
 
     nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
 
-
-def test_ignore_exceptions():
-    nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
-    pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=[RawDataError])
-    nt.eq_(len(pop), 0)
-
     # Single string
     nrns = utils.load_neurons(str(FILES[0]), neuron_loader=_mock_load_neuron)
     nt.assert_equal(nrns[0].name, FILES[0].stem)
@@ -137,6 +131,13 @@ def test_ignore_exceptions():
     nt.assert_true({f.stem for f in FILES}.issubset({nrn.name for nrn in nrns}))
 
     nt.assert_raises(SomaError, utils.load_neurons, NO_SOMA_FILE)
+
+
+def test_ignore_exceptions():
+    nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+    pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=[RawDataError])
+    nt.eq_(len(pop), 0)
+
 
 def test_load_neuron():
     nrn = utils.load_neuron(FILENAMES[0])
