@@ -33,8 +33,8 @@ import os
 import shutil
 import tempfile
 import uuid
-from functools import lru_cache, partial
-from io import IOBase, StringIO, open
+from functools import lru_cache
+from io import StringIO, open
 from pathlib import Path
 
 import morphio
@@ -109,15 +109,15 @@ def get_files_by_path(path):
 
 def load_neuron(neuron, reader=None):
     """Build section trees from a neuron or a h5, swc or asc file.
+
     Args:
         neuron (str|Path|Neuron|morphio.Morphology|morphio.mut.Morphology): A neuron representation
             It can be:
-                - a filename with the h5, swc or asc extension
-                - a NeuroM Neuron object
-                - a morphio mutable or immutable Morphology object
-                - a stream that can be put into a io.StreamIO object.
-                  In this case, the READER argument must be passed with
-                  the corresponding file format (asc, swc and h5)
+            - a filename with the h5, swc or asc extension
+            - a NeuroM Neuron object
+            - a morphio mutable or immutable Morphology object
+            - a stream that can be put into a io.StreamIO object. In this case, the READER argument
+            must be passed with the corresponding file format (asc, swc and h5)
         reader (str): Optional, must be provided if neuron is a stream to
                       specify the file format (asc, swc, h5)
 
@@ -129,21 +129,21 @@ def load_neuron(neuron, reader=None):
 
             neuron = neurom.load_neuron(morphio.Morphology('my_neuron_file.h5'))
 
-            neuron = nm.load_neuron(io.StringIO('''((Dendrite)
-                                                   (3 -4 0 2)
-                                                   (3 -6 0 2)
-                                                   (3 -8 0 2)
-                                                   (3 -10 0 2)
-                                                   (
-                                                     (0 -10 0 2)
-                                                     (-3 -10 0 2)
-                                                     |
-                                                     (6 -10 0 2)
-                                                     (9 -10 0 2)
-                                                   )
-                                                   )'''), reader='asc')
-
-              """
+            neuron = nm.load_neuron(io.StringIO('''
+            ((Dendrite)
+            (3 -4 0 2)
+            (3 -6 0 2)
+            (3 -8 0 2)
+            (3 -10 0 2)
+            (
+            (0 -10 0 2)
+            (-3 -10 0 2)
+            |
+            (6 -10 0 2)
+            (9 -10 0 2)
+            )
+            )'''), reader='asc')
+    """
     if isinstance(neuron, (Neuron, morphio.Morphology, morphio.mut.Morphology)):
         return Neuron(neuron)
 
@@ -170,6 +170,8 @@ def load_neurons(neurons,
         name (str): optional name of population. By default 'Population' or\
             filepath basename depending on whether neurons is list or\
             directory path respectively.
+        ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
+            loading neurons.
 
     Returns:
         neuron population object
@@ -198,12 +200,9 @@ def load_neurons(neurons,
 
     return population_class(pop, name=name)
 
-# TODO: embed this feature directly in morphio
-
 
 def _get_file(stream, extension):
-    """Returns the filename of the file to read"""
-
+    """Returns the filename of the file to read."""
     if isinstance(stream, str):
         stream = StringIO(stream)
     fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.' + extension,

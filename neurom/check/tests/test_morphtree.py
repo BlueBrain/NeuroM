@@ -118,7 +118,7 @@ def _generate_back_track_tree(n, dev):
     ))
     """.format(*points.tolist())), reader='asc')
 
-    return neuron.neurites[0]
+    return neuron
 
 
 # def test_is_flat():
@@ -129,30 +129,28 @@ def _generate_back_track_tree(n, dev):
 #     nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
 
 
-# FIXME: this test fails because of https://github.com/BlueBrain/MorphIO/issues/29
-@nt.nottest
 def test_is_back_tracking():
     # case 1: a back-track falls directly on a previous node
     t = _generate_back_track_tree(1, (0., 0., 0.))
-    nt.assert_true(mt.is_back_tracking(t))
+    nt.assert_true(mt.is_back_tracking(t.neurites[0]))
 
     # case 2: a zigzag is close to another segment
     t = _generate_back_track_tree(1, (0.1, -0.1, 0.02))
-    nt.assert_true(mt.is_back_tracking(t))
+    nt.assert_true(mt.is_back_tracking(t.neurites[0]))
 
     # case 3: a zigzag is close to another segment 2
     t = _generate_back_track_tree(1, (-0.2, 0.04, 0.144))
-    nt.assert_true(mt.is_back_tracking(t))
+    nt.assert_true(mt.is_back_tracking(t.neurites[0]))
 
     # case 4: a zigzag far from civilization
     t = _generate_back_track_tree(1, (10., -10., 10.))
-    nt.assert_false(mt.is_back_tracking(t))
+    nt.assert_false(mt.is_back_tracking(t.neurites[0]))
 
     # case 5: a zigzag on another section
     # currently zigzag is defined on the same section
     # thus this test should not be true
     t = _generate_back_track_tree(0, (-0.2, 0.04, 0.144))
-    nt.assert_false(mt.is_back_tracking(t))
+    nt.assert_false(mt.is_back_tracking(t.neurites[0]))
 
 
 def test_get_flat_neurites():

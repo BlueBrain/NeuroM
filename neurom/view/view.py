@@ -86,7 +86,7 @@ def plot_tree(ax, tree, plane='xy',
 
     Args:
         ax(matplotlib axes): on what to plot
-        tree(neurom.core.Tree or neurom.core.Neurite): plotted tree
+        tree(neurom.core.Section or neurom.core.Neurite): plotted tree
         plane(str): Any pair of 'xyz'
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -238,7 +238,7 @@ def plot_tree3d(ax, tree,
 
     Args:
         ax(matplotlib axes): on what to plot
-        tree(neurom.core.Tree or neurom.core.Neurite): plotted tree
+        tree(neurom.core.Section or neurom.core.Neurite): plotted tree
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
@@ -251,7 +251,6 @@ def plot_tree3d(ax, tree,
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    colors = (_get_color(color, tree.type),)
 
     collection = Line3DCollection(segs, colors=colors, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
@@ -365,7 +364,7 @@ def plot_dendrogram(ax, obj, show_diameters=True):
 
     Args:
         ax: matplotlib axes
-        obj (neurom.Neuron, neurom.Tree): neuron or tree
+        obj (neurom.Neuron, neurom.Section): neuron or section
         show_diameters (bool): whether to show node diameters or not
     """
     dendrogram = Dendrogram(obj)

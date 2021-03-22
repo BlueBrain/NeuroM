@@ -35,8 +35,8 @@ from morphio import (IDSequenceError, MissingParentError, MorphioError, Multiple
 
 
 class NeuroMError(Exception):
-    """Base class for NeuroM errors"""
+    """Base class for NeuroM errors."""
 
 
 class ConfigError(NeuroMError):
-    """Exception class for configuration data in apps errors"""
+    """Exception class for configuration data in apps errors."""

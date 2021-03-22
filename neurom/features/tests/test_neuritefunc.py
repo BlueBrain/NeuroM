@@ -155,7 +155,7 @@ def test_total_length_per_neurite():
 
 def test_max_radial_distance():
     dmax = _nf.max_radial_distance(SIMPLE)
-    nt.eq_(dmax, 7.810249675906654)
+    nt.assert_almost_equal(dmax, 7.81025, places=6)
 
 
 def test_n_segments():

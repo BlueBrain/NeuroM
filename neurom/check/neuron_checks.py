@@ -29,8 +29,6 @@
 """NeuroM neuron checking functions.
 
 Contains functions for checking validity of neuron neurites and somata.
-Tests assumes neurites and/or soma have been succesfully built where applicable,
-i.e. soma- and neurite-related structural tests pass.
 """
 from itertools import chain, islice
 
@@ -39,7 +37,7 @@ from morphio import AnnotationType
 from neurom import NeuriteType
 from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites
-from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
+from neurom.core import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
@@ -242,7 +240,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         `final_point_count`
     """
     bad_ids = []
-    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Tree.ileaf):
+    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Section.ileaf):
         mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
 
         if mean_radius * multiple_of_mean <= leaf.points[-1, COLS.R]:
@@ -347,13 +345,12 @@ def has_multifurcation(neuron):
 
 
 def has_no_single_children(neuron):
-    """Check if the neuron has sections with only one child section"""
-
+    """Check if the neuron has sections with only one child section."""
     single_child_annotations = (annot for annot in neuron.annotations
                                 if annot.type == AnnotationType.single_child)
 
     def first_annotated_point(annotation):
-        """Return the first annotated 4D-point [X,Y,Z,Radius]"""
+        """Return the first annotated 4D-point [X,Y,Z,Radius]."""
         return [annotation.points[0] + [annotation.diameters[0] / 2]]
 
     bad_ids = [(annot.section_id, first_annotated_point(annot))

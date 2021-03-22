@@ -27,17 +27,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Test neurom.io.utils."""
-import sys
 import warnings
 from io import StringIO
 from pathlib import Path
 
 import numpy as np
 from neurom import COLS, get, load_neuron
-from neurom.core import Neuron, SomaError
+from neurom.core import Neuron
 from neurom.exceptions import (MissingParentError, NeuroMError, RawDataError, SomaError,
                                UnknownFileType)
-from neurom.features import neuritefunc as _nf
 from neurom.io import utils
 from nose import tools as nt
 
@@ -134,7 +132,7 @@ def test_load_neurons():
 
 def test_ignore_exceptions():
     nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
-    pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=[RawDataError])
+    pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=(RawDataError,))
     nt.eq_(len(pop), 0)
 
 

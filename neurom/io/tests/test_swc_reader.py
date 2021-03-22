@@ -31,7 +31,6 @@ from pathlib import Path
 import numpy as np
 
 from neurom import load_neuron, NeuriteType
-from neurom.core.dataformat import COLS
 from numpy.testing import assert_array_equal, assert_equal
 
 from nose import tools as nt
@@ -152,9 +151,12 @@ def test_simple_reversed():
                         [6, -4, 0, 0],
                         [-5, -4, 0, 0]])
 
+
 # def test_custom_type():
+#     # TODO Requires a fix to MorphIO to handle custom types
 #     neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
 #     assert_equal(neuron.neurites[1].type, NeuriteType.custom)
+
 
 def test_undefined_type():
     neuron = load_neuron(Path(SWC_PATH, 'undefined_type.swc'))

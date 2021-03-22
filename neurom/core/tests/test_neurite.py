@@ -26,76 +26,50 @@
 # # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# import math
+import math
+from pathlib import Path
 
-# import numpy as np
-# from nose import tools as nt
+from nose import tools as nt
 
-# import neurom as nm
-# from neurom.core import Neurite, Section
+import neurom as nm
+from neurom.core import Neurite
 
-# RADIUS = 4.
-# POINTS0 = np.array([[0., 0., 0., RADIUS],
-#                     [0., 0., 1., RADIUS],
-#                     [0., 0., 2., RADIUS],
-#                     [0., 0., 3., RADIUS],
-#                     [1., 0., 3., RADIUS],
-#                     [2., 0., 3., RADIUS],
-#                     [3., 0., 3., RADIUS]])
+SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
+nrn = nm.load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
 
-# POINTS1 = np.array([[3., 0., 3., RADIUS],
-#                     [3., 0., 4., RADIUS],
-#                     [3., 0., 5., RADIUS],
-#                     [3., 0., 6., RADIUS],
-#                     [4., 0., 6., RADIUS],
-#                     [5., 0., 6., RADIUS],
-#                     [6., 0., 6., RADIUS]])
-
-# REF_LEN = 12
+ROOT_NODE = nrn.neurites[0].morphio_root_node
+RADIUS = .5
+REF_LEN = 3
 
 
-# ROOT_NODE = Section(POINTS0)
-# ROOT_NODE.add_child(Section(POINTS1))
+def test_init():
+    nrt = Neurite(ROOT_NODE)
+    nt.eq_(nrt.type, nm.NeuriteType.basal_dendrite)
+    nt.eq_(len(nrt.points), 4)
 
 
-# def test_init():
-#     nrt = Neurite(ROOT_NODE)
-#     nt.eq_(nrt.type, nm.NeuriteType.undefined)
-#     nt.eq_(len(nrt.points), 13)
+def test_neurite_length():
+    nrt = Neurite(ROOT_NODE)
+    nt.assert_almost_equal(nrt.length, REF_LEN)
 
 
-# def test_neurite_type():
-#     root_node = Section(POINTS0, section_type=nm.AXON)
-#     nrt = Neurite(root_node)
-#     nt.eq_(nrt.type, nm.AXON)
-
-#     root_node = Section(POINTS0, section_type=nm.BASAL_DENDRITE)
-#     nrt = Neurite(root_node)
-#     nt.eq_(nrt.type, nm.BASAL_DENDRITE)
+def test_neurite_area():
+    nrt = Neurite(ROOT_NODE)
+    area = 2 * math.pi * RADIUS * REF_LEN
+    nt.assert_almost_equal(nrt.area, area)
 
 
-# def test_neurite_length():
-#     nrt = Neurite(ROOT_NODE)
-#     nt.assert_almost_equal(nrt.length, REF_LEN)
+def test_neurite_volume():
+    nrt = Neurite(ROOT_NODE)
+    volume = math.pi * RADIUS * RADIUS * REF_LEN
+    nt.assert_almost_equal(nrt.volume, volume)
 
 
-# def test_neurite_area():
-#     nrt = Neurite(ROOT_NODE)
-#     area = 2 * math.pi * RADIUS * REF_LEN
-#     nt.assert_almost_equal(nrt.area, area)
+def test_str():
+    nrt = Neurite(ROOT_NODE)
+    nt.ok_('Neurite' in str(nrt))
 
 
-# def test_neurite_volume():
-#     nrt = Neurite(ROOT_NODE)
-#     volume = math.pi * RADIUS * RADIUS * REF_LEN
-#     nt.assert_almost_equal(nrt.volume, volume)
-
-
-# def test_str():
-#     nrt = Neurite(ROOT_NODE)
-#     nt.ok_('Neurite' in str(nrt))
-
-
-# def test_neurite_hash():
-#     nrt = Neurite(ROOT_NODE)
-#     nt.eq_(hash(nrt), hash((nrt.type, nrt.root_node)))
+def test_neurite_hash():
+    nrt = Neurite(ROOT_NODE)
+    nt.eq_(hash(nrt), hash((nrt.type, nrt.root_node)))

@@ -38,7 +38,7 @@ setup(
     install_requires=[
         'click>=7.0',
         'matplotlib>=3.2.1',
-        'morphio>=2.3.10',
+        'morphio>=3.0.0',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
         'pyyaml>=3.10',

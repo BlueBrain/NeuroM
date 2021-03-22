@@ -153,16 +153,16 @@ def test_section_tortuosity_pop():
     assert_allclose(_stats(get_feature(feat, POP)),
                     (1.0,
                      4.657,
-                     440.408,
-                     1.342),
-                    rtol=1e-2)
+                     439.331,
+                     1.343),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
                     (1.0,
                      4.657,
-                     440.408,
-                     1.342),
-                    rtol=1e-2)
+                     439.331,
+                     1.343),
+                    rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),
                     (1.070,

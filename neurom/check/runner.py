@@ -112,9 +112,6 @@ class CheckRunner:
 
         try:
             nrn = load_neuron(f)
-            result, summary = self._check_loop(nrn, 'structural_checks')
-            full_result &= result
-            full_summary.update(summary)
             result, summary = self._check_loop(nrn, 'neuron_checks')
             full_result &= result
             full_summary.update(summary)
@@ -147,8 +144,6 @@ class CheckRunner:
         """Check that the config has the correct keys, add missing keys if necessary."""
         if 'checks' in config:
             checks = config['checks']
-            if 'structural_checks' not in checks:
-                checks['structural_checks'] = []
             if 'neuron_checks' not in checks:
                 checks['neuron_checks'] = []
         else:

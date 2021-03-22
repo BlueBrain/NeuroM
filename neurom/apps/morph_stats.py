@@ -38,11 +38,12 @@ from collections import defaultdict
 from functools import partial
 from itertools import chain, product
 from pathlib import Path
+import pkg_resources
 
-import neurom as nm
 import numpy as np
 import pandas as pd
-import pkg_resources
+import neurom as nm
+
 from neurom.core._neuron import Neuron
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func

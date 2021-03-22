@@ -41,10 +41,6 @@ SWC_PATH = Path(__file__).parent / '../../../test_data/swc/'
 
 CONFIG = {
     'checks': {
-        'structural_checks': [
-            'has_soma_points',
-            'has_valid_soma',
-        ],
         'neuron_checks': [
             'has_basal_dendrite',
             'has_axon',
@@ -63,13 +59,6 @@ CONFIG = {
     },
 }
 
-checks_not_in_morphio = OrderedDict([
-    ('has_valid_neurites', 'Has valid neurites'),
-    ('has_sequential_ids', 'Has sequential ids'),
-    ('has_increasing_ids', 'Has increasing ids'),
-    ('is_single_tree', 'Is single tree'),
-])
-
 CONFIG_COLOR = copy(CONFIG)
 CONFIG_COLOR['color'] = True
 
@@ -83,8 +72,6 @@ def _run_test(path, ref, config=CONFIG, should_pass=False):
                     "PASS" if should_pass else "FAIL")
 
 ref = dict([
-    ("Has soma points", True),
-    ("Has valid soma", True),
     ("Has basal dendrite", True),
     ("Has axon", True),
     ("Has apical dendrite", True),
@@ -109,8 +96,6 @@ def test_ok_neuron_color():
 
 def test_zero_length_sections_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", True),
                   ("Has axon", True),
                   ("Has apical dendrite", True),
@@ -126,8 +111,6 @@ def test_zero_length_sections_neuron():
 
 def test_single_apical_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", False),
                   ("Has axon", False),
                   ("Has apical dendrite", True),
@@ -144,8 +127,6 @@ def test_single_apical_neuron():
 def test_single_basal_neuron():
     expected = dict(
                   ([
-                      ("Has soma points", True),
-                      ("Has valid soma", True),
                       ("Has basal dendrite", True),
                       ("Has axon", False),
                       ("Has apical dendrite", False),
@@ -161,8 +142,6 @@ def test_single_basal_neuron():
 
 def test_single_axon_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", False),
                   ("Has axon", True),
                   ("Has apical dendrite", False),
@@ -177,9 +156,7 @@ def test_single_axon_neuron():
 
 
 def test_single_apical_no_soma():
-    expected = dict([('Has soma points', False),
-                     ('Has valid soma', False),
-                     ('ALL', False),
+    expected = dict([('ALL', False),
                      ('Has basal dendrite', False),
                      ('Has axon', False),
                      ('Has apical dendrite', True),
@@ -212,7 +189,7 @@ def test__sanitize_config():
     # creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})
     nt.eq_(new_config, {'checks':
-                        {'structural_checks': [],
+                        {
                          'neuron_checks': [],
                          },
                         'options': {},

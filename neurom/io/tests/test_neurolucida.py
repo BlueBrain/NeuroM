@@ -1,18 +1,14 @@
-import textwrap
-import warnings
 from io import StringIO
 from pathlib import Path
 
-import neurom as nm
-import neurom.io as io
 import numpy as np
-from mock import patch
-from neurom import load_neuron
-from neurom.core.dataformat import COLS
-from neurom.exceptions import RawDataError, SomaError
 from nose import tools as nt
-from nose.tools import assert_equal, assert_raises, eq_, ok_
+from nose.tools import assert_raises, ok_
 from numpy.testing import assert_array_equal
+
+import neurom as nm
+from neurom import load_neuron
+from neurom.exceptions import RawDataError, SomaError
 
 DATA_PATH = Path(Path(__file__).parent, '../../../test_data')
 NEUROLUCIDA_PATH = Path(DATA_PATH, 'neurolucida')
@@ -220,30 +216,6 @@ def test_read_without_duplicates():
                        n_without_duplicate.neurites[0].points)
 
 
-# def test_broken_duplicate():
-#     with assert_raises(RawDataError) as obj:
-#         load_neuron(('asc',
-#                      """
-#                      ((Dendrite)
-#                       (3 -4 0 2)
-#                       (3 -6 0 2)
-#                       (3 -8 0 2)
-#                       (3 -10 0 2)
-#                       (
-#                         (3 -10 0 40) ; <-- duplicate with different radii
-#                         (0 -10 0 2)
-#                         (-3 -10 0 2)
-#                         |
-#                         (3 -10 0 2) ; <-- good duplicate
-#                         (6 -10 0 2)
-#                         (9 -10 0 2)
-#                       )
-#                       )
-#                      """))
-
-#     ok_("Parent point is duplicated but have a different radius" in str(obj.exception))
-
-
 def test_unfinished_file():
     with assert_raises(RawDataError) as obj:
         load_neuron("""
@@ -288,40 +260,40 @@ def test_empty_sibling():
                                 dtype=np.float32))
 
 
-# def test_single_children():
-#     n = load_neuron(('asc',
-#                      """
-#                      ((Dendrite)
-#                       (3 -4 0 2)
-#                       (3 -6 0 2)
-#                       (3 -8 0 2)
-#                       (3 -10 0 2)
-#                       (
-#                         (3 -10 0 2)
-#                         (0 -10 0 2)
-#                         (-3 -10 0 2)
-#                        )
-#                       )
-#                  """))
+def test_single_children():
+    n = load_neuron(StringIO(
+                     """
+                     ((Dendrite)
+                      (3 -4 0 2)
+                      (3 -6 0 2)
+                      (3 -8 0 2)
+                      (3 -10 0 2)
+                      (
+                        (3 -10 0 2)
+                        (0 -10 0 2)
+                        (-3 -10 0 2)
+                       )
+                      )
+                 """), 'asc')
 
-#     assert_array_equal(n.neurites[0].points,
-#                        np.array([[3, -4, 0, 1],
-#                                  [3, -6, 0, 1],
-#                                  [3, -8, 0, 1],
-#                                  [3, -10, 0, 1],
-#                                  [0, -10, 0, 1],
-#                                  [-3, -10, 0, 1]],
-#                                 dtype=np.float32))
+    assert_array_equal(n.neurites[0].points,
+                       np.array([[3, -4, 0, 1],
+                                 [3, -6, 0, 1],
+                                 [3, -8, 0, 1],
+                                 [3, -10, 0, 1],
+                                 [0, -10, 0, 1],
+                                 [-3, -10, 0, 1]],
+                                dtype=np.float32))
 
-#     nt.assert_equal(len(n.sections), 2)
-#     assert_array_equal(n.neurites[0].points,
-#                        np.array([[3, -4, 0, 1],
-#                                  [3, -6, 0, 1],
-#                                  [3, -8, 0, 1],
-#                                  [3, -10, 0, 1],
-#                                  [0, -10, 0, 1],
-#                                  [-3, -10, 0, 1]],
-#                                 dtype=np.float32))
+    nt.assert_equal(len(n.sections), 1)
+    assert_array_equal(n.neurites[0].points,
+                       np.array([[3, -4, 0, 1],
+                                 [3, -6, 0, 1],
+                                 [3, -8, 0, 1],
+                                 [3, -10, 0, 1],
+                                 [0, -10, 0, 1],
+                                 [-3, -10, 0, 1]],
+                                dtype=np.float32))
 
 
 def test_markers():

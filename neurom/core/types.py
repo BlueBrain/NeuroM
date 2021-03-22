@@ -28,12 +28,9 @@
 
 """Type enumerations."""
 
-from enum import unique
-
-from neurom import NeuriteType
+from enum import IntEnum, unique
+from morphio import SectionType
 from neurom.utils import OrderedEnum
-
-NeuriteType.name = property(lambda self: str(self).split('.')[-1])
 
 
 @unique
@@ -45,6 +42,18 @@ class NeuriteIter(OrderedEnum):
     # Coming from:
     # https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874
     NRN = 2
+
+
+# for backward compatibility with 'v1' version
+class NeuriteType(IntEnum):
+    """Type of neurite."""
+    axon = int(SectionType.axon)
+    apical_dendrite = int(SectionType.apical_dendrite)
+    basal_dendrite = int(SectionType.basal_dendrite)
+    undefined = int(SectionType.undefined)
+    soma = 31
+    all = 32
+    custom = 5
 
 
 NEURITES = (NeuriteType.all,

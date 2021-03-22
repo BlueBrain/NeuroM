@@ -201,16 +201,16 @@ def test_locate_segment_position():
     )
 
 def test_mean_radius():
-    s = load_neuron(StringIO(u"""
+    n = load_neuron(StringIO(u"""
     ((CellBody)
      (0 0 0 1))
 
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
-    (6 4 4 400))"""), reader='asc').neurites[0]
+    (6 4 4 400))"""), reader='asc')
 
     nt.assert_equal(
-        _sf.section_mean_radius(s),
+        _sf.section_mean_radius(n.neurites[0]),
        100.
     )

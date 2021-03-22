@@ -26,11 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Core functionality and data types of NeuroM."""
+"""Tree class that is dropped in v2."""
 
-from neurom.exceptions import SomaError
-from .types import NeuriteType, NeuriteIter
-from ._soma import Soma
-from ._neuron import (Section, Neurite, Neuron, iter_neurites,
-                      iter_sections, iter_segments, graft_neuron)
-from .population import Population
+raise NotImplementedError('This class is not accessible since v2 version. If you rely on'
+                          'that, you can copy sources from v1 version into your project.')

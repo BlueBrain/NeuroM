@@ -25,16 +25,12 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import itertools as it
 import warnings
 from io import StringIO
 from pathlib import Path
 
 import numpy as np
-from morphio import SomaType
 from neurom import load_neuron
-from neurom.core import Section
-from neurom.core._soma import make_soma
 from neurom.core.types import NeuriteType
 from neurom.view import common, view
 from nose.tools import assert_raises, eq_, ok_

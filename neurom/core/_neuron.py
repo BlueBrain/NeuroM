@@ -34,40 +34,39 @@ from itertools import chain
 import morphio
 import numpy as np
 from neurom import morphmath
-from neurom.core._soma import Soma, make_soma
+from neurom.core._soma import make_soma
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
-from neurom.utils import memoize
 
 
 class Section:
-    """Simple recursive tree class"""
+    """Simple recursive tree class."""
 
     def __init__(self, morphio_section):
-        """The section ctor"""
+        """The section constructor."""
         self.morphio_section = morphio_section
 
     @property
     def id(self):
-        """Returns the section ID"""
+        """Returns the section ID."""
         return self.morphio_section.id
 
     @property
     def parent(self):
-        """Returns the parent section if non root section else None"""
+        """Returns the parent section if non root section else None."""
         return None if self.morphio_section.is_root else Section(self.morphio_section.parent)
 
     @property
     def children(self):
-        """Returns a list of child section"""
+        """Returns a list of child section."""
         return [Section(child) for child in self.morphio_section.children]
 
     def append_section(self, section):
-        """
+        """Appends a section.
+
         Args:
             section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
         """
-
         if isinstance(section, Section):
             return self.morphio_section.append_section(section.morphio_section)
         return self.morphio_section.append_section(section)
@@ -89,7 +88,7 @@ class Section:
         return self.parent is None
 
     def ipreorder(self):
-        """Depth-first pre-order iteration of tree nodes"""
+        """Depth-first pre-order iteration of tree nodes."""
         children = deque((self, ))
         while children:
             cur_node = children.pop()
@@ -97,7 +96,7 @@ class Section:
             yield cur_node
 
     def ipostorder(self):
-        """Depth-first post-order iteration of tree nodes"""
+        """Depth-first post-order iteration of tree nodes."""
         children = [self, ]
         seen = set()
         while children:
@@ -110,64 +109,63 @@ class Section:
                 yield cur_node
 
     def iupstream(self):
-        """Iterate from a tree node to the root nodes"""
+        """Iterate from a tree node to the root nodes."""
         t = self
         while t is not None:
             yield t
             t = t.parent
 
     def ileaf(self):
-        """Iterator to all leaves of a tree"""
-        return filter(Tree.is_leaf, self.ipreorder())
+        """Iterator to all leaves of a tree."""
+        return filter(Section.is_leaf, self.ipreorder())
 
     def iforking_point(self, iter_mode=ipreorder):
-        """Iterator to forking points. Returns a tree object.
+        """Iterator to forking points.
 
-        Parameters:
-            tree: the tree over which to iterate
+        Args:
             iter_mode: iteration mode. Default: ipreorder.
         """
-        return filter(Tree.is_forking_point, iter_mode(self))
+        return filter(Section.is_forking_point, iter_mode(self))
 
     def ibifurcation_point(self, iter_mode=ipreorder):
-        """Iterator to bifurcation points. Returns a tree object.
+        """Iterator to bifurcation points.
 
-        Parameters:
-            tree: the tree over which to iterate
+        Args:
             iter_mode: iteration mode. Default: ipreorder.
         """
-        return filter(Tree.is_bifurcation_point, iter_mode(self))
+        return filter(Section.is_bifurcation_point, iter_mode(self))
 
     def __eq__(self, other):
+        """Equal when its morphio section is equal."""
         return self.morphio_section == other.morphio_section
 
     def __hash__(self):
+        """Hash of its id."""
         return hash(self.id)
 
     def __nonzero__(self):
+        """If has children."""
         return bool(self.children)
 
     __bool__ = __nonzero__
 
     @property
     def points(self):
-        """Returns the section list of points the NeuroM way (points + radius)"""
+        """Returns the section list of points the NeuroM way (points + radius)."""
         return np.concatenate((self.morphio_section.points,
                                self.morphio_section.diameters[:, np.newaxis] / 2.),
                               axis=1)
 
     @points.setter
     def points(self, value):
-        """Set the points"""
+        """Set the points."""
         self.morphio_section.points = np.copy(value[:, COLS.XYZ])
         self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
 
     @property
     def type(self):
-        """Returns the section type"""
+        """Returns the section type."""
         return NeuriteType(int(self.morphio_section.type))
-
-    # TODO: Should we have a @type.setter ?
 
     @property
     def length(self):
@@ -193,13 +191,13 @@ class Section:
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
     def __str__(self):
-        return 'Section(id=%s, type=%s, n_points=%s) <parent: %s, nchildren: %d>' % \
-            (self.id, self.type, len(self.points), self.parent, len(self.children))
+        """Text representation."""
+        parent_id = None if self.parent is None else self.parent.id
+        return (f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
+                f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>')
 
     __repr__ = __str__
 
-
-Tree = Section
 
 # NRN simulator iteration order
 # See:
@@ -249,7 +247,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
 
 
 def iter_sections(neurites,
-                  iterator_type=Tree.ipreorder,
+                  iterator_type=Section.ipreorder,
                   neurite_filter=None,
                   neurite_order=NeuriteIter.FileOrder):
     """Iterator to the sections in a neurite, neuron or neuron population.
@@ -257,11 +255,11 @@ def iter_sections(neurites,
     Arguments:
         neurites: neuron, population, neurite, or iterable containing neurite objects
         iterator_type: section iteration order within a given neurite. Must be one of:
-            Tree.ipreorder: Depth-first pre-order iteration of tree nodes
-            Tree.ipostorder: Depth-first post-order iteration of tree nodes
-            Tree.iupstream: Iterate from a tree node to the root nodes
-            Tree.ibifurcation_point: Iterator to bifurcation points
-            Tree.ileaf: Iterator to all leaves of a tree
+            Section.ipreorder: Depth-first pre-order iteration of tree nodes
+            Section.ipostorder: Depth-first post-order iteration of tree nodes
+            Section.iupstream: Iterate from a tree node to the root nodes
+            Section.ibifurcation_point: Iterator to bifurcation points
+            Section.ileaf: Iterator to all leaves of a tree
 
         neurite_filter: optional top level filter on properties of neurite neurite objects.
         neurite_order (NeuriteIter): order upon which neurites should be iterated
@@ -307,7 +305,7 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
 
 
 def graft_neuron(section):
-    """Returns a neuron starting at section"""
+    """Returns a neuron starting at section."""
     assert isinstance(section, Section)
     m = morphio.mut.Morphology()
     m.append_root_section(section.morphio_section)
@@ -315,36 +313,39 @@ def graft_neuron(section):
 
 
 class Neurite:
-    """Class representing a neurite tree"""
+    """Class representing a neurite tree."""
 
     def __init__(self, root_node):
+        """Constructor.
+
+        Args:
+            root_node (morphio.Section): root section
+        """
         self.morphio_root_node = root_node
 
     @property
     def root_node(self):
-        """Returns the first section of the neurite"""
+        """The first section of the neurite."""
         return Section(self.morphio_root_node)
 
     @property
     def type(self):
-        """Returns the type of the root node"""
-        return NeuriteType(int(self.root_node.type))
+        """The type of the root node."""
+        return self.root_node.type
 
     @property
-    # @memoize
     def points(self):
-        """Returns unordered array with all the points in this neurite
+        """Array with all the points in this neurite.
 
-        Note: Duplicate points at section bifurcations are removed"""
-
+        Note: Duplicate points at section bifurcations are removed
+        """
         # Neurite first point must be added manually
-        _ptr = list(chain([Section(self.morphio_root_node).points[0][COLS.XYZR]],
-                          [v for s in self.morphio_root_node.iter()
-                           for v in Section(s).points[1:, COLS.XYZR]]))
-        return np.array(_ptr)
+        _ptr = [self.root_node.points[0][COLS.XYZR]]
+        for s in iter_sections(self):
+            _ptr.append(s.points[1:, COLS.XYZR])
+        return np.vstack(_ptr)
 
     @property
-    @memoize
     def length(self):
         """Returns the total length of this neurite.
 
@@ -353,7 +354,6 @@ class Neurite:
         return sum(s.length for s in self.iter_sections())
 
     @property
-    @memoize
     def area(self):
         """Return the surface area of this neurite.
 
@@ -362,7 +362,6 @@ class Neurite:
         return sum(s.area for s in self.iter_sections())
 
     @property
-    @memoize
     def volume(self):
         """Return the volume of this neurite.
 
@@ -370,16 +369,16 @@ class Neurite:
         """
         return sum(s.volume for s in self.iter_sections())
 
-    def iter_sections(self, order=Tree.ipreorder, neurite_order=NeuriteIter.FileOrder):
+    def iter_sections(self, order=Section.ipreorder, neurite_order=NeuriteIter.FileOrder):
         """Iteration over section nodes.
 
         Arguments:
             order: section iteration order within a given neurite. Must be one of:
-                Tree.ipreorder: Depth-first pre-order iteration of tree nodes
-                Tree.ipreorder: Depth-first post-order iteration of tree nodes
-                Tree.iupstream: Iterate from a tree node to the root nodes
-                Tree.ibifurcation_point: Iterator to bifurcation points
-                Tree.ileaf: Iterator to all leaves of a tree
+                Section.ipreorder: Depth-first pre-order iteration of tree nodes
+                Section.ipreorder: Depth-first post-order iteration of tree nodes
+                Section.iupstream: Iterate from a tree node to the root nodes
+                Section.ibifurcation_point: Iterator to bifurcation points
+                Section.ileaf: Iterator to all leaves of a tree
 
             neurite_order: order upon which neurites should be iterated. Values:
                 - NeuriteIter.FileOrder: order of appearance in the file
@@ -387,18 +386,17 @@ class Neurite:
         """
         return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 
-    # def __deepcopy__(self, memo):
-    #     """Deep copy of neurite object"""
-    #     return Neurite(deepcopy(self.morphio_root_node, memo))
-
     def __nonzero__(self):
+        """If has root node."""
         return bool(self.morphio_root_node)
 
     def __eq__(self, other):
+        """If root node ids and types are equal."""
         return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
 
     def __hash__(self):
-        return hash((self.type, self.morphio_root_node))
+        """Hash is made of tuple of type and root_node."""
+        return hash((self.type, self.root_node))
 
     __bool__ = __nonzero__
 
@@ -410,62 +408,63 @@ class Neurite:
 
 
 class Neuron(morphio.mut.Morphology):
-    """Class representing a simple neuron"""
+    """Class representing a simple neuron."""
 
     def __init__(self, filename, name=None):
-        """Neuron ctor
+        """Neuron constructor.
 
         Args:
             filename (str|Path): a filename
             name (str): a option neuron name
         """
-        super(Neuron, self).__init__(filename)
+        super().__init__(filename)
+        self.remove_unifurcations()
         self.name = name if name else 'Neuron'
-        self.morphio_soma = super(Neuron, self).soma
-
+        self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
-
-    def __copy__(self):
-        return Neuron(self)
 
     @property
     def soma(self):
-        """Return the soma"""
+        """Corresponding soma."""
         return self.neurom_soma
-
-    @soma.setter
-    def soma(self, value):
-        """Set the soma"""
-        self.neurom_soma = value
-
-    def __str__(self):
-        """Return a string representation."""
-        return 'Neuron <soma: %s, n_neurites: %d>' % \
-            ('1', len(self.neurites))
 
     @property
     def neurites(self):
-        """Returns the list of neurites"""
+        """The list of neurites."""
         return [Neurite(root_section) for root_section in self.root_sections]
 
     @property
     def sections(self):
-        """Returns an array of all sections (excluding the soma)"""
+        """The array of all sections, excluding the soma."""
         return list(iter_sections(self))
 
     @property
     def points(self):
-        """Returns the list of points"""
+        """Returns the list of points."""
         return np.concatenate(
             [section.points for section in iter_sections(self)])
 
     def transform(self, trans):
-        """Return a copy of this neuron with a 3D transformation applied"""
+        """Return a copy of this neuron with a 3D transformation applied."""
         obj = Neuron(self)
         obj.morphio_soma.points = trans(obj.morphio_soma.points)
 
         for section in obj.sections:
             section.morphio_section.points = trans(section.morphio_section.points)
         return obj
+
+    def __copy__(self):
+        """Creates a deep copy of Neuron instance."""
+        return Neuron(self, self.name)
+
+    def __deepcopy__(self, memodict={}):
+        """Creates a deep copy of Neuron instance."""
+        # pylint: disable=dangerous-default-value
+        return Neuron(self, self.name)
+
+    def __str__(self):
+        """Return a string representation."""
+        return 'Neuron <soma: %s, n_neurites: %d>' % \
+            ('1', len(self.neurites))
 
     __repr__ = __str__

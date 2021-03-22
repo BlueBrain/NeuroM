@@ -43,27 +43,34 @@ class Soma:
     """
 
     def __init__(self, morphio_soma):
+        """Constructor.
+
+        Args:
+            morphio_soma (morphio.Soma): instance of soma of MorphIO class
+        """
         self._morphio_soma = morphio_soma
+        # this radius is used only for `volume` method, please avoid using it for anything else.
+        self.radius = 0
 
     @property
     def center(self):
-        """Obtain the center from the first stored point"""
+        """Obtain the center from the first stored point."""
         return self._morphio_soma.points[0]
 
     def iter(self):
-        """Iterator to soma contents"""
+        """Iterator to soma contents."""
         return iter(self.points)
 
     @property
     def points(self):
-        """Get the set of (x, y, z, r) points this soma"""
+        """Get the set of (x, y, z, r) points this soma."""
         return np.concatenate((self._morphio_soma.points,
                                self._morphio_soma.diameters[:, np.newaxis] / 2.),
                               axis=1)
 
     @points.setter
     def points(self, value):
-        """Set the points"""
+        """Set the points."""
         value = np.asarray(value)
         self._morphio_soma.points = np.copy(value[:, COLS.XYZ])
         self._morphio_soma.diameters = np.copy(value[:, COLS.R]) * 2
@@ -83,7 +90,7 @@ class SomaSinglePoint(Soma):
 
     def __init__(self, morphio_soma):
         """Initialize a SomaSinglePoint object."""
-        super(SomaSinglePoint, self).__init__(morphio_soma)
+        super().__init__(morphio_soma)
         self.radius = self.points[0][COLS.R]
 
     def __str__(self):
@@ -118,7 +125,7 @@ class SomaCylinders(Soma):
 
     def __init__(self, morphio_soma):
         """Initialize a SomaCyliners object."""
-        super(SomaCylinders, self).__init__(morphio_soma)
+        super().__init__(morphio_soma)
         self.area = sum(morphmath.segment_area((p0, p1))
                         for p0, p1 in zip(self.points, self.points[1:]))
         self.radius = math.sqrt(self.area / (4. * math.pi))
@@ -162,7 +169,7 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
     def __init__(self, morphio_soma):
         """Initialize a SomaNeuromorphoThreePointCylinders object."""
-        super(SomaNeuromorphoThreePointCylinders, self).__init__(morphio_soma)
+        super().__init__(morphio_soma)
 
         # X    Y     Z   R    P
         # xs ys      zs rs   -1
@@ -210,7 +217,7 @@ class SomaSimpleContour(Soma):
 
     def __init__(self, morphio_soma):
         """Initialize a SomaSimpleContour object."""
-        super(SomaSimpleContour, self).__init__(morphio_soma)
+        super().__init__(morphio_soma)
         self.radius = morphmath.average_points_dist(
             self.center, self.points[:, COLS.XYZ])
 
@@ -226,11 +233,10 @@ class SomaSimpleContour(Soma):
 
 
 def make_soma(morphio_soma):
-    """Make a soma object from a set of points
+    """Make a soma object from a set of points.
 
-    Parameters:
-        soma_type: the type of soma
-        points: collection of points forming a soma.
+    Args:
+        morphio_soma(morphio.Soma): soma instance of MorphIO
     """
     SomaBuilders = {
         SomaType.SOMA_SINGLE_POINT: SomaSinglePoint,

@@ -35,15 +35,12 @@ of sorts.
 
 The tests are grouped in two categories:
 
-1. Structural tests. These apply to the structure of the data and are a good indicator
-   as to whether a neuron object or any of its sub-components can actually be reconstructed.
-   Failure in some of these may make further tests fail.
+1. Structural tests. **Dropped in v2 version**.
 2. Neuron tests. These are applied to properties of reconstructed neurons and their
    constituent soma and neurites, and can be thought of as "quality" checks.
 
 
-It is very likely that a failure in the structural tests will make the neuron
-tests fail. Furthermore, inability to build a soma typically results
+It is very likely that inability to build a soma typically results
 in an inability to build neurites. Failure to build a soma or neurites results
 in an early failure for a given morphology file.
 
@@ -54,11 +51,6 @@ mentioned above. Here is an example configuration:
 .. code-block:: yaml
 
     checks:
-        structural_checks:
-            - is_single_tree
-            - has_soma_points
-            - has_valid_soma
-            - has_valid_neurites
         neuron_checks:
             - has_basal_dendrite
             - has_axon
@@ -75,11 +67,9 @@ mentioned above. Here is an example configuration:
 
 
 As can be seen, the configuration file is split into two sections ``checks``, and ``options``.
-Each of the ``checks`` sub-items corresponds to a sub-module of :py:mod:`neurom.check`, namely
-:py:mod:`structural_checks<neurom.check.structural_checks>`
-and :py:mod:`neuron_checks<neurom.check.neuron_checks>`. And each
-of their sub-items corresponds to a function in that sub-module. This illustrates the possible
-checks that may be applied by ``morph_check``.
+``checks`` can only have `neuron_checks` sub-item that corresponds to a sub-module
+:py:mod:`neuron_checks<neurom.check.neuron_checks>`. Each its sub-items corresponds to a function
+in that sub-module.
 
 
 The application also produces a summary ``json`` file, which can be useful when
@@ -90,13 +80,6 @@ processing more than one file:
     {
         "files": {
             "test_data/swc/Neuron.swc": {
-                "Is single tree": true,
-                "Has soma points": true,
-                "No missing parents": true,
-                "Has sequential ids": true,
-                "Has increasing ids": true,
-                "Has valid soma": true,
-                "Has valid neurites": true,
                 "Has basal dendrite": true,
                 "Has axon": true,
                 "Has apical dendrite": true,

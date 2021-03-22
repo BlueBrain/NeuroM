@@ -26,20 +26,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Module with consistency/validity checks for raw data blocks."""
-from neurom.check import CheckResult
+"""Module with consistency/validity checks for raw data blocks. Dropped in v2 version.
 
+These checks can't be implemented because MorphIO does not have access to raw underlying data
+Also we can't rely on warnings from MorphIO. They can't be caught via `warnings.catch_warnings`
+because its warnings are not Python warnings.
+For example if we to implement `no_missing_parents` check via:
 
-def has_soma_points(neuron):
-    """Check if has soma points"""
-    return CheckResult(len(neuron.soma.points) > 0, None)
+try:
+    Neuron(neuron_file)
+except MissingParentError as e:
+    return CheckResult(False, e)
+return CheckResult(True)
 
+then this check will fail in case `neuron_file` is invalid due to any non parent error. For example
+if `neuron_file` has invalid soma => an error is raised and this check fails.
+"""
 
-def has_all_finite_radius_neurites(neuron, threshold=0.0):  # pylint: disable=unused-argument
-    """Check if has finite radius neurites"""
-    raise NotImplementedError("Should be reimplemented directly in MorphIO")
-
-
-def has_valid_soma(neuron):  # pylint: disable=unused-argument
-    """Check if has valid soma"""
-    return CheckResult(len(neuron.soma.points) > 0)
+raise NotImplementedError('Can not be implemented in v2 due to MorphIO constraints')

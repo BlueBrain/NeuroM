@@ -26,14 +26,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from copy import deepcopy
+from copy import copy, deepcopy
 from pathlib import Path
 
 import neurom as nm
 import numpy as np
 from morphio import Morphology as ImmutMorphology
 from morphio.mut import Morphology
-from neurom.core import Neuron, graft_neuron, iter_neurites, iter_segments
+from neurom.core import Neuron, graft_neuron, iter_segments
 from nose import tools as nt
 from numpy.testing import assert_array_equal
 
@@ -41,16 +41,15 @@ SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 
 
 def test_simple():
-    nrn1 = nm.load_neuron(str(Path(SWC_PATH, 'simple.swc')))
+    nm.load_neuron(str(SWC_PATH / 'simple.swc'))
+
 
 def test_load_neuron_pathlib():
-    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
+    nm.load_neuron(SWC_PATH / 'simple.swc')
 
-def test_load_neuron_pathlib():
-    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
 
 def test_load_neuron_from_other_neurons():
-    filename = Path(SWC_PATH, 'simple.swc')
+    filename = SWC_PATH / 'simple.swc'
 
     expected_points = [[ 0.,  0.,  0.,  1.],
                        [ 0.,  5.,  0.,  1.],
@@ -74,6 +73,7 @@ def test_load_neuron_from_other_neurons():
     assert_array_equal(nm.load_neuron(ImmutMorphology(filename)).points,
                        expected_points)
 
+
 def test_for_morphio():
     Neuron(Morphology())
 
@@ -94,21 +94,7 @@ def test_for_morphio():
                         [2, 2, 2, 2]])
 
 
-# def test_deep_copy():
-#     nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
-#     nrn2 = deepcopy(nrn1)
-#     check_cloned_neuron(nrn1, nrn2)
-
-
-def test_graft_neuron():
-    nrn1 = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
-    basal_dendrite = nrn1.neurites[0]
-    nrn2 = graft_neuron(basal_dendrite.root_node)
-    nt.assert_equal(len(nrn2.neurites), 1)
-    nt.assert_equal(basal_dendrite, nrn2.neurites[0])
-
-
-def check_cloned_neuron(nrn1, nrn2):
+def _check_cloned_neuron(nrn1, nrn2):
     # check if two neurons are identical
 
     # soma
@@ -137,7 +123,25 @@ def check_cloned_neuron(nrn1, nrn2):
     nt.ok_(nrn1.soma.radius != nrn2.soma.radius)
 
 
+def test_copy():
+    nrn = nm.load_neuron(SWC_PATH / 'simple.swc')
+    _check_cloned_neuron(nrn, copy(nrn))
+
+
+def test_deepcopy():
+    nrn = nm.load_neuron(SWC_PATH / 'simple.swc')
+    _check_cloned_neuron(nrn, deepcopy(nrn))
+
+
+def test_graft_neuron():
+    nrn1 = nm.load_neuron(SWC_PATH / 'simple.swc')
+    basal_dendrite = nrn1.neurites[0]
+    nrn2 = graft_neuron(basal_dendrite.root_node)
+    nt.assert_equal(len(nrn2.neurites), 1)
+    nt.assert_equal(basal_dendrite, nrn2.neurites[0])
+
+
 def test_str():
-    n = nm.load_neuron(Path(SWC_PATH, 'simple.swc'))
+    n = nm.load_neuron(SWC_PATH / 'simple.swc')
     nt.ok_('Neuron' in str(n))
     nt.ok_('Section' in str(n.neurites[0].root_node))

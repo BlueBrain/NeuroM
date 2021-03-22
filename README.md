@@ -47,6 +47,10 @@ NeuroM documentation is built and hosted on [readthedocs](https://readthedocs.or
 * [latest snapshot](http://neurom.readthedocs.org/en/latest/)
 * [latest release](http://neurom.readthedocs.org/en/stable/)
 
+## Migration to v2
+
+Refer to [the doc page](https://neurom.readthedocs.io/en/latest/migration_v2.html) on this topic.
+
 ## Installation
 
 It is recommended that you use [`pip`](https://pip.pypa.io/en/stable/) to install
