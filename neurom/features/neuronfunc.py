@@ -237,6 +237,7 @@ def sholl_crossings(neurites, center, radii):
         for start, end in iter_segments(neurite):
             start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
                                       morphmath.point_dist2(center, end))
+
             count += int(start_dist2 <= r2 <= end_dist2 or
                          end_dist2 <= r2 <= start_dist2)
 
