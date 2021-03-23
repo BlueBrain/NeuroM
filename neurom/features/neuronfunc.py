@@ -214,6 +214,13 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
 def sholl_crossings(neurites, center, radii):
     """Calculate crossings of neurites.
 
+    This function can also be used with a list aa neurites, as follow:
+
+        secs = (sec for sec in nm.iter_sections(neuron) if complex_filter(sec))
+        sholl = nm.features.neuronfunc.sholl_crossings(secs,
+                                                       center=neuron.soma.center,
+                                                       radii=np.arange(0, 1000, 100))
+
     Args:
         nrn(morph): morphology on which to perform Sholl analysis, or list of sections
         radii(iterable of floats): radii for which crossings will be counted
