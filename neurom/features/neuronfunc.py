@@ -211,7 +211,6 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
             for i, _ in enumerate(ordered_vectors)]
 
 
-@feature(shape=(...,))
 def sholl_crossings(neurites, center, radii):
     """Calculate crossings of neurites.
 
