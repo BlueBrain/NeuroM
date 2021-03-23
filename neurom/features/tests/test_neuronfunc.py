@@ -160,24 +160,26 @@ def test_trunk_elevation_zero_norm_vector_raises():
 
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
-    radii = []
-    nt.eq_(list(_nf.sholl_crossings(SIMPLE, center, radii=radii)),
-           [])
+    #radii = []
+    #nt.eq_(list(_nf.sholl_crossings(SIMPLE, center, radii=radii)),
+    #       [])
 
-    radii = [1.0]
-    nt.eq_([2],
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+    #radii = [1.0]
+    #nt.eq_([2],
+    #       list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
-    radii = [1.0, 5.1]
-    nt.eq_([2, 4],
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+    #radii = [1.0, 5.1]
+    #nt.eq_([2, 4],
+    #       list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1., 4., 5.]
-    nt.eq_([2, 4, 5],
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
-
+    #nt.eq_([2, 4, 5],
+    #       list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+    
+    print('lkjlkjlkjlkj')
     nt.eq_([2, 2, 2],
-           list(_nf.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
+           list(_nf.sholl_crossings(list(SIMPLE.sections[:2]), center, radii=radii)))
+    print('lkjlkjlkjlkj')
 
 
 def load_swc(string):

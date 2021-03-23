@@ -222,7 +222,8 @@ def sholl_crossings(neurites, center, radii):
                                                        radii=np.arange(0, 1000, 100))
 
     Args:
-        nrn(morph): morphology on which to perform Sholl analysis, or list of sections
+        neurites(list): morphology on which to perform Sholl analysis, or list of neurites
+        center(Point): center point
         radii(iterable of floats): radii for which crossings will be counted
 
     Returns:
@@ -241,13 +242,8 @@ def sholl_crossings(neurites, center, radii):
 
         return count
 
-    if hasattr(neurites, 'neurites') or hasattr(neurites, 'points'):
-        neurites = list(iter_neurites(neurites))
-    else:
-        neurites = list(neurites)
-
     return np.array([sum(_count_crossings(neurite, r)
-                         for neurite in neurites)
+                         for neurite in iter_neurites(neurites))
                      for r in radii])
 
 
