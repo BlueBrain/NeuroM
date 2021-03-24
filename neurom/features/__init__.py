@@ -88,7 +88,11 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     """
     feat = _find_feature_func(feature_name)
 
-    return np.array(list(feat(obj, **kwargs))), feat
+    res = feat(obj, **kwargs)
+    if len(feat.shape) != 0:
+        res = np.array(list(res))
+
+    return res, feat
 
 
 def get(feature_name, obj, **kwargs):

@@ -65,6 +65,12 @@ def total_length(nrn_pop, neurite_type=NeuriteType.all):
 
 
 @feature(shape=())
+def max_radial_distance(neurites, neurite_type=NeuriteType.all):
+    """Get the maximum radial distances of the termination sections for a collection of neurites."""
+    return max(section_term_radial_distances(neurites, neurite_type))
+
+
+@feature(shape=())
 def n_segments(neurites, neurite_type=NeuriteType.all):
     """Number of segments in a collection of neurites."""
     return sum(len(s.points) - 1
@@ -185,6 +191,12 @@ def map_neurons(fun, neurites, neurite_type):
     """Map `fun` to all the neurites in a single or collection of neurons."""
     nrns = neuronfunc.neuron_population(neurites)
     return [fun(n, neurite_type=neurite_type) for n in nrns]
+
+
+@feature(shape=(...,))
+def max_radial_distances(neurites, neurite_type=NeuriteType.all):
+    """Get the maximum radial distances of the termination sections for a collection of neurites."""
+    return map_neurons(max_radial_distance, neurites, neurite_type)
 
 
 @feature(shape=(...,))
