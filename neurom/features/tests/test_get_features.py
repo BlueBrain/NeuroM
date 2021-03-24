@@ -119,6 +119,32 @@ def test_max_radial_distances():
     }
     assert_features_for_neurite(feat, POP, expected, exact=False)
 
+    # Test with a list of neurites
+    neurites = POP[0].neurites
+    expected = {
+        None: [99.58945832],
+        NeuriteType.all: [99.58945832],
+        NeuriteType.apical_dendrite: [99.589458],
+    }
+    assert_features_for_neurite(feat, neurites, expected, exact=False)
+
+
+def test_max_radial_distance():
+    feat = 'max_radial_distance'
+    neurites = POP[0].neurites
+    expected = {
+        None: 99.58945832,
+        NeuriteType.all: 99.58945832,
+        NeuriteType.apical_dendrite: 99.589458,
+    }
+
+    for neurite_type, expected_values in expected.items():
+        if neurite_type is None:
+            res = get_feature(feat, neurites)
+        else:
+            res = get_feature(feat, neurites, neurite_type=neurite_type)
+        assert_allclose(res, expected_values)
+
 
 def test_section_tortuosity_pop():
 
@@ -465,7 +491,8 @@ def test_neurite_features_accept_single_tree():
     for f in NEURITEFEATURES:
         ret = get_feature(f, NRN.neurites[0])
         nt.ok_(ret.dtype.kind in ('i', 'f'))
-        nt.ok_(len(ret) > 0)
+        if len(features._find_feature_func(f).shape) >= 1:
+            nt.ok_(len(ret) > 0)
 
 
 @patch.dict(NEURITEFEATURES)
