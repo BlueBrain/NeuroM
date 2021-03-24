@@ -170,10 +170,7 @@ def feature(shape, namespace=None, name=None):
         name(string): name of the feature, used to access the feature via `neurom.features.get()`.
     """
     def inner(func):
-        # Keep the old behavior that do not register those features
-        # TODO: this will be changed in the next commit
-        if not func.__name__.startswith('n_'):
-            _register_feature(namespace, name or func.__name__, func, shape)
+        _register_feature(namespace, name or func.__name__, func, shape)
         return func
     return inner
 

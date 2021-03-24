@@ -490,7 +490,10 @@ def test_segment_meander_angles_single_section():
 def test_neurite_features_accept_single_tree():
     for f in NEURITEFEATURES:
         ret = get_feature(f, NRN.neurites[0])
-        nt.ok_(ret.dtype.kind in ('i', 'f'))
+        if isinstance(ret, np.ndarray):
+            nt.ok_(ret.dtype.kind in ('i', 'f'))
+        else:
+            nt.assert_true(np.isscalar(ret))
         if len(features._find_feature_func(f).shape) >= 1:
             nt.ok_(len(ret) > 0)
 
