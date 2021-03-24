@@ -492,10 +492,10 @@ def test_neurite_features_accept_single_tree():
         ret = get_feature(f, NRN.neurites[0])
         if isinstance(ret, np.ndarray):
             nt.ok_(ret.dtype.kind in ('i', 'f'))
-        else:
-            nt.assert_true(np.isscalar(ret))
-        if len(features._find_feature_func(f).shape) >= 1:
+            nt.ok_(len(features._find_feature_func(f).shape) >= 1)
             nt.ok_(len(ret) > 0)
+        else:
+            nt.ok_(np.isscalar(ret))
 
 
 @patch.dict(NEURITEFEATURES)
