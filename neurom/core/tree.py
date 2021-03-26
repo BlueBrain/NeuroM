@@ -28,5 +28,5 @@
 
 """Tree class that is dropped in v2."""
 
-raise NotImplementedError('This class is not accessible since v2 version. If you rely on'
-                          'that, you can copy sources from v1 version into your project.')
+raise NotImplementedError('This class is not accessible since v2 version. See documentation page'
+                          '"Migration to v2 version".')

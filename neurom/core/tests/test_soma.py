@@ -140,21 +140,6 @@ def test_Soma_Cylinders():
     assert_array_equal(s.center, [0, 0, -10])
     nt.ok_('SomaCylinders' in str(s))
 
-    # # cylinder: h = 10, r = 20
-    # s = load_neuron(StringIO(u"""
-    #             1 1 0   0 0 20 -1
-    #             2 1 0 -10 0 20  1"""), reader='swc').soma
-
-    # nt.assert_almost_equal(s.area, 1256.6370614) # see r = 2*h above
-    # nt.eq_(list(s.center), [0., 0., 0.])
-
-    # #check tapering
-    # s = load_neuron(StringIO(u"""
-    #             1 1 0   0 0  0 -1
-    #             2 1 0 -10 0 20  1"""), reader='swc').soma
-
-    # nt.assert_almost_equal(s.area, 1404.9629462081452) # cone area, not including 'bottom'
-
     # neuromorpho style
     with warnings.catch_warnings(record=True):
         s = load_neuron(StringIO(u"""

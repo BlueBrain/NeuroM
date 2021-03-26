@@ -12,13 +12,6 @@ color : true
 ##############################################
 
 checks:
-    structural_checks:
-        - is_single_tree
-        - has_soma_points
-        - has_sequential_ids
-        - has_increasing_ids
-        - has_valid_soma
-        - has_valid_neurites
     neuron_checks:
         - has_basal_dendrite
         - has_axon
