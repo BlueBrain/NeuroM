@@ -296,7 +296,9 @@ def segment_taper_rates(neurites, neurite_type=NeuriteType.all):
         pts = sec.points[:, COLS.XYZR]
         diff = np.diff(pts, axis=0)
         distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
-        return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
+        out = np.divide(2 * np.abs(diff[:, COLS.R]), distance)
+        print('---', diff, pts)
+        return out
 
     return map_segments(_seg_taper_rates, neurites, neurite_type)
 
