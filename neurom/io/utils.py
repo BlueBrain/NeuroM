@@ -113,36 +113,37 @@ def load_neuron(neuron, reader=None):
     Args:
         neuron (str|Path|Neuron|morphio.Morphology|morphio.mut.Morphology): A neuron representation
             It can be:
+
             - a filename with the h5, swc or asc extension
             - a NeuroM Neuron object
             - a morphio mutable or immutable Morphology object
             - a stream that can be put into a io.StreamIO object. In this case, the READER argument
-            must be passed with the corresponding file format (asc, swc and h5)
+              must be passed with the corresponding file format (asc, swc and h5)
         reader (str): Optional, must be provided if neuron is a stream to
                       specify the file format (asc, swc, h5)
 
     Returns:
         A Neuron object
 
-    Examples:
+    Examples::
+
             neuron = neurom.load_neuron('my_neuron_file.h5')
 
             neuron = neurom.load_neuron(morphio.Morphology('my_neuron_file.h5'))
 
-            neuron = nm.load_neuron(io.StringIO('''
-            ((Dendrite)
-            (3 -4 0 2)
-            (3 -6 0 2)
-            (3 -8 0 2)
-            (3 -10 0 2)
-            (
-            (0 -10 0 2)
-            (-3 -10 0 2)
-            |
-            (6 -10 0 2)
-            (9 -10 0 2)
-            )
-            )'''), reader='asc')
+            neuron = nm.load_neuron(io.StringIO('''((Dendrite)
+                                                   (3 -4 0 2)
+                                                   (3 -6 0 2)
+                                                   (3 -8 0 2)
+                                                   (3 -10 0 2)
+                                                   (
+                                                     (0 -10 0 2)
+                                                     (-3 -10 0 2)
+                                                     |
+                                                     (6 -10 0 2)
+                                                     (9 -10 0 2)
+                                                   )
+                                                   )'''), reader='asc')
     """
     if isinstance(neuron, (Neuron, morphio.Morphology, morphio.mut.Morphology)):
         return Neuron(neuron)
