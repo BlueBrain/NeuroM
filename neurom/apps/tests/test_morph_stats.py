@@ -36,7 +36,7 @@ import pandas as pd
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
-from nose.tools import assert_almost_equal, assert_equal, assert_greater_equal, assert_raises, ok_
+from nose.tools import assert_almost_equal, assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
@@ -54,12 +54,14 @@ REF_CONFIG = {
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
         'soma_radii': ['mean'],
+        'max_radial_distance': ['mean'],
     }
 }
 
 REF_OUT = {
     'neuron': {
         'mean_soma_radius': 0.13065629648763766,
+        'mean_max_radial_distance': 99.5894610648815,
     },
     'axon': {
         'total_section_length': 207.87975220908129,
@@ -131,6 +133,7 @@ def test_eval_stats_on_empty_stat():
     assert_equal(ms.eval_stats(np.array([]), 'raw'), [])
     assert_equal(ms.eval_stats(np.array([]), 'total'), 0.0)
 
+
 def test_eval_stats_applies_numpy_function():
     modes = ('min', 'max', 'mean', 'median', 'std')
 
@@ -148,6 +151,9 @@ def test_extract_stats_single_neuron():
     # Note: soma radius is calculated from the sphere that gives the area
     # of the cylinders described in Neuron.swc
     assert_almost_equal(res['neuron']['mean_soma_radius'], REF_OUT['neuron']['mean_soma_radius'])
+    assert_almost_equal(
+        res['neuron']['mean_max_radial_distance'], REF_OUT['neuron']['mean_max_radial_distance']
+    )
 
     for k in ('all', 'axon', 'basal_dendrite', 'apical_dendrite'):
         assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
@@ -247,7 +253,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    assert_equal(1 + 1 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
+    assert_equal(1 + 2 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
     ok_('name' in header)
     ok_('neuron:mean_soma_radius' in header)
 
@@ -260,7 +266,7 @@ def test_generate_flattened_dict():
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
     assert_equal(3, len(rows))  # one for fake_name[0-2]
-    assert_equal(1 + 1 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
+    assert_equal(1 + 2 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
 
 
 def test_full_config():
