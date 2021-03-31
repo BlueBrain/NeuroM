@@ -50,4 +50,4 @@ def convex_hull(obj):
     Returns:
         scipy.spatial.ConvexHull object built from obj.points
     """
-    return ConvexHull(obj.points[:, COLS.XZY])
+    return ConvexHull(obj.points[:, COLS.XYZ])
