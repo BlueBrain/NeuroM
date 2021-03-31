@@ -50,6 +50,7 @@ REF_CONFIG = {
         'section_volumes': ['total'],
         'section_branch_orders': ['max'],
         'segment_midpoints': ['max'],
+        'max_radial_distance': ['mean'],
     },
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
@@ -71,6 +72,7 @@ REF_OUT = {
         'max_segment_midpoint_0': 0.0,
         'max_segment_midpoint_1': 0.0,
         'max_segment_midpoint_2': 49.520305964149998,
+        'mean_max_radial_distance': 82.44254511788921,
     },
     'all': {
         'total_section_length': 840.68521442251949,
@@ -80,6 +82,7 @@ REF_OUT = {
         'max_segment_midpoint_0': 64.401674984050004,
         'max_segment_midpoint_1': 48.48197694465,
         'max_segment_midpoint_2': 53.750947521650005,
+        'mean_max_radial_distance': 99.5894610648815,
     },
     'apical_dendrite': {
         'total_section_length': 214.37304577550353,
@@ -89,6 +92,7 @@ REF_OUT = {
         'max_segment_midpoint_0': 64.401674984050004,
         'max_segment_midpoint_1': 0.0,
         'max_segment_midpoint_2': 53.750947521650005,
+        'mean_max_radial_distance': 99.5894610648815,
     },
     'basal_dendrite': {
         'total_section_length': 418.43241643793476,
@@ -98,6 +102,7 @@ REF_OUT = {
         'max_segment_midpoint_0': 64.007872333250006,
         'max_segment_midpoint_1': 48.48197694465,
         'max_segment_midpoint_2': 51.575580778049996,
+        'mean_max_radial_distance': 94.43342438865741,
     },
 }
 
@@ -253,7 +258,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    assert_equal(1 + 2 + 4 * (4 + 3), len(header))  # name + everything in REF_OUT
+    assert_equal(1 + 2 + 4 * (4 + 4), len(header))  # name + everything in REF_OUT
     ok_('name' in header)
     ok_('neuron:mean_soma_radius' in header)
 
@@ -266,7 +271,7 @@ def test_generate_flattened_dict():
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
     assert_equal(3, len(rows))  # one for fake_name[0-2]
-    assert_equal(1 + 2 + 4 * (4 + 3), len(rows[0]))  # name + everything in REF_OUT
+    assert_equal(1 + 2 + 4 * (4 + 4), len(rows[0]))  # name + everything in REF_OUT
 
 
 def test_full_config():
