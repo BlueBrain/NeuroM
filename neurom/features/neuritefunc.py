@@ -70,6 +70,7 @@ def max_radial_distance(neurites, neurite_type=NeuriteType.all):
     term_radial_distances = section_term_radial_distances(neurites, neurite_type)
     return max(term_radial_distances) if term_radial_distances else 0.
 
+
 @feature(shape=())
 def n_segments(neurites, neurite_type=NeuriteType.all):
     """Number of segments in a collection of neurites."""
