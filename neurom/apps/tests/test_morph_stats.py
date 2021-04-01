@@ -161,11 +161,14 @@ def test_extract_stats_scalar_feature():
         'neurite_type': ['ALL'],
         'neurite': {
             'n_forking_points': ['max'],
+        },
+        'neuron': {
+            'soma_volume': ['total'],
         }
     }
     res = ms.extract_stats(nrn, config)
-    print(res)
-    assert_equal(res, {'all': {'max_n_forking_point': 277}})
+    assert_equal(res, {'all': {'max_n_forking_point': 277},
+                       'neuron': {'total_soma_volume': 1424.438520318901}})
 
 
 def test_extract_dataframe():
