@@ -181,6 +181,8 @@ def extract_stats(neurons, config):
         neurite_type = _NEURITE_MAP[neurite_type]
         feature, func = _get_feature_value_and_func(feature_name, neurons,
                                                     neurite_type=neurite_type)
+        if np.isscalar(feature):
+            feature = [feature]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
@@ -188,6 +190,8 @@ def extract_stats(neurons, config):
 
     for feature_name, modes in config.get('neuron', {}).items():
         feature, func = _get_feature_value_and_func(feature_name, neurons)
+        if np.isscalar(feature):
+            feature = [feature]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
             stat = eval_stats(feature, mode)
