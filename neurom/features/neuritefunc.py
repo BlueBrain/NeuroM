@@ -548,8 +548,8 @@ def neurite_volume_density(neurites, neurite_type=NeuriteType.all):
     The volume density is defined as the ratio of the neurite volume and
     the volume of the neurite's enclosing convex hull
 
-    TODO: the convex hul fails on some morphologies, it may be good to instead use
-        bounding_box to comute the neurite enclosing volume
+    TODO: the convex hull fails on some morphologies, it may be good to instead use
+        bounding_box to compute the neurite enclosing volume
 
     .. note:: Returns `np.nan` if the convex hull computation fails.
     """
