@@ -155,6 +155,22 @@ def test_extract_stats_single_neuron():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
 
 
+def test_extract_stats_scalar_feature():
+    nrn = nm.load_neuron(DATA_PATH / 'neurolucida' / 'bio_neuron-000.asc')
+    config = {
+        'neurite_type': ['ALL'],
+        'neurite': {
+            'n_forking_points': ['max'],
+        },
+        'neuron': {
+            'soma_volume': ['total'],
+        }
+    }
+    res = ms.extract_stats(nrn, config)
+    assert_equal(res, {'all': {'max_n_forking_point': 277},
+                       'neuron': {'total_soma_volume': 1424.438520318901}})
+
+
 def test_extract_dataframe():
     # Vanilla test
     nrns = nm.load_neurons([Path(SWC_PATH, name)
