@@ -186,8 +186,6 @@ def extract_stats(neurons, config):
             feature = [feature]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
-            if isinstance(feature, (int, float)):
-                feature = [feature]
             stat = eval_stats(feature, mode)
             _fill_stats_dict(stats[neurite_type.name], stat_name, stat, func.shape)
 
@@ -197,8 +195,6 @@ def extract_stats(neurons, config):
             feature = [feature]
         for mode in modes:
             stat_name = _stat_name(feature_name, mode)
-            if isinstance(feature, (int, float)):
-                feature = [feature]
             stat = eval_stats(feature, mode)
             _fill_stats_dict(stats['neuron'], stat_name, stat, func.shape)
     return dict(stats)
