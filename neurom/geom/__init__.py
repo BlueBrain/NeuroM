@@ -30,6 +30,7 @@
 
 import numpy as np
 from scipy.spatial import ConvexHull
+from neurom.core.dataformat import COLS
 from .transform import translate, rotate
 
 
@@ -39,8 +40,8 @@ def bounding_box(obj):
     Returns:
         2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
     """
-    return np.array([np.min(obj.points[:, 0:3], axis=0),
-                     np.max(obj.points[:, 0:3], axis=0)])
+    return np.array([np.min(obj.points[:, COLS.XYZ], axis=0),
+                     np.max(obj.points[:, COLS.XYZ], axis=0)])
 
 
 def convex_hull(obj):
@@ -49,4 +50,4 @@ def convex_hull(obj):
     Returns:
         scipy.spatial.ConvexHull object built from obj.points
     """
-    return ConvexHull(obj.points[:, :3])
+    return ConvexHull(obj.points[:, COLS.XYZ])
