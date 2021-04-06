@@ -28,10 +28,9 @@
 
 
 """Core code for morph_stats application."""
-import numbers
-import os
 import logging
 import multiprocessing
+import numbers
 import os
 import warnings
 from collections import defaultdict
