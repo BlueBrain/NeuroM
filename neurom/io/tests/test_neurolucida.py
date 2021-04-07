@@ -276,21 +276,15 @@ def test_single_children():
                       )
                  """), 'asc')
 
-    assert_array_equal(n.neurites[0].points,
+    nt.assert_equal(len(n.sections), 2)
+    assert_array_equal(n.sections[0].points,
                        np.array([[3, -4, 0, 1],
                                  [3, -6, 0, 1],
                                  [3, -8, 0, 1],
-                                 [3, -10, 0, 1],
-                                 [0, -10, 0, 1],
-                                 [-3, -10, 0, 1]],
+                                 [3, -10, 0, 1]],
                                 dtype=np.float32))
-
-    nt.assert_equal(len(n.sections), 1)
-    assert_array_equal(n.neurites[0].points,
-                       np.array([[3, -4, 0, 1],
-                                 [3, -6, 0, 1],
-                                 [3, -8, 0, 1],
-                                 [3, -10, 0, 1],
+    assert_array_equal(n.sections[1].points,
+                       np.array([[3, -10, 0, 1],
                                  [0, -10, 0, 1],
                                  [-3, -10, 0, 1]],
                                 dtype=np.float32))

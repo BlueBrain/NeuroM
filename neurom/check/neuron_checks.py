@@ -33,7 +33,6 @@ Contains functions for checking validity of neuron neurites and somata.
 from itertools import chain, islice
 
 import numpy as np
-from morphio import AnnotationType
 from neurom import NeuriteType
 from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites
@@ -346,14 +345,5 @@ def has_multifurcation(neuron):
 
 def has_no_single_children(neuron):
     """Check if the neuron has sections with only one child section."""
-    single_child_annotations = (annot for annot in neuron.annotations
-                                if annot.type == AnnotationType.single_child)
-
-    def first_annotated_point(annotation):
-        """Return the first annotated 4D-point [X,Y,Z,Radius]."""
-        return [annotation.points[0] + [annotation.diameters[0] / 2]]
-
-    bad_ids = [(annot.section_id, first_annotated_point(annot))
-               for annot in single_child_annotations]
-
+    bad_ids = [section.id for section in iter_sections(neuron) if len(section.children) == 1]
     return CheckResult(len(bad_ids) == 0, bad_ids)

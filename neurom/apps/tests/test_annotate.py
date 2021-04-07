@@ -2,7 +2,7 @@ from pathlib import Path
 from neurom import load_neuron
 from neurom.apps.annotate import annotate, generate_annotation
 from neurom.check import CheckResult
-from neurom.check.neuron_checks import has_no_narrow_start, has_no_single_children
+from neurom.check.neuron_checks import has_no_narrow_start
 from nose import tools as nt
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data' / 'swc'
@@ -49,35 +49,3 @@ def test_annotate():
     neuron = load_neuron(SWC_PATH / 'narrow_start.swc')
     results = [checker(neuron) for checker in checkers.keys()]
     nt.assert_equal(annotate(results, checkers.values()), correct_result)
-
-
-def test_single_children():
-
-    checkers = {has_no_single_children: {"name": "single child",
-                                         "label": "Circle6",
-                                         "color": "Red"}}
-
-    neuron = load_neuron("""
-( (Color Blue)
-  (Axon)
-  (0 5 0 2)
-  (2 9 0 2)
-  (0 13 0 2)
-  (
-    (2 13 0 2)
-    (4 13 0 2)
-    (6 13 0 2)
-  )
-)
-""", "asc")
-
-    results = [checker(neuron) for checker in checkers.keys()]
-    nt.assert_equal(annotate(results, checkers.values()),
-                    """
-
-(Circle6   ; MUK_ANNOTATION
-    (Color Red)   ; MUK_ANNOTATION
-    (Name "single child")   ; MUK_ANNOTATION
-    (      0.00      13.00       0.00 0.50)   ; MUK_ANNOTATION
-)   ; MUK_ANNOTATION
-""")

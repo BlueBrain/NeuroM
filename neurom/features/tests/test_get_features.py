@@ -100,9 +100,9 @@ def _stats(seq):
 
 def test_number_of_sections():
     feat = 'number_of_sections'
-    expected = {None: [84, 42, 201],
-                NeuriteType.all: [84, 42, 201],
-                NeuriteType.axon: [21, 21, 178],
+    expected = {None: [84, 42, 202],
+                NeuriteType.all: [84, 42, 202],
+                NeuriteType.axon: [21, 21, 179],
                 NeuriteType.apical_dendrite: [21, 0, 0],
                 NeuriteType.basal_dendrite: [42, 21, 23],
                 }
@@ -153,15 +153,15 @@ def test_section_tortuosity_pop():
     assert_allclose(_stats(get_feature(feat, POP)),
                     (1.0,
                      4.657,
-                     439.331,
-                     1.343),
+                     440.408,
+                     1.342),
                     rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.all)),
                     (1.0,
                      4.657,
-                     439.331,
-                     1.343),
+                     440.408,
+                     1.342),
                     rtol=1e-3)
 
     assert_allclose(_stats(get_feature(feat, POP, neurite_type=NeuriteType.apical_dendrite)),

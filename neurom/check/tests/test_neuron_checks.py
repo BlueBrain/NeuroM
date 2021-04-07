@@ -442,3 +442,22 @@ def test_has_multifurcation():
     info = check_.info
     assert_array_equal(info[0][0], 0)
     assert_array_equal(info[0][1][:, COLS.XYZR], [[0.0, 13.0, 0.0, 1.0]])
+
+
+def test_single_children():
+    neuron = load_neuron("""
+( (Color Blue)
+  (Axon)
+  (0 5 0 2)
+  (2 9 0 2)
+  (0 13 0 2)
+  (
+    (2 13 0 2)
+    (4 13 0 2)
+    (6 13 0 2)
+  )
+)
+""", "asc")
+    result = nrn_chk.has_no_single_children(neuron)
+    nt.assert_equal(result.status, False)
+    nt.assert_equal(result.info, [0])

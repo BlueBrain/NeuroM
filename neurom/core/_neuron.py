@@ -30,6 +30,7 @@
 
 from collections import deque
 from itertools import chain
+from pathlib import Path
 
 import morphio
 import numpy as np
@@ -418,7 +419,9 @@ class Neuron(morphio.mut.Morphology):
             name (str): a option neuron name
         """
         super().__init__(filename)
-        self.remove_unifurcations()
+        if isinstance(filename, (Path, str)):
+            if Path(filename).suffix == '.swc':
+                self.remove_unifurcations()
         self.name = name if name else 'Neuron'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
