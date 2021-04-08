@@ -13,10 +13,6 @@ Migration to v2 version
   ``FstNeuron``.
 - Validation of morphologies changed.
     The following is not an invalid morphology anymore:
-    - no soma
     - 2 point soma
     - unknown soma type
-    - disconnected points
     - non-consequent ids
-    The following is an invalid morphology:
-    - custom neurite type (5 or more)

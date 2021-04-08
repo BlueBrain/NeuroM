@@ -418,10 +418,13 @@ class Neuron(morphio.mut.Morphology):
             filename (str|Path): a filename
             name (str): a option neuron name
         """
-        super().__init__(filename)
-        if isinstance(filename, (Path, str)):
-            if Path(filename).suffix == '.swc':
-                self.remove_unifurcations()
+        try:
+            morphio.set_ignored_warning([morphio.Warning.appending_empty_section,
+                                         morphio.Warning.soma_non_conform], True)
+            morphio.set_raise_warnings(True)
+            super().__init__(filename)
+        finally:
+            morphio.set_raise_warnings(False)
         self.name = name if name else 'Neuron'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)

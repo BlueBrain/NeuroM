@@ -35,7 +35,7 @@ import numpy as np
 from neurom import COLS, get, load_neuron
 from neurom.core import Neuron
 from neurom.exceptions import (MissingParentError, NeuroMError, RawDataError, SomaError,
-                               UnknownFileType)
+                               UnknownFileType, MorphioError)
 from neurom.io import utils
 from nose import tools as nt
 
@@ -66,8 +66,6 @@ NO_SOMA_FILE = Path(SWC_PATH, 'Single_apical_no_soma.swc')
 DISCONNECTED_POINTS_FILE = Path(SWC_PATH, 'Neuron_disconnected_components.swc')
 
 MISSING_PARENTS_FILE = Path(SWC_PATH, 'Neuron_missing_parents.swc')
-
-INVALID_ID_SEQUENCE_FILE = Path(SWC_PATH, 'non_increasing_trunk_off_1_16pt.swc')
 
 
 def _mock_load_neuron(filename):
@@ -200,23 +198,17 @@ def test_load_neuron_soma_only():
     nt.assert_equal(nrn.name, 'Soma_origin')
 
 
-# TODO: decide if we want to check for this in fst.
-@nt.nottest
-@nt.raises(RawDataError)
 def test_load_neuron_disconnected_points_raises():
-    utils.load_neuron(DISCONNECTED_POINTS_FILE)
+    nt.assert_raises(MorphioError, load_neuron, DISCONNECTED_POINTS_FILE)
+    try:
+        load_neuron(DISCONNECTED_POINTS_FILE)
+    except MorphioError as e:
+        nt.assert_in('Warning: found a disconnected neurite', e.args[0])
 
 
 @nt.raises(MissingParentError)
 def test_load_neuron_missing_parents_raises():
     utils.load_neuron(MISSING_PARENTS_FILE)
-
-
-# TODO: decide if we want to check for this in fst.
-@nt.nottest
-@nt.raises(RawDataError)
-def test_load_neuron_invalid_id_sequence_raises():
-    utils.load_neuron(INVALID_ID_SEQUENCE_FILE)
 
 
 def test_load_neurons_directory():

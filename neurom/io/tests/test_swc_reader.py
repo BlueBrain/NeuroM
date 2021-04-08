@@ -34,7 +34,7 @@ from neurom import load_neuron, NeuriteType
 from numpy.testing import assert_array_equal, assert_equal
 
 from nose import tools as nt
-from neurom.exceptions import SomaError, RawDataError
+from neurom.exceptions import RawDataError, MorphioError
 
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -44,12 +44,15 @@ SWC_SOMA_PATH = Path(SWC_PATH, 'soma')
 
 @nt.raises(RawDataError)
 def test_repeated_id():
-    n = load_neuron(SWC_PATH / 'repeated_id.swc')
+    load_neuron(SWC_PATH / 'repeated_id.swc')
 
 
-@nt.raises(SomaError)
 def test_neurite_followed_by_soma():
-    load_neuron(SWC_PATH / 'soma_with_neurite_parent.swc')
+    nt.assert_raises(MorphioError, load_neuron, SWC_PATH / 'soma_with_neurite_parent.swc')
+    try:
+        load_neuron(SWC_PATH / 'soma_with_neurite_parent.swc')
+    except MorphioError as e:
+        nt.assert_in('Warning: found a disconnected neurite', e.args[0])
 
 
 def test_read_single_neurite():
@@ -152,12 +155,14 @@ def test_simple_reversed():
                         [-5, -4, 0, 0]])
 
 
-# def test_custom_type():
-#     # TODO Requires a fix to MorphIO to handle custom types
-#     neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
-#     assert_equal(neuron.neurites[1].type, NeuriteType.custom)
+def test_custom_type():
+    neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
+    assert_equal(neuron.neurites[1].type, NeuriteType.custom)
 
 
 def test_undefined_type():
-    neuron = load_neuron(Path(SWC_PATH, 'undefined_type.swc'))
-    assert_equal(neuron.neurites[1].type, NeuriteType.undefined)
+    nt.assert_raises(RawDataError, load_neuron, SWC_PATH / 'undefined_type.swc')
+    try:
+        load_neuron(SWC_PATH / 'undefined_type.swc')
+    except RawDataError as e:
+        nt.assert_in('Unsupported section type: 0', e.args[0])

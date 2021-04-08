@@ -53,7 +53,7 @@ class NeuriteType(IntEnum):
     undefined = int(SectionType.undefined)
     soma = 31
     all = 32
-    custom = 5
+    custom = int(SectionType.custom5)
 
 
 NEURITES = (NeuriteType.all,

@@ -33,7 +33,7 @@ from io import StringIO
 import numpy as np
 from neurom import load_neuron
 from neurom.core import _soma
-from neurom.exceptions import RawDataError, SomaError
+from neurom.exceptions import MorphioError, SomaError
 from nose import tools as nt
 from numpy.testing import assert_array_equal
 
@@ -60,23 +60,24 @@ def test_Soma_contour():
 
 
 def test_Soma_ThreePointCylinder():
-    with warnings.catch_warnings(record=True):
-        sm = load_neuron(StringIO(u"""1 1 0   0 0 44 -1
-                                      2 1 0 -44 0 44  1
-                                      3 1 0 +44 0 44  1"""), reader='swc').soma
-
+    sm = load_neuron(StringIO(u"""1 1 0   0 0 44 -1
+                                  2 1 0 -44 0 44  1
+                                  3 1 0 +44 0 44  1"""), reader='swc').soma
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
     nt.eq_(sm.radius, 44)
 
-def test_Soma_ThreePointCylinder_small_radius():
-    with warnings.catch_warnings(record=True):
-        sm = load_neuron(StringIO(u"""
-                1 1 0   0 0 1e-8 -1
-                2 1 0 -44 0 1e-8  1
-                3 1 0 +44 0 1e-8  1"""), reader='swc').soma
 
+def test_Soma_ThreePointCylinder_invalid_radius():
+    with warnings.catch_warnings(record=True) as w_list:
+        load_neuron(StringIO(u"""
+                        1 1 0   0 0 1e-8 -1
+                        2 1 0 -44 0 1e-8  1
+                        3 1 0 +44 0 1e-8  1"""), reader='swc').soma
+        nt.assert_in('Zero radius for SomaNeuromorphoThreePointCylinders', str(w_list[0]))
+        nt.assert_in('The second point must be one radius below 0 on the y-plane', str(w_list[1]))
+        nt.assert_in('The third point must be one radius above 0 on the y-plane', str(w_list[2]))
 
 def check_SomaC(stream):
     sm = load_neuron(StringIO(stream), reader='asc').soma
@@ -118,12 +119,13 @@ def test_SomaC():
                                        cos=cos_pi_by_4))
 
 
-# @nt.raises(SomaError)
-def test_invalid_soma_points_2_raises_SomaError():
-    with warnings.catch_warnings(record=True):
-        load_neuron(StringIO(u"""((CellBody)
-                                 (0 0 0 44)
-                                 (0 +44 0 44))"""), reader='asc').soma
+def test_soma_points_2():
+    load_neuron(StringIO(u"""
+                    1 1 0 0 -10 40 -1
+                    2 1 0 0   0 40  1"""), reader='swc').soma
+    load_neuron(StringIO(u"""((CellBody)
+                             (0 0 0 44)
+                             (0 +44 0 44))"""), reader='asc').soma
 
 
 def test_Soma_Cylinders():

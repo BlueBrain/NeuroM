@@ -156,17 +156,7 @@ def test_single_axon_neuron():
 
 
 def test_single_apical_no_soma():
-    expected = dict([('ALL', False),
-                     ('Has basal dendrite', False),
-                     ('Has axon', False),
-                     ('Has apical dendrite', True),
-                     ('Has all nonzero segment lengths', False),
-                     ('Has all nonzero section lengths', True),
-                     ('Has all nonzero neurite radii', True),
-                     ('Has nonzero soma radius', False)])
-
-    _run_test(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'),
-              expected)
+    _run_test(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'), dict([('ALL', False)]))
 
 
 def test_directory_input():
