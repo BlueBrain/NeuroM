@@ -72,5 +72,5 @@ setup(
     setup_requires=['setuptools_scm'],
 
     # 2.0.1 allows for a pip requirement formatted like "neurom>=2.0.0"
-    version="2.0.1.dev8",
+    version="2.0.1.dev9",
 )
