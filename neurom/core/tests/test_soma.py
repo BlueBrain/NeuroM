@@ -70,14 +70,16 @@ def test_Soma_ThreePointCylinder():
 
 
 def test_Soma_ThreePointCylinder_invalid_radius():
-    with warnings.catch_warnings(record=True) as w_list:
-        load_neuron(StringIO(u"""
+    swc_content = StringIO(u"""
                         1 1 0   0 0 1e-8 -1
                         2 1 0 -44 0 1e-8  1
-                        3 1 0 +44 0 1e-8  1"""), reader='swc').soma
-        nt.assert_in('Zero radius for SomaNeuromorphoThreePointCylinders', str(w_list[0]))
-        nt.assert_in('The second point must be one radius below 0 on the y-plane', str(w_list[1]))
-        nt.assert_in('The third point must be one radius above 0 on the y-plane', str(w_list[2]))
+                        3 1 0 +44 0 1e-8  1""")
+    nt.assert_raises(MorphioError, load_neuron, swc_content, reader='swc')
+    try:
+        load_neuron(swc_content, reader='swc')
+    except MorphioError as e:
+        nt.assert_in('Warning: the soma does not conform the three point soma spec', e.args[0])
+
 
 def check_SomaC(stream):
     sm = load_neuron(StringIO(stream), reader='asc').soma

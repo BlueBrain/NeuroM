@@ -420,7 +420,7 @@ class Neuron(morphio.mut.Morphology):
         """
         try:
             morphio.set_ignored_warning([morphio.Warning.appending_empty_section,
-                                         morphio.Warning.soma_non_conform], True)
+                                         morphio.Warning.wrong_root_point], True)
             morphio.set_raise_warnings(True)
             super().__init__(filename)
         finally:
