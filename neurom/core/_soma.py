@@ -180,15 +180,8 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         # make sure the above invariant holds
         assert (np.isclose(r, self.points[1, COLS.R]) and np.isclose(r, self.points[2, COLS.R])), \
             'All radii must be the same'
-        # only warn users about invalid format
         if r < 1e-5:
             warnings.warn('Zero radius for {}'.format(self))
-        if not np.isclose(self.points[0, COLS.Y] - self.points[1, COLS.Y], r):
-            warnings.warn(
-                'The second point must be one radius below 0 on the y-plane for {}'.format(self))
-        if not np.isclose(self.points[0, COLS.Y] - self.points[2, COLS.Y], -r):
-            warnings.warn(
-                'The third point must be one radius above 0 on the y-plane for {}'.format(self))
         h = morphmath.point_dist(self.points[1, COLS.XYZ], self.points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
         self.radius = math.sqrt(self.area / (4. * math.pi))

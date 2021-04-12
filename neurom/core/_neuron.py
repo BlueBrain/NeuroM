@@ -30,7 +30,6 @@
 
 from collections import deque
 from itertools import chain
-from pathlib import Path
 
 import morphio
 import numpy as np

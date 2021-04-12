@@ -70,6 +70,15 @@ def test_Soma_ThreePointCylinder():
 
 
 def test_Soma_ThreePointCylinder_invalid_radius():
+    with warnings.catch_warnings(record=True) as w_list:
+        load_neuron(StringIO(u"""
+                        1 1 0   0 0 1e-8 -1
+                        2 1 0 -1e-8 0 1e-8  1
+                        3 1 0 +1e-8 0 1e-8  1"""), reader='swc').soma
+        nt.assert_in('Zero radius for SomaNeuromorphoThreePointCylinders', str(w_list[0]))
+
+
+def test_Soma_ThreePointCylinder_invalid():
     swc_content = StringIO(u"""
                         1 1 0   0 0 1e-8 -1
                         2 1 0 -44 0 1e-8  1
