@@ -29,11 +29,6 @@
 """Module containing NeuroM specific exceptions."""
 
 
-# pylint: disable=unused-import, import-error
-from morphio import (IDSequenceError, MissingParentError, MorphioError, MultipleTrees, RawDataError,
-                     SomaError, UnknownFileType)
-
-
 class NeuroMError(Exception):
     """Base class for NeuroM errors."""
 

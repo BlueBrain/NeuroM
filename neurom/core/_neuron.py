@@ -470,6 +470,6 @@ class Neuron(morphio.mut.Morphology):
     def __str__(self):
         """Return a string representation."""
         return 'Neuron <soma: %s, n_neurites: %d>' % \
-            ('1', len(self.neurites))
+            (self.soma, len(self.neurites))
 
     __repr__ = __str__

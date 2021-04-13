@@ -34,6 +34,32 @@ from neurom import morphmath as mm
 from neurom.morphmath import principal_direction_extent
 
 
+def is_monotonic(neurite, tol):
+    """Check if neurite tree is monotonic.
+
+    If each child has smaller or equal diameters from its parent
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tol(float): tolerance
+
+    Returns:
+        True if neurite monotonic
+    """
+    for node in neurite.iter_sections():
+        # check that points in section satisfy monotonicity
+        sec = node.points
+        for point_id in range(len(sec) - 1):
+            if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
+                return False
+        # Check that section boundary points satisfy monotonicity
+        if(node.parent is not None and
+           sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol):
+            return False
+
+    return True
+
+
 def is_flat(neurite, tol, method='tolerance'):
     """Check if neurite is flat using the given method.
 
@@ -174,6 +200,19 @@ def get_flat_neurites(neuron, tol=0.1, method='ratio'):
     return [n for n in neuron.neurites if is_flat(n, tol, method)]
 
 
+def get_nonmonotonic_neurites(neuron, tol=1e-6):
+    """Get neurites that are not monotonic.
+
+    Args:
+        neuron(Neuron): neuron to operate on
+        tol(float): the tolerance or the ratio
+
+    Returns:
+        list of neurites that do not satisfy monotonicity test
+    """
+    return [n for n in neuron.neurites if not is_monotonic(n, tol)]
+
+
 def get_back_tracking_neurites(neuron):
     """Get neurites that have back-tracks.
 
@@ -182,7 +221,7 @@ def get_back_tracking_neurites(neuron):
     cause issues with meshing algorithms.
 
     Args:
-        neurite(Neurite): neurite to operate on
+        neuron(Neuron): neurite to operate on
 
     Returns:
         List of neurons with backtracks

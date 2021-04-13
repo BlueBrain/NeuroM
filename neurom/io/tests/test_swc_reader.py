@@ -30,11 +30,11 @@ from pathlib import Path
 
 import numpy as np
 
+from morphio import RawDataError, MorphioError
 from neurom import load_neuron, NeuriteType
 from numpy.testing import assert_array_equal, assert_equal
 
 from nose import tools as nt
-from neurom.exceptions import RawDataError, MorphioError
 
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'

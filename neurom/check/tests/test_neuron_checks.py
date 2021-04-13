@@ -42,7 +42,6 @@ DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
 ASC_PATH = DATA_PATH / 'neurolucida'
 H5V1_PATH = DATA_PATH / 'h5/v1'
-MORPHIO_OFFSET = -2
 
 
 
@@ -209,12 +208,12 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    bad_ids = [[2, 23, 44, 65], [2], [2], [2], [2]]
+    bad_ids = [[0, 21, 42, 63], [0], [0], [0], [0]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
         nt.assert_equal(ids.info,
-                        [(id + MORPHIO_OFFSET, 0) for id in bad_ids[i]])
+                        [(id, 0) for id in bad_ids[i]])
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -226,9 +225,9 @@ def test_nonzero_segment_lengths_threshold():
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
 
-    bad_ids = [(2, 0), (23, 0), (38, 9), (44, 0), (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)]
+    bad_ids = [(0, 0), (21, 0), (36, 9), (42, 0), (52, 7), (60, 2), (63, 0), (70, 4), (76, 6)]
     nt.assert_equal(ids.info,
-                    [(id + MORPHIO_OFFSET, val) for id, val in bad_ids])
+                    [(id, val) for id, val in bad_ids])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -249,7 +248,7 @@ def test_nonzero_section_lengths_bad_data():
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
     nt.ok_(not ids.status)
-    nt.assert_equal(ids.info, [15 + MORPHIO_OFFSET])
+    nt.assert_equal(ids.info, [13])
 
 
 def test_nonzero_section_lengths_threshold():

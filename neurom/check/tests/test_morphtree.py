@@ -54,43 +54,13 @@ def _make_flat(neuron):
 
 def _make_monotonic(neuron):
     for neurite in neuron.neurites:
-        for node in neurite.iter_sections():
-            sec = node.points
-            if node.parent is not None:
-                sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
-            for point_id in range(len(sec) - 1):
-                sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
-
-
-def _generate_neurite(mode):
-
-    def new_radius(prev_radius, mode):
-        if mode == 0:
-            return prev_radius/2.
-        elif mode == 1:
-            return prev_radius
-        else:
-            return prev_radius * 2.
-
-    def fake_tree(init_radius, mode):
-
-        radius = init_radius
-
-        sec = []
-        for _ in range(5):
-            sec.append([0, 0, 0, radius, 0, 0])
-            radius = new_radius(radius, mode)
-
-        return Section(np.array(sec))
-
-    radius = 1.
-
-    tree = fake_tree(radius, mode)
-    tree.add_child(fake_tree(tree.points[-1][COLS.R], mode))
-    tree.add_child(fake_tree(tree.points[-1][COLS.R], mode))
-    tree.type = NeuriteType.undefined
-
-    return Neurite(tree)
+        for section in neurite.iter_sections():
+            points = section.points
+            if section.parent is not None:
+                points[0][COLS.R] = section.parent.points[-1][COLS.R] / 2
+            for point_id in range(len(points) - 1):
+                points[point_id + 1][COLS.R] = points[point_id][COLS.R] / 2.
+            section.points = points
 
 
 def _generate_back_track_tree(n, dev):
@@ -121,12 +91,68 @@ def _generate_back_track_tree(n, dev):
     return neuron
 
 
-# def test_is_flat():
+def test_is_monotonic():
+    # tree with decreasing radii
+    neuron = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 0.99)
+        (
+          (0 0 0 0.99)
+          (0 0 0 0.1)
+          |
+          (0 0 0 0.5)
+          (0 0 0 0.2)
+        ))"""), reader='asc')
+    nt.assert_true(mt.is_monotonic(neuron.neurites[0], 1e-6))
 
-#     neu_tree = load_neuron(Path(SWC_PATH, 'Neuron.swc')).neurites[0]
+    # tree with equal radii
+    neuron = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 1.0)
+        (
+          (0 0 0 1.0)
+          (0 0 0 1.0)
+          |
+          (0 0 0 1.0)
+          (0 0 0 1.0)
+        ))"""), reader='asc')
+    nt.assert_true(mt.is_monotonic(neuron.neurites[0], 1e-6))
 
-#     nt.assert_false(mt.is_flat(neu_tree, 1e-6, method='tolerance'))
-#     nt.assert_false(mt.is_flat(neu_tree, 0.1, method='ratio'))
+    # tree with increasing radii
+    neuron = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 1.01)
+        (
+          (0 0 0 1.1)
+          (0 0 0 1.5)
+          |
+          (0 0 0 0.3)
+          (0 0 0 0.1)
+        ))"""), reader='asc')
+    nt.assert_false(mt.is_monotonic(neuron.neurites[0], 1e-6))
+
+    # Tree with larger child initial point
+    neuron = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 0.75)
+        (0 0 0 0.5)
+        (0 0 0 0.25)
+        (
+          (0 0 0 0.375)
+          (0 0 0 0.125)
+          (0 0 0 0.625)
+        ))"""), reader='asc')
+    nt.assert_false(mt.is_monotonic(neuron.neurites[0], 1e-6))
+
+
+def test_is_flat():
+    neu_tree = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+    nt.assert_false(mt.is_flat(neu_tree.neurites[0], 1e-6, method='tolerance'))
+    nt.assert_false(mt.is_flat(neu_tree.neurites[0], 0.1, method='ratio'))
 
 
 def test_is_back_tracking():
@@ -166,7 +192,13 @@ def test_get_flat_neurites():
     nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 4)
 
 
-def test_get_back_tracking_neurites():
+def test_get_nonmonotonic_neurites():
+    n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 4)
+    _make_monotonic(n)
+    nt.assert_equal(len(mt.get_nonmonotonic_neurites(n)), 0)
 
+
+def test_get_back_tracking_neurites():
     n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     nt.assert_equal(len(mt.get_back_tracking_neurites(n)), 4)

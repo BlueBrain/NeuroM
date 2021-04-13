@@ -28,7 +28,6 @@
 
 """Core functionality and data types of NeuroM."""
 
-from neurom.exceptions import SomaError
 from .types import NeuriteType, NeuriteIter
 from ._soma import Soma
 from ._neuron import (Section, Neurite, Neuron, iter_neurites,

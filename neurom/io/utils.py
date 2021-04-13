@@ -38,9 +38,10 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
+from morphio import MorphioError
 from neurom.core._neuron import Neuron
 from neurom.core.population import Population
-from neurom.exceptions import MorphioError, NeuroMError
+from neurom.exceptions import NeuroMError
 
 L = logging.getLogger(__name__)
 

@@ -31,9 +31,9 @@ import warnings
 from io import StringIO
 
 import numpy as np
+from morphio import MorphioError
 from neurom import load_neuron
 from neurom.core import _soma
-from neurom.exceptions import MorphioError, SomaError
 from nose import tools as nt
 from numpy.testing import assert_array_equal
 

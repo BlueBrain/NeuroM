@@ -2,6 +2,9 @@
 Migration to v2 version
 =======================
 
+- Soma is not considered as a section anymore. Soma is skipped when iterating over neuron's
+  sections. It means that section indexing offset needs to be adjusted by
+  ``-(number of soma sections)`` which is usually is ``-1``.
 - drop ``benchmarks``
 - drop ``neurom.check.structural_checks`` as MorphIO does not allow to load invalid morphologies,
   and it does not give access to raw data.
@@ -15,4 +18,4 @@ Migration to v2 version
     The following is not an invalid morphology anymore:
     - 2 point soma
     - unknown soma type
-    - non-consequent ids
+    - non-sequential ids

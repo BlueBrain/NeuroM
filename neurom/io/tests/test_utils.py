@@ -32,10 +32,10 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
+from morphio import MissingParentError, RawDataError, SomaError, UnknownFileType, MorphioError
 from neurom import COLS, get, load_neuron
 from neurom.core import Neuron
-from neurom.exceptions import (MissingParentError, NeuroMError, RawDataError, SomaError,
-                               UnknownFileType, MorphioError)
+from neurom.exceptions import NeuroMError
 from neurom.io import utils
 from nose import tools as nt
 
