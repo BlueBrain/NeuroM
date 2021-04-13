@@ -33,7 +33,6 @@ from pathlib import Path
 import numpy as np
 from neurom import load_neuron
 from neurom.check import morphtree as mt
-from neurom.core import Neurite, NeuriteType, Section
 from neurom.core.dataformat import COLS
 from nose import tools as nt
 
@@ -46,7 +45,7 @@ def _make_flat(neuron):
     class Flattenizer:
         def __call__(self, points):
             points = deepcopy(points)
-            points[:, COLS.Z] = 0.;
+            points[:, COLS.Z] = 0.
             return points
 
     return neuron.transform(Flattenizer())
@@ -124,10 +123,10 @@ def test_is_monotonic():
     neuron = load_neuron(StringIO(u"""
         ((Dendrite)
         (0 0 0 1.0)
-        (0 0 0 1.01)
+        (0 0 0 1.0)
         (
           (0 0 0 1.1)
-          (0 0 0 1.5)
+          (0 0 0 1.1)
           |
           (0 0 0 0.3)
           (0 0 0 0.1)
@@ -180,14 +179,11 @@ def test_is_back_tracking():
 
 
 def test_get_flat_neurites():
-
     n = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
-
     nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 0)
     nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 0)
 
     n = _make_flat(n)
-
     nt.assert_equal(len(mt.get_flat_neurites(n, 1e-6, method='tolerance')), 4)
     nt.assert_equal(len(mt.get_flat_neurites(n, 0.1, method='ratio')), 4)
 
