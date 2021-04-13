@@ -6,9 +6,9 @@ from nose import tools as nt
 from nose.tools import assert_raises, ok_
 from numpy.testing import assert_array_equal
 
+from morphio import RawDataError, SomaError
 import neurom as nm
 from neurom import load_neuron
-from neurom.exceptions import RawDataError, SomaError
 
 DATA_PATH = Path(Path(__file__).parent, '../../../test_data')
 NEUROLUCIDA_PATH = Path(DATA_PATH, 'neurolucida')
