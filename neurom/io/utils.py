@@ -198,7 +198,7 @@ def load_neurons(neurons,
                 L.info('Ignoring exception "%s" for file %s',
                        e, f.name)
                 continue
-            raise NeuroMError(e)
+            raise NeuroMError('`load_neurons` failed') from e
 
     return population_class(pop, name=name)
 

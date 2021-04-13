@@ -229,7 +229,7 @@ class SomaSimpleContour(Soma):
 
 
 def make_soma(morphio_soma):
-    """Make a soma object from a MorphIO soma
+    """Make a soma object from a MorphIO soma.
 
     Args:
         morphio_soma(morphio.Soma): soma instance of MorphIO
