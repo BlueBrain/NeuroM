@@ -47,13 +47,13 @@ class NeuriteIter(OrderedEnum):
 # for backward compatibility with 'v1' version
 class NeuriteType(IntEnum):
     """Type of neurite."""
-    axon = int(SectionType.axon)
-    apical_dendrite = int(SectionType.apical_dendrite)
-    basal_dendrite = int(SectionType.basal_dendrite)
-    undefined = int(SectionType.undefined)
+    axon = SectionType.axon
+    apical_dendrite = SectionType.apical_dendrite
+    basal_dendrite = SectionType.basal_dendrite
+    undefined = SectionType.undefined
     soma = 31
     all = 32
-    custom = int(SectionType.custom5)
+    custom = SectionType.custom5
 
 
 NEURITES = (NeuriteType.all,

@@ -31,6 +31,7 @@ import math
 import warnings
 
 import numpy as np
+from morphio import SomaError
 from neurom import SomaType, morphmath
 from neurom.core.dataformat import COLS
 
@@ -55,7 +56,9 @@ class Soma:
     @property
     def center(self):
         """Obtain the center from the first stored point."""
-        return self._morphio_soma.points[0]
+        if len(self._morphio_soma.points) > 0:
+            return self._morphio_soma.points[0]
+        return None
 
     def iter(self):
         """Iterator to soma contents."""
@@ -69,11 +72,11 @@ class Soma:
                               axis=1)
 
     @points.setter
-    def points(self, value):
+    def points(self, values):
         """Set the points."""
-        value = np.asarray(value)
-        self._morphio_soma.points = np.copy(value[:, COLS.XYZ])
-        self._morphio_soma.diameters = np.copy(value[:, COLS.R]) * 2
+        values = np.asarray(values)
+        self._morphio_soma.points = np.copy(values[:, COLS.XYZ])
+        self._morphio_soma.diameters = np.copy(values[:, COLS.R]) * 2
 
     @property
     def volume(self):
@@ -226,16 +229,20 @@ class SomaSimpleContour(Soma):
 
 
 def make_soma(morphio_soma):
-    """Make a soma object from a set of points.
+    """Make a soma object from a MorphIO soma
 
     Args:
         morphio_soma(morphio.Soma): soma instance of MorphIO
     """
-    SomaBuilders = {
+    soma_builders = {
         SomaType.SOMA_SINGLE_POINT: SomaSinglePoint,
         SomaType.SOMA_CYLINDERS: SomaCylinders,
         SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: SomaNeuromorphoThreePointCylinders,
         SomaType.SOMA_SIMPLE_CONTOUR: SomaSimpleContour,
+        SomaType.SOMA_UNDEFINED: Soma,
     }
 
-    return SomaBuilders.get(morphio_soma.type, SomaSimpleContour)(morphio_soma)
+    builder = soma_builders.get(morphio_soma.type)
+    if builder is None:
+        raise SomaError(f'No NeuroM constructor for MorphIO soma type: {morphio_soma.type}')
+    return builder(morphio_soma)

@@ -31,11 +31,31 @@ import warnings
 from io import StringIO
 
 import numpy as np
-from morphio import MorphioError
+from morphio import MorphioError, SomaError
 from neurom import load_neuron
 from neurom.core import _soma
+from mock import Mock
 from nose import tools as nt
 from numpy.testing import assert_array_equal
+
+
+def test_no_soma_builder():
+    morphio_soma = Mock()
+    morphio_soma.type = None
+    nt.assert_raises(SomaError, _soma.make_soma, morphio_soma)
+    try:
+        _soma.make_soma(morphio_soma)
+    except SomaError as e:
+        nt.assert_in('No NeuroM constructor for MorphIO soma type', e.args[0])
+
+
+def test_no_soma():
+    sm = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 2.0))"""), reader='asc').soma
+    nt.assert_is_none(sm.center)
+    nt.eq_(sm.points.shape, (0, 4))
 
 
 def test_Soma_SinglePoint():

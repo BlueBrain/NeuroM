@@ -38,7 +38,7 @@ setup(
     install_requires=[
         'click>=7.0',
         'matplotlib>=3.2.1',
-        'morphio>=3.0.1',
+        'morphio>=3.0.2',
         'numpy>=1.8.0',
         'pandas>=1.0.5',
         'pyyaml>=3.10',
@@ -70,7 +70,4 @@ setup(
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     setup_requires=['setuptools_scm'],
-
-    # 2.0.1 allows for a pip requirement formatted like "neurom>=2.0.0"
-    version="2.0.1.dev9",
 )

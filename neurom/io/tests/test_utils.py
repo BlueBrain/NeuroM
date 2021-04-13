@@ -97,7 +97,7 @@ def test_load_neurons():
     for i, nrn in enumerate(nrns):
         nt.assert_equal(nrn.name, FILES[i].stem)
 
-    nt.assert_raises(MissingParentError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+    nt.assert_raises(NeuroMError, utils.load_neurons, (MISSING_PARENTS_FILE,))
 
     # Single string
     nrns = utils.load_neurons(str(FILES[0]), neuron_loader=_mock_load_neuron)
@@ -129,7 +129,7 @@ def test_load_neurons():
 
 
 def test_ignore_exceptions():
-    nt.assert_raises(RawDataError, utils.load_neurons, (MISSING_PARENTS_FILE,))
+    nt.assert_raises(NeuroMError, utils.load_neurons, (MISSING_PARENTS_FILE,))
     pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=(RawDataError,))
     nt.eq_(len(pop), 0)
 

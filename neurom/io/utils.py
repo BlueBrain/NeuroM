@@ -198,7 +198,7 @@ def load_neurons(neurons,
                 L.info('Ignoring exception "%s" for file %s',
                        e, f.name)
                 continue
-            raise
+            raise NeuroMError(e)
 
     return population_class(pop, name=name)
 
@@ -207,7 +207,7 @@ def _get_file(stream, extension):
     """Returns the filename of the file to read."""
     if isinstance(stream, str):
         stream = StringIO(stream)
-    fd, temp_file = tempfile.mkstemp(str(uuid.uuid4()) + '.' + extension,
+    fd, temp_file = tempfile.mkstemp(suffix=str(uuid.uuid4()) + '.' + extension,
                                      prefix='neurom-')
     os.close(fd)
     with open(temp_file, 'w') as fd:

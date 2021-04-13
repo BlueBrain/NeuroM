@@ -54,7 +54,9 @@ class Section:
     @property
     def parent(self):
         """Returns the parent section if non root section else None."""
-        return None if self.morphio_section.is_root else Section(self.morphio_section.parent)
+        if self.morphio_section.is_root:
+            return None
+        return Section(self.morphio_section.parent)
 
     @property
     def children(self):
@@ -62,7 +64,7 @@ class Section:
         return [Section(child) for child in self.morphio_section.children]
 
     def append_section(self, section):
-        """Appends a section.
+        """Appends a section to the current section object.
 
         Args:
             section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
@@ -72,7 +74,7 @@ class Section:
         return self.morphio_section.append_section(section)
 
     def is_forking_point(self):
-        """Is tree a forking point?"""
+        """Is this section a forking point?"""
         return len(self.children) > 1
 
     def is_bifurcation_point(self):
@@ -141,11 +143,11 @@ class Section:
 
     def __hash__(self):
         """Hash of its id."""
-        return hash(self.id)
+        return self.id
 
     def __nonzero__(self):
         """If has children."""
-        return bool(self.children)
+        return self.morphio_section is not None
 
     __bool__ = __nonzero__
 
@@ -190,13 +192,11 @@ class Section:
         """
         return sum(morphmath.segment_volume(s) for s in iter_segments(self))
 
-    def __str__(self):
+    def __repr__(self):
         """Text representation."""
         parent_id = None if self.parent is None else self.parent.id
         return (f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
                 f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>')
-
-    __repr__ = __str__
 
 
 # NRN simulator iteration order
@@ -400,11 +400,9 @@ class Neurite:
 
     __bool__ = __nonzero__
 
-    def __str__(self):
+    def __repr__(self):
         """Return a string representation."""
         return 'Neurite <type: %s>' % self.type
-
-    __repr__ = __str__
 
 
 class Neuron(morphio.mut.Morphology):
@@ -467,9 +465,7 @@ class Neuron(morphio.mut.Morphology):
         # pylint: disable=dangerous-default-value
         return Neuron(self, self.name)
 
-    def __str__(self):
+    def __repr__(self):
         """Return a string representation."""
         return 'Neuron <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
-
-    __repr__ = __str__

@@ -2,6 +2,7 @@
 Migration to v2 version
 =======================
 
+- ``Neuron`` object is now extends ``morphio.Morphology``.
 - Soma is not considered as a section anymore. Soma is skipped when iterating over neuron's
   sections. It means that section indexing offset needs to be adjusted by
   ``-(number of soma sections)`` which is usually is ``-1``.
