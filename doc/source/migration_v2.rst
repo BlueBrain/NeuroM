@@ -18,5 +18,4 @@ Migration to v2 version
 - Validation of morphologies changed.
     The following is not an invalid morphology anymore:
     - 2 point soma
-    - unknown soma type
     - non-sequential ids
