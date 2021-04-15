@@ -28,8 +28,8 @@
 
 """Type enumerations."""
 
-from enum import unique
-
+from enum import IntEnum, unique
+from morphio import SectionType
 from neurom.utils import OrderedEnum
 
 
@@ -44,22 +44,22 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-@unique
-class NeuriteType(OrderedEnum):
-    """Enum representing valid tree types."""
-    undefined = 0
-    soma = 1
-    axon = 2
-    basal_dendrite = 3
-    apical_dendrite = 4
-    custom = 5
+# for backward compatibility with 'v1' version
+class NeuriteType(IntEnum):
+    """Type of neurite."""
+    axon = SectionType.axon
+    apical_dendrite = SectionType.apical_dendrite
+    basal_dendrite = SectionType.basal_dendrite
+    undefined = SectionType.undefined
+    soma = 31
     all = 32
+    custom = SectionType.custom5
 
 
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
-            NeuriteType.basal_dendrite,
-            NeuriteType.apical_dendrite)
+            NeuriteType.apical_dendrite,
+            NeuriteType.basal_dendrite)
 
 ROOT_ID = -1
 

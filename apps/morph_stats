@@ -33,8 +33,9 @@ import json
 import logging
 import sys
 
+from morphio import SomaError
 import neurom as nm
-from neurom import exceptions
+from neurom.exceptions import ConfigError
 from neurom.apps import get_config
 from neurom.apps.morph_stats import (extract_stats, generate_flattened_dict,
                                      get_header, sanitize_config, full_config,
@@ -45,7 +46,7 @@ from neurom.utils import NeuromJSON
 L = logging.getLogger(__name__)
 
 IGNORABLE_EXCEPTIONS = {
-    'SomaError': exceptions.SomaError,
+    'SomaError': SomaError,
 }
 
 
@@ -95,7 +96,7 @@ def main(args):
         try:
             config = get_config(args.config, EXAMPLE_CONFIG)
             config = sanitize_config(config)
-        except exceptions.ConfigError as e:
+        except ConfigError as e:
             L.error(str(e))
             sys.exit(1)
 

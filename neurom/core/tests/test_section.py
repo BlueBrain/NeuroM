@@ -26,66 +26,82 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import math
+from pathlib import Path
 from nose import tools as nt
 import neurom as nm
-from neurom.core import Section
+from numpy.testing import assert_array_equal
 import numpy as np
 
-
-RADIUS = 4.
-POINTS = np.array([[0., 0., 0., RADIUS],
-                   [0., 0., 1., RADIUS],
-                   [0., 0., 2., RADIUS],
-                   [0., 0., 3., RADIUS],
-                   [1., 0., 3., RADIUS],
-                   [2., 0., 3., RADIUS],
-                   [3., 0., 3., RADIUS]])
-
-REF_LEN = 6.0
+SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 
 
-def test_init_empty():
+def test_section_base_func():
+    nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
+    section = nrn.sections[0]
 
-    sec = Section([])
-    nt.ok_(sec.id is None)
-    nt.eq_(sec.type, nm.NeuriteType.undefined)
-    nt.eq_(len(sec.points), 0)
-
-
-def test_section_id():
-
-    sec = Section([], section_id=42)
-    nt.eq_(sec.id, 42)
+    nt.eq_(section.type, nm.NeuriteType.basal_dendrite)
+    nt.eq_(section.id, 0)
+    assert_array_equal(section.points, [[0, 0, 0, 1], [0, 5, 0, 1]])
+    nt.assert_almost_equal(section.length, 5)
+    nt.assert_almost_equal(section.area, 31.41592653589793)
+    nt.assert_almost_equal(section.volume, 15.707963267948964)
 
 
-def test_section_type():
+def test_section_tree():
+    nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
 
-    sec = Section([], section_type=nm.AXON)
-    nt.eq_(sec.type, nm.AXON)
+    nt.assert_is_none(nrn.sections[0].parent)
+    nt.assert_equal(nrn.sections[0], nrn.sections[0].children[0].parent)
 
-    sec = Section([], section_type=nm.BASAL_DENDRITE)
-    nt.eq_(sec.type, nm.BASAL_DENDRITE)
+    assert_array_equal([s.is_root() for s in nrn.sections],
+                       [True, False, False, True, False, False])
+    assert_array_equal([s.is_leaf() for s in nrn.sections],
+                       [False, True, True, False, True, True])
+    assert_array_equal([s.is_forking_point() for s in nrn.sections],
+                       [True, False, False, True, False, False])
+    assert_array_equal([s.is_bifurcation_point() for s in nrn.sections],
+                       [True, False, False, True, False, False])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ipreorder()],
+                       [0, 1, 2])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ipostorder()],
+                       [1, 2, 0])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.iupstream()],
+                       [0])
+    assert_array_equal([s.id for s in nrn.sections[2].iupstream()],
+                       [2, 0])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ileaf()],
+                       [1, 2])
+    assert_array_equal([s.id for s in nrn.sections[2].ileaf()],
+                       [2])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.iforking_point()],
+                       [0])
+    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ibifurcation_point()],
+                       [0])
 
 
-def test_section_length():
+def test_append_section():
+    n = nm.load_neuron(SWC_PATH / 'simple.swc')
+    s = n.sections[0]
 
-    sec = Section(POINTS)
-    nt.assert_almost_equal(sec.length, REF_LEN)
+    s.append_section(n.sections[-1])
+    nt.assert_equal(len(s.children), 3)
+    nt.assert_equal(s.children[-1].id, 6)
+    nt.assert_equal(s.children[-1].type, n.sections[-1].type)
 
-
-def test_section_area():
-
-    sec = Section(POINTS)
-    area = 2 * math.pi * RADIUS * REF_LEN
-    nt.assert_almost_equal(sec.area, area)
-
-
-def test_section_volume():
-
-    sec = Section(POINTS)
-    volume = math.pi * RADIUS * RADIUS * REF_LEN
-    nt.assert_almost_equal(sec.volume, volume)
+    s.append_section(n.sections[-1].morphio_section)
+    nt.assert_equal(len(s.children), 4)
+    nt.assert_equal(s.children[-1].id, 7)
+    nt.assert_equal(s.children[-1].type, n.sections[-1].type)
 
 
-
+def test_set_points():
+    n = nm.load_neuron(SWC_PATH / 'simple.swc')
+    s = n.sections[0]
+    s.points = np.array([
+        [0, 5, 0, 2],
+        [0, 7, 0, 2],
+    ])
+    assert_array_equal(s.points, np.array([
+        [0, 5, 0, 2],
+        [0, 7, 0, 2],
+    ]))

@@ -204,7 +204,7 @@ def get_nonmonotonic_neurites(neuron, tol=1e-6):
     """Get neurites that are not monotonic.
 
     Args:
-        neurite(Neurite): neurite to operate on
+        neuron(Neuron): neuron to operate on
         tol(float): the tolerance or the ratio
 
     Returns:
@@ -221,7 +221,7 @@ def get_back_tracking_neurites(neuron):
     cause issues with meshing algorithms.
 
     Args:
-        neurite(Neurite): neurite to operate on
+        neuron(Neuron): neurite to operate on
 
     Returns:
         List of neurons with backtracks

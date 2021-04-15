@@ -20,7 +20,7 @@ from neurom.view.view import TREE_COLOR
 def draw(obj, plane='3d', inline=False, **kwargs):
     """Draw the object using the given plane.
 
-    obj (neurom.Neuron, neurom.Tree): neuron or tree
+    obj (neurom.Neuron, neurom.Section): neuron or section
     plane (str): a string representing the 2D plane (example: 'xy')
                  or '3d', '3D' for a 3D view
 

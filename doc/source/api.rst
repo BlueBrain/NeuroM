@@ -32,5 +32,25 @@ Code Documentation
 .. toctree::
    :hidden:
 
-   api-public
-   api-dev
+   Introduction <self>
+
+.. autosummary::
+   :nosignatures:
+   :toctree: _neurom_build
+
+   neurom.morphmath
+   neurom.features
+   neurom.features.neuritefunc
+   neurom.features.sectionfunc
+   neurom.features.bifurcationfunc
+   neurom.check.morphtree
+   neurom.check.neuron_checks
+   neurom.core.types
+   neurom.core._neuron
+   neurom.core._soma
+   neurom.core.point
+   neurom.core.dataformat
+   neurom.io.utils
+   neurom.view
+   neurom.view.common
+   neurom.view.view

@@ -42,7 +42,6 @@ DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
 ASC_PATH = DATA_PATH / 'neurolucida'
 H5V1_PATH = DATA_PATH / 'h5/v1'
-MORPHIO_OFFSET = 0
 
 
 
@@ -166,17 +165,6 @@ def test_has_no_flat_neurites():
     nt.assert_false(nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio'))
 
 
-def test_has_all_monotonic_neurites():
-
-    _, n = _load_neuron('Neuron.swc')
-
-    nt.assert_false(nrn_chk.has_all_monotonic_neurites(n))
-
-    _make_monotonic(n)
-
-    nt.assert_true(nrn_chk.has_all_monotonic_neurites(n))
-
-
 def test_nonzero_neurite_radii_good_data():
     files = ['Neuron.swc',
              'Single_apical.swc',
@@ -202,11 +190,8 @@ def test_has_all_nonzero_neurite_radii_threshold():
 
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
-    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
-    nt.assert_equal(ids.info, [(20, 10), (21, 0),
-                               (22, 0), (22, 6),
-                               (26, 1), (31, 9),
-                               (50, 7)])
+    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.7)
+    nt.assert_equal(ids.info, [(0, 2)])
 
 
 def test_nonzero_segment_lengths_good_data():
@@ -223,12 +208,12 @@ def test_nonzero_segment_lengths_bad_data():
              'Single_axon.swc',
              ]
 
-    bad_ids = [[2, 23, 44, 65], [2], [2], [2], [2]]
+    bad_ids = [[0, 21, 42, 63], [0], [0], [0], [0]]
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
         nt.assert_equal(ids.info,
-                        [(id + MORPHIO_OFFSET, 0) for id in bad_ids[i]])
+                        [(id, 0) for id in bad_ids[i]])
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -240,9 +225,9 @@ def test_nonzero_segment_lengths_threshold():
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
 
-    bad_ids = [(2, 0), (23, 0), (38, 9), (44, 0), (54, 7), (62, 2), (65, 0), (72, 4), (78, 6)]
+    bad_ids = [(0, 0), (21, 0), (36, 9), (42, 0), (52, 7), (60, 2), (63, 0), (70, 4), (76, 6)]
     nt.assert_equal(ids.info,
-                    [(id + MORPHIO_OFFSET, val) for id, val in bad_ids])
+                    [(id, val) for id, val in bad_ids])
 
 
 def test_nonzero_section_lengths_good_data():
@@ -263,7 +248,7 @@ def test_nonzero_section_lengths_bad_data():
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
     nt.ok_(not ids.status)
-    nt.assert_equal(ids.info, [15 + MORPHIO_OFFSET])
+    nt.assert_equal(ids.info, [13])
 
 
 def test_nonzero_section_lengths_threshold():
@@ -309,7 +294,7 @@ def test_has_no_root_node_jumps():
     check = nrn_chk.has_no_root_node_jumps(nrn)
     nt.ok_(not check.status)
     assert_equal(len(check.info), 1)
-    assert_equal(check.info[0][0], 1)
+    assert_equal(check.info[0][0], 0)
     assert_array_equal(check.info[0][1], [[0, 3, 0]])
 
     nt.ok_(nrn_chk.has_no_root_node_jumps(nrn, radius_multiplier=4).status)
@@ -454,5 +439,24 @@ def test_has_multifurcation():
     check_ = nrn_chk.has_multifurcation(nrn)
     nt.ok_(not check_.status)
     info = check_.info
-    assert_array_equal(info[0][0], 1)
+    assert_array_equal(info[0][0], 0)
     assert_array_equal(info[0][1][:, COLS.XYZR], [[0.0, 13.0, 0.0, 1.0]])
+
+
+def test_single_children():
+    neuron = load_neuron("""
+( (Color Blue)
+  (Axon)
+  (0 5 0 2)
+  (2 9 0 2)
+  (0 13 0 2)
+  (
+    (2 13 0 2)
+    (4 13 0 2)
+    (6 13 0 2)
+  )
+)
+""", "asc")
+    result = nrn_chk.has_no_single_children(neuron)
+    nt.assert_equal(result.status, False)
+    nt.assert_equal(result.info, [0])

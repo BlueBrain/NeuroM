@@ -178,7 +178,7 @@ For example,
 Check data validity
 -------------------
 
-The :doc:`morph_check<morph_check>` application applies some structural and semantic
+The :doc:`morph_check<morph_check>` application applies some semantic
 checks to morphology data files in order to
 determine whether it is suitable to construct a neuron structure and whether certain
 defects within the structure are detected. It can be invoked from the command line, and

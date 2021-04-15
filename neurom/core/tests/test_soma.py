@@ -31,11 +31,31 @@ import warnings
 from io import StringIO
 
 import numpy as np
+from morphio import MorphioError, SomaError
 from neurom import load_neuron
 from neurom.core import _soma
-from neurom.exceptions import RawDataError, SomaError
+from mock import Mock
 from nose import tools as nt
 from numpy.testing import assert_array_equal
+
+
+def test_no_soma_builder():
+    morphio_soma = Mock()
+    morphio_soma.type = None
+    nt.assert_raises(SomaError, _soma.make_soma, morphio_soma)
+    try:
+        _soma.make_soma(morphio_soma)
+    except SomaError as e:
+        nt.assert_in('No NeuroM constructor for MorphIO soma type', e.args[0])
+
+
+def test_no_soma():
+    sm = load_neuron(StringIO(u"""
+        ((Dendrite)
+        (0 0 0 1.0)
+        (0 0 0 2.0))"""), reader='asc').soma
+    nt.assert_is_none(sm.center)
+    nt.eq_(sm.points.shape, (0, 4))
 
 
 def test_Soma_SinglePoint():
@@ -60,22 +80,34 @@ def test_Soma_contour():
 
 
 def test_Soma_ThreePointCylinder():
-    with warnings.catch_warnings(record=True):
-        sm = load_neuron(StringIO(u"""1 1 0   0 0 44 -1
-                                      2 1 0 -44 0 44  1
-                                      3 1 0 +44 0 44  1"""), reader='swc').soma
-
+    sm = load_neuron(StringIO(u"""1 1 0   0 0 44 -1
+                                  2 1 0 -44 0 44  1
+                                  3 1 0 +44 0 44  1"""), reader='swc').soma
     nt.ok_('SomaNeuromorphoThreePointCylinders' in str(sm))
     nt.ok_(isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders))
     nt.eq_(list(sm.center), [0, 0, 0])
     nt.eq_(sm.radius, 44)
 
-def test_Soma_ThreePointCylinder_small_radius():
-    with warnings.catch_warnings(record=True):
-        sm = load_neuron(StringIO(u"""
-                1 1 0   0 0 1e-8 -1
-                2 1 0 -44 0 1e-8  1
-                3 1 0 +44 0 1e-8  1"""), reader='swc').soma
+
+def test_Soma_ThreePointCylinder_invalid_radius():
+    with warnings.catch_warnings(record=True) as w_list:
+        load_neuron(StringIO(u"""
+                        1 1 0   0 0 1e-8 -1
+                        2 1 0 -1e-8 0 1e-8  1
+                        3 1 0 +1e-8 0 1e-8  1"""), reader='swc').soma
+        nt.assert_in('Zero radius for SomaNeuromorphoThreePointCylinders', str(w_list[0]))
+
+
+def test_Soma_ThreePointCylinder_invalid():
+    swc_content = StringIO(u"""
+                        1 1 0   0 0 1e-8 -1
+                        2 1 0 -44 0 1e-8  1
+                        3 1 0 +44 0 1e-8  1""")
+    nt.assert_raises(MorphioError, load_neuron, swc_content, reader='swc')
+    try:
+        load_neuron(swc_content, reader='swc')
+    except MorphioError as e:
+        nt.assert_in('Warning: the soma does not conform the three point soma spec', e.args[0])
 
 
 def check_SomaC(stream):
@@ -118,21 +150,13 @@ def test_SomaC():
                                        cos=cos_pi_by_4))
 
 
-@nt.raises(RawDataError)
-def test_invalid_soma_points_0_raises_SomaError():
-    with warnings.catch_warnings(record=True):
-        load_neuron(StringIO(u"""((Dendrite)
-                                 (0 0 0 44)
-                                 (0 -44 0 44)
-                                 (0 +44 0 44))"""), reader='asc').soma
-
-
-@nt.raises(SomaError)
-def test_invalid_soma_points_2_raises_SomaError():
-    with warnings.catch_warnings(record=True):
-        load_neuron(StringIO(u"""((CellBody)
-                                 (0 0 0 44)
-                                 (0 +44 0 44))"""), reader='asc').soma
+def test_soma_points_2():
+    load_neuron(StringIO(u"""
+                    1 1 0 0 -10 40 -1
+                    2 1 0 0   0 40  1"""), reader='swc').soma
+    load_neuron(StringIO(u"""((CellBody)
+                             (0 0 0 44)
+                             (0 +44 0 44))"""), reader='asc').soma
 
 
 def test_Soma_Cylinders():
@@ -148,21 +172,6 @@ def test_Soma_Cylinders():
     nt.assert_almost_equal(s.area, 5026.548245743669)
     assert_array_equal(s.center, [0, 0, -10])
     nt.ok_('SomaCylinders' in str(s))
-
-    # cylinder: h = 10, r = 20
-    s = load_neuron(StringIO(u"""
-                1 1 0   0 0 20 -1
-                2 1 0 -10 0 20  1"""), reader='swc').soma
-
-    nt.assert_almost_equal(s.area, 1256.6370614) # see r = 2*h above
-    nt.eq_(list(s.center), [0., 0., 0.])
-
-    #check tapering
-    s = load_neuron(StringIO(u"""
-                1 1 0   0 0  0 -1
-                2 1 0 -10 0 20  1"""), reader='swc').soma
-
-    nt.assert_almost_equal(s.area, 1404.9629462081452) # cone area, not including 'bottom'
 
     # neuromorpho style
     with warnings.catch_warnings(record=True):

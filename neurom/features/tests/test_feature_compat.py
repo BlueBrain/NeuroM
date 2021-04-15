@@ -34,7 +34,7 @@ from itertools import chain
 from pathlib import Path
 
 import neurom as nm
-from neurom.core import Tree
+from neurom.core import Section
 from neurom.core.types import NeuriteType
 from neurom.features import bifurcationfunc as _bf
 from neurom.features import neuritefunc as _nrt
@@ -63,7 +63,7 @@ def get(feat, neurite_format, **kwargs):
     return json_data[neurite_format][feat][neurite_type]
 
 
-def i_chain2(trees, iterator_type=Tree.ipreorder, mapping=None, tree_filter=None):
+def i_chain2(trees, iterator_type=Section.ipreorder, mapping=None, tree_filter=None):
     """Returns a mapped iterator to a collection of trees
     Provides access to all the elements of all the trees
     in one iteration sequence.
@@ -147,7 +147,7 @@ class SectionTreeBase:
                    get('local_bifurcation_angles', self.ref_nrn, neurite_type=t))
 
         ba = [_bf.local_bifurcation_angle(b)
-              for b in i_chain2(self.sec_nrn_trees, iterator_type=Tree.ibifurcation_point)]
+              for b in i_chain2(self.sec_nrn_trees, iterator_type=Section.ibifurcation_point)]
 
         _close(ba, get('local_bifurcation_angles', self.ref_nrn))
 
@@ -160,7 +160,7 @@ class SectionTreeBase:
                    get('remote_bifurcation_angles', self.ref_nrn, neurite_type=t))
 
         ba = [_bf.remote_bifurcation_angle(b)
-              for b in i_chain2(self.sec_nrn_trees, iterator_type=Tree.ibifurcation_point)]
+              for b in i_chain2(self.sec_nrn_trees, iterator_type=Section.ibifurcation_point)]
 
         _close(ba, get('remote_bifurcation_angles', self.ref_nrn))
 

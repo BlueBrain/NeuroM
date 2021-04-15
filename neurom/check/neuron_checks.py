@@ -29,17 +29,14 @@
 """NeuroM neuron checking functions.
 
 Contains functions for checking validity of neuron neurites and somata.
-Tests assumes neurites and/or soma have been succesfully built where applicable,
-i.e. soma- and neurite-related structural tests pass.
 """
 from itertools import chain, islice
 
 import numpy as np
-
 from neurom import NeuriteType
 from neurom.check import CheckResult
-from neurom.check.morphtree import get_flat_neurites, get_nonmonotonic_neurites
-from neurom.core import Tree, iter_neurites, iter_sections, iter_segments
+from neurom.check.morphtree import get_flat_neurites
+from neurom.core import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
@@ -109,19 +106,6 @@ def has_no_flat_neurites(neuron, tol=0.1, method='ratio'):
         CheckResult with result
     """
     return CheckResult(len(get_flat_neurites(neuron, tol, method)) == 0)
-
-
-def has_all_monotonic_neurites(neuron, tol=1e-6):
-    """Check that a neuron has only neurites that are monotonic.
-
-    Arguments:
-        neuron(Neuron): The neuron object to test
-        tol(float): tolerance
-
-    Returns:
-        CheckResult with result
-    """
-    return CheckResult(len(get_nonmonotonic_neurites(neuron, tol)) == 0)
 
 
 def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
@@ -255,7 +239,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         `final_point_count`
     """
     bad_ids = []
-    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Tree.ileaf):
+    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Section.ileaf):
         mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
 
         if mean_radius * multiple_of_mean <= leaf.points[-1, COLS.R]:
@@ -356,4 +340,10 @@ def has_multifurcation(neuron):
     """Check if a section has more than 3 children."""
     bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
                if len(section.children) > 3]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_single_children(neuron):
+    """Check if the neuron has sections with only one child section."""
+    bad_ids = [section.id for section in iter_sections(neuron) if len(section.children) == 1]
     return CheckResult(len(bad_ids) == 0, bad_ids)

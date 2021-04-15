@@ -35,7 +35,7 @@ from itertools import chain
 import numpy as np
 import scipy
 from neurom import morphmath
-from neurom.core import (NeuriteType, Tree, iter_neurites, iter_sections,
+from neurom.core import (NeuriteType, Section, iter_neurites, iter_sections,
                          iter_segments)
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
@@ -50,7 +50,7 @@ feature = partial(feature, namespace='NEURITEFEATURES')
 L = logging.getLogger(__name__)
 
 
-def _map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreorder):
+def _map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Section.ipreorder):
     """Map `fun` to all the sections in a collection of neurites."""
     return map(fun, iter_sections(neurites,
                                   iterator_type=iterator_type,
@@ -85,7 +85,7 @@ def n_neurites(neurites, neurite_type=NeuriteType.all):
 
 
 @feature(shape=())
-def n_sections(neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreorder):
+def n_sections(neurites, neurite_type=NeuriteType.all, iterator_type=Section.ipreorder):
     """Number of sections in a collection of neurites."""
     return sum(1 for _ in iter_sections(neurites,
                                         iterator_type=iterator_type,
@@ -95,19 +95,19 @@ def n_sections(neurites, neurite_type=NeuriteType.all, iterator_type=Tree.ipreor
 @feature(shape=())
 def n_bifurcation_points(neurites, neurite_type=NeuriteType.all):
     """Number of bifurcation points in a collection of neurites."""
-    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Tree.ibifurcation_point)
+    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=())
 def n_forking_points(neurites, neurite_type=NeuriteType.all):
     """Number of forking points in a collection of neurites."""
-    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Tree.iforking_point)
+    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Section.iforking_point)
 
 
 @feature(shape=())
 def n_leaves(neurites, neurite_type=NeuriteType.all):
     """Number of leaves points in a collection of neurites."""
-    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Tree.ileaf)
+    return n_sections(neurites, neurite_type=neurite_type, iterator_type=Section.ileaf)
 
 
 @feature(shape=(...,))
@@ -134,14 +134,14 @@ def section_lengths(neurites, neurite_type=NeuriteType.all):
 def section_term_lengths(neurites, neurite_type=NeuriteType.all):
     """Termination section lengths in a collection of neurites."""
     return _map_sections(_section_length, neurites, neurite_type=neurite_type,
-                         iterator_type=Tree.ileaf)
+                         iterator_type=Section.ileaf)
 
 
 @feature(shape=(...,))
 def section_bif_lengths(neurites, neurite_type=NeuriteType.all):
     """Bifurcation section lengths in a collection of neurites."""
     return _map_sections(_section_length, neurites, neurite_type=neurite_type,
-                         iterator_type=Tree.ibifurcation_point)
+                         iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
@@ -154,14 +154,14 @@ def section_branch_orders(neurites, neurite_type=NeuriteType.all):
 def section_bif_branch_orders(neurites, neurite_type=NeuriteType.all):
     """Bifurcation section branch orders in a collection of neurites."""
     return _map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type,
-                         iterator_type=Tree.ibifurcation_point)
+                         iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def section_term_branch_orders(neurites, neurite_type=NeuriteType.all):
     """Termination section branch orders in a collection of neurites."""
     return _map_sections(sectionfunc.branch_order, neurites, neurite_type=neurite_type,
-                         iterator_type=Tree.ileaf)
+                         iterator_type=Section.ileaf)
 
 
 @feature(shape=(...,), name='section_path_distances')
@@ -375,7 +375,7 @@ def local_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     return _map_sections(bifurcationfunc.local_bifurcation_angle,
                          neurites,
                          neurite_type=neurite_type,
-                         iterator_type=Tree.ibifurcation_point)
+                         iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
@@ -384,7 +384,7 @@ def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
     return _map_sections(bifurcationfunc.remote_bifurcation_angle,
                          neurites,
                          neurite_type=neurite_type,
-                         iterator_type=Tree.ibifurcation_point)
+                         iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,), name='partition')
@@ -392,7 +392,7 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
     """Partition at bifurcation points of a collection of neurites."""
     return map(bifurcationfunc.bifurcation_partition,
                iter_sections(neurites,
-                             iterator_type=Tree.ibifurcation_point,
+                             iterator_type=Section.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
 
 
@@ -410,14 +410,14 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
     if variant == 'branch-order':
         return map(partition_asymmetry,
                    iter_sections(neurites,
-                                 iterator_type=Tree.ibifurcation_point,
+                                 iterator_type=Section.ibifurcation_point,
                                  neurite_filter=is_type(neurite_type)))
 
     asymmetries = list()
     for neurite in iter_neurites(neurites, filt=is_type(neurite_type)):
         neurite_length = total_length_per_neurite(neurite)[0]
         for section in iter_sections(neurite,
-                                     iterator_type=Tree.ibifurcation_point,
+                                     iterator_type=Section.ibifurcation_point,
                                      neurite_filter=is_type(neurite_type)):
             pathlength_diff = abs(downstream_pathlength(section.children[0]) -
                                   downstream_pathlength(section.children[1]))
@@ -443,7 +443,7 @@ def sibling_ratios(neurites, neurite_type=NeuriteType.all, method='first'):
     """
     return map(lambda bif_point: bifurcationfunc.sibling_ratio(bif_point, method),
                iter_sections(neurites,
-                             iterator_type=Tree.ibifurcation_point,
+                             iterator_type=Section.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
 
 
@@ -456,7 +456,7 @@ def partition_pairs(neurites, neurite_type=NeuriteType.all):
     """
     return map(bifurcationfunc.partition_pair,
                iter_sections(neurites,
-                             iterator_type=Tree.ibifurcation_point,
+                             iterator_type=Section.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
 
 
@@ -471,13 +471,13 @@ def diameter_power_relations(neurites, neurite_type=NeuriteType.all, method='fir
     """
     return (bifurcationfunc.diameter_power_relation(bif_point, method)
             for bif_point in iter_sections(neurites,
-                                           iterator_type=Tree.ibifurcation_point,
+                                           iterator_type=Section.ibifurcation_point,
                                            neurite_filter=is_type(neurite_type)))
 
 
 @feature(shape=(...,))
 def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None,
-                             iterator_type=Tree.ipreorder):
+                             iterator_type=Section.ipreorder):
     """Section radial distances in a collection of neurites.
 
     The iterator_type can be used to select only terminal sections (ileaf)
@@ -496,14 +496,14 @@ def section_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None
 def section_term_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     """Get the radial distances of the termination sections for a collection of neurites."""
     return section_radial_distances(neurites, neurite_type=neurite_type, origin=origin,
-                                    iterator_type=Tree.ileaf)
+                                    iterator_type=Section.ileaf)
 
 
 @feature(shape=(...,))
 def section_bif_radial_distances(neurites, neurite_type=NeuriteType.all, origin=None):
     """Get the radial distances of the bifurcation sections for a collection of neurites."""
     return section_radial_distances(neurites, neurite_type=neurite_type, origin=origin,
-                                    iterator_type=Tree.ibifurcation_point)
+                                    iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
@@ -531,7 +531,7 @@ def terminal_path_lengths_per_neurite(neurites, neurite_type=NeuriteType.all):
     """Get the path lengths to each terminal point per neurite in a collection."""
     return list(sectionfunc.section_path_length(s)
                 for n in iter_neurites(neurites, filt=is_type(neurite_type))
-                for s in iter_sections(n, iterator_type=Tree.ileaf))
+                for s in iter_sections(n, iterator_type=Section.ileaf))
 
 
 @feature(shape=(...,), name='neurite_volumes')

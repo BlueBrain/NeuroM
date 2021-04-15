@@ -57,11 +57,14 @@ Examples:
 """
 
 import logging as _logging
+from morphio import SomaType, Morphology
 
-from .core import (NeuriteType, graft_neuron, iter_neurites, iter_sections,
-                   iter_segments, Neuron)
-from .core.dataformat import COLS
+from neurom.core.dataformat import COLS
+from neurom.core.types import NeuriteType
+
+from .core import graft_neuron, iter_neurites, iter_sections, iter_segments
 from .core.types import NEURITES as NEURITE_TYPES
+from .core.types import NeuriteIter
 from .features import get
 from .io.utils import NeuronLoader, load_neuron, load_neurons
 

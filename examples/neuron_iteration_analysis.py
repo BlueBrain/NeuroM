@@ -39,7 +39,7 @@ from neurom.core.dataformat import COLS
 import neurom as nm
 from neurom import geom
 from neurom.features import sectionfunc
-from neurom.core import Tree
+from neurom.core import Section
 from neurom.core.types import tree_type_checker, NEURITES
 from neurom import morphmath as mm
 import numpy as np
@@ -127,12 +127,12 @@ if __name__ == '__main__':
     # Number of bifurcation points.
     print('Number of bifurcation points:',
           sum(1 for _ in nm.iter_sections(nrn,
-                                          iterator_type=Tree.ibifurcation_point)))
+                                          iterator_type=Section.ibifurcation_point)))
 
     # Number of bifurcation points for apical dendrites
     print('Number of bifurcation points (apical dendrites):',
           sum(1 for _ in nm.iter_sections(nrn,
-                                          iterator_type=Tree.ibifurcation_point,
+                                          iterator_type=Section.ibifurcation_point,
                                           neurite_filter=tree_type_checker(nm.APICAL_DENDRITE))))
 
     # Maximum branch order

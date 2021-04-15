@@ -27,55 +27,25 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import math
+from pathlib import Path
 
-import numpy as np
 from nose import tools as nt
 
 import neurom as nm
-from neurom.core import Neurite, Section
+from neurom.core import Neurite
 
-RADIUS = 4.
-POINTS0 = np.array([[0., 0., 0., RADIUS],
-                    [0., 0., 1., RADIUS],
-                    [0., 0., 2., RADIUS],
-                    [0., 0., 3., RADIUS],
-                    [1., 0., 3., RADIUS],
-                    [2., 0., 3., RADIUS],
-                    [3., 0., 3., RADIUS]])
+SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
+nrn = nm.load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
 
-POINTS1 = np.array([[3., 0., 3., RADIUS],
-                    [3., 0., 4., RADIUS],
-                    [3., 0., 5., RADIUS],
-                    [3., 0., 6., RADIUS],
-                    [4., 0., 6., RADIUS],
-                    [5., 0., 6., RADIUS],
-                    [6., 0., 6., RADIUS]])
-
-REF_LEN = 12
-
-
-ROOT_NODE = Section(POINTS0)
-ROOT_NODE.add_child(Section(POINTS1))
+ROOT_NODE = nrn.neurites[0].morphio_root_node
+RADIUS = .5
+REF_LEN = 3
 
 
 def test_init():
     nrt = Neurite(ROOT_NODE)
-    nt.eq_(nrt.type, nm.NeuriteType.undefined)
-    nt.eq_(len(nrt.points), 13)
-
-
-def test_neurite_type():
-    root_node = Section(POINTS0, section_type=nm.AXON)
-    nrt = Neurite(root_node)
-    nt.eq_(nrt.type, nm.AXON)
-
-    root_node = Section(POINTS0, section_type=nm.BASAL_DENDRITE)
-    nrt = Neurite(root_node)
-    nt.eq_(nrt.type, nm.BASAL_DENDRITE)
-
-    # https://github.com/BlueBrain/NeuroM/issues/697
-    nt.assert_equal(np.array([nm.AXON, nm.BASAL_DENDRITE]).dtype,
-                    np.object)
+    nt.eq_(nrt.type, nm.NeuriteType.basal_dendrite)
+    nt.eq_(len(nrt.points), 4)
 
 
 def test_neurite_length():

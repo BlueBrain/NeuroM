@@ -43,7 +43,7 @@ from .view import (plot_neuron, plot_neuron3d,
                    plot_soma, plot_soma3d,
                    plot_dendrogram)
 from .view import common
-from .core import Tree, Neurite, Soma, Neuron
+from .core import Section, Neurite, Soma, Neuron
 
 
 MODES = ('2d', '3d', 'dendrogram')
@@ -107,7 +107,7 @@ def draw(obj, mode='2d', **kwargs):
 
     if isinstance(obj, Neuron):
         tag = 'neuron'
-    elif isinstance(obj, (Tree, Neurite)):
+    elif isinstance(obj, (Section, Neurite)):
         tag = 'tree'
     elif isinstance(obj, Soma):
         tag = 'soma'

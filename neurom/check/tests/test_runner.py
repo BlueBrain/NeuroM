@@ -41,10 +41,6 @@ SWC_PATH = Path(__file__).parent / '../../../test_data/swc/'
 
 CONFIG = {
     'checks': {
-        'structural_checks': [
-            'has_soma_points',
-            'has_valid_soma',
-        ],
         'neuron_checks': [
             'has_basal_dendrite',
             'has_axon',
@@ -63,14 +59,6 @@ CONFIG = {
     },
 }
 
-checks_not_in_morphio = OrderedDict([
-    ('has_valid_neurites', 'Has valid neurites'),
-    ('has_sequential_ids', 'Has sequential ids'),
-    ('has_increasing_ids', 'Has increasing ids'),
-    ('is_single_tree', 'Is single tree'),
-])
-CONFIG['checks']['structural_checks'] += list(checks_not_in_morphio.keys())
-
 CONFIG_COLOR = copy(CONFIG)
 CONFIG_COLOR['color'] = True
 
@@ -84,8 +72,6 @@ def _run_test(path, ref, config=CONFIG, should_pass=False):
                     "PASS" if should_pass else "FAIL")
 
 ref = dict([
-    ("Has soma points", True),
-    ("Has valid soma", True),
     ("Has basal dendrite", True),
     ("Has axon", True),
     ("Has apical dendrite", True),
@@ -95,7 +81,6 @@ ref = dict([
     ("Has nonzero soma radius", True),
     ("ALL", True)
 ])
-ref.update({(item.replace('_', ' ').capitalize(), True) for item in checks_not_in_morphio.values()})
 
 def test_ok_neuron():
     _run_test(os.path.join(SWC_PATH, 'Neuron.swc'),
@@ -111,8 +96,6 @@ def test_ok_neuron_color():
 
 def test_zero_length_sections_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", True),
                   ("Has axon", True),
                   ("Has apical dendrite", True),
@@ -122,15 +105,12 @@ def test_zero_length_sections_neuron():
                   ("Has nonzero soma radius", True),
                   ("ALL", False)
     ])
-    expected.update({(item, True) for item in checks_not_in_morphio.values()})
     _run_test(os.path.join(SWC_PATH, 'Neuron_zero_length_sections.swc'),
               expected)
 
 
 def test_single_apical_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", False),
                   ("Has axon", False),
                   ("Has apical dendrite", True),
@@ -140,7 +120,6 @@ def test_single_apical_neuron():
                   ("Has nonzero soma radius", True),
                   ("ALL", False)
               ])
-    expected.update({(item, True) for item in checks_not_in_morphio.values()})
     _run_test(os.path.join(SWC_PATH, 'Single_apical.swc'),
               expected)
 
@@ -148,26 +127,21 @@ def test_single_apical_neuron():
 def test_single_basal_neuron():
     expected = dict(
                   ([
-                      ("Has soma points", True),
-                      ("Has valid soma", True),
                       ("Has basal dendrite", True),
                       ("Has axon", False),
                       ("Has apical dendrite", False),
                       ("Has all nonzero segment lengths", False),
                       ("Has all nonzero section lengths", True),
                       ("Has all nonzero neurite radii", True),
-                      ("Has nonzero soma radius", False),  # Should be True, will be fixed by v2
+                      ("Has nonzero soma radius", True),
                       ("ALL", False)
                   ]))
-    expected.update({(item, True) for item in checks_not_in_morphio.values()})
     _run_test(os.path.join(SWC_PATH, 'Single_basal.swc'),
               expected)
 
 
 def test_single_axon_neuron():
     expected = dict([
-                  ("Has soma points", True),
-                  ("Has valid soma", True),
                   ("Has basal dendrite", False),
                   ("Has axon", True),
                   ("Has apical dendrite", False),
@@ -177,19 +151,12 @@ def test_single_axon_neuron():
                   ("Has nonzero soma radius", True),
                   ("ALL", False)
               ])
-    expected.update({(item, True) for item in checks_not_in_morphio.values()})
     _run_test(os.path.join(SWC_PATH, 'Single_axon.swc'),
               expected)
 
 
 def test_single_apical_no_soma():
-    expected = dict([('Has soma points', False),
-                    ('Has valid soma', False),
-                    ('ALL', False)])
-    expected.update({(item, True) for item in checks_not_in_morphio.values()})
-    expected['Has valid neurites'] = False
-    _run_test(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'),
-              expected)
+    _run_test(os.path.join(SWC_PATH, 'Single_apical_no_soma.swc'), dict([('ALL', False)]))
 
 
 def test_directory_input():
@@ -212,7 +179,7 @@ def test__sanitize_config():
     # creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})
     nt.eq_(new_config, {'checks':
-                        {'structural_checks': [],
+                        {
                          'neuron_checks': [],
                          },
                         'options': {},

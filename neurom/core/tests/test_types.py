@@ -56,17 +56,22 @@ def test_tree_type_checker():
     nt.ok_(tree_filter(mock_tree))
 
 
-# FIXME: https://github.com/BlueBrain/NeuroM/issues/804
-@nt.nottest
 def test_tree_type_checker_broken():
     tree_filter = tree_type_checker(NeuriteType.all)
+    nt.ok_(tree_filter('fake_tree'))
+
     mock_tree = Mock()
+    mock_tree.type = NeuriteType.axon
+
+    tree_filter = tree_type_checker(*NEURITES)
+    nt.ok_(tree_filter(mock_tree))
+
+    tree_filter = tree_type_checker(
+        NeuriteType.axon,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite)
     mock_tree.type = NeuriteType.soma
     nt.ok_(not tree_filter(mock_tree))
-
-    mock_tree.type = NeuriteType.undefined
-    nt.ok_(not tree_filter(mock_tree))
-
 
 def test_type_filters():
     axon = Mock()
