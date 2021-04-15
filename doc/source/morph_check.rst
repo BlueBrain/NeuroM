@@ -68,7 +68,7 @@ mentioned above. Here is an example configuration:
 
 As can be seen, the configuration file is split into two sections ``checks``, and ``options``.
 ``checks`` can only have `neuron_checks` sub-item that corresponds to a sub-module
-:py:mod:`neuron_checks<neurom.check.neuron_checks>`. Each its sub-items corresponds to a function
+:py:mod:`neuron_checks<neurom.check.neuron_checks>`. Each of its sub-items corresponds to a function
 in that sub-module.
 
 
