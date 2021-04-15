@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Anomaly and artefact detection and annotation generation."""
 import logging
-from itertools import chain
 
 from neurom.core.dataformat import COLS
 
@@ -38,26 +37,26 @@ def generate_annotation(result, settings):
     """Generate the annotation for a given checker.
 
     Arguments:
-        result: the result of the checker
-        settings: the display settings for NeuroLucida
-    Returns
+        result (CheckResult): the result of the checker
+        settings (dict): the display settings for NeuroLucida
+
+    Returns:
         An S-expression-like string representing the annotation
     """
     if result.status:
-        return ""
+        return ''
 
-    header = ("\n\n"
-              "({label}   ; MUK_ANNOTATION\n"
-              "    (Color {color})   ; MUK_ANNOTATION\n"
-              "    (Name \"{name}\")   ; MUK_ANNOTATION").format(**settings)
-
+    header = ('\n\n'
+              f'({settings["label"]}   ; MUK_ANNOTATION\n'
+              f'    (Color {settings["color"]})   ; MUK_ANNOTATION\n'
+              f'    (Name "{settings["name"]}")   ; MUK_ANNOTATION')
     points = [p for _, _points in result.info for p in _points]
+    annotations = '\n'.join((f'    '
+                             f'({p[COLS.X]:10.2f} {p[COLS.Y]:10.2f} {p[COLS.Z]:10.2f} 0.50)'
+                             f'   ; MUK_ANNOTATION' for p in points))
+    footer = ')   ; MUK_ANNOTATION\n'
 
-    annotations = ("    ({:10.2f} {:10.2f} {:10.2f} 0.50)   ; MUK_ANNOTATION".format(
-        p[COLS.X], p[COLS.Y], p[COLS.Z]) for p in points)
-    footer = ")   ; MUK_ANNOTATION\n"
-
-    return '\n'.join(chain.from_iterable(([header], annotations, [footer])))
+    return f'{header}\n{annotations}\n{footer}'
 
 
 def annotate(results, settings):

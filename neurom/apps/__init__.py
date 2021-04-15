@@ -32,17 +32,24 @@ import logging
 import yaml
 from neurom.exceptions import ConfigError
 
+L = logging.getLogger(__name__)
+
 
 def get_config(config, default_config):
-    """Load configuration from file if in config, else use default."""
-    if not config:
-        logging.warning('Using default config: %s', default_config)
-        config = default_config
+    """Load configuration from file if in config, else use default.
 
+    Args:
+        config (str|Path): path to a config file
+        default_config (str|Path): path to a default config file
+
+    Returns:
+        dict: config dictionary
+    """
+    if not config:
+        L.warning(f'Using default config: {default_config}')
+        config = default_config
     try:
-        with open(config, 'r') as config_file:
-            return yaml.load(config_file, Loader=yaml.FullLoader)
-    except (yaml.reader.ReaderError,
-            yaml.parser.ParserError,
-            yaml.scanner.ScannerError) as e:
+        with open(config, 'r') as f:
+            return yaml.load(f, Loader=yaml.SafeLoader)
+    except yaml.YAMLError as e:
         raise ConfigError('Invalid yaml file: \n %s' % str(e)) from e
