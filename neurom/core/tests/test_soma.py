@@ -107,7 +107,7 @@ def test_Soma_ThreePointCylinder_invalid():
     try:
         load_neuron(swc_content, reader='swc')
     except MorphioError as e:
-        nt.assert_in('Warning: the soma does not conform to the three point soma spec', e.args[0])
+        nt.assert_in('Warning: the soma does not conform the three point soma spec', e.args[0])
 
 
 def check_SomaC(stream):
