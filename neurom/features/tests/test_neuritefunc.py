@@ -34,13 +34,14 @@ from pathlib import Path
 import neurom as nm
 import numpy as np
 import scipy
-from mock import Mock, patch
+from mock import patch
 from neurom.features import neuritefunc as _nf
 from neurom.features import sectionfunc as sectionfunc
 from neurom.features.tests.utils import _close
 from neurom.geom import convex_hull
-from nose import tools as nt
-from numpy.testing import assert_allclose, assert_array_almost_equal
+
+import pytest
+from numpy.testing import assert_allclose, assert_array_almost_equal, assert_almost_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -66,21 +67,21 @@ def test_principal_direction_extents():
 
 
 def test_n_bifurcation_points():
-    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites[0]), 1)
-    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites[1]), 1)
-    nt.assert_equal(_nf.n_bifurcation_points(SIMPLE.neurites), 2)
+    assert _nf.n_bifurcation_points(SIMPLE.neurites[0]) == 1
+    assert _nf.n_bifurcation_points(SIMPLE.neurites[1]) == 1
+    assert _nf.n_bifurcation_points(SIMPLE.neurites) == 2
 
 
 def test_n_forking_points():
-    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites[0]), 1)
-    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites[1]), 1)
-    nt.assert_equal(_nf.n_forking_points(SIMPLE.neurites), 2)
+    assert _nf.n_forking_points(SIMPLE.neurites[0]) == 1
+    assert _nf.n_forking_points(SIMPLE.neurites[1]) == 1
+    assert _nf.n_forking_points(SIMPLE.neurites) == 2
 
 
 def test_n_leaves():
-    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites[0]), 2)
-    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites[1]), 2)
-    nt.assert_equal(_nf.n_leaves(SIMPLE.neurites), 4)
+    assert _nf.n_leaves(SIMPLE.neurites[0]) == 2
+    assert _nf.n_leaves(SIMPLE.neurites[1]) == 2
+    assert _nf.n_leaves(SIMPLE.neurites) == 4
 
 
 def test_total_area_per_neurite():
@@ -90,30 +91,30 @@ def test_total_area_per_neurite():
     basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
     ret = _nf.total_area_per_neurite(SIMPLE,
                                      neurite_type=nm.BASAL_DENDRITE)
-    nt.assert_almost_equal(ret[0], basal_area)
+    assert_almost_equal(ret[0], basal_area)
 
     axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
     ret = _nf.total_area_per_neurite(SIMPLE, neurite_type=nm.AXON)
-    nt.assert_almost_equal(ret[0], axon_area)
+    assert_almost_equal(ret[0], axon_area)
 
     ret = _nf.total_area_per_neurite(SIMPLE)
-    nt.ok_(np.allclose(ret, [basal_area, axon_area]))
+    assert np.allclose(ret, [basal_area, axon_area])
 
 
 def test_total_volume_per_neurite():
     vol = _nf.total_volume_per_neurite(NRN)
-    nt.eq_(len(vol), 4)
+    assert len(vol) == 4
 
     # calculate the volumes by hand and compare
     vol2 = [sum(sectionfunc.section_volume(s) for s in n.iter_sections())
             for n in NRN.neurites
             ]
-    nt.eq_(vol, vol2)
+    assert vol == vol2
 
     # regression test
     ref_vol = [271.94122143951864, 281.24754646913954,
                274.98039928781355, 276.73860261723024]
-    nt.ok_(np.allclose(vol, ref_vol))
+    assert np.allclose(vol, ref_vol)
 
 
 def test_neurite_volume_density():
@@ -122,8 +123,8 @@ def test_neurite_volume_density():
     hull_vol = np.array([convex_hull(n).volume for n in nm.iter_neurites(NRN)])
 
     vol_density = _nf.neurite_volume_density(NRN)
-    nt.eq_(len(vol_density), 4)
-    nt.ok_(np.allclose(vol_density, vol / hull_vol))
+    assert len(vol_density) == 4
+    assert np.allclose(vol_density, vol / hull_vol)
 
     ref_density = [0.43756606998299519, 0.52464681266899216,
                    0.24068543213643726, 0.26289304906104355]
@@ -134,7 +135,7 @@ def test_neurite_volume_density_failed_convex_hull():
     with patch('neurom.features.neuritefunc.convex_hull',
                side_effect=scipy.spatial.qhull.QhullError('boom')):
         vol_density = _nf.neurite_volume_density(NRN)
-        nt.ok_(vol_density, np.nan)
+        assert vol_density, np.nan
 
 
 def test_terminal_path_length_per_neurite():
@@ -155,22 +156,22 @@ def test_total_length_per_neurite():
 
 def test_max_radial_distance():
     dmax = _nf.max_radial_distance(SIMPLE)
-    nt.assert_almost_equal(dmax, 7.81025, places=6)
+    assert_almost_equal(dmax, 7.81025, decimal=6)
 
 
 def test_n_segments():
     n_segments = _nf.n_segments(SIMPLE)
-    nt.eq_(n_segments, 6)
+    assert n_segments == 6
 
 
 def test_n_neurites():
     n_neurites = _nf.n_neurites(SIMPLE)
-    nt.eq_(n_neurites, 2)
+    assert n_neurites == 2
 
 
 def test_n_sections():
     n_sections = _nf.n_sections(SIMPLE)
-    nt.eq_(n_sections, 6)
+    assert n_sections == 6
 
 
 def test_neurite_volumes():
@@ -311,7 +312,8 @@ def test_partition_asymmetry():
     assert_allclose(partition,
                     (0.0625, 0.06666666666666667))
 
-    nt.assert_raises(ValueError, _nf.partition_asymmetries, SIMPLE, variant='unvalid-variant')
+    with pytest.raises(ValueError):
+        _nf.partition_asymmetries(SIMPLE, variant='unvalid-variant')
 
 
 def test_segment_lengths():

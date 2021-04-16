@@ -30,7 +30,8 @@ from pathlib import Path
 
 from neurom.apps import get_config
 from neurom.exceptions import ConfigError
-from nose import tools as nt
+
+import pytest
 
 
 def test_get_config():
@@ -41,13 +42,13 @@ def test_get_config():
     expected = {'neurite': {'section_lengths': ['max', 'total'], 'section_volumes': ['total'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'neuron': {'soma_radii': ['mean']}}
 
     config = get_config(None, test_yaml)
-    nt.assert_equal(config, expected)
+    assert config == expected
 
     config = get_config(test_yaml, '')
-    nt.assert_equal(config, expected)
+    assert config == expected
 
 
-@nt.raises(ConfigError)
 def test_get_config_exception():
     """current python file isn't a yaml file."""
-    get_config(__file__, {})
+    with pytest.raises(ConfigError):
+        get_config(__file__, {})

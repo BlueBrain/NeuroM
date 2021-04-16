@@ -33,7 +33,7 @@ import warnings
 
 import numpy as np
 from neurom import utils as nu
-from nose import tools as nt
+import pytest
 
 
 def test_memoize_caches():
@@ -48,12 +48,12 @@ def test_memoize_caches():
     ref3 = a.dummy(42, y=43)
 
     for _ in range(10):
-        nt.assert_equal(a.dummy(42), ref1)
-        nt.assert_not_equal(A().dummy(42), ref1)
-        nt.assert_equal(a.dummy(42, 43), ref2)
-        nt.assert_not_equal(A().dummy(42, 43), ref2)
-        nt.assert_equal(a.dummy(42, y=43), ref3)
-        nt.assert_not_equal(A().dummy(42, y=43), ref3)
+        assert a.dummy(42) == ref1
+        assert A().dummy(42) != ref1
+        assert a.dummy(42, 43) == ref2
+        assert A().dummy(42, 43) != ref2
+        assert a.dummy(42, y=43) == ref3
+        assert A().dummy(42, y=43) != ref3
 
 
 def test_deprecated():
@@ -63,14 +63,14 @@ def test_deprecated():
 
     with warnings.catch_warnings(record=True) as s:
         dummy()
-        nt.ok_(len(s) > 0)
-        nt.eq_(s[0].message.args[0], 'Call to deprecated function dummy. Hello')
+        assert len(s) > 0
+        assert s[0].message.args[0] == 'Call to deprecated function dummy. Hello'
 
 
 def test_deprecated_module():
     with warnings.catch_warnings(record=True) as s:
         nu.deprecated_module('foo', msg='msg')
-        nt.ok_(len(s) > 0)
+        assert len(s) > 0
 
 
 def test_NeuromJSON():
@@ -81,7 +81,7 @@ def test_NeuromJSON():
           }
     output = json.dumps(ex, cls=nu.NeuromJSON)
     loaded = json.loads(output)
-    nt.eq_(loaded,
+    assert (loaded ==
            {'zero': 0,
             'one': 1,
             'two': 2.0,
@@ -89,10 +89,11 @@ def test_NeuromJSON():
             })
 
     enc = nu.NeuromJSON()
-    nt.eq_(enc.default(ex['one']), 1)
-    nt.eq_(enc.default(ex['two']), 2.0)
+    assert enc.default(ex['one']) == 1
+    assert enc.default(ex['two']) == 2.0
 
-    nt.assert_raises(TypeError, enc.default, 0)
+    with pytest.raises(TypeError):
+        enc.default(0)
 
 
 def test_ordered_enum():
@@ -103,13 +104,17 @@ def test_ordered_enum():
         D = 2
         F = 1
 
-    nt.ok_(Grade.C < Grade.A)
-    nt.ok_(Grade.C <= Grade.A)
-    nt.ok_(Grade.C <= Grade.C)
-    nt.ok_(not Grade.C > Grade.A)
-    nt.ok_(not Grade.C >= Grade.A)
-    nt.ok_(Grade.C >= Grade.C)
-    nt.assert_raises(NotImplementedError, Grade.__ge__, Grade.A, 1)
-    nt.assert_raises(NotImplementedError, Grade.__le__, Grade.A, 1)
-    nt.assert_raises(NotImplementedError, Grade.__gt__, Grade.A, 1)
-    nt.assert_raises(NotImplementedError, Grade.__lt__, Grade.A, 1)
+    assert Grade.C < Grade.A
+    assert Grade.C <= Grade.A
+    assert Grade.C <= Grade.C
+    assert not Grade.C > Grade.A
+    assert not Grade.C >= Grade.A
+    assert Grade.C >= Grade.C
+    with pytest.raises(NotImplementedError):
+        Grade.__ge__(Grade.A, 1)
+    with pytest.raises(NotImplementedError):
+        Grade.__le__(Grade.A, 1)
+    with pytest.raises(NotImplementedError):
+        Grade.__gt__(Grade.A, 1)
+    with pytest.raises(NotImplementedError):
+        Grade.__lt__(Grade.A, 1)

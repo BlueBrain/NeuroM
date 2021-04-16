@@ -3,7 +3,6 @@ from neurom import load_neuron
 from neurom.apps.annotate import annotate, generate_annotation
 from neurom.check import CheckResult
 from neurom.check.neuron_checks import has_no_narrow_start
-from nose import tools as nt
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data' / 'swc'
 
@@ -14,7 +13,7 @@ def test_generate_annotation():
                                          ('section 2', [[7, 8, 9], [10, 11, 12]])])
 
     settings = {'color': 'blue', 'label': 'circle', 'name': 'dangling'}
-    nt.assert_equal(generate_annotation(checker_ok, settings), "")
+    assert generate_annotation(checker_ok, settings) == ""
 
     correct_result = """
 
@@ -28,7 +27,7 @@ def test_generate_annotation():
 )   ; MUK_ANNOTATION
 """
 
-    nt.assert_equal(generate_annotation(checker_not_ok, settings), correct_result)
+    assert generate_annotation(checker_not_ok, settings) == correct_result
 
 
 def test_annotate():
@@ -48,4 +47,4 @@ def test_annotate():
 
     neuron = load_neuron(SWC_PATH / 'narrow_start.swc')
     results = [checker(neuron) for checker in checkers.keys()]
-    nt.assert_equal(annotate(results, checkers.values()), correct_result)
+    assert annotate(results, checkers.values()) == correct_result

@@ -34,8 +34,6 @@ from neurom import check, load_neuron
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
-from nose import tools as nt
-from nose.tools import assert_equal
 from numpy.testing import assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -100,7 +98,7 @@ def test_has_axon_good_data():
              'Neuron.h5',
              ]
     for n in _pick(files):
-        nt.ok_(nrn_chk.has_axon(n))
+        assert nrn_chk.has_axon(n)
 
 
 def test_has_axon_bad_data():
@@ -108,7 +106,7 @@ def test_has_axon_bad_data():
              'Single_basal.swc',
              ]
     for n in _pick(files):
-        nt.ok_(not nrn_chk.has_axon(n))
+        assert not nrn_chk.has_axon(n)
 
 
 def test_has_apical_dendrite_good_data():
@@ -119,7 +117,7 @@ def test_has_apical_dendrite_good_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(nrn_chk.has_apical_dendrite(n))
+        assert nrn_chk.has_apical_dendrite(n)
 
 
 def test_has_apical_dendrite_bad_data():
@@ -128,7 +126,7 @@ def test_has_apical_dendrite_bad_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(not nrn_chk.has_apical_dendrite(n))
+        assert not nrn_chk.has_apical_dendrite(n)
 
 
 def test_has_basal_dendrite_good_data():
@@ -140,7 +138,7 @@ def test_has_basal_dendrite_good_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(nrn_chk.has_basal_dendrite(n))
+        assert nrn_chk.has_basal_dendrite(n)
 
 
 def test_has_basal_dendrite_bad_data():
@@ -149,20 +147,20 @@ def test_has_basal_dendrite_bad_data():
              ]
 
     for n in _pick(files):
-        nt.ok_(not nrn_chk.has_basal_dendrite(n))
+        assert not nrn_chk.has_basal_dendrite(n)
 
 
 def test_has_no_flat_neurites():
 
     _, n = _load_neuron('Neuron.swc')
 
-    nt.assert_true(nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance'))
-    nt.assert_true(nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio'))
+    assert nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance')
+    assert nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio')
 
     n = _make_flat(n)
 
-    nt.assert_false(nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance'))
-    nt.assert_false(nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio'))
+    assert not nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance')
+    assert not nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio')
 
 
 def test_nonzero_neurite_radii_good_data():
@@ -175,30 +173,30 @@ def test_nonzero_neurite_radii_good_data():
 
     for n in _pick(files):
         ids = nrn_chk.has_all_nonzero_neurite_radii(n)
-        nt.ok_(len(ids.info) == 0)
+        assert len(ids.info) == 0
 
 
 def test_has_all_nonzero_neurite_radii_threshold():
     nrn = NEURONS['Neuron.swc']
 
     ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
-    nt.ok_(ids.status)
+    assert ids.status
 
     ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.25)
-    nt.assert_equal(len(ids.info), 122)
+    assert len(ids.info) == 122
 
 
 def test_nonzero_neurite_radii_bad_data():
     nrn = NEURONS['Neuron_zero_radius.swc']
     ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.7)
-    nt.assert_equal(ids.info, [(0, 2)])
+    assert ids.info == [(0, 2)]
 
 
 def test_nonzero_segment_lengths_good_data():
     nrn = NEURONS['Neuron.swc']
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
-    nt.ok_(ids.status)
-    nt.ok_(len(ids.info) == 0)
+    assert ids.status
+    assert len(ids.info) == 0
 
 
 def test_nonzero_segment_lengths_bad_data():
@@ -212,7 +210,7 @@ def test_nonzero_segment_lengths_bad_data():
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
-        nt.assert_equal(ids.info,
+        assert (ids.info ==
                         [(id, 0) for id in bad_ids[i]])
 
 
@@ -220,13 +218,13 @@ def test_nonzero_segment_lengths_threshold():
     nrn = NEURONS['Neuron.swc']
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
-    nt.ok_(ids.status)
-    nt.assert_equal(len(ids.info), 0)
+    assert ids.status
+    assert len(ids.info) == 0
 
     ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
 
     bad_ids = [(0, 0), (21, 0), (36, 9), (42, 0), (52, 7), (60, 2), (63, 0), (70, 4), (76, 6)]
-    nt.assert_equal(ids.info,
+    assert (ids.info ==
                     [(id, val) for id, val in bad_ids])
 
 
@@ -239,78 +237,78 @@ def test_nonzero_section_lengths_good_data():
 
     for i, nrn in enumerate(_pick(files)):
         ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
-        nt.ok_(ids.status)
-        nt.ok_(len(ids.info) == 0)
+        assert ids.status
+        assert len(ids.info) == 0
 
 
 def test_nonzero_section_lengths_bad_data():
     nrn = NEURONS['Neuron_zero_length_sections.swc']
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
-    nt.ok_(not ids.status)
-    nt.assert_equal(ids.info, [13])
+    assert not ids.status
+    assert ids.info == [13]
 
 
 def test_nonzero_section_lengths_threshold():
     nrn = NEURONS['Neuron.swc']
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
-    nt.ok_(ids.status)
-    nt.ok_(len(ids.info) == 0)
+    assert ids.status
+    assert len(ids.info) == 0
 
     ids = nrn_chk.has_all_nonzero_section_lengths(nrn, threshold=15.)
-    nt.ok_(not ids.status)
-    nt.assert_equal(len(ids.info), 84)
+    assert not ids.status
+    assert len(ids.info) == 84
 
 
 def test_has_nonzero_soma_radius():
 
     nrn = load_neuron(SWC_PATH / 'Neuron.swc')
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
+    assert nrn_chk.has_nonzero_soma_radius(nrn)
 
 
 def test_has_nonzero_soma_radius_bad_data():
     nrn = load_neuron(SWC_PATH / 'soma_zero_radius.swc')
-    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn).status)
+    assert not nrn_chk.has_nonzero_soma_radius(nrn).status
 
 
 def test_has_no_fat_ends():
     _, nrn = _load_neuron('fat_end.swc')
-    nt.ok_(not nrn_chk.has_no_fat_ends(nrn).status)
+    assert not nrn_chk.has_no_fat_ends(nrn).status
 
     # if we only use point, there isn't a 'fat end'
     # since if the last point is 'x': x < 2*mean([x])
-    nt.ok_(nrn_chk.has_no_fat_ends(nrn, final_point_count=1).status)
+    assert nrn_chk.has_no_fat_ends(nrn, final_point_count=1).status
 
     # if the multiple of the mean is large, the end won't be fat
-    nt.ok_(nrn_chk.has_no_fat_ends(nrn, multiple_of_mean=10).status)
+    assert nrn_chk.has_no_fat_ends(nrn, multiple_of_mean=10).status
 
     _, nrn = _load_neuron('Single_basal.swc')
-    nt.ok_(nrn_chk.has_no_fat_ends(nrn).status)
+    assert nrn_chk.has_no_fat_ends(nrn).status
 
 
 def test_has_no_root_node_jumps():
     _, nrn = _load_neuron('root_node_jump.swc')
     check = nrn_chk.has_no_root_node_jumps(nrn)
-    nt.ok_(not check.status)
-    assert_equal(len(check.info), 1)
-    assert_equal(check.info[0][0], 0)
+    assert not check.status
+    assert len(check.info) == 1
+    assert check.info[0][0] == 0
     assert_array_equal(check.info[0][1], [[0, 3, 0]])
 
-    nt.ok_(nrn_chk.has_no_root_node_jumps(nrn, radius_multiplier=4).status)
+    assert nrn_chk.has_no_root_node_jumps(nrn, radius_multiplier=4).status
 
 
 def test_has_no_narrow_start():
     _, nrn = _load_neuron('narrow_start.swc')
     check = nrn_chk.has_no_narrow_start(nrn)
-    nt.ok_(not check.status)
+    assert not check.status
     assert_array_equal(check.info[0][1][:, COLS.XYZR], [[0, 0, 2, 2]])
 
     _, nrn = _load_neuron('narrow_start.swc')
-    nt.ok_(nrn_chk.has_no_narrow_start(nrn, 0.25).status)
+    assert nrn_chk.has_no_narrow_start(nrn, 0.25).status
 
     _, nrn = _load_neuron('fat_end.swc')  # doesn't have narrow start
-    nt.ok_(nrn_chk.has_no_narrow_start(nrn, 0.25).status)
+    assert nrn_chk.has_no_narrow_start(nrn, 0.25).status
 
 
 def test_has_nonzero_soma_radius_threshold():
@@ -322,22 +320,22 @@ def test_has_nonzero_soma_radius_threshold():
     nrn.soma = Dummy()
     nrn.soma.radius = 1.5
 
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn))
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 0.25))
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 0.75))
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 1.25))
-    nt.assert_true(nrn_chk.has_nonzero_soma_radius(nrn, 1.499))
-    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.5))
-    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 1.75))
-    nt.assert_false(nrn_chk.has_nonzero_soma_radius(nrn, 2.5))
+    assert nrn_chk.has_nonzero_soma_radius(nrn)
+    assert nrn_chk.has_nonzero_soma_radius(nrn, 0.25)
+    assert nrn_chk.has_nonzero_soma_radius(nrn, 0.75)
+    assert nrn_chk.has_nonzero_soma_radius(nrn, 1.25)
+    assert nrn_chk.has_nonzero_soma_radius(nrn, 1.499)
+    assert not nrn_chk.has_nonzero_soma_radius(nrn, 1.5)
+    assert not nrn_chk.has_nonzero_soma_radius(nrn, 1.75)
+    assert not nrn_chk.has_nonzero_soma_radius(nrn, 2.5)
 
 
 def test_has_no_jumps():
     _, nrn = _load_neuron('z_jump.swc')
-    nt.ok_(not nrn_chk.has_no_jumps(nrn).status)
-    nt.ok_(nrn_chk.has_no_jumps(nrn, 100).status)
+    assert not nrn_chk.has_no_jumps(nrn).status
+    assert nrn_chk.has_no_jumps(nrn, 100).status
 
-    nt.ok_(nrn_chk.has_no_jumps(nrn, 100, axis='x').status)
+    assert nrn_chk.has_no_jumps(nrn, 100, axis='x').status
 
 
 def test_has_no_narrow_dendritic_section():
@@ -359,12 +357,12 @@ def test_has_no_narrow_dendritic_section():
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
 
-    nt.ok_(res.status)
+    assert res.status
 
     res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
                                                 radius_threshold=7,
                                                 considered_section_min_length=0)
-    nt.ok_(not res.status)
+    assert not res.status
 
     swc_content = StringIO(u"""
 # index, type, x, y, z, radius, parent
@@ -382,33 +380,33 @@ def test_has_no_narrow_dendritic_section():
     res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
-    nt.ok_(res.status, 'Narrow soma or axons should not raise bad status when checking for narrow dendrites')
+    assert res.status, 'Narrow soma or axons should not raise bad status when checking for narrow dendrites'
 
 
 def test_has_no_dangling_branch():
     _, nrn = _load_neuron('dangling_axon.swc')
     res = nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(not res.status)
-    nt.assert_equal(len(res.info), 1)
+    assert not res.status
+    assert len(res.info) == 1
     assert_array_equal(res.info[0][1][0][COLS.XYZ],
                        [0., 49.,  0.])
 
     _, nrn = _load_neuron('dangling_dendrite.swc')
     res = nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(not res.status)
-    nt.assert_equal(len(res.info), 1)
+    assert not res.status
+    assert len(res.info) == 1
     assert_array_equal(res.info[0][1][0][COLS.XYZ],
                        [0., 49.,  0.])
 
     _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
     res = nrn_chk.has_no_dangling_branch(nrn)
-    nt.ok_(res.status)
+    assert res.status
 
 
 def test__bool__():
     c = check.CheckResult(status=True)
-    nt.ok_(c.__nonzero__())
-    nt.eq_(c.__bool__(), c.__nonzero__())
+    assert c.__nonzero__()
+    assert c.__bool__() == c.__nonzero__()
 
 
 
@@ -437,7 +435,7 @@ def test_has_multifurcation():
 """), reader='asc')
 
     check_ = nrn_chk.has_multifurcation(nrn)
-    nt.ok_(not check_.status)
+    assert not check_.status
     info = check_.info
     assert_array_equal(info[0][0], 0)
     assert_array_equal(info[0][1][:, COLS.XYZR], [[0.0, 13.0, 0.0, 1.0]])
@@ -458,5 +456,5 @@ def test_single_children():
 )
 """, "asc")
     result = nrn_chk.has_no_single_children(neuron)
-    nt.assert_equal(result.status, False)
-    nt.assert_equal(result.info, [0])
+    assert result.status == False
+    assert result.info == [0]

@@ -38,27 +38,25 @@ from neurom import load_neuron
 from neurom import morphmath as mmth
 from neurom.features import neuritefunc as _nf
 from neurom.features import sectionfunc as _sf
-from nose import tools as nt
+
+import pytest
 from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = Path(DATA_PATH, 'h5/v1/')
 SWC_PATH = Path(DATA_PATH, 'swc/')
-
 NRN = load_neuron(H5_PATH / 'Neuron.h5')
-
-# Will simplify NeuroM v2 transition
 SECTION_ID = 0
 
 
 def test_total_volume_per_neurite():
 
     vol = _nf.total_volume_per_neurite(NRN)
-    nt.eq_(len(vol), 4)
+    assert len(vol) == 4
 
     # calculate the volumes by hand and compare
     vol2 = [sum(_sf.section_volume(s) for s in n.iter_sections()) for n in NRN.neurites]
-    nt.eq_(vol, vol2)
+    assert vol == vol2
 
     # regression test
     ref_vol = [271.94122143951864, 281.24754646913954,
@@ -72,7 +70,7 @@ def test_section_area():
                                      (0 0 0 2)
                                      (1 0 0 2))"""), reader='asc').sections[SECTION_ID]
     area = _sf.section_area(sec)
-    nt.eq_(math.pi * 1 * 2 * 1, area)
+    assert math.pi * 1 * 2 * 1 == area
 
 
 def test_section_tortuosity():
@@ -92,11 +90,11 @@ def test_section_tortuosity():
     (1 2 0 2)
     (0 2 0 2))"""), reader='asc').sections[SECTION_ID]
 
-    nt.eq_(_sf.section_tortuosity(sec_a), 1.0)
-    nt.eq_(_sf.section_tortuosity(sec_b), 4.0 / 2.0)
+    assert _sf.section_tortuosity(sec_a) == 1.0
+    assert _sf.section_tortuosity(sec_b) == 4.0 / 2.0
 
     for s in _nf.iter_sections(NRN):
-        nt.eq_(_sf.section_tortuosity(s),
+        assert (_sf.section_tortuosity(s) ==
                mmth.section_length(s.points) / mmth.point_dist(s.points[0],
                                                                s.points[-1]))
 
@@ -104,7 +102,7 @@ def test_setion_tortuosity_single_point():
     sec = load_neuron(StringIO(u"""((CellBody) (0 0 0 2))
                                    ((Dendrite)
                                     (1 2 3 2))"""), reader='asc').sections[SECTION_ID]
-    nt.eq_(_sf.section_tortuosity(sec), 1.0)
+    assert _sf.section_tortuosity(sec) == 1.0
 
 
 def test_section_tortuosity_looping_section():
@@ -117,7 +115,7 @@ def test_section_tortuosity_looping_section():
     (0 2 0 2)
     (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
     with warnings.catch_warnings(record=True):
-        nt.eq_(_sf.section_tortuosity(sec), np.inf)
+        assert _sf.section_tortuosity(sec) == np.inf
 
 
 def test_section_meander_angles():
@@ -129,7 +127,7 @@ def test_section_meander_angles():
     (3 0 0 2)
     (4 0 0 2))"""), reader='asc').sections[SECTION_ID]
 
-    nt.assert_equal(_sf.section_meander_angles(s0),
+    assert (_sf.section_meander_angles(s0) ==
                     [math.pi, math.pi, math.pi])
 
     s1 = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
@@ -140,7 +138,7 @@ def test_section_meander_angles():
     (2 1 0 2)
     (2 2 0 2))"""), reader='asc').sections[SECTION_ID]
 
-    nt.assert_equal(_sf.section_meander_angles(s1),
+    assert (_sf.section_meander_angles(s1) ==
                     [math.pi / 2, math.pi / 2, math.pi / 2])
 
     s2 = load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
@@ -150,7 +148,7 @@ def test_section_meander_angles():
     (0 0 2 2)
     (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
 
-    nt.assert_equal(_sf.section_meander_angles(s2),
+    assert (_sf.section_meander_angles(s2) ==
                     [math.pi, 0.])
 
 
@@ -159,14 +157,14 @@ def test_section_meander_angles_single_segment():
     ((Dendrite)
     (0 0 0 2)
     (1 1 1 2))"""), reader='asc').sections[SECTION_ID]
-    nt.assert_equal(len(_sf.section_meander_angles(s)), 0)
+    assert len(_sf.section_meander_angles(s)) == 0
 
 
 def test_strahler_order():
     path = Path(SWC_PATH, 'strahler.swc')
     n = load_neuron(path)
     strahler_order = _sf.strahler_order(n.neurites[0].root_node)
-    nt.eq_(strahler_order, 4)
+    assert strahler_order == 4
 
 
 def test_locate_segment_position():
@@ -175,30 +173,22 @@ def test_locate_segment_position():
     (0 0 0 0)
     (3 0 4 200)
     (6 4 4 400))"""), reader='asc').sections[SECTION_ID]
-    nt.assert_equal(
-        _sf.locate_segment_position(s, 0.0),
-        (0, 0.0)
-    )
-    nt.assert_equal(
-        _sf.locate_segment_position(s, 0.25),
-        (0, 2.5)
-    )
-    nt.assert_equal(
-        _sf.locate_segment_position(s, 0.75),
-        (1, 2.5)
-    )
-    nt.assert_equal(
-        _sf.locate_segment_position(s, 1.0),
-        (1, 5.0)
-    )
-    nt.assert_raises(
-        ValueError,
-        _sf.locate_segment_position, s, 1.1
-    )
-    nt.assert_raises(
-        ValueError,
-        _sf.locate_segment_position, s, -0.1
-    )
+    assert (
+        _sf.locate_segment_position(s, 0.0) ==
+        (0, 0.0))
+    assert (
+        _sf.locate_segment_position(s, 0.25) ==
+        (0, 2.5))
+    assert (
+        _sf.locate_segment_position(s, 0.75) ==
+        (1, 2.5))
+    assert (
+        _sf.locate_segment_position(s, 1.0) ==
+        (1, 5.0))
+    with pytest.raises(ValueError):
+        _sf.locate_segment_position(s, 1.1)
+    with pytest.raises(ValueError):
+        _sf.locate_segment_position(s, -0.1)
 
 def test_mean_radius():
     n = load_neuron(StringIO(u"""
@@ -210,7 +200,6 @@ def test_mean_radius():
     (3 0 4 200)
     (6 4 4 400))"""), reader='asc')
 
-    nt.assert_equal(
-        _sf.section_mean_radius(n.neurites[0]),
-       100.
-    )
+    assert (
+        _sf.section_mean_radius(n.neurites[0]) ==
+       100.)

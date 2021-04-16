@@ -26,22 +26,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from nose import tools as nt
 from neurom.core.point import Point
 from neurom.core.point import as_point
 
 
 def test_point_members():
     p = Point(1, 2, 3, 4)
-    nt.ok_(p.x == 1)
-    nt.ok_(p.y == 2)
-    nt.ok_(p.z == 3)
-    nt.ok_(p.r == 4)
+    assert p.x == 1
+    assert p.y == 2
+    assert p.z == 3
+    assert p.r == 4
 
 
 def test_as_point():
     p = as_point([1, 2, 3, 4, 5, 6, 7])
-    nt.ok_(p.x == 1)
-    nt.ok_(p.y == 2)
-    nt.ok_(p.z == 3)
-    nt.ok_(p.r == 4)
+    assert p.x == 1
+    assert p.y == 2
+    assert p.z == 3
+    assert p.r == 4

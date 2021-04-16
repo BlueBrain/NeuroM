@@ -33,12 +33,13 @@ import numpy as np
 from neurom import load_neuron
 from neurom.core.types import NeuriteType
 from neurom.view import common, view
-from nose.tools import assert_raises, eq_, ok_
+
+import pytest
 from numpy.testing import assert_allclose, assert_array_almost_equal
 
 from .utils import get_fig_2d, get_fig_3d  # needs to be at top to trigger matplotlib Agg backend
 
-DATA_PATH = './test_data'
+DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = Path(DATA_PATH, 'swc/')
 fst_neuron = load_neuron(Path(SWC_PATH, 'Neuron.swc'))
 simple_neuron = load_neuron(Path(SWC_PATH, 'simple.swc'))
@@ -56,7 +57,7 @@ def test_tree():
             view.plot_tree(ax, tree,
                            color=input_color, diameter_scale=None, alpha=1., linewidth=1.2)
             collection = ax.collections[0]
-            eq_(collection.get_linewidth()[0], 1.2)
+            assert collection.get_linewidth()[0] == 1.2
             assert_array_almost_equal(collection.get_colors(), expected_colors)
 
         with get_fig_2d() as (fig, ax):
@@ -64,12 +65,12 @@ def test_tree():
             view.plot_tree(ax, tree,
                            color=input_color, alpha=1., linewidth=1.2, realistic_diameters=True)
             collection = ax.collections[0]
-            eq_(collection.get_linewidth()[0], 1.0)
+            assert collection.get_linewidth()[0] == 1.0
             assert_array_almost_equal(collection.get_facecolors(), expected_colors)
 
 
-    with get_fig_2d() as (fig, ax):
-        assert_raises(AssertionError, view.plot_tree, ax, tree, plane='wrong')
+    with get_fig_2d() as (fig, ax), pytest.raises(AssertionError):
+        view.plot_tree(ax, tree, plane='wrong')
 
     with get_fig_2d() as (fig, ax):
         tree = simple_neuron.neurites[0]
@@ -80,13 +81,13 @@ def test_tree():
 def test_neuron():
     with get_fig_2d() as (fig, ax):
         view.plot_neuron(ax, fst_neuron)
-        ok_(ax.get_title() == fst_neuron.name)
+        assert ax.get_title() == fst_neuron.name
         assert_allclose(ax.dataLim.get_points(),
                                    [[-40.32853516, -57.600172],
                                     [64.74726272, 48.51626225], ])
 
-    with get_fig_2d() as (fig, ax):
-        assert_raises(AssertionError, view.plot_tree, ax, fst_neuron, plane='wrong')
+    with get_fig_2d() as (fig, ax), pytest.raises(AssertionError):
+        view.plot_tree(ax, fst_neuron, plane='wrong')
 
 
 def test_tree3d():
@@ -102,7 +103,7 @@ def test_tree3d():
 def test_neuron3d():
     with get_fig_3d() as (fig, ax):
         view.plot_neuron3d(ax, fst_neuron)
-        ok_(ax.get_title() == fst_neuron.name)
+        assert ax.get_title() == fst_neuron.name
         assert_allclose(ax.xy_dataLim.get_points(),
                                    [[-40.32853516, -57.600172],
                                     [64.74726272, 48.51626225], ])
@@ -180,11 +181,11 @@ def test_soma3d():
 
 
 def test_get_color():
-    eq_(view._get_color(None, NeuriteType.basal_dendrite), "red")
-    eq_(view._get_color(None, NeuriteType.axon), "blue")
-    eq_(view._get_color(None, NeuriteType.apical_dendrite), "purple")
-    eq_(view._get_color(None, NeuriteType.soma), "black")
-    eq_(view._get_color(None, NeuriteType.undefined), "green")
-    eq_(view._get_color(None, 'wrong'), "green")
-    eq_(view._get_color('blue', 'wrong'), "blue")
-    eq_(view._get_color('yellow', NeuriteType.axon), "yellow")
+    assert view._get_color(None, NeuriteType.basal_dendrite) == "red"
+    assert view._get_color(None, NeuriteType.axon) == "blue"
+    assert view._get_color(None, NeuriteType.apical_dendrite) == "purple"
+    assert view._get_color(None, NeuriteType.soma) == "black"
+    assert view._get_color(None, NeuriteType.undefined) == "green"
+    assert view._get_color(None, 'wrong') == "green"
+    assert view._get_color('blue', 'wrong') == "blue"
+    assert view._get_color('yellow', NeuriteType.axon) == "yellow"

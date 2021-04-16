@@ -29,10 +29,10 @@
 import math
 from pathlib import Path
 
-from nose import tools as nt
-
 import neurom as nm
 from neurom.core import Neurite
+
+from numpy.testing import assert_almost_equal
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
 nrn = nm.load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
@@ -44,32 +44,32 @@ REF_LEN = 3
 
 def test_init():
     nrt = Neurite(ROOT_NODE)
-    nt.eq_(nrt.type, nm.NeuriteType.basal_dendrite)
-    nt.eq_(len(nrt.points), 4)
+    assert nrt.type == nm.NeuriteType.basal_dendrite
+    assert len(nrt.points) == 4
 
 
 def test_neurite_length():
     nrt = Neurite(ROOT_NODE)
-    nt.assert_almost_equal(nrt.length, REF_LEN)
+    assert_almost_equal(nrt.length, REF_LEN)
 
 
 def test_neurite_area():
     nrt = Neurite(ROOT_NODE)
     area = 2 * math.pi * RADIUS * REF_LEN
-    nt.assert_almost_equal(nrt.area, area)
+    assert_almost_equal(nrt.area, area)
 
 
 def test_neurite_volume():
     nrt = Neurite(ROOT_NODE)
     volume = math.pi * RADIUS * RADIUS * REF_LEN
-    nt.assert_almost_equal(nrt.volume, volume)
+    assert_almost_equal(nrt.volume, volume)
 
 
 def test_str():
     nrt = Neurite(ROOT_NODE)
-    nt.ok_('Neurite' in str(nrt))
+    assert 'Neurite' in str(nrt)
 
 
 def test_neurite_hash():
     nrt = Neurite(ROOT_NODE)
-    nt.eq_(hash(nrt), hash((nrt.type, nrt.root_node)))
+    assert hash(nrt) == hash((nrt.type, nrt.root_node))

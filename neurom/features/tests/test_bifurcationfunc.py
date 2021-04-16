@@ -32,8 +32,6 @@ from pathlib import Path
 import warnings
 
 import numpy as np
-from nose import tools as nt
-from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_raises
 
 import neurom as nm
@@ -51,23 +49,23 @@ with warnings.catch_warnings(record=True):
 
 
 def test_local_bifurcation_angle():
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
-    nt.ok_(bf.local_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
+    assert bf.local_bifurcation_angle(SIMPLE.sections[0]) == np.pi
+    assert bf.local_bifurcation_angle(SIMPLE.sections[3]) == np.pi
     leaf = SIMPLE.section(2)
     assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 
 def test_remote_bifurcation_angle():
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[0]) == np.pi)
-    nt.ok_(bf.remote_bifurcation_angle(SIMPLE.sections[3]) == np.pi)
+    assert bf.remote_bifurcation_angle(SIMPLE.sections[0]) == np.pi
+    assert bf.remote_bifurcation_angle(SIMPLE.sections[3]) == np.pi
     leaf = SIMPLE.section(2)
     assert_raises(NeuroMError, bf.local_bifurcation_angle, leaf)
 
 
 def test_bifurcation_partition():
     root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.bifurcation_partition(root), 3.0)
-    assert_equal(bf.bifurcation_partition(root.children[0]), 1.0)
+    assert bf.bifurcation_partition(root) == 3.0
+    assert bf.bifurcation_partition(root.children[0]) == 1.0
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.bifurcation_partition, leaf)
@@ -78,8 +76,8 @@ def test_bifurcation_partition():
 
 def test_partition_asymmetry():
     root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.partition_asymmetry(root), 0.5)
-    assert_equal(bf.partition_asymmetry(root.children[0]), 0.0)
+    assert bf.partition_asymmetry(root) == 0.5
+    assert bf.partition_asymmetry(root.children[0]) == 0.0
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.partition_asymmetry, leaf)
@@ -90,11 +88,11 @@ def test_partition_asymmetry():
 
 def test_sibling_ratio():
     root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.sibling_ratio(root), 1.0)
-    assert_equal(bf.sibling_ratio(root.children[0]), 1.0)
+    assert bf.sibling_ratio(root) == 1.0
+    assert bf.sibling_ratio(root.children[0]) == 1.0
 
-    assert_equal(bf.sibling_ratio(root, method='mean'), 1.0)
-    assert_equal(bf.sibling_ratio(root.children[0], method='mean'), 1.0)
+    assert bf.sibling_ratio(root, method='mean') == 1.0
+    assert bf.sibling_ratio(root.children[0], method='mean') == 1.0
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.sibling_ratio, leaf)
@@ -108,11 +106,11 @@ def test_sibling_ratio():
 
 def test_diameter_power_relation():
     root = SIMPLE2.neurites[0].root_node
-    assert_equal(bf.diameter_power_relation(root), 2.0)
-    assert_equal(bf.diameter_power_relation(root.children[0]), 2.0)
+    assert bf.diameter_power_relation(root) == 2.0
+    assert bf.diameter_power_relation(root.children[0]) == 2.0
 
-    assert_equal(bf.diameter_power_relation(root, method='mean'), 2.0)
-    assert_equal(bf.diameter_power_relation(root.children[0], method='mean'), 2.0)
+    assert bf.diameter_power_relation(root, method='mean') == 2.0
+    assert bf.diameter_power_relation(root.children[0], method='mean') == 2.0
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.diameter_power_relation, leaf)

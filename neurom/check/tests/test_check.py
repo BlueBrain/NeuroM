@@ -29,7 +29,6 @@
 from collections import namedtuple
 
 from neurom.check import check_wrapper
-from nose import tools as nt
 
 MockResult = namedtuple('MockResult', 'status')
 
@@ -42,4 +41,4 @@ def test_check_wrapper_title():
         return Mock()
 
     f = check_wrapper(mock_fun)
-    nt.assert_equal(f().title, "Mock fun")
+    assert f().title == "Mock fun"

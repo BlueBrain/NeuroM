@@ -33,12 +33,12 @@ import neurom.geom.transform as gtr
 import numpy as np
 from neurom import COLS, load_neuron
 from neurom.features import neuritefunc as _nf
-from nose import tools as nt
+
+import pytest
+from numpy.testing import assert_almost_equal
 
 TEST_UVEC = np.array([0.01856633,  0.37132666,  0.92831665])
-
 TEST_ANGLE = np.pi / 3.
-
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_NRN_PATH = DATA_PATH / 'h5/v1/Neuron.h5'
 SWC_NRN_PATH = DATA_PATH / 'swc/Neuron.swc'
@@ -68,39 +68,39 @@ def _Rz(angle):
                      [0., 0., 1.]])
 
 
-@nt.raises(NotImplementedError)
 def test_not_implemented_transform_call_raises():
-    class Dummy(gtr.Transform3D):
-        pass
+    with pytest.raises(NotImplementedError):
+        class Dummy(gtr.Transform3D):
+            pass
 
-    d = Dummy()
-    d([1, 2, 3])
+        d = Dummy()
+        d([1, 2, 3])
 
 
-@nt.raises(NotImplementedError)
 def test_translate_bad_type_raises():
-    gtr.translate("hello", [1, 2, 3])
+    with pytest.raises(NotImplementedError):
+        gtr.translate("hello", [1, 2, 3])
 
 
-@nt.raises(NotImplementedError)
 def test_rotate_bad_type_raises():
-    gtr.rotate("hello", [1, 0, 0], math.pi)
+    with pytest.raises(NotImplementedError):
+        gtr.rotate("hello", [1, 0, 0], math.pi)
 
 
 def test_translate_point():
 
     t = gtr.Translation([100, -100, 100])
     point = [1, 2, 3]
-    nt.assert_equal(t(point).tolist(), [101, -98, 103])
+    assert t(point).tolist() == [101, -98, 103]
 
 
 def test_translate_points():
 
     t = gtr.Translation([100, -100, 100])
     points = np.array([[1, 2, 3], [11, 22, 33], [111, 222, 333]])
-    nt.assert_true(np.all(t(points) == np.array([[101, -98, 103],
+    assert np.all(t(points) == np.array([[101, -98, 103],
                                                  [111, -78, 133],
-                                                 [211, 122, 433]])))
+                                                 [211, 122, 433]]))
 
 
 ROT_90 = np.array([[0, -1, 0],
@@ -119,19 +119,19 @@ ROT_270 = np.array([[0, 1, 0],
 def test_rotate_point():
 
     rot = gtr.Rotation(ROT_90)
-    nt.assert_equal(rot([2, 0, 0]).tolist(), [0, 2, 0])
-    nt.assert_equal(rot([0, 2, 0]).tolist(), [-2, 0, 0])
-    nt.assert_equal(rot([0, 0, 2]).tolist(), [0, 0, 2])
+    assert rot([2, 0, 0]).tolist() == [0, 2, 0]
+    assert rot([0, 2, 0]).tolist() == [-2, 0, 0]
+    assert rot([0, 0, 2]).tolist() == [0, 0, 2]
 
     rot = gtr.Rotation(ROT_180)
-    nt.assert_equal(rot([2, 0, 0]).tolist(), [-2, 0, 0])
-    nt.assert_equal(rot([0, 2, 0]).tolist(), [0, -2, 0])
-    nt.assert_equal(rot([0, 0, 2]).tolist(), [0, 0, 2])
+    assert rot([2, 0, 0]).tolist() == [-2, 0, 0]
+    assert rot([0, 2, 0]).tolist() == [0, -2, 0]
+    assert rot([0, 0, 2]).tolist() == [0, 0, 2]
 
     rot = gtr.Rotation(ROT_270)
-    nt.assert_equal(rot([2, 0, 0]).tolist(), [0, -2, 0])
-    nt.assert_equal(rot([0, 2, 0]).tolist(), [2, 0, 0])
-    nt.assert_equal(rot([0, 0, 2]).tolist(), [0, 0, 2])
+    assert rot([2, 0, 0]).tolist() == [0, -2, 0]
+    assert rot([0, 2, 0]).tolist() == [2, 0, 0]
+    assert rot([0, 0, 2]).tolist() == [0, 0, 2]
 
 
 def test_rotate_points():
@@ -143,22 +143,22 @@ def test_rotate_points():
                        [0, 0, 2],
                        [3, 0, 3]])
 
-    nt.assert_true(np.all(rot(points) == np.array([[0, 2, 0],
+    assert np.all(rot(points) == np.array([[0, 2, 0],
                                                    [-2, 0, 0],
                                                    [0, 0, 2],
-                                                   [0, 3, 3]])))
+                                                   [0, 3, 3]]))
 
     rot = gtr.Rotation(ROT_180)
-    nt.assert_true(np.all(rot(points) == np.array([[-2, 0, 0],
+    assert np.all(rot(points) == np.array([[-2, 0, 0],
                                                    [0, -2, 0],
                                                    [0, 0, 2],
-                                                   [-3, 0, 3]])))
+                                                   [-3, 0, 3]]))
 
     rot = gtr.Rotation(ROT_270)
-    nt.assert_true(np.all(rot(points) == np.array([[0, -2, 0],
+    assert np.all(rot(points) == np.array([[0, -2, 0],
                                                    [2, 0, 0],
                                                    [0, 0, 2],
-                                                   [0, -3, 3]])))
+                                                   [0, -3, 3]]))
 
 
 def test_pivot_rotate_point():
@@ -180,7 +180,7 @@ def test_pivot_rotate_point():
     p2 = gtr.Rotation(R)(p2)
     p2 = t(p2)
 
-    nt.assert_equal(p1.tolist(), p2.tolist())
+    assert p1.tolist() == p2.tolist()
 
 
 def test_pivot_rotate_points():
@@ -205,14 +205,14 @@ def test_pivot_rotate_points():
     p2 = gtr.Rotation(R)(p2)
     p2 = t(p2)
 
-    nt.assert_true(np.all(p1 == p2))
+    assert np.all(p1 == p2)
 
 
 def _check_fst_nrn_translate(nrn_a, nrn_b, t):
 
     # soma points
-    nt.assert_true(np.allclose(
-        (nrn_b.soma.points[:, COLS.XYZ] - nrn_a.soma.points[:, COLS.XYZ]), t))
+    assert np.allclose(
+        (nrn_b.soma.points[:, COLS.XYZ] - nrn_a.soma.points[:, COLS.XYZ]), t)
     _check_fst_neurite_translate(nrn_a.neurites, nrn_b.neurites, t)
 
 
@@ -220,7 +220,7 @@ def _check_fst_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
     for sa, sb in zip(_nf.iter_sections(nrts_a),
                       _nf.iter_sections(nrts_b)):
-        nt.assert_true(np.allclose((sb.points[:, COLS.XYZ] - sa.points[:, COLS.XYZ]), t))
+        assert np.allclose((sb.points[:, COLS.XYZ] - sa.points[:, COLS.XYZ]), t)
 
 
 def test_translate_fst_neuron_swc():
@@ -261,8 +261,8 @@ def _apply_rot(points, rot_mat):
 def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 
     # soma points
-    nt.assert_true(np.allclose(_apply_rot(nrn_a.soma.points[:, COLS.XYZ], rot_mat),
-                               nrn_b.soma.points[:, COLS.XYZ]))
+    assert np.allclose(_apply_rot(nrn_a.soma.points[:, COLS.XYZ], rot_mat),
+                               nrn_b.soma.points[:, COLS.XYZ])
 
     # neurite sections
     _check_fst_neurite_rotate(nrn_a.neurites, nrn_b.neurites, rot_mat)
@@ -271,8 +271,8 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
     for sa, sb in zip(_nf.iter_sections(nrt_a),
                       _nf.iter_sections(nrt_b)):
-        nt.assert_true(np.allclose(sb.points[:, COLS.XYZ],
-                                   _apply_rot(sa.points[:, COLS.XYZ], rot_mat)))
+        assert np.allclose(sb.points[:, COLS.XYZ],
+                                   _apply_rot(sa.points[:, COLS.XYZ], rot_mat))
 
 
 def test_rotate_neuron_swc():
@@ -314,18 +314,18 @@ def test_rodrigues_to_dcm():
     # assess rotation matrix properties:
 
     # detR = +=1
-    nt.assert_almost_equal(np.linalg.det(R), 1.)
+    assert_almost_equal(np.linalg.det(R), 1.)
 
     # R.T = R^-1
-    nt.assert_true(np.allclose(np.linalg.inv(R), R.transpose()))
+    assert np.allclose(np.linalg.inv(R), R.transpose())
 
     # check against calculated matrix
-    nt.assert_true(np.allclose(R, RES))
+    assert np.allclose(R, RES)
 
     # check if opposite sign generates inverse
     Rinv = gtr._rodrigues_to_dcm(TEST_UVEC, -TEST_ANGLE)
 
-    nt.assert_true(np.allclose(np.dot(Rinv, R), np.identity(3)))
+    assert np.allclose(np.dot(Rinv, R), np.identity(3))
 
     # check basic rotations with a range of angles
     for angle in np.linspace(0., 2. * np.pi, 10):
@@ -334,6 +334,6 @@ def test_rodrigues_to_dcm():
         Ry = gtr._rodrigues_to_dcm(np.array([0., 1., 0.]), angle)
         Rz = gtr._rodrigues_to_dcm(np.array([0., 0., 1.]), angle)
 
-        nt.assert_true(np.allclose(Rx, _Rx(angle)))
-        nt.assert_true(np.allclose(Ry, _Ry(angle)))
-        nt.assert_true(np.allclose(Rz, _Rz(angle)))
+        assert np.allclose(Rx, _Rx(angle))
+        assert np.allclose(Ry, _Ry(angle))
+        assert np.allclose(Rz, _Rz(angle))

@@ -41,7 +41,6 @@ from neurom.features import neuritefunc as _nrt
 from neurom.features import neuronfunc as _nrn
 from neurom.features import sectionfunc as _sec
 from neurom.features.tests.utils import _close, _equal
-from nose import tools as nt
 from numpy.testing import assert_almost_equal
 
 DATA_PATH =  Path(__file__).parent.parent.parent.parent / 'test_data'
@@ -83,21 +82,21 @@ def i_chain2(trees, iterator_type=Section.ipreorder, mapping=None, tree_filter=N
 class SectionTreeBase:
     """Base class for section tree tests."""
 
-    def setUp(self):
+    def setup_method(self):
         self.ref_nrn = 'h5'
         self.ref_types = REF_NEURITE_TYPES
 
     def test_neurite_type(self):
         neurite_types = [n0.type for n0 in self.sec_nrn.neurites]
-        nt.assert_equal(neurite_types, self.ref_types)
+        assert neurite_types == self.ref_types
 
     def test_get_n_sections(self):
-        nt.assert_equal(_nrt.n_sections(self.sec_nrn),
+        assert (_nrt.n_sections(self.sec_nrn) ==
                         get('number_of_sections', self.ref_nrn)[0])
 
         for t in NeuriteType:
             actual = _nrt.n_sections(self.sec_nrn, neurite_type=t)
-            nt.assert_equal(actual,
+            assert (actual ==
                             get('number_of_sections', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_number_of_sections_per_neurite(self):
@@ -109,15 +108,15 @@ class SectionTreeBase:
                    get('number_of_sections_per_neurite', self.ref_nrn, neurite_type=t))
 
     def test_get_n_segments(self):
-        nt.assert_equal(_nrt.n_segments(self.sec_nrn), get('number_of_segments', self.ref_nrn)[0])
+        assert _nrt.n_segments(self.sec_nrn) == get('number_of_segments', self.ref_nrn)[0]
         for t in NeuriteType:
-            nt.assert_equal(_nrt.n_segments(self.sec_nrn, neurite_type=t),
+            assert (_nrt.n_segments(self.sec_nrn, neurite_type=t) ==
                             get('number_of_segments', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_number_of_neurites(self):
-        nt.assert_equal(_nrt.n_neurites(self.sec_nrn), get('number_of_neurites', self.ref_nrn)[0])
+        assert _nrt.n_neurites(self.sec_nrn) == get('number_of_neurites', self.ref_nrn)[0]
         for t in NeuriteType:
-            nt.assert_equal(_nrt.n_neurites(self.sec_nrn, neurite_type=t),
+            assert (_nrt.n_neurites(self.sec_nrn, neurite_type=t) ==
                             get('number_of_neurites', self.ref_nrn, neurite_type=t)[0])
 
     def test_get_section_path_distances(self):
@@ -188,8 +187,8 @@ class SectionTreeBase:
 
 class TestH5V1(SectionTreeBase):
 
-    def setUp(self):
-        super(TestH5V1, self).setUp()
+    def setup_method(self):
+        super(TestH5V1, self).setup_method()
         self.sec_nrn = nm.load_neuron(Path(H5V1_DATA_PATH, MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]
 
@@ -209,7 +208,7 @@ class TestH5V1(SectionTreeBase):
 
 class TestSWC(SectionTreeBase):
 
-    def setUp(self):
+    def setup_method(self):
         self.ref_nrn = 'swc'
         self.sec_nrn = nm.load_neuron(Path(SWC_DATA_PATH, SWC_MORPH_FILENAME))
         self.sec_nrn_trees = [n.root_node for n in self.sec_nrn.neurites]

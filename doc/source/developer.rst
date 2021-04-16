@@ -45,7 +45,7 @@ Running the tests
 -----------------
 
 The tests require that you have cloned the repository, since the test code is
-not distributed in the package. It is recommended to use ``nosetests`` for
+not distributed in the package. It is recommended to use ``pytest`` for
 this. There are two options:
 
 Use the provided ``Makefile`` to run the tests using ``make``:
@@ -89,7 +89,7 @@ Then, run the tests manually in the ``virtualenv``. For example,
 
 .. code-block:: bash
 
-    (nrm)$ nosetests -v --with-coverage --cover-min-percentage=100 --cover-package neurom
+    (nrm)$ pytest --cov-report term-missing --cov-report xml --cov-report html --cov=neurom neurom
 
 .. warning::
 

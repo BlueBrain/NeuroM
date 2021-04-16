@@ -36,13 +36,13 @@ import numpy as np
 from neurom import NeuriteType, load_neuron
 from neurom.core.population import Population
 from neurom.features import neuronfunc as _nf
-from nose import tools as nt
+
+import pytest
 from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 H5_PATH = DATA_PATH / 'h5/v1'
 NRN = load_neuron(Path(H5_PATH, 'Neuron.h5'))
-
 SWC_PATH = DATA_PATH / 'swc'
 SIMPLE = load_neuron(Path(SWC_PATH, 'simple.swc'))
 SIMPLE_TRUNK = load_neuron(Path(SWC_PATH, 'simple_trunk.swc'))
@@ -70,37 +70,37 @@ def test_soma_volume():
 def test_soma_volumes():
     with warnings.catch_warnings(record=True):
         ret = _nf.soma_volumes(SIMPLE)
-        nt.eq_(ret, [4.1887902047863905, ])
+        assert ret == [4.1887902047863905, ]
 
 
 def test_soma_surface_area():
     ret = _nf.soma_surface_area(SIMPLE)
-    nt.eq_(ret, 12.566370614359172)
+    assert ret == 12.566370614359172
 
 
 def test_soma_surface_areas():
     ret = _nf.soma_surface_areas(SIMPLE)
-    nt.eq_(ret, [12.566370614359172, ])
+    assert ret == [12.566370614359172, ]
 
 
 def test_soma_radii():
     ret = _nf.soma_radii(SIMPLE)
-    nt.eq_(ret, [1., ])
+    assert ret == [1., ]
 
 
 def test_trunk_section_lengths():
     ret = _nf.trunk_section_lengths(SIMPLE)
-    nt.eq_(ret, [5.0, 4.0])
+    assert ret == [5.0, 4.0]
 
 
 def test_trunk_origin_radii():
     ret = _nf.trunk_origin_radii(SIMPLE)
-    nt.eq_(ret, [1.0, 1.0])
+    assert ret == [1.0, 1.0]
 
 
 def test_trunk_origin_azimuths():
     ret = _nf.trunk_origin_azimuths(SIMPLE)
-    nt.eq_(ret, [0.0, 0.0])
+    assert ret == [0.0, 0.0]
 
 
 def test_trunk_angles():
@@ -153,30 +153,30 @@ def test_trunk_origin_elevations():
                               [])
 
 
-@nt.raises(Exception)
 def test_trunk_elevation_zero_norm_vector_raises():
-    _nf.trunk_origin_elevations(SWC_NRN)
+    with pytest.raises(Exception):
+        _nf.trunk_origin_elevations(SWC_NRN)
 
 
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
-    nt.eq_(list(_nf.sholl_crossings(SIMPLE, center, radii=radii)),
+    assert (list(_nf.sholl_crossings(SIMPLE, center, radii=radii)) ==
            [])
 
     radii = [1.0]
-    nt.eq_([2],
+    assert ([2] ==
            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1.0, 5.1]
-    nt.eq_([2, 4],
+    assert ([2, 4] ==
            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1., 4., 5.]
-    nt.eq_([2, 4, 5],
+    assert ([2, 4, 5] ==
            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
     
-    nt.eq_([1, 1, 2],
+    assert ([1, 1, 2] ==
            list(_nf.sholl_crossings(list(SIMPLE.sections[:2]), center, radii=radii)))
 
 
@@ -198,7 +198,7 @@ def test_sholl_analysis_custom():
  3 3  80  0  0 1.  2
  4 4   0  0  0 1.  1
  5 4 -80  0  0 1.  4""")
-    nt.eq_(list(_nf.sholl_crossings(morph_A, center, radii=radii)),
+    assert (list(_nf.sholl_crossings(morph_A, center, radii=radii)) ==
            [2, 2, 2, 2, 2, 2, 2, 2])
 
     morph_B = load_swc("""\
@@ -217,7 +217,7 @@ def test_sholl_analysis_custom():
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
                        """)
-    nt.eq_(list(_nf.sholl_crossings(morph_B, center, radii=radii)),
+    assert (list(_nf.sholl_crossings(morph_B, center, radii=radii)) ==
            [2, 2, 2, 10, 10, 0, 0, 0])
 
     morph_C = load_swc("""\
@@ -236,6 +236,6 @@ def test_sholl_analysis_custom():
 13 4  85  -5  0 1.  9
 14 4  85 -10  0 1.  9
                        """)
-    nt.eq_(list(_nf.sholl_crossings(morph_C, center, radii=radii)),
+    assert (list(_nf.sholl_crossings(morph_C, center, radii=radii)) ==
            [2, 2, 2, 2, 2, 2, 10, 10])
     # view.neuron(morph_C)[0].savefig('foo.png')

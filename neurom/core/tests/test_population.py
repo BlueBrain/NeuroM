@@ -28,7 +28,6 @@
 
 from pathlib import Path
 
-from nose import tools as nt
 from neurom.core.population import Population
 from neurom import load_neuron
 
@@ -44,36 +43,36 @@ POP = Population(NEURONS, name='foo')
 
 
 def test_population():
-    nt.assert_equal(len(POP.neurons), 3)
-    nt.ok_(POP.neurons[0].name, 'Neuron')
-    nt.ok_(POP.neurons[1].name, 'Single_basal')
-    nt.ok_(POP.neurons[2].name, 'Neuron_small_radius')
+    assert len(POP.neurons) == 3
+    assert POP.neurons[0].name, 'Neuron'
+    assert POP.neurons[1].name, 'Single_basal'
+    assert POP.neurons[2].name, 'Neuron_small_radius'
 
-    nt.assert_equal(len(POP.somata), 3)
+    assert len(POP.somata) == 3
 
-    nt.assert_equal(len(POP.neurites), TOT_NEURITES)
+    assert len(POP.neurites) == TOT_NEURITES
 
-    nt.assert_equal(POP.name, 'foo')
+    assert POP.name == 'foo'
 
 
 def test_neurons():
     for i, n in enumerate(NEURONS):
-        nt.assert_true(n is POP.neurons[i])
+        assert n is POP.neurons[i]
 
 
 def test_iterate_neurons():
     for a, b in zip(NEURONS, POP):
-        nt.assert_true(a is b)
+        assert a is b
 
 
 def test_len():
-    nt.assert_equal(len(POP), len(NEURONS))
+    assert len(POP) == len(NEURONS)
 
 
 def test_getitem():
     for i in range(len(NEURONS)):
-        nt.assert_true(POP[i] is NEURONS[i])
+        assert POP[i] is NEURONS[i]
 
 
 def test_str():
-    nt.ok_('Population' in str(POP))
+    assert 'Population' in str(POP)

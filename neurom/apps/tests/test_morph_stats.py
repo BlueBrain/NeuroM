@@ -36,14 +36,13 @@ import pandas as pd
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES
-from nose.tools import assert_almost_equal, assert_equal, assert_raises, ok_
-from numpy.testing import assert_array_equal
+
+import pytest
+from numpy.testing import assert_array_equal, assert_almost_equal
 from pandas.testing import assert_frame_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 SWC_PATH = DATA_PATH / 'swc'
-
-
 REF_CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'total'],
@@ -108,35 +107,35 @@ REF_OUT = {
 
 
 def test_name_correction():
-    assert_equal(ms._stat_name('foo', 'raw'), 'foo')
-    assert_equal(ms._stat_name('foos', 'raw'), 'foo')
-    assert_equal(ms._stat_name('foos', 'bar'), 'bar_foo')
-    assert_equal(ms._stat_name('foos', 'total'), 'total_foo')
-    assert_equal(ms._stat_name('soma_radii', 'total'), 'total_soma_radius')
-    assert_equal(ms._stat_name('soma_radii', 'raw'), 'soma_radius')
+    assert ms._stat_name('foo', 'raw') == 'foo'
+    assert ms._stat_name('foos', 'raw') == 'foo'
+    assert ms._stat_name('foos', 'bar') == 'bar_foo'
+    assert ms._stat_name('foos', 'total') == 'total_foo'
+    assert ms._stat_name('soma_radii', 'total') == 'total_soma_radius'
+    assert ms._stat_name('soma_radii', 'raw') == 'soma_radius'
 
 
 def test_eval_stats_raw_returns_list():
-    assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'raw'), [1, 2, 3, 4])
+    assert ms.eval_stats(np.array([1, 2, 3, 4]), 'raw') == [1, 2, 3, 4]
 
 
 def test_eval_stats_empty_input_returns_none():
-    ok_(ms.eval_stats([], 'min') is None)
+    assert ms.eval_stats([], 'min') is None
 
 
 def test_eval_stats_total_returns_sum():
-    assert_equal(ms.eval_stats(np.array([1, 2, 3, 4]), 'total'), 10)
+    assert ms.eval_stats(np.array([1, 2, 3, 4]), 'total') == 10
 
 
 def test_eval_stats_on_empty_stat():
-    assert_equal(ms.eval_stats(np.array([]), 'mean'), None)
-    assert_equal(ms.eval_stats(np.array([]), 'std'), None)
-    assert_equal(ms.eval_stats(np.array([]), 'median'), None)
-    assert_equal(ms.eval_stats(np.array([]), 'min'), None)
-    assert_equal(ms.eval_stats(np.array([]), 'max'), None)
+    assert ms.eval_stats(np.array([]), 'mean') == None
+    assert ms.eval_stats(np.array([]), 'std') == None
+    assert ms.eval_stats(np.array([]), 'median') == None
+    assert ms.eval_stats(np.array([]), 'min') == None
+    assert ms.eval_stats(np.array([]), 'max') == None
 
-    assert_equal(ms.eval_stats(np.array([]), 'raw'), [])
-    assert_equal(ms.eval_stats(np.array([]), 'total'), 0.0)
+    assert ms.eval_stats(np.array([]), 'raw') == []
+    assert ms.eval_stats(np.array([]), 'total') == 0.0
 
 
 def test_eval_stats_applies_numpy_function():
@@ -145,18 +144,17 @@ def test_eval_stats_applies_numpy_function():
     ref_array = np.arange(1, 10)
 
     for m in modes:
-        assert_equal(ms.eval_stats(ref_array, m),
-                     getattr(np, m)(ref_array))
+        assert (ms.eval_stats(ref_array, m) == getattr(np, m)(ref_array))
 
 
 def test_extract_stats_single_neuron():
     nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     res = ms.extract_stats(nrn, REF_CONFIG)
-    assert_equal(set(res.keys()), set(REF_OUT.keys()))
+    assert set(res.keys()) == set(REF_OUT.keys())
     for k in ('neuron', 'all', 'axon', 'basal_dendrite', 'apical_dendrite'):
-        assert_equal(set(res[k].keys()), set(REF_OUT[k].keys()))
+        assert set(res[k].keys()) == set(REF_OUT[k].keys())
         for kk in res[k].keys():
-            assert_almost_equal(res[k][kk], REF_OUT[k][kk], places=3)
+            assert_almost_equal(res[k][kk], REF_OUT[k][kk], decimal=4)
 
 
 def test_extract_stats_scalar_feature():
@@ -171,8 +169,8 @@ def test_extract_stats_scalar_feature():
         }
     }
     res = ms.extract_stats(nrn, config)
-    assert_equal(res, {'all': {'max_n_forking_point': 277},
-                       'neuron': {'total_soma_volume': 1424.4383771584492}})
+    assert res == {'all': {'max_n_forking_point': 277},
+                       'neuron': {'total_soma_volume': 1424.4383771584492}}
 
 
 def test_extract_dataframe():
@@ -245,7 +243,7 @@ def test_extract_dataframe_multiproc():
 
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=os.cpu_count() + 1)
-        assert_equal(len(w), 1, "Warning not emitted")
+        assert len(w) == 1, "Warning not emitted"
     assert_frame_equal(actual, expected)
 
 
@@ -255,9 +253,9 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    assert_equal(1 + 2 + 4 * (4 + 4), len(header))  # name + everything in REF_OUT
-    ok_('name' in header)
-    ok_('neuron:mean_soma_radius' in header)
+    assert 1 + 2 + 4 * (4 + 4) == len(header)  # name + everything in REF_OUT
+    assert 'name' in header
+    assert 'neuron:mean_soma_radius' in header
 
 
 def test_generate_flattened_dict():
@@ -267,23 +265,25 @@ def test_generate_flattened_dict():
                     }
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
-    assert_equal(3, len(rows))  # one for fake_name[0-2]
-    assert_equal(1 + 2 + 4 * (4 + 4), len(rows[0]))  # name + everything in REF_OUT
+    assert 3 == len(rows)  # one for fake_name[0-2]
+    assert 1 + 2 + 4 * (4 + 4) == len(rows[0])  # name + everything in REF_OUT
 
 
 def test_full_config():
     config = ms.full_config()
-    assert_equal(set(config.keys()), {'neurite', 'neuron', 'neurite_type'})
+    assert set(config.keys()) == {'neurite', 'neuron', 'neurite_type'}
 
-    assert_equal(set(config['neurite'].keys()), set(NEURITEFEATURES.keys()))
-    assert_equal(set(config['neuron'].keys()), set(NEURONFEATURES.keys()))
+    assert set(config['neurite'].keys()) == set(NEURITEFEATURES.keys())
+    assert set(config['neuron'].keys()) == set(NEURONFEATURES.keys())
 
 
 def test_sanitize_config():
-    assert_raises(ConfigError, ms.sanitize_config, {'neurite': []})
+
+    with pytest.raises(ConfigError):
+        ms.sanitize_config({'neurite': []})
 
     new_config = ms.sanitize_config({})  # empty
-    assert_equal(2, len(new_config))  # neurite & neuron created
+    assert 2 == len(new_config)  # neurite & neuron created
 
     full_config = {
         'neurite': {
@@ -297,7 +297,7 @@ def test_sanitize_config():
         }
     }
     new_config = ms.sanitize_config(full_config)
-    assert_equal(3, len(new_config))  # neurite, neurite_type & neuron
+    assert 3 == len(new_config)  # neurite, neurite_type & neuron
 
 
 def test_multidimensional_features():

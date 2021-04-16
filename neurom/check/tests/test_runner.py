@@ -27,18 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from collections import OrderedDict
 from copy import copy
 from pathlib import Path
 
 from neurom.check.runner import CheckRunner
 from neurom.exceptions import ConfigError
-from nose import tools as nt
+
+import pytest
 
 _path = os.path.dirname(os.path.abspath(__file__))
 SWC_PATH = Path(__file__).parent / '../../../test_data/swc/'
-
-
 CONFIG = {
     'checks': {
         'neuron_checks': [
@@ -58,7 +56,6 @@ CONFIG = {
         "has_all_nonzero_section_lengths": [0.01]
     },
 }
-
 CONFIG_COLOR = copy(CONFIG)
 CONFIG_COLOR['color'] = True
 
@@ -67,9 +64,9 @@ def _run_test(path, ref, config=CONFIG, should_pass=False):
     """Run checkers with the passed "config" on file "path"
     and compare the results to 'ref'"""
     results = CheckRunner(config).run(path)
-    nt.assert_dict_equal(dict(results['files'][path]), ref)
-    nt.assert_equal(results['STATUS'],
-                    "PASS" if should_pass else "FAIL")
+    assert dict(results['files'][path]) == ref
+    assert (results['STATUS'] ==
+                    ("PASS" if should_pass else "FAIL"))
 
 ref = dict([
     ("Has basal dendrite", True),
@@ -162,30 +159,31 @@ def test_single_apical_no_soma():
 def test_directory_input():
     checker = CheckRunner(CONFIG)
     summ = checker.run(SWC_PATH)
-    nt.eq_(summ['files'][os.path.join(SWC_PATH, 'Single_axon.swc')]['Has axon'], True)
-    nt.eq_(summ['files'][os.path.join(SWC_PATH, 'Single_apical.swc')]['Has axon'], False)
+    assert summ['files'][os.path.join(SWC_PATH, 'Single_axon.swc')]['Has axon'] == True
+    assert summ['files'][os.path.join(SWC_PATH, 'Single_apical.swc')]['Has axon'] == False
 
 
-@nt.raises(IOError)
 def test_invalid_data_path_raises_IOError():
-    checker = CheckRunner(CONFIG)
-    _ = checker.run('foo/bar/baz')
+    with pytest.raises(IOError):
+        checker = CheckRunner(CONFIG)
+        _ = checker.run('foo/bar/baz')
 
 
 def test__sanitize_config():
     # fails if missing 'checks'
-    nt.assert_raises(ConfigError, CheckRunner._sanitize_config, {})
+    with pytest.raises(ConfigError):
+        CheckRunner._sanitize_config({})
 
     # creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})
-    nt.eq_(new_config, {'checks':
+    assert new_config == {'checks':
                         {
                          'neuron_checks': [],
                          },
                         'options': {},
                         'color': False,
-                        })
+                        }
 
     # makes no changes to already filled out config
     new_config = CheckRunner._sanitize_config(CONFIG)
-    nt.eq_(CONFIG, new_config)
+    assert CONFIG == new_config

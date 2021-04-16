@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -41,12 +40,13 @@ if 'DISPLAY' not in os.environ:  # noqa
 import neurom
 from neurom import NeuriteType, load_neuron, viewer
 from neurom.view import common, plotly
-from nose import tools as nt
-from numpy.testing import assert_allclose, assert_array_almost_equal
+
+import pytest
+from numpy.testing import assert_allclose
+
 
 DATA_PATH = Path(__file__).parent.parent.parent / 'test_data/swc'
 MORPH_FILENAME = Path(DATA_PATH, 'Neuron.swc')
-
 nrn = load_neuron(MORPH_FILENAME)
 
 
@@ -60,9 +60,9 @@ def test_plotly_extra_not_installed():
     with mock.patch.dict(sys.modules, {'plotly': None}):
         try:
             _reload_module(neurom.view.plotly)
-            nt.ok_(False, "ImportError not triggered")
+            assert False, "ImportError not triggered"
         except ImportError as e:
-            nt.assert_equal(str(e),
+            assert (str(e) ==
                             'neurom[plotly] is not installed. '
                             'Please install it by doing: pip install neurom[plotly]')
 
@@ -104,7 +104,8 @@ def test_draw_neuron3d():
     viewer.draw(nrn, mode='3d')
     common.plt.close('all')
 
-    nt.assert_raises(NotImplementedError, viewer.draw, nrn, mode='3d', realistic_diameters=True)
+    with pytest.raises(NotImplementedError):
+        viewer.draw(nrn, mode='3d', realistic_diameters=True)
 
 
 def test_draw_tree():
@@ -141,26 +142,26 @@ def test_draw_dendrogram_empty_segment():
 
 
 
-@nt.raises(viewer.InvalidDrawModeError)
 def test_invalid_draw_mode_raises():
-    viewer.draw(nrn, mode='4d')
+    with pytest.raises(viewer.InvalidDrawModeError):
+        viewer.draw(nrn, mode='4d')
 
 
-@nt.raises(viewer.NotDrawableError)
 def test_invalid_object_raises():
-    class Dummy:
-        pass
-    viewer.draw(Dummy())
+    with pytest.raises(viewer.NotDrawableError):
+        class Dummy:
+            pass
+        viewer.draw(Dummy())
 
 
-@nt.raises(viewer.NotDrawableError)
 def test_invalid_combo_raises():
-    viewer.draw(nrn.soma, mode='dendrogram')
+    with pytest.raises(viewer.NotDrawableError):
+        viewer.draw(nrn.soma, mode='dendrogram')
 
 
 def test_writing_output():
     with tempfile.TemporaryDirectory() as folder:
         output_dir = Path(folder, 'subdir')
         viewer.draw(nrn, mode='2d', output_path=output_dir)
-        nt.ok_((output_dir / 'Figure.png').is_file())
+        assert (output_dir / 'Figure.png').is_file()
         common.plt.close('all')

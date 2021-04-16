@@ -29,62 +29,61 @@
 
 from mock import Mock
 from neurom.core.types import NEURITES, NeuriteType, axon_filter, dendrite_filter, tree_type_checker
-from nose import tools as nt
 
 
 def test_tree_type_checker():
     # check that when NeuriteType.all, we accept all trees, w/o checking type
     tree_filter = tree_type_checker(NeuriteType.all)
-    nt.ok_(tree_filter('fake_tree'))
+    assert tree_filter('fake_tree')
 
     mock_tree = Mock()
     mock_tree.type = NeuriteType.axon
 
     # single arg
     tree_filter = tree_type_checker(NeuriteType.axon)
-    nt.ok_(tree_filter(mock_tree))
+    assert tree_filter(mock_tree)
 
     mock_tree.type = NeuriteType.basal_dendrite
-    nt.ok_(not tree_filter(mock_tree))
+    assert not tree_filter(mock_tree)
 
     # multiple args
     tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
-    nt.ok_(tree_filter(mock_tree))
+    assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(*NEURITES)
-    nt.ok_(tree_filter('fake_tree'))
-    nt.ok_(tree_filter(mock_tree))
+    assert tree_filter('fake_tree')
+    assert tree_filter(mock_tree)
 
 
 def test_tree_type_checker_broken():
     tree_filter = tree_type_checker(NeuriteType.all)
-    nt.ok_(tree_filter('fake_tree'))
+    assert tree_filter('fake_tree')
 
     mock_tree = Mock()
     mock_tree.type = NeuriteType.axon
 
     tree_filter = tree_type_checker(*NEURITES)
-    nt.ok_(tree_filter(mock_tree))
+    assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(
         NeuriteType.axon,
         NeuriteType.apical_dendrite,
         NeuriteType.basal_dendrite)
     mock_tree.type = NeuriteType.soma
-    nt.ok_(not tree_filter(mock_tree))
+    assert not tree_filter(mock_tree)
 
 def test_type_filters():
     axon = Mock()
     axon.type = NeuriteType.axon
-    nt.ok_(axon_filter(axon))
-    nt.ok_(not dendrite_filter(axon))
+    assert axon_filter(axon)
+    assert not dendrite_filter(axon)
 
     basal_dendrite = Mock()
     basal_dendrite.type = NeuriteType.basal_dendrite
-    nt.ok_(not axon_filter(basal_dendrite))
-    nt.ok_(dendrite_filter(basal_dendrite))
+    assert not axon_filter(basal_dendrite)
+    assert dendrite_filter(basal_dendrite)
 
     apical_dendrite = Mock()
     apical_dendrite.type = NeuriteType.apical_dendrite
-    nt.ok_(not axon_filter(apical_dendrite))
-    nt.ok_(dendrite_filter(apical_dendrite))
+    assert not axon_filter(apical_dendrite)
+    assert dendrite_filter(apical_dendrite)

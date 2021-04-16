@@ -31,7 +31,6 @@ from pathlib import Path
 import neurom as nm
 import numpy as np
 from neurom import geom
-from nose import tools as nt
 from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc'
@@ -52,7 +51,7 @@ def test_bounding_box():
     obj = PointObj()
     obj.points = pts
 
-    nt.assert_true(np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]]))
+    assert np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
 
 
 def test_bounding_box_neuron():
@@ -60,12 +59,12 @@ def test_bounding_box_neuron():
     ref = np.array([[-40.32853516, -57.600172, 0.],
                     [64.74726272, 48.51626225, 54.20408797]])
 
-    nt.assert_true(np.allclose(geom.bounding_box(NRN), ref))
+    assert np.allclose(geom.bounding_box(NRN), ref)
 
 
 def test_bounding_box_soma():
     ref = np.array([[0., 0., 0.], [0.1, 0.2, 0.]])
-    nt.assert_true(np.allclose(geom.bounding_box(NRN.soma), ref))
+    assert np.allclose(geom.bounding_box(NRN.soma), ref)
 
 
 def test_bounding_box_neurite():
@@ -78,7 +77,7 @@ def test_convex_hull_points():
     # This leverages scipy ConvexHull and we don't want
     # to re-test scipy, so simply check that the points are the same.
     hull = geom.convex_hull(NRN)
-    nt.ok_(np.alltrue(hull.points == NRN.points[:, :3]))
+    assert np.alltrue(hull.points == NRN.points[:, :3])
 
 
 def test_convex_hull_volume():

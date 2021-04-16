@@ -2,12 +2,11 @@ from pathlib import Path
 from collections import namedtuple
 
 import numpy as np
-from nose import tools as nt
-from numpy.testing import assert_array_almost_equal
-
 import neurom.view.dendrogram as dm
 from neurom import load_neuron, get
 from neurom.core.types import NeuriteType
+
+from numpy.testing import assert_array_almost_equal
 
 DATA_PATH = Path(__file__).parent.parent.parent.parent / 'test_data'
 NEURON_PATH = Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
@@ -16,14 +15,14 @@ NEURON_PATH = Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5')
 def test_create_dendrogram_neuron():
     neuron = load_neuron(NEURON_PATH)
     dendrogram = dm.Dendrogram(neuron)
-    nt.assert_equal(NeuriteType.soma, dendrogram.neurite_type)
+    assert NeuriteType.soma == dendrogram.neurite_type
     soma_len = 1.0
-    nt.assert_equal(soma_len, dendrogram.height)
-    nt.assert_equal(soma_len, dendrogram.width)
+    assert soma_len == dendrogram.height
+    assert soma_len == dendrogram.width
     assert_array_almost_equal(
         [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
         dendrogram.coords)
-    nt.assert_equal(len(neuron.neurites), len(dendrogram.children))
+    assert len(neuron.neurites) == len(dendrogram.children)
 
 
 def test_dendrogram_get_coords():
@@ -37,15 +36,15 @@ def test_dendrogram_get_coords():
 
 def test_create_dendrogram_neurite():
     def assert_trees(neurom_section, dendrogram):
-        nt.assert_equal(len(neurom_section.children), len(dendrogram.children))
+        assert len(neurom_section.children) == len(dendrogram.children)
         for i, d in enumerate(dendrogram.children):
             section = neurom_section.children[i]
-            nt.assert_equal(section.type, d.neurite_type)
+            assert section.type == d.neurite_type
 
     neuron = load_neuron(NEURON_PATH)
     neurite = neuron.neurites[0]
     dendrogram = dm.Dendrogram(neurite)
-    nt.assert_equal(neurite.type, dendrogram.neurite_type)
+    assert neurite.type == dendrogram.neurite_type
     assert_trees(neurite.root_node, dendrogram)
 
 
@@ -53,9 +52,9 @@ def test_move_positions():
     origin = [10, -10]
     positions = {1: [0, 0], 2: [3, -3]}
     moved_positions = dm.move_positions(positions, origin)
-    nt.assert_list_equal(list(positions.keys()), list(moved_positions.keys()))
-    nt.assert_list_equal([10, -10], moved_positions[1].tolist())
-    nt.assert_list_equal([13, -13], moved_positions[2].tolist())
+    assert list(positions.keys()) == list(moved_positions.keys())
+    assert [10, -10] == moved_positions[1].tolist()
+    assert [13, -13] == moved_positions[2].tolist()
 
 
 def test_get_size():
@@ -64,22 +63,22 @@ def test_get_size():
     dendrogram2 = DendrogramMock(1)
     positions = {dendrogram1: [-1, 0], dendrogram2: [3, 3]}
     w, h = dm.get_size(positions)
-    nt.assert_equal(4, w)
-    nt.assert_equal(10, h)
+    assert 4 == w
+    assert 10 == h
 
 
 def test_layout_dendrogram():
     def assert_layout(dendrogram):
         for i, child in enumerate(dendrogram.children):
             # child is higher than parent in Y coordinate
-            nt.assert_greater_equal(
-                positions[child][1],
+            assert (
+                positions[child][1] >=
                 positions[dendrogram][1] + dendrogram.height)
             if i < len(dendrogram.children) - 1:
                 next_child = dendrogram.children[i + 1]
                 # X space between child is enough for their widths
-                nt.assert_greater(
-                    positions[next_child][0] - positions[child][0],
+                assert (
+                    positions[next_child][0] - positions[child][0] >
                     .5 * (next_child.width + child.width))
             assert_layout(child)
 
@@ -96,4 +95,4 @@ def test_neuron_not_corrupted():
     # to raise a KeyError exception.
     neuron = load_neuron(NEURON_PATH)
     dm.Dendrogram(neuron)
-    nt.assert_greater(get('section_path_distances', neuron).size, 0)
+    assert get('section_path_distances', neuron).size > 0

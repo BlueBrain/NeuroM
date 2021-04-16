@@ -2,13 +2,12 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
-from nose import tools as nt
-from nose.tools import assert_raises, ok_
-from numpy.testing import assert_array_equal
-
 from morphio import RawDataError, SomaError
 import neurom as nm
 from neurom import load_neuron
+
+import pytest
+from numpy.testing import assert_array_equal
 
 DATA_PATH = Path(Path(__file__).parent, '../../../test_data')
 NEUROLUCIDA_PATH = Path(DATA_PATH, 'neurolucida')
@@ -31,11 +30,11 @@ def test_soma():
                         [-1, 1, 0, 0.5],
                         [-1, -1, 0, 1]])
 
-    nt.assert_equal(len(n.neurites), 0)
+    assert len(n.neurites) == 0
 
 
 def test_unknown_token():
-    with assert_raises(RawDataError) as obj:
+    with pytest.raises(RawDataError) as obj:
         string_section = u"""
                          ("CellBody"
                          (Color Red)
@@ -47,24 +46,24 @@ def test_unknown_token():
         """
         n = nm.load_neuron(string_section, reader='asc')
 
-    ok_("Unexpected token: Z" in str(obj.exception))
-    ok_(":6:error" in str(obj.exception))
+    assert obj.match("Unexpected token: Z")
+    assert obj.match(":6:error")
 
 
 def test_unfinished_point():
-    with assert_raises(RawDataError) as obj:
+    with pytest.raises(RawDataError) as obj:
         string_section = u"""("CellBody"
                          (Color Red)
                          (CellBody)
                          (1 1"""
         n = nm.load_neuron(string_section, reader='asc')
 
-    ok_('Error converting: "" to float' in str(obj.exception))
-    ok_(':4:error' in str(obj.exception))
+    assert obj.match('Error converting: "" to float')
+    assert obj.match(':4:error')
 
 
 def test_multiple_soma():
-    with assert_raises(SomaError) as obj:
+    with pytest.raises(SomaError) as obj:
         string_section = u"""
                              ("CellBody"
                              (Color Red)
@@ -83,8 +82,8 @@ def test_multiple_soma():
                              )
             """
         load_neuron(string_section, reader='asc')
-    ok_("A soma is already defined" in str(obj.exception))
-    ok_(':16:error' in str(obj.exception))
+    assert obj.match("A soma is already defined")
+    assert obj.match(':16:error')
 
 
 def test_single_neurite_no_soma():
@@ -104,7 +103,7 @@ def test_single_neurite_no_soma():
     n = nm.load_neuron(string_section, reader='asc')
 
     assert_array_equal(n.soma.points, np.empty((0, 4)))
-    nt.assert_equal(len(n.neurites), 1)
+    assert len(n.neurites) == 1
     assert_array_equal(n.neurites[0].points,
                        np.array([[1.2, 2.7, 1.0, 6.5],
                                  [1.2, 3.7, 2.0, 6.5]], dtype=np.float32))
@@ -127,7 +126,7 @@ def test_skip_header():
                          )"""
 
     n = nm.load_neuron(str_neuron, reader='asc')
-    nt.assert_equal(len(n.neurites), 1)
+    assert len(n.neurites) == 1
     assert_array_equal(n.neurites[0].points,
                        np.array([[1.2, 2.7, 1.0, 6.5],
                                  [1.2, 3.7, 2.0, 6.5]], dtype=np.float32))
@@ -175,7 +174,7 @@ def test_read_with_duplicates():
 # would look like
     n = load_neuron(StringIO(with_duplicate), reader='asc')
 
-    nt.assert_equal(len(n.neurites), 1)
+    assert len(n.neurites) == 1
 
     assert_array_equal(n.neurites[0].points,
                        # Duplicate points are not present
@@ -217,7 +216,7 @@ def test_read_without_duplicates():
 
 
 def test_unfinished_file():
-    with assert_raises(RawDataError) as obj:
+    with pytest.raises(RawDataError) as obj:
         load_neuron("""
                      ((Dendrite)
                       (3 -4 0 2)
@@ -231,7 +230,7 @@ def test_unfinished_file():
                         |
                      """, reader='asc')
 
-        ok_("Hit end of of file while consuming a neurite " in str(obj.exception))
+        assert obj.match("Hit end of of file while consuming a neurite ")
 
 
 def test_empty_sibling():
@@ -276,7 +275,7 @@ def test_single_children():
                       )
                  """), 'asc')
 
-    nt.assert_equal(len(n.sections), 2)
+    assert len(n.sections) == 2
     assert_array_equal(n.sections[0].points,
                        np.array([[3, -4, 0, 1],
                                  [3, -6, 0, 1],
@@ -336,7 +335,7 @@ def test_markers():
 )
 """, reader='asc')
 
-    nt.assert_equal(len(n.neurites), 1)
+    assert len(n.neurites) == 1
 
     res = np.array([[-290.87,  -113.09,   -16.32,     1.03],
                     [-290.87,  -113.09,   -16.32,     1.03],

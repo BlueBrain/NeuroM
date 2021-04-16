@@ -27,9 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pathlib import Path
-from nose import tools as nt
 import neurom as nm
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal
 import numpy as np
 
 SWC_PATH = Path(__file__).parent.parent.parent.parent / 'test_data/swc/'
@@ -39,19 +38,19 @@ def test_section_base_func():
     nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
     section = nrn.sections[0]
 
-    nt.eq_(section.type, nm.NeuriteType.basal_dendrite)
-    nt.eq_(section.id, 0)
+    assert section.type == nm.NeuriteType.basal_dendrite
+    assert section.id == 0
     assert_array_equal(section.points, [[0, 0, 0, 1], [0, 5, 0, 1]])
-    nt.assert_almost_equal(section.length, 5)
-    nt.assert_almost_equal(section.area, 31.41592653589793)
-    nt.assert_almost_equal(section.volume, 15.707963267948964)
+    assert_almost_equal(section.length, 5)
+    assert_almost_equal(section.area, 31.41592653589793)
+    assert_almost_equal(section.volume, 15.707963267948964)
 
 
 def test_section_tree():
     nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
 
-    nt.assert_is_none(nrn.sections[0].parent)
-    nt.assert_equal(nrn.sections[0], nrn.sections[0].children[0].parent)
+    assert nrn.sections[0].parent is None
+    assert nrn.sections[0] == nrn.sections[0].children[0].parent
 
     assert_array_equal([s.is_root() for s in nrn.sections],
                        [True, False, False, True, False, False])
@@ -84,14 +83,14 @@ def test_append_section():
     s = n.sections[0]
 
     s.append_section(n.sections[-1])
-    nt.assert_equal(len(s.children), 3)
-    nt.assert_equal(s.children[-1].id, 6)
-    nt.assert_equal(s.children[-1].type, n.sections[-1].type)
+    assert len(s.children) == 3
+    assert s.children[-1].id == 6
+    assert s.children[-1].type == n.sections[-1].type
 
     s.append_section(n.sections[-1].morphio_section)
-    nt.assert_equal(len(s.children), 4)
-    nt.assert_equal(s.children[-1].id, 7)
-    nt.assert_equal(s.children[-1].type, n.sections[-1].type)
+    assert len(s.children) == 4
+    assert s.children[-1].id == 7
+    assert s.children[-1].type == n.sections[-1].type
 
 
 def test_set_points():
