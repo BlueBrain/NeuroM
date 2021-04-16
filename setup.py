@@ -31,6 +31,7 @@
 # pylint: disable=R0801
 from setuptools import find_packages, setup
 
+
 setup(
     description='NeuroM: a light-weight neuron morphology analysis package',
     author='Blue Brain Project, EPFL',
@@ -69,5 +70,6 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
+    use_scm_version={"local_scheme": "no-local-version"},
     setup_requires=['setuptools_scm'],
 )
