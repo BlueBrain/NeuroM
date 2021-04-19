@@ -11,7 +11,7 @@ from neurom.view.common import plt
 import pytest
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def get_fig_2d():
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -21,7 +21,7 @@ def get_fig_2d():
         plt.close(fig)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def get_fig_3d():
     fig = plt.figure()
     ax = fig.add_subplot((111), projection='3d')
