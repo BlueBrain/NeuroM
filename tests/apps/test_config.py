@@ -37,7 +37,7 @@ import pytest
 def test_get_config():
     # get the default
 
-    test_yaml = Path(__file__).parent.parent.parent / 'config/morph_stats.yaml'
+    test_yaml = Path(__file__).parent.parent.parent / 'neurom/config/morph_stats.yaml'
 
     expected = {'neurite': {'section_lengths': ['max', 'total'], 'section_volumes': ['total'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'neuron': {'soma_radii': ['mean']}}
 
