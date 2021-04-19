@@ -34,4 +34,4 @@ jobs:
         fail_ci_if_error: false
         files: ./coverage.xml
         flags: pytest
-        name: "bluepysnap-py36"
+        name: "neurom-py36"
