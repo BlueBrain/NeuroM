@@ -26,14 +26,50 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+import math
+from pathlib import Path
+
+import neurom as nm
+from neurom.core import Neurite
+
+from numpy.testing import assert_almost_equal
+
+SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
+nrn = nm.load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
+
+ROOT_NODE = nrn.neurites[0].morphio_root_node
+RADIUS = .5
+REF_LEN = 3
+
+
+def test_init():
+    nrt = Neurite(ROOT_NODE)
+    assert nrt.type == nm.NeuriteType.basal_dendrite
+    assert len(nrt.points) == 4
+
+
+def test_neurite_length():
+    nrt = Neurite(ROOT_NODE)
+    assert_almost_equal(nrt.length, REF_LEN)
+
+
+def test_neurite_area():
+    nrt = Neurite(ROOT_NODE)
+    area = 2 * math.pi * RADIUS * REF_LEN
+    assert_almost_equal(nrt.area, area)
+
+
+def test_neurite_volume():
+    nrt = Neurite(ROOT_NODE)
+    volume = math.pi * RADIUS * RADIUS * REF_LEN
+    assert_almost_equal(nrt.volume, volume)
+
+
+def test_str():
+    nrt = Neurite(ROOT_NODE)
+    assert 'Neurite' in str(nrt)
+
+
+def test_neurite_hash():
+    nrt = Neurite(ROOT_NODE)
+    assert hash(nrt) == hash((nrt.type, nrt.root_node))

@@ -26,14 +26,29 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+from pathlib import Path
+
+from neurom.apps import get_config
+from neurom.exceptions import ConfigError
+
+import pytest
+
+
+def test_get_config():
+    # get the default
+
+    test_yaml = Path(__file__).parent.parent.parent / 'neurom/config/morph_stats.yaml'
+
+    expected = {'neurite': {'section_lengths': ['max', 'total'], 'section_volumes': ['total'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'neuron': {'soma_radii': ['mean']}}
+
+    config = get_config(None, test_yaml)
+    assert config == expected
+
+    config = get_config(test_yaml, '')
+    assert config == expected
+
+
+def test_get_config_exception():
+    """current python file isn't a yaml file."""
+    with pytest.raises(ConfigError):
+        get_config(__file__, {})

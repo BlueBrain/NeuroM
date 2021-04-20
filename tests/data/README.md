@@ -1,3 +1,4 @@
+<!--
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -25,15 +26,11 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+tests/data
+==========
+
+This directory contains test data for `neurom` unit and functional tests.
+
+The swc directory contains artificially generated morphologies -in swc format - for testing purposes.

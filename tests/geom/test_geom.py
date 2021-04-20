@@ -26,14 +26,63 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+from pathlib import Path
+
+import neurom as nm
+import numpy as np
+from neurom import geom
+from numpy.testing import assert_almost_equal
+
+SWC_DATA_PATH = Path(__file__).parent.parent / 'data/swc'
+NRN = nm.load_neuron(SWC_DATA_PATH / 'Neuron.swc')
+SIMPLE = nm.load_neuron(SWC_DATA_PATH / 'simple.swc')
+
+class PointObj:
+    pass
+
+
+def test_bounding_box():
+
+    pts = np.array([[-1, -2, -3, -999],
+                    [1, 2, 3, 1000],
+                    [-100, 5, 33, 42],
+                    [42, 55, 12, -3]])
+
+    obj = PointObj()
+    obj.points = pts
+
+    assert np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
+
+
+def test_bounding_box_neuron():
+
+    ref = np.array([[-40.32853516, -57.600172, 0.],
+                    [64.74726272, 48.51626225, 54.20408797]])
+
+    assert np.allclose(geom.bounding_box(NRN), ref)
+
+
+def test_bounding_box_soma():
+    ref = np.array([[0., 0., 0.], [0.1, 0.2, 0.]])
+    assert np.allclose(geom.bounding_box(NRN.soma), ref)
+
+
+def test_bounding_box_neurite():
+    nrt = SIMPLE.neurites[0]
+    ref = np.array([[-5.,  0.,  0.], [ 6.,  5.,  0.]])
+    np.testing.assert_allclose(geom.bounding_box(nrt), ref)
+
+def test_convex_hull_points():
+
+    # This leverages scipy ConvexHull and we don't want
+    # to re-test scipy, so simply check that the points are the same.
+    hull = geom.convex_hull(NRN)
+    assert np.alltrue(hull.points == NRN.points[:, :3])
+
+
+def test_convex_hull_volume():
+
+    # This leverages scipy ConvexHull and we don't want
+    # to re-test scipy, so simply regression test the volume
+    hull = geom.convex_hull(NRN)
+    assert_almost_equal(hull.volume, 208641, decimal=0)

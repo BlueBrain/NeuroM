@@ -26,14 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+from collections import namedtuple
+
+from neurom.check import check_wrapper
+
+MockResult = namedtuple('MockResult', 'status')
+
+
+def test_check_wrapper_title():
+    class Mock:
+        pass
+
+    def mock_fun():
+        return Mock()
+
+    f = check_wrapper(mock_fun)
+    assert f().title == "Mock fun"

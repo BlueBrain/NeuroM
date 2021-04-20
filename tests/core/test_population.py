@@ -26,14 +26,53 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+from pathlib import Path
+
+from neurom.core.population import Population
+from neurom import load_neuron
+
+DATA_PATH = Path(__file__).parent.parent / 'data'
+
+NRN1 = load_neuron(DATA_PATH / 'swc/Neuron.swc')
+NRN2 = load_neuron(DATA_PATH / 'swc/Single_basal.swc')
+NRN3 = load_neuron(DATA_PATH / 'swc/Neuron_small_radius.swc')
+
+NEURONS = [NRN1, NRN2, NRN3]
+TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
+POP = Population(NEURONS, name='foo')
+
+
+def test_population():
+    assert len(POP.neurons) == 3
+    assert POP.neurons[0].name, 'Neuron'
+    assert POP.neurons[1].name, 'Single_basal'
+    assert POP.neurons[2].name, 'Neuron_small_radius'
+
+    assert len(POP.somata) == 3
+
+    assert len(POP.neurites) == TOT_NEURITES
+
+    assert POP.name == 'foo'
+
+
+def test_neurons():
+    for i, n in enumerate(NEURONS):
+        assert n is POP.neurons[i]
+
+
+def test_iterate_neurons():
+    for a, b in zip(NEURONS, POP):
+        assert a is b
+
+
+def test_len():
+    assert len(POP) == len(NEURONS)
+
+
+def test_getitem():
+    for i in range(len(NEURONS)):
+        assert POP[i] is NEURONS[i]
+
+
+def test_str():
+    assert 'Population' in str(POP)

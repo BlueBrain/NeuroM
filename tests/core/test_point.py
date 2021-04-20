@@ -26,14 +26,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mock>=1.3.0
-pylint==1.7.4
-pycodestyle==2.3.1
-pytest>=6.0
-pytest-cov==3.7
-sphinx>=1.3.0
-sphinxcontrib-napoleon>=0.3.0
-sphinx_rtd_theme>=0.1.0
-sphinx-autorun
-pyyaml>=3.10
-future>=0.16.0
+from neurom.core.point import Point
+from neurom.core.point import as_point
+
+
+def test_point_members():
+    p = Point(1, 2, 3, 4)
+    assert p.x == 1
+    assert p.y == 2
+    assert p.z == 3
+    assert p.r == 4
+
+
+def test_as_point():
+    p = as_point([1, 2, 3, 4, 5, 6, 7])
+    assert p.x == 1
+    assert p.y == 2
+    assert p.z == 3
+    assert p.r == 4
