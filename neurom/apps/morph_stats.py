@@ -55,7 +55,7 @@ from neurom.utils import NeuromJSON
 
 L = logging.getLogger(__name__)
 
-EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom', 'config'), 'morph_stats.yaml')
+EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_stats.yaml')
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
