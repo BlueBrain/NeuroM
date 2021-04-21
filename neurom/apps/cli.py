@@ -48,7 +48,7 @@ def view(input_file, plane, backend, realistic_diameters):
 
 @cli.command(short_help='Morphology statistics extractor, more details at'
                         'https://neurom.readthedocs.io/en/latest/morph_stats.html')
-@click.argument('datapath')
+@click.argument('datapath', required=False)
 @click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
               default=morph_stats.EXAMPLE_CONFIG, show_default=True,
               help='Configuration File')

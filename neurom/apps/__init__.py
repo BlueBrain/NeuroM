@@ -52,4 +52,4 @@ def get_config(config, default_config):
         with open(config, 'r') as f:
             return yaml.load(f, Loader=yaml.SafeLoader)
     except yaml.YAMLError as e:
-        raise ConfigError('Invalid yaml file: \n %s' % str(e)) from e
+        raise ConfigError(f'Invalid yaml file: \n {e}') from e

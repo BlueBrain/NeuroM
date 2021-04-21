@@ -3,10 +3,12 @@ from pathlib import Path
 import tempfile
 
 import pandas as pd
+import yaml
 from click.testing import CliRunner
 from mock import patch
 
 from neurom.apps.cli import cli
+from neurom.exceptions import ConfigError
 
 DATA = Path(__file__).parent.parent / 'data'
 
@@ -64,6 +66,50 @@ def test_morph_stat():
                                    'all:max_section_length',
                                    'all:total_section_length', 'all:total_section_volume',
                                    'all:max_section_branch_order', 'neuron:mean_soma_radius'}
+
+
+def test_morph_stat_full_config():
+    runner = CliRunner()
+    filename = DATA / 'h5/v1/Neuron.h5'
+    with tempfile.NamedTemporaryFile() as f:
+        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--output', f.name])
+        assert result.exit_code == 0
+        df = pd.read_csv(f)
+        assert not df.empty
+
+
+def test_morph_stat_invalid_config():
+    runner = CliRunner()
+    with tempfile.NamedTemporaryFile('w') as config_f:
+        yaml.dump({'neurite': 'invalid'}, config_f)
+        result = runner.invoke(cli, ['stats', '--config', config_f.name])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, ConfigError)
+
+
+def test_morph_stat_stdout():
+    runner = CliRunner()
+    filename = DATA / 'swc' / 'simple.swc'
+    result = runner.invoke(cli, ['stats', str(filename)])
+    assert result.exit_code == 0
+
+
+def test_morph_stat_as_population():
+    runner = CliRunner()
+    filename = DATA / 'swc' / 'simple.swc'
+    result = runner.invoke(cli, ['stats', str(filename), '--as-population'])
+    assert result.exit_code == 0
+
+
+def test_morph_stat_json():
+    runner = CliRunner()
+    filename = DATA / 'swc' / 'simple.swc'
+    with tempfile.NamedTemporaryFile(suffix='.json') as f:
+        result = runner.invoke(cli, ['stats', str(filename), '--output', f.name])
+        assert result.exit_code == 0
+        content = json.load(f)
+        assert content
+
 
 
 def test_morph_check():

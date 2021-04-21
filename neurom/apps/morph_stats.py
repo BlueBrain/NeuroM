@@ -287,7 +287,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
             config = sanitize_config(config)
         except ConfigError as e:
             L.error(e)
-            return
+            raise
 
     if ignored_exceptions is None:
         ignored_exceptions = ()
