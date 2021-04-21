@@ -26,30 +26,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Helper code for neurom applications."""
-import logging
+"""Check on morphologies."""
 
-import yaml
-from neurom.exceptions import ConfigError
+import json
+from pathlib import Path
+import pkg_resources
+from neurom.apps import get_config
+from neurom.check.runner import CheckRunner
 
-L = logging.getLogger(__name__)
+EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_check.yaml')
 
 
-def get_config(config, default_config):
-    """Load configuration from file if in config, else use default.
+def main(datapath, config, output):
+    """Main function that checks morphologies.
 
     Args:
-        config (str|Path): path to a config file
-        default_config (str|Path): path to a default config file
-
-    Returns:
-        dict: config dictionary
+        datapath (str|Path): path to a morphology file or folder
+        config (str|Path): path to a statistics config file
+        output (str|Path): path to output the resulted checks file
     """
-    if not config:
-        L.warning('Using default config %s', default_config)
-        config = default_config
-    try:
-        with open(config, 'r') as f:
-            return yaml.load(f, Loader=yaml.SafeLoader)
-    except yaml.YAMLError as e:
-        raise ConfigError(f'Invalid yaml file: \n {e}') from e
+    config = get_config(config, EXAMPLE_CONFIG)
+    checker = CheckRunner(config)
+    summary = checker.run(datapath)
+    with open(output, 'w') as json_output:
+        json.dump(summary, json_output, indent=4)

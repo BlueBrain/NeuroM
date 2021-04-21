@@ -48,9 +48,6 @@ setup(
     ],
     packages=find_packages(),
     license='BSD',
-    scripts=['apps/morph_check',
-             'apps/morph_stats',
-             ],
     entry_points={
         'console_scripts': ['neurom=neurom.apps.cli:cli']
     },

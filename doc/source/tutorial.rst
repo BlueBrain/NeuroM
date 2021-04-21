@@ -44,17 +44,17 @@ Applications using NeuroM
 NeuroM ships with configurable command line applications for commonly
 needed functionality.
 
-morph_check: check the validity of a morphology file
-----------------------------------------------------
+neurom check: check the validity of a morphology file
+-----------------------------------------------------
 
 The application
-`morph_check <http://neurom.readthedocs.io/en/latest/morph_check.html>`__
+`neurom check <http://neurom.readthedocs.io/en/latest/morph_check.html>`__
 allows you to apply semantic checks to a morphology file before loading
 it into NeuroM:
 
 .. code-block:: bash
 
-    (nrm)$ morph_check -h                      # shows help for morphology checking script
+    (nrm)$ neurom check -h                      # shows help for morphology checking script
 
 Try it yourself! You can go to
 `NeuroMorpho.Org <http://neuromorpho.org>`__ to download a neuronal
@@ -62,7 +62,7 @@ morphology and perform the semantic checks:
 
 .. code-block:: bash
 
-    (nrm)$ morph_check path/to/files/filename
+    (nrm)$ neurom check path/to/files/filename
 
 morph_stats: extract basic morphometrics of a sample morphology
 ---------------------------------------------------------------
@@ -76,7 +76,7 @@ documentation <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__.
 
 .. code-block:: bash
 
-    (nrm)$ morph_stats -h                      # shows help for the morphometrics extraction script
-    (nrm)$ morph_stats path/to/files/filename  # analyze single morphology file
-    (nrm)$ morph_stats path/to/files           # analyze many morphology files
+    (nrm)$ neurom stats -h                      # shows help for the morphometrics extraction script
+    (nrm)$ neurom stats path/to/files/filename  # analyze single morphology file
+    (nrm)$ neurom stats path/to/files           # analyze many morphology files
 
