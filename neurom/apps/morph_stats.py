@@ -26,8 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""Statistics for morphologies."""
 
-"""Core code for morph_stats application."""
 import csv
 import json
 import logging
@@ -43,7 +43,7 @@ import pkg_resources
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-from morphio._morphio import SomaError
+from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
@@ -269,7 +269,16 @@ def sanitize_config(config):
 
 
 def main(datapath, config, output_file, is_full_config, as_population, ignored_exceptions):
-    """main function."""
+    """Main function that get statistics for morphologies.
+
+    Args:
+        datapath (str|Path): path to a morphology file or folder
+        config (str|Path): path to a statistics config file
+        output_file (str|Path): path to output the resulted statistics file
+        is_full_config (bool): should be statistics made over all possible features, modes, neurites
+        as_population (bool): treat ``datapath`` as directory of morphologies population
+        ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
+    """
     if is_full_config:
         config = full_config()
     else:
@@ -295,11 +304,11 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))
     elif output_file.endswith('.json'):
-        with open(output_file, 'w') as output_file:
-            json.dump(results, output_file, cls=NeuromJSON)
+        with open(output_file, 'w') as f:
+            json.dump(results, f, cls=NeuromJSON)
     else:
-        with open(output_file, 'w') as output_file:
-            csvwriter = csv.writer(output_file)
+        with open(output_file, 'w') as f:
+            csvwriter = csv.writer(f)
             header = get_header(results)
             csvwriter.writerow(header)
             for line in generate_flattened_dict(header, dict(results)):

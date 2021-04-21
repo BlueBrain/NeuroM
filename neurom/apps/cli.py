@@ -63,13 +63,16 @@ def view(input_file, plane, backend, realistic_diameters):
 @click.option('-I', '--ignored-exceptions', help='Exception to ignore',
               type=click.Choice(morph_stats.IGNORABLE_EXCEPTIONS.keys()))
 def stats(datapath, config, output, full_config, as_population, ignored_exceptions):
+    """Cli for apps/morph_stats."""
     morph_stats.main(datapath, config, output, full_config, as_population, ignored_exceptions)
 
 
 @cli.command(short_help='list all available features')
 def features():
+    """Cli to get list of available features. For backward compatibility."""
     # TODO replace it with programmatically generated Sphinx page that contains all available
     # features, also programmatically generate EXAMPLE_CONFIG on that page.
+    # pylint: disable=protected-access
     print(nm.features._get_doc())
 
 
@@ -82,4 +85,5 @@ def features():
 @click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
               help='Path to output json summary file')
 def check(datapath, config, output):
+    """Cli for apps/morph_check."""
     morph_check.main(datapath, config, output)

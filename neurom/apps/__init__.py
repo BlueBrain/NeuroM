@@ -46,7 +46,7 @@ def get_config(config, default_config):
         dict: config dictionary
     """
     if not config:
-        L.warning(f'Using default config: {default_config}')
+        L.warning('Using default config %s', default_config)
         config = default_config
     try:
         with open(config, 'r') as f:
