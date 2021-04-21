@@ -19,3 +19,5 @@ Migration to v2 version
     The following is not an invalid morphology anymore:
     - 2 point soma
     - non-sequential ids
+- script ``morph_check`` and ``morph_stats`` changed to ``neurom check`` and ``neurom stats``
+    correspondingly.
