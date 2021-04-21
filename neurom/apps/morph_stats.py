@@ -28,6 +28,8 @@
 
 
 """Core code for morph_stats application."""
+import csv
+import json
 import logging
 import multiprocessing
 import numbers
@@ -38,19 +40,23 @@ from functools import partial
 from itertools import chain, product
 from pathlib import Path
 import pkg_resources
-
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
-import neurom as nm
+from morphio._morphio import SomaError
 
+import neurom as nm
+from neurom.apps import get_config
 from neurom.core._neuron import Neuron
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
+from neurom.io.utils import get_files_by_path
+from neurom.utils import NeuromJSON
 
 L = logging.getLogger(__name__)
 
-EXAMPLE_CONFIG = Path(pkg_resources.resource_filename(
-    'neurom', 'config'), 'morph_stats.yaml')
+EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom', 'config'), 'morph_stats.yaml')
+IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
 def eval_stats(values, mode):
@@ -138,6 +144,9 @@ def extract_dataframe(neurons, config, n_workers=1):
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
+extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
+
+
 def extract_stats(neurons, config):
     """Extract stats from neurons.
 
@@ -201,6 +210,9 @@ def extract_stats(neurons, config):
     return dict(stats)
 
 
+extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
+
+
 def get_header(results):
     """Extracts the headers, using the first value in the dict as the template."""
     ret = ['name', ]
@@ -256,5 +268,39 @@ def sanitize_config(config):
     return config
 
 
-extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
-extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
+def main(datapath, config, output_file, is_full_config, as_population, ignored_exceptions):
+    """main function."""
+    if is_full_config:
+        config = full_config()
+    else:
+        try:
+            config = get_config(config, EXAMPLE_CONFIG)
+            config = sanitize_config(config)
+        except ConfigError as e:
+            L.error(e)
+            return
+
+    if ignored_exceptions is None:
+        ignored_exceptions = ()
+    ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+    neurons = nm.load_neurons(get_files_by_path(datapath), ignored_exceptions=ignored_exceptions)
+
+    results = {}
+    if as_population:
+        results[datapath] = extract_stats(neurons, config)
+    else:
+        for neuron in tqdm(neurons):
+            results[neuron.name] = extract_stats(neuron, config)
+
+    if not output_file:
+        print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))
+    elif output_file.endswith('.json'):
+        with open(output_file, 'w') as output_file:
+            json.dump(results, output_file, cls=NeuromJSON)
+    else:
+        with open(output_file, 'w') as output_file:
+            csvwriter = csv.writer(output_file)
+            header = get_header(results)
+            csvwriter.writerow(header)
+            for line in generate_flattened_dict(header, dict(results)):
+                csvwriter.writerow(line)

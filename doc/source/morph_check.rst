@@ -26,12 +26,19 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-morph_check: the morphology checker
-***************************************
+neurom check: the morphology checker
+************************************
 
-The ``morph_check`` application performs checks on reconstructed morphologies from
+The ``neurom check`` application performs checks on reconstructed morphologies from
 data contained in morphology files, and so may be used as a morphology validation
 of sorts.
+
+An example usage
+
+.. code-block:: bash
+
+    neurom check path/to/morph/file_or_dir --config path/to/config --output path/to/output/file
+
 
 The tests are grouped in two categories:
 
@@ -96,7 +103,7 @@ processing more than one file:
 For more information on the application and available options, invoke it with the ``--help``
 or ``-h`` option.
 
-
 .. code-block:: bash
 
-    morph_check --help
+    neurom check --help
+    neurom --help  # to see all logging options

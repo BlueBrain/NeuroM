@@ -4,18 +4,20 @@ import logging
 import click
 import matplotlib.pyplot as plt
 
+import neurom as nm
+from neurom.apps import morph_stats, morph_check
 from neurom import load_neuron
 from neurom.view.plotly import draw as plotly_draw
 from neurom.viewer import draw as pyplot_draw
 
-logging.basicConfig()
-logger = logging.getLogger('morph_tool')
-logger.setLevel(logging.INFO)
-
 
 @click.group()
-def cli():
+@click.option('-v', '--verbose', count=True, default=0,
+              help='-v for WARNING, -vv for INFO, -vvv for DEBUG')
+def cli(verbose):
     """The CLI entry point."""
+    level = (logging.WARNING, logging.INFO, logging.DEBUG, logging.DEBUG)[min(verbose, 2)]
+    logging.basicConfig(level=level)
 
 
 @cli.command()
@@ -26,7 +28,7 @@ def cli():
               default='matplotlib')
 @click.option('-r', '--realistic-diameters/--no-realistic-diameters', default=False,
               help='Scale diameters according to the plot axis\n'
-              'Warning: Only works with the matplotlib backend')
+                   'Warning: Only works with the matplotlib backend')
 def view(input_file, plane, backend, realistic_diameters):
     """A simple neuron viewer."""
     if backend == 'matplotlib':
@@ -42,3 +44,42 @@ def view(input_file, plane, backend, realistic_diameters):
 
     if backend == 'matplotlib':
         plt.show()
+
+
+@cli.command(short_help='Morphology statistics extractor, more details at'
+                        'https://neurom.readthedocs.io/en/latest/morph_stats.html')
+@click.argument('datapath')
+@click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
+              default=morph_stats.EXAMPLE_CONFIG, show_default=True,
+              help='Configuration File')
+@click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
+              help='Path to output file, if it ends in .json, a json file is created,'
+                   'otherwise a csv file is created')
+@click.option('-f', '--full-config', is_flag=True, default=False,
+              help='If passed then --config is ignored. Compute statistics for all neurite'
+                   'types, all modes and all features')
+@click.option('--as-population', is_flag=True, default=False,
+              help='If enabled the directory is treated as a population')
+@click.option('-I', '--ignored-exceptions', help='Exception to ignore',
+              type=click.Choice(morph_stats.IGNORABLE_EXCEPTIONS.keys()))
+def stats(datapath, config, output, full_config, as_population, ignored_exceptions):
+    morph_stats.main(datapath, config, output, full_config, as_population, ignored_exceptions)
+
+
+@cli.command(short_help='list all available features')
+def features():
+    # TODO replace it with programmatically generated Sphinx page that contains all available
+    # features, also programmatically generate EXAMPLE_CONFIG on that page.
+    print(nm.features._get_doc())
+
+
+@cli.command(short_help='Perform checks on morphologies, more details at'
+                        'https://neurom.readthedocs.io/en/latest/morph_check.html')
+@click.argument('datapath')
+@click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
+              default=morph_check.EXAMPLE_CONFIG, show_default=True,
+              help='Configuration File')
+@click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
+              help='Path to output json summary file')
+def check(datapath, config, output):
+    morph_check.main(datapath, config, output)

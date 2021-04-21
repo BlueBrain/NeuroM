@@ -29,12 +29,19 @@
 morph_stats: morphometric statistics extraction
 ***********************************************
 
-The ``morph_stats`` application extracts morphometrics from a set of neuron morphology
+The ``neurom stats`` application extracts morphometrics from a set of neuron morphology
 files and produces a summary in JSON or CSV format. It may obtain any of the morphometrics available
 in the :py:func:`neurom.get` function, and is highly configurable, allowing the user to get
 raw or summary statistics from a large set of neurite and neuron features.
 
-The functionality can be best explained by looking at a sample configuration file:
+An example usage:
+
+.. code-block:: bash
+
+    neurom stats path/to/morph/file_or_dir --config path/to/config --output path/to/output/file
+
+The functionality can be best explained by looking at a sample configuration file that is supposed
+to go under ``--config`` option:
 
 .. code-block:: yaml
     
@@ -113,11 +120,14 @@ or ``-h`` option.
 
 .. code-block:: bash
 
-    morph_stats --help
+    neurom stats --help
+    neurom --help  # to see all logging options
 
 Features
 --------
 
+To see all available features for ``--config``:
+
 .. runblock:: console
 
-    $ morph_stats -l
+    $ neurom features

@@ -1,6 +1,8 @@
+import json
 from pathlib import Path
-from subprocess import check_output
+import tempfile
 
+import pandas as pd
 from click.testing import CliRunner
 from mock import patch
 
@@ -41,5 +43,50 @@ def test_viewer_plotly(mock):
     assert result.exit_code == 0
     mock.assert_called_once()
 
+
 def test_morph_stat():
-    check_output(['morph_stats', '-l'])
+    runner = CliRunner()
+    filename = DATA / 'swc' / 'simple.swc'
+    with tempfile.NamedTemporaryFile() as f:
+        result = runner.invoke(cli, ['stats', str(filename), '--output', f.name])
+        assert result.exit_code == 0
+        df = pd.read_csv(f)
+        assert set(df.columns) == {'name', 'axon:max_section_length', 'axon:total_section_length',
+                                   'axon:total_section_volume', 'axon:max_section_branch_order',
+                                   'apical_dendrite:max_section_length',
+                                   'apical_dendrite:total_section_length',
+                                   'apical_dendrite:total_section_volume',
+                                   'apical_dendrite:max_section_branch_order',
+                                   'basal_dendrite:max_section_length',
+                                   'basal_dendrite:total_section_length',
+                                   'basal_dendrite:total_section_volume',
+                                   'basal_dendrite:max_section_branch_order',
+                                   'all:max_section_length',
+                                   'all:total_section_length', 'all:total_section_volume',
+                                   'all:max_section_branch_order', 'neuron:mean_soma_radius'}
+
+
+def test_morph_check():
+    runner = CliRunner()
+    filename = DATA / 'swc' / 'simple.swc'
+    with tempfile.NamedTemporaryFile() as f:
+        result = runner.invoke(cli, ['check', str(filename), '--output', f.name])
+        assert result.exit_code == 0
+        content = json.load(f)
+        assert content == {'files': {
+            str(filename.absolute()): {'Has basal dendrite': True,
+                                       'Has axon': True,
+                                       'Has apical dendrite': False,
+                                       'Has all nonzero segment lengths': True,
+                                       'Has all nonzero section lengths': True,
+                                       'Has all nonzero neurite radii': False,
+                                       'Has nonzero soma radius': True,
+                                       'ALL': False}},
+            'STATUS': 'FAIL'}
+
+
+def test_features():
+    runner = CliRunner()
+    result = runner.invoke(cli, ['features'])
+    assert result.exit_code == 0
+    assert len(result.stdout) > 0

@@ -138,7 +138,7 @@ For example,
 
 .. code-block:: bash
 
-    $ morph_stats some/path/morph.swc # single file
+    $ neurom stats some/path/morph.swc # single file
     {
       "some/path/morph.swc":{
         "axon":{
@@ -169,7 +169,7 @@ For example,
       }
     }
 
-    $ morph_stats some/path # all files in directory
+    $ neurom stats some/path # all files in directory
 
 .. seealso::
     The :doc:`morph_stats documentation page<morph_stats>`
@@ -188,7 +188,7 @@ For example,
 
 .. code-block:: bash
 
-    $ morph_check some/path/morph.swc # single file
+    $ neurom check some/path/morph.swc # single file
     INFO: ========================================
     INFO: File: test_data/swc/Neuron.swc
     INFO:                      Is single tree PASS
@@ -208,8 +208,8 @@ For example,
     INFO:                                 ALL PASS
     INFO: ========================================
 
-    $ morph_check test_data/swc # all files in directory
+    $ neurom check test_data/swc # all files in directory
     # loops over all morphology files found in test_data/swc
 
 .. seealso::
-    The :doc:`morph_check documentation page<morph_check>`
+    The :doc:`neurom check documentation page<morph_check>`

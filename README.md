@@ -97,7 +97,7 @@ install!
 - Extract morphometrics from one or many morphology files:
 
 ```
-$ morph_stats some/path/morph.swc # single file
+$ neurom stats some/path/morph.swc --full-config # single file
 {
   "some/path/morph.swc":{
     "axon":{
@@ -128,13 +128,13 @@ $ morph_stats some/path/morph.swc # single file
   }
 }
 
-$ morph_stats some/path # all files in directory
+$ neurom stats some/path --full-config # all files in directory
 ```
 
 - Perform checks on neuron morphology files:
 
 ```
-(nrm)$ morph_check some/data/path/morph_file.swc # single file
+(nrm)$ neurom check some/data/path/morph_file.swc # single file
 INFO: ========================================
 INFO: File: some/data/path/morph_file.swc
 INFO:                      Is single tree PASS
@@ -153,7 +153,7 @@ INFO:             Has nonzero soma radius PASS
 INFO:                                 ALL PASS
 INFO: ========================================
 
-(nrm)$ morph_check some/data/path # all files in directory
+(nrm)$ neurom check some/data/path # all files in directory
     ....
 ```
 
