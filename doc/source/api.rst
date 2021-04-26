@@ -46,9 +46,8 @@ Code Documentation
    neurom.check.morphtree
    neurom.check.neuron_checks
    neurom.core.types
-   neurom.core._neuron
-   neurom.core._soma
-   neurom.core.point
+   neurom.core.neuron
+   neurom.core.soma
    neurom.core.dataformat
    neurom.io.utils
    neurom.view
