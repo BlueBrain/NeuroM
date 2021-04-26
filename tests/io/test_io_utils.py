@@ -34,7 +34,7 @@ from pathlib import Path
 import numpy as np
 from morphio import MissingParentError, RawDataError, SomaError, UnknownFileType, MorphioError
 from neurom import COLS, get, load_neuron
-from neurom.core import Neuron
+from neurom.core.neuron import Neuron
 from neurom.exceptions import NeuroMError
 from neurom.io import utils
 import pytest

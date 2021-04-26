@@ -33,7 +33,7 @@ import neurom as nm
 import numpy as np
 from morphio import Morphology as ImmutMorphology
 from morphio.mut import Morphology
-from neurom.core import Neuron, graft_neuron, iter_segments
+from neurom.core.neuron import Neuron, graft_neuron, iter_segments
 from numpy.testing import assert_array_equal
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'

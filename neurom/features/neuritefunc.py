@@ -35,8 +35,7 @@ from itertools import chain
 import numpy as np
 import scipy
 from neurom import morphmath
-from neurom.core import (NeuriteType, Section, iter_neurites, iter_sections,
-                         iter_segments)
+from neurom.core.neuron import NeuriteType, Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import _register_feature, bifurcationfunc, feature, neuronfunc, sectionfunc

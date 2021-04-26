@@ -31,7 +31,6 @@
 import numpy as np
 from scipy.spatial import ConvexHull
 from neurom.core.dataformat import COLS
-from .transform import translate, rotate
 
 
 def bounding_box(obj):

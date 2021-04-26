@@ -38,13 +38,13 @@ Examples:
     >>> viewer.draw(nrn, mode='dendrogram') # dendrogram plot
 """
 
-from .view import (plot_neuron, plot_neuron3d,
-                   plot_tree, plot_tree3d,
-                   plot_soma, plot_soma3d,
-                   plot_dendrogram)
-from .view import common
-from .core import Section, Neurite, Soma, Neuron
-
+from neurom.view.view import (plot_neuron, plot_neuron3d,
+                              plot_tree, plot_tree3d,
+                              plot_soma, plot_soma3d,
+                              plot_dendrogram)
+from neurom.view import common
+from neurom.core.neuron import Section, Neurite, Neuron
+from neurom.core.soma import Soma
 
 MODES = ('2d', '3d', 'dendrogram')
 

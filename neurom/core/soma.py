@@ -31,8 +31,8 @@ import math
 import warnings
 
 import numpy as np
-from morphio import SomaError
-from neurom import SomaType, morphmath
+from morphio import SomaError, SomaType
+from neurom import morphmath
 from neurom.core.dataformat import COLS
 
 

@@ -13,7 +13,7 @@ except ImportError as e:
     ) from e
 
 from neurom import COLS, iter_segments, iter_neurites
-from neurom.core import Neuron
+from neurom.core.neuron import Neuron
 from neurom.view.view import TREE_COLOR
 
 

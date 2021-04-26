@@ -26,8 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neurom.core.point import Point
-from neurom.core.point import as_point
+from neurom.core.dataformat import Point
+from neurom.core.dataformat import as_point
 
 
 def test_point_members():

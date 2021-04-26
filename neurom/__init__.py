@@ -57,16 +57,13 @@ Examples:
 """
 
 import logging as _logging
-from morphio import SomaType, Morphology
 
 from neurom.core.dataformat import COLS
-from neurom.core.types import NeuriteType
+from neurom.core.types import NeuriteType, NeuriteIter, NEURITES as NEURITE_TYPES
+from neurom.core.neuron import graft_neuron, iter_neurites, iter_sections, iter_segments
 
-from .core import graft_neuron, iter_neurites, iter_sections, iter_segments
-from .core.types import NEURITES as NEURITE_TYPES
-from .core.types import NeuriteIter
-from .features import get
-from .io.utils import NeuronLoader, load_neuron, load_neurons
+from neurom.features import get
+from neurom.io.utils import NeuronLoader, load_neuron, load_neurons
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite

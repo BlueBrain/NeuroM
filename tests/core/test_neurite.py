@@ -30,7 +30,7 @@ import math
 from pathlib import Path
 
 import neurom as nm
-from neurom.core import Neurite
+from neurom.core.neuron import Neurite
 
 from numpy.testing import assert_almost_equal
 
