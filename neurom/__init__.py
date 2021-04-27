@@ -56,8 +56,6 @@ Examples:
     >>> n_points = [n for n in nm.iter_neurites(nrns, mapping, filter)]
 """
 
-import logging as _logging
-
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType, NeuriteIter, NEURITES as NEURITE_TYPES
 from neurom.core.neuron import graft_neuron, iter_neurites, iter_sections, iter_segments
@@ -70,7 +68,3 @@ BASAL_DENDRITE = NeuriteType.basal_dendrite
 AXON = NeuriteType.axon
 SOMA = NeuriteType.soma
 ANY_NEURITE = NeuriteType.all
-
-# prevent 'No handlers could be found for logger ...' errors
-# https://pythonhosted.org/logutils/libraries.html
-_logging.getLogger(__name__).addHandler(_logging.NullHandler())
