@@ -30,7 +30,7 @@ from math import fabs, pi, sqrt
 
 import numpy as np
 from neurom import morphmath as mm
-from neurom.core.point import Point
+from neurom.core.dataformat import Point
 from numpy.random import uniform
 from numpy.testing import assert_array_almost_equal, assert_almost_equal
 

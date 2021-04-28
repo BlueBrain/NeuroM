@@ -27,5 +27,3 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """IO operations module for NeuroM."""
-
-from neurom.io.utils import load_neuron, load_neurons, NeuronLoader

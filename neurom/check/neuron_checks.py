@@ -36,7 +36,7 @@ import numpy as np
 from neurom import NeuriteType
 from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites
-from neurom.core import Section, iter_neurites, iter_sections, iter_segments
+from neurom.core.neuron import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length

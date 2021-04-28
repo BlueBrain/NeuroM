@@ -34,7 +34,7 @@ from itertools import chain
 from pathlib import Path
 
 import neurom as nm
-from neurom.core import Section
+from neurom.core.neuron import Section
 from neurom.core.types import NeuriteType
 from neurom.features import bifurcationfunc as _bf
 from neurom.features import neuritefunc as _nrt

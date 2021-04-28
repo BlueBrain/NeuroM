@@ -47,7 +47,7 @@ from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
-from neurom.core._neuron import Neuron
+from neurom.core.neuron import Neuron
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path

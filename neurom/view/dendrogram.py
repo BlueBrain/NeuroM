@@ -29,7 +29,7 @@
 """Dendrogram helper functions and class."""
 import numpy as np
 from neurom import NeuriteType
-from neurom.core import Neurite, Neuron
+from neurom.core.neuron import Neurite, Neuron
 from neurom.core.dataformat import COLS
 from neurom.morphmath import interval_lengths
 

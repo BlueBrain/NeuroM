@@ -34,7 +34,7 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core._neuron import iter_neurites, iter_segments
+from neurom.core.neuron import iter_neurites, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type

@@ -30,16 +30,17 @@
 
 Examples:
     Obtain some morphometrics
-
+    >>> import neurom
+    >>> from neurom import features
+    >>> nrn = neurom.load_neuron('path/to/neuron')
     >>> ap_seg_len = features.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 """
 
 import numpy as np
 
-from neurom.core import NeuriteType as _ntype
-from neurom.core import iter_neurites as _ineurites
-from neurom.core.types import tree_type_checker as _is_type
+from neurom.core.types import NeuriteType, tree_type_checker
+from neurom.core.neuron import iter_neurites
 from neurom.exceptions import NeuroMError
 from neurom.utils import deprecated
 
@@ -60,9 +61,9 @@ def register_neurite_feature(name, func):
         func: single parameter function of a neurite.
 
     """
-    def _fun(neurites, neurite_type=_ntype.all):
+    def _fun(neurites, neurite_type=NeuriteType.all):
         """Wrap neurite function from outer scope and map into list."""
-        return list(func(n) for n in _ineurites(neurites, filt=_is_type(neurite_type)))
+        return list(func(n) for n in iter_neurites(neurites, filt=tree_type_checker(neurite_type)))
 
     _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
 
@@ -99,7 +100,7 @@ def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
-        feature(string): feature to extract
+        feature_name(string): feature to extract
         obj: a neuron, population or neurite tree
         kwargs: parameters to forward to underlying worker functions
 

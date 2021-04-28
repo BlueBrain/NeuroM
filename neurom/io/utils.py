@@ -39,7 +39,7 @@ from pathlib import Path
 
 import morphio
 from morphio import MorphioError
-from neurom.core._neuron import Neuron
+from neurom.core.neuron import Neuron
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
 

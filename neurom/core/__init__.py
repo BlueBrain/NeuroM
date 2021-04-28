@@ -27,9 +27,3 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Core functionality and data types of NeuroM."""
-
-from .types import NeuriteType, NeuriteIter
-from ._soma import Soma
-from ._neuron import (Section, Neurite, Neuron, iter_neurites,
-                      iter_sections, iter_segments, graft_neuron)
-from .population import Population

@@ -33,7 +33,7 @@ from io import StringIO
 import numpy as np
 from morphio import MorphioError, SomaError
 from neurom import load_neuron
-from neurom.core import _soma
+from neurom.core import soma
 from mock import Mock
 
 import pytest
@@ -44,7 +44,7 @@ def test_no_soma_builder():
     morphio_soma = Mock()
     morphio_soma.type = None
     with pytest.raises(SomaError, match='No NeuroM constructor for MorphIO soma type'):
-        _soma.make_soma(morphio_soma)
+        soma.make_soma(morphio_soma)
 
 
 def test_no_soma():
@@ -59,7 +59,7 @@ def test_no_soma():
 def test_Soma_SinglePoint():
     sm = load_neuron(StringIO(u"""1 1 11 22 33 44 -1"""), reader='swc').soma
     assert 'SomaSinglePoint' in str(sm)
-    assert isinstance(sm, _soma.SomaSinglePoint)
+    assert isinstance(sm, soma.SomaSinglePoint)
     assert list(sm.center) == [11, 22, 33]
     assert sm.radius == 44
 
@@ -72,7 +72,7 @@ def test_Soma_contour():
                                       (0 +44 0 44))"""), reader='asc').soma
 
     assert 'SomaSimpleContour' in str(sm)
-    assert isinstance(sm, _soma.SomaSimpleContour)
+    assert isinstance(sm, soma.SomaSimpleContour)
     assert list(sm.center) == [0, 0, 0]
     assert_almost_equal(sm.radius, 29.33333333, decimal=6)
 
@@ -82,7 +82,7 @@ def test_Soma_ThreePointCylinder():
                                   2 1 0 -44 0 44  1
                                   3 1 0 +44 0 44  1"""), reader='swc').soma
     assert 'SomaNeuromorphoThreePointCylinders' in str(sm)
-    assert isinstance(sm, _soma.SomaNeuromorphoThreePointCylinders)
+    assert isinstance(sm, soma.SomaNeuromorphoThreePointCylinders)
     assert list(sm.center) == [0, 0, 0]
     assert sm.radius == 44
 
@@ -107,7 +107,7 @@ def test_Soma_ThreePointCylinder_invalid():
 def check_SomaC(stream):
     sm = load_neuron(StringIO(stream), reader='asc').soma
     assert 'SomaSimpleContour' in str(sm)
-    assert isinstance(sm, _soma.SomaSimpleContour)
+    assert isinstance(sm, soma.SomaSimpleContour)
     np.testing.assert_almost_equal(sm.center, [0., 0., 0.])
     assert_almost_equal(sm.radius, 1.0)
 

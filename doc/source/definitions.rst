@@ -125,7 +125,7 @@ The soma is classified solely based on the number of points it contains thus:
 .. todo::
     Expand list if and when specifications require new types of soma.
 
-The soma is represented by classes derived from :py:class:`Soma<neurom.core._soma.Soma>`.
+The soma is represented by classes derived from :py:class:`Soma<neurom.core.soma.Soma>`.
 The interface exports a center and radius. These can be calculated in different
 ways, but the default is to use the center and radius for type A and the mean center
 and radius for types B and C.
@@ -137,7 +137,7 @@ and radius for types B and C.
 
 See also
 
-.. seealso:: The :py:mod:`soma implementation module<neurom.core._soma>`
+.. seealso:: The :py:mod:`soma implementation module<neurom.core.soma>`
 
 
 .. _neurite-label:

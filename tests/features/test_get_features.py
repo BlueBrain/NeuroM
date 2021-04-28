@@ -35,7 +35,7 @@ from pathlib import Path
 import neurom as nm
 import numpy as np
 from mock import patch
-from neurom import core, features, iter_neurites, iter_sections, load_neuron, load_neurons
+from neurom import features, iter_neurites, iter_sections, load_neuron, load_neurons
 from neurom.core.population import Population
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as _is_type
@@ -477,7 +477,7 @@ def test_segment_meander_angles_single_section():
                                        (2 2 0 2)))"""), reader='asc')
 
     nrt = nrn.neurites[0]
-    pop = core.Population([nrn])
+    pop = Population([nrn])
 
     ref = [math.pi / 2, math.pi / 2, math.pi / 2]
 

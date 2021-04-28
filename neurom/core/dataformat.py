@@ -28,6 +28,7 @@
 
 """Data format definitions."""
 
+from collections import namedtuple
 
 _COL_COUNT = 4
 
@@ -43,15 +44,9 @@ class COLS:
     XYZR = slice(0, 4)
 
 
-class POINT_TYPE:
-    """Point types.
-
-    These follow SWC specification.
-    """
-    (UNDEFINED, SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE,
-     FORK_POINT, END_POINT, CUSTOM) = range(8)
-
-    NEURITES = (AXON, BASAL_DENDRITE, APICAL_DENDRITE)
+Point = namedtuple('Point', ('x', 'y', 'z', 'r'))
 
 
-ROOT_ID = -1
+def as_point(row):
+    """Create a Point from a data block row."""
+    return Point(row[COLS.X], row[COLS.Y], row[COLS.Z], row[COLS.R])

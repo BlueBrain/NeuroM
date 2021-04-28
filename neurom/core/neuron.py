@@ -34,7 +34,7 @@ from itertools import chain
 import morphio
 import numpy as np
 from neurom import morphmath
-from neurom.core._soma import make_soma
+from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
 
@@ -225,13 +225,13 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
     Examples:
         Get the number of points in each neurite in a neuron population
 
-        >>> from neurom.core import iter_neurites
+        >>> from neurom.core.neuron import iter_neurites
         >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
 
         Get the number of points in each axon in a neuron population
 
         >>> import neurom as nm
-        >>> from neurom.core import iter_neurites
+        >>> from neurom.core.neuron import iter_neurites
         >>> filter = lambda n : n.type == nm.AXON
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
@@ -271,7 +271,7 @@ def iter_sections(neurites,
         Get the number of points in each section of all the axons in a neuron population
 
         >>> import neurom as nm
-        >>> from neurom.core import ites_sections
+        >>> from neurom.core.neuron import iter_sections
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
@@ -416,8 +416,7 @@ class Neuron(morphio.mut.Morphology):
             name (str): a option neuron name
         """
         try:
-            morphio.set_ignored_warning([morphio.Warning.appending_empty_section,
-                                         morphio.Warning.wrong_root_point], True)
+            morphio.set_ignored_warning([morphio.Warning.wrong_root_point], True)
             morphio.set_raise_warnings(True)
             super().__init__(filename)
         finally:
