@@ -416,7 +416,8 @@ class Neuron(morphio.mut.Morphology):
             name (str): a option neuron name
         """
         try:
-            morphio.set_ignored_warning([morphio.Warning.wrong_root_point], True)
+            morphio.set_ignored_warning([morphio.Warning.wrong_root_point,
+                                         morphio.Warning.no_soma_found], True)
             morphio.set_raise_warnings(True)
             super().__init__(filename)
         finally:
