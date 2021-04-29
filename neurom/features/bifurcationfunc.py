@@ -32,7 +32,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
-from neurom.features import sectionfunc
+from neurom.features.sectionfunc import section_mean_radius
 
 
 def _raise_if_not_bifurcation(section):
@@ -148,8 +148,8 @@ def sibling_ratio(bif_point, method='first'):
         n = bif_point.children[0].points[1, COLS.R]
         m = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        n = sectionfunc.section_mean_radius(bif_point.children[0])
-        m = sectionfunc.section_mean_radius(bif_point.children[1])
+        n = section_mean_radius(bif_point.children[0])
+        m = section_mean_radius(bif_point.children[1])
     return min(n, m) / max(n, m)
 
 
@@ -174,7 +174,7 @@ def diameter_power_relation(bif_point, method='first'):
         d_child1 = bif_point.children[0].points[1, COLS.R]
         d_child2 = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        d_child = sectionfunc.section_mean_radius(bif_point)
-        d_child1 = sectionfunc.section_mean_radius(bif_point.children[0])
-        d_child2 = sectionfunc.section_mean_radius(bif_point.children[1])
+        d_child = section_mean_radius(bif_point)
+        d_child1 = section_mean_radius(bif_point.children[0])
+        d_child2 = section_mean_radius(bif_point.children[1])
     return (d_child / d_child1)**(1.5) + (d_child / d_child2)**(1.5)
