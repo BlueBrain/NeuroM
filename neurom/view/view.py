@@ -48,7 +48,13 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
               NeuriteType.apical_dendrite: 'purple',
               NeuriteType.axon: 'blue',
               NeuriteType.soma: 'black',
-              NeuriteType.undefined: 'green'}
+              NeuriteType.undefined: 'green',
+              NeuriteType.custom5: 'orange',
+              NeuriteType.custom6: 'orange',
+              NeuriteType.custom7: 'orange',
+              NeuriteType.custom8: 'orange',
+              NeuriteType.custom9: 'orange',
+              NeuriteType.custom10: 'orange'}
 
 
 def _plane2col(plane):

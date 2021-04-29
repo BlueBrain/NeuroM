@@ -11,7 +11,12 @@
 	  "NeuriteType.axon": [
 		 0.8535128831863403
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	  "NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -35,7 +40,12 @@
 	  "NeuriteType.axon": [
 		 21.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
   	"NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -107,7 +117,12 @@
 		 0.7236249805881595,
 		 0.34182623199705564
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -302,7 +317,12 @@
 		 107.76121287585062,
 		 108.82672117676924
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -466,7 +486,12 @@
 	  "NeuriteType.axon": [
 		 1.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
     "NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -490,7 +515,13 @@
 	  "NeuriteType.axon": [
 		 210.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
+
 	"NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -522,7 +553,12 @@
 	  "NeuriteType.axon": [
 		 21.0
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -649,7 +685,12 @@
 		 80.70320753186719,
 		 82.44254515324077
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -816,7 +857,12 @@
 	  "NeuriteType.axon": [
 		 9.579117512683075
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -888,7 +934,12 @@
 		 2.094392668737722,
 		 2.094393971479266
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -981,7 +1032,12 @@
 	  "NeuriteType.axon": [
 		 0.853512884994
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1005,7 +1061,12 @@
 	  "NeuriteType.axon": [
 		 21.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
 	"NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -1077,7 +1138,12 @@
 		 0.7236246855393367,
 		 0.3418260638851744
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1272,7 +1338,12 @@
 		 107.76119894706187,
 		 108.82670843871607
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1436,7 +1507,12 @@
 	  "NeuriteType.axon": [
 		 1.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
 	"NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -1460,7 +1536,12 @@
 	  "NeuriteType.axon": [
 		 210.0
 	  ],
-	  "NeuriteType.custom": [0],
+	  "NeuriteType.custom5": [0],
+	  "NeuriteType.custom6": [0],
+	  "NeuriteType.custom7": [0],
+	  "NeuriteType.custom8": [0],
+	  "NeuriteType.custom9": [0],
+	  "NeuriteType.custom10": [0],
 	  "NeuriteType.undefined": [
 		 0.0
 	  ],
@@ -1497,7 +1578,12 @@
 	  "NeuriteType.axon": [
 		 21.0
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1624,7 +1710,12 @@
 		 80.70320815279175,
 		 82.44254511788921
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1791,7 +1882,12 @@
 	  "NeuriteType.axon": [
 		 9.579117366740002
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [
@@ -1863,7 +1959,12 @@
 		 2.0943951024087544,
 		 2.0943951024087544
 	  ],
-	  "NeuriteType.custom": [],
+	  "NeuriteType.custom5": [],
+	  "NeuriteType.custom6": [],
+	  "NeuriteType.custom7": [],
+	  "NeuriteType.custom8": [],
+	  "NeuriteType.custom9": [],
+	  "NeuriteType.custom10": [],
 	"NeuriteType.undefined": [],
 	  "NeuriteType.soma": [],
 	  "NeuriteType.all": [

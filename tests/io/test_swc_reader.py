@@ -153,7 +153,7 @@ def test_simple_reversed():
 
 def test_custom_type():
     neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
-    assert neuron.neurites[1].type == NeuriteType.custom
+    assert neuron.neurites[1].type == NeuriteType.custom5
 
 
 def test_undefined_type():
