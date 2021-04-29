@@ -110,7 +110,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
     Returns:
         (segment ID, segment offset) pair.
     """
-    if not (0. <= fraction <= 1.0):
+    if not 0. <= fraction <= 1.0:
         raise ValueError("Invalid fraction: %.3f" % fraction)
     lengths = interval_lengths(points)
     cum_lengths = np.cumsum(lengths)

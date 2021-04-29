@@ -199,7 +199,7 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
         """Angle between p1-p2 to sort vectors."""
         ang1 = np.arctan2(*p1[::-1])
         ang2 = np.arctan2(*p2[::-1])
-        return (ang1 - ang2)
+        return ang1 - ang2
 
     # Sorting angles according to x-y plane
     order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
