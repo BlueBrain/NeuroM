@@ -39,8 +39,6 @@ from neurom.core.neuron import NeuriteType, Section, iter_neurites, iter_section
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import _register_feature, bifurcationfunc, feature, neuronfunc, sectionfunc
-from neurom.features.bifurcationfunc import partition_asymmetry
-from neurom.features.sectionfunc import downstream_pathlength
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
@@ -407,7 +405,7 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
                          found %s' % variant)
 
     if variant == 'branch-order':
-        return map(partition_asymmetry,
+        return map(bifurcationfunc.partition_asymmetry,
                    iter_sections(neurites,
                                  iterator_type=Section.ibifurcation_point,
                                  neurite_filter=is_type(neurite_type)))
@@ -418,8 +416,8 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
         for section in iter_sections(neurite,
                                      iterator_type=Section.ibifurcation_point,
                                      neurite_filter=is_type(neurite_type)):
-            pathlength_diff = abs(downstream_pathlength(section.children[0]) -
-                                  downstream_pathlength(section.children[1]))
+            pathlength_diff = abs(sectionfunc.downstream_pathlength(section.children[0]) -
+                                  sectionfunc.downstream_pathlength(section.children[1]))
             asymmetries.append(pathlength_diff / neurite_length)
     return asymmetries
 
