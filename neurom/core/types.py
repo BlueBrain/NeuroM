@@ -53,7 +53,6 @@ class NeuriteType(IntEnum):
     undefined = SectionType.undefined
     soma = 31
     all = 32
-    # custom = SectionType.custom5
     custom5 = SectionType.custom5
     custom6 = SectionType.custom6
     custom7 = SectionType.custom7
