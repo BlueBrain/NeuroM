@@ -35,7 +35,6 @@ import matplotlib.pyplot as plt
 import neurom as nm
 from neurom.apps import morph_stats, morph_check
 from neurom import load_neuron
-from neurom.view.plotly import draw as plotly_draw
 from neurom.viewer import draw as pyplot_draw
 
 
@@ -59,6 +58,7 @@ def cli(verbose):
                    'Warning: Only works with the matplotlib backend')
 def view(input_file, plane, backend, realistic_diameters):
     """A simple neuron viewer."""
+    # pylint: disable=import-outside-toplevel
     if backend == 'matplotlib':
         kwargs = {
             'mode': '3d' if plane == '3d' else '2d',
@@ -67,11 +67,10 @@ def view(input_file, plane, backend, realistic_diameters):
         if plane != '3d':
             kwargs['plane'] = plane
         pyplot_draw(load_neuron(input_file), **kwargs)
-    else:
-        plotly_draw(load_neuron(input_file), plane=plane)
-
-    if backend == 'matplotlib':
         plt.show()
+    else:
+        from neurom.view.plotly import draw as plotly_draw
+        plotly_draw(load_neuron(input_file), plane=plane)
 
 
 @cli.command(short_help='Morphology statistics extractor, more details at'
