@@ -27,3 +27,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Core functionality and data types of NeuroM."""
+
+# those imports here for backward compatibility
+from neurom.core.soma import Soma
+from neurom.core.neuron import Section, Neurite, Neuron
+from neurom.core.population import Population
