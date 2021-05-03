@@ -34,6 +34,8 @@ from neurom import check, load_neuron
 from neurom.check import neuron_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
+from neurom.exceptions import NeuroMError
+import pytest
 from numpy.testing import assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
@@ -401,6 +403,12 @@ def test_has_no_dangling_branch():
     _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
     res = nrn_chk.has_no_dangling_branch(nrn)
     assert res.status
+
+
+def test_dangling_branch_no_soma():
+    with pytest.raises(NeuroMError, match='Can\'t check for dangling neurites if there is no soma'):
+        nrn = load_neuron(SWC_PATH / 'Single_apical_no_soma.swc')
+        nrn_chk.has_no_dangling_branch(nrn)
 
 
 def test__bool__():

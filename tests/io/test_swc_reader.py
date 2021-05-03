@@ -47,7 +47,7 @@ def test_repeated_id():
 
 
 def test_neurite_followed_by_soma():
-    with pytest.raises(MorphioError, match='Warning: found a disconnected neurite'):
+    with pytest.raises(MorphioError, match='Found a soma point with a neurite as parent'):
         load_neuron(SWC_PATH / 'soma_with_neurite_parent.swc')
 
 

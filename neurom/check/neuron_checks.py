@@ -38,6 +38,7 @@ from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites
 from neurom.core.neuron import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
+from neurom.exceptions import NeuroMError
 from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
 
@@ -67,8 +68,7 @@ def has_apical_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     Arguments:
         neuron(Neuron): The neuron object to test
         min_number: minimum number of apical dendrites required
-        treefun: Optional function to calculate the tree type of neuron's
-        neurites
+        treefun: Optional function to calculate the tree type of neuron's neurites
 
     Returns:
         CheckResult with result
@@ -279,6 +279,8 @@ def has_no_dangling_branch(neuron):
     Returns:
         CheckResult with a list of all first segments of dangling neurites
     """
+    if len(neuron.soma.points) == 0:
+        raise NeuroMError('Can\'t check for dangling neurites if there is no soma')
     soma_center = neuron.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = neuron.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
