@@ -859,19 +859,19 @@ def test_soma_surface_areas():
 
 def test_sholl_frequency():
     assert_allclose(get_feature('sholl_frequency', NEURON),
-                    [4, 8, 8, 14, 9, 8, 7, 7])
+                    [4, 6, 10, 8, 8, 11, 7, 9, 8, 8])
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.all),
-                    [4, 8, 8, 14, 9, 8, 7, 7])
+                    [4, 6, 10, 8, 8, 11, 7, 9, 8, 8])
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.apical_dendrite),
-                    [1, 2, 2, 2, 2, 2, 1, 1])
+                    [1, 1, 2, 2, 2, 3, 1, 2, 2, 2])
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.basal_dendrite),
-                    [2, 4, 4, 6, 5, 4, 4, 4])
+                    [2, 4, 6, 4, 4, 4, 4, 5, 4, 4])
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.axon),
-                    [1, 2, 2, 6, 2, 2, 2, 2])
+                    [1, 1, 2, 2, 2, 4, 2, 2, 2, 2])
 
 
 @pytest.mark.skip('test_get_segment_lengths is disabled in test_get_features')
