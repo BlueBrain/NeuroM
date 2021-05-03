@@ -249,13 +249,14 @@ def sholl_crossings(neurites, center, radii, neurite_filter=None):
 
 
 @feature(shape=(...,))
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, bins=None):
+def sholl_frequency(nrn, neurite_type=NeuriteType.all, bins=10):
     """Perform Sholl frequency calculations on a population of neurites.
 
     Args:
         nrn(morph): nrn or population
         neurite_type(NeuriteType): which neurites to operate on
-        bins(iterable of floats|int|None): binning to use for the Sholl radii
+        bins(iterable of floats|int): binning to use for the Sholl radii. If ``int`` is used then \
+            it sets the number of bins in the interval between min and max radii of ``nrn``.
 
     Note:
         Given a neuron, the soma center is used for the concentric circles,
