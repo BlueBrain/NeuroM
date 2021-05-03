@@ -268,13 +268,10 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, bins=10):
         having crossed multiple times.
     """
     nrns = neuron_population(nrn)
-    if bins is None or isinstance(bins, int):
+    if isinstance(bins, int):
         min_soma_edge = min(neuron.soma.radius for neuron in nrns)
         max_radii = np.max([np.abs(bounding_box(neuron)) for neuron in nrns])
-        n_bins = bins
-        if bins is None:
-            n_bins = 10
-        bins = np.linspace(min_soma_edge, max_radii, n_bins)
+        bins = np.linspace(min_soma_edge, max_radii, bins)
 
     return sum(sholl_crossings(neuron, neuron.soma.center, bins, is_type(neurite_type))
                for neuron in nrns)
