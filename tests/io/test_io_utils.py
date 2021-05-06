@@ -42,7 +42,7 @@ import pytest
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
 VALID_DATA_PATH = DATA_PATH / 'valid_set'
-NRN_NAMES = ('Neuron', 'Neuron_h5v1')
+NRN_NAMES = ('Neuron.swc', 'Neuron_h5v1.h5')
 FILES = [SWC_PATH / f
          for f in ['Neuron.swc',
                    'Single_apical_no_soma.swc',
@@ -132,7 +132,7 @@ def test_ignore_exceptions():
 def test_load_neuron():
     nrn = utils.load_neuron(FILENAMES[0])
     assert isinstance(NRN, Neuron)
-    assert NRN.name == 'Neuron'
+    assert NRN.name == 'Neuron.swc'
     _check_neurites_have_no_parent(nrn)
 
     neuron_str = u""" 1 1  0  0 0 1. -1
@@ -190,7 +190,7 @@ def test_load_neuron_soma_only():
 
     nrn = utils.load_neuron(Path(DATA_PATH, 'swc', 'Soma_origin.swc'))
     assert len(nrn.neurites) == 0
-    assert nrn.name == 'Soma_origin'
+    assert nrn.name == 'Soma_origin.swc'
 
 
 def test_load_neuron_disconnected_points_raises():
