@@ -1,17 +1,15 @@
-Main Contributors
-=================
+Maintainer
+----------
+* Michael Gevaert
 
-Main contributors to code and ideas in alphabetical order:
-----------------------------------------------------------
+Authors
+-------
+* Benoit Coste
+* Mike Gevaert
+* Lida Kanari
+* Juan Palacios
+* Eleftherios Zisis
 
-* Mike Gevaert @ BBP
-* Lida Kanari @ BBP
-* Juan Palacios @ BBP
-* Eleftherios Zisis @ BBP
-
-Maintainer / release manager
-----------------------------
-
-* [Benoit Coste @ BBP](https://github.com/wizmer)
-* [Michael Gevaert @ BBP](https://github.com/mgeplf)
+Contributors
+------------
 
