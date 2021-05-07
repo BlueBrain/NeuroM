@@ -72,6 +72,7 @@ ROOT_ID = -1
 def tree_type_checker(*ref):
     """Tree type checker functor.
 
+    Args:
         *ref(NeuriteType|tuple): Either a single NeuriteType or a variable list of them or a tuple
         of them.
 
