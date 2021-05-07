@@ -182,7 +182,7 @@ def test_extract_dataframe():
     assert_frame_equal(actual, expected)
 
     # Test with a single neuron in the population
-    nrns = nm.load_neurons(Path(SWC_PATH, 'Neuron.swc'))
+    nrns = nm.load_neurons(SWC_PATH / 'Neuron.swc')
     actual = ms.extract_dataframe(nrns, REF_CONFIG)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
@@ -223,8 +223,8 @@ def test_extract_dataframe():
          ('all', 'total_total_length_per_neurite')])
     expected = pd.DataFrame(
         columns=expected_columns,
-        data=[['Neuron', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
-              ['simple', 15.,          16.,           0.,          31., ]])
+        data=[['Neuron.swc', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
+              ['simple.swc', 15.,          16.,           0.,          31., ]])
     assert_frame_equal(actual, expected)
 
 

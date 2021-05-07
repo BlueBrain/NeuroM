@@ -108,6 +108,18 @@ def get_files_by_path(path):
     raise IOError('Invalid data path %s' % path)
 
 
+def _get_file(stream, extension):
+    """Returns the filename of the file to read."""
+    if isinstance(stream, str):
+        stream = StringIO(stream)
+    fd, temp_file = tempfile.mkstemp(suffix=f'{uuid.uuid4()}.{extension}', prefix='neurom-')
+    os.close(fd)
+    with open(temp_file, 'w') as fd:
+        stream.seek(0)
+        shutil.copyfileobj(stream, fd)
+    return temp_file
+
+
 def load_neuron(neuron, reader=None):
     """Build section trees from a neuron or a h5, swc or asc file.
 
@@ -152,8 +164,7 @@ def load_neuron(neuron, reader=None):
     if reader:
         return Neuron(_get_file(neuron, reader))
 
-    name = os.path.splitext(os.path.basename(neuron))[0]
-    return Neuron(neuron, name)
+    return Neuron(neuron, Path(neuron).name)
 
 
 def load_neurons(neurons,
@@ -201,16 +212,3 @@ def load_neurons(neurons,
             raise NeuroMError('`load_neurons` failed') from e
 
     return population_class(pop, name=name)
-
-
-def _get_file(stream, extension):
-    """Returns the filename of the file to read."""
-    if isinstance(stream, str):
-        stream = StringIO(stream)
-    fd, temp_file = tempfile.mkstemp(suffix=str(uuid.uuid4()) + '.' + extension,
-                                     prefix='neurom-')
-    os.close(fd)
-    with open(temp_file, 'w') as fd:
-        stream.seek(0)
-        shutil.copyfileobj(stream, fd)
-    return temp_file
