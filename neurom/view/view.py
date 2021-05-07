@@ -199,7 +199,7 @@ def plot_neuron(ax, nrn,
 
     Args:
         ax(matplotlib axes): on what to plot
-        neurite_type(NeuriteType): an optional filter on the neurite type
+        neurite_type(NeuriteType|tuple): an optional filter on the neurite type
         nrn(neuron): neuron to be plotted
         soma_outline(bool): should the soma be drawn as an outline
         plane(str): Any pair of 'xyz'

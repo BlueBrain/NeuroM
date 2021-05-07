@@ -72,16 +72,30 @@ ROOT_ID = -1
 def tree_type_checker(*ref):
     """Tree type checker functor.
 
+    Args:
+        *ref(NeuriteType|tuple): Either a single NeuriteType or a variable list of them or a tuple
+        of them.
+
     Returns:
         Functor that takes a tree, and returns true if that tree matches any of
         NeuriteTypes in ref
 
     Ex:
+        >>> import neurom
         >>> from neurom.core.types import NeuriteType, tree_type_checker
+        >>> from neurom.core.neuron import Section
+        >>> nrn = neurom.load_neuron('path')
+        >>>
         >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
-        >>> nrn.i_neurites(tree.isegment, tree_filter=tree_filter)
+        >>> nrn.i_neurites(Section.ipreorder, tree_filter=tree_filter)
+        >>>
+        >>> tree_filter = tree_type_checker((NeuriteType.axon, NeuriteType.basal_dendrite))
+        >>> nrn.i_neurites(Section.ipreorder, tree_filter=tree_filter)
     """
     ref = tuple(ref)
+    if len(ref) == 1 and isinstance(ref[0], tuple):
+        # if `ref` is passed as a tuple of types
+        ref = ref[0]
     if NeuriteType.all in ref:
         def check_tree_type(_):
             """Always returns true."""
