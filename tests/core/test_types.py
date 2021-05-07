@@ -49,8 +49,14 @@ def test_tree_type_checker():
     # multiple args
     tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
     assert tree_filter(mock_tree)
+    tree_filter = tree_type_checker((NeuriteType.axon, NeuriteType.basal_dendrite))
+    assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(*NEURITES)
+    assert tree_filter('fake_tree')
+    assert tree_filter(mock_tree)
+
+    tree_filter = tree_type_checker(NEURITES)
     assert tree_filter('fake_tree')
     assert tree_filter(mock_tree)
 
@@ -71,6 +77,7 @@ def test_tree_type_checker_broken():
         NeuriteType.basal_dendrite)
     mock_tree.type = NeuriteType.soma
     assert not tree_filter(mock_tree)
+
 
 def test_type_filters():
     axon = Mock()
