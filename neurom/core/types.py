@@ -96,6 +96,9 @@ def tree_type_checker(*ref):
     if len(ref) == 1 and isinstance(ref[0], tuple):
         # if `ref` is passed as a tuple of types
         ref = ref[0]
+    # validate that all values are of NeuriteType
+    for t in ref:
+        NeuriteType(t)
     if NeuriteType.all in ref:
         def check_tree_type(_):
             """Always returns true."""

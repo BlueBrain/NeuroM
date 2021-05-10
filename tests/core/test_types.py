@@ -29,6 +29,7 @@
 
 from mock import Mock
 from neurom.core.types import NEURITES, NeuriteType, axon_filter, dendrite_filter, tree_type_checker
+import pytest
 
 
 def test_tree_type_checker():
@@ -77,6 +78,11 @@ def test_tree_type_checker_broken():
         NeuriteType.basal_dendrite)
     mock_tree.type = NeuriteType.soma
     assert not tree_filter(mock_tree)
+
+
+def test_tree_type_checker_error():
+    with pytest.raises(ValueError, match='is not a valid NeuriteType'):
+        tree_type_checker('all')
 
 
 def test_type_filters():
