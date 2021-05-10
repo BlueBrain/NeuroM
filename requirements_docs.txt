@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-sphinx>=2.0.0
+# sphinx 4.0.0 brings an error to autosummary doc generation. Fixing the version until it is resolved.
+sphinx>=2.0.0,<4.0.0
 sphinx-bluebrain-theme
 sphinx-autorun
