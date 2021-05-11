@@ -62,7 +62,7 @@ def pprint_stats(data):
 
 if __name__ == '__main__':
 
-    filename = 'test_data/swc/Neuron.swc'
+    filename = 'tests/data/swc/Neuron.swc'
 
     #  load a neuron from an SWC file
     nrn = nm.load_neuron(filename)
