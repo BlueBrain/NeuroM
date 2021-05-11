@@ -26,19 +26,22 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Building the Documentation
---------------------------
+Building documentation locally
+------------------------------
 
-The documentation requires that you clone the repository. Once you have done that,
-there's a ``make`` target to build the HTML version of the documentation:
+To build documentation, go into project's ``doc`` folder.
 
 .. code-block:: bash
 
-    $ git clone https://github.com/BlueBrain/NeuroM.git
-    ....
-    $ cd NeuroM # repository location
-    $ make doc
+    $ cd doc  # assuming that you start from the project's root.
 
-This builds the documentation in ``doc/build``.
-To view it, point a browser at ``doc/build/html/index.html``
+Make sure you have installed into your virtual environment libraries from ``requirements_docs.txt``
+in the project's root. Run the command:
+
+.. code-block:: bash
+
+    $ make html
+
+This builds the documentation in ``doc/build``. To view it, open ``doc/build/html/index.html`` in
+a browser.
 

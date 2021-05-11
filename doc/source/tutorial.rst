@@ -5,9 +5,8 @@ Tutorial
 The NeuroM tutorial notebook
 ============================
 
-NeuroM includes tutorial notebooks under the :file:`tutorial` subdirectory
-of the repository. You can launch the tutorials using MyBinder or with
-Jupyter notebooks. Refer to :ref:`installation-label` for help installing.
+NeuroM includes tutorial notebooks under the :file:`tutorial` subdirectory of the repository.
+You can launch the tutorials using MyBinder, no need to download or install!
 
 MyBinder
 --------
@@ -54,7 +53,7 @@ it into NeuroM:
 
 .. code-block:: bash
 
-    (nrm)$ neurom check -h                      # shows help for morphology checking script
+    (nrm)$ neurom check --help                  # shows help for morphology checking script
 
 Try it yourself! You can go to
 `NeuroMorpho.Org <http://neuromorpho.org>`__ to download a neuronal
@@ -76,7 +75,7 @@ documentation <http://neurom.readthedocs.io/en/latest/morph_stats.html>`__.
 
 .. code-block:: bash
 
-    (nrm)$ neurom stats -h                      # shows help for the morphometrics extraction script
+    (nrm)$ neurom stats --help                  # shows help for the morphometrics extraction script
     (nrm)$ neurom stats path/to/files/filename  # analyze single morphology file
     (nrm)$ neurom stats path/to/files           # analyze many morphology files
 

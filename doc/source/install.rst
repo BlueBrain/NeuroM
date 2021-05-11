@@ -26,15 +26,13 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. _installation-label:
-
 Installation
 ============
 
-It is recommended that you use `pip <https://pip.pypa.io/en/stable/>`_ version 8.1.0
-or higher to install into
-``NeuroM`` into a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_. For details on
-how to set it up, see :ref:`venv-label`
+``NeuroM`` requires Python version 3.6 or higher, and uses
+`MorphIO <https://github.com/BlueBrain/MorphIO>`_ library to read morphologies. It is recommended
+that you use `pip <https://pip.pypa.io/en/stable/>`_ to install ``NeuroM`` into a
+`virtualenv <https://virtualenv.pypa.io/en/stable/>`_. For details, see :ref:`venv-label`.
 
 Once the virtualenv is set up, there are three ways to install ``NeuroM``:
 
@@ -54,7 +52,7 @@ Virtualenv setup
 
 .. code-block:: bash
 
-    $ virtualenv nrm           # creates a virtualenv called "nrm" in the current directory
+    $ python3 -mvenv nrm           # creates a virtualenv called "nrm" in the current directory
     $ source nrm/bin/activate  # activates the "nrm" virtualenv
     (nrm)$                     # now we are in the nrm virtualenv
 
@@ -70,9 +68,9 @@ To de-activate the virtualenv run the ``deactivate`` command:
 
     (nrm)$ deactivate
 
-Note that you do not have to work in the ``nrm`` directory. This is where python
-packages will get installed, but you can work anywhere on your file system, as long as
-you have activated the ``virtualenv``.
+Note that you do not have to work in the ``nrm`` directory. This is where python packages will
+get installed, but you can work anywhere on your file system, as long as you have activated the
+``virtualenv``.
 
 Installation options
 ^^^^^^^^^^^^^^^^^^^^

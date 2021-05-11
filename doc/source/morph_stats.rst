@@ -26,8 +26,8 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-morph_stats: morphometric statistics extraction
-***********************************************
+neurom stats: morphometric statistics extraction
+************************************************
 
 The ``neurom stats`` application extracts morphometrics from a set of neuron morphology
 files and produces a summary in JSON or CSV format. It may obtain any of the morphometrics available
@@ -121,7 +121,6 @@ or ``-h`` option.
 .. code-block:: bash
 
     neurom stats --help
-    neurom --help  # to see all logging options
 
 Features
 --------
