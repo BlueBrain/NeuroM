@@ -34,8 +34,8 @@ import numpy as np
 import neurom as nm
 from neurom.features import neuritefunc as _nf
 
-nrn_h5 = nm.load_neuron('test_data/h5/v1/bio_neuron-001.h5')
-nrn_asc = nm.load_neuron('test_data/neurolucida/bio_neuron-001.asc')
+nrn_h5 = nm.load_neuron('tests/data/h5/v1/bio_neuron-001.h5')
+nrn_asc = nm.load_neuron('tests/data/neurolucida/bio_neuron-001.asc')
 
 print('h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0])
 print('nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0])

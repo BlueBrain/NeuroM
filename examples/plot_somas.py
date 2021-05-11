@@ -36,7 +36,7 @@ import neurom.view.common as common
 import matplotlib.pyplot as plt
 import numpy as np
 
-DATA_PATH = Path(__file__).parent.parent / 'test_data'
+DATA_PATH = Path(__file__).parent.parent / 'tests/data'
 SWC_PATH = Path(DATA_PATH, 'swc')
 
 

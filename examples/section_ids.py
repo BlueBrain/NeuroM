@@ -46,7 +46,7 @@ def get_segment(neuron, section_id, segment_id):
 
 if __name__ == '__main__':
 
-    nrn = nm.load_neuron('test_data/h5/v1/Neuron.h5')
+    nrn = nm.load_neuron('tests/data/h5/v1/Neuron.h5')
 
     seg = get_segment(nrn, 3, 2)
     print('Segment:\n', seg)

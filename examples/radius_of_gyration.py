@@ -89,7 +89,7 @@ def mean_rad_of_gyration(neurites):
 
 if __name__ == '__main__':
     #  load a neuron from an SWC file
-    filename = 'test_data/swc/Neuron.swc'
+    filename = 'tests/data/swc/Neuron.swc'
     nrn = nm.load_neuron(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
