@@ -84,7 +84,7 @@ This function also allows obtaining the soma radius and surface area.
 
 
 Iterate over neurites with :func:`neurom.core.neuron.iter_neurites`
-----------------------------------------------------------
+-------------------------------------------------------------------
 
 :func:`neurom.core.neuron.iter_neurites` function allows to iterate over the neurites
 of a single neuron or a neuron population. It can also be applied to a single
