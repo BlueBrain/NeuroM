@@ -40,8 +40,6 @@ from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import feature
 
-from neurom.geom import bounding_box
-
 feature = partial(feature, namespace='NEURONFEATURES')
 
 
@@ -257,7 +255,7 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-            intervals of step_size between min and max radii of ``nrn``.
+        intervals of step_size between min and max radii of ``nrn``.
 
     Note:
         Given a neuron, the soma center is used for the concentric circles,
