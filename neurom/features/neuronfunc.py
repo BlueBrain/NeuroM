@@ -249,14 +249,15 @@ def sholl_crossings(neurites, center, radii, neurite_filter=None):
 
 
 @feature(shape=(...,))
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, bins=10):
+def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a population of neurites.
 
     Args:
         nrn(morph): nrn or population
         neurite_type(NeuriteType): which neurites to operate on
-        bins(iterable of floats|int): binning to use for the Sholl radii. If ``int`` is used then \
-            it sets the number of bins in the interval between min and max radii of ``nrn``.
+        step_size(float): step size between Sholl radii
+        bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
+            intervals of step_size between min and max radii of ``nrn``.
 
     Note:
         Given a neuron, the soma center is used for the concentric circles,
@@ -268,10 +269,13 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, bins=10):
         having crossed multiple times.
     """
     nrns = neuron_population(nrn)
-    if isinstance(bins, int):
-        min_soma_edge = min(neuron.soma.radius for neuron in nrns)
-        max_radii = np.max([np.abs(bounding_box(neuron)) for neuron in nrns])
-        bins = np.linspace(min_soma_edge, max_radii, bins)
+    neurite_filter = is_type(neurite_type)
 
-    return sum(sholl_crossings(neuron, neuron.soma.center, bins, is_type(neurite_type))
-               for neuron in nrns)
+    if bins is None:
+        min_soma_edge = min(neuron.soma.radius for neuron in nrns)
+        max_radii = np.max([np.abs(bounding_box(neurite))
+                            for neuron in nrns
+                            for neurite in iter_neurites(neuron, filt=neurite_filter)])
+        bins = np.arange(min_soma_edge, max_radii, step_size)
+
+    return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_filter) for neuron in nrns)

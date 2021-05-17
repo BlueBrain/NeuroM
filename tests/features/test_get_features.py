@@ -859,7 +859,7 @@ def test_soma_surface_areas():
 
 def test_sholl_frequency():
     assert_allclose(get_feature('sholl_frequency', NEURON),
-                    [4, 6, 10, 8, 8, 11, 7, 9, 8, 8])
+                    [4, 8, 8, 14, 9, 8, 7, 7])
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.all),
                     [4, 6, 10, 8, 8, 11, 7, 9, 8, 8])
