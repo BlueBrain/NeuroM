@@ -273,9 +273,8 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
 
     if bins is None:
         min_soma_edge = min(neuron.soma.radius for neuron in nrns)
-        max_radii = np.max([np.abs(bounding_box(neurite))
-                            for neuron in nrns
-                            for neurite in iter_neurites(neuron, filt=neurite_filter)])
-        bins = np.arange(min_soma_edge, max_radii, step_size)
+        max_radii = max(np.max(np.linalg.norm(neurite.points[:, COLS.XYZ], axis=1))
+                        for nrn in nrns for neurite in iter_neurites(nrn, filt=neurite_filter))
+        bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
     return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_filter) for neuron in nrns)
