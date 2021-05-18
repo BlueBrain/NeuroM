@@ -195,10 +195,9 @@ def _get_isec_map(nrn, nrn_secid):
     from morph_tool import nrnhines
     import tempfile
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        tmp_morph = tmpdirname + '/tmp.asc'
-        nrn.write(tmp_morph)
-        cell = nrnhines.get_NRN_cell(tmp_morph)
+    with tempfile.NamedTemporaryFile(suffix='.asc') as tmp_morph:
+        nrn.write(tmp_morph.name)
+        cell = nrnhines.get_NRN_cell(tmp_morph.name)
         if not hasattr(cell.icell, nrn_secid):
             warnings.warn(f'Section type {nrn_secid} does not exist, we will plot all')
             nrn_secid = 'all'
@@ -231,6 +230,7 @@ def plot_neuron(ax, nrn,
         alpha(float): Transparency of plotted values
         realistic_diameters(bool): scale linewidths with axis data coordinates
         nrn_secid(str): display NEURON secid on sections of given seclist name
+        secid_fontsize(int): fontsize to plot secid labels (default=8)
     """
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
