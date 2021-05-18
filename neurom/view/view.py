@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Visualize morphologies."""
+import warnings
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
@@ -44,6 +45,7 @@ from neurom.view import common
 _LINEWIDTH = 1.2
 _ALPHA = 0.8
 _DIAMETER_SCALE = 1.0
+_SECID_FONTSIZE = 8
 TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
               NeuriteType.apical_dendrite: 'purple',
               NeuriteType.axon: 'blue',
@@ -188,13 +190,33 @@ def plot_soma(ax, soma, plane='xy',
                                    ignore=False)
 
 
+def _get_isec_map(nrn, nrn_secid):
+    """Get NEURON isec from nrn morphology."""
+    from morph_tool import nrnhines
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tmp_morph = tmpdirname + '/tmp.asc'
+        nrn.write(tmp_morph)
+        cell = nrnhines.get_NRN_cell(tmp_morph)
+        if not hasattr(cell.icell, nrn_secid):
+            warnings.warn(f'Section type {nrn_secid} does not exist, we will plot all')
+            nrn_secid = 'all'
+
+        return [[section.points[int(len(section.points) / 2)],
+                 nrnhines.point_to_section_end(getattr(cell.icell, nrn_secid),
+                                               section.points[-1, COLS.XYZ])]
+                for section in nrn.sections]
+
+
 # pylint: disable=too-many-arguments
 def plot_neuron(ax, nrn,
                 neurite_type=NeuriteType.all,
                 plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA, realistic_diameters=False):
+                color=None, alpha=_ALPHA, realistic_diameters=False,
+                nrn_secid=None, secid_fontsize=_SECID_FONTSIZE):
     """Plots a 2D figure of the neuron, that contains a soma and the neurites.
 
     Args:
@@ -208,6 +230,7 @@ def plot_neuron(ax, nrn,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
         realistic_diameters(bool): scale linewidths with axis data coordinates
+        nrn_secid(str): display NEURON secid on sections of given seclist name
     """
     plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
@@ -216,6 +239,10 @@ def plot_neuron(ax, nrn,
         plot_tree(ax, neurite, plane=plane,
                   diameter_scale=diameter_scale, linewidth=linewidth,
                   color=color, alpha=alpha, realistic_diameters=realistic_diameters)
+
+    if nrn_secid is not None:
+        for pos, isec in _get_isec_map(nrn, nrn_secid):
+            ax.text(pos[0], pos[1], isec, fontsize=secid_fontsize)
 
     ax.set_title(nrn.name)
     ax.set_xlabel(plane[0])
