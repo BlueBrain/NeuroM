@@ -31,6 +31,8 @@ from pathlib import Path
 from neurom.core.population import Population
 from neurom import load_neuron
 
+import pytest
+
 DATA_PATH = Path(__file__).parent.parent / 'data'
 
 NRN1 = load_neuron(DATA_PATH / 'swc/Neuron.swc')
@@ -52,7 +54,8 @@ def test_names():
 def test_indexing():
     for i, n in enumerate(NEURONS):
         assert n is POP[i]
-
+    with pytest.raises(ValueError, match='no 10 index'):
+        POP[10]
 
 def test_double_indexing():
     for i, n in enumerate(NEURONS):
@@ -65,6 +68,9 @@ def test_double_indexing():
 def test_iterating():
     for a, b in zip(NEURONS, POP):
         assert a is b
+
+    for a, b in zip(NEURONS, POP.somata):
+        assert a.soma is b
 
 
 def test_len():

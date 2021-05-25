@@ -50,8 +50,10 @@ class Population:
 
         Arguments:
             files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
-              paths to them.
-            name (str): Optional name for this Population.
+              paths to them
+            name (str): Optional name for this Population
+            ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
+              loading neurons.
         """
         self._files = files
         self._ignored_exceptions = ignored_exceptions
