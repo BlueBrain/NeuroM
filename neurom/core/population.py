@@ -44,19 +44,28 @@ class Population:
     It does not store the loaded neuron in memory unless the neuron has been already passed
     as loaded (instance of ``Neuron``).
     """
-    def __init__(self, files, name='Population', ignored_exceptions=()):
+    def __init__(self, files, name='Population', ignored_exceptions=(), cache=False):
         """Construct a neuron population.
 
         Arguments:
             files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
-              paths to them
+                paths to them
             name (str): Optional name for this Population
             ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
-              loading neurons.
+                loading neurons.
+            cache (bool): whether to cache the loaded neurons in memory. If false then a neuron
+                will be loaded everytime it is accessed within the population. Which is good when
+                population is big. If true then all neurons will be loaded upon the construction
+                and kept in memory.
         """
-        self._files = files
         self._ignored_exceptions = ignored_exceptions
         self.name = name
+        if cache:
+            self._files = []
+            for f in files:
+                self._files.append(self._load_file(f))
+        else:
+            self._files = files
 
     @property
     def neurons(self):

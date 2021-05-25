@@ -29,58 +29,74 @@
 from pathlib import Path
 
 from neurom.core.population import Population
+from neurom.core.neuron import Neuron
 from neurom import load_neuron
 
 import pytest
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 
-NRN1 = load_neuron(DATA_PATH / 'swc/Neuron.swc')
-NRN2 = load_neuron(DATA_PATH / 'swc/Single_basal.swc')
-NRN3 = load_neuron(DATA_PATH / 'swc/Neuron_small_radius.swc')
+FILES = [DATA_PATH / 'swc/Neuron.swc',
+         DATA_PATH / 'swc/Single_basal.swc',
+         DATA_PATH / 'swc/Neuron_small_radius.swc']
 
-NEURONS = [NRN1, NRN2, NRN3]
+NEURONS = [load_neuron(f) for f in FILES]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
-POP = Population(NEURONS, name='foo')
+populations = [Population(NEURONS, name='foo'),
+               Population(FILES, name='foo', cache=True)]
 
 
-def test_names():
-    assert POP[0].name, 'Neuron'
-    assert POP[1].name, 'Single_basal'
-    assert POP[2].name, 'Neuron_small_radius'
-    assert POP.name == 'foo'
+@pytest.mark.parametrize('pop', populations)
+def test_names(pop):
+    assert pop[0].name, 'Neuron'
+    assert pop[1].name, 'Single_basal'
+    assert pop[2].name, 'Neuron_small_radius'
+    assert pop.name == 'foo'
 
 
 def test_indexing():
+    pop = populations[0]
     for i, n in enumerate(NEURONS):
-        assert n is POP[i]
+        assert n is pop[i]
     with pytest.raises(ValueError, match='no 10 index'):
-        POP[10]
+        pop[10]
+
+
+def test_cache():
+    pop = populations[1]
+    for n in pop._files:
+        assert isinstance(n, Neuron)
+
 
 def test_double_indexing():
+    pop = populations[0]
     for i, n in enumerate(NEURONS):
-        assert n is POP[i]
+        assert n is pop[i]
     # second time to assure that generator is available again
     for i, n in enumerate(NEURONS):
-        assert n is POP[i]
+        assert n is pop[i]
 
 
 def test_iterating():
-    for a, b in zip(NEURONS, POP):
+    pop = populations[0]
+    for a, b in zip(NEURONS, pop):
         assert a is b
 
-    for a, b in zip(NEURONS, POP.somata):
+    for a, b in zip(NEURONS, pop.somata):
         assert a.soma is b
 
 
-def test_len():
-    assert len(POP) == len(NEURONS)
+@pytest.mark.parametrize('pop', populations)
+def test_len(pop):
+    assert len(pop) == len(NEURONS)
 
 
 def test_getitem():
+    pop = populations[0]
     for i in range(len(NEURONS)):
-        assert POP[i] is NEURONS[i]
+        assert pop[i] is NEURONS[i]
 
 
-def test_str():
-    assert 'Population' in str(POP)
+@pytest.mark.parametrize('pop', populations)
+def test_str(pop):
+    assert 'Population' in str(pop)

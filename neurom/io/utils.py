@@ -168,7 +168,8 @@ def load_neuron(neuron, reader=None):
 
 def load_neurons(neurons,
                  name=None,
-                 ignored_exceptions=()):
+                 ignored_exceptions=(),
+                 cache=False):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
@@ -179,18 +180,11 @@ def load_neurons(neurons,
             filepath basename depending on whether neurons is list or\
             directory path respectively.
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
-            loading neurons.
+            loading neurons
+        cache (bool): whether to cache the loaded neurons in memory
 
     Returns:
         Population: population object
-
-    Examples::
-
-            # when there are many morphologies
-            population = neurom.load_neurons('/path/to/dir')
-            # when there not many morphologies
-            population = neurom.load_neurons([load_neuron('/path/to/neuron1'),
-                                              load_neuron('/path/to/neuron2')])
     """
     if isinstance(neurons, (str, Path)):
         files = get_files_by_path(neurons)
@@ -198,4 +192,4 @@ def load_neurons(neurons,
     else:
         files = neurons
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions)
+    return Population(files, name, ignored_exceptions, cache)
