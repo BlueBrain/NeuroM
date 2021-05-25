@@ -42,25 +42,27 @@ TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 POP = Population(NEURONS, name='foo')
 
 
-def test_population():
-    assert len(POP.neurons) == 3
-    assert POP.neurons[0].name, 'Neuron'
-    assert POP.neurons[1].name, 'Single_basal'
-    assert POP.neurons[2].name, 'Neuron_small_radius'
-
-    assert len(POP.somata) == 3
-
-    assert len(POP.neurites) == TOT_NEURITES
-
+def test_names():
+    assert POP[0].name, 'Neuron'
+    assert POP[1].name, 'Single_basal'
+    assert POP[2].name, 'Neuron_small_radius'
     assert POP.name == 'foo'
 
 
-def test_neurons():
+def test_indexing():
     for i, n in enumerate(NEURONS):
-        assert n is POP.neurons[i]
+        assert n is POP[i]
 
 
-def test_iterate_neurons():
+def test_double_indexing():
+    for i, n in enumerate(NEURONS):
+        assert n is POP[i]
+    # second time to assure that generator is available again
+    for i, n in enumerate(NEURONS):
+        assert n is POP[i]
+
+
+def test_iterating():
     for a, b in zip(NEURONS, POP):
         assert a is b
 

@@ -50,9 +50,8 @@ from numpy.testing import assert_allclose
 DATA_PATH = Path(__file__).parent.parent / 'data'
 NRN_FILES = [DATA_PATH / 'h5/v1' / f
              for f in ('Neuron.h5', 'Neuron_2_branch.h5', 'bio_neuron-001.h5')]
-NRNS = load_neurons(NRN_FILES)
-NRN = NRNS[0]
-POP = Population(NRNS)
+POP = load_neurons(NRN_FILES)
+NRN = POP[0]
 
 SWC_PATH = DATA_PATH / 'swc'
 NEURON_PATH = SWC_PATH / 'Neuron.swc'
@@ -119,18 +118,16 @@ def test_max_radial_distances():
     assert_features_for_neurite(feat, POP, expected, exact=False)
 
     # Test with a list of neurites
-    neurites = POP[0].neurites
     expected = {
         None: [99.58945832],
         NeuriteType.all: [99.58945832],
         NeuriteType.apical_dendrite: [99.589458],
     }
-    assert_features_for_neurite(feat, neurites, expected, exact=False)
+    assert_features_for_neurite(feat, NRN.neurites, expected, exact=False)
 
 
 def test_max_radial_distance():
     feat = 'max_radial_distance'
-    neurites = POP[0].neurites
     expected = {
         None: 99.58945832,
         NeuriteType.all: 99.58945832,
@@ -139,9 +136,9 @@ def test_max_radial_distance():
 
     for neurite_type, expected_values in expected.items():
         if neurite_type is None:
-            res = get_feature(feat, neurites)
+            res = get_feature(feat, NRN)
         else:
-            res = get_feature(feat, neurites, neurite_type=neurite_type)
+            res = get_feature(feat, NRN, neurite_type=neurite_type)
         assert_allclose(res, expected_values)
 
 
@@ -508,24 +505,24 @@ def test_register_neurite_feature_nrns():
 
     features.register_neurite_feature('foo', npts)
 
-    n_points_ref = [len(n.points) for n in iter_neurites(NRNS)]
-    n_points = get_feature('foo', NRNS)
+    n_points_ref = [len(n.points) for n in iter_neurites(POP)]
+    n_points = get_feature('foo', POP)
     assert_items_equal(n_points, n_points_ref)
 
     # test neurite type filtering
-    n_points_ref = [len(n.points) for n in iter_neurites(NRNS, filt=_is_type(NeuriteType.axon))]
-    n_points = get_feature('foo', NRNS, neurite_type=NeuriteType.axon)
+    n_points_ref = [len(n.points) for n in iter_neurites(POP, filt=_is_type(NeuriteType.axon))]
+    n_points = get_feature('foo', POP, neurite_type=NeuriteType.axon)
     assert_items_equal(n_points, n_points_ref)
 
     features.register_neurite_feature('bar', vol)
 
-    n_volume_ref = [n.volume for n in iter_neurites(NRNS)]
-    n_volume = get_feature('bar', NRNS)
+    n_volume_ref = [n.volume for n in iter_neurites(POP)]
+    n_volume = get_feature('bar', POP)
     assert_items_equal(n_volume, n_volume_ref)
 
     # test neurite type filtering
-    n_volume_ref = [n.volume for n in iter_neurites(NRNS, filt=_is_type(NeuriteType.axon))]
-    n_volume = get_feature('bar', NRNS, neurite_type=NeuriteType.axon)
+    n_volume_ref = [n.volume for n in iter_neurites(POP, filt=_is_type(NeuriteType.axon))]
+    n_volume = get_feature('bar', POP, neurite_type=NeuriteType.axon)
     assert_items_equal(n_volume, n_volume_ref)
 
 
@@ -894,12 +891,12 @@ def test_section_path_distances_start_point():
 
 
 def test_partition():
-    assert np.all(get_feature('partition', NRNS)[:10] == np.array(
+    assert np.all(get_feature('partition', POP)[:10] == np.array(
         [19.,  17.,  15.,  13.,  11.,   9.,   7.,   5.,   3.,   1.]))
 
 
 def test_partition_asymmetry():
-    assert_allclose(get_feature('partition_asymmetry', NRNS)[:10], np.array([0.9, 0.88888889, 0.875,
+    assert_allclose(get_feature('partition_asymmetry', POP)[:10], np.array([0.9, 0.88888889, 0.875,
                                                                              0.85714286, 0.83333333,
 
                                                                              0.8, 0.75,  0.66666667,
@@ -907,7 +904,7 @@ def test_partition_asymmetry():
 
 
 def test_partition_asymmetry_length():
-    assert_allclose(get_feature('partition_asymmetry_length', NRNS)[:1], np.array([0.853925]))
+    assert_allclose(get_feature('partition_asymmetry_length', POP)[:1], np.array([0.853925]))
 
 
 def test_section_strahler_orders():

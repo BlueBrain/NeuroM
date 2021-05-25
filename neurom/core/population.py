@@ -27,42 +27,82 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Neuron Population Classes and Functions."""
+import logging
+from pathlib import Path
 
-from itertools import chain
+import neurom
+from morphio import MorphioError
+from neurom.exceptions import NeuroMError
+
+
+L = logging.getLogger(__name__)
 
 
 class Population:
     """Neuron Population Class.
 
-    Features:
-        - flattened collection of neurites.
-        - collection of somas, neurons.
-        - iterable-like iteration over neurons.
+    Offers an iterator over neurons within population, neurites of neurons, somas of neurons.
+    It does not store the loaded neuron in memory unless the neuron has been already passed
+    as loaded (instance of ``Neuron``).
     """
-    def __init__(self, neurons, name='Population'):
+    def __init__(self, files, name='Population', ignored_exceptions=()):
         """Construct a neuron population.
 
         Arguments:
-            neurons: iterable of neuron objects.
-            name: Optional name for this Population.
+            files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
+              paths to them.
+            name (str): Optional name for this Population.
         """
-        self.neurons = tuple(neurons)
-        self.somata = tuple(neu.soma for neu in neurons)
-        self.neurites = tuple(chain.from_iterable(neu.neurites for neu in neurons))
+        self._files = files
+        self._ignored_exceptions = ignored_exceptions
         self.name = name
+
+    @property
+    def neurons(self):
+        """Iterator to populations's somas."""
+        return (n for n in self)
+
+    @property
+    def somata(self):
+        """Iterator to populations's somas."""
+        return (n.soma for n in self)
+
+    @property
+    def neurites(self):
+        """Iterator to populations's neurites."""
+        return (neurite for n in self for neurite in n.neurites)
+
+    def _load_file(self, f):
+        """Iterator to populations's neurons."""
+        if isinstance(f, neurom.core.neuron.Neuron):
+            return f
+        try:
+            return neurom.load_neuron(f)
+        except (NeuroMError, MorphioError) as e:
+            if isinstance(e, self._ignored_exceptions):
+                L.info('Ignoring exception "%s" for file %s', e, f.name)
+            else:
+                raise NeuroMError('`load_neurons` failed') from e
 
     def __iter__(self):
         """Iterator to populations's neurons."""
-        return iter(self.neurons)
+        for f in self._files:
+            nrn = self._load_file(f)
+            if nrn is None:
+                continue
+            yield nrn
 
     def __len__(self):
         """Length of neuron collection."""
-        return len(self.neurons)
+        return len(self._files)
 
     def __getitem__(self, idx):
         """Get neuron at index idx."""
-        return self.neurons[idx]
+        if idx > len(self):
+            raise ValueError(
+                f'no {idx} index in "{self.name}" population, max possible index is {len(self)}')
+        return self._load_file(self._files[idx])
 
     def __str__(self):
         """Return a string representation."""
-        return 'Population <name: %s, nneurons: %d>' % (self.name, len(self.neurons))
+        return 'Population <name: %s, nneurons: %d>' % (self.name, len(self))
