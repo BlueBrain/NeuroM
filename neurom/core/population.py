@@ -28,10 +28,9 @@
 
 """Neuron Population Classes and Functions."""
 import logging
-from pathlib import Path
 
-import neurom
 from morphio import MorphioError
+import neurom
 from neurom.exceptions import NeuroMError
 
 
@@ -75,7 +74,6 @@ class Population:
         return (neurite for n in self for neurite in n.neurites)
 
     def _load_file(self, f):
-        """Iterator to populations's neurons."""
         if isinstance(f, neurom.core.neuron.Neuron):
             return f
         try:
@@ -85,6 +83,7 @@ class Population:
                 L.info('Ignoring exception "%s" for file %s', e, f.name)
             else:
                 raise NeuroMError('`load_neurons` failed') from e
+        return None
 
     def __iter__(self):
         """Iterator to populations's neurons."""
