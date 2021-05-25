@@ -183,6 +183,14 @@ def load_neurons(neurons,
 
     Returns:
         Population: population object
+
+    Examples::
+
+            # when there are many morphologies
+            population = neurom.load_neurons('/path/to/dir')
+            # when there not many morphologies
+            population = neurom.load_neurons([load_neuron('/path/to/neuron1'),
+                                              load_neuron('/path/to/neuron2')])
     """
     if isinstance(neurons, (str, Path)):
         files = get_files_by_path(neurons)
