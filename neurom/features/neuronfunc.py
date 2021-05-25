@@ -38,7 +38,7 @@ from neurom.core.neuron import iter_neurites, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import feature
+from neurom.features import feature, neuritefunc
 
 feature = partial(feature, namespace='NEURONFEATURES')
 
@@ -276,3 +276,10 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
     return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_filter) for neuron in nrns)
+
+
+@feature(shape=(...,))
+def total_length(nrn_pop, neurite_type=NeuriteType.all):
+    """Get the total length of all sections in the group of neurons or neurites."""
+    nrns = neuron_population(nrn_pop)
+    return list(sum(neuritefunc.section_lengths(n, neurite_type=neurite_type)) for n in nrns)

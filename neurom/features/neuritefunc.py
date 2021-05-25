@@ -38,7 +38,8 @@ from neurom import morphmath
 from neurom.core.neuron import NeuriteType, Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import _register_feature, bifurcationfunc, feature, neuronfunc, sectionfunc
+from neurom.features import _register_feature, bifurcationfunc, feature, sectionfunc
+from neurom.features.neuronfunc import neuron_population
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
@@ -52,13 +53,6 @@ def _map_sections(fun, neurites, neurite_type=NeuriteType.all, iterator_type=Sec
     return map(fun, iter_sections(neurites,
                                   iterator_type=iterator_type,
                                   neurite_filter=is_type(neurite_type)))
-
-
-@feature(shape=(...,))
-def total_length(nrn_pop, neurite_type=NeuriteType.all):
-    """Get the total length of all sections in the group of neurons or neurites."""
-    nrns = neuronfunc.neuron_population(nrn_pop)
-    return list(sum(section_lengths(n, neurite_type=neurite_type)) for n in nrns)
 
 
 @feature(shape=())
@@ -187,7 +181,7 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
 
 def map_neurons(fun, neurites, neurite_type):
     """Map `fun` to all the neurites in a single or collection of neurons."""
-    nrns = neuronfunc.neuron_population(neurites)
+    nrns = neuron_population(neurites)
     return [fun(n, neurite_type=neurite_type) for n in nrns]
 
 
