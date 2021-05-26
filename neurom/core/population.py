@@ -61,9 +61,7 @@ class Population:
         self._ignored_exceptions = ignored_exceptions
         self.name = name
         if cache:
-            self._files = []
-            for f in files:
-                self._files.append(self._load_file(f))
+            self._files = [self._load_file(f) for f in files if f is not None]
         else:
             self._files = files
 
