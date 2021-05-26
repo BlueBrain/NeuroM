@@ -47,6 +47,7 @@ API Documentation
    neurom.check.neuron_checks
    neurom.core.types
    neurom.core.neuron
+   neurom.core.population
    neurom.core.soma
    neurom.core.dataformat
    neurom.io.utils

@@ -141,6 +141,7 @@ todo_include_todos = True
 suppress_warnings = ["ref.python"]
 autosummary_generate = True
 autosummary_imported_members = True
+autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
     'imported-members': True,
