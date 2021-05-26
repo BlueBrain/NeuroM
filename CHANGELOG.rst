@@ -3,6 +3,8 @@ Changelog
 
 Version 2.2.0
 -------------
+- Move ``total_length`` feature to from ``neuritefunc`` to ``neuronfunc``. Use ``neurite_lengths``
+  feature for neurites
 - Include morphology filename extension into Neuron's name
 - Extend ``tree_type_checker`` to accept a single tuple as an argument. Additionally validate
   function's arguments (#909, #912)

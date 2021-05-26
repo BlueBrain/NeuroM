@@ -42,7 +42,7 @@ from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
 from neurom.features import NEURITEFEATURES
 from neurom.features import get as get_feature
-from neurom.features import neuritefunc as nf
+from neurom.features import neuritefunc as nf, neuronfunc
 
 import pytest
 from numpy.testing import assert_allclose
@@ -569,7 +569,7 @@ def test_get_raises():
 
 def test_register_existing_feature_raises():
     with pytest.raises(NeuroMError):
-        features.register_neurite_feature('total_length', lambda n: None)
+        features.register_neurite_feature('section_areas', lambda n: None)
 
 
 def test_section_lengths():
