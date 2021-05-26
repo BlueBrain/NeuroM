@@ -40,16 +40,14 @@ NeuroM is a Python-based toolkit for the analysis and processing of neuron morph
 
    Home <self>
    quickstart
-   apps
-   definitions
-   api
-   file_formats
    install
    tutorial
    examples
-   issue_reporting
+   cli
+   definitions
+   api
    developer
-   dependencies
+   documentation
    migration_v2
    changelog
    license

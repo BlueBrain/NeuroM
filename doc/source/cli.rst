@@ -26,43 +26,33 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+Command Line Interface
+**********************
 
+NeuroM ships with configurable command line applications for commonly needed
+functionality. These are convenience tools which leverage ``NeuroM`` library functionality
+without users having to concern themselves with writing any code beyond simple and optional
+configuration scripts. These command-line tools are installed as executable scripts with
+``NeuroM``. The tools are designed to be used in batch mode, i.e. they do not require any
+user interactivity upon launch, and do not require access to a display.
 
-Dependencies
-============
+For more information type in your terminal.
 
-Build and runtime
------------------
+.. code-block:: bash
 
-.. _pre-dep-label:
+    neurom --help
 
-``NeuroM`` requires Python version 2.7 or higher.
-When installed using `pip <https://pip.pypa.io/en/stable/>`_, ``NeuroM``
-will take care of installing unmet dependencies, although it is also possible
-to pre-install before ``NeuroM``.
+Also pay attention that logging options must be set immediately after ``neurom``. A single ``-v``
+is used by default and outputs WARNING messages. ``-vv`` adds INFO messages. ``-vvv`` adds DEBUG
+messages.
 
-* `numpy <http://www.numpy.org/>`_ >= 1.8.0
-* `scipy <http://www.scipy.org/>`_ >= 0.13.3
-* `matplotlib <http://www.matplotlib.org/>`_ >= 1.3.1
-* `h5py <http://www.h5py.org/>`_ >= 2.2.1
-* `enum34 <https://pypi.python.org/pypi/enum34/>`_ >= 1.0.4
-* `pyyaml <http://www.pyyaml.org/>`_ >= 3.10.0
-* `tqdm <https://pypi.python.org/pypi/tqdm/>`_ tqdm >= 4.8.4
+.. code-block:: bash
 
+    neurom -vvv <command>  # example of DEBUG invocation
 
-Installing and building
------------------------
+.. toctree::
+   :hidden:
 
-* `pip <https://pip.pypa.io/en/stable/>`_ version 8.1.0 or higher.
-* `virtualenv <https://virtualenv.pypa.io/en/stable/>`_
-
-Testing and documentation
--------------------------
-
-These dependencies are not needed for installing and running ``NeuroM``,
-but are useful for those who want to contribute to its development.
-
-* `GNU Make <https://www.gnu.org/software/make/>`_
-* `nose <https://nose.readthedocs.org/en/latest/>`_
-* `coverage <https://coverage.readthedocs.org/en/latest/>`_
-* `sphinx <http://sphinx-doc.org/>`_
+   Introduction <self>
+   morph_check
+   morph_stats

@@ -60,6 +60,7 @@ Here we visualize a neuronal morphology:
     >>> from neurom import viewer
     >>> fig, ax = viewer.draw(nrn)
     >>> fig.show()
+    >>>
     >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
     >>> fig.show()
 
@@ -87,7 +88,6 @@ Getting Log Information
 ``neurom`` emits many logging statements during the course of its functioning.
 They are emitted in the ``neurom`` namespace, and can thus be filtered based
 on this.  An example of setting up a handler is:
-
 
 .. code-block:: python
 

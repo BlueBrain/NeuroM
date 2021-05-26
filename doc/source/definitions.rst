@@ -32,8 +32,7 @@
 NeuroM morphology definitions
 =============================
 
-These are ``NeuroM`` specific working definitions of various components of
-neuron morphologies.
+``NeuroM`` specific working definitions of various components of neuron morphologies.
 
 
 .. _point-label:
@@ -41,30 +40,10 @@ neuron morphologies.
 Point
 -----
 
-A point is a vector of numbers **[X, Y, Z, R, TYPE, ID, PID]** where the components are
+A point is a ``numpy`` array of numbers **[X, Y, Z, R]** where the components are
 
 * X, Y, Z: Cartesian coordinates of position
 * R: Radius
-* TYPE: One of the :py:class:`NeuroM valid point types<neurom.core.dataformat.POINT_TYPE>`
-* ID: Unique identifier of the point.
-* PID: ID of the parent of the point.
-
-Typically only the first four or five components are of interest to morphology analysis.
-The rest are used to construct the soma and hierarchical tree structures of the neuron,
-and to check its semantic validity.
-
-In ``NeuroM`` a point is represented as an iterable of floating point numbers, usually
-a ``numpy`` array.
-
-.. note::
-    For most of what follows, it suffices to consider a
-    **point** as a vector of **[X, Y, Z, R, TYPE]**. The remaining
-    components **ID** and **PID** can be considered book-keeping.
-
-.. todo::
-    Point types may need to be restricted to align SWC with H5. This is dependent on
-    future H5 specs.
-
 
 .. _segment-label:
 
@@ -74,8 +53,7 @@ Segment
 A segment consists of two consecutive :ref:`points<point-label>` belonging to
 the same :ref:`neurite<neurite-label>` and :ref:`section<section-label>`.
 
-In ``NeuroM`` a segment is represented as a length 2 tuple or ``numpy`` array of
-`points<point-label>`.
+In ``NeuroM`` a segment is represented as a tuple or a ``numpy`` array of two `points<point-label>`.
 
 
 .. _section-label:
@@ -83,7 +61,7 @@ In ``NeuroM`` a segment is represented as a length 2 tuple or ``numpy`` array of
 Section
 -------
 
-A section is a tree node containing a series of two or more :ref:`points<point-label>`
+A section is a node of morphology tree containing a series of two or more :ref:`points<point-label>`
 whose first and last element are any of the following combinations:
 
 * root node, forking point
@@ -94,24 +72,14 @@ whose first and last element are any of the following combinations:
 The first point of a section is a duplicate of the last point of its parent section,
 unless the latter is a soma section.
 
-In ``NeuroM``, a section is represented by class :py:class:`Section<neurom.core.Section>`.
-This pseudocode shows the relevant parts of the section class:
-
-.. code-block:: python
-
-    section = {
-        section_id,
-        points,
-        parent,
-        children
-    }
+In ``NeuroM``, a section is represented by class :class:`Section<neurom.core.neuron.Section>`.
 
 .. _soma-label:
 
 Soma
 ----
 
-A soma can be represented by one, three or more :ref:`points<point-label>`.
+A soma can be represented by one or more :ref:`points<point-label>`.
 The soma is classified solely based on the number of points it contains thus:
 
 * Type A: 1 point defining the center and radius.
