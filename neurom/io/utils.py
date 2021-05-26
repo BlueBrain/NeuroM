@@ -38,7 +38,6 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
-from morphio import MorphioError
 from neurom.core.neuron import Neuron
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
@@ -168,47 +167,29 @@ def load_neuron(neuron, reader=None):
 
 
 def load_neurons(neurons,
-                 neuron_loader=load_neuron,
                  name=None,
-                 population_class=Population,
-                 ignored_exceptions=()):
+                 ignored_exceptions=(),
+                 cache=False):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
 
     Arguments:
-        neurons: directory path or list of neuron file paths
-        neuron_loader: function taking a filename and returning a neuron
-        population_class: class representing populations
+        neurons(str|Path|Iterable[Path]): path to a folder or list of paths to neuron files
         name (str): optional name of population. By default 'Population' or\
             filepath basename depending on whether neurons is list or\
             directory path respectively.
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
-            loading neurons.
+            loading neurons
+        cache (bool): whether to cache the loaded neurons in memory
 
     Returns:
-        neuron population object
+        Population: population object
     """
-    if isinstance(neurons, str):
-        neurons = Path(neurons)
-
-    if isinstance(neurons, Path):
+    if isinstance(neurons, (str, Path)):
         files = get_files_by_path(neurons)
-        name = name or neurons.name
+        name = name or Path(neurons).name
     else:
         files = neurons
         name = name or 'Population'
-
-    ignored_exceptions = tuple(ignored_exceptions)
-    pop = []
-    for f in files:
-        try:
-            pop.append(neuron_loader(f))
-        except (NeuroMError, MorphioError) as e:
-            if isinstance(e, ignored_exceptions):
-                L.info('Ignoring exception "%s" for file %s',
-                       e, f.name)
-                continue
-            raise NeuroMError('`load_neurons` failed') from e
-
-    return population_class(pop, name=name)
+    return Population(files, name, ignored_exceptions, cache)

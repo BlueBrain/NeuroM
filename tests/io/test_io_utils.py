@@ -61,16 +61,6 @@ DISCONNECTED_POINTS_FILE = SWC_PATH / 'Neuron_disconnected_components.swc'
 MISSING_PARENTS_FILE = SWC_PATH / 'Neuron_missing_parents.swc'
 
 
-def _mock_load_neuron(filename):
-    class MockNeuron:
-        def __init__(self, name):
-            self.soma = 42
-            self.neurites = list()
-            self.name = name
-
-    return MockNeuron(Path(filename).stem)
-
-
 def _check_neurites_have_no_parent(nrn):
 
     for n in nrn.neurites:
@@ -86,47 +76,50 @@ def test_get_morph_files():
 
 def test_load_neurons():
     # List of strings
-    nrns = utils.load_neurons(map(str, FILES), neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(list(map(str, FILES)))
     for i, nrn in enumerate(nrns):
-        assert nrn.name == FILES[i].stem
+        assert nrn.name == FILES[i].name
 
     with pytest.raises(NeuroMError):
-        utils.load_neurons(MISSING_PARENTS_FILE,)
+        list(utils.load_neurons(MISSING_PARENTS_FILE,))
 
     # Single string
-    nrns = utils.load_neurons(str(FILES[0]), neuron_loader=_mock_load_neuron)
-    assert nrns[0].name == FILES[0].stem
+    nrns = utils.load_neurons(str(FILES[0]))
+    assert nrns[0].name == FILES[0].name
 
     # Single Path
-    nrns = utils.load_neurons(FILES[0], neuron_loader=_mock_load_neuron)
-    assert nrns[0].name == FILES[0].stem
+    nrns = utils.load_neurons(FILES[0])
+    assert nrns[0].name == FILES[0].name
 
-    # sequence of strings
-    nrns = utils.load_neurons(map(str, FILES), neuron_loader=_mock_load_neuron)
+    # list of strings
+    nrns = utils.load_neurons(list(map(str, FILES)))
     for i, nrn in enumerate(nrns):
-        assert nrn.name == FILES[i].stem
+        assert nrn.name == FILES[i].name
 
     # sequence of Path objects
-    nrns = utils.load_neurons(FILES, neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(FILES)
     for nrn, file in zip(nrns, FILES):
-        assert nrn.name == file.stem
+        assert nrn.name == file.name
 
     # string path to a directory
-    nrns = utils.load_neurons(str(SWC_PATH), neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(str(SWC_PATH), ignored_exceptions=(MissingParentError, MorphioError))
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    assert {f.stem for f in FILES}.issubset({nrn.name for nrn in nrns})
+    assert {f.name for f in FILES}.issubset({nrn.name for nrn in nrns})
 
     # Path path to a directory
-    nrns = utils.load_neurons(SWC_PATH, neuron_loader=_mock_load_neuron)
+    nrns = utils.load_neurons(SWC_PATH, ignored_exceptions=(MissingParentError, MorphioError))
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    assert {f.stem for f in FILES}.issubset({nrn.name for nrn in nrns})
+    assert {f.name for f in FILES}.issubset({nrn.name for nrn in nrns})
 
 
 def test_ignore_exceptions():
     with pytest.raises(NeuroMError):
-        utils.load_neurons(MISSING_PARENTS_FILE,)
+        list(utils.load_neurons(MISSING_PARENTS_FILE,))
+    count = 0
     pop = utils.load_neurons((MISSING_PARENTS_FILE,), ignored_exceptions=(RawDataError,))
-    assert len(pop) == 0
+    for _ in pop:
+        count += 1
+    assert count == 0
 
 
 def test_load_neuron():
@@ -205,7 +198,6 @@ def test_load_neuron_missing_parents_raises():
 
 def test_load_neurons_directory():
     pop = utils.load_neurons(VALID_DATA_PATH)
-    assert len(pop.neurons) == 4
     assert len(pop) == 4
     assert pop.name == 'valid_set'
     for nrn in pop:
@@ -214,7 +206,6 @@ def test_load_neurons_directory():
 
 def test_load_neurons_directory_name():
     pop = utils.load_neurons(VALID_DATA_PATH, name='test123')
-    assert len(pop.neurons) == 4
     assert len(pop) == 4
     assert pop.name == 'test123'
     for nrn in pop:
@@ -223,7 +214,7 @@ def test_load_neurons_directory_name():
 
 def test_load_neurons_filenames():
     pop = utils.load_neurons(FILENAMES, name='test123')
-    assert len(pop.neurons) == 2
+    assert len(pop) == 2
     assert pop.name == 'test123'
     for nrn, name in zip(pop.neurons, NRN_NAMES):
         assert isinstance(nrn, Neuron)
