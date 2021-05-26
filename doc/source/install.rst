@@ -90,7 +90,7 @@ Install a specific version:
 
     (nrm)$ pip install neurom==1.2.3
 
-Install a with plotly extra for better graphics display:
+Install with plotly extra for better graphics display:
 
 .. code-block:: bash
 
