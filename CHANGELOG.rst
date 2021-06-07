@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 2.2.1
+-------------
+- Fix 'section_path_lengths' feature for Population
+
 Version 2.2.0
 -------------
 - Don't force loading of neurons into memory for Population (#922). See new API of

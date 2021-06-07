@@ -162,15 +162,9 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
     # then queries the lengths in the path length iterations.
     # This avoids repeatedly calculating the lengths of the
     # same sections.
-    dist = {}
-    neurite_filter = is_type(neurite_type)
-
-    for s in iter_sections(neurites, neurite_filter=neurite_filter):
-        dist[s] = s.length
-
     def pl2(node):
         """Calculate the path length using cached section lengths."""
-        return sum(dist[n] for n in node.iupstream())
+        return sum(n.length for n in node.iupstream())
 
     return _map_sections(pl2, neurites, neurite_type=neurite_type)
 
