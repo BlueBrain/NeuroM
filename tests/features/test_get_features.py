@@ -639,6 +639,12 @@ def test_section_path_distances_axon():
     assert len(path_lengths) == 21
 
 
+def test_section_path_distances_pop():
+    path_distances = get_feature('section_path_distances', POP)
+    assert len(path_distances) == 328
+    assert sum(len(get_feature('section_path_distances', nrn)) for nrn in POP) == 328
+
+
 def test_segment_lengths():
     ref_seglen = nf.segment_lengths(NEURON)
     seglen = get_feature('segment_lengths', NEURON)
