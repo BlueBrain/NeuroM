@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 2.3.0
+-------------
+- Introduce a new method to calculate partition asymmetry by Uylings. See docstring of
+  :func:`neurom.features.neuritefunc.partition_asymmetries`.
+
 Version 2.2.1
 -------------
 - Fix 'section_path_lengths' feature for Population
