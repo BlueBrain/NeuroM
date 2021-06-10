@@ -313,7 +313,10 @@ def test_partition_asymmetry():
                     (0.0625, 0.06666666666666667))
 
     with pytest.raises(ValueError):
-        _nf.partition_asymmetries(SIMPLE, variant='unvalid-variant')
+        _nf.partition_asymmetries(SIMPLE, variant='invalid-variant')
+
+    with pytest.raises(ValueError):
+        _nf.partition_asymmetries(SIMPLE, method='invalid-method')
 
 
 def test_segment_lengths():
