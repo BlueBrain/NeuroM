@@ -10,6 +10,7 @@ Version 2.3.0
 - Remove the cli command ``neurom features`` that listed all possible features. Instead a proper
   documentation is provided on that topic. See :func:`neurom.features.get`.
 - Make ``neurom.features.neuronfunc.sholl_crossings`` private.
+- Remove ``NeuriteType.all`` from ``NEURITES``
 
 Version 2.2.1
 -------------

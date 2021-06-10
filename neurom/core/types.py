@@ -62,8 +62,7 @@ class NeuriteType(IntEnum):
 
 
 #: Collection of all neurite types
-NEURITES = (NeuriteType.all,
-            NeuriteType.axon,
+NEURITES = (NeuriteType.axon,
             NeuriteType.apical_dendrite,
             NeuriteType.basal_dendrite)
 
