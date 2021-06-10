@@ -372,28 +372,27 @@ def remote_bifurcation_angles(neurites, neurite_type=NeuriteType.all):
                          iterator_type=Section.ibifurcation_point)
 
 
-@feature(shape=(...,), name='partition')
-def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
-    """Partition at bifurcation points of a collection of neurites."""
-    return map(bifurcationfunc.bifurcation_partition,
-               iter_sections(neurites,
-                             iterator_type=Section.ibifurcation_point,
-                             neurite_filter=is_type(neurite_type)))
-
-
 @feature(shape=(...,), name='partition_asymmetry')
-def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branch-order'):
+def partition_asymmetries(neurites,
+                          neurite_type=NeuriteType.all,
+                          variant='branch-order',
+                          method='petilla'):
     """Partition asymmetry at bifurcation points of a collection of neurites.
 
     Variant: length is a different definition, as the absolute difference in
     downstream path lenghts, relative to the total neurite path length
+    Method: 'petilla' or 'uylings'. The former is default. The latter uses ``-2`` shift. See
+    :func:`neurom.features.bifurcationfunc.partition_asymmetry`
     """
     if variant not in {'branch-order', 'length'}:
-        raise ValueError('Please provide a valid variant for partition asymmetry,\
-                         found %s' % variant)
+        raise ValueError('Please provide a valid variant for partition asymmetry,'
+                         f'found {variant}')
+    if method not in {'petilla', 'uylings'}:
+        raise ValueError('Please provide a valid method for partition asymmetry,'
+                         'either "petilla" or "uylings"')
 
     if variant == 'branch-order':
-        return map(bifurcationfunc.partition_asymmetry,
+        return map(partial(bifurcationfunc.partition_asymmetry, uylings=method == 'uylings'),
                    iter_sections(neurites,
                                  iterator_type=Section.ibifurcation_point,
                                  neurite_filter=is_type(neurite_type)))
@@ -408,6 +407,15 @@ def partition_asymmetries(neurites, neurite_type=NeuriteType.all, variant='branc
                                   sectionfunc.downstream_pathlength(section.children[1]))
             asymmetries.append(pathlength_diff / neurite_length)
     return asymmetries
+
+
+@feature(shape=(...,), name='partition')
+def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
+    """Partition at bifurcation points of a collection of neurites."""
+    return map(bifurcationfunc.bifurcation_partition,
+               iter_sections(neurites,
+                             iterator_type=Section.ibifurcation_point,
+                             neurite_filter=is_type(neurite_type)))
 
 
 # Register `partition_asymmetries` variant

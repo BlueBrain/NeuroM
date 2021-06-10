@@ -99,10 +99,12 @@ def bifurcation_partition(bif_point):
     return max(n, m) / min(n, m)
 
 
-def partition_asymmetry(bif_point):
+def partition_asymmetry(bif_point, uylings=False):
     """Calculate the partition asymmetry at a bifurcation point.
 
-    Partition asymmetry is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
+    By default partition asymmetry is defined as in https://www.ncbi.nlm.nih.gov/pubmed/18568015.
+    However if ``uylings=True`` is set then
+    https://jvanpelt.nl/papers/Uylings_Network_13_2002_397-414.pdf is used.
 
     The number of nodes in each child tree is counted. The partition
     is defined as the ratio of the absolute difference and the sum
@@ -113,9 +115,13 @@ def partition_asymmetry(bif_point):
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    if n == m:
-        return 0.0
-    return abs(n - m) / abs(n + m)
+    c = 0
+    if uylings:
+        c = 2
+        if n + m <= c:
+            raise NeuroMError('Partition asymmetry cant be calculated by Uylings because the sum of'
+                              'terminal tips is less than 2.')
+    return abs(n - m) / abs(n + m - c)
 
 
 def partition_pair(bif_point):

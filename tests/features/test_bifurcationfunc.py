@@ -37,8 +37,9 @@ from numpy.testing import assert_raises
 import neurom as nm
 from neurom import load_neuron
 from neurom.exceptions import NeuroMError
-
 from neurom.features import bifurcationfunc as bf
+
+import pytest
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
@@ -78,6 +79,9 @@ def test_partition_asymmetry():
     root = SIMPLE2.neurites[0].root_node
     assert bf.partition_asymmetry(root) == 0.5
     assert bf.partition_asymmetry(root.children[0]) == 0.0
+    assert bf.partition_asymmetry(root, True) == 1.0
+    with pytest.raises(NeuroMError, match='Uylings'):
+        bf.partition_asymmetry(root.children[0], True)
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.partition_asymmetry, leaf)
