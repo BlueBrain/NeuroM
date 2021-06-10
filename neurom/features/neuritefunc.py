@@ -383,11 +383,11 @@ def partition_asymmetries(neurites,
     downstream path lenghts, relative to the total neurite path length
     """
     if variant not in {'branch-order', 'length'}:
-        raise ValueError('Please provide a valid variant for partition asymmetry,\
-                         found %s' % variant)
+        raise ValueError('Please provide a valid variant for partition asymmetry,'
+                         f'found {variant}')
     if method not in {'petilla', 'uylings'}:
         raise ValueError('Please provide a valid method for partition asymmetry,'
-                         f'either "petilla" or "uylings"')
+                         'either "petilla" or "uylings"')
 
     if variant == 'branch-order':
         return map(partial(bifurcationfunc.partition_asymmetry, uylings=method == 'uylings'),
