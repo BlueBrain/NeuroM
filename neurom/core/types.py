@@ -61,6 +61,7 @@ class NeuriteType(IntEnum):
     custom10 = SectionType.custom10
 
 
+#: Collection of all neurite types
 NEURITES = (NeuriteType.all,
             NeuriteType.axon,
             NeuriteType.apical_dendrite,
