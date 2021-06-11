@@ -39,5 +39,18 @@ an error. If you want validate morphologies as strictly as possible then
    import morphio
    morphio.set_raise_warnings(True)
 
-This will make MorphIO raise warning as errors. For more documentation on that topic refer to
-`<https://morphio.readthedocs.io/en/latest/warnings.html>`__.
+This will make MorphIO (hence NeuroM as well) raise warnings as errors. You might want to skip some
+warnings at all. For example, zero diameter is ok to have in your morpology. Then you can:
+
+.. code-block:: python
+
+   try:
+       morphio.set_raise_warnings(True)
+       # warnings you are not interested in
+       morphio.set_ignored_warning(morphio.Warning.zero_diameter, True)
+       m = morphio.Morphology('path/to/morph')
+   finally:
+       morphio.set_ignored_warning(morphio.Warning.zero_diameter, False)
+       morphio.set_raise_warnings(False)
+
+For more documentation on that topic refer to `<https://morphio.readthedocs.io/en/latest/warnings.html>`__.
