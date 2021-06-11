@@ -28,7 +28,7 @@ def test_viewer_matplotlib(mock):
     mock.assert_called_once()
 
 
-@patch('neurom.view.plotly.plot')
+@patch('neurom.view.plotly_impl.plot')
 def test_viewer_plotly(mock):
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')

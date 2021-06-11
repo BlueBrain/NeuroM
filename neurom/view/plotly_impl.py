@@ -1,5 +1,4 @@
-"""Define the public 'draw' function to be used to draw morphology using plotly."""
-from __future__ import absolute_import  # prevents name clash with local plotly module
+"""Morphology draw functions using plotly."""
 from itertools import chain
 
 import numpy as np
@@ -14,29 +13,29 @@ except ImportError as e:
 
 from neurom import COLS, iter_segments, iter_neurites
 from neurom.core.neuron import Neuron
-from neurom.view.view import TREE_COLOR
+from neurom.view.matplotlib_impl import TREE_COLOR
 
 
-def draw(obj, plane='3d', inline=False, **kwargs):
-    """Draw the object using the given plane.
+def plot_neuron(neuron, plane='xy', inline=False, **kwargs):
+    """Draw morphology in 2D.
 
-    obj (neurom.Neuron, neurom.Section): neuron or section
-    plane (str): a string representing the 2D plane (example: 'xy')
-                 or '3d', '3D' for a 3D view
-
-    inline (bool): must be set to True for interactive ipython notebook plotting
+    Args:
+        neuron(Neuron|Section): neuron or section
+        plane(str): a string representing the 2D plane (example: 'xy')
+        inline(bool): must be set to True for interactive ipython notebook plotting
+        **kwargs: additional plotly keyword arguments
     """
-    if plane.lower() == '3d':
-        return _plot_neuron3d(obj, inline, **kwargs)
-    return _plot_neuron(obj, plane, inline, **kwargs)
-
-
-def _plot_neuron(neuron, plane, inline, **kwargs):
     return _plotly(neuron, plane=plane, title='neuron-2D', inline=inline, **kwargs)
 
 
-def _plot_neuron3d(neuron, inline, **kwargs):
-    """Generates a figure of the neuron, that contains a soma and a list of trees."""
+def plot_neuron3d(neuron, inline=False, **kwargs):
+    """Draw morphology in 3D.
+
+    Args:
+        neuron(Neuron|Section): neuron or section
+        inline(bool): must be set to True for interactive ipython notebook plotting
+        **kwargs: additional plotly keyword arguments
+    """
     return _plotly(neuron, plane='3d', title='neuron-3D', inline=inline, **kwargs)
 
 

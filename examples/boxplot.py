@@ -29,7 +29,7 @@
 
 """Box Plot function for multiple neurons."""
 
-from neurom.view import common
+from neurom.view import matplotlib_utils
 
 
 def boxplot(neurons, feature, new_fig=True, subplot=False):
@@ -55,7 +55,7 @@ def boxplot(neurons, feature, new_fig=True, subplot=False):
     """
     feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
 
-    _, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    _, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     ax.boxplot(feature_values)
 

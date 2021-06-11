@@ -36,7 +36,7 @@ import argparse
 
 import numpy as np
 import neurom as nm
-from neurom.view import common as view_utils
+from neurom.view import matplotlib_utils as view_utils
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
 

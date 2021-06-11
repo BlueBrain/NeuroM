@@ -53,6 +53,7 @@ API Documentation
    neurom.core.dataformat
    neurom.io.utils
    neurom.view
-   neurom.view.common
-   neurom.view.view
-   neurom.viewer
+   neurom.view.dendrogram
+   neurom.view.matplotlib_utils
+   neurom.view.matplotlib_impl
+   neurom.view.plotly_impl

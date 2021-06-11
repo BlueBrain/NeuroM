@@ -32,7 +32,7 @@
 from pathlib import Path
 
 from neurom import load_neuron
-import neurom.view.common as common
+import neurom.view.matplotlib_utils as common
 import matplotlib.pyplot as plt
 import numpy as np
 
