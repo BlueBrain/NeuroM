@@ -26,29 +26,18 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+Morphology validation
+*********************
 
-.. image:: /logo/NeuroM.jpg
+What morphology is valid or invalid? NeuroM completely follows MorphIO in this question because
+NeuroM uses MorphIO for reading/writing of morphologies. The rule is be less rigid as possible.
+If there is a problem with morphology then NeuroM rather print a warning about instead of raising
+an error. If you want validate morphologies as strictly as possible then
 
-NeuroM
-======
+.. code-block:: python
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+   import morphio
+   morphio.set_raise_warnings(True)
 
-.. toctree::
-   :hidden:
-
-   Home <self>
-   quickstart
-   install
-   validation
-   tutorial
-   examples
-   cli
-   definitions
-   api
-   developer
-   documentation
-   migration_v2
-   changelog
-   license
+This will make MorphIO raise warning as errors. For more documentation on that topic refer to
+`<https://morphio.readthedocs.io/en/latest/warnings.html>`__.
