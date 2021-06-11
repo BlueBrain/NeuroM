@@ -100,7 +100,8 @@ def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite features or Neuron features. For the list of Neurite features
-    see :mod:`neurom.features.neuritefunc`.
+    see :mod:`neurom.features.neuritefunc`. For the list of Neuron features see
+    :mod:`neurom.features.neuronfunc`.
 
     Arguments:
         feature_name(string): feature to extract
