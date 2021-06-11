@@ -26,7 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Morphometrics functions for neurons or neuron populations."""
+"""Neuron features.
+
+Any public function from this namespace can be called via features mechanism on a neuron, a
+neuron population:
+
+>>> import neurom
+>>> from neurom import features
+>>> nrn = neurom.load_neuron('path/to/neuron')
+>>> features.get('soma_surface_area', nrn)
+>>> nrn_population = neurom.load_neurons('path/to/neurons')
+>>> features.get('sholl_frequency', nrn_population)
+"""
+
 
 from functools import partial
 import math
@@ -43,7 +55,7 @@ from neurom.features import feature, neuritefunc
 feature = partial(feature, namespace='NEURONFEATURES')
 
 
-def neuron_population(nrns):
+def _neuron_population(nrns):
     """Makes sure `nrns` behaves like a neuron population."""
     return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
 
@@ -62,7 +74,7 @@ def soma_volumes(nrn_pop):
         If a single neuron is passed, a single element list with the volume
         of its soma member is returned.
     """
-    nrns = neuron_population(nrn_pop)
+    nrns = _neuron_population(nrn_pop)
     return [soma_volume(n) for n in nrns]
 
 
@@ -88,7 +100,7 @@ def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
         If a single neuron is passed, a single element list with the surface
         area of its soma member is returned.
     """
-    nrns = neuron_population(nrn_pop)
+    nrns = _neuron_population(nrn_pop)
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
     return [soma_surface_area(n) for n in nrns]
 
@@ -102,7 +114,7 @@ def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
         radius of its soma member is returned.
     """
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
-    nrns = neuron_population(nrn_pop)
+    nrns = _neuron_population(nrn_pop)
     return [n.soma.radius for n in nrns]
 
 
@@ -131,7 +143,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
     The range of the azimuth angle [-pi, pi] radians
     """
     neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
+    nrns = _neuron_population(nrn)
 
     def _azimuth(section, soma):
         """Azimuth of a section."""
@@ -154,7 +166,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
     The range of the elevation angle [-pi/2, pi/2] radians
     """
     neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
+    nrns = _neuron_population(nrn)
 
     def _elevation(section, soma):
         """Elevation of a section."""
@@ -174,7 +186,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 def trunk_vectors(nrn, neurite_type=NeuriteType.all):
     """Calculates the vectors between all the trunks of the neuron and the soma center."""
     neurite_filter = is_type(neurite_type)
-    nrns = neuron_population(nrn)
+    nrns = _neuron_population(nrn)
 
     return np.array([morphmath.vector(s.root_node.points[0], n.soma.center)
                      for n in nrns
@@ -209,24 +221,25 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
             for i, _ in enumerate(ordered_vectors)]
 
 
-def sholl_crossings(neurites, center, radii, neurite_filter=None):
+def _sholl_crossings(neurites, center, radii, neurite_type=NeuriteType.all):
     """Calculate crossings of neurites.
-
-    This function can also be used with a list aa neurites, as follow:
-
-        secs = (sec for sec in nm.iter_sections(neuron) if complex_filter(sec))
-        sholl = nm.features.neuronfunc.sholl_crossings(secs,
-                                                       center=neuron.soma.center,
-                                                       radii=np.arange(0, 1000, 100))
 
     Args:
         neurites(list): morphology on which to perform Sholl analysis, or list of neurites
         center(Point): center point
         radii(iterable of floats): radii for which crossings will be counted
+        neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
 
     Returns:
         Array of same length as radii, with a count of the number of crossings
         for the respective radius
+
+    This function can also be used with a list of sections, as follow::
+
+        secs = (sec for sec in nm.iter_sections(neuron) if complex_filter(sec))
+        sholl = nm.features.neuritefunc.sholl_crossings(secs,
+                                                        center=neuron.soma.center,
+                                                        radii=np.arange(0, 1000, 100))
     """
     def _count_crossings(neurite, radius):
         """Used to count_crossings of segments in neurite with radius."""
@@ -242,7 +255,7 @@ def sholl_crossings(neurites, center, radii, neurite_filter=None):
         return count
 
     return np.array([sum(_count_crossings(neurite, r)
-                         for neurite in iter_neurites(neurites, filt=neurite_filter))
+                         for neurite in iter_neurites(neurites, filt=is_type(neurite_type)))
                      for r in radii])
 
 
@@ -266,20 +279,21 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
         bends back on itself, and crosses the same Sholl radius will get counted as
         having crossed multiple times.
     """
-    nrns = neuron_population(nrn)
-    neurite_filter = is_type(neurite_type)
+    nrns = _neuron_population(nrn)
 
     if bins is None:
         min_soma_edge = min(neuron.soma.radius for neuron in nrns)
         max_radii = max(np.max(np.linalg.norm(neurite.points[:, COLS.XYZ], axis=1))
-                        for nrn in nrns for neurite in iter_neurites(nrn, filt=neurite_filter))
+                        for nrn in nrns
+                        for neurite in iter_neurites(nrn, filt=is_type(neurite_type)))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_filter) for neuron in nrns)
+    return sum(_sholl_crossings(neuron, neuron.soma.center, bins, neurite_type)
+               for neuron in nrns)
 
 
 @feature(shape=(...,))
 def total_length(nrn_pop, neurite_type=NeuriteType.all):
     """Get the total length of all sections in the group of neurons or neurites."""
-    nrns = neuron_population(nrn_pop)
+    nrns = _neuron_population(nrn_pop)
     return list(sum(neuritefunc.section_lengths(n, neurite_type=neurite_type)) for n in nrns)

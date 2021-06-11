@@ -26,7 +26,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Neurite functions."""
+"""Neurite features.
+
+Any public function from this namespace can be called via features mechanism on a neurite, a
+collection of neurites, a neuron, a neuron population:
+
+>>> import neurom
+>>> from neurom import features
+>>> nrn = neurom.load_neuron('path/to/neuron')
+>>> features.get('max_radial_distance', nrn.neurites)
+>>> features.get('n_segments', nrn.neurites, neurite_type=neurom.AXON)
+"""
 
 import logging
 from functools import partial, update_wrapper
@@ -39,7 +49,7 @@ from neurom.core.neuron import NeuriteType, Section, iter_neurites, iter_section
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import _register_feature, bifurcationfunc, feature, sectionfunc
-from neurom.features.neuronfunc import neuron_population
+from neurom.features.neuronfunc import _neuron_population
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
@@ -173,52 +183,52 @@ def section_path_lengths(neurites, neurite_type=NeuriteType.all):
 # Features returning one value per NEURON                                      #
 ################################################################################
 
-def map_neurons(fun, neurites, neurite_type):
+def _map_neurons(fun, neurites, neurite_type):
     """Map `fun` to all the neurites in a single or collection of neurons."""
-    nrns = neuron_population(neurites)
+    nrns = _neuron_population(neurites)
     return [fun(n, neurite_type=neurite_type) for n in nrns]
 
 
 @feature(shape=(...,))
 def max_radial_distances(neurites, neurite_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections for a collection of neurites."""
-    return map_neurons(max_radial_distance, neurites, neurite_type)
+    return _map_neurons(max_radial_distance, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_sections(neurites, neurite_type=NeuriteType.all):
     """Number of sections in a collection of neurites."""
-    return map_neurons(n_sections, neurites, neurite_type)
+    return _map_neurons(n_sections, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_neurites(neurites, neurite_type=NeuriteType.all):
     """Number of neurites in a collection of neurites."""
-    return map_neurons(n_neurites, neurites, neurite_type)
+    return _map_neurons(n_neurites, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_bifurcations(neurites, neurite_type=NeuriteType.all):
     """Number of bifurcation points in a collection of neurites."""
-    return map_neurons(n_bifurcation_points, neurites, neurite_type)
+    return _map_neurons(n_bifurcation_points, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_forking_points(neurites, neurite_type=NeuriteType.all):
     """Number of forking points in a collection of neurites."""
-    return map_neurons(n_forking_points, neurites, neurite_type)
+    return _map_neurons(n_forking_points, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_terminations(neurites, neurite_type=NeuriteType.all):
     """Number of leaves points in a collection of neurites."""
-    return map_neurons(n_leaves, neurites, neurite_type)
+    return _map_neurons(n_leaves, neurites, neurite_type)
 
 
 @feature(shape=(...,))
 def number_of_segments(neurites, neurite_type=NeuriteType.all):
     """Number of sections in a collection of neurites."""
-    return map_neurons(n_segments, neurites, neurite_type)
+    return _map_neurons(n_segments, neurites, neurite_type)
 
 ################################################################################
 # Features returning one value per SEGMENT                                     #

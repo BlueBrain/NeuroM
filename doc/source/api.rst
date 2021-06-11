@@ -40,6 +40,7 @@ API Documentation
 
    neurom.morphmath
    neurom.features
+   neurom.features.neuronfunc
    neurom.features.neuritefunc
    neurom.features.sectionfunc
    neurom.features.bifurcationfunc

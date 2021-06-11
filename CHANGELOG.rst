@@ -7,6 +7,9 @@ Version 2.3.0
   :func:`neurom.features.neuritefunc.partition_asymmetries`.
 - Follow the same morphology validation rules as in MorphIO. See the :ref:`doc page<validation>`
   about it.
+- Remove the cli command ``neurom features`` that listed all possible features. Instead a proper
+  documentation is provided on that topic.
+- Make ``neurom.features.neuronfunc.sholl_crossings`` private.
 
 Version 2.2.1
 -------------

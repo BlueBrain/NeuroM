@@ -32,7 +32,6 @@ import logging
 import click
 import matplotlib.pyplot as plt
 
-import neurom as nm
 from neurom.apps import morph_stats, morph_check
 from neurom import load_neuron
 from neurom.viewer import draw as pyplot_draw
@@ -92,15 +91,6 @@ def view(input_file, plane, backend, realistic_diameters):
 def stats(datapath, config, output, full_config, as_population, ignored_exceptions):
     """Cli for apps/morph_stats."""
     morph_stats.main(datapath, config, output, full_config, as_population, ignored_exceptions)
-
-
-@cli.command(short_help='list all available features')
-def features():
-    """Cli to get list of available features. For backward compatibility."""
-    # TODO replace it with programmatically generated Sphinx page that contains all available
-    # features, also programmatically generate EXAMPLE_CONFIG on that page.
-    # pylint: disable=protected-access
-    print(nm.features._get_doc())
 
 
 @cli.command(short_help='Perform checks on morphologies, more details at'
