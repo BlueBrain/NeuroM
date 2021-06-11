@@ -5,6 +5,8 @@ Version 2.3.0
 -------------
 - Introduce a new method to calculate partition asymmetry by Uylings. See docstring of
   :func:`neurom.features.neuritefunc.partition_asymmetries`.
+- Follow the same morphology validation rules as in MorphIO. See the :ref:`doc page<validation>`
+  about it.
 
 Version 2.2.1
 -------------
