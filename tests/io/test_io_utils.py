@@ -32,7 +32,8 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
-from morphio import MissingParentError, RawDataError, SomaError, UnknownFileType, MorphioError
+from morphio import MissingParentError, RawDataError, SomaError, UnknownFileType, MorphioError, \
+    set_raise_warnings
 from neurom import COLS, get, load_neuron
 from neurom.core.neuron import Neuron
 from neurom.exceptions import NeuroMError
@@ -187,8 +188,12 @@ def test_load_neuron_soma_only():
 
 
 def test_load_neuron_disconnected_points_raises():
-    with pytest.raises(MorphioError, match='Warning: found a disconnected neurite'):
-        load_neuron(DISCONNECTED_POINTS_FILE)
+    try:
+        set_raise_warnings(True)
+        with pytest.raises(MorphioError, match='Warning: found a disconnected neurite'):
+            load_neuron(DISCONNECTED_POINTS_FILE)
+    finally:
+        set_raise_warnings(False)
 
 
 def test_load_neuron_missing_parents_raises():

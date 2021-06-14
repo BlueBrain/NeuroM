@@ -26,29 +26,33 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. NeuroM documentation master file
+.. _validation:
 
-.. image:: /logo/NeuroM.jpg
+Morphology validation
+*********************
 
-NeuroM
-======
+What morphology is valid or invalid? NeuroM completely follows MorphIO in this question because
+NeuroM uses MorphIO for reading/writing of morphologies. The rule is be less rigid as possible.
+If there is a problem with morphology then NeuroM rather print a warning about instead of raising
+an error. If you want validate morphologies as strictly as possible then
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+.. code-block:: python
 
-.. toctree::
-   :hidden:
+   import morphio
+   morphio.set_raise_warnings(True)
 
-   Home <self>
-   quickstart
-   install
-   validation
-   tutorial
-   examples
-   cli
-   definitions
-   api
-   developer
-   documentation
-   migration_v2
-   changelog
-   license
+This will make MorphIO (hence NeuroM as well) raise warnings as errors. You might want to skip some
+warnings at all. For example, zero diameter is ok to have in your morpology. Then you can:
+
+.. code-block:: python
+
+   try:
+       morphio.set_raise_warnings(True)
+       # warnings you are not interested in
+       morphio.set_ignored_warning(morphio.Warning.zero_diameter, True)
+       m = morphio.Morphology('path/to/morph')
+   finally:
+       morphio.set_ignored_warning(morphio.Warning.zero_diameter, False)
+       morphio.set_raise_warnings(False)
+
+For more documentation on that topic refer to `<https://morphio.readthedocs.io/en/latest/warnings.html>`__.

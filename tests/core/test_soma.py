@@ -31,7 +31,7 @@ import warnings
 from io import StringIO
 
 import numpy as np
-from morphio import MorphioError, SomaError
+from morphio import MorphioError, SomaError, set_raise_warnings
 from neurom import load_neuron
 from neurom.core import soma
 from mock import Mock
@@ -97,11 +97,16 @@ def test_Soma_ThreePointCylinder_invalid_radius():
 
 
 def test_Soma_ThreePointCylinder_invalid():
-    with pytest.raises(MorphioError, match='Warning: the soma does not conform the three point soma spec'):
-        load_neuron(StringIO(u"""
-                        1 1 0   0 0 1e-8 -1
-                        2 1 0 -44 0 1e-8  1
-                        3 1 0 +44 0 1e-8  1"""), reader = 'swc')
+    try:
+        set_raise_warnings(True)
+        with pytest.raises(MorphioError,
+                           match='Warning: the soma does not conform the three point soma spec'):
+            load_neuron(StringIO(u"""
+                            1 1 0   0 0 1e-4 -1
+                            2 1 0 -44 0 1e-4  1
+                            3 1 0 +44 0 1e-4  1"""), reader='swc')
+    finally:
+        set_raise_warnings(False)
 
 
 def check_SomaC(stream):
