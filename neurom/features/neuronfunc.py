@@ -221,8 +221,8 @@ def trunk_angles(nrn, neurite_type=NeuriteType.all):
             for i, _ in enumerate(ordered_vectors)]
 
 
-def _sholl_crossings(neurites, center, radii, neurite_type=NeuriteType.all):
-    """Calculate crossings of neurites.
+def sholl_crossings(neurites, center, radii, neurite_type=NeuriteType.all):
+    """Calculate crossings of neurites. The only function in this module that is not a feature.
 
     Args:
         neurites(list): morphology on which to perform Sholl analysis, or list of neurites
@@ -288,7 +288,7 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
                         for neurite in iter_neurites(nrn, filt=is_type(neurite_type)))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sum(_sholl_crossings(neuron, neuron.soma.center, bins, neurite_type)
+    return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_type)
                for neuron in nrns)
 
 
