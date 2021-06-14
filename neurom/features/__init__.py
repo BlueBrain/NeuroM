@@ -99,45 +99,19 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
 def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
+    Features can be either Neurite features or Neuron features. For the list of Neurite features
+    see :mod:`neurom.features.neuritefunc`. For the list of Neuron features see
+    :mod:`neurom.features.neuronfunc`.
+
     Arguments:
         feature_name(string): feature to extract
-        obj: a neuron, population or neurite tree
+        obj: a neuron, a neuron population or a neurite tree
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D, 2D or 3D numpy array.
     """
     return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
-
-
-_INDENT = ' ' * 4
-
-
-def _indent(string, count):
-    """Indent `string` by `count` * INDENT."""
-    indent = _INDENT * count
-    ret = indent + string.replace('\n', '\n' + indent)
-    return ret.rstrip()
-
-
-def _get_doc():
-    """Get a description of all the known available features."""
-    def get_docstring(func):
-        """Extract doctstring, if possible."""
-        docstring = ':\n'
-        if func.__doc__:
-            docstring += _indent(func.__doc__, 2)
-        return docstring
-
-    ret = ['\nNeurite features (neurite, neuron, neuron population):']
-    ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(NEURITEFEATURES.items()))
-
-    ret.append('\nNeuron features (neuron, neuron population):')
-    ret.extend(_INDENT + '- ' + feature + get_docstring(func)
-               for feature, func in sorted(NEURONFEATURES.items()))
-
-    return '\n'.join(ret)
 
 
 def _register_feature(namespace, name, func, shape):
@@ -178,6 +152,3 @@ def feature(shape, namespace=None, name=None):
 
 # These imports are necessary in order to register the features
 from neurom.features import neuritefunc, neuronfunc  # noqa, pylint: disable=wrong-import-position
-
-# This must be done after all features have been registered
-get.__doc__ += _indent('\nFeatures:\n', 1) + _indent(_get_doc(), 2)  # pylint: disable=no-member

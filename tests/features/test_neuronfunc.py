@@ -162,22 +162,22 @@ def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
     assert (list(_nf.sholl_crossings(SIMPLE, center, radii=radii)) ==
-           [])
+            [])
 
     radii = [1.0]
     assert ([2] ==
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1.0, 5.1]
     assert ([2, 4] ==
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1., 4., 5.]
     assert ([2, 4, 5] ==
-           list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
     
     assert ([1, 1, 2] ==
-           list(_nf.sholl_crossings(list(SIMPLE.sections[:2]), center, radii=radii)))
+            list(_nf.sholl_crossings(list(SIMPLE.sections[:2]), center, radii=radii)))
 
 
 def load_swc(string):
@@ -199,7 +199,7 @@ def test_sholl_analysis_custom():
  4 4   0  0  0 1.  1
  5 4 -80  0  0 1.  4""")
     assert (list(_nf.sholl_crossings(morph_A, center, radii=radii)) ==
-           [2, 2, 2, 2, 2, 2, 2, 2])
+            [2, 2, 2, 2, 2, 2, 2, 2])
 
     morph_B = load_swc("""\
  1 1   0   0  0 1. -1
@@ -218,7 +218,7 @@ def test_sholl_analysis_custom():
 14 4 -51 -10  0 1.  9
                        """)
     assert (list(_nf.sholl_crossings(morph_B, center, radii=radii)) ==
-           [2, 2, 2, 10, 10, 0, 0, 0])
+            [2, 2, 2, 10, 10, 0, 0, 0])
 
     morph_C = load_swc("""\
  1 1   0   0  0 1. -1
@@ -237,5 +237,5 @@ def test_sholl_analysis_custom():
 14 4  85 -10  0 1.  9
                        """)
     assert (list(_nf.sholl_crossings(morph_C, center, radii=radii)) ==
-           [2, 2, 2, 2, 2, 2, 10, 10])
+            [2, 2, 2, 2, 2, 2, 10, 10])
     # view.neuron(morph_C)[0].savefig('foo.png')

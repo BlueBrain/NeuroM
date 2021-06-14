@@ -72,7 +72,7 @@ def test_morph_stat_full_config():
     runner = CliRunner()
     filename = DATA / 'h5/v1/Neuron.h5'
     with tempfile.NamedTemporaryFile() as f:
-        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--output', f.name])
+        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--output', f.name], catch_exceptions=False)
         assert result.exit_code == 0
         df = pd.read_csv(f)
         assert not df.empty
@@ -129,10 +129,3 @@ def test_morph_check():
                                        'Has nonzero soma radius': True,
                                        'ALL': False}},
             'STATUS': 'FAIL'}
-
-
-def test_features():
-    runner = CliRunner()
-    result = runner.invoke(cli, ['features'])
-    assert result.exit_code == 0
-    assert len(result.stdout) > 0

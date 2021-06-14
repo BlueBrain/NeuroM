@@ -125,8 +125,5 @@ or ``-h`` option.
 Features
 --------
 
-To see all available features for ``--config``:
-
-.. runblock:: console
-
-    $ neurom features
+All available features for ``--config`` are documented in :mod:`neurom.features.neuronfunc` and
+:mod:`neurom.features.neuritefunc`.

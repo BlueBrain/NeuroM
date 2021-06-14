@@ -140,11 +140,11 @@ pygments_style = 'sphinx'
 todo_include_todos = True
 suppress_warnings = ["ref.python"]
 autosummary_generate = True
-autosummary_imported_members = True
+autosummary_imported_members = False
 autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
-    'imported-members': True,
+    'imported-members': False,
     'show-inheritance': True,
 }
 
