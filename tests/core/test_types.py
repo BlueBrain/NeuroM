@@ -54,11 +54,9 @@ def test_tree_type_checker():
     assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(*NEURITES)
-    assert tree_filter('fake_tree')
     assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(NEURITES)
-    assert tree_filter('fake_tree')
     assert tree_filter(mock_tree)
 
 
