@@ -38,7 +38,7 @@ def test_viewer_plotly(mock):
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')
 
-    result = runner.invoke(cli, ['view', filename,
+    result = runner.invoke(cli, ['view', filename, '--3d',
                                  '--backend', 'plotly'])
     assert result.exit_code == 0
     mock.assert_called_once()
