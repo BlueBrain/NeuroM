@@ -56,6 +56,8 @@ def cli(verbose):
               help='Scale diameters according to the plot axis\n'
                    'Warning: Only works with the matplotlib backend')
 def view(input_file, is_3d, plane, backend, realistic_diameters):
+    """CLI interface to draw morphologies."""
+    # pylint: disable=import-outside-toplevel
     is_matplotlib = backend == 'matplotlib'
     if is_matplotlib:
         if is_3d:

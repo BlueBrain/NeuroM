@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Dendrogram helper functions and class."""
+
 import numpy as np
 from neurom import NeuriteType
 from neurom.core.neuron import Neurite, Neuron

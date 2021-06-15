@@ -25,7 +25,9 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """Morphology draw functions using matplotlib."""
+
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
@@ -164,10 +166,11 @@ def plot_soma(soma, ax, plane='xy',
 
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
-            matplotlib_utils.project_cylinder_onto_2d(ax, (plane0, plane1),
-                                                      start=start[COLS.XYZ], end=end[COLS.XYZ],
-                                                      start_radius=start[COLS.R], end_radius=end[COLS.R],
-                                                      color=color, alpha=alpha)
+            matplotlib_utils.project_cylinder_onto_2d(
+                ax, (plane0, plane1),
+                start=start[COLS.XYZ], end=end[COLS.XYZ],
+                start_radius=start[COLS.R], end_radius=end[COLS.R],
+                color=color, alpha=alpha)
     else:
         if soma_outline:
             ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
