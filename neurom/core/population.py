@@ -49,7 +49,7 @@ class Population:
 
         Arguments:
             files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
-                paths to them
+                paths to them or instances of ``Neuron``.
             name (str): Optional name for this Population
             ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
                 loading neurons.
@@ -72,7 +72,7 @@ class Population:
 
     @property
     def somata(self):
-        """Iterator to populations's somas."""
+        """Iterator to populations's somata. Somata is the plural form of soma."""
         return (n.soma for n in self)
 
     @property
