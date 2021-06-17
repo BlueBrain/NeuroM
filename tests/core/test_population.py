@@ -82,7 +82,7 @@ def test_iterating():
     for a, b in zip(NEURONS, pop):
         assert a is b
 
-    for a, b in zip(NEURONS, pop.somata):
+    for a, b in zip(NEURONS, pop.soma):
         assert a.soma is b
 
 
