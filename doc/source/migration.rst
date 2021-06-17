@@ -60,10 +60,10 @@ Migration to v2.4.0 version
    # If you used ``output_path`` with any of functions above then add this line
    matplotlib_utils.save_plot(fig=fig, output_path=output_path)
 
-   # For '2d' and '3d' modes you can also use plotly
+   # instead of `plotly.draw`
    from neurom import plotly_impl
-   plotly_impl.plot_neuron(nrn)
-   plotly_impl.plot_neuron3d(nrn)
+   plotly_impl.plot_neuron(nrn)  # for 2d
+   plotly_impl.plot_neuron3d(nrn)  # for 3d
 
 Migration to v2 version
 -----------------------
