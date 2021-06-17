@@ -85,6 +85,9 @@ def test_iterating():
     for a, b in zip(NEURONS, pop.soma):
         assert a.soma is b
 
+    for a, b in zip(NEURONS, pop.somata):
+        assert a.soma is b
+
 
 @pytest.mark.parametrize('pop', populations)
 def test_len(pop):

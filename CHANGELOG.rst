@@ -3,8 +3,8 @@ Changelog
 
 Version 2.4.0
 -------------
-- rename ``Population.somata`` to ``Population.soma`` to have name consistency among ``Population``
-  and ``Neuron``.
+- deprecate ``Population.somata`` in favor of ``Population.soma`` to have name consistency among
+  ``Population`` and ``Neuron``.
 
 Version 2.3.0
 -------------

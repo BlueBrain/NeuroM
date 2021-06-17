@@ -32,7 +32,7 @@ import logging
 from morphio import MorphioError
 import neurom
 from neurom.exceptions import NeuroMError
-
+from neurom.utils import deprecated
 
 L = logging.getLogger(__name__)
 
@@ -69,6 +69,12 @@ class Population:
     def neurons(self):
         """Iterator to populations's somas."""
         return (n for n in self)
+
+    @property
+    @deprecated('`somata`', 'Use `soma` instead.')
+    def somata(self):
+        """Iterator to populations's somas."""
+        return self.soma
 
     @property
     def soma(self):
