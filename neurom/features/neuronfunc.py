@@ -300,7 +300,8 @@ def total_length(neurons, neurite_type=NeuriteType.all):
 def max_radial_distances(neurons, neurite_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections.
 
-    For a collection of neurites, neurons or a neuron population."""
+    For a collection of neurites, neurons or a neuron population.
+    """
     neurons = _assure_iterable(neurons)
     return [neuritefunc.max_radial_distance(n, neurite_type) for n in neurons]
 
