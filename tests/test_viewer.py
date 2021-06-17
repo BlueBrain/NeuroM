@@ -52,6 +52,9 @@ def test_draw_neuron():
     viewer.draw(nrn)
     matplotlib_utils.plt.close('all')
 
+    viewer.draw(nrn, realistic_diameters=True)
+    matplotlib_utils.plt.close('all')
+
 
 def test_draw_filter_neurite():
     for mode in ['2d', '3d']:
