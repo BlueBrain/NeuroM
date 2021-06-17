@@ -60,10 +60,9 @@ def _assure_iterable(neurons):
     """Makes sure `neurons` is an iterable of neurons."""
     if hasattr(neurons, 'neurons'):
         return neurons.neurons
-    elif isinstance(neurons, Iterable):
+    if isinstance(neurons, Iterable):
         return neurons
-    else:
-        return (neurons,)
+    return (neurons,)
 
 
 def _iter_neurites(neurons, neurite_type):
