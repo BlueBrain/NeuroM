@@ -32,7 +32,7 @@ import logging
 from morphio import MorphioError
 import neurom
 from neurom.exceptions import NeuroMError
-from neurom.utils import deprecated
+
 
 L = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class Population:
 
         Arguments:
             files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
-                paths to them or instances of Neuron
+                paths to them
             name (str): Optional name for this Population
             ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
                 loading neurons.
@@ -71,13 +71,7 @@ class Population:
         return (n for n in self)
 
     @property
-    @deprecated('`somata`', 'Use `soma` instead.')
     def somata(self):
-        """Iterator to populations's somas."""
-        return self.soma
-
-    @property
-    def soma(self):
         """Iterator to populations's somas."""
         return (n.soma for n in self)
 
