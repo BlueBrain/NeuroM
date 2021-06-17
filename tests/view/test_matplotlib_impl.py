@@ -32,7 +32,7 @@ from pathlib import Path
 import numpy as np
 from neurom import load_neuron
 from neurom.core.types import NeuriteType
-from neurom.view import common, view
+from neurom.view import matplotlib_utils, matplotlib_impl
 
 import pytest
 from numpy.testing import assert_allclose, assert_array_almost_equal
@@ -52,7 +52,7 @@ def test_tree_diameter_scale(get_fig_2d):
     fig, ax = get_fig_2d
     tree = neuron_different.neurites[0]
     for input_color, expected_colors in tree_colors.items():
-        view.plot_tree(ax, tree, color=input_color, diameter_scale=None, alpha=1., linewidth=1.2)
+        matplotlib_impl.plot_tree(tree, ax, color=input_color, diameter_scale=None, alpha=1., linewidth=1.2)
         collection = ax.collections[0]
         assert collection.get_linewidth()[0] == 1.2
         assert_array_almost_equal(collection.get_colors(), expected_colors)
@@ -63,7 +63,7 @@ def test_tree_diameter_real(get_fig_2d):
     fig, ax = get_fig_2d
     tree = neuron_different.neurites[0]
     for input_color, expected_colors in tree_colors.items():
-        view.plot_tree(ax, tree, color=input_color, alpha=1., linewidth=1.2, realistic_diameters=True)
+        matplotlib_impl.plot_tree(tree, ax, color=input_color, alpha=1., linewidth=1.2, realistic_diameters=True)
         collection = ax.collections[0]
         assert collection.get_linewidth()[0] == 1.0
         assert_array_almost_equal(collection.get_facecolors(), expected_colors)
@@ -73,31 +73,31 @@ def test_tree_diameter_real(get_fig_2d):
 def test_tree_invalid(get_fig_2d):
     fig, ax = get_fig_2d
     with pytest.raises(AssertionError):
-        view.plot_tree(ax, neuron_different.neurites[0], plane='wrong')
+        matplotlib_impl.plot_tree(neuron_different.neurites[0], ax, plane='wrong')
 
 
 def test_tree_bounds(get_fig_2d):
     fig, ax = get_fig_2d
-    view.plot_tree(ax, neuron_different.neurites[0])
+    matplotlib_impl.plot_tree(neuron_different.neurites[0], ax)
     np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.))
 
 
 def test_neuron(get_fig_2d):
     fig, ax = get_fig_2d
-    view.plot_neuron(ax, fst_neuron)
+    matplotlib_impl.plot_neuron(fst_neuron, ax)
     assert ax.get_title() == fst_neuron.name
     assert_allclose(ax.dataLim.get_points(),
                                [[-40.32853516, -57.600172],
                                 [64.74726272, 48.51626225], ])
 
     with pytest.raises(AssertionError):
-        view.plot_tree(ax, fst_neuron, plane='wrong')
+        matplotlib_impl.plot_tree(fst_neuron, ax, plane='wrong')
 
 
 def test_tree3d(get_fig_3d):
     fig, ax = get_fig_3d
     tree = simple_neuron.neurites[0]
-    view.plot_tree3d(ax, tree)
+    matplotlib_impl.plot_tree3d(tree, ax)
     xy_bounds = ax.xy_dataLim.bounds
     np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
     zz_bounds = ax.zz_dataLim.bounds
@@ -106,7 +106,7 @@ def test_tree3d(get_fig_3d):
 
 def test_neuron3d(get_fig_3d):
     fig, ax = get_fig_3d
-    view.plot_neuron3d(ax, fst_neuron)
+    matplotlib_impl.plot_neuron3d(fst_neuron, ax)
     assert ax.get_title() == fst_neuron.name
     assert_allclose(ax.xy_dataLim.get_points(),
                                [[-40.32853516, -57.600172],
@@ -118,22 +118,27 @@ def test_neuron3d(get_fig_3d):
 def test_neuron_no_neurites(get_fig_2d):
     filename = Path(SWC_PATH, 'point_soma.swc')
     fig, ax = get_fig_2d
-    view.plot_neuron(ax, load_neuron(filename))
+    matplotlib_impl.plot_neuron(load_neuron(filename), ax)
 
 
 def test_neuron3d_no_neurites(get_fig_3d):
     filename = Path(SWC_PATH, 'point_soma.swc')
     fig, ax = get_fig_3d
-    view.plot_neuron3d(ax, load_neuron(filename))
+    matplotlib_impl.plot_neuron3d(load_neuron(filename), ax)
 
 
 def test_dendrogram(get_fig_2d):
     fig, ax = get_fig_2d
-    view.plot_dendrogram(ax, fst_neuron)
+    matplotlib_impl.plot_dendrogram(fst_neuron, ax)
     assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
 
-    view.plot_dendrogram(ax, fst_neuron, show_diameters=False)
+    matplotlib_impl.plot_dendrogram(fst_neuron, ax, show_diameters=False)
     assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
+
+    matplotlib_impl.plot_dendrogram(fst_neuron.neurites[0], ax, show_diameters=False)
+
+    neuron = load_neuron(SWC_PATH / 'empty_segments.swc')
+    matplotlib_impl.plot_dendrogram(neuron, ax)
 
 
 with warnings.catch_warnings(record=True):
@@ -167,27 +172,41 @@ def test_soma(get_fig_2d):
               soma_3pt_normal,
               soma_4pt_normal_cylinder,
               soma_4pt_normal_contour):
-        view.plot_soma(ax, s)
-        common.plt.close(fig)
+        matplotlib_impl.plot_soma(s, ax)
+        matplotlib_utils.plt.close(fig)
 
-        view.plot_soma(ax, s, soma_outline=False)
-        common.plt.close(fig)
+        matplotlib_impl.plot_soma(s, ax, soma_outline=False)
+        matplotlib_utils.plt.close(fig)
 
 
 def test_soma3d(get_fig_3d):
     _, ax = get_fig_3d
-    view.plot_soma3d(ax, soma_3pt_normal)
+    matplotlib_impl.plot_soma3d(soma_3pt_normal, ax)
     assert_allclose(ax.get_xlim(), (-11.,  11.), atol=2)
     assert_allclose(ax.get_ylim(), (-11.,  11.), atol=2)
     assert_allclose(ax.get_zlim(), (-10.,  10.), atol=2)
 
 
 def test_get_color():
-    assert view._get_color(None, NeuriteType.basal_dendrite) == "red"
-    assert view._get_color(None, NeuriteType.axon) == "blue"
-    assert view._get_color(None, NeuriteType.apical_dendrite) == "purple"
-    assert view._get_color(None, NeuriteType.soma) == "black"
-    assert view._get_color(None, NeuriteType.undefined) == "green"
-    assert view._get_color(None, 'wrong') == "green"
-    assert view._get_color('blue', 'wrong') == "blue"
-    assert view._get_color('yellow', NeuriteType.axon) == "yellow"
+    assert matplotlib_impl._get_color(None, NeuriteType.basal_dendrite) == "red"
+    assert matplotlib_impl._get_color(None, NeuriteType.axon) == "blue"
+    assert matplotlib_impl._get_color(None, NeuriteType.apical_dendrite) == "purple"
+    assert matplotlib_impl._get_color(None, NeuriteType.soma) == "black"
+    assert matplotlib_impl._get_color(None, NeuriteType.undefined) == "green"
+    assert matplotlib_impl._get_color(None, 'wrong') == "green"
+    assert matplotlib_impl._get_color('blue', 'wrong') == "blue"
+    assert matplotlib_impl._get_color('yellow', NeuriteType.axon) == "yellow"
+
+
+def test_filter_neurite():
+    fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
+    matplotlib_impl.plot_neuron3d(fst_neuron, ax, neurite_type=NeuriteType.basal_dendrite)
+    matplotlib_utils.plot_style(fig=fig, ax=ax)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    matplotlib_utils.plt.close('all')
+
+    fig, ax = matplotlib_utils.get_figure()
+    matplotlib_impl.plot_neuron(fst_neuron, ax, neurite_type=NeuriteType.basal_dendrite)
+    matplotlib_utils.plot_style(fig=fig, ax=ax)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    matplotlib_utils.plt.close('all')

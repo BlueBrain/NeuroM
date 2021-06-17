@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Functionality for styling plots."""
+
 from pathlib import Path
 
 import numpy as np

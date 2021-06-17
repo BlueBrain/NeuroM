@@ -69,7 +69,7 @@ def test_deprecated():
 
 def test_deprecated_module():
     with warnings.catch_warnings(record=True) as s:
-        nu.deprecated_module('foo', msg='msg')
+        nu.deprecated_module('msg')
         assert len(s) > 0
 
 

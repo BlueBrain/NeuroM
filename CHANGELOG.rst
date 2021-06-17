@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Version 2.4.0
+-------------
+- Refactor viewer. :ref:`Migration guide<migration-v2.4.0>`.
+    - deprecate ``neurom.view.viewer``
+    - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
+    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
+      ``neurom.view.plotly.plot_neuron3d``.
+    - rename ``neurom.view.view`` to ``neurom.view.matplotlib_impl``
+    - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
+    - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
+
 Version 2.3.0
 -------------
 - Introduce a new method to calculate partition asymmetry by Uylings. See docstring of

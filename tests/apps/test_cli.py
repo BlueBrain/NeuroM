@@ -23,17 +23,22 @@ def test_viewer_matplotlib(mock):
     mock.assert_called_once()
 
     mock.reset_mock()
+    result = runner.invoke(cli, ['view', filename, '--3d'])
+    assert result.exit_code == 0
+    mock.assert_called_once()
+
+    mock.reset_mock()
     result = runner.invoke(cli, ['view', filename, '--plane', 'xy'])
     assert result.exit_code == 0
     mock.assert_called_once()
 
 
-@patch('neurom.view.plotly.plot')
+@patch('neurom.view.plotly_impl.plot')
 def test_viewer_plotly(mock):
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')
 
-    result = runner.invoke(cli, ['view', filename,
+    result = runner.invoke(cli, ['view', filename, '--3d',
                                  '--backend', 'plotly'])
     assert result.exit_code == 0
     mock.assert_called_once()
