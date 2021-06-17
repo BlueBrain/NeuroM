@@ -298,49 +298,50 @@ def total_length(neurons, neurite_type=NeuriteType.all):
 
 @feature(shape=(...,))
 def max_radial_distances(neurons, neurite_type=NeuriteType.all):
-    """Get the maximum radial distances of the termination sections for a collection of neurites,
-    neurons or a population."""
+    """Get the maximum radial distances of the termination sections.
+
+    For a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.max_radial_distance(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_sections(neurons, neurite_type=NeuriteType.all):
-    """Number of sections in a collection of neurites, neurons or a population."""
+    """Number of sections in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_sections(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_neurites(neurons, neurite_type=NeuriteType.all):
-    """Number of neurites in a collection of neurites, neurons or a population."""
+    """Number of neurites in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_neurites(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_bifurcations(neurons, neurite_type=NeuriteType.all):
-    """Number of bifurcation points in a collection of neurites, neurons or a population."""
+    """Number of bifurcation points in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_bifurcation_points(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_forking_points(neurons, neurite_type=NeuriteType.all):
-    """Number of forking points in a collection of neurites, neurons or a population."""
+    """Number of forking points in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_forking_points(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_terminations(neurons, neurite_type=NeuriteType.all):
-    """Number of leaves points in a collection of neurites, neurons or a population."""
+    """Number of leaves points in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_leaves(n, neurite_type) for n in neurons]
 
 
 @feature(shape=(...,))
 def number_of_segments(neurons, neurite_type=NeuriteType.all):
-    """Number of sections in a collection of neurites, neurons or a population."""
+    """Number of sections in a collection of neurites, neurons or a neuron population."""
     neurons = _assure_iterable(neurons)
     return [neuritefunc.n_segments(n, neurite_type) for n in neurons]
