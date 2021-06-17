@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 2.4.0
+-------------
+- deprecate ``Population.somata`` in favor of ``Population.soma`` to have name consistency among
+  ``Population`` and ``Neuron``.
+
 Version 2.3.0
 -------------
 - Introduce a new method to calculate partition asymmetry by Uylings. See docstring of
