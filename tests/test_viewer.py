@@ -52,9 +52,6 @@ def test_draw_neuron():
     viewer.draw(nrn)
     matplotlib_utils.plt.close('all')
 
-    viewer.draw(nrn, realistic_diameters=True)
-    matplotlib_utils.plt.close('all')
-
 
 def test_draw_filter_neurite():
     for mode in ['2d', '3d']:
@@ -71,6 +68,10 @@ def test_draw_neuron3d():
 
     with pytest.raises(NotImplementedError):
         viewer.draw(nrn, mode='3d', realistic_diameters=True)
+
+    # for coverage
+    viewer.draw(nrn, mode='3d', realistic_diameters=False)
+    matplotlib_utils.plt.close('all')
 
 
 def test_draw_tree():
