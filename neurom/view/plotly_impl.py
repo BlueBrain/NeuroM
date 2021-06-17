@@ -1,5 +1,33 @@
-"""Define the public 'draw' function to be used to draw morphology using plotly."""
-from __future__ import absolute_import  # prevents name clash with local plotly module
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 501ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""Morphology draw functions using plotly."""
+
 from itertools import chain
 
 import numpy as np
@@ -14,29 +42,29 @@ except ImportError as e:
 
 from neurom import COLS, iter_segments, iter_neurites
 from neurom.core.neuron import Neuron
-from neurom.view.view import TREE_COLOR
+from neurom.view.matplotlib_impl import TREE_COLOR
 
 
-def draw(obj, plane='3d', inline=False, **kwargs):
-    """Draw the object using the given plane.
+def plot_neuron(neuron, plane='xy', inline=False, **kwargs):
+    """Draw morphology in 2D.
 
-    obj (neurom.Neuron, neurom.Section): neuron or section
-    plane (str): a string representing the 2D plane (example: 'xy')
-                 or '3d', '3D' for a 3D view
-
-    inline (bool): must be set to True for interactive ipython notebook plotting
+    Args:
+        neuron(Neuron|Section): neuron or section
+        plane(str): a string representing the 2D plane (example: 'xy')
+        inline(bool): must be set to True for interactive ipython notebook plotting
+        **kwargs: additional plotly keyword arguments
     """
-    if plane.lower() == '3d':
-        return _plot_neuron3d(obj, inline, **kwargs)
-    return _plot_neuron(obj, plane, inline, **kwargs)
-
-
-def _plot_neuron(neuron, plane, inline, **kwargs):
     return _plotly(neuron, plane=plane, title='neuron-2D', inline=inline, **kwargs)
 
 
-def _plot_neuron3d(neuron, inline, **kwargs):
-    """Generates a figure of the neuron, that contains a soma and a list of trees."""
+def plot_neuron3d(neuron, inline=False, **kwargs):
+    """Draw morphology in 3D.
+
+    Args:
+        neuron(Neuron|Section): neuron or section
+        inline(bool): must be set to True for interactive ipython notebook plotting
+        **kwargs: additional plotly keyword arguments
+    """
     return _plotly(neuron, plane='3d', title='neuron-3D', inline=inline, **kwargs)
 
 

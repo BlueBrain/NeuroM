@@ -31,7 +31,7 @@
 from itertools import chain
 
 import numpy as np
-from neurom.view import common
+from neurom.view import matplotlib_utils
 
 
 def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
@@ -73,7 +73,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
 
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     kwargs['xlabel'] = kwargs.get('xlabel', feature)
 
@@ -89,7 +89,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
 
     kwargs['no_legend'] = len(neu_labels) == 1
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
 
 def population_feature_values(pops, feature):
@@ -149,7 +149,7 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
 
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     kwargs['xlabel'] = kwargs.get('xlabel', feature)
 
@@ -165,4 +165,4 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
 
     kwargs['no_legend'] = len(pops_labels) == 1
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)

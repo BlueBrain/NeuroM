@@ -102,9 +102,9 @@ def deprecated(fun_name=None, msg=""):
     return _deprecated
 
 
-def deprecated_module(mod_name, msg=""):
+def deprecated_module(msg):
     """Issue a deprecation warning for a module."""
-    _warn_deprecated('Module %s is deprecated. %s' % (mod_name, msg))
+    _warn_deprecated(msg)
 
 
 class NeuromJSON(json.JSONEncoder):
