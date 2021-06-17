@@ -25,7 +25,7 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import warnings
 from io import StringIO
 from pathlib import Path
 
@@ -87,6 +87,14 @@ def test_iter_neurites_filter_mapping():
 
     ref = [500, 500, 500]
     assert n == ref
+
+
+def test_iter_population():
+    with warnings.catch_warnings(record=True) as w_list:
+        for _ in iter_neurites(POP, neurite_order=NeuriteIter.NRN):
+            pass
+        assert len(w_list) == 1
+        assert '`iter_neurites` with `neurite_order` over Population' in str(w_list[0].message)
 
 
 def test_iter_sections_default():
