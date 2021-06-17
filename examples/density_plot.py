@@ -32,7 +32,7 @@ import pylab as plt
 import numpy as np
 
 from neurom import get as get_feat
-from neurom.view import (matplotlib_utils, matplotlib_impl)
+from neurom.view import matplotlib_utils, matplotlib_impl
 from neurom.core.types import NeuriteType
 
 

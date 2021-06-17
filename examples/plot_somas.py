@@ -32,7 +32,7 @@
 from pathlib import Path
 
 from neurom import load_neuron
-import neurom.view.matplotlib_utils as common
+from neurom.view import matplotlib_utils
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -47,10 +47,10 @@ def random_color():
 
 def plot_somas(somas):
     """Plot set of somas on same figure as spheres, each with different color."""
-    _, ax = common.get_figure(new_fig=True, subplot=111,
-                              params={'projection': '3d', 'aspect': 'equal'})
+    _, ax = matplotlib_utils.get_figure(new_fig=True, subplot=111,
+                                        params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
-        common.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
+        matplotlib_utils.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
     plt.show()
 
 

@@ -36,7 +36,7 @@ import argparse
 
 import numpy as np
 import neurom as nm
-from neurom.view import matplotlib_utils as view_utils
+from neurom.view import matplotlib_utils
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -177,7 +177,7 @@ def main(data_dir, mtype_file):  # pylint: disable=too-many-locals
             print('PLOT LIMITS:', limits)
             # print 'DATA:', data
             # print 'BIN HEIGHT', histo[0]
-            plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
+            plot = Plot(*matplotlib_utils.get_figure(new_fig=True, subplot=111))
             plot.ax.set_xlim(*limits)
             plot.ax.bar(histo[1][:-1], histo[0], width=bin_widths(histo[1]))
             dp, bc = dist_points(histo[1], dist)
