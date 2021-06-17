@@ -117,13 +117,13 @@ def test_max_radial_distances():
     }
     assert_features_for_neurite(feat, POP, expected, exact=False)
 
-    # Test with a list of neurites
+    # Test with a single Neuron
     expected = {
         None: [99.58945832],
         NeuriteType.all: [99.58945832],
         NeuriteType.apical_dendrite: [99.589458],
     }
-    assert_features_for_neurite(feat, NRN.neurites, expected, exact=False)
+    assert_features_for_neurite(feat, (NRN,), expected, exact=False)
 
 
 def test_max_radial_distance():

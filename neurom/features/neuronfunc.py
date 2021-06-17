@@ -40,6 +40,7 @@ neuron population:
 """
 
 
+from collections import Iterable
 from functools import partial
 import math
 
@@ -55,86 +56,88 @@ from neurom.features import feature, neuritefunc
 feature = partial(feature, namespace='NEURONFEATURES')
 
 
-def _neuron_population(nrns):
-    """Makes sure `nrns` behaves like a neuron population."""
-    return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+def _assure_iterable(neurons):
+    """Makes sure `neurons` is an iterable of neurons."""
+    if hasattr(neurons, 'neurons'):
+        return neurons.neurons
+    elif isinstance(neurons, Iterable):
+        return neurons
+    else:
+        return (neurons,)
+
+
+def _iter_neurites(neurons, neurite_type):
+    neurite_filter = is_type(neurite_type)
+    for n in neurons:
+        for s in n.neurites:
+            if neurite_filter(s):
+                yield s, n
 
 
 @feature(shape=())
-def soma_volume(nrn):
+def soma_volume(neuron):
     """Get the volume of a neuron's soma."""
-    return nrn.soma.volume
+    return neuron.soma.volume
 
 
 @feature(shape=(...,))
-def soma_volumes(nrn_pop):
+def soma_volumes(neurons):
     """Get the volume of the somata in a population of neurons.
 
     Note:
         If a single neuron is passed, a single element list with the volume
         of its soma member is returned.
     """
-    nrns = _neuron_population(nrn_pop)
-    return [soma_volume(n) for n in nrns]
+    return [soma_volume(n) for n in _assure_iterable(neurons)]
 
 
 @feature(shape=())
-def soma_surface_area(nrn, neurite_type=NeuriteType.soma):
+def soma_surface_area(neuron, neurite_type=NeuriteType.soma):
     """Get the surface area of a neuron's soma.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
     """
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
-    return 4 * math.pi * nrn.soma.radius ** 2
+    return 4 * math.pi * neuron.soma.radius ** 2
 
 
 @feature(shape=(...,))
-def soma_surface_areas(nrn_pop, neurite_type=NeuriteType.soma):
-    """Get the surface areas of the somata in a population of neurons.
+def soma_surface_areas(neurons, neurite_type=NeuriteType.soma):
+    """Get soma surface areas of of neurons.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
-
-    Note:
-        If a single neuron is passed, a single element list with the surface
-        area of its soma member is returned.
     """
-    nrns = _neuron_population(nrn_pop)
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
-    return [soma_surface_area(n) for n in nrns]
+    return [soma_surface_area(n) for n in _assure_iterable(neurons)]
 
 
 @feature(shape=(...,))
-def soma_radii(nrn_pop, neurite_type=NeuriteType.soma):
-    """Get the radii of the somata of a population of neurons.
-
-    Note:
-        If a single neuron is passed, a single element list with the
-        radius of its soma member is returned.
-    """
+def soma_radii(neurons, neurite_type=NeuriteType.soma):
+    """Get the radii of the somata of a population of neurons."""
     assert neurite_type == NeuriteType.soma, 'Neurite type must be soma'
-    nrns = _neuron_population(nrn_pop)
-    return [n.soma.radius for n in nrns]
+    return [n.soma.radius for n in _assure_iterable(neurons)]
 
 
 @feature(shape=(...,))
-def trunk_section_lengths(nrn, neurite_type=NeuriteType.all):
+def trunk_section_lengths(neurons, neurite_type=NeuriteType.all):
     """List of lengths of trunk sections of neurites in a neuron."""
-    neurite_filter = is_type(neurite_type)
+    neurons = _assure_iterable(neurons)
     return [morphmath.section_length(s.root_node.points)
-            for s in nrn.neurites if neurite_filter(s)]
+            for s, n in _iter_neurites(neurons, neurite_type)]
 
 
 @feature(shape=(...,))
-def trunk_origin_radii(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_radii(neurons, neurite_type=NeuriteType.all):
     """Radii of the trunk sections of neurites in a neuron."""
-    neurite_filter = is_type(neurite_type)
-    return [s.root_node.points[0][COLS.R] for s in nrn.neurites if neurite_filter(s)]
+    neurons = _assure_iterable(neurons)
+    return [s.root_node.points[0][COLS.R]
+            for s, n in _iter_neurites(neurons, neurite_type)]
 
 
 @feature(shape=(...,))
-def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_azimuths(neurons, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin azimuths of a neuron or population.
 
     The azimuth is defined as Angle between x-axis and the vector
@@ -142,8 +145,7 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
 
     The range of the azimuth angle [-pi, pi] radians
     """
-    neurite_filter = is_type(neurite_type)
-    nrns = _neuron_population(nrn)
+    neurons = _assure_iterable(neurons)
 
     def _azimuth(section, soma):
         """Azimuth of a section."""
@@ -151,12 +153,11 @@ def trunk_origin_azimuths(nrn, neurite_type=NeuriteType.all):
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
     return [_azimuth(s.root_node.points, n.soma)
-            for n in nrns
-            for s in n.neurites if neurite_filter(s)]
+            for s, n in _iter_neurites(neurons, neurite_type)]
 
 
 @feature(shape=(...,))
-def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
+def trunk_origin_elevations(neurons, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin elevations of a neuron or population.
 
     The elevation is defined as the angle between x-axis and the
@@ -165,8 +166,7 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
 
     The range of the elevation angle [-pi/2, pi/2] radians
     """
-    neurite_filter = is_type(neurite_type)
-    nrns = _neuron_population(nrn)
+    neurons = _assure_iterable(neurons)
 
     def _elevation(section, soma):
         """Elevation of a section."""
@@ -178,29 +178,25 @@ def trunk_origin_elevations(nrn, neurite_type=NeuriteType.all):
         raise ValueError("Norm of vector between soma center and section is almost zero.")
 
     return [_elevation(s.root_node.points, n.soma)
-            for n in nrns
-            for s in n.neurites if neurite_filter(s)]
+            for s, n in _iter_neurites(neurons, neurite_type)]
 
 
 @feature(shape=(...,))
-def trunk_vectors(nrn, neurite_type=NeuriteType.all):
+def trunk_vectors(neurons, neurite_type=NeuriteType.all):
     """Calculates the vectors between all the trunks of the neuron and the soma center."""
-    neurite_filter = is_type(neurite_type)
-    nrns = _neuron_population(nrn)
-
+    neurons = _assure_iterable(neurons)
     return np.array([morphmath.vector(s.root_node.points[0], n.soma.center)
-                     for n in nrns
-                     for s in n.neurites if neurite_filter(s)])
+                     for s, n in _iter_neurites(neurons, neurite_type)])
 
 
 @feature(shape=(...,))
-def trunk_angles(nrn, neurite_type=NeuriteType.all):
+def trunk_angles(neurons, neurite_type=NeuriteType.all):
     """Calculates the angles between all the trunks of the neuron.
 
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
     """
-    vectors = trunk_vectors(nrn, neurite_type=neurite_type)
+    vectors = trunk_vectors(neurons, neurite_type=neurite_type)
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if not vectors.size:
         return []
@@ -260,15 +256,15 @@ def sholl_crossings(neurites, center, radii, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
+def sholl_frequency(neurons, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a population of neurites.
 
     Args:
-        nrn(morph): nrn or population
+        neurons(morph): neuron, list of neurons or neuron population
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-        intervals of step_size between min and max radii of ``nrn``.
+        intervals of step_size between min and max radii of ``neurons``.
 
     Note:
         Given a neuron, the soma center is used for the concentric circles,
@@ -279,21 +275,72 @@ def sholl_frequency(nrn, neurite_type=NeuriteType.all, step_size=10, bins=None):
         bends back on itself, and crosses the same Sholl radius will get counted as
         having crossed multiple times.
     """
-    nrns = _neuron_population(nrn)
+    neurons = _assure_iterable(neurons)
+    neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        min_soma_edge = min(neuron.soma.radius for neuron in nrns)
-        max_radii = max(np.max(np.linalg.norm(neurite.points[:, COLS.XYZ], axis=1))
-                        for nrn in nrns
-                        for neurite in iter_neurites(nrn, filt=is_type(neurite_type)))
+        min_soma_edge = min(n.soma.radius for n in neurons)
+        max_radii = max(np.max(np.linalg.norm(s.points[:, COLS.XYZ], axis=1))
+                        for n in neurons
+                        for s in n.neurites if neurite_filter(s))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sum(sholl_crossings(neuron, neuron.soma.center, bins, neurite_type)
-               for neuron in nrns)
+    return sum(sholl_crossings(n, n.soma.center, bins, neurite_type)
+               for n in neurons)
 
 
 @feature(shape=(...,))
-def total_length(nrn_pop, neurite_type=NeuriteType.all):
+def total_length(neurons, neurite_type=NeuriteType.all):
     """Get the total length of all sections in the group of neurons or neurites."""
-    nrns = _neuron_population(nrn_pop)
-    return list(sum(neuritefunc.section_lengths(n, neurite_type=neurite_type)) for n in nrns)
+    neurons = _assure_iterable(neurons)
+    return list(sum(neuritefunc.section_lengths(n, neurite_type=neurite_type)) for n in neurons)
+
+
+@feature(shape=(...,))
+def max_radial_distances(neurons, neurite_type=NeuriteType.all):
+    """Get the maximum radial distances of the termination sections for a collection of neurites,
+    neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.max_radial_distance(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_sections(neurons, neurite_type=NeuriteType.all):
+    """Number of sections in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_sections(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_neurites(neurons, neurite_type=NeuriteType.all):
+    """Number of neurites in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_neurites(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_bifurcations(neurons, neurite_type=NeuriteType.all):
+    """Number of bifurcation points in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_bifurcation_points(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_forking_points(neurons, neurite_type=NeuriteType.all):
+    """Number of forking points in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_forking_points(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_terminations(neurons, neurite_type=NeuriteType.all):
+    """Number of leaves points in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_leaves(n, neurite_type) for n in neurons]
+
+
+@feature(shape=(...,))
+def number_of_segments(neurons, neurite_type=NeuriteType.all):
+    """Number of sections in a collection of neurites, neurons or a population."""
+    neurons = _assure_iterable(neurons)
+    return [neuritefunc.n_segments(n, neurite_type) for n in neurons]
