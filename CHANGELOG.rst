@@ -3,7 +3,7 @@ Changelog
 
 Version 2.4.0
 -------------
-- Refactor viewer. :ref:`Migration guide<migration-v2.4.0>`.
+- Refactor ``viewer``. :ref:`Migration guide<migration-v2.4.0>`.
     - deprecate ``neurom.view.viewer``
     - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
     - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
@@ -11,6 +11,12 @@ Version 2.4.0
     - rename ``neurom.view.view`` to ``neurom.view.matplotlib_impl``
     - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
+
+- Refactor ``features``.
+    - Move ``neuritefunc`` functions that expect neurons to ``neuronfunc``. The functions are:
+      ``max_radial_distances, number_of_sections, number_of_neurites, number_of_bifurcations, number_of_forking_points, number_of_terminations, number_of_segments``
+    - Make ``neuronfunc`` to work with list of neurons besides a neuron and a neuron population.
+    - Name consistency among private variables.
 
 Version 2.3.1
 -------------
