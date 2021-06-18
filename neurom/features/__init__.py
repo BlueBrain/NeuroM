@@ -39,41 +39,18 @@ Examples:
 
 import numpy as np
 
-from neurom.core.types import NeuriteType, tree_type_checker
-from neurom.core.neuron import iter_neurites
 from neurom.exceptions import NeuroMError
-from neurom.utils import deprecated
 
 NEURITEFEATURES = dict()
 NEURONFEATURES = dict()
 
 
-@deprecated(
-    '`register_neurite_feature`',
-    'Please use the decorator `neurom.features.register.feature` to register custom features')
-def register_neurite_feature(name, func):
-    """Register a feature to be applied to neurites.
-
-    .. warning:: This feature has been deprecated in 1.6.0
-
-    Arguments:
-        name: name of the feature, used for access via get() function.
-        func: single parameter function of a neurite.
-
-    """
-    def _fun(neurites, neurite_type=NeuriteType.all):
-        """Wrap neurite function from outer scope and map into list."""
-        return list(func(n) for n in iter_neurites(neurites, filt=tree_type_checker(neurite_type)))
-
-    _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
-
-
 def _find_feature_func(feature_name):
     """Returns the python function used when getting a feature with `neurom.get(feature_name)`."""
-    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
-        if feature_name in feature_dict:
-            return feature_dict[feature_name]
-    raise NeuroMError(f'Unable to find feature: {feature_name}')
+    feat = NEURITEFEATURES.get(feature_name) or NEURONFEATURES.get(feature_name)
+    if feat is None:
+        raise NeuroMError(f'Unable to find feature: {feature_name}')
+    return feat
 
 
 def _get_feature_value_and_func(feature_name, obj, **kwargs):

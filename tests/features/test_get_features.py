@@ -34,11 +34,9 @@ from pathlib import Path
 
 import neurom as nm
 import numpy as np
-from mock import patch
-from neurom import features, iter_neurites, iter_sections, load_neuron, load_neurons
+from neurom import features, iter_sections, load_neuron, load_neurons
 from neurom.core.population import Population
 from neurom.core.types import NeuriteType
-from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
 from neurom.features import NEURITEFEATURES
 from neurom.features import get as get_feature
@@ -494,71 +492,6 @@ def test_neurite_features_accept_single_tree():
             assert np.isscalar(ret)
 
 
-@patch.dict(NEURITEFEATURES)
-def test_register_neurite_feature_nrns():
-
-    def npts(neurite):
-        return len(neurite.points)
-
-    def vol(neurite):
-        return neurite.volume
-
-    features.register_neurite_feature('foo', npts)
-
-    n_points_ref = [len(n.points) for n in iter_neurites(POP)]
-    n_points = get_feature('foo', POP)
-    assert_items_equal(n_points, n_points_ref)
-
-    # test neurite type filtering
-    n_points_ref = [len(n.points) for n in iter_neurites(POP, filt=_is_type(NeuriteType.axon))]
-    n_points = get_feature('foo', POP, neurite_type=NeuriteType.axon)
-    assert_items_equal(n_points, n_points_ref)
-
-    features.register_neurite_feature('bar', vol)
-
-    n_volume_ref = [n.volume for n in iter_neurites(POP)]
-    n_volume = get_feature('bar', POP)
-    assert_items_equal(n_volume, n_volume_ref)
-
-    # test neurite type filtering
-    n_volume_ref = [n.volume for n in iter_neurites(POP, filt=_is_type(NeuriteType.axon))]
-    n_volume = get_feature('bar', POP, neurite_type=NeuriteType.axon)
-    assert_items_equal(n_volume, n_volume_ref)
-
-
-@patch.dict(NEURITEFEATURES)
-def test_register_neurite_feature_pop():
-
-    def npts(neurite):
-        return len(neurite.points)
-
-    def vol(neurite):
-        return neurite.volume
-
-    features.register_neurite_feature('foo', npts)
-
-    n_points_ref = [len(n.points) for n in iter_neurites(POP)]
-    n_points = get_feature('foo', POP)
-    assert_items_equal(n_points, n_points_ref)
-
-    # test neurite type filtering
-    n_points_ref = [len(n.points) for n in iter_neurites(POP,
-                                                         filt=_is_type(NeuriteType.basal_dendrite))]
-    n_points = get_feature('foo', POP, neurite_type=NeuriteType.basal_dendrite)
-    assert_items_equal(n_points, n_points_ref)
-
-    features.register_neurite_feature('bar', vol)
-
-    n_volume_ref = [n.volume for n in iter_neurites(POP)]
-    n_volume = get_feature('bar', POP)
-    assert_items_equal(n_volume, n_volume_ref)
-
-    # test neurite type filtering
-    n_volume_ref = [n.volume for n in iter_neurites(POP, filt=_is_type(NeuriteType.basal_dendrite))]
-    n_volume = get_feature('bar', POP, neurite_type=NeuriteType.basal_dendrite)
-    assert_items_equal(n_volume, n_volume_ref)
-
-
 def test_get_raises():
     with pytest.raises(NeuroMError):
         get_feature('ahah-I-do-not-exist!', lambda n: None)
@@ -566,7 +499,7 @@ def test_get_raises():
 
 def test_register_existing_feature_raises():
     with pytest.raises(NeuroMError):
-        features.register_neurite_feature('section_areas', lambda n: None)
+        features._register_feature('NEURITEFEATURES', 'section_areas', lambda n: None, ())
 
 
 def test_section_lengths():
