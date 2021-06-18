@@ -167,10 +167,6 @@ def section_term_branch_orders(neurites, neurite_type=NeuriteType.all):
 @feature(shape=(...,), name='section_path_distances')
 def section_path_lengths(neurites, neurite_type=NeuriteType.all):
     """Path lengths of a collection of neurites."""
-    # Calculates and stores the section lengths in one pass,
-    # then queries the lengths in the path length iterations.
-    # This avoids repeatedly calculating the lengths of the
-    # same sections.
     def pl2(node):
         """Calculate the path length using cached section lengths."""
         return sum(n.length for n in node.iupstream())

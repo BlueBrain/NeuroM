@@ -42,7 +42,7 @@ from neurom.core.types import tree_type_checker as _is_type
 from neurom.exceptions import NeuroMError
 from neurom.features import NEURITEFEATURES
 from neurom.features import get as get_feature
-from neurom.features import neuritefunc as nf, neuronfunc
+from neurom.features import neuritefunc as nf
 
 import pytest
 from numpy.testing import assert_allclose
@@ -875,25 +875,6 @@ def test_sholl_frequency():
 
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.axon),
                     [1, 2, 2, 6, 2, 2, 2, 2, 2])
-
-
-@pytest.mark.skip('test_get_segment_lengths is disabled in test_get_features')
-def test_section_path_distances_endpoint():
-
-    ref_sec_path_len_start = list(iter_neurites(NEURON, sec.start_point_path_length))
-    ref_sec_path_len = list(iter_neurites(NEURON, sec.end_point_path_length))
-    path_lengths = get_feature('section_path_distances', NEURON)
-    assert ref_sec_path_len != ref_sec_path_len_start
-    assert len(path_lengths) == 84
-    assert np.all(path_lengths == ref_sec_path_len)
-
-
-@pytest.mark.skip('test_get_segment_lengths is disabled in test_get_features')
-def test_section_path_distances_start_point():
-    ref_sec_path_len_start = list(iter_neurites(NEURON, sec.start_point_path_length))
-    path_lengths = get_feature('section_path_distances', NEURON, use_start_point=True)
-    assert len(path_lengths) == 84
-    assert np.all(path_lengths == ref_sec_path_len_start)
 
 
 def test_partition():
