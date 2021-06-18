@@ -30,6 +30,7 @@
 
 from collections import deque
 from itertools import chain
+import warnings
 
 import morphio
 import numpy as np
@@ -37,6 +38,7 @@ from neurom import morphmath
 from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
+from neurom.core.population import Population
 
 
 class Section:
@@ -239,6 +241,9 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
     neurites = ((obj,) if isinstance(obj, Neurite) else
                 obj.neurites if hasattr(obj, 'neurites') else obj)
     if neurite_order == NeuriteIter.NRN:
+        if isinstance(obj, Population):
+            warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
+                          'within the whole population, not within each neuron separately.')
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
