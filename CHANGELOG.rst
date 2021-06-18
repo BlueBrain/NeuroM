@@ -17,6 +17,7 @@ Version 2.4.0
       ``max_radial_distances, number_of_sections, number_of_neurites, number_of_bifurcations, number_of_forking_points, number_of_terminations, number_of_segments``
     - Make ``neuronfunc`` to work with list of neurons besides a neuron and a neuron population.
     - Name consistency among private variables.
+    - Delete deprecated `neurom.features.register_neurite_feature`.
 
 Version 2.3.1
 -------------
