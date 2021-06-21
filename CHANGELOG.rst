@@ -19,6 +19,9 @@ Version 2.4.0
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
+- New config format for ``morph_stats``. See :ref:`morph-stats-new-config`.
+- Delete feature ``partition_asymmetry_length`` as it can be now get via the new config format.
+
 Version 2.3.0
 -------------
 - Introduce a new method to calculate partition asymmetry by Uylings. See docstring of

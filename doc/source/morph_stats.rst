@@ -40,8 +40,22 @@ An example usage:
 
     neurom stats path/to/morph/file_or_dir --config path/to/config --output path/to/output/file
 
+For more information on the application and available options, invoke it with the ``--help``
+or ``-h`` option.
+
+.. code-block:: bash
+
+    neurom stats --help
+
 The functionality can be best explained by looking at a sample configuration file that is supposed
 to go under ``--config`` option:
+
+Config
+------
+
+Old format (prior version 2.4.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+An example config
 
 .. code-block:: yaml
     
@@ -73,14 +87,16 @@ Here, there are two feature categories,
    the trunk radii, etc.
 
 Each category sub-item (section_lengths, soma_radii, etc) corresponds to a
-:py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic, e.g.
+:py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
+function, e.g.
 
 * ``raw``: array of raw values
 * ``max``, ``min``, ``mean``, ``median``, ``std``: self-explanatory.
 * ``total``: sum of the raw values
   
 An additional field ``neurite_type`` specifies the neurite types into which the morphometrics
-are to be split. This is a sample output using the above configuration:
+are to be split. It applies only to ``neurite`` features. A sample output using the above
+configuration:
 
 .. code-block:: json
 
@@ -114,13 +130,40 @@ are to be split. This is a sample output using the above configuration:
       }
     }
 
+.. _morph-stats-new-config:
 
-For more information on the application and available options, invoke it with the ``--help``
-or ``-h`` option.
+New format (starting version 2.4.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The new format allows to specify features arguments. For example, ``partition_asymmetry`` feature
+has additional arguments like ``method`` and ``variant`` (see
+:py:func:`neurom.features.neuritefunc.partition_asymmetries`). Before it wasn't possible to set
+them. Here is how you can set them now:
 
-.. code-block:: bash
+.. code-block:: yaml
 
-    neurom stats --help
+    neurite:
+        partition_asymmetry:
+            kwargs:
+               variant: 'length'
+               method: 'petilla'
+            modes:
+               - max
+               - total
+
+Instead of statistic aggregating functions right after a feature name, config expects ``kwargs``
+and ``modes`` properties. The former sets the feature arguments. The latter sets the statistic
+aggregating function. This allows to set ``neurite_type`` directly on the feature, and overwrites
+global setting of neurite types via ``neurite_type`` global config field. For example:
+
+.. code-block:: yaml
+
+    neurite:
+        section_lengths:
+            kwargs:
+               neurite_type: APICAL_DENDRITE
+            modes:
+               - max
+               - total
 
 Features
 --------

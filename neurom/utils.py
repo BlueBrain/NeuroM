@@ -79,7 +79,7 @@ class memoize:
         return res
 
 
-def _warn_deprecated(msg):
+def warn_deprecated(msg):
     """Issue a deprecation warning."""
     warnings.simplefilter('always', DeprecationWarning)
     warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
@@ -94,7 +94,7 @@ def deprecated(fun_name=None, msg=""):
         def _wrapper(*args, **kwargs):
             """Issue deprecation warning and forward arguments to fun."""
             name = fun_name if fun_name is not None else fun.__name__
-            _warn_deprecated('Call to deprecated function %s. %s' % (name, msg))
+            warn_deprecated('Call to deprecated function %s. %s' % (name, msg))
             return fun(*args, **kwargs)
 
         return _wrapper
@@ -104,7 +104,7 @@ def deprecated(fun_name=None, msg=""):
 
 def deprecated_module(msg):
     """Issue a deprecation warning for a module."""
-    _warn_deprecated(msg)
+    warn_deprecated(msg)
 
 
 class NeuromJSON(json.JSONEncoder):
