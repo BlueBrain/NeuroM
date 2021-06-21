@@ -33,37 +33,40 @@ Migration to v2.4.0 version
 ---------------------------
 .. _migration-v2.4.0:
 
-``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
+- ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 
-.. code-block:: python
+   .. code-block:: python
 
-   import neurom as nm
-   # instead of: from neurom import viewer
-   from neurom import matplotlib_impl, matplotlib_utils
-   nrn = nm.load_neuron('some/data/path/morph_file.asc')
+      import neurom as nm
+      # instead of: from neurom import viewer
+      from neurom import matplotlib_impl, matplotlib_utils
+      nrn = nm.load_neuron('some/data/path/morph_file.asc')
 
-   # instead of: viewer.draw(nrn)
-   fig, ax = matplotlib_utils.get_figure()
-   matplotlib_impl.plot_neuron(nrn, ax)
-   matplotlib_utils.plot_style(fig=fig, ax=ax)
+      # instead of: viewer.draw(nrn)
+      fig, ax = matplotlib_utils.get_figure()
+      matplotlib_impl.plot_neuron(nrn, ax)
+      matplotlib_utils.plot_style(fig=fig, ax=ax)
 
-   # instead of: viewer.draw(nrn, mode='3d')
-   fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
-   matplotlib_impl.plot_neuron3d(nrn, ax)
-   matplotlib_utils.plot_style(fig=fig, ax=ax)
+      # instead of: viewer.draw(nrn, mode='3d')
+      fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
+      matplotlib_impl.plot_neuron3d(nrn, ax)
+      matplotlib_utils.plot_style(fig=fig, ax=ax)
 
-   # instead of: viewer.draw(nrn, mode='dendrogram')
-   fig, ax = matplotlib_utils.get_figure()
-   matplotlib_impl.plot_dendrogram(nrn, ax)
-   matplotlib_utils.plot_style(fig=fig, ax=ax)
+      # instead of: viewer.draw(nrn, mode='dendrogram')
+      fig, ax = matplotlib_utils.get_figure()
+      matplotlib_impl.plot_dendrogram(nrn, ax)
+      matplotlib_utils.plot_style(fig=fig, ax=ax)
 
-   # If you used ``output_path`` with any of functions above then add this line
-   matplotlib_utils.save_plot(fig=fig, output_path=output_path)
+      # If you used ``output_path`` with any of functions above then add this line
+      matplotlib_utils.save_plot(fig=fig, output_path=output_path)
 
-   # instead of `plotly.draw`
-   from neurom import plotly_impl
-   plotly_impl.plot_neuron(nrn)  # for 2d
-   plotly_impl.plot_neuron3d(nrn)  # for 3d
+      # instead of `plotly.draw`
+      from neurom import plotly_impl
+      plotly_impl.plot_neuron(nrn)  # for 2d
+      plotly_impl.plot_neuron3d(nrn)  # for 3d
+
+- ``neurom stats`` uses a new config format. See :ref:`morph-stats-new-config`. The old format still
+  works but deprecated.
 
 Migration to v2 version
 -----------------------

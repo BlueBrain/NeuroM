@@ -214,6 +214,7 @@ def extract_stats(neurons, config):
                     stats[t.name].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
             else:
                 t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
+                kwargs['neurite_type'] = t
                 stats[t.name].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
         else:
             stats[namespace].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
