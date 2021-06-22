@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 2.3.1
+-------------
+- fix ``features.neuronfunc._neuron_population`` for 'sholl_frequency' feature over a neuron
+  population.
+- use a tuple for ``subplot`` default value in ``view.common.get_figure``.
+
 Version 2.3.0
 -------------
 - Introduce a new method to calculate partition asymmetry by Uylings. See docstring of
