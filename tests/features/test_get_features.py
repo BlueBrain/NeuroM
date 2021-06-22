@@ -876,6 +876,8 @@ def test_sholl_frequency():
     assert_allclose(get_feature('sholl_frequency', NEURON, neurite_type=NeuriteType.axon),
                     [1, 2, 2, 6, 2, 2, 2, 2, 2])
 
+    assert len(get_feature('sholl_frequency', POP)) == 108
+
 
 @pytest.mark.skip('test_get_segment_lengths is disabled in test_get_features')
 def test_section_path_distances_endpoint():

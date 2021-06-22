@@ -46,6 +46,7 @@ import math
 import numpy as np
 
 from neurom import morphmath
+from neurom.core import Population
 from neurom.core.neuron import iter_neurites, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
@@ -57,7 +58,7 @@ feature = partial(feature, namespace='NEURONFEATURES')
 
 def _neuron_population(nrns):
     """Makes sure `nrns` behaves like a neuron population."""
-    return nrns.neurons if hasattr(nrns, 'neurons') else (nrns,)
+    return nrns if isinstance(nrns, Population) else (nrns,)
 
 
 @feature(shape=())
