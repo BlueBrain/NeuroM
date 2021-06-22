@@ -82,12 +82,12 @@ def figure_naming(pretitle='', posttitle='', prefile='', postfile=''):
     return pretitle, posttitle, prefile, postfile
 
 
-def get_figure(new_fig=True, subplot='111', params=None):
+def get_figure(new_fig=True, subplot=(1, 1, 1), params=None):
     """Function to be used for viewing - plotting, to initialize the matplotlib figure - axes.
 
     Args:
         new_fig(bool): Defines if a new figure will be created, if false current figure is used
-        subplot (tuple or matplolib subplot specifier string): Create axes with these parameters
+        subplot (tuple): Create axes with these parameters
         params (dict): extra options passed to add_subplot()
 
     Returns:
