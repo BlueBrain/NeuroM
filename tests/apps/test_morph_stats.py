@@ -58,6 +58,21 @@ REF_CONFIG = {
     }
 }
 
+REF_CONFIG_NEW = {
+    'neurite': {
+        'section_lengths': {'modes': ['max', 'total']},
+        'section_volumes': {'modes': ['total']},
+        'section_branch_orders': {'modes': ['max']},
+        'segment_midpoints': {'modes': ['max']},
+        'max_radial_distance': {'modes': ['mean']},
+    },
+    'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+    'neuron': {
+        'soma_radii': {'modes': ['mean']},
+        'max_radial_distance': {'modes': ['mean']},
+    }
+}
+
 REF_OUT = {
     'neuron': {
         'mean_soma_radius': 0.13065629648763766,
@@ -155,6 +170,34 @@ def test_extract_stats_single_neuron():
         assert set(res[k].keys()) == set(REF_OUT[k].keys())
         for kk in res[k].keys():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], decimal=4)
+
+
+def test_extract_stats_new_format():
+    nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
+    res = ms.extract_stats(nrn, REF_CONFIG_NEW)
+    assert set(res.keys()) == set(REF_OUT.keys())
+    for k in ('neuron', 'all', 'axon', 'basal_dendrite', 'apical_dendrite'):
+        assert set(res[k].keys()) == set(REF_OUT[k].keys())
+        for kk in res[k].keys():
+            assert_almost_equal(res[k][kk], REF_OUT[k][kk], decimal=4)
+
+
+def test_stats_new_format_set_arg():
+    nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
+    config = {
+        'neurite': {
+            'section_lengths': {'kwargs': {'neurite_type': 'AXON'}, 'modes': ['max', 'total']},
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'neuron': {
+            'soma_radii': {'modes': ['mean']},
+        }
+    }
+
+    res = ms.extract_stats(nrn, config)
+    assert set(res.keys()) == {'neuron', 'axon'}
+    assert set(res['axon'].keys()) == {'max_section_length', 'total_section_length'}
+    assert set(res['neuron'].keys()) == {'mean_soma_radius'}
 
 
 def test_extract_stats_scalar_feature():

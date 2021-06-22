@@ -51,7 +51,7 @@ from neurom.core.neuron import Neuron
 from neurom.exceptions import ConfigError
 from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path
-from neurom.utils import NeuromJSON
+from neurom.utils import NeuromJSON, warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -147,6 +147,29 @@ def extract_dataframe(neurons, config, n_workers=1):
 extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
 
 
+def _get_feature_stats(feature_name, neurons, modes, kwargs):
+    """Insert the stat data in the dict.
+
+    If the feature is 2-dimensional, the feature is flattened on its last axis
+    """
+    data = {}
+    feature, func = _get_feature_value_and_func(feature_name, neurons, **kwargs)
+    shape = func.shape
+    if isinstance(feature, numbers.Number):
+        feature = [feature]
+    for mode in modes:
+        stat_name = _stat_name(feature_name, mode)
+        stat = eval_stats(feature, mode)
+        if len(shape) == 2:
+            for i in range(shape[1]):
+                data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
+        elif len(shape) > 2:
+            raise ValueError(f'Feature with wrong shape: {shape}')  # pragma: no cover
+        else:
+            data[stat_name] = stat
+    return data
+
+
 def extract_stats(neurons, config):
     """Extract stats from neurons.
 
@@ -170,43 +193,32 @@ def extract_stats(neurons, config):
 
     {config_path}
     """
-
-    def _fill_stats_dict(data, stat_name, stat, shape):
-        """Insert the stat data in the dict.
-
-        If the feature is 2-dimensional, the feature is flattened on its last axis
-        """
-        if len(shape) == 2:
-            for i in range(shape[1]):
-                data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
-        elif len(shape) > 2:
-            raise ValueError(f'Feature with wrong shape: {shape}')  # pragma: no cover
-        else:
-            data[stat_name] = stat
-
     stats = defaultdict(dict)
+    neurite_features = product(['neurite'], config.get('neurite', {}).items())
+    neuron_features = product(['neuron'], config.get('neuron', {}).items())
+    neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
-    for (feature_name, modes), neurite_type in product(config['neurite'].items(),
-                                                       config.get('neurite_type',
-                                                                  _NEURITE_MAP.keys())):
-        neurite_type = _NEURITE_MAP[neurite_type]
-        feature, func = _get_feature_value_and_func(feature_name, neurons,
-                                                    neurite_type=neurite_type)
-        if isinstance(feature, numbers.Number):
-            feature = [feature]
-        for mode in modes:
-            stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats[neurite_type.name], stat_name, stat, func.shape)
+    for namespace, (feature_name, opts) in chain(neurite_features, neuron_features):
+        if isinstance(opts, dict):
+            kwargs = opts.get('kwargs', {})
+            modes = opts.get('modes', [])
+        else:
+            warn_deprecated('You are using an old config format. Please update it. See the'
+                            'migration documentation page.')
+            kwargs = {}
+            modes = opts
+        if namespace == 'neurite':
+            if 'neurite_type' not in kwargs and neurite_types:
+                for t in neurite_types:
+                    kwargs['neurite_type'] = t
+                    stats[t.name].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
+            else:
+                t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
+                kwargs['neurite_type'] = t
+                stats[t.name].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
+        else:
+            stats[namespace].update(_get_feature_stats(feature_name, neurons, modes, kwargs))
 
-    for feature_name, modes in config.get('neuron', {}).items():
-        feature, func = _get_feature_value_and_func(feature_name, neurons)
-        if isinstance(feature, numbers.Number):
-            feature = [feature]
-        for mode in modes:
-            stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats['neuron'], stat_name, stat, func.shape)
     return dict(stats)
 
 

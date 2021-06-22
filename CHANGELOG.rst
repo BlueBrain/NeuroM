@@ -19,6 +19,10 @@ Version 2.4.0
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
+- New config format for ``morph_stats``. See :ref:`morph-stats-new-config`. The old format is
+  deprecated. Please update your configs.
+- Delete feature ``partition_asymmetry_length`` as it can be now get via the new config format.
+
 Version 2.3.1
 -------------
 - fix ``features.neuronfunc._neuron_population`` for 'sholl_frequency' feature over a neuron

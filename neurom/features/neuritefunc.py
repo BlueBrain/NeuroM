@@ -39,7 +39,7 @@ collection of neurites, a neuron, a neuron population:
 """
 
 import logging
-from functools import partial, update_wrapper
+from functools import partial
 from itertools import chain
 
 import numpy as np
@@ -48,7 +48,7 @@ from neurom import morphmath
 from neurom.core.neuron import NeuriteType, Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import _register_feature, bifurcationfunc, feature, sectionfunc
+from neurom.features import bifurcationfunc, feature, sectionfunc
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
@@ -370,13 +370,6 @@ def bifurcation_partitions(neurites, neurite_type=NeuriteType.all):
                iter_sections(neurites,
                              iterator_type=Section.ibifurcation_point,
                              neurite_filter=is_type(neurite_type)))
-
-
-# Register `partition_asymmetries` variant
-_partition_asymmetry_length = partial(partition_asymmetries, variant='length')
-update_wrapper(_partition_asymmetry_length, partition_asymmetries)  # this fixes the docstring
-_register_feature('NEURITEFEATURES', 'partition_asymmetry_length',
-                  _partition_asymmetry_length, shape=(...,))
 
 
 @feature(shape=(...,))
