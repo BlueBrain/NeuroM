@@ -13,9 +13,10 @@ Version 2.4.0
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
 
 - Refactor ``features``.
-    - Move ``neuritefunc`` functions that expect neurons to ``neuronfunc``. The functions are:
-      ``max_radial_distances, number_of_sections, number_of_neurites, number_of_bifurcations, number_of_forking_points, number_of_terminations, number_of_segments``
-    - Make ``neuronfunc`` to work with list of neurons besides a neuron and a neuron population.
+    - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
+      ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
+      accept only a collection of neurons or a neuron population.
+    - Features that duplicated other features were deleted, see :ref:`migration-v2.4.0`.
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
