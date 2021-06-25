@@ -83,9 +83,23 @@ def soma_radius(neuron):
 def max_radial_distance(neuron, neurite_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections.
      TODO Put it as an example to the doc page"""
-    term_radial_distances = [neuritefunc.section_term_radial_distances(s)
+    term_radial_distances = [neuritefunc.max_radial_distance(s)
                              for s in iter_neurites(neuron, filt=is_type(neurite_type))]
     return max(term_radial_distances) if term_radial_distances else 0.
+
+
+@feature(shape=(...,))
+def neurite_lengths(neuron, neurite_type=NeuriteType.all):
+    """Neurite lengths."""
+    return [neuritefunc.total_length(s)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+
+
+@feature(shape=())
+def neurite_volumes(neuron, neurite_type=NeuriteType.all):
+    """Get the volume."""
+    return [neuritefunc.total_volume(s)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))

@@ -16,7 +16,7 @@ Version 2.4.0
     - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
       ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
       accept only a collection of neurons or a neuron population.
-    - Features that duplicated other features were deleted, see :ref:`migration-v2.4.0`.
+    - Features, that duplicated other features, were deleted, see :ref:`migration-v2.4.0`.
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 

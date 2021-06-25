@@ -52,7 +52,6 @@ from neurom.core.dataformat import COLS
 from neurom.features import bifurcationfunc, feature, sectionfunc, NameSpace
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
-from neurom.utils import warn_deprecated
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 
@@ -61,7 +60,7 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder):
     """Map `fun` to all the sections."""
-    return map(fun, (s for s in iterator_type(neurite.root_node)))
+    return list(map(fun, (s for s in iterator_type(neurite.root_node))))
 
 
 @feature(shape=())
@@ -413,12 +412,6 @@ def section_bif_radial_distances(neurite, origin=None):
 
 
 @feature(shape=())
-def number_of_sections(neurite):
-    """Get the number of sections."""
-    return sum(1 for _ in neurite.iter_sections())
-
-
-@feature(shape=())
 def total_length(neurite):
     """Get the path length)."""
     return sum(s.length for s in neurite.iter_sections())
@@ -430,13 +423,13 @@ def terminal_path_lengths(neurite):
     return _map_sections(sectionfunc.section_path_length, neurite, Section.ileaf)
 
 
-@feature(shape=(), name='neurite_volumes')
+@feature(shape=())
 def total_volume(neurite):
     """Get the volume."""
     return sum(s.volume for s in Section.ipreorder(neurite.root_node))
 
 
-@feature(shape=())
+@feature(shape=(...,))
 def neurite_volume_density(neurite):
     """Get the volume density.
 
@@ -453,9 +446,9 @@ def neurite_volume_density(neurite):
     except scipy.spatial.qhull.QhullError:
         L.exception('Failure to compute neurite volume using the convex hull. '
                     'Feature `neurite_volume_density` will return `np.nan`.\n')
-        return np.nan
+        return [np.nan]
 
-    return neurite.volume / volume
+    return [neurite.volume / volume]
 
 
 @feature(shape=(...,))

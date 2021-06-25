@@ -79,8 +79,8 @@ Migration to v2.4.0 version
    - `soma_surface_area` instead of `soma_surface_areas`
    - `soma_volume` instead of `soma_volumes`
    - `total_area` instead of `total_area_per_neurite`
-   - `total_length` instead of `total_length_per_neurite`, `neurite_lengths`
-   - `total_volume` instead of `total_volume_per_neurite`
+   - `neurite_lengths` instead of `total_length_per_neurite`
+   - `neurite_volumes` instead of `total_volume_per_neurite`
    - `terminal_path_lengths` instead of `terminal_path_lengths_per_neurite`
 
 
