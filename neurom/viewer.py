@@ -102,6 +102,11 @@ def draw(obj, mode='2d', **kwargs):
             raise NotImplementedError('Option realistic_diameter not implemented for 3D plots')
         del kwargs['realistic_diameters']
 
+    if 'nrn_secid' in kwargs and mode == '3d':
+        if kwargs['nrn_secid']:
+            raise NotImplementedError('Option nrn_secid not implemented for 3D plots')
+        del kwargs['nrn_secid']
+
     fig, ax = (common.get_figure() if mode in ('2d', 'dendrogram')
                else common.get_figure(params={'projection': '3d'}))
 
