@@ -89,6 +89,13 @@ def max_radial_distance(neuron, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
+def number_of_sections_per_neurite(neuron, neurite_type=NeuriteType.all):
+    """Neurite lengths."""
+    return [neuritefunc.number_of_sections(s)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+
+
+@feature(shape=(...,))
 def neurite_lengths(neuron, neurite_type=NeuriteType.all):
     """Neurite lengths."""
     return [neuritefunc.total_length(s)
@@ -176,6 +183,20 @@ def trunk_angles(neuron, neurite_type=NeuriteType.all):
 
     return [morphmath.angle_between_vectors(ordered_vectors[i], ordered_vectors[i - 1])
             for i, _ in enumerate(ordered_vectors)]
+
+
+@feature(shape=(...,))
+def trunk_origin_radii(neuron, neurite_type=NeuriteType.all):
+    """Radii of the trunk sections of neurites in a neuron."""
+    return [s.root_node.points[0][COLS.R]
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+
+
+@feature(shape=(...,))
+def trunk_section_lengths(neuron, neurite_type=NeuriteType.all):
+    """List of lengths of trunk sections of neurites in a neuron."""
+    return [morphmath.section_length(s.root_node.points)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
 @feature(shape=())

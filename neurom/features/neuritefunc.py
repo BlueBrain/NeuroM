@@ -486,15 +486,3 @@ def principal_direction_extents(neurite, direction=0):
 def section_strahler_orders(neurite):
     """Inter-segment opening angles in a section."""
     return _map_sections(sectionfunc.strahler_order, neurite)
-
-
-@feature(shape=())
-def trunk_section_length(neurite):
-    """Length of the neurite's trunk section."""
-    return morphmath.section_length(neurite.root_node.points)
-
-
-@feature(shape=())
-def trunk_origin_radius(neurite):
-    """Radius of the neurite's trunk section."""
-    return neurite.root_node.points[0][COLS.R]

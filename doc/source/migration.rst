@@ -67,11 +67,13 @@ Migration to v2.4.0 version
 
 - ``neurom stats`` uses a new config format. See :ref:`morph-stats-new-config`. The old format still
   works but deprecated.
+- TODO. better explan returned types here. Better refer here to the features documentation page where explicitly describe with examples. features return either a number or a list. For features called on populations the return list
+  will be a list of lists.
 - To replace deleted features use the replacement:
    - `max_radial_distance` instead of `max_radial_distances`
    - `number_of_segments` instead of `n_segments`
    - `number_of_neurites` instead of `n_neurites`
-   - `number_of_sections` instead of `n_sections`, `number_of_sections_per_neurite`
+   - `number_of_sections` instead of `n_sections`
    - `number_of_bifurcations` instead of `n_bifurcation_points`
    - `number_of_forking_points` instead of `n_forking_points`
    - `number_of_leaves` instead of `number_of_terminations`, `n_leaves`
