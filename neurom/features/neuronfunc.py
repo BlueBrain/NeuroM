@@ -47,12 +47,11 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.neuron import iter_neurites
+from neurom.core.neuron import iter_neurites, iter_segments
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.features import feature, NameSpace, neuritefunc
-from neurom.features.sectionfunc import sholl_crossings
 
 feature = partial(feature, namespace=NameSpace.NEURON)
 
@@ -90,21 +89,28 @@ def max_radial_distance(neuron, neurite_type=NeuriteType.all):
 
 @feature(shape=(...,))
 def number_of_sections_per_neurite(neuron, neurite_type=NeuriteType.all):
-    """Neurite lengths."""
+    """List of numbers of sections per neurite."""
     return [neuritefunc.number_of_sections(s)
             for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def neurite_lengths(neuron, neurite_type=NeuriteType.all):
+def total_length_per_neurite(neuron, neurite_type=NeuriteType.all):
     """Neurite lengths."""
     return [neuritefunc.total_length(s)
             for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
-@feature(shape=())
-def neurite_volumes(neuron, neurite_type=NeuriteType.all):
-    """Get the volume."""
+@feature(shape=(...,))
+def total_area_per_neurite(neuron, neurite_type=NeuriteType.all):
+    """Neurite areas."""
+    return [neuritefunc.total_area(s)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+
+
+@feature(shape=(...,))
+def total_volume_per_neurite(neuron, neurite_type=NeuriteType.all):
+    """Neurite volumes."""
     return [neuritefunc.total_volume(s)
             for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
@@ -203,6 +209,52 @@ def trunk_section_lengths(neuron, neurite_type=NeuriteType.all):
 def number_of_neurites(neuron, neurite_type=NeuriteType.all):
     """Number of neurites in a neuron."""
     return sum(1 for _ in iter_neurites(neuron, filt=is_type(neurite_type)))
+
+
+@feature(shape=(...,))
+def neurite_volume_density(neuron, neurite_type=NeuriteType.all):
+    """Get volume density per neurite."""
+    return [neuritefunc.volume_density(s)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+
+
+@feature(shape=(...,))
+def sholl_crossings(neuron, center, radii, neurite_type=NeuriteType.all):
+    """Calculate crossings of neurites.
+
+    Args:
+        neuron(Neuron|list): morphology or a list of neurites
+        center(Point): center point
+        radii(iterable of floats): radii for which crossings will be counted
+        neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
+
+    Returns:
+        Array of same length as radii, with a count of the number of crossings
+        for the respective radius
+
+    This function can also be used with a list of sections, as follow::
+
+        secs = (sec for sec in nm.iter_sections(neuron) if complex_filter(sec))
+        sholl = nm.features.neuritefunc.sholl_crossings(secs,
+                                                        center=neuron.soma.center,
+                                                        radii=np.arange(0, 1000, 100))
+    """
+    def _count_crossings(neurite, radius):
+        """Used to count_crossings of segments in neurite with radius."""
+        r2 = radius ** 2
+        count = 0
+        for start, end in iter_segments(neurite):
+            start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
+                                      morphmath.point_dist2(center, end))
+
+            count += int(start_dist2 <= r2 <= end_dist2 or
+                         end_dist2 <= r2 <= start_dist2)
+
+        return count
+
+    return [sum(_count_crossings(neurite, r)
+                for neurite in iter_neurites(neuron, filt=is_type(neurite_type)))
+            for r in radii]
 
 
 @feature(shape=(...,))

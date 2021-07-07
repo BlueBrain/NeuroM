@@ -31,9 +31,7 @@
 import numpy as np
 
 from neurom import morphmath as mm
-from neurom.core.neuron import NeuriteType, iter_segments, iter_sections
 from neurom.core.dataformat import COLS
-from neurom.core.types import tree_type_checker as is_type
 from neurom.morphmath import interval_lengths
 
 
@@ -165,34 +163,3 @@ def section_mean_radius(section):
 def downstream_pathlength(section):
     """Compute the total downstream length starting from a section."""
     return sum(sec.length for sec in section.ipreorder())
-
-
-def sholl_crossings(sections, center, radii, neurite_type=NeuriteType.all):
-    """Calculate crossings of sections.
-
-    Args:
-        sections(list): an iterable container of sections
-        center(Point): center point
-        radii(iterable of floats): radii for which crossings will be counted
-        neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
-
-    Returns:
-        Array of same length as radii, with a count of the number of crossings
-        for the respective radius
-    """
-    def _count_crossings(section, radius):
-        """Used to count_crossings of segments in neurite with radius."""
-        r2 = radius ** 2
-        count = 0
-        for start, end in iter_segments(section):
-            start_dist2, end_dist2 = (mm.point_dist2(center, start),
-                                      mm.point_dist2(center, end))
-
-            count += int(start_dist2 <= r2 <= end_dist2 or
-                         end_dist2 <= r2 <= start_dist2)
-
-        return count
-
-    return np.array([sum(_count_crossings(sec, r)
-                         for sec in iter_sections(sections, neurite_filter=is_type(neurite_type)))
-                     for r in radii])

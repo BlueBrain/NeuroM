@@ -69,21 +69,23 @@ Migration to v2.4.0 version
   works but deprecated.
 - TODO. better explan returned types here. Better refer here to the features documentation page where explicitly describe with examples. features return either a number or a list. For features called on populations the return list
   will be a list of lists.
-- To replace deleted features use the replacement:
-   - `max_radial_distance` instead of `max_radial_distances`
-   - `number_of_segments` instead of `n_segments`
-   - `number_of_neurites` instead of `n_neurites`
-   - `number_of_sections` instead of `n_sections`
-   - `number_of_bifurcations` instead of `n_bifurcation_points`
-   - `number_of_forking_points` instead of `n_forking_points`
-   - `number_of_leaves` instead of `number_of_terminations`, `n_leaves`
-   - `soma_radius` instead of `soma_radii`
-   - `soma_surface_area` instead of `soma_surface_areas`
-   - `soma_volume` instead of `soma_volumes`
-   - `total_area` instead of `total_area_per_neurite`
-   - `neurite_lengths` instead of `total_length_per_neurite`
-   - `neurite_volumes` instead of `total_volume_per_neurite`
-   - `terminal_path_lengths` instead of `terminal_path_lengths_per_neurite`
+- breaking features changes:
+   - use `max_radial_distance` instead of `max_radial_distances`
+   - use `number_of_segments` instead of `n_segments`
+   - use `number_of_neurites` instead of `n_neurites`
+   - use `number_of_sections` instead of `n_sections`
+   - use `number_of_bifurcations` instead of `n_bifurcation_points`
+   - use `number_of_forking_points` instead of `n_forking_points`
+   - use `number_of_leaves` instead of `number_of_terminations`, `n_leaves`
+   - use `soma_radius` instead of `soma_radii`
+   - use `soma_surface_area` instead of `soma_surface_areas`
+   - use `soma_volume` instead of `soma_volumes`
+   - use `total_length_per_neurite` instead of `neurite_lengths`
+   - use `total_volume_per_neurite` instead of `neurite_volumes`
+   - use `terminal_path_lengths` instead of `terminal_path_lengths_per_neurite`
+   - use `bifurcation_partitions` instead of `partition`
+   - new neurite feature `total_area` that complements `total_area_per_neurite`.
+   - new neurite feature `volume_density` that complements `neurite_volume_density`.
 
 
 Migration to v2 version

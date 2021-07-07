@@ -37,7 +37,7 @@ anything other than neurite then you must use the features mechanism e.g. `featu
 >>> nrn = neurom.load_neuron('path/to/neuron')
 >>> features.get('max_radial_distance', nrn.neurites[0])
 >>> features.get('max_radial_distance', nrn)
->>> features.get('n_segments', nrn.neurites, neurite_type=neurom.AXON)
+>>> features.get('number_of_segments', nrn.neurites, neurite_type=neurom.AXON)
 """
 
 import logging
@@ -78,7 +78,7 @@ def number_of_segments(neurite):
 
 @feature(shape=())
 def number_of_sections(neurite, iterator_type=Section.ipreorder):
-    """Number of sections."""
+    """Number of sections. For a neuron it will be a sum of all neurites sections numbers."""
     return sum(1 for _ in iterator_type(neurite.root_node))
 
 
@@ -101,9 +101,24 @@ def number_of_leaves(neurite):
 
 
 @feature(shape=())
+def total_length(neurite):
+    """Neurite length. For a neuron it will be a sum of all neurite lengths."""
+    return sum(s.length for s in neurite.iter_sections())
+
+
+@feature(shape=())
 def total_area(neurite):
-    """Surface area. The area is defined as the sum of the area of the sections."""
+    """Neurite surface area. For a neuron it will be a sum of all neurite areas.
+
+    The area is defined as the sum of the area of the sections.
+    """
     return neurite.area
+
+
+@feature(shape=())
+def total_volume(neurite):
+    """Neurite volume. For a neuron it will be a sum of neurites volumes."""
+    return sum(s.volume for s in Section.ipreorder(neurite.root_node))
 
 
 def _section_length(section):
@@ -147,8 +162,8 @@ def section_term_branch_orders(neurite):
     return _map_sections(sectionfunc.branch_order, neurite, Section.ileaf)
 
 
-@feature(shape=(...,), name='section_path_distances')
-def section_path_lengths(neurite):
+@feature(shape=(...,))
+def section_path_distances(neurite):
     """Path lengths."""
 
     def pl2(node):
@@ -307,8 +322,8 @@ def remote_bifurcation_angles(neurite):
                          iterator_type=Section.ibifurcation_point)
 
 
-@feature(shape=(...,), name='partition_asymmetry')
-def partition_asymmetries(neurite, variant='branch-order', method='petilla'):
+@feature(shape=(...,))
+def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
     """Partition asymmetry at bifurcation points.
 
     Variant: length is a different definition, as the absolute difference in
@@ -338,7 +353,7 @@ def partition_asymmetries(neurite, variant='branch-order', method='petilla'):
     return asymmetries
 
 
-@feature(shape=(...,), name='partition')
+@feature(shape=(...,))
 def bifurcation_partitions(neurite):
     """Partition at bifurcation points."""
     return _map_sections(bifurcationfunc.bifurcation_partition,
@@ -411,12 +426,6 @@ def section_bif_radial_distances(neurite, origin=None):
     return section_radial_distances(neurite, origin, Section.ibifurcation_point)
 
 
-@feature(shape=())
-def total_length(neurite):
-    """Get the path length)."""
-    return sum(s.length for s in neurite.iter_sections())
-
-
 @feature(shape=(...,))
 def terminal_path_lengths(neurite):
     """Get the path lengths to each terminal point."""
@@ -424,13 +433,7 @@ def terminal_path_lengths(neurite):
 
 
 @feature(shape=())
-def total_volume(neurite):
-    """Get the volume."""
-    return sum(s.volume for s in Section.ipreorder(neurite.root_node))
-
-
-@feature(shape=(...,))
-def neurite_volume_density(neurite):
+def volume_density(neurite):
     """Get the volume density.
 
     The volume density is defined as the ratio of the neurite volume and
@@ -445,10 +448,10 @@ def neurite_volume_density(neurite):
         volume = convex_hull(neurite).volume
     except scipy.spatial.qhull.QhullError:
         L.exception('Failure to compute neurite volume using the convex hull. '
-                    'Feature `neurite_volume_density` will return `np.nan`.\n')
-        return [np.nan]
+                    'Feature `volume_density` will return `np.nan`.\n')
+        return np.nan
 
-    return [neurite.volume / volume]
+    return neurite.volume / volume
 
 
 @feature(shape=(...,))

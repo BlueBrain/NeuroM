@@ -26,19 +26,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test neurom._neuronfunc functionality."""
+"""Test features.neuronfunc."""
+from math import pi, sqrt
 import tempfile
 import warnings
 from io import StringIO
 from pathlib import Path
 
 import numpy as np
-from neurom import NeuriteType, load_neuron
-from neurom.core.population import Population
-from neurom.features import neuronfunc as _nf
+from neurom import NeuriteType, load_neuron, AXON, BASAL_DENDRITE
+from neurom.features import neuronfunc, sectionfunc
 
 import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -54,73 +54,114 @@ with warnings.catch_warnings(record=True):
 def test_soma_volume():
     with warnings.catch_warnings(record=True):
         # SomaSinglePoint
-        ret = _nf.soma_volume(SIMPLE)
+        ret = neuronfunc.soma_volume(SIMPLE)
         assert_almost_equal(ret, 4.1887902047863905)
         # SomaCylinders
-        ret = _nf.soma_volume(SWC_NRN)
+        ret = neuronfunc.soma_volume(SWC_NRN)
         assert_almost_equal(ret, 0.010726068245337955)
         # SomaSimpleContour
-        ret = _nf.soma_volume(NRN)
+        ret = neuronfunc.soma_volume(NRN)
         assert_almost_equal(ret, 0.0033147000251481135)
         # SomaNeuromorphoThreePointCylinders
-        ret = _nf.soma_volume(SWC_NRN_3PT)
+        ret = neuronfunc.soma_volume(SWC_NRN_3PT)
         assert_almost_equal(ret, 50.26548245743669)
 
 
-def test_soma_volumes():
-    with warnings.catch_warnings(record=True):
-        ret = _nf.soma_volumes(SIMPLE)
-        assert ret == [4.1887902047863905, ]
-
-
 def test_soma_surface_area():
-    ret = _nf.soma_surface_area(SIMPLE)
-    assert ret == 12.566370614359172
+    assert_allclose(neuronfunc.soma_surface_area(SIMPLE), 12.566370614359172)
+    assert_allclose(neuronfunc.soma_surface_area(NRN), 0.1075095256160432)
 
 
-def test_soma_surface_areas():
-    ret = _nf.soma_surface_areas(SIMPLE)
-    assert ret == [12.566370614359172, ]
+def test_soma_radius():
+    assert neuronfunc.soma_radius(SIMPLE) == 1
+    assert_allclose(neuronfunc.soma_radius(NRN), 0.09249506049313666)
 
 
-def test_soma_radii():
-    ret = _nf.soma_radii(SIMPLE)
-    assert ret == [1., ]
+def test_total_area_per_neurite():
+    def surface(r0, r1, h):
+        return pi * (r0 + r1) * sqrt((r0 - r1) ** 2 + h ** 2)
+
+    basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = neuronfunc.total_area_per_neurite(SIMPLE, neurite_type=BASAL_DENDRITE)
+    assert_almost_equal(ret[0], basal_area)
+
+    axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = neuronfunc.total_area_per_neurite(SIMPLE, neurite_type=AXON)
+    assert_almost_equal(ret[0], axon_area)
+
+    ret = neuronfunc.total_area_per_neurite(SIMPLE)
+    assert np.allclose(ret, [basal_area, axon_area])
+
+
+def test_total_volume_per_neurite():
+    vol = neuronfunc.total_volume_per_neurite(NRN)
+    assert len(vol) == 4
+
+    # calculate the volumes by hand and compare
+    vol2 = [sum(sectionfunc.section_volume(s) for s in n.iter_sections())
+            for n in NRN.neurites]
+    assert vol == vol2
+
+    # regression test
+    ref_vol = [271.94122143951864, 281.24754646913954,
+               274.98039928781355, 276.73860261723024]
+    assert np.allclose(vol, ref_vol)
+
+
+def test_total_length_per_neurite():
+    total_lengths = neuronfunc.total_length_per_neurite(SIMPLE)
+    assert total_lengths == [5. + 5. + 6., 4. + 5. + 6.]
+
+
+def test_number_of_neurites():
+    assert neuronfunc.number_of_neurites(SIMPLE) == 2
+
+
+def test_total_volume_per_neurite():
+    # note: cannot use SIMPLE since it lies in a plane
+    total_volumes = neuronfunc.total_volume_per_neurite(NRN)
+    assert_allclose(total_volumes,
+                    [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024])
+
+
+def test_number_of_sections_per_neurite():
+    sections = neuronfunc.number_of_sections_per_neurite(SIMPLE)
+    assert_allclose(sections, (3, 3))
 
 
 def test_trunk_section_lengths():
-    ret = _nf.trunk_section_lengths(SIMPLE)
+    ret = neuronfunc.trunk_section_lengths(SIMPLE)
     assert ret == [5.0, 4.0]
 
 
 def test_trunk_origin_radii():
-    ret = _nf.trunk_origin_radii(SIMPLE)
+    ret = neuronfunc.trunk_origin_radii(SIMPLE)
     assert ret == [1.0, 1.0]
 
 
 def test_trunk_origin_azimuths():
-    ret = _nf.trunk_origin_azimuths(SIMPLE)
+    ret = neuronfunc.trunk_origin_azimuths(SIMPLE)
     assert ret == [0.0, 0.0]
 
 
 def test_trunk_angles():
-    ret = _nf.trunk_angles(SIMPLE_TRUNK)
+    ret = neuronfunc.trunk_angles(SIMPLE_TRUNK)
     assert_array_almost_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
-    ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
+    ret = neuronfunc.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
     assert_array_almost_equal(ret, [np.pi, np.pi])
-    ret = _nf.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    ret = neuronfunc.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
     assert_array_almost_equal(ret, [0.0])
-    ret = _nf.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
+    ret = neuronfunc.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
     assert_array_almost_equal(ret, [])
 
 
 def test_trunk_vectors():
-    ret = _nf.trunk_vectors(SIMPLE_TRUNK)
+    ret = neuronfunc.trunk_vectors(SIMPLE_TRUNK)
     assert_array_equal(ret[0], [0., -1.,  0.])
     assert_array_equal(ret[1], [1.,  0.,  0.])
     assert_array_equal(ret[2], [-1.,  0.,  0.])
     assert_array_equal(ret[3], [0.,  1.,  0.])
-    ret = _nf.trunk_vectors(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    ret = neuronfunc.trunk_vectors(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
     assert_array_equal(ret[0], [0., -1.,  0.])
 
 
@@ -139,45 +180,43 @@ def test_trunk_origin_elevations():
     3 3 -1 -2 -1 2 2
     """), reader='swc')
 
-    pop = Population([n0, n1])
-    assert_array_almost_equal(_nf.trunk_origin_elevations(pop),
-                              [0.0, np.pi/2., -np.pi/2.])
+    pop = [n0, n1]
+    assert_allclose(neuronfunc.trunk_origin_elevations(n0), [0.0, np.pi/2.])
+    assert_allclose(neuronfunc.trunk_origin_elevations(n1), [-np.pi/2.])
+    assert_allclose(neuronfunc.trunk_origin_elevations(n0, NeuriteType.basal_dendrite), [0.0, np.pi/2.])
+    assert_allclose(neuronfunc.trunk_origin_elevations(n1, NeuriteType.basal_dendrite), [-np.pi/2.])
 
-    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.basal_dendrite),
-                              [0.0, np.pi/2., -np.pi/2.])
-
-    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.axon),
-                              [])
-
-    assert_array_almost_equal(_nf.trunk_origin_elevations(pop, neurite_type=NeuriteType.apical_dendrite),
-                              [])
+    assert neuronfunc.trunk_origin_elevations(n0, NeuriteType.axon) == []
+    assert neuronfunc.trunk_origin_elevations(n1, NeuriteType.axon) == []
+    assert neuronfunc.trunk_origin_elevations(n0, NeuriteType.apical_dendrite) == []
+    assert neuronfunc.trunk_origin_elevations(n1, NeuriteType.apical_dendrite) == []
 
 
 def test_trunk_elevation_zero_norm_vector_raises():
     with pytest.raises(Exception):
-        _nf.trunk_origin_elevations(SWC_NRN)
+        neuronfunc.trunk_origin_elevations(SWC_NRN)
 
 
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
-    assert (list(_nf.sholl_crossings(SIMPLE, center, radii=radii)) ==
+    assert (list(neuronfunc.sholl_crossings(SIMPLE, center, radii=radii)) ==
             [])
 
     radii = [1.0]
     assert ([2] ==
-            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(neuronfunc.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1.0, 5.1]
     assert ([2, 4] ==
-            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(neuronfunc.sholl_crossings(SIMPLE, center, radii=radii)))
 
     radii = [1., 4., 5.]
     assert ([2, 4, 5] ==
-            list(_nf.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(neuronfunc.sholl_crossings(SIMPLE, center, radii=radii)))
     
     assert ([1, 1, 2] ==
-            list(_nf.sholl_crossings(list(SIMPLE.sections[:2]), center, radii=radii)))
+            list(neuronfunc.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
 
 
 def load_swc(string):
@@ -198,7 +237,7 @@ def test_sholl_analysis_custom():
  3 3  80  0  0 1.  2
  4 4   0  0  0 1.  1
  5 4 -80  0  0 1.  4""")
-    assert (list(_nf.sholl_crossings(morph_A, center, radii=radii)) ==
+    assert (list(neuronfunc.sholl_crossings(morph_A, center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 2, 2])
 
     morph_B = load_swc("""\
@@ -217,7 +256,7 @@ def test_sholl_analysis_custom():
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
                        """)
-    assert (list(_nf.sholl_crossings(morph_B, center, radii=radii)) ==
+    assert (list(neuronfunc.sholl_crossings(morph_B, center, radii=radii)) ==
             [2, 2, 2, 10, 10, 0, 0, 0])
 
     morph_C = load_swc("""\
@@ -236,6 +275,6 @@ def test_sholl_analysis_custom():
 13 4  85  -5  0 1.  9
 14 4  85 -10  0 1.  9
                        """)
-    assert (list(_nf.sholl_crossings(morph_C, center, radii=radii)) ==
+    assert (list(neuronfunc.sholl_crossings(morph_C, center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
     # view.neuron(morph_C)[0].savefig('foo.png')

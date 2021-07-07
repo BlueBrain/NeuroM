@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test neurom.features_get features."""
+"""Test ``neurom.features.get`` function."""
 import itertools
 import math
 from io import StringIO
@@ -38,7 +38,7 @@ from neurom import features, iter_sections, load_neuron, load_neurons
 from neurom.core.population import Population
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
-from neurom.features import neuritefunc as nf, NameSpace
+from neurom.features import neuritefunc, NameSpace
 
 import pytest
 from numpy.testing import assert_allclose
@@ -77,7 +77,7 @@ def test_register_existing_feature():
     with pytest.raises(NeuroMError):
         features._register_feature(NameSpace.NEURITE, 'total_area', lambda n: None, ())
     with pytest.raises(NeuroMError):
-        features._register_feature(NameSpace.NEURON, 'neurite_lengths', lambda n: None, ())
+        features._register_feature(NameSpace.NEURON, 'total_length_per_neurite', lambda n: None, ())
     with pytest.raises(NeuroMError):
         features._register_feature(NameSpace.POPULATION, 'sholl_frequency', lambda n: None, ())
 
@@ -314,7 +314,7 @@ def test_total_length():
 
 
 def test_neurite_lengths():
-    actual = features.get('neurite_lengths', POP, neurite_type=NeuriteType.basal_dendrite)
+    actual = features.get('total_length_per_neurite', POP, neurite_type=NeuriteType.basal_dendrite)
     expected = [[207.31504917144775, 211.11737489700317],
                 [211.02336168289185],
                 [501.28893661499023, 133.21348762512207, 849.1672043800354]]
@@ -322,13 +322,13 @@ def test_neurite_lengths():
         assert_allclose(a, e)
 
     assert_allclose(
-        features.get('neurite_lengths', NEURON, neurite_type=NeuriteType.axon),
+        features.get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.axon),
         (207.87975221,))
     assert_allclose(
-        features.get('neurite_lengths', NEURON, neurite_type=NeuriteType.basal_dendrite),
+        features.get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.basal_dendrite),
         (211.11737442, 207.31504202))
     assert_allclose(
-        features.get('neurite_lengths', NEURON, neurite_type=NeuriteType.apical_dendrite),
+        features.get('total_length_per_neurite', NEURON, neurite_type=NeuriteType.apical_dendrite),
         (214.37304578,))
 
 
@@ -408,35 +408,35 @@ def test_segment_meander_angles_single_section():
 
 def test_neurite_volumes():
     assert_allclose(
-        _stats(features.get('neurite_volumes', POP)),
+        _stats(features.get('total_volume_per_neurite', POP)),
         (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
     assert_allclose(
-        _stats(features.get('neurite_volumes', POP, neurite_type=NeuriteType.all)),
+        _stats(features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.all)),
         (28.356406629821159, 281.24754646913954, 2249.4613918388391, 224.9461391838839))
     assert_allclose(
-        _stats(features.get('neurite_volumes', POP, neurite_type=NeuriteType.axon)),
+        _stats(features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.axon)),
         (276.58135508666612, 277.5357232437392, 830.85568094763551, 276.95189364921185))
     assert_allclose(
-        _stats(features.get('neurite_volumes', POP, neurite_type=NeuriteType.apical_dendrite)),
+        _stats(features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.apical_dendrite)),
         (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864))
     assert_allclose(
-        _stats(features.get('neurite_volumes', POP, neurite_type=NeuriteType.basal_dendrite)),
+        _stats(features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.basal_dendrite)),
         (28.356406629821159, 281.24754646913954, 1146.6644894516851, 191.1107482419475))
 
     assert_allclose(
-        _stats(features.get('neurite_volumes', NRN)),
+        _stats(features.get('total_volume_per_neurite', NRN)),
         (271.9412, 281.2475, 1104.907, 276.2269), rtol=1e-5)
     assert_allclose(
-        _stats(features.get('neurite_volumes', NRN, neurite_type=NeuriteType.all)),
+        _stats(features.get('total_volume_per_neurite', NRN, neurite_type=NeuriteType.all)),
         (271.9412, 281.2475, 1104.907, 276.2269), rtol=1e-5)
     assert_allclose(
-        _stats(features.get('neurite_volumes', NRN, neurite_type=NeuriteType.axon)),
+        _stats(features.get('total_volume_per_neurite', NRN, neurite_type=NeuriteType.axon)),
         (276.7386, 276.7386, 276.7386, 276.7386), rtol=1e-5)
     assert_allclose(
-        _stats(features.get('neurite_volumes', NRN, neurite_type=NeuriteType.apical_dendrite)),
+        _stats(features.get('total_volume_per_neurite', NRN, neurite_type=NeuriteType.apical_dendrite)),
         (271.9412, 271.9412, 271.9412, 271.9412), rtol=1e-5)
     assert_allclose(
-        _stats(features.get('neurite_volumes', NRN, neurite_type=NeuriteType.basal_dendrite)),
+        _stats(features.get('total_volume_per_neurite', NRN, neurite_type=NeuriteType.basal_dendrite)),
         (274.9803, 281.2475, 556.2279, 278.1139), rtol=1e-5)
 
 
@@ -503,7 +503,7 @@ def test_section_path_distances():
 
 
 def test_segment_lengths():
-    ref_seglen = np.concatenate([nf.segment_lengths(s) for s in NEURON.neurites])
+    ref_seglen = np.concatenate([neuritefunc.segment_lengths(s) for s in NEURON.neurites])
     seglen = features.get('segment_lengths', NEURON)
     assert len(seglen) == 840
     assert_allclose(seglen, ref_seglen)
@@ -514,7 +514,8 @@ def test_segment_lengths():
 
 
 def test_local_bifurcation_angles():
-    ref_local_bifangles = np.concatenate([nf.local_bifurcation_angles(s) for s in NEURON.neurites])
+    ref_local_bifangles = np.concatenate([neuritefunc.local_bifurcation_angles(s)
+                                          for s in NEURON.neurites])
 
     local_bifangles = features.get('local_bifurcation_angles', NEURON)
     assert len(local_bifangles) == 40
@@ -537,7 +538,7 @@ def test_local_bifurcation_angles():
 
 
 def test_remote_bifurcation_angles():
-    ref_remote_bifangles = np.concatenate([nf.remote_bifurcation_angles(s)
+    ref_remote_bifangles = np.concatenate([neuritefunc.remote_bifurcation_angles(s)
                                            for s in NEURON.neurites])
     remote_bifangles = features.get('remote_bifurcation_angles', NEURON)
     assert len(remote_bifangles) == 40
@@ -562,8 +563,8 @@ def test_remote_bifurcation_angles():
 
 def test_segment_radial_distances_origin():
     origin = (-100, -200, -300)
-    ref_segs = np.concatenate([nf.segment_radial_distances(s) for s in NEURON.neurites])
-    ref_segs_origin = np.concatenate([nf.segment_radial_distances(s, origin)
+    ref_segs = np.concatenate([neuritefunc.segment_radial_distances(s) for s in NEURON.neurites])
+    ref_segs_origin = np.concatenate([neuritefunc.segment_radial_distances(s, origin)
                                       for s in NEURON.neurites])
 
     rad_dists = features.get('segment_radial_distances', NEURON)
@@ -586,8 +587,8 @@ def test_segment_radial_distances_origin():
 
 
 def test_section_radial_distances_endpoint():
-    ref_sec_rad_dist = np.concatenate([nf.section_radial_distances(s) for s in NEURON.neurites])
-
+    ref_sec_rad_dist = np.concatenate([neuritefunc.section_radial_distances(s)
+                                       for s in NEURON.neurites])
     rad_dists = features.get('section_radial_distances', NEURON)
 
     assert len(rad_dists) == 84
@@ -606,7 +607,7 @@ def test_section_radial_distances_endpoint():
 
 def test_section_radial_distances_origin():
     origin = (-100, -200, -300)
-    ref_sec_rad_dist_origin = np.concatenate([nf.section_radial_distances(s, origin)
+    ref_sec_rad_dist_origin = np.concatenate([neuritefunc.section_radial_distances(s, origin)
                                               for s in NEURON.neurites])
     rad_dists = features.get('section_radial_distances', NEURON, origin=origin)
     assert len(rad_dists) == 84
@@ -694,7 +695,7 @@ def test_sholl_frequency():
 
 
 def test_partition():
-    assert_allclose(features.get('partition', POP, agg='concatenate')[:10],
+    assert_allclose(features.get('bifurcation_partitions', POP, agg='concatenate')[:10],
                     [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
 
 
@@ -709,3 +710,34 @@ def test_section_strahler_orders():
     n = nm.load_neuron(path)
     assert_allclose(features.get('section_strahler_orders', n),
                     [4, 1, 4, 3, 2, 1, 1, 2, 1, 1, 3, 1, 3, 2, 1, 1, 2, 1, 1])
+
+
+def test_section_bif_radial_distances():
+    trm_rads = features.get('section_bif_radial_distances', NRN, neurite_type=nm.AXON)
+    assert_allclose(trm_rads,
+                    [8.842008561870646,
+                     16.7440421479104,
+                     23.070306480850533,
+                     30.181121708042546,
+                     36.62766031035137,
+                     43.967487830324885,
+                     51.91971040624528,
+                     59.427722328770955,
+                     66.25222507299583,
+                     74.05119754074926])
+
+
+def test_section_term_radial_distances():
+    trm_rads = features.get('section_term_radial_distances', NRN, neurite_type=nm.APICAL_DENDRITE)
+    assert_allclose(trm_rads,
+                    [16.22099879395879,
+                     25.992977561564082,
+                     33.31600613822663,
+                     42.721314797308175,
+                     52.379508081911546,
+                     59.44327819128149,
+                     67.07832724133213,
+                     79.97743930553612,
+                     87.10434825508366,
+                     97.25246040544428,
+                     99.58945832481642])
