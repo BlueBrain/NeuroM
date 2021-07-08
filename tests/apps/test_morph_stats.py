@@ -179,7 +179,7 @@ def test_extract_dataframe():
     nrns = nm.load_neurons([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
     actual = ms.extract_dataframe(nrns, REF_CONFIG_NEW)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test with a single neuron in the population
     nrns = nm.load_neurons(SWC_PATH / 'Neuron.swc')
@@ -194,7 +194,7 @@ def test_extract_dataframe():
     actual = ms.extract_dataframe(nrns, config)
     idx = pd.IndexSlice
     expected = expected.loc[:, idx[:, ['name', 'sum_section_lengths']]]
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test with a Neuron argument
     nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
@@ -205,12 +205,12 @@ def test_extract_dataframe():
     nrns = [nm.load_neuron(Path(SWC_PATH, name))
             for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(nrns, config)
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test with a List[Path] argument
     nrns = [Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(nrns, config)
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test without any neurite_type keys, it should pick the defaults
     config = {'neurite': {'total_length_per_neurite': ['sum']}}
@@ -225,7 +225,7 @@ def test_extract_dataframe():
         columns=expected_columns,
         data=[['Neuron.swc', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
               ['simple.swc', 15.,          16.,           0.,          31., ]])
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
 
 def test_extract_dataframe_multiproc():
@@ -239,12 +239,12 @@ def test_extract_dataframe_multiproc():
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=2)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
 
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(nrns, REF_CONFIG, n_workers=os.cpu_count() + 1)
         assert len(w) == 1, "Warning not emitted"
-    assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected, check_dtype=False)
 
 
 def test_get_header():

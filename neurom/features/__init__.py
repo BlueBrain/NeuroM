@@ -37,12 +37,10 @@ Examples:
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 """
 import operator
-from collections import Sized
+from collections.abc import Sized
 from enum import Enum
 from functools import reduce
 from numbers import Number
-
-import numpy as np
 
 from neurom.core import Population, Neuron, Neurite
 from neurom.core.neuron import iter_neurites

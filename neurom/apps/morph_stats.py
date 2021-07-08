@@ -34,7 +34,8 @@ import logging
 import multiprocessing
 import os
 import warnings
-from collections import defaultdict, Sized
+from collections import defaultdict
+from collections.abc import Sized
 from functools import partial
 from itertools import chain, product
 from pathlib import Path
