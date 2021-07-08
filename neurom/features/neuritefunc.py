@@ -178,18 +178,19 @@ def section_path_distances(neurite):
 ################################################################################
 
 
-def map_segments(func, neurite):
+def _map_segments(func, neurite):
     """Map `func` to all the segments.
 
     `func` accepts a section and returns list of values corresponding to each segment.
     """
-    return [mapped_seg for s in Section.ipreorder(neurite.root_node) for mapped_seg in func(s)]
+    tmp = [mapped_seg for s in Section.ipreorder(neurite.root_node) for mapped_seg in func(s)]
+    return tmp
 
 
 @feature(shape=(...,))
 def segment_lengths(neurite):
     """Lengths of the segments."""
-    return map_segments(sectionfunc.segment_lengths, neurite)
+    return _map_segments(sectionfunc.segment_lengths, neurite)
 
 
 @feature(shape=(...,))
@@ -208,7 +209,7 @@ def segment_volumes(neurite):
         """List of segment volumes of a section."""
         return [morphmath.segment_volume(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
 
-    return map_segments(_func, neurite)
+    return _map_segments(_func, neurite)
 
 
 @feature(shape=(...,))
@@ -220,7 +221,7 @@ def segment_radii(neurite):
         pts = sec.points[:, COLS.R]
         return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    return map_segments(_seg_radii, neurite)
+    return _map_segments(_seg_radii, neurite)
 
 
 @feature(shape=(...,))
@@ -237,7 +238,7 @@ def segment_taper_rates(neurite):
         distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
         return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
 
-    return map_segments(_seg_taper_rates, neurite)
+    return _map_segments(_seg_taper_rates, neurite)
 
 
 @feature(shape=(...,))
@@ -271,7 +272,7 @@ def segment_midpoints(neurite):
         pts = sec.points[:, COLS.XYZ]
         return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
 
-    return map_segments(_seg_midpoint, neurite)
+    return _map_segments(_seg_midpoint, neurite)
 
 
 @feature(shape=(...,))
@@ -289,7 +290,7 @@ def segment_path_lengths(neurite):
 
     result = [_get_pathlength(section) + np.cumsum(sectionfunc.segment_lengths(section))
               for section in Section.ipreorder(neurite.root_node)]
-    return np.hstack(result) if result else np.array([])
+    return np.hstack(result).tolist() if result else []
 
 
 @feature(shape=(...,))

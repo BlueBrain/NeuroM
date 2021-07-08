@@ -69,8 +69,6 @@ def test_get_raises():
         features.get('invalid', (n for n in POP))
     with pytest.raises(NeuroMError, match='Cant apply "invalid" feature'):
         features.get('invalid', NRN)
-    with pytest.raises(NeuroMError, match='`agg` argument must be an aggregating function'):
-        features.get('total_length', NRN, agg='unknown')
 
 
 def test_register_existing_feature():
@@ -494,7 +492,7 @@ def test_section_lengths():
 
 
 def test_section_path_distances():
-    path_distances = features.get('section_path_distances', POP, agg='concatenate')
+    path_distances = np.concatenate(features.get('section_path_distances', POP), axis=0)
     assert len(path_distances) == 328
     assert sum(len(features.get('section_path_distances', nrn)) for nrn in POP) == 328
 
@@ -579,10 +577,10 @@ def test_segment_radial_distances_origin():
     pop = Population(nrns)
     rad_dist_nrns = []
     for nrn in nrns:
-        rad_dist_nrns.extend(nm.get('segment_radial_distances', nrn))
+        rad_dist_nrns.extend(features.get('segment_radial_distances', nrn))
 
     rad_dist_nrns = np.array(rad_dist_nrns)
-    rad_dist_pop = nm.get('segment_radial_distances', pop, agg='concatenate')
+    rad_dist_pop = np.concatenate(features.get('segment_radial_distances', pop), axis=0)
     assert_allclose(rad_dist_nrns, rad_dist_pop)
 
 
@@ -597,8 +595,8 @@ def test_section_radial_distances_endpoint():
     nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
-    rad_dist_nrns = [nm.get('section_radial_distances', nrn) for nrn in nrns]
-    rad_dist_pop = nm.get('section_radial_distances', pop)
+    rad_dist_nrns = [features.get('section_radial_distances', nrn) for nrn in nrns]
+    rad_dist_pop = features.get('section_radial_distances', pop)
     assert_allclose(rad_dist_pop, rad_dist_nrns)
 
     rad_dists = features.get('section_radial_distances', NEURON, neurite_type=NeuriteType.axon)
@@ -695,13 +693,14 @@ def test_sholl_frequency():
 
 
 def test_partition():
-    assert_allclose(features.get('bifurcation_partitions', POP, agg='concatenate')[:10],
-                    [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
+    assert_allclose(
+        np.concatenate(features.get('bifurcation_partitions', POP), axis=0)[:10],
+        [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
 
 
 def test_partition_asymmetry():
     assert_allclose(
-        features.get('partition_asymmetry', POP, agg='concatenate')[:10],
+        np.concatenate(features.get('partition_asymmetry', POP), axis=0)[:10],
         [0.9, 0.88888889, 0.875, 0.85714286, 0.83333333, 0.8, 0.75, 0.66666667, 0.5, 0.])
 
 

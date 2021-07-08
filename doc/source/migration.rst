@@ -67,6 +67,8 @@ Migration to v2.4.0 version
 
 - ``neurom stats`` uses a new config format. See :ref:`morph-stats-new-config`. The old format still
   works but deprecated.
+- ``neurom stats`` Use `sum` instead of `total` mode in config.
+- ``neurom stats`` keep feature names as is. Don't trim 's' at the end of plurals.
 - TODO. better explan returned types here. Better refer here to the features documentation page where explicitly describe with examples. features return either a number or a list. For features called on populations the return list
   will be a list of lists.
 - breaking features changes:

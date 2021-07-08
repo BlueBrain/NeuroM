@@ -159,8 +159,8 @@ def trunk_origin_elevations(neuron, neurite_type=NeuriteType.all):
 @feature(shape=(...,))
 def trunk_vectors(neuron, neurite_type=NeuriteType.all):
     """Calculates the vectors between all the trunks of the neuron and the soma center."""
-    return np.array([morphmath.vector(s.root_node.points[0], neuron.soma.center)
-                     for s in iter_neurites(neuron, filt=is_type(neurite_type))])
+    return [morphmath.vector(s.root_node.points[0], neuron.soma.center)
+            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
@@ -170,9 +170,9 @@ def trunk_angles(neuron, neurite_type=NeuriteType.all):
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
     """
-    vectors = trunk_vectors(neuron, neurite_type=neurite_type)
+    vectors = np.array(trunk_vectors(neuron, neurite_type=neurite_type))
     # In order to avoid the failure of the process in case the neurite_type does not exist
-    if not vectors.size:
+    if len(vectors) == 0:
         return []
 
     def _sort_angle(p1, p2):
@@ -218,9 +218,8 @@ def neurite_volume_density(neuron, neurite_type=NeuriteType.all):
             for s in iter_neurites(neuron, filt=is_type(neurite_type))]
 
 
-@feature(shape=(...,))
 def sholl_crossings(neuron, center, radii, neurite_type=NeuriteType.all):
-    """Calculate crossings of neurites.
+    """Calculate crossings of neurites. Not a feature.
 
     Args:
         neuron(Neuron|list): morphology or a list of neurites

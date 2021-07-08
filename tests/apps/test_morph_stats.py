@@ -31,11 +31,10 @@ import warnings
 from pathlib import Path
 
 import neurom as nm
-import numpy as np
 import pandas as pd
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES
+from neurom.features import _NEURITE_FEATURES, _NEURON_FEATURES, _POPULATION_FEATURES
 
 import pytest
 from numpy.testing import assert_array_equal, assert_almost_equal
@@ -45,30 +44,30 @@ DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
 REF_CONFIG = {
     'neurite': {
-        'section_lengths': ['max', 'total'],
-        'section_volumes': ['total'],
+        'section_lengths': ['max', 'sum'],
+        'section_volumes': ['sum'],
         'section_branch_orders': ['max'],
         'segment_midpoints': ['max'],
         'max_radial_distance': ['mean'],
     },
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
-        'soma_radii': ['mean'],
+        'soma_radius': ['mean'],
         'max_radial_distance': ['mean'],
     }
 }
 
 REF_CONFIG_NEW = {
     'neurite': {
-        'section_lengths': {'modes': ['max', 'total']},
-        'section_volumes': {'modes': ['total']},
+        'section_lengths': {'modes': ['max', 'sum']},
+        'section_volumes': {'modes': ['sum']},
         'section_branch_orders': {'modes': ['max']},
         'segment_midpoints': {'modes': ['max']},
         'max_radial_distance': {'modes': ['mean']},
     },
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'neuron': {
-        'soma_radii': {'modes': ['mean']},
+        'soma_radius': {'modes': ['mean']},
         'max_radial_distance': {'modes': ['mean']},
     }
 }
@@ -79,87 +78,46 @@ REF_OUT = {
         'mean_max_radial_distance': 99.5894610648815,
     },
     'axon': {
-        'total_section_length': 207.87975220908129,
-        'max_section_length': 11.018460736176685,
-        'max_section_branch_order': 10,
-        'total_section_volume': 276.73857657289523,
-        'max_segment_midpoint_0': 0.0,
-        'max_segment_midpoint_1': 0.0,
-        'max_segment_midpoint_2': 49.520305964149998,
+        'sum_section_lengths': 207.87975220908129,
+        'max_section_lengths': 11.018460736176685,
+        'max_section_branch_orders': 10,
+        'sum_section_volumes': 276.73857657289523,
+        'max_segment_midpoints_0': 0.0,
+        'max_segment_midpoints_1': 0.0,
+        'max_segment_midpoints_2': 49.520305964149998,
         'mean_max_radial_distance': 82.44254511788921,
     },
     'all': {
-        'total_section_length': 840.68521442251949,
-        'max_section_length': 11.758281556059444,
-        'max_section_branch_order': 10,
-        'total_section_volume': 1104.9077419665782,
-        'max_segment_midpoint_0': 64.401674984050004,
-        'max_segment_midpoint_1': 48.48197694465,
-        'max_segment_midpoint_2': 53.750947521650005,
+        'sum_section_lengths': 840.68521442251949,
+        'max_section_lengths': 11.758281556059444,
+        'max_section_branch_orders': 10,
+        'sum_section_volumes': 1104.9077419665782,
+        'max_segment_midpoints_0': 64.401674984050004,
+        'max_segment_midpoints_1': 48.48197694465,
+        'max_segment_midpoints_2': 53.750947521650005,
         'mean_max_radial_distance': 99.5894610648815,
     },
     'apical_dendrite': {
-        'total_section_length': 214.37304577550353,
-        'max_section_length': 11.758281556059444,
-        'max_section_branch_order': 10,
-        'total_section_volume': 271.9412385728449,
-        'max_segment_midpoint_0': 64.401674984050004,
-        'max_segment_midpoint_1': 0.0,
-        'max_segment_midpoint_2': 53.750947521650005,
+        'sum_section_lengths': 214.37304577550353,
+        'max_section_lengths': 11.758281556059444,
+        'max_section_branch_orders': 10,
+        'sum_section_volumes': 271.9412385728449,
+        'max_segment_midpoints_0': 64.401674984050004,
+        'max_segment_midpoints_1': 0.0,
+        'max_segment_midpoints_2': 53.750947521650005,
         'mean_max_radial_distance': 99.5894610648815,
     },
     'basal_dendrite': {
-        'total_section_length': 418.43241643793476,
-        'max_section_length': 11.652508126101711,
-        'max_section_branch_order': 10,
-        'total_section_volume': 556.22792682083821,
-        'max_segment_midpoint_0': 64.007872333250006,
-        'max_segment_midpoint_1': 48.48197694465,
-        'max_segment_midpoint_2': 51.575580778049996,
+        'sum_section_lengths': 418.43241643793476,
+        'max_section_lengths': 11.652508126101711,
+        'max_section_branch_orders': 10,
+        'sum_section_volumes': 556.22792682083821,
+        'max_segment_midpoints_0': 64.007872333250006,
+        'max_segment_midpoints_1': 48.48197694465,
+        'max_segment_midpoints_2': 51.575580778049996,
         'mean_max_radial_distance': 94.43342438865741,
     },
 }
-
-
-def test_name_correction():
-    assert ms._stat_name('foo', 'raw') == 'foo'
-    assert ms._stat_name('foos', 'raw') == 'foo'
-    assert ms._stat_name('foos', 'bar') == 'bar_foo'
-    assert ms._stat_name('foos', 'total') == 'total_foo'
-    assert ms._stat_name('soma_radii', 'total') == 'total_soma_radius'
-    assert ms._stat_name('soma_radii', 'raw') == 'soma_radius'
-
-
-def test_eval_stats_raw_returns_list():
-    assert ms.eval_stats(np.array([1, 2, 3, 4]), 'raw') == [1, 2, 3, 4]
-
-
-def test_eval_stats_empty_input_returns_none():
-    assert ms.eval_stats([], 'min') is None
-
-
-def test_eval_stats_total_returns_sum():
-    assert ms.eval_stats(np.array([1, 2, 3, 4]), 'total') == 10
-
-
-def test_eval_stats_on_empty_stat():
-    assert ms.eval_stats(np.array([]), 'mean') == None
-    assert ms.eval_stats(np.array([]), 'std') == None
-    assert ms.eval_stats(np.array([]), 'median') == None
-    assert ms.eval_stats(np.array([]), 'min') == None
-    assert ms.eval_stats(np.array([]), 'max') == None
-
-    assert ms.eval_stats(np.array([]), 'raw') == []
-    assert ms.eval_stats(np.array([]), 'total') == 0.0
-
-
-def test_eval_stats_applies_numpy_function():
-    modes = ('min', 'max', 'mean', 'median', 'std')
-
-    ref_array = np.arange(1, 10)
-
-    for m in modes:
-        assert (ms.eval_stats(ref_array, m) == getattr(np, m)(ref_array))
 
 
 def test_extract_stats_single_neuron():
@@ -186,17 +144,17 @@ def test_stats_new_format_set_arg():
     nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
     config = {
         'neurite': {
-            'section_lengths': {'kwargs': {'neurite_type': 'AXON'}, 'modes': ['max', 'total']},
+            'section_lengths': {'kwargs': {'neurite_type': 'AXON'}, 'modes': ['max', 'sum']},
         },
         'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
         'neuron': {
-            'soma_radii': {'modes': ['mean']},
+            'soma_radius': {'modes': ['mean']},
         }
     }
 
     res = ms.extract_stats(nrn, config)
     assert set(res.keys()) == {'neuron', 'axon'}
-    assert set(res['axon'].keys()) == {'max_section_length', 'total_section_length'}
+    assert set(res['axon'].keys()) == {'max_section_lengths', 'sum_section_lengths'}
     assert set(res['neuron'].keys()) == {'mean_soma_radius'}
 
 
@@ -205,46 +163,45 @@ def test_extract_stats_scalar_feature():
     config = {
         'neurite_type': ['ALL'],
         'neurite': {
-            'n_forking_points': ['max'],
+            'number_of_forking_points': ['max'],
         },
         'neuron': {
-            'soma_volume': ['total'],
+            'soma_volume': ['sum'],
         }
     }
     res = ms.extract_stats(nrn, config)
-    assert res == {'all': {'max_n_forking_point': 277},
-                       'neuron': {'total_soma_volume': 1424.4383771584492}}
+    assert res == {'all': {'max_number_of_forking_points': 277},
+                   'neuron': {'sum_soma_volume': 1424.4383771584492}}
 
 
 def test_extract_dataframe():
     # Vanilla test
-    nrns = nm.load_neurons([SWC_PATH / name
-                            for name in ['Neuron.swc', 'simple.swc']])
-    actual = ms.extract_dataframe(nrns, REF_CONFIG)
+    nrns = nm.load_neurons([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
+    actual = ms.extract_dataframe(nrns, REF_CONFIG_NEW)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
     assert_frame_equal(actual, expected)
 
     # Test with a single neuron in the population
     nrns = nm.load_neurons(SWC_PATH / 'Neuron.swc')
-    actual = ms.extract_dataframe(nrns, REF_CONFIG)
+    actual = ms.extract_dataframe(nrns, REF_CONFIG_NEW)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
     # Test with a config without the 'neuron' key
     nrns = nm.load_neurons([Path(SWC_PATH, name)
                             for name in ['Neuron.swc', 'simple.swc']])
-    config = {'neurite': {'section_lengths': ['total']},
+    config = {'neurite': {'section_lengths': ['sum']},
               'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
     actual = ms.extract_dataframe(nrns, config)
     idx = pd.IndexSlice
-    expected = expected.loc[:, idx[:, ['name', 'total_section_length']]]
+    expected = expected.loc[:, idx[:, ['name', 'sum_section_lengths']]]
     assert_frame_equal(actual, expected)
 
-    # Test with a FstNeuron argument
+    # Test with a Neuron argument
     nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrn, config)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
-    # Test with a List[FstNeuron] argument
+    # Test with a List[Neuron] argument
     nrns = [nm.load_neuron(Path(SWC_PATH, name))
             for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(nrns, config)
@@ -256,14 +213,14 @@ def test_extract_dataframe():
     assert_frame_equal(actual, expected)
 
     # Test without any neurite_type keys, it should pick the defaults
-    config = {'neurite': {'total_length_per_neurite': ['total']}}
+    config = {'neurite': {'total_length_per_neurite': ['sum']}}
     actual = ms.extract_dataframe(nrns, config)
     expected_columns = pd.MultiIndex.from_tuples(
         [('property', 'name'),
-         ('axon', 'total_total_length_per_neurite'),
-         ('basal_dendrite', 'total_total_length_per_neurite'),
-         ('apical_dendrite', 'total_total_length_per_neurite'),
-         ('all', 'total_total_length_per_neurite')])
+         ('axon', 'sum_total_length_per_neurite'),
+         ('basal_dendrite', 'sum_total_length_per_neurite'),
+         ('apical_dendrite', 'sum_total_length_per_neurite'),
+         ('all', 'sum_total_length_per_neurite')])
     expected = pd.DataFrame(
         columns=expected_columns,
         data=[['Neuron.swc', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
@@ -314,10 +271,11 @@ def test_generate_flattened_dict():
 
 def test_full_config():
     config = ms.full_config()
-    assert set(config.keys()) == {'neurite', 'neuron', 'neurite_type'}
+    assert set(config.keys()) == {'neurite', 'population', 'neuron', 'neurite_type'}
 
-    assert set(config['neurite'].keys()) == set(NEURITEFEATURES.keys())
-    assert set(config['neuron'].keys()) == set(NEURONFEATURES.keys())
+    assert set(config['neurite'].keys()) == set(_NEURITE_FEATURES.keys())
+    assert set(config['neuron'].keys()) == set(_NEURON_FEATURES.keys())
+    assert set(config['population'].keys()) == set(_POPULATION_FEATURES.keys())
 
 
 def test_sanitize_config():
@@ -330,13 +288,13 @@ def test_sanitize_config():
 
     full_config = {
         'neurite': {
-            'section_lengths': ['max', 'total'],
-            'section_volumes': ['total'],
+            'section_lengths': ['max', 'sum'],
+            'section_volumes': ['sum'],
             'section_branch_orders': ['max']
         },
         'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
         'neuron': {
-            'soma_radii': ['mean']
+            'soma_radius': ['mean']
         }
     }
     new_config = ms.sanitize_config(full_config)
@@ -359,13 +317,13 @@ def test_multidimensional_features():
     config = {'neurite': {'segment_midpoints': ['max']},
               'neurite_type': ['AXON']}
     actual = ms.extract_dataframe(neuron, config)
-    assert_array_equal(actual['axon'][['max_segment_midpoint_0',
-                                       'max_segment_midpoint_1',
-                                       'max_segment_midpoint_2']].values,
+    assert_array_equal(actual['axon'][['max_segment_midpoints_0',
+                                       'max_segment_midpoints_1',
+                                       'max_segment_midpoints_2']].values,
                        [[None, None, None]])
 
     config = {'neurite': {'partition_pairs': ['max']}}
     actual = ms.extract_dataframe(neuron, config)
-    assert_array_equal(actual['axon'][['max_partition_pair_0',
-                                       'max_partition_pair_1']].values,
+    assert_array_equal(actual['axon'][['max_partition_pairs_0',
+                                       'max_partition_pairs_1']].values,
                        [[None, None]])

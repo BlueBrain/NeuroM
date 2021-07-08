@@ -37,8 +37,11 @@ Examples:
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 """
 import operator
+from collections import Sized
 from enum import Enum
 from functools import reduce
+from numbers import Number
+
 import numpy as np
 
 from neurom.core import Population, Neuron, Neurite
@@ -65,13 +68,12 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
                   0 if feature_.shape == () else [])
 
 
-def _get_feature_value_and_func(feature_name, obj, agg=None, **kwargs):
+def _get_feature_value_and_func(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
         feature_name(string): feature to extract
         obj (Neurite|Neuron|Population): neurite, neuron or population
-        agg (string|None): TODO
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
@@ -81,8 +83,6 @@ def _get_feature_value_and_func(feature_name, obj, agg=None, **kwargs):
     if not isinstance(obj, (Neurite, Neuron, Population)) and not is_obj_list:
         raise NeuroMError('Only Neurite, Neuron, Population or list, tuple of Neurite, Neuron can'
                           ' be used for feature calculation')
-    if agg is not None and not hasattr(np, agg):
-        raise NeuroMError('`agg` argument must be an aggregating function of numpy package.')
 
     neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
     res, feature_ = None, None
@@ -121,14 +121,13 @@ def _get_feature_value_and_func(feature_name, obj, agg=None, **kwargs):
     if res is None or feature_ is None:
         raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
                           'and can be applied to your input. See the features documentation page.')
-    if isinstance(res, list) and agg is not None:
-        # TODO consider `res` is a list of lists
-        res = getattr(np, agg)(res, axis=0)
+    if not isinstance(res, (Sized, Number)):
+        raise NeuroMError('Feature must return a number or a sized collection')  # pragma: no cover
 
     return res, feature_
 
 
-def get(feature_name, obj, agg=None, **kwargs):
+def get(feature_name, obj, **kwargs):
     """TODO Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite features or Neuron features. For the list of Neurite features
@@ -138,13 +137,12 @@ def get(feature_name, obj, agg=None, **kwargs):
     Arguments:
         feature_name(string): feature to extract
         obj: a neuron, a neuron population or a neurite tree
-        agg (string|None): TODO
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
         features as a 1D, 2D or 3D numpy array.
     """
-    return _get_feature_value_and_func(feature_name, obj, agg, **kwargs)[0]
+    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
 
 
 def _register_feature(namespace: NameSpace, name, func, shape):
@@ -176,11 +174,14 @@ def feature(shape, namespace: NameSpace, name=None):
         namespace(string): a namespace, see :class:`NameSpace`
         name(string): name of the feature, used to access the feature via `neurom.features.get()`.
     """
+
     def inner(func):
         _register_feature(namespace, name or func.__name__, func, shape)
         return func
+
     return inner
 
 
 # These imports are necessary in order to register the features
-from neurom.features import neuritefunc, neuronfunc, populationfunc  # noqa, pylint: disable=wrong-import-position
+from neurom.features import neuritefunc, neuronfunc, \
+    populationfunc  # noqa, pylint: disable=wrong-import-position

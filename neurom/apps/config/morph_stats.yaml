@@ -7,9 +7,9 @@
 neurite:
     section_lengths:
         - max
-        - total
+        - sum
     section_volumes:
-        - total
+        - sum
     section_branch_orders:
         - max
 
@@ -20,7 +20,7 @@ neurite_type:
     - ALL
 
 neuron:
-    soma_radii:
+    soma_radius:
         - mean
 
 ##############################################
