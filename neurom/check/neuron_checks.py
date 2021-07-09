@@ -39,7 +39,6 @@ from neurom.check.morphtree import get_flat_neurites
 from neurom.core.neuron import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.exceptions import NeuroMError
-from neurom.features import neuritefunc as _nf
 from neurom.morphmath import section_length, segment_length
 
 
@@ -83,8 +82,7 @@ def has_basal_dendrite(neuron, min_number=1, treefun=_read_neurite_type):
     Arguments:
         neuron(Neuron): The neuron object to test
         min_number: minimum number of basal dendrites required
-        treefun: Optional function to calculate the tree type of neuron's
-        neurites
+        treefun: Optional function to calculate the tree type of neuron's neurites
 
     Returns:
         CheckResult with result
@@ -121,7 +119,7 @@ def has_all_nonzero_segment_lengths(neuron, threshold=0.0):
         of zero length segments
     """
     bad_ids = []
-    for sec in _nf.iter_sections(neuron):
+    for sec in iter_sections(neuron):
         p = sec.points
         for i, s in enumerate(zip(p[:-1], p[1:])):
             if segment_length(s) <= threshold:
@@ -141,7 +139,7 @@ def has_all_nonzero_section_lengths(neuron, threshold=0.0):
     Returns:
         CheckResult with result including list of ids of bad sections
     """
-    bad_ids = [s.id for s in _nf.iter_sections(neuron.neurites)
+    bad_ids = [s.id for s in iter_sections(neuron.neurites)
                if section_length(s.points) <= threshold]
 
     return CheckResult(len(bad_ids) == 0, bad_ids)
@@ -160,7 +158,7 @@ def has_all_nonzero_neurite_radii(neuron, threshold=0.0):
     """
     bad_ids = []
     seen_ids = set()
-    for s in _nf.iter_sections(neuron):
+    for s in iter_sections(neuron):
         for i, p in enumerate(s.points):
             info = (s.id, i)
             if p[COLS.R] <= threshold and info not in seen_ids:
@@ -239,7 +237,7 @@ def has_no_fat_ends(neuron, multiple_of_mean=2.0, final_point_count=5):
         `final_point_count`
     """
     bad_ids = []
-    for leaf in _nf.iter_sections(neuron.neurites, iterator_type=Section.ileaf):
+    for leaf in iter_sections(neuron.neurites, iterator_type=Section.ileaf):
         mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
 
         if mean_radius * multiple_of_mean <= leaf.points[-1, COLS.R]:

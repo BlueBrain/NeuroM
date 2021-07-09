@@ -54,23 +54,8 @@ that it will suffice for most analyses.
 Extract morphometrics with :func:`neurom.features.get`
 ------------------------------------------------------
 
-These are some of the properties can be obtained for a single neurite type or for all
-neurites regardless of type via :func:`neurom.features.get`:
-
-* Segment lengths
-* Section lengths
-* Segment radii
-* Number of sections
-* Number of sections per neurite
-* Number of neurites
-* Number of segments
-* Local and remote bifurcation angles
-* Section path distances
-* Section radial distances
-* Section branch orders
-* Total neurite length
-
-The usage is simple:
+Analyze morphologies via :func:`neurom.features.get`. This way you can get things like segment
+lengths, section lengths, etc.
 
 .. code::
 
@@ -80,8 +65,7 @@ The usage is simple:
     pop = nm.load_neurons('some/data/path')
     pop_ap_seg_len = nm.features.get('segment_lengths', pop, neurite_type=nm.APICAL_DENDRITE)
 
-This function also allows obtaining the soma radius and surface area.
-
+For more details see :ref:`features`.
 
 Iterate over neurites with :func:`neurom.core.neuron.iter_neurites`
 -------------------------------------------------------------------

@@ -95,4 +95,4 @@ def test_neuron_not_corrupted():
     # to raise a KeyError exception.
     neuron = load_neuron(NEURON_PATH)
     dm.Dendrogram(neuron)
-    assert get('section_path_distances', neuron).size > 0
+    assert len(get('section_path_distances', neuron)) > 0

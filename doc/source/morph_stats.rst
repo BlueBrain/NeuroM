@@ -62,9 +62,9 @@ An example config
     neurite:
         section_lengths:
             - max
-            - total
+            - sum
         section_volumes:
-            - total
+            - sum
         section_branch_orders:
             - max
     
@@ -75,7 +75,7 @@ An example config
         - ALL
     
     neuron:
-        soma_radii:
+        soma_radius:
             - mean
 
 
@@ -86,13 +86,13 @@ Here, there are two feature categories,
 2. ``neuron``: these are morphometrics that can be applied to a whole neuron, e.g. the soma radius,
    the trunk radii, etc.
 
-Each category sub-item (section_lengths, soma_radii, etc) corresponds to a
+Each category sub-item (section_lengths, soma_radius, etc) corresponds to a
 :py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
 function, e.g.
 
 * ``raw``: array of raw values
 * ``max``, ``min``, ``mean``, ``median``, ``std``: self-explanatory.
-* ``total``: sum of the raw values
+* ``sum``: sum of the raw values
   
 An additional field ``neurite_type`` specifies the neurite types into which the morphometrics
 are to be split. It applies only to ``neurite`` features. A sample output using the above
@@ -104,28 +104,28 @@ configuration:
       "some/path/morph.swc":{
         "mean_soma_radius":0.17071067811865476,
         "axon":{
-          "total_section_length":207.87975220908129,
-          "max_section_length":11.018460736176685,
-          "max_section_branch_order":10,
-          "total_section_volume":276.73857657289523
+          "sum_section_lengths":207.87975220908129,
+          "max_section_lengths":11.018460736176685,
+          "max_section_branch_orders":10,
+          "sum_section_volumes":276.73857657289523
         },
         "all":{
-          "total_section_length":840.68521442251949,
-          "max_section_length":11.758281556059444,
-          "max_section_branch_order":10,
-          "total_section_volume":1104.9077419665782
+          "sum_section_lengths":840.68521442251949,
+          "max_section_lengths":11.758281556059444,
+          "max_section_branch_orders":10,
+          "sum_section_volumes":1104.9077419665782
         },
         "apical_dendrite":{
-          "total_section_length":214.37304577550353,
-          "max_section_length":11.758281556059444,
-          "max_section_branch_order":10,
-          "total_section_volume":271.9412385728449
+          "sum_section_lengths":214.37304577550353,
+          "max_section_lengths":11.758281556059444,
+          "max_section_branch_orders":10,
+          "sum_section_volumes":271.9412385728449
         },
         "basal_dendrite":{
-          "total_section_length":418.43241643793476,
-          "max_section_length":11.652508126101711,
-          "max_section_branch_order":10,
-          "total_section_volume":556.22792682083821
+          "sum_section_lengths":418.43241643793476,
+          "max_section_lengths":11.652508126101711,
+          "max_section_branch_orders":10,
+          "sum_section_volumes":556.22792682083821
         }
       }
     }
@@ -148,7 +148,7 @@ them. Here is how you can set them now:
                method: 'petilla'
             modes:
                - max
-               - total
+               - sum
 
 Instead of statistic aggregating functions right after a feature name, config expects ``kwargs``
 and ``modes`` properties. The former sets the feature arguments. The latter sets the statistic
@@ -163,7 +163,7 @@ global setting of neurite types via ``neurite_type`` global config field. For ex
                neurite_type: APICAL_DENDRITE
             modes:
                - max
-               - total
+               - sum
 
 Features
 --------

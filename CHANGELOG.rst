@@ -3,7 +3,7 @@ Changelog
 
 Version 2.4.0
 -------------
-- Refactor ``viewer``. :ref:`Migration guide<migration-v2.4.0>`.
+- Refactor plotting functionality. :ref:`migration-v2.4.0`.
     - deprecate ``neurom.view.viewer``
     - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
     - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
@@ -12,16 +12,18 @@ Version 2.4.0
     - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
 
-- Refactor ``features``.
-    - Move ``neuritefunc`` functions that expect neurons to ``neuronfunc``. The functions are:
-      ``max_radial_distances, number_of_sections, number_of_neurites, number_of_bifurcations, number_of_forking_points, number_of_terminations, number_of_segments``
-    - Make ``neuronfunc`` to work with list of neurons besides a neuron and a neuron population.
+- Refactor features.
+    - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
+      ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
+      accept only a collection of neurons or a neuron population.
+    - Some features were deleted, renamed, added. See :ref:`migration-v2.4.0`.
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
-- New config format for ``morph_stats``. See :ref:`morph-stats-new-config`. The old format is
-  deprecated. Please update your configs.
-- Delete feature ``partition_asymmetry_length`` as it can be now get via the new config format.
+- Refactor morphology statistics, e.g. ``neurom stats`` command.
+    - New config format. See :ref:`morph-stats-new-config`. The old format is deprecated.
+    - Use `sum` instead of `total` mode in config
+    - Keep feature names as is. Don't trim 's' at the end of plurals.
 
 Version 2.3.1
 -------------

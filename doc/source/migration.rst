@@ -29,9 +29,10 @@
 Migration guides
 =======================
 
+.. _migration-v2.4.0:
+
 Migration to v2.4.0 version
 ---------------------------
-.. _migration-v2.4.0:
 
 - ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 
@@ -65,8 +66,25 @@ Migration to v2.4.0 version
       plotly_impl.plot_neuron(nrn)  # for 2d
       plotly_impl.plot_neuron3d(nrn)  # for 3d
 
-- ``neurom stats`` uses a new config format. See :ref:`morph-stats-new-config`. The old format still
-  works but deprecated.
+- breaking features changes:
+   - use `max_radial_distance` instead of `max_radial_distances`
+   - use `number_of_segments` instead of `n_segments`
+   - use `number_of_neurites` instead of `n_neurites`
+   - use `number_of_sections` instead of `n_sections`
+   - use `number_of_bifurcations` instead of `n_bifurcation_points`
+   - use `number_of_forking_points` instead of `n_forking_points`
+   - use `number_of_leaves` instead of `number_of_terminations`, `n_leaves`
+   - use `soma_radius` instead of `soma_radii`
+   - use `soma_surface_area` instead of `soma_surface_areas`
+   - use `soma_volume` instead of `soma_volumes`
+   - use `total_length_per_neurite` instead of `neurite_lengths`
+   - use `total_volume_per_neurite` instead of `neurite_volumes`
+   - use `terminal_path_lengths` instead of `terminal_path_lengths_per_neurite`
+   - use `bifurcation_partitions` instead of `partition`
+   - new neurite feature `total_area` that complements `total_area_per_neurite`
+   - new neurite feature `volume_density` that complements `neurite_volume_density`
+   - delete `partition_asymmetry_length`, see :ref:`morph-stats-new-config`
+
 
 Migration to v2 version
 -----------------------

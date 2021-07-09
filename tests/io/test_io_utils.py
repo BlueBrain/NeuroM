@@ -236,31 +236,22 @@ def assert_items_equal(a, b):
 
 def test_load_neuron_mixed_tree_swc():
     nrn_mix = utils.load_neuron(Path(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
 
+    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                        get('number_of_sections_per_neurite', SWC_ORD_REF))
-
-    assert_items_equal(get('number_of_segments', nrn_mix),
-                       get('number_of_segments', SWC_ORD_REF))
-
-    assert_items_equal(get('total_length', nrn_mix),
-                       get('total_length', SWC_ORD_REF))
+    assert get('number_of_segments', nrn_mix) == get('number_of_segments', SWC_ORD_REF)
+    assert get('total_length', nrn_mix) == get('total_length', SWC_ORD_REF)
 
 
 def test_load_neuron_section_order_break_swc():
     nrn_mix = utils.load_neuron(Path(SWC_ORD_PATH, 'sample_disordered.swc'))
 
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
-
     assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
                        get('number_of_sections_per_neurite', SWC_ORD_REF))
-
-    assert_items_equal(get('number_of_segments', nrn_mix),
-                       get('number_of_segments', SWC_ORD_REF))
-
-    assert_items_equal(get('total_length', nrn_mix),
-                       get('total_length', SWC_ORD_REF))
+    assert get('number_of_segments', nrn_mix) == get('number_of_segments', SWC_ORD_REF)
+    assert get('total_length', nrn_mix) == get('total_length', SWC_ORD_REF)
 
 
 H5_PATH = Path(DATA_PATH, 'h5', 'v1', 'ordering')

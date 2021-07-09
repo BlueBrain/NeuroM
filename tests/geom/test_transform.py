@@ -31,8 +31,7 @@ from pathlib import Path
 
 import neurom.geom.transform as gtr
 import numpy as np
-from neurom import COLS, load_neuron
-from neurom.features import neuritefunc as _nf
+from neurom import COLS, load_neuron, iter_sections
 
 import pytest
 from numpy.testing import assert_almost_equal
@@ -218,8 +217,7 @@ def _check_fst_nrn_translate(nrn_a, nrn_b, t):
 
 def _check_fst_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
-    for sa, sb in zip(_nf.iter_sections(nrts_a),
-                      _nf.iter_sections(nrts_b)):
+    for sa, sb in zip(iter_sections(nrts_a), iter_sections(nrts_b)):
         assert np.allclose((sb.points[:, COLS.XYZ] - sa.points[:, COLS.XYZ]), t)
 
 
@@ -269,8 +267,7 @@ def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
 
 
 def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
-    for sa, sb in zip(_nf.iter_sections(nrt_a),
-                      _nf.iter_sections(nrt_b)):
+    for sa, sb in zip(iter_sections(nrt_a), iter_sections(nrt_b)):
         assert np.allclose(sb.points[:, COLS.XYZ],
                                    _apply_rot(sa.points[:, COLS.XYZ], rot_mat))
 

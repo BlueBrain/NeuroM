@@ -32,10 +32,10 @@ import csv
 import json
 import logging
 import multiprocessing
-import numbers
 import os
 import warnings
 from collections import defaultdict
+from collections.abc import Sized
 from functools import partial
 from itertools import chain, product
 from pathlib import Path
@@ -49,7 +49,8 @@ import neurom as nm
 from neurom.apps import get_config
 from neurom.core.neuron import Neuron
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
+from neurom.features import _NEURITE_FEATURES, _NEURON_FEATURES, _POPULATION_FEATURES, \
+    _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path
 from neurom.utils import NeuromJSON, warn_deprecated
 
@@ -57,39 +58,6 @@ L = logging.getLogger(__name__)
 
 EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_stats.yaml')
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
-
-
-def eval_stats(values, mode):
-    """Extract a summary statistic from an array of list of values.
-
-    Arguments:
-        values: A numpy array of values
-        mode: A summary stat to extract. One of:
-            ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-
-    .. note:: If values is empty, mode `raw` returns `[]`, `total` returns `0.0`
-    and the other modes return `None`.
-    """
-    if mode == 'raw':
-        return values.tolist()
-    if mode == 'total':
-        mode = 'sum'
-    if len(values) == 0 and mode not in {'raw', 'sum'}:
-        return None
-
-    return getattr(np, mode)(values, axis=0)
-
-
-def _stat_name(feat_name, stat_mode):
-    """Set stat name based on feature name and stat mode."""
-    if feat_name[-1] == 's':
-        feat_name = feat_name[:-1]
-    if feat_name == 'soma_radii':
-        feat_name = 'soma_radius'
-    if stat_mode == 'raw':
-        return feat_name
-
-    return '%s_%s' % (stat_mode, feat_name)
 
 
 def _run_extract_stats(nrn, config):
@@ -110,7 +78,7 @@ def extract_dataframe(neurons, config, n_workers=1):
             - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
-                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
             - neuron: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole neuron.
         n_workers (int): number of workers for multiprocessing (on collection of neurons)
@@ -153,18 +121,24 @@ def _get_feature_stats(feature_name, neurons, modes, kwargs):
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
     data = {}
-    feature, func = _get_feature_value_and_func(feature_name, neurons, **kwargs)
+    value, func = _get_feature_value_and_func(feature_name, neurons, **kwargs)
     shape = func.shape
-    if isinstance(feature, numbers.Number):
-        feature = [feature]
+    if len(shape) > 2:
+        raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
+
     for mode in modes:
-        stat_name = _stat_name(feature_name, mode)
-        stat = eval_stats(feature, mode)
+        stat_name = f'{mode}_{feature_name}'
+
+        stat = value
+        if isinstance(value, Sized):
+            if len(value) == 0 and mode not in {'raw', 'sum'}:
+                stat = None
+            else:
+                stat = getattr(np, mode)(value, axis=0)
+
         if len(shape) == 2:
             for i in range(shape[1]):
                 data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
-        elif len(shape) > 2:
-            raise ValueError(f'Feature with wrong shape: {shape}')  # pragma: no cover
         else:
             data[stat_name] = stat
     return data
@@ -181,7 +155,7 @@ def extract_stats(neurons, config):
             - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
-                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
             - neuron: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole neuron.
 
@@ -196,9 +170,11 @@ def extract_stats(neurons, config):
     stats = defaultdict(dict)
     neurite_features = product(['neurite'], config.get('neurite', {}).items())
     neuron_features = product(['neuron'], config.get('neuron', {}).items())
+    population_features = product(['population'], config.get('population', {}).items())
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
-    for namespace, (feature_name, opts) in chain(neurite_features, neuron_features):
+    for namespace, (feature_name, opts) in chain(neurite_features, neuron_features,
+                                                 population_features):
         if isinstance(opts, dict):
             kwargs = opts.get('kwargs', {})
             modes = opts.get('modes', [])
@@ -260,8 +236,9 @@ def full_config():
     """Returns a config with all features, all modes, all neurite types."""
     modes = ['min', 'max', 'median', 'mean', 'std']
     return {
-        'neurite': {feature: modes for feature in NEURITEFEATURES},
-        'neuron': {feature: modes for feature in NEURONFEATURES},
+        'neurite': {feature: modes for feature in _NEURITE_FEATURES},
+        'neuron': {feature: modes for feature in _NEURON_FEATURES},
+        'population': {feature: modes for feature in _POPULATION_FEATURES},
         'neurite_type': list(_NEURITE_MAP.keys()),
     }
 
