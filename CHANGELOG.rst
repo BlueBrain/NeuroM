@@ -1,9 +1,9 @@
 Changelog
 =========
 
-Version 2.4.0
+Version 3.0.0
 -------------
-- Refactor plotting functionality. :ref:`migration-v2.4.0`.
+- Refactor plotting functionality. :ref:`migration-v3.0.0`.
     - deprecate ``neurom.view.viewer``
     - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
     - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
@@ -16,7 +16,7 @@ Version 2.4.0
     - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
       ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
       accept only a collection of neurons or a neuron population.
-    - Some features were deleted, renamed, added. See :ref:`migration-v2.4.0`.
+    - Some features were deleted, renamed, added. See :ref:`migration-v3.0.0`.
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 

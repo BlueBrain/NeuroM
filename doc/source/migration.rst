@@ -29,10 +29,10 @@
 Migration guides
 =======================
 
-.. _migration-v2.4.0:
+.. _migration-v3.0.0:
 
-Migration to v2.4.0 version
----------------------------
+Migration to v3 version
+-----------------------
 
 - ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 

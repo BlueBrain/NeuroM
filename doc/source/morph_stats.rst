@@ -53,7 +53,7 @@ to go under ``--config`` option:
 Config
 ------
 
-Old format (prior version 2.4.0)
+Old format (prior version 3.0.0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 An example config
 
@@ -132,7 +132,7 @@ configuration:
 
 .. _morph-stats-new-config:
 
-New format (starting version 2.4.0)
+New format (starting version 3.0.0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The new format allows to specify features arguments. For example, ``partition_asymmetry`` feature
 has additional arguments like ``method`` and ``variant`` (see
