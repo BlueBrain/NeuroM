@@ -229,10 +229,6 @@ def test_extract_dataframe():
 
 
 def test_extract_dataframe_multiproc():
-    # FIXME: Cannot use Neuron objects in the extract_dataframe ctor right now
-    # because of "TypeError: can't pickle Neuron objects"
-    # nrns = nm.load_neurons([Path(SWC_PATH, name)
-    #                         for name in ['Neuron.swc', 'simple.swc']])
     nrns = [Path(SWC_PATH, name)
             for name in ['Neuron.swc', 'simple.swc']]
     with warnings.catch_warnings(record=True) as w:

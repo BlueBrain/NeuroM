@@ -28,10 +28,10 @@
 
 """Neuron features.
 
-Any public function from this namespace can be called via features mechanism. The public
-function in this namespace can only accept a neuron as its input. If you want to apply it to
-a neuron population then you must use the features mechanism e.g. `features.get`. Even via
-features mechanism the function can't be applied to a single neurite.
+Any public function from this namespace can be called via the features mechanism. If calling
+directly the function in this namespace can only accept a neuron as its input. If you want to
+apply it to a neuron population then you must use the features mechanism e.g. ``features.get``.
+The features mechanism does not allow you to apply these features to neurites.
 
 >>> import neurom
 >>> from neurom import features
@@ -39,6 +39,8 @@ features mechanism the function can't be applied to a single neurite.
 >>> features.get('soma_surface_area', nrn)
 >>> population = neurom.load_neurons('path/to/neurons')
 >>> features.get('sholl_crossings', population)
+
+For more details see :ref:`features`.
 """
 
 
@@ -80,8 +82,7 @@ def soma_radius(neuron):
 
 @feature(shape=())
 def max_radial_distance(neuron, neurite_type=NeuriteType.all):
-    """Get the maximum radial distances of the termination sections.
-     TODO Put it as an example to the doc page"""
+    """Get the maximum radial distances of the termination sections."""
     term_radial_distances = [neuritefunc.max_radial_distance(s)
                              for s in iter_neurites(neuron, filt=is_type(neurite_type))]
     return max(term_radial_distances) if term_radial_distances else 0.

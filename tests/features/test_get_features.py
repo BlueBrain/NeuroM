@@ -313,9 +313,8 @@ def test_total_length():
 
 def test_neurite_lengths():
     actual = features.get('total_length_per_neurite', POP, neurite_type=NeuriteType.basal_dendrite)
-    expected = [[207.31504917144775, 211.11737489700317],
-                [211.02336168289185],
-                [501.28893661499023, 133.21348762512207, 849.1672043800354]]
+    expected = [207.31504917144775, 211.11737489700317, 211.02336168289185,
+                501.28893661499023, 133.21348762512207, 849.1672043800354]
     for a,e in zip(actual, expected):
         assert_allclose(a, e)
 
@@ -401,7 +400,7 @@ def test_segment_meander_angles_single_section():
 
     assert ref == features.get('segment_meander_angles', nrt)
     assert ref == features.get('segment_meander_angles', nrn)
-    assert [ref] == features.get('segment_meander_angles', pop)
+    assert ref == features.get('segment_meander_angles', pop)
 
 
 def test_neurite_volumes():
@@ -492,7 +491,7 @@ def test_section_lengths():
 
 
 def test_section_path_distances():
-    path_distances = np.concatenate(features.get('section_path_distances', POP), axis=0)
+    path_distances = features.get('section_path_distances', POP)
     assert len(path_distances) == 328
     assert sum(len(features.get('section_path_distances', nrn)) for nrn in POP) == 328
 
@@ -580,7 +579,7 @@ def test_segment_radial_distances_origin():
         rad_dist_nrns.extend(features.get('segment_radial_distances', nrn))
 
     rad_dist_nrns = np.array(rad_dist_nrns)
-    rad_dist_pop = np.concatenate(features.get('segment_radial_distances', pop), axis=0)
+    rad_dist_pop = features.get('segment_radial_distances', pop)
     assert_allclose(rad_dist_nrns, rad_dist_pop)
 
 
@@ -595,7 +594,7 @@ def test_section_radial_distances_endpoint():
     nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
-    rad_dist_nrns = [features.get('section_radial_distances', nrn) for nrn in nrns]
+    rad_dist_nrns = [v for nrn in nrns for v in features.get('section_radial_distances', nrn)]
     rad_dist_pop = features.get('section_radial_distances', pop)
     assert_allclose(rad_dist_pop, rad_dist_nrns)
 
@@ -692,15 +691,14 @@ def test_sholl_frequency():
     assert len(features.get('sholl_frequency', POP)) == 108
 
 
-def test_partition():
-    assert_allclose(
-        np.concatenate(features.get('bifurcation_partitions', POP), axis=0)[:10],
-        [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
+def test_bifurcation_partitions():
+    assert_allclose(features.get('bifurcation_partitions', POP)[:10],
+                    [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
 
 
 def test_partition_asymmetry():
     assert_allclose(
-        np.concatenate(features.get('partition_asymmetry', POP), axis=0)[:10],
+        features.get('partition_asymmetry', POP)[:10],
         [0.9, 0.88888889, 0.875, 0.85714286, 0.83333333, 0.8, 0.75, 0.66666667, 0.5, 0.])
 
 

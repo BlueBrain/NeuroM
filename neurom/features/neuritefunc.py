@@ -28,9 +28,10 @@
 
 """Neurite features.
 
-Any public function from this namespace can be called via features mechanism. The public
-function in this namespace can only accept a neurite as its input. If you want to apply it to
-anything other than neurite then you must use the features mechanism e.g. `features.get`.
+Any public function from this namespace can be called via the features mechanism. If calling
+directly the function in this namespace can only accept a neurite as its input. If you want to
+apply it to anything other than neurite then you must use the features mechanism e.g.
+``features.get``.
 
 >>> import neurom
 >>> from neurom import features
@@ -38,6 +39,8 @@ anything other than neurite then you must use the features mechanism e.g. `featu
 >>> features.get('max_radial_distance', nrn.neurites[0])
 >>> features.get('max_radial_distance', nrn)
 >>> features.get('number_of_segments', nrn.neurites, neurite_type=neurom.AXON)
+
+For more details see :ref:`features`.
 """
 
 import logging

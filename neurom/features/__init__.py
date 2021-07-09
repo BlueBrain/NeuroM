@@ -37,10 +37,8 @@ Examples:
     >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
 """
 import operator
-from collections.abc import Sized
 from enum import Enum
 from functools import reduce
-from numbers import Number
 
 from neurom.core import Population, Neuron, Neurite
 from neurom.core.neuron import iter_neurites
@@ -59,7 +57,15 @@ class NameSpace(Enum):
     POPULATION = 'population'
 
 
+def _flatten_feature(feature_shape, feature_value):
+    """Flattens feature values. Applies for population features for backward compatibility."""
+    if feature_shape == ():
+        return feature_value
+    return reduce(operator.concat, feature_value, [])
+
+
 def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
+    """Collects neurite feature values appropriately to feature's shape."""
     kwargs.pop('neurite_type', None)  # there is no 'neurite_type' arg in _NEURITE_FEATURES
     return reduce(operator.add,
                   (feature_(s, **kwargs) for s in iter_neurites(obj, filt=neurite_filter)),
@@ -77,6 +83,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     Returns:
         A tuple (feature, func) of the feature value and its function
     """
+    # pylint: disable=too-many-branches
     is_obj_list = isinstance(obj, (list, tuple))
     if not isinstance(obj, (Neurite, Neuron, Population)) and not is_obj_list:
         raise NeuroMError('Only Neurite, Neuron, Population or list, tuple of Neurite, Neuron can'
@@ -110,27 +117,26 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
             res = feature_(obj, **kwargs)
         elif feature_name in _NEURON_FEATURES:
             feature_ = _NEURON_FEATURES[feature_name]
-            res = [feature_(n, **kwargs) for n in obj]
+            res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
         elif feature_name in _NEURITE_FEATURES:
             feature_ = _NEURITE_FEATURES[feature_name]
-            res = [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs)
-                   for n in obj]
+            res = _flatten_feature(
+                feature_.shape,
+                [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
 
     if res is None or feature_ is None:
         raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
                           'and can be applied to your input. See the features documentation page.')
-    if not isinstance(res, (Sized, Number)):
-        raise NeuroMError('Feature must return a number or a sized collection')  # pragma: no cover
 
     return res, feature_
 
 
 def get(feature_name, obj, **kwargs):
-    """TODO Obtain a feature from a set of morphology objects.
+    """Obtain a feature from a set of morphology objects.
 
-    Features can be either Neurite features or Neuron features. For the list of Neurite features
-    see :mod:`neurom.features.neuritefunc`. For the list of Neuron features see
-    :mod:`neurom.features.neuronfunc`.
+    Features can be either Neurite, Neuron or Population features. For Neurite features see
+    :mod:`neurom.features.neuritefunc`. For Neuron features see :mod:`neurom.features.neuronfunc`.
+    For Population features see :mod:`neurom.features.populationfunc`.
 
     Arguments:
         feature_name(string): feature to extract

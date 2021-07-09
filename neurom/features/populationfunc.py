@@ -28,23 +28,21 @@
 
 """Population features.
 
-Any public function from this namespace can be called via features mechanism. The public
-function in this namespace can only accept a neuron population as its input. If you want to apply
-it to anything other than population then you must use the features mechanism e.g. `features.get`.
-Even via features mechanism the function can't be applied to a neurite, a collection of neurites,
-a neuron. Only a collection of neurons or a neuron population can be used.
+Any public function from this namespace can be called via features mechanism. Functions in this
+namespace can only accept a neuron population as its input no matter how called.
 
 >>> import neurom
 >>> from neurom import features
 >>> nrn_population = neurom.load_neurons('path/to/neurons')
 >>> features.get('sholl_frequency', nrn_population)
+
+For more details see :ref:`features`.
 """
 
 
 from functools import partial
 import numpy as np
 
-from neurom.core import Population
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
