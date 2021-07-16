@@ -37,7 +37,7 @@ import mock
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
-from neurom import NeuriteType, load_neuron, viewer
+from neurom import NeuriteType, load_morphology, viewer
 from neurom.view import matplotlib_utils
 
 import pytest
@@ -45,7 +45,7 @@ from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent / 'data/swc'
 MORPH_FILENAME = DATA_PATH / 'Neuron.swc'
-nrn = load_neuron(MORPH_FILENAME)
+nrn = load_morphology(MORPH_FILENAME)
 
 
 def test_draw_neuron():
@@ -102,7 +102,7 @@ def test_draw_dendrogram():
     matplotlib_utils.plt.close('all')
 
 def test_draw_dendrogram_empty_segment():
-    neuron = load_neuron(DATA_PATH / 'empty_segments.swc')
+    neuron = load_morphology(DATA_PATH / 'empty_segments.swc')
     viewer.draw(neuron, mode='dendrogram')
     matplotlib_utils.plt.close('all')
 

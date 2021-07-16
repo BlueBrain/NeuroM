@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Utility functions and for loading neurons."""
+"""Utility functions and for loading morphs."""
 
 import logging
 import os
@@ -38,7 +38,7 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
-from neurom.core.neuron import Neuron
+from neurom.core.morphology import Morphology
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
 
@@ -50,7 +50,7 @@ def _is_morphology_file(filepath):
     return filepath.is_file() and filepath.suffix.lower() in {'.swc', '.h5', '.asc'}
 
 
-class NeuronLoader:
+class MorphLoader:
     """Caching morphology loader.
 
     Arguments:
@@ -60,7 +60,7 @@ class NeuronLoader:
     """
 
     def __init__(self, directory, file_ext=None, cache_size=None):
-        """Initialize a NeuronLoader object."""
+        """Initialize a MorphLoader object."""
         self.directory = Path(directory)
         self.file_ext = file_ext
         if cache_size is not None:
@@ -80,7 +80,7 @@ class NeuronLoader:
     # pylint:disable=method-hidden
     def get(self, name):
         """Get `name` morphology data."""
-        return load_neuron(self._filepath(name))
+        return load_morphology(self._filepath(name))
 
 
 def get_morph_files(directory):
@@ -119,31 +119,29 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_neuron(neuron, reader=None):
-    """Build section trees from a neuron or a h5, swc or asc file.
+def load_morphology(morph, reader=None):
+    """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
-        neuron (str|Path|Neuron|morphio.Morphology|morphio.mut.Morphology): A neuron representation
-            It can be:
+        morph (str|Path|Morphology|morphio.Morphology|morphio.mut.Morphology): a morphology
+            representation. It can be:
 
             - a filename with the h5, swc or asc extension
             - a NeuroM Neuron object
             - a morphio mutable or immutable Morphology object
             - a stream that can be put into a io.StreamIO object. In this case, the READER argument
               must be passed with the corresponding file format (asc, swc and h5)
-        reader (str): Optional, must be provided if neuron is a stream to
+        reader (str): Optional, must be provided if morphology is a stream to
                       specify the file format (asc, swc, h5)
 
     Returns:
-        A Neuron object
+        A Morphology object
 
     Examples::
 
-            neuron = neurom.load_neuron('my_neuron_file.h5')
-
-            neuron = neurom.load_neuron(morphio.Morphology('my_neuron_file.h5'))
-
-            neuron = nm.load_neuron(io.StringIO('''((Dendrite)
+            morphology = neurom.load_morphology('my_morphology_file.h5')
+            morphology = neurom.load_morphology(morphio.Morphology('my_morphology_file.h5'))
+            morphology = nm.load_morphology(io.StringIO('''((Dendrite)
                                                    (3 -4 0 2)
                                                    (3 -6 0 2)
                                                    (3 -8 0 2)
@@ -157,39 +155,39 @@ def load_neuron(neuron, reader=None):
                                                    )
                                                    )'''), reader='asc')
     """
-    if isinstance(neuron, (Neuron, morphio.Morphology, morphio.mut.Morphology)):
-        return Neuron(neuron)
+    if isinstance(morph, (Morphology, morphio.Morphology, morphio.mut.Morphology)):
+        return Morphology(morph)
 
     if reader:
-        return Neuron(_get_file(neuron, reader))
+        return Morphology(_get_file(morph, reader))
 
-    return Neuron(neuron, Path(neuron).name)
+    return Morphology(morph, Path(morph).name)
 
 
-def load_neurons(neurons,
-                 name=None,
-                 ignored_exceptions=(),
-                 cache=False):
+def load_morphologies(morphs,
+                      name=None,
+                      ignored_exceptions=(),
+                      cache=False):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
 
     Arguments:
-        neurons(str|Path|Iterable[Path]): path to a folder or list of paths to neuron files
+        morphs(str|Path|Iterable[Path]): path to a folder or list of paths to morphology files
         name (str): optional name of population. By default 'Population' or\
-            filepath basename depending on whether neurons is list or\
+            filepath basename depending on whether morphologies is list or\
             directory path respectively.
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
-            loading neurons
-        cache (bool): whether to cache the loaded neurons in memory
+            loading morphologies
+        cache (bool): whether to cache the loaded morphologies in memory
 
     Returns:
         Population: population object
     """
-    if isinstance(neurons, (str, Path)):
-        files = get_files_by_path(neurons)
-        name = name or Path(neurons).name
+    if isinstance(morphs, (str, Path)):
+        files = get_files_by_path(morphs)
+        name = name or Path(morphs).name
     else:
-        files = neurons
+        files = morphs
         name = name or 'Population'
     return Population(files, name, ignored_exceptions, cache)

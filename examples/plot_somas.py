@@ -31,7 +31,7 @@
 
 from pathlib import Path
 
-from neurom import load_neuron
+from neurom import load_morphology
 from neurom.view import matplotlib_utils
 import matplotlib.pyplot as plt
 import numpy as np
@@ -55,11 +55,11 @@ def plot_somas(somas):
 
 
 if __name__ == '__main__':
-    #  define set of files containing relevant neurons
+    #  define set of files containing relevant morphs
     file_nms = [Path(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
                                                                 'Soma_translated_1.swc',
                                                                 'Soma_translated_2.swc']]
 
     # load from file and plot
-    sms = [load_neuron(file_nm).soma for file_nm in file_nms]
+    sms = [load_morphology(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)

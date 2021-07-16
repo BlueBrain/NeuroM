@@ -29,10 +29,10 @@
 neurom stats: morphometric statistics extraction
 ************************************************
 
-The ``neurom stats`` application extracts morphometrics from a set of neuron morphology
+The ``neurom stats`` application extracts morphometrics from a set of morphology
 files and produces a summary in JSON or CSV format. It may obtain any of the morphometrics available
 in the :py:func:`neurom.get` function, and is highly configurable, allowing the user to get
-raw or summary statistics from a large set of neurite and neuron features.
+raw or summary statistics from a large set of neurite and morphology features.
 
 An example usage:
 
@@ -74,7 +74,7 @@ An example config
         - BASAL_DENDRITE
         - ALL
     
-    neuron:
+    morphology:
         soma_radius:
             - mean
 
@@ -83,7 +83,7 @@ Here, there are two feature categories,
 
 1. ``neurite``: these are morphometrics obtained from neurites, e.g. branch orders, section
    lengths, bifurcation angles, path lengths.
-2. ``neuron``: these are morphometrics that can be applied to a whole neuron, e.g. the soma radius,
+2. ``morphology``: these are morphometrics that can be applied to a whole morphology, e.g. the soma radius,
    the trunk radii, etc.
 
 Each category sub-item (section_lengths, soma_radius, etc) corresponds to a
@@ -168,5 +168,5 @@ global setting of neurite types via ``neurite_type`` global config field. For ex
 Features
 --------
 
-All available features for ``--config`` are documented in :mod:`neurom.features.neuronfunc` and
-:mod:`neurom.features.neuritefunc`.
+All available features for ``--config`` are documented in :mod:`neurom.features.morphology`,
+:mod:`neurom.features.neurite`, :mod:`neurom.features.population`.

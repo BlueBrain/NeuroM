@@ -12,7 +12,7 @@ color : true
 ##############################################
 
 checks:
-    neuron_checks:
+    morph_checks:
         - has_basal_dendrite
         - has_axon
         - has_apical_dendrite

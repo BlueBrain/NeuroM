@@ -34,28 +34,28 @@ Migration guides
 Migration to v3 version
 -----------------------
 
-- ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
+- ``neurom.view.viewer`` is removed. To get the same results as before, use the replacement:
 
    .. code-block:: python
 
       import neurom as nm
       # instead of: from neurom import viewer
       from neurom import matplotlib_impl, matplotlib_utils
-      nrn = nm.load_neuron('some/data/path/morph_file.asc')
+      m = nm.load_morphology('some/data/path/morph_file.asc')
 
-      # instead of: viewer.draw(nrn)
+      # instead of: viewer.draw(m)
       fig, ax = matplotlib_utils.get_figure()
-      matplotlib_impl.plot_neuron(nrn, ax)
+      matplotlib_impl.plot_morph(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
 
-      # instead of: viewer.draw(nrn, mode='3d')
+      # instead of: viewer.draw(m, mode='3d')
       fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
-      matplotlib_impl.plot_neuron3d(nrn, ax)
+      matplotlib_impl.plot_morph3d(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
 
-      # instead of: viewer.draw(nrn, mode='dendrogram')
+      # instead of: viewer.draw(m, mode='dendrogram')
       fig, ax = matplotlib_utils.get_figure()
-      matplotlib_impl.plot_dendrogram(nrn, ax)
+      matplotlib_impl.plot_dendrogram(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
 
       # If you used ``output_path`` with any of functions above then add this line
@@ -63,8 +63,8 @@ Migration to v3 version
 
       # instead of `plotly.draw`
       from neurom import plotly_impl
-      plotly_impl.plot_neuron(nrn)  # for 2d
-      plotly_impl.plot_neuron3d(nrn)  # for 3d
+      plotly_impl.plot_morph(m)  # for 2d
+      plotly_impl.plot_morph3d(m)  # for 3d
 
 - breaking features changes:
    - use `max_radial_distance` instead of `max_radial_distances`
@@ -98,10 +98,10 @@ Migration to v2 version
   .. code-block:: python
 
       import neurom as nm
-      nrn = nm.load_neuron('some/data/path/morph_file.asc')
+      nrn = nm.load_morphology('some/data/path/morph_file.asc')
       nrn.remove_unifurcations()
 
-- Soma is not considered as a section anymore. Soma is skipped when iterating over neuron's
+- Soma is not considered as a section anymore. Soma is skipped when iterating over morphology's
   sections. It means that section indexing offset needs to be adjusted by
   ``-(number of soma sections)`` which is usually ``-1``.
 - drop ``benchmarks``

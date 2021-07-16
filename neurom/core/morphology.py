@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Neuron classes and functions."""
+"""Morphology classes and functions."""
 
 from collections import deque
 from itertools import chain
@@ -212,12 +212,12 @@ NRN_ORDER = {NeuriteType.soma: 0,
 
 
 def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
-    """Iterator to a neurite, neuron or neuron population.
+    """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
 
     Arguments:
-        obj: a neurite, neuron or neuron population.
+        obj: a neurite, morphology or morphology population.
         mapfun: optional neurite mapping function.
         filt: optional neurite filter function.
         neurite_order (NeuriteIter): order upon which neurites should be iterated
@@ -225,15 +225,17 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
 
     Examples:
-        Get the number of points in each neurite in a neuron population
+        Get the number of points in each neurite in a morphology population
 
-        >>> from neurom.core.neuron import iter_neurites
+        >>> from neurom.core.morphology import iter_neurites
+        >>> from neurom import load_morphologies
+        >>> pop = load_morphologies('path/to/morphologies')
         >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
 
-        Get the number of points in each axon in a neuron population
+        Get the number of points in each axon in a morphology population
 
         >>> import neurom as nm
-        >>> from neurom.core.neuron import iter_neurites
+        >>> from neurom.core.morphology import iter_neurites
         >>> filter = lambda n : n.type == nm.AXON
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
@@ -243,7 +245,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
             warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
-                          'within the whole population, not within each neuron separately.')
+                          'within the whole population, not within each morphology separately.')
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
@@ -255,10 +257,10 @@ def iter_sections(neurites,
                   iterator_type=Section.ipreorder,
                   neurite_filter=None,
                   neurite_order=NeuriteIter.FileOrder):
-    """Iterator to the sections in a neurite, neuron or neuron population.
+    """Iterator to the sections in a neurite, morphology or morphology population.
 
     Arguments:
-        neurites: neuron, population, neurite, or iterable containing neurite objects
+        neurites: morphology, population, neurite, or iterable containing neurite objects
         iterator_type: section iteration order within a given neurite. Must be one of:
             Section.ipreorder: Depth-first pre-order iteration of tree nodes
             Section.ipostorder: Depth-first post-order iteration of tree nodes
@@ -273,10 +275,10 @@ def iter_sections(neurites,
 
 
     Examples:
-        Get the number of points in each section of all the axons in a neuron population
+        Get the number of points in each section of all the axons in a morphology population
 
         >>> import neurom as nm
-        >>> from neurom.core.neuron import iter_sections
+        >>> from neurom.core.morphology import iter_sections
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
@@ -289,7 +291,7 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
     """Return an iterator to the segments in a collection of neurites.
 
     Arguments:
-        obj: neuron, population, neurite, section, or iterable containing neurite objects
+        obj: morphology, population, neurite, section, or iterable containing neurite objects
         neurite_filter: optional top level filter on properties of neurite neurite objects
         neurite_order: order upon which neurite should be iterated. Values:
             - NeuriteIter.FileOrder: order of appearance in the file
@@ -297,7 +299,7 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
 
     Note:
         This is a convenience function provided for generic access to
-        neuron segments. It may have a performance overhead WRT custom-made
+        morphology segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     """
     sections = iter((obj,) if isinstance(obj, Section) else
@@ -309,12 +311,12 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
                                for sec in sections)
 
 
-def graft_neuron(section):
-    """Returns a neuron starting at section."""
+def graft_morphology(section):
+    """Returns a morphology starting at section."""
     assert isinstance(section, Section)
     m = morphio.mut.Morphology()
     m.append_root_section(section.morphio_section)
-    return Neuron(m)
+    return Morphology(m)
 
 
 class Neurite:
@@ -410,18 +412,18 @@ class Neurite:
         return 'Neurite <type: %s>' % self.type
 
 
-class Neuron(morphio.mut.Morphology):
-    """Class representing a simple neuron."""
+class Morphology(morphio.mut.Morphology):
+    """Class representing a simple morphology."""
 
     def __init__(self, filename, name=None):
-        """Neuron constructor.
+        """Morphology constructor.
 
         Args:
             filename (str|Path): a filename
-            name (str): a option neuron name
+            name (str): a option morphology name
         """
         super().__init__(filename)
-        self.name = name if name else 'Neuron'
+        self.name = name if name else 'Morphology'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
 
@@ -447,8 +449,8 @@ class Neuron(morphio.mut.Morphology):
             [section.points for section in iter_sections(self)])
 
     def transform(self, trans):
-        """Return a copy of this neuron with a 3D transformation applied."""
-        obj = Neuron(self)
+        """Return a copy of this morphology with a 3D transformation applied."""
+        obj = Morphology(self)
         obj.morphio_soma.points = trans(obj.morphio_soma.points)
 
         for section in obj.sections:
@@ -456,15 +458,15 @@ class Neuron(morphio.mut.Morphology):
         return obj
 
     def __copy__(self):
-        """Creates a deep copy of Neuron instance."""
-        return Neuron(self, self.name)
+        """Creates a deep copy of Morphology instance."""
+        return Morphology(self, self.name)
 
     def __deepcopy__(self, memodict={}):
-        """Creates a deep copy of Neuron instance."""
+        """Creates a deep copy of Morphology instance."""
         # pylint: disable=dangerous-default-value
-        return Neuron(self, self.name)
+        return Morphology(self, self.name)
 
     def __repr__(self):
         """Return a string representation."""
-        return 'Neuron <soma: %s, n_neurites: %d>' % \
+        return 'Morphology <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))

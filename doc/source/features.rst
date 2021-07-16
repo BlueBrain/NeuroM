@@ -33,27 +33,27 @@ Features
 A tool for analysing of morphologies. It allows to extract various information about morphologies.
 For example if you need to know segments lengths of a morphology then you need to call
 ``segment_lengths`` feature. The complete list of available features is spread among pages
-:mod:`neurom.features.neuritefunc`, :mod:`neurom.features.neuronfunc`,
-:mod:`neurom.features.populationfunc`.
+:mod:`neurom.features.neurite`, :mod:`neurom.features.morphology`,
+:mod:`neurom.features.population`.
 
-Features are spread among ``neuritefunc``, ``neuronfunc``, ``populationfunc`` to emphasize their
-expected input. Features from ``neuritefunc`` expect a neurite as their input. So calling it with
-a neuron input will fail. ``neuronfunc`` expects a neuron only. ``populationfunc`` expects a
+Features are spread among ``neurite``, ``morphology``, ``population`` modules to emphasize their
+expected input. Features from ``neurite`` expect a neurite as their input. So calling it with
+a morphology input will fail. ``morphology`` expects a morphology only. ``population`` expects a
 population only.
 
-This restriction can be bypassed if you call a feature from ``neuritefunc`` via the features
-mechanism ``features.get``. However the mechanism does not allow to appply ``populationfunc``
-features to anything other than a neuron population, and ``neuronfunc`` features can be applied
-only to a neuron or a neuron population.
+This restriction can be bypassed if you call a feature from ``neurite`` via the features
+mechanism ``features.get``. However the mechanism does not allow to appply ``population``
+features to anything other than a morphology population, and ``morphology`` features can be applied
+only to a morphology or a morphology population.
 
-An example for ``neuritefunc``:
+An example for ``neurite``:
 
 .. code-block:: python
 
-   from neurom import load_neuron, features
-   from neurom.features.neuritefunc import max_radial_distance
+   from neurom import load_morphology, features
+   from neurom.features.neurite import max_radial_distance
 
-   m = load_neuron('path/to/neuron')
+   m = load_morphology('path/to/morphology')
    # valid input
    max_radial_distance(m.neurites[0])
    # invalid input
@@ -63,23 +63,23 @@ An example for ``neuritefunc``:
 
 The features mechanism assumes that a neurite feature must be summed if it returns a number, and
 concatenated if it returns a list. Other types of returns are invalid. For example lets take
-a feature ``number_of_segments`` of ``neuritefunc``. It returns a number of segments in a neurite.
-Calling it on a neuron will return a sum of ``number_of_segments`` of all the neuron's neurites.
-Calling it on a neuron population will return a list of ``number_of_segments`` of each neuron
+a feature ``number_of_segments`` of ``neurite``. It returns a number of segments in a neurite.
+Calling it on a morphology will return a sum of ``number_of_segments`` of all the morphology's neurites.
+Calling it on a morphology population will return a list of ``number_of_segments`` of each morphology
 within the population.
 
 
 .. code-block:: python
 
-   from neurom import load_neuron, features
+   from neurom import load_morphology, features
 
-   m = load_neuron('path/to/neuron')
+   m = load_morphology('path/to/morphology')
    # a single number
    features.get('number_of_segments', m.neurites[0])
    # a single number that is a sum for all `m.neurites`.
    features.get('number_of_segments', m)
 
-   pop = load_neuron('path/to/neuron population')
+   pop = load_morphology('path/to/morphology population')
    # a list of numbers
    features.get('number_of_segments', pop)
 
@@ -87,37 +87,37 @@ if a list is returned then the feature results are concatenated.
 
 .. code-block:: python
 
-   from neurom import load_neuron, features
+   from neurom import load_morphology, features
 
-   m = load_neuron('path/to/neuron')
+   m = load_morphology('path/to/morphology')
    # a list of lengths in a neurite
    features.get('section_lengths', m.neurites[0])
-   # a flat list of lengths in a neuron, no separation among neurites
+   # a flat list of lengths in a morphology, no separation among neurites
    features.get('section_lengths', m)
 
-   pop = load_neuron('path/to/neuron population')
-   # a flat list of lengths in a population, no separation among neurons
+   pop = load_morphology('path/to/morphology population')
+   # a flat list of lengths in a population, no separation among morphologies
    features.get('section_lengths', pop)
 
 In case such implicit behaviour does not work a feature can be rewritten for each input separately.
 For example, a feature ``max_radial_distance`` that requires a `max` operation instead of implicit
-`sum`. Its definition in ``neuritefunc``:
+`sum`. Its definition in ``neurite``:
 
-.. literalinclude:: ../../neurom/features/neuritefunc.py
+.. literalinclude:: ../../neurom/features/neurite.py
     :pyobject: max_radial_distance
 
-In order to make it work for a neuron, it is redefined in ``neuronfunc``:
+In order to make it work for a morphology, it is redefined in ``morphology``:
 
-.. literalinclude:: ../../neurom/features/neuronfunc.py
+.. literalinclude:: ../../neurom/features/morphology.py
     :pyobject: max_radial_distance
 
 Another feature that requires redefining is ``sholl_frequency``. This feature applies different
-logic for a neuron and a neuron population. That is why it is defined in ``neuronfunc``:
+logic for a morphology and a morphology population. That is why it is defined in ``morphology``:
 
-.. literalinclude:: ../../neurom/features/neuronfunc.py
+.. literalinclude:: ../../neurom/features/morphology.py
     :pyobject: sholl_frequency
 
-and redefined in ``populationfunc``
+and redefined in ``population``
 
-.. literalinclude:: ../../neurom/features/populationfunc.py
+.. literalinclude:: ../../neurom/features/population.py
     :pyobject: sholl_frequency

@@ -35,7 +35,7 @@ SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 
 
 def test_section_base_func():
-    nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
+    nrn = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
     section = nrn.sections[0]
 
     assert section.type == nm.NeuriteType.basal_dendrite
@@ -47,7 +47,7 @@ def test_section_base_func():
 
 
 def test_section_tree():
-    nrn = nm.load_neuron(str(SWC_PATH / 'simple.swc'))
+    nrn = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
     assert nrn.sections[0].parent is None
     assert nrn.sections[0] == nrn.sections[0].children[0].parent
@@ -79,7 +79,7 @@ def test_section_tree():
 
 
 def test_append_section():
-    n = nm.load_neuron(SWC_PATH / 'simple.swc')
+    n = nm.load_morphology(SWC_PATH / 'simple.swc')
     s = n.sections[0]
 
     s.append_section(n.sections[-1])
@@ -94,7 +94,7 @@ def test_append_section():
 
 
 def test_set_points():
-    n = nm.load_neuron(SWC_PATH / 'simple.swc')
+    n = nm.load_morphology(SWC_PATH / 'simple.swc')
     s = n.sections[0]
     s.points = np.array([
         [0, 5, 0, 2],

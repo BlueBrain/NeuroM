@@ -19,7 +19,7 @@ neurite_type:
     - BASAL_DENDRITE
     - ALL
 
-neuron:
+morphology:
     soma_radius:
         - mean
 

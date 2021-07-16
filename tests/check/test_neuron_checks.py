@@ -30,8 +30,8 @@ from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 
-from neurom import check, load_neuron
-from neurom.check import neuron_checks as nrn_chk
+from neurom import check, load_morphology
+from neurom.check import morph_checks as nrn_chk
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
 from neurom.exceptions import NeuroMError
@@ -52,7 +52,7 @@ def _load_neuron(name):
         path = H5V1_PATH / name
     else:
         path = ASC_PATH / name
-    return name, load_neuron(path)
+    return name, load_morphology(path)
 
 
 def _make_monotonic(neuron):
@@ -265,12 +265,12 @@ def test_nonzero_section_lengths_threshold():
 
 def test_has_nonzero_soma_radius():
 
-    nrn = load_neuron(SWC_PATH / 'Neuron.swc')
+    nrn = load_morphology(SWC_PATH / 'Neuron.swc')
     assert nrn_chk.has_nonzero_soma_radius(nrn)
 
 
 def test_has_nonzero_soma_radius_bad_data():
-    nrn = load_neuron(SWC_PATH / 'soma_zero_radius.swc')
+    nrn = load_morphology(SWC_PATH / 'soma_zero_radius.swc')
     assert not nrn_chk.has_nonzero_soma_radius(nrn).status
 
 
@@ -353,7 +353,7 @@ def test_has_no_narrow_dendritic_section():
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
 """)
-    nrn = load_neuron(swc_content, reader='swc')
+    nrn = load_morphology(swc_content, reader='swc')
     res = nrn_chk.has_no_narrow_neurite_section(nrn,
                                                 dendrite_filter,
                                                 radius_threshold=5,
@@ -378,7 +378,7 @@ def test_has_no_narrow_dendritic_section():
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
 """)
-    nrn = load_neuron(swc_content, reader='swc')
+    nrn = load_morphology(swc_content, reader='swc')
     res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
@@ -407,7 +407,7 @@ def test_has_no_dangling_branch():
 
 def test_dangling_branch_no_soma():
     with pytest.raises(NeuroMError, match='Can\'t check for dangling neurites if there is no soma'):
-        nrn = load_neuron(SWC_PATH / 'Single_apical_no_soma.swc')
+        nrn = load_morphology(SWC_PATH / 'Single_apical_no_soma.swc')
         nrn_chk.has_no_dangling_branch(nrn)
 
 
@@ -419,7 +419,7 @@ def test__bool__():
 
 
 def test_has_multifurcation():
-    nrn = load_neuron(StringIO(u"""
+    nrn = load_morphology(StringIO(u"""
 	((CellBody) (0 0 0 2))
 ( (Color Blue)
   (Axon)
@@ -450,7 +450,7 @@ def test_has_multifurcation():
 
 
 def test_single_children():
-    neuron = load_neuron("""
+    neuron = load_morphology("""
 ( (Color Blue)
   (Axon)
   (0 5 0 2)

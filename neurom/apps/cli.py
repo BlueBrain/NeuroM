@@ -34,7 +34,7 @@ import click
 import matplotlib.pyplot as plt
 
 from neurom.apps import morph_stats, morph_check
-from neurom import load_neuron
+from neurom import load_morphology
 from neurom.view import matplotlib_impl, matplotlib_utils
 
 
@@ -62,19 +62,19 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
     if is_matplotlib:
         if is_3d:
             _, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
-            plot = partial(matplotlib_impl.plot_neuron3d, ax=ax)
+            plot = partial(matplotlib_impl.plot_morph3d, ax=ax)
         else:
             _, ax = matplotlib_utils.get_figure()
-            plot = partial(matplotlib_impl.plot_neuron, ax=ax,
+            plot = partial(matplotlib_impl.plot_morph, ax=ax,
                            plane=plane, realistic_diameters=realistic_diameters)
     else:
         from neurom.view import plotly_impl
         if is_3d:
-            plot = plotly_impl.plot_neuron3d
+            plot = plotly_impl.plot_morph3d
         else:
-            plot = partial(plotly_impl.plot_neuron, plane=plane)
+            plot = partial(plotly_impl.plot_morph, plane=plane)
 
-    plot(load_neuron(input_file))
+    plot(load_morphology(input_file))
     if is_matplotlib:
         plt.show()
 

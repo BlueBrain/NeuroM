@@ -34,7 +34,7 @@ import neurom as nm
 import pandas as pd
 from neurom.apps import morph_stats as ms
 from neurom.exceptions import ConfigError
-from neurom.features import _NEURITE_FEATURES, _NEURON_FEATURES, _POPULATION_FEATURES
+from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES
 
 import pytest
 from numpy.testing import assert_array_equal, assert_almost_equal
@@ -121,7 +121,7 @@ REF_OUT = {
 
 
 def test_extract_stats_single_neuron():
-    nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
+    nrn = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     res = ms.extract_stats(nrn, REF_CONFIG)
     assert set(res.keys()) == set(REF_OUT.keys())
     for k in ('neuron', 'all', 'axon', 'basal_dendrite', 'apical_dendrite'):
@@ -131,7 +131,7 @@ def test_extract_stats_single_neuron():
 
 
 def test_extract_stats_new_format():
-    nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
+    nrn = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     res = ms.extract_stats(nrn, REF_CONFIG_NEW)
     assert set(res.keys()) == set(REF_OUT.keys())
     for k in ('neuron', 'all', 'axon', 'basal_dendrite', 'apical_dendrite'):
@@ -141,7 +141,7 @@ def test_extract_stats_new_format():
 
 
 def test_stats_new_format_set_arg():
-    nrn = nm.load_neuron(SWC_PATH / 'Neuron.swc')
+    nrn = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     config = {
         'neurite': {
             'section_lengths': {'kwargs': {'neurite_type': 'AXON'}, 'modes': ['max', 'sum']},
@@ -159,7 +159,7 @@ def test_stats_new_format_set_arg():
 
 
 def test_extract_stats_scalar_feature():
-    nrn = nm.load_neuron(DATA_PATH / 'neurolucida' / 'bio_neuron-000.asc')
+    nrn = nm.load_morphology(DATA_PATH / 'neurolucida' / 'bio_neuron-000.asc')
     config = {
         'neurite_type': ['ALL'],
         'neurite': {
@@ -176,19 +176,19 @@ def test_extract_stats_scalar_feature():
 
 def test_extract_dataframe():
     # Vanilla test
-    nrns = nm.load_neurons([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
+    nrns = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
     actual = ms.extract_dataframe(nrns, REF_CONFIG_NEW)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
     assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test with a single neuron in the population
-    nrns = nm.load_neurons(SWC_PATH / 'Neuron.swc')
+    nrns = nm.load_morphologies(SWC_PATH / 'Neuron.swc')
     actual = ms.extract_dataframe(nrns, REF_CONFIG_NEW)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
     # Test with a config without the 'neuron' key
-    nrns = nm.load_neurons([Path(SWC_PATH, name)
-                            for name in ['Neuron.swc', 'simple.swc']])
+    nrns = nm.load_morphologies([Path(SWC_PATH, name)
+                                 for name in ['Neuron.swc', 'simple.swc']])
     config = {'neurite': {'section_lengths': ['sum']},
               'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
     actual = ms.extract_dataframe(nrns, config)
@@ -196,13 +196,13 @@ def test_extract_dataframe():
     expected = expected.loc[:, idx[:, ['name', 'sum_section_lengths']]]
     assert_frame_equal(actual, expected, check_dtype=False)
 
-    # Test with a Neuron argument
-    nrn = nm.load_neuron(Path(SWC_PATH, 'Neuron.swc'))
+    # Test with a Morphology argument
+    nrn = nm.load_morphology(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(nrn, config)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
-    # Test with a List[Neuron] argument
-    nrns = [nm.load_neuron(Path(SWC_PATH, name))
+    # Test with a List[Morphology] argument
+    nrns = [nm.load_morphology(Path(SWC_PATH, name))
             for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(nrns, config)
     assert_frame_equal(actual, expected, check_dtype=False)
@@ -270,7 +270,7 @@ def test_full_config():
     assert set(config.keys()) == {'neurite', 'population', 'neuron', 'neurite_type'}
 
     assert set(config['neurite'].keys()) == set(_NEURITE_FEATURES.keys())
-    assert set(config['neuron'].keys()) == set(_NEURON_FEATURES.keys())
+    assert set(config['neuron'].keys()) == set(_MORPHOLOGY_FEATURES.keys())
     assert set(config['population'].keys()) == set(_POPULATION_FEATURES.keys())
 
 
@@ -308,7 +308,7 @@ def test_multidimensional_features():
 
     Cf: https://github.com/BlueBrain/NeuroM/issues/859
     """
-    neuron = nm.load_neuron(Path(SWC_PATH, 'no-axon.swc'))
+    neuron = nm.load_morphology(Path(SWC_PATH, 'no-axon.swc'))
 
     config = {'neurite': {'segment_midpoints': ['max']},
               'neurite_type': ['AXON']}

@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Extract the optimal distributions for the following features of the population of neurons:
+"""Extract the optimal distributions for the following features of the population of morphologies:
    soma: radius
    basal dendrites: n_neurites
    apical dendrites: n_neurites
@@ -44,7 +44,7 @@ import os
 import json
 from json import encoder
 
-from neurom import get, load_neurons, NeuriteType, stats
+from neurom import get, load_morphologies, NeuriteType, stats
 from neurom.io.utils import get_morph_files
 
 encoder.FLOAT_REPR = lambda o: format(o, '.2f')
@@ -74,7 +74,7 @@ PARAM_MAP = {
 
 
 def extract_data(neurons, feature, params=None):
-    """Extracts feature from a list of neurons
+    """Extracts feature from a list of morphologies
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution and corresponding parameters.
        Normal distribution params (mean, std)
@@ -106,7 +106,7 @@ def transform_package(mtype, files, components):
        features, feature_names, feature_components, feature_min, feature_max
     """
     data_dict = transform_header(mtype)
-    neurons = load_neurons(files)
+    neurons = load_morphologies(files)
 
     for comp in components:
         params = PARAM_MAP[comp.name]

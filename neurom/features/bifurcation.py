@@ -32,7 +32,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
-from neurom.features.sectionfunc import section_mean_radius
+from neurom.features.section import section_mean_radius
 
 
 def _raise_if_not_bifurcation(section):

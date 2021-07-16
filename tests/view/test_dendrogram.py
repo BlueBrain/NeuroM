@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import numpy as np
 import neurom.view.dendrogram as dm
-from neurom import load_neuron, get
+from neurom import load_morphology, get
 from neurom.core.types import NeuriteType
 
 from numpy.testing import assert_array_almost_equal
@@ -13,7 +13,7 @@ NEURON_PATH = DATA_PATH / 'h5/v1/Neuron.h5'
 
 
 def test_create_dendrogram_neuron():
-    neuron = load_neuron(NEURON_PATH)
+    neuron = load_morphology(NEURON_PATH)
     dendrogram = dm.Dendrogram(neuron)
     assert NeuriteType.soma == dendrogram.neurite_type
     soma_len = 1.0
@@ -41,7 +41,7 @@ def test_create_dendrogram_neurite():
             section = neurom_section.children[i]
             assert section.type == d.neurite_type
 
-    neuron = load_neuron(NEURON_PATH)
+    neuron = load_morphology(NEURON_PATH)
     neurite = neuron.neurites[0]
     dendrogram = dm.Dendrogram(neurite)
     assert neurite.type == dendrogram.neurite_type
@@ -82,7 +82,7 @@ def test_layout_dendrogram():
                     .5 * (next_child.width + child.width))
             assert_layout(child)
 
-    neuron = load_neuron(NEURON_PATH)
+    neuron = load_morphology(NEURON_PATH)
     dendrogram = dm.Dendrogram(neuron)
     positions = dm.layout_dendrogram(dendrogram, np.array([0, 0]))
     assert_layout(dendrogram)
@@ -93,6 +93,6 @@ def test_neuron_not_corrupted():
     # neuron used to construct it.
     # This caused the section path distance calculation
     # to raise a KeyError exception.
-    neuron = load_neuron(NEURON_PATH)
+    neuron = load_morphology(NEURON_PATH)
     dm.Dendrogram(neuron)
     assert len(get('section_path_distances', neuron)) > 0

@@ -34,13 +34,13 @@ because its warnings are not Python warnings.
 For example if we to implement `no_missing_parents` check via:
 
 try:
-    Neuron(neuron_file)
+    Morphology(morph_file)
 except MissingParentError as e:
     return CheckResult(False, e)
 return CheckResult(True)
 
-then this check will fail in case `neuron_file` is invalid due to any non parent error. For example
-if `neuron_file` has invalid soma => an error is raised and this check fails.
+then this check will fail in case `morph_file` is invalid due to any non parent error. For example
+if `morph_file` has invalid soma => an error is raised and this check fails.
 """
 
 raise NotImplementedError('Can not be implemented in v2 due to MorphIO constraints')

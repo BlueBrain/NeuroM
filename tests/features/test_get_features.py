@@ -34,11 +34,11 @@ from pathlib import Path
 
 import neurom as nm
 import numpy as np
-from neurom import features, iter_sections, load_neuron, load_neurons
+from neurom import features, iter_sections, load_morphology, load_morphologies
 from neurom.core.population import Population
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
-from neurom.features import neuritefunc, NameSpace
+from neurom.features import neurite, NameSpace
 
 import pytest
 from numpy.testing import assert_allclose
@@ -46,12 +46,12 @@ from numpy.testing import assert_allclose
 DATA_PATH = Path(__file__).parent.parent / 'data'
 NRN_FILES = [DATA_PATH / 'h5/v1' / f
              for f in ('Neuron.h5', 'Neuron_2_branch.h5', 'bio_neuron-001.h5')]
-POP = load_neurons(NRN_FILES)
+POP = load_morphologies(NRN_FILES)
 NRN = POP[0]
 
 SWC_PATH = DATA_PATH / 'swc'
 NEURON_PATH = SWC_PATH / 'Neuron.swc'
-NEURON = load_neuron(NEURON_PATH)
+NEURON = load_morphology(NEURON_PATH)
 NEURITES = (NeuriteType.axon,
             NeuriteType.apical_dendrite,
             NeuriteType.basal_dendrite,
@@ -65,7 +65,7 @@ def _stats(seq):
 
 def test_get_raises():
     with pytest.raises(NeuroMError,
-                       match='Only Neurite, Neuron, Population or list, tuple of Neurite, Neuron'):
+                       match='Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology'):
         features.get('invalid', (n for n in POP))
     with pytest.raises(NeuroMError, match='Cant apply "invalid" feature'):
         features.get('invalid', NRN)
@@ -386,7 +386,7 @@ def test_segment_meander_angles():
 
 
 def test_segment_meander_angles_single_section():
-    nrn = nm.load_neuron(StringIO(u"""((CellBody) (0 0 0 0))
+    nrn = nm.load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
                                       ((Dendrite)
                                        (0 0 0 2)
                                        (1 0 0 2)
@@ -500,7 +500,7 @@ def test_section_path_distances():
 
 
 def test_segment_lengths():
-    ref_seglen = np.concatenate([neuritefunc.segment_lengths(s) for s in NEURON.neurites])
+    ref_seglen = np.concatenate([neurite.segment_lengths(s) for s in NEURON.neurites])
     seglen = features.get('segment_lengths', NEURON)
     assert len(seglen) == 840
     assert_allclose(seglen, ref_seglen)
@@ -511,7 +511,7 @@ def test_segment_lengths():
 
 
 def test_local_bifurcation_angles():
-    ref_local_bifangles = np.concatenate([neuritefunc.local_bifurcation_angles(s)
+    ref_local_bifangles = np.concatenate([neurite.local_bifurcation_angles(s)
                                           for s in NEURON.neurites])
 
     local_bifangles = features.get('local_bifurcation_angles', NEURON)
@@ -535,7 +535,7 @@ def test_local_bifurcation_angles():
 
 
 def test_remote_bifurcation_angles():
-    ref_remote_bifangles = np.concatenate([neuritefunc.remote_bifurcation_angles(s)
+    ref_remote_bifangles = np.concatenate([neurite.remote_bifurcation_angles(s)
                                            for s in NEURON.neurites])
     remote_bifangles = features.get('remote_bifurcation_angles', NEURON)
     assert len(remote_bifangles) == 40
@@ -560,8 +560,8 @@ def test_remote_bifurcation_angles():
 
 def test_segment_radial_distances_origin():
     origin = (-100, -200, -300)
-    ref_segs = np.concatenate([neuritefunc.segment_radial_distances(s) for s in NEURON.neurites])
-    ref_segs_origin = np.concatenate([neuritefunc.segment_radial_distances(s, origin)
+    ref_segs = np.concatenate([neurite.segment_radial_distances(s) for s in NEURON.neurites])
+    ref_segs_origin = np.concatenate([neurite.segment_radial_distances(s, origin)
                                       for s in NEURON.neurites])
 
     rad_dists = features.get('segment_radial_distances', NEURON)
@@ -571,7 +571,7 @@ def test_segment_radial_distances_origin():
     assert np.all(rad_dists_origin == ref_segs_origin)
     assert np.all(rad_dists_origin != ref_segs)
 
-    nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
+    nrns = [nm.load_morphology(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
     rad_dist_nrns = []
@@ -584,14 +584,14 @@ def test_segment_radial_distances_origin():
 
 
 def test_section_radial_distances_endpoint():
-    ref_sec_rad_dist = np.concatenate([neuritefunc.section_radial_distances(s)
+    ref_sec_rad_dist = np.concatenate([neurite.section_radial_distances(s)
                                        for s in NEURON.neurites])
     rad_dists = features.get('section_radial_distances', NEURON)
 
     assert len(rad_dists) == 84
     assert np.all(rad_dists == ref_sec_rad_dist)
 
-    nrns = [nm.load_neuron(Path(SWC_PATH, f)) for
+    nrns = [nm.load_morphology(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
     pop = Population(nrns)
     rad_dist_nrns = [v for nrn in nrns for v in features.get('section_radial_distances', nrn)]
@@ -604,7 +604,7 @@ def test_section_radial_distances_endpoint():
 
 def test_section_radial_distances_origin():
     origin = (-100, -200, -300)
-    ref_sec_rad_dist_origin = np.concatenate([neuritefunc.section_radial_distances(s, origin)
+    ref_sec_rad_dist_origin = np.concatenate([neurite.section_radial_distances(s, origin)
                                               for s in NEURON.neurites])
     rad_dists = features.get('section_radial_distances', NEURON, origin=origin)
     assert len(rad_dists) == 84
@@ -704,7 +704,7 @@ def test_partition_asymmetry():
 
 def test_section_strahler_orders():
     path = Path(SWC_PATH, 'strahler.swc')
-    n = nm.load_neuron(path)
+    n = nm.load_morphology(path)
     assert_allclose(features.get('section_strahler_orders', n),
                     [4, 1, 4, 3, 2, 1, 1, 2, 1, 1, 3, 1, 3, 2, 1, 1, 2, 1, 1])
 

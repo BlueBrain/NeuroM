@@ -112,13 +112,13 @@ FEATURES = ('segment_lengths',
 def load_neurite_features(filepath):
     """Unpack relevant data into megadict."""
     stuff = defaultdict(lambda: defaultdict(list))
-    nrns = nm.load_neurons(filepath)
+    morphs = nm.load_morphologies(filepath)
     # unpack data into arrays
-    for nrn in nrns:
+    for m in morphs:
         for t in NEURITES_:
             for feat in FEATURES:
                 stuff[feat][str(t).split('.')[1]].extend(
-                    nm.get(feat, nrn, neurite_type=t)
+                    nm.get(feat, m, neurite_type=t)
                 )
     return stuff
 

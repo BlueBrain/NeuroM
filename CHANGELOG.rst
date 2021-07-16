@@ -3,18 +3,31 @@ Changelog
 
 Version 3.0.0
 -------------
+- Rename all 'neuron' names to 'morphology' names, including module and package names.
+    - ``neurom.core.neuron`` => ``neurom.core.morphology``
+    - ``neurom.core.neuron.Neuron`` => ``neurom.core.morphology.Morphology``
+    - ``neurom.check.neuron_checks`` => ``neurom.check.morph_checks``, replace `neuron_checks` with
+      `morph_checks` in configs for ``neurom check``
+    - ``neurom.core.neuron.graft_neuron`` => ``neurom.core.morphology.graft_morphology``
+
 - Refactor plotting functionality. :ref:`migration-v3.0.0`.
-    - deprecate ``neurom.view.viewer``
-    - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
-    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
-      ``neurom.view.plotly.plot_neuron3d``.
+    - delete ``neurom.view.viewer``
     - rename ``neurom.view.view`` to ``neurom.view.matplotlib_impl``
     - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
+    - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.matplotlib_impl``,
+      also ``nrn`` arg is renamed to ``morph``.
+    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_morph`` and
+      ``neurom.view.plotly.plot_morph3d``.
 
 - Refactor features.
-    - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
-      ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
+    - Drop 'func' suffix of all module names within `features` package:
+        - ``neurom.features.bifurcationfunc`` => ``neurom.features.bifurcation``
+        - ``neurom.features.sectionfunc`` => ``neurom.features.section``
+        - ``neurom.features.neuritefunc`` => ``neurom.features.neurite``
+        - ``neurom.features.neuronfunc`` => ``neurom.features.morphology``
+    - Rigid classification of features. ``neurite`` features must accept only a single neurite.
+      ``morphology`` features must accept only a single morphology. ``population`` features must
       accept only a collection of neurons or a neuron population.
     - Some features were deleted, renamed, added. See :ref:`migration-v3.0.0`.
     - Name consistency among private variables.

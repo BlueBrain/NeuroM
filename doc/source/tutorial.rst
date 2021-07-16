@@ -34,8 +34,7 @@ a folder that contains the NeuroM Tutorial notebook.
     (nrm)$ jupyter notebook                    # launch the Jupyter Notebook App
 
 Next, you can select the notebook that you want to open. Now, you can go
-through the tutorial and learn about loading, viewing, and analyzing
-neuronal morphologies!
+through the tutorial and learn about loading, viewing, and analyzing morphologies!
 
 Applications using NeuroM
 =========================
@@ -55,8 +54,7 @@ it into NeuroM:
 
     (nrm)$ neurom check --help                  # shows help for morphology checking script
 
-Try it yourself! You can go to
-`NeuroMorpho.Org <http://neuromorpho.org>`__ to download a neuronal
+Try it yourself! You can go to `NeuroMorpho.Org <http://neuromorpho.org>`__ to download a
 morphology and perform the semantic checks:
 
 .. code-block:: bash

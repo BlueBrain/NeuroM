@@ -30,12 +30,12 @@ import math
 from pathlib import Path
 
 import neurom as nm
-from neurom.core.neuron import Neurite
+from neurom.core.morphology import Neurite
 
 from numpy.testing import assert_almost_equal
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
-nrn = nm.load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
+nrn = nm.load_morphology(SWC_PATH / 'point_soma_single_neurite.swc')
 
 ROOT_NODE = nrn.neurites[0].morphio_root_node
 RADIUS = .5

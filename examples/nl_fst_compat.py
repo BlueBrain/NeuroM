@@ -32,28 +32,28 @@
 import numpy as np
 
 import neurom as nm
-from neurom.features import neuritefunc as _nf
+from neurom.features import neurite as _nf
 
-nrn_h5 = nm.load_neuron('tests/data/h5/v1/bio_neuron-001.h5')
-nrn_asc = nm.load_neuron('tests/data/neurolucida/bio_neuron-001.asc')
+m_h5 = nm.load_morphology('tests/data/h5/v1/bio_neuron-001.h5')
+m_asc = nm.load_morphology('tests/data/neurolucida/bio_neuron-001.asc')
 
-print('h5 number of sections: %s' % nm.get('number_of_sections', nrn_h5)[0])
-print('nl number of sections: %s\n' % nm.get('number_of_sections', nrn_asc)[0])
-print('h5 number of segments: %s' % nm.get('number_of_segments', nrn_h5)[0])
-print('nl number of segments: %s\n' % nm.get('number_of_segments', nrn_asc)[0])
+print('h5 number of sections: %s' % nm.get('number_of_sections', m_h5)[0])
+print('nl number of sections: %s\n' % nm.get('number_of_sections', m_asc)[0])
+print('h5 number of segments: %s' % nm.get('number_of_segments', m_h5)[0])
+print('nl number of segments: %s\n' % nm.get('number_of_segments', m_asc)[0])
 print('h5 total neurite length: %s' %
-      np.sum(nm.get('section_lengths', nrn_h5)))
+      np.sum(nm.get('section_lengths', m_h5)))
 print('nl total neurite length: %s\n' %
-      np.sum(nm.get('section_lengths', nrn_asc)))
+      np.sum(nm.get('section_lengths', m_asc)))
 print('h5 principal direction extents: %s' %
-      nm.get('principal_direction_extents', nrn_h5))
+      nm.get('principal_direction_extents', m_h5))
 print('nl principal direction extents: %s' %
-      nm.get('principal_direction_extents', nrn_asc))
+      nm.get('principal_direction_extents', m_asc))
 
 print('\nNumber of neurites:')
 for nt in iter(nm.NeuriteType):
-    print(nt, _nf.n_neurites(nrn_h5, neurite_type=nt), _nf.n_neurites(nrn_asc, neurite_type=nt))
+    print(nt, _nf.n_neurites(m_h5, neurite_type=nt), _nf.n_neurites(m_asc, neurite_type=nt))
 
 print('\nNumber of segments:')
 for nt in iter(nm.NeuriteType):
-    print(nt, _nf.n_segments(nrn_h5, neurite_type=nt), _nf.n_segments(nrn_asc, neurite_type=nt))
+    print(nt, _nf.n_segments(m_h5, neurite_type=nt), _nf.n_segments(m_asc, neurite_type=nt))

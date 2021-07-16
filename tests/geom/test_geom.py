@@ -34,8 +34,8 @@ from neurom import geom
 from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent / 'data/swc'
-NRN = nm.load_neuron(SWC_DATA_PATH / 'Neuron.swc')
-SIMPLE = nm.load_neuron(SWC_DATA_PATH / 'simple.swc')
+NRN = nm.load_morphology(SWC_DATA_PATH / 'Neuron.swc')
+SIMPLE = nm.load_morphology(SWC_DATA_PATH / 'simple.swc')
 
 class PointObj:
     pass

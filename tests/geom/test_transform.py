@@ -31,7 +31,7 @@ from pathlib import Path
 
 import neurom.geom.transform as gtr
 import numpy as np
-from neurom import COLS, load_neuron, iter_sections
+from neurom import COLS, load_morphology, iter_sections
 
 import pytest
 from numpy.testing import assert_almost_equal
@@ -224,14 +224,14 @@ def _check_fst_neurite_translate(nrts_a, nrts_b, t):
 def test_translate_fst_neuron_swc():
 
     t = np.array([100., 100., 100.])
-    nrn = load_neuron(SWC_NRN_PATH)
+    nrn = load_morphology(SWC_NRN_PATH)
     tnrn = gtr.translate(nrn, t)
     _check_fst_nrn_translate(nrn, tnrn, t)
 
 
 def test_transform_translate_neuron_swc():
     t = np.array([100., 100., 100.])
-    nrn = load_neuron(SWC_NRN_PATH)
+    nrn = load_morphology(SWC_NRN_PATH)
     tnrn = nrn.transform(gtr.Translation(t))
     _check_fst_nrn_translate(nrn, tnrn, t)
 
@@ -239,7 +239,7 @@ def test_transform_translate_neuron_swc():
 def test_translate_fst_neuron_h5():
 
     t = np.array([100., 100., 100.])
-    nrn = load_neuron(H5_NRN_PATH)
+    nrn = load_morphology(H5_NRN_PATH)
     tnrn = gtr.translate(nrn, t)
 
     _check_fst_nrn_translate(nrn, tnrn, t)
@@ -247,7 +247,7 @@ def test_translate_fst_neuron_h5():
 
 def test_transform_translate_neuron_h5():
     t = np.array([100., 100., 100.])
-    nrn = load_neuron(H5_NRN_PATH)
+    nrn = load_morphology(H5_NRN_PATH)
     tnrn = nrn.transform(gtr.Translation(t))
     _check_fst_nrn_translate(nrn, tnrn, t)
 
@@ -273,7 +273,7 @@ def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
 
 
 def test_rotate_neuron_swc():
-    nrn_a = load_neuron(SWC_NRN_PATH)
+    nrn_a = load_morphology(SWC_NRN_PATH)
     nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
@@ -281,13 +281,13 @@ def test_rotate_neuron_swc():
 
 def test_transform_rotate_neuron_swc():
     rot = gtr.Rotation(ROT_90)
-    nrn_a = load_neuron(SWC_NRN_PATH)
+    nrn_a = load_morphology(SWC_NRN_PATH)
     nrn_b = nrn_a.transform(rot)
     _check_fst_nrn_rotate(nrn_a, nrn_b, ROT_90)
 
 
 def test_rotate_neuron_h5():
-    nrn_a = load_neuron(H5_NRN_PATH)
+    nrn_a = load_morphology(H5_NRN_PATH)
     nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
     _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
@@ -295,7 +295,7 @@ def test_rotate_neuron_h5():
 
 def test_transform_rotate_neuron_h5():
     rot = gtr.Rotation(ROT_90)
-    nrn_a = load_neuron(H5_NRN_PATH)
+    nrn_a = load_morphology(H5_NRN_PATH)
     nrn_b = nrn_a.transform(rot)
     _check_fst_nrn_rotate(nrn_a, nrn_b, ROT_90)
 

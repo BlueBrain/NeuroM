@@ -33,7 +33,7 @@
 NeuroM
 ======
 
-NeuroM is a Python-based toolkit for the analysis and processing of neuron morphologies.
+NeuroM is a Python-based toolkit for the analysis and processing of morphologies.
 
 .. toctree::
    :hidden:
