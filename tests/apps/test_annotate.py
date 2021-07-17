@@ -2,7 +2,7 @@ from pathlib import Path
 from neurom import load_morphology
 from neurom.apps.annotate import annotate, generate_annotation
 from neurom.check import CheckResult
-from neurom.check.morph_checks import has_no_narrow_start
+from neurom.check.morphology_checks import has_no_narrow_start
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc'
 
@@ -45,6 +45,6 @@ def test_annotate():
                                       "label": "Circle1",
                                       "color": "Blue"}}
 
-    neuron = load_morphology(SWC_PATH / 'narrow_start.swc')
-    results = [checker(neuron) for checker in checkers.keys()]
+    m = load_morphology(SWC_PATH / 'narrow_start.swc')
+    results = [checker(m) for checker in checkers.keys()]
     assert annotate(results, checkers.values()) == correct_result

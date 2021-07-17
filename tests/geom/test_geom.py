@@ -54,7 +54,7 @@ def test_bounding_box():
     assert np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
 
 
-def test_bounding_box_neuron():
+def test_bounding_box_morphology():
 
     ref = np.array([[-40.32853516, -57.600172, 0.],
                     [64.74726272, 48.51626225, 54.20408797]])

@@ -386,20 +386,20 @@ def test_segment_meander_angles():
 
 
 def test_segment_meander_angles_single_section():
-    nrn = nm.load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    m = nm.load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
                                       ((Dendrite)
                                        (0 0 0 2)
                                        (1 0 0 2)
                                        (1 1 0 2)
                                        (2 1 0 2)
                                        (2 2 0 2)))"""), reader='asc')
-    nrt = nrn.neurites[0]
-    pop = [nrn]
+    nrt = m.neurites[0]
+    pop = [m]
 
     ref = [math.pi / 2, math.pi / 2, math.pi / 2]
 
     assert ref == features.get('segment_meander_angles', nrt)
-    assert ref == features.get('segment_meander_angles', nrn)
+    assert ref == features.get('segment_meander_angles', m)
     assert ref == features.get('segment_meander_angles', pop)
 
 
@@ -493,7 +493,7 @@ def test_section_lengths():
 def test_section_path_distances():
     path_distances = features.get('section_path_distances', POP)
     assert len(path_distances) == 328
-    assert sum(len(features.get('section_path_distances', nrn)) for nrn in POP) == 328
+    assert sum(len(features.get('section_path_distances', m)) for m in POP) == 328
 
     path_lengths = features.get('section_path_distances', NEURON, neurite_type=NeuriteType.axon)
     assert len(path_lengths) == 21
@@ -571,16 +571,16 @@ def test_segment_radial_distances_origin():
     assert np.all(rad_dists_origin == ref_segs_origin)
     assert np.all(rad_dists_origin != ref_segs)
 
-    nrns = [nm.load_morphology(Path(SWC_PATH, f)) for
+    morphs = [nm.load_morphology(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
-    pop = Population(nrns)
-    rad_dist_nrns = []
-    for nrn in nrns:
-        rad_dist_nrns.extend(features.get('segment_radial_distances', nrn))
+    pop = Population(morphs)
+    rad_dist_morphs = []
+    for m in morphs:
+        rad_dist_morphs.extend(features.get('segment_radial_distances', m))
 
-    rad_dist_nrns = np.array(rad_dist_nrns)
+    rad_dist_morphs = np.array(rad_dist_morphs)
     rad_dist_pop = features.get('segment_radial_distances', pop)
-    assert_allclose(rad_dist_nrns, rad_dist_pop)
+    assert_allclose(rad_dist_morphs, rad_dist_pop)
 
 
 def test_section_radial_distances_endpoint():
@@ -591,12 +591,12 @@ def test_section_radial_distances_endpoint():
     assert len(rad_dists) == 84
     assert np.all(rad_dists == ref_sec_rad_dist)
 
-    nrns = [nm.load_morphology(Path(SWC_PATH, f)) for
+    morphs = [nm.load_morphology(Path(SWC_PATH, f)) for
             f in ('point_soma_single_neurite.swc', 'point_soma_single_neurite2.swc')]
-    pop = Population(nrns)
-    rad_dist_nrns = [v for nrn in nrns for v in features.get('section_radial_distances', nrn)]
+    pop = Population(morphs)
+    rad_dist_morphs = [v for m in morphs for v in features.get('section_radial_distances', m)]
     rad_dist_pop = features.get('section_radial_distances', pop)
-    assert_allclose(rad_dist_pop, rad_dist_nrns)
+    assert_allclose(rad_dist_pop, rad_dist_morphs)
 
     rad_dists = features.get('section_radial_distances', NEURON, neurite_type=NeuriteType.axon)
     assert len(rad_dists) == 21

@@ -39,7 +39,7 @@ DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
 
 
-def _make_flat(neuron):
+def _make_flat(morphology):
 
     class Flattenizer:
         def __call__(self, points):
@@ -47,11 +47,11 @@ def _make_flat(neuron):
             points[:, COLS.Z] = 0.
             return points
 
-    return neuron.transform(Flattenizer())
+    return morphology.transform(Flattenizer())
 
 
-def _make_monotonic(neuron):
-    for neurite in neuron.neurites:
+def _make_monotonic(morphology):
+    for neurite in morphology.neurites:
         for section in neurite.iter_sections():
             points = section.points
             if section.parent is not None:
@@ -64,7 +64,7 @@ def _make_monotonic(neuron):
 def _generate_back_track_tree(n, dev):
     points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
-    neuron = load_morphology(StringIO(u"""
+    m = load_morphology(StringIO(u"""
     ((CellBody)
      (0 0 0 0.4))
 
@@ -86,12 +86,12 @@ def _generate_back_track_tree(n, dev):
     ))
     """.format(*points.tolist())), reader='asc')
 
-    return neuron
+    return m
 
 
 def test_is_monotonic():
     # tree with decreasing radii
-    neuron = load_morphology(StringIO(u"""
+    m = load_morphology(StringIO(u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 0.99)
@@ -102,10 +102,10 @@ def test_is_monotonic():
           (0 0 0 0.5)
           (0 0 0 0.2)
         ))"""), reader='asc')
-    assert mt.is_monotonic(neuron.neurites[0], 1e-6)
+    assert mt.is_monotonic(m.neurites[0], 1e-6)
 
     # tree with equal radii
-    neuron = load_morphology(StringIO(u"""
+    m = load_morphology(StringIO(u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 1.0)
@@ -116,10 +116,10 @@ def test_is_monotonic():
           (0 0 0 1.0)
           (0 0 0 1.0)
         ))"""), reader='asc')
-    assert mt.is_monotonic(neuron.neurites[0], 1e-6)
+    assert mt.is_monotonic(m.neurites[0], 1e-6)
 
     # tree with increasing radii
-    neuron = load_morphology(StringIO(u"""
+    m = load_morphology(StringIO(u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 1.0)
@@ -130,10 +130,10 @@ def test_is_monotonic():
           (0 0 0 0.3)
           (0 0 0 0.1)
         ))"""), reader='asc')
-    assert not mt.is_monotonic(neuron.neurites[0], 1e-6)
+    assert not mt.is_monotonic(m.neurites[0], 1e-6)
 
     # Tree with larger child initial point
-    neuron = load_morphology(StringIO(u"""
+    m = load_morphology(StringIO(u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 0.75)
@@ -144,13 +144,13 @@ def test_is_monotonic():
           (0 0 0 0.125)
           (0 0 0 0.625)
         ))"""), reader='asc')
-    assert not mt.is_monotonic(neuron.neurites[0], 1e-6)
+    assert not mt.is_monotonic(m.neurites[0], 1e-6)
 
 
 def test_is_flat():
-    neu_tree = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
-    assert not mt.is_flat(neu_tree.neurites[0], 1e-6, method='tolerance')
-    assert not mt.is_flat(neu_tree.neurites[0], 0.1, method='ratio')
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert not mt.is_flat(m.neurites[0], 1e-6, method='tolerance')
+    assert not mt.is_flat(m.neurites[0], 0.1, method='ratio')
 
 
 def test_is_back_tracking():
@@ -178,22 +178,22 @@ def test_is_back_tracking():
 
 
 def test_get_flat_neurites():
-    n = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
-    assert len(mt.get_flat_neurites(n, 1e-6, method='tolerance')) == 0
-    assert len(mt.get_flat_neurites(n, 0.1, method='ratio')) == 0
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert len(mt.get_flat_neurites(m, 1e-6, method='tolerance')) == 0
+    assert len(mt.get_flat_neurites(m, 0.1, method='ratio')) == 0
 
-    n = _make_flat(n)
-    assert len(mt.get_flat_neurites(n, 1e-6, method='tolerance')) == 4
-    assert len(mt.get_flat_neurites(n, 0.1, method='ratio')) == 4
+    m = _make_flat(m)
+    assert len(mt.get_flat_neurites(m, 1e-6, method='tolerance')) == 4
+    assert len(mt.get_flat_neurites(m, 0.1, method='ratio')) == 4
 
 
 def test_get_nonmonotonic_neurites():
-    n = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
-    assert len(mt.get_nonmonotonic_neurites(n)) == 4
-    _make_monotonic(n)
-    assert len(mt.get_nonmonotonic_neurites(n)) == 0
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert len(mt.get_nonmonotonic_neurites(m)) == 4
+    _make_monotonic(m)
+    assert len(mt.get_nonmonotonic_neurites(m)) == 0
 
 
 def test_get_back_tracking_neurites():
-    n = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
-    assert len(mt.get_back_tracking_neurites(n)) == 4
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert len(mt.get_back_tracking_neurites(m)) == 4

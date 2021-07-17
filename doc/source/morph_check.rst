@@ -58,7 +58,7 @@ mentioned above. Here is an example configuration:
 .. code-block:: yaml
 
     checks:
-        morph_checks:
+        morphology_checks:
             - has_basal_dendrite
             - has_axon
             - has_all_nonzero_segment_lengths
@@ -74,8 +74,8 @@ mentioned above. Here is an example configuration:
 
 
 As can be seen, the configuration file is split into two sections ``checks``, and ``options``.
-``checks`` can only have `morph_checks` sub-item that corresponds to a sub-module
-:py:mod:`morph_checks<neurom.check.morph_checks>`. Each of its sub-items corresponds to a function
+``checks`` can only have `morphology_checks` sub-item that corresponds to a sub-module
+:py:mod:`morphology_checks<neurom.check.morphology_checks>`. Each of its sub-items corresponds to a function
 in that sub-module.
 
 

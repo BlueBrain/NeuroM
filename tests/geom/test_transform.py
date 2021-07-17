@@ -207,97 +207,96 @@ def test_pivot_rotate_points():
     assert np.all(p1 == p2)
 
 
-def _check_fst_nrn_translate(nrn_a, nrn_b, t):
+def _check_morphology_translate(m_a, m_b, t):
 
     # soma points
     assert np.allclose(
-        (nrn_b.soma.points[:, COLS.XYZ] - nrn_a.soma.points[:, COLS.XYZ]), t)
-    _check_fst_neurite_translate(nrn_a.neurites, nrn_b.neurites, t)
+        (m_b.soma.points[:, COLS.XYZ] - m_a.soma.points[:, COLS.XYZ]), t)
+    _check_neurite_translate(m_a.neurites, m_b.neurites, t)
 
 
-def _check_fst_neurite_translate(nrts_a, nrts_b, t):
+def _check_neurite_translate(nrts_a, nrts_b, t):
     # neurite sections
     for sa, sb in zip(iter_sections(nrts_a), iter_sections(nrts_b)):
         assert np.allclose((sb.points[:, COLS.XYZ] - sa.points[:, COLS.XYZ]), t)
 
 
-def test_translate_fst_neuron_swc():
+def test_translate_morphology_swc():
 
     t = np.array([100., 100., 100.])
-    nrn = load_morphology(SWC_NRN_PATH)
-    tnrn = gtr.translate(nrn, t)
-    _check_fst_nrn_translate(nrn, tnrn, t)
+    m = load_morphology(SWC_NRN_PATH)
+    tm = gtr.translate(m, t)
+    _check_morphology_translate(m, tm, t)
 
 
-def test_transform_translate_neuron_swc():
+def test_transform_translate_morphology_swc():
     t = np.array([100., 100., 100.])
-    nrn = load_morphology(SWC_NRN_PATH)
-    tnrn = nrn.transform(gtr.Translation(t))
-    _check_fst_nrn_translate(nrn, tnrn, t)
+    m = load_morphology(SWC_NRN_PATH)
+    tm = m.transform(gtr.Translation(t))
+    _check_morphology_translate(m, tm, t)
 
 
-def test_translate_fst_neuron_h5():
-
+def test_translate_morphology_h5():
     t = np.array([100., 100., 100.])
-    nrn = load_morphology(H5_NRN_PATH)
-    tnrn = gtr.translate(nrn, t)
+    m = load_morphology(H5_NRN_PATH)
+    tm = gtr.translate(m, t)
 
-    _check_fst_nrn_translate(nrn, tnrn, t)
+    _check_morphology_translate(m, tm, t)
 
 
-def test_transform_translate_neuron_h5():
+def test_transform_translate_morphology_h5():
     t = np.array([100., 100., 100.])
-    nrn = load_morphology(H5_NRN_PATH)
-    tnrn = nrn.transform(gtr.Translation(t))
-    _check_fst_nrn_translate(nrn, tnrn, t)
+    m = load_morphology(H5_NRN_PATH)
+    tm = m.transform(gtr.Translation(t))
+    _check_morphology_translate(m, tm, t)
 
 
 def _apply_rot(points, rot_mat):
     return np.dot(rot_mat, np.array(points).T).T
 
 
-def _check_fst_nrn_rotate(nrn_a, nrn_b, rot_mat):
+def _check_morphology_rotate(m_a, m_b, rot_mat):
 
     # soma points
-    assert np.allclose(_apply_rot(nrn_a.soma.points[:, COLS.XYZ], rot_mat),
-                               nrn_b.soma.points[:, COLS.XYZ])
+    assert np.allclose(_apply_rot(m_a.soma.points[:, COLS.XYZ], rot_mat),
+                               m_b.soma.points[:, COLS.XYZ])
 
     # neurite sections
-    _check_fst_neurite_rotate(nrn_a.neurites, nrn_b.neurites, rot_mat)
+    _check_neurite_rotate(m_a.neurites, m_b.neurites, rot_mat)
 
 
-def _check_fst_neurite_rotate(nrt_a, nrt_b, rot_mat):
+def _check_neurite_rotate(nrt_a, nrt_b, rot_mat):
     for sa, sb in zip(iter_sections(nrt_a), iter_sections(nrt_b)):
         assert np.allclose(sb.points[:, COLS.XYZ],
                                    _apply_rot(sa.points[:, COLS.XYZ], rot_mat))
 
 
-def test_rotate_neuron_swc():
-    nrn_a = load_morphology(SWC_NRN_PATH)
-    nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
+def test_rotate_morphology_swc():
+    m_a = load_morphology(SWC_NRN_PATH)
+    m_b = gtr.rotate(m_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
+    _check_morphology_rotate(m_a, m_b, rot)
 
 
-def test_transform_rotate_neuron_swc():
+def test_transform_rotate_morphology_swc():
     rot = gtr.Rotation(ROT_90)
-    nrn_a = load_morphology(SWC_NRN_PATH)
-    nrn_b = nrn_a.transform(rot)
-    _check_fst_nrn_rotate(nrn_a, nrn_b, ROT_90)
+    m_a = load_morphology(SWC_NRN_PATH)
+    m_b = m_a.transform(rot)
+    _check_morphology_rotate(m_a, m_b, ROT_90)
 
 
-def test_rotate_neuron_h5():
-    nrn_a = load_morphology(H5_NRN_PATH)
-    nrn_b = gtr.rotate(nrn_a, [0, 0, 1], math.pi/2.0)
+def test_rotate_morphology_h5():
+    m_a = load_morphology(H5_NRN_PATH)
+    m_b = gtr.rotate(m_a, [0, 0, 1], math.pi/2.0)
     rot = gtr._rodrigues_to_dcm([0, 0, 1], math.pi/2.0)
-    _check_fst_nrn_rotate(nrn_a, nrn_b, rot)
+    _check_morphology_rotate(m_a, m_b, rot)
 
 
-def test_transform_rotate_neuron_h5():
+def test_transform_rotate_morphology_h5():
     rot = gtr.Rotation(ROT_90)
-    nrn_a = load_morphology(H5_NRN_PATH)
-    nrn_b = nrn_a.transform(rot)
-    _check_fst_nrn_rotate(nrn_a, nrn_b, ROT_90)
+    m_a = load_morphology(H5_NRN_PATH)
+    m_b = m_a.transform(rot)
+    _check_morphology_rotate(m_a, m_b, ROT_90)
 
 
 def test_rodrigues_to_dcm():

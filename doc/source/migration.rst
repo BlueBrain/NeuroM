@@ -34,7 +34,7 @@ Migration guides
 Migration to v3 version
 -----------------------
 
-- ``neurom.view.viewer`` is removed. To get the same results as before, use the replacement:
+- ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 
    .. code-block:: python
 

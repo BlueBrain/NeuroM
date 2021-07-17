@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test features.neuronfunc."""
+"""Test ``features.morphology``."""
 from math import pi, sqrt
 import tempfile
 import warnings
@@ -220,7 +220,7 @@ def test_sholl_crossings_simple():
 
 
 def load_swc(string):
-    with tempfile.NamedTemporaryFile(prefix='test_neuron_func', mode='w', suffix='.swc') as fd:
+    with tempfile.NamedTemporaryFile(prefix='test_morphology', mode='w', suffix='.swc') as fd:
         fd.write(string)
         fd.flush()
         return load_morphology(fd.name)
@@ -277,4 +277,3 @@ def test_sholl_analysis_custom():
                        """)
     assert (list(morphology.sholl_crossings(morph_C, center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
-    # view.neuron(morph_C)[0].savefig('foo.png')

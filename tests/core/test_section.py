@@ -35,8 +35,8 @@ SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 
 
 def test_section_base_func():
-    nrn = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
-    section = nrn.sections[0]
+    m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
+    section = m.sections[0]
 
     assert section.type == nm.NeuriteType.basal_dendrite
     assert section.id == 0
@@ -47,34 +47,34 @@ def test_section_base_func():
 
 
 def test_section_tree():
-    nrn = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
+    m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
-    assert nrn.sections[0].parent is None
-    assert nrn.sections[0] == nrn.sections[0].children[0].parent
+    assert m.sections[0].parent is None
+    assert m.sections[0] == m.sections[0].children[0].parent
 
-    assert_array_equal([s.is_root() for s in nrn.sections],
+    assert_array_equal([s.is_root() for s in m.sections],
                        [True, False, False, True, False, False])
-    assert_array_equal([s.is_leaf() for s in nrn.sections],
+    assert_array_equal([s.is_leaf() for s in m.sections],
                        [False, True, True, False, True, True])
-    assert_array_equal([s.is_forking_point() for s in nrn.sections],
+    assert_array_equal([s.is_forking_point() for s in m.sections],
                        [True, False, False, True, False, False])
-    assert_array_equal([s.is_bifurcation_point() for s in nrn.sections],
+    assert_array_equal([s.is_bifurcation_point() for s in m.sections],
                        [True, False, False, True, False, False])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ipreorder()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.ipreorder()],
                        [0, 1, 2])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ipostorder()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.ipostorder()],
                        [1, 2, 0])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.iupstream()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.iupstream()],
                        [0])
-    assert_array_equal([s.id for s in nrn.sections[2].iupstream()],
+    assert_array_equal([s.id for s in m.sections[2].iupstream()],
                        [2, 0])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ileaf()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.ileaf()],
                        [1, 2])
-    assert_array_equal([s.id for s in nrn.sections[2].ileaf()],
+    assert_array_equal([s.id for s in m.sections[2].ileaf()],
                        [2])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.iforking_point()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.iforking_point()],
                        [0])
-    assert_array_equal([s.id for s in nrn.neurites[0].root_node.ibifurcation_point()],
+    assert_array_equal([s.id for s in m.neurites[0].root_node.ibifurcation_point()],
                        [0])
 
 

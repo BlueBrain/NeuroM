@@ -62,9 +62,9 @@ DISCONNECTED_POINTS_FILE = SWC_PATH / 'Neuron_disconnected_components.swc'
 MISSING_PARENTS_FILE = SWC_PATH / 'Neuron_missing_parents.swc'
 
 
-def _check_neurites_have_no_parent(nrn):
+def _check_neurites_have_no_parent(m):
 
-    for n in nrn.neurites:
+    for n in m.neurites:
         assert n.root_node.parent is None
 
 
@@ -75,42 +75,42 @@ def test_get_morph_files():
     assert ref == files
 
 
-def test_load_neurons():
+def test_load_morphologies():
     # List of strings
-    nrns = utils.load_morphologies(list(map(str, FILES)))
-    for i, nrn in enumerate(nrns):
-        assert nrn.name == FILES[i].name
+    pop = utils.load_morphologies(list(map(str, FILES)))
+    for i, m in enumerate(pop):
+        assert m.name == FILES[i].name
 
     with pytest.raises(NeuroMError):
         list(utils.load_morphologies(MISSING_PARENTS_FILE, ))
 
     # Single string
-    nrns = utils.load_morphologies(str(FILES[0]))
-    assert nrns[0].name == FILES[0].name
+    pop = utils.load_morphologies(str(FILES[0]))
+    assert pop[0].name == FILES[0].name
 
     # Single Path
-    nrns = utils.load_morphologies(FILES[0])
-    assert nrns[0].name == FILES[0].name
+    pop = utils.load_morphologies(FILES[0])
+    assert pop[0].name == FILES[0].name
 
     # list of strings
-    nrns = utils.load_morphologies(list(map(str, FILES)))
-    for i, nrn in enumerate(nrns):
-        assert nrn.name == FILES[i].name
+    pop = utils.load_morphologies(list(map(str, FILES)))
+    for i, m in enumerate(pop):
+        assert m.name == FILES[i].name
 
     # sequence of Path objects
-    nrns = utils.load_morphologies(FILES)
-    for nrn, file in zip(nrns, FILES):
-        assert nrn.name == file.name
+    pop = utils.load_morphologies(FILES)
+    for m, file in zip(pop, FILES):
+        assert m.name == file.name
 
     # string path to a directory
-    nrns = utils.load_morphologies(str(SWC_PATH), ignored_exceptions=(MissingParentError, MorphioError))
+    pop = utils.load_morphologies(str(SWC_PATH), ignored_exceptions=(MissingParentError, MorphioError))
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    assert {f.name for f in FILES}.issubset({nrn.name for nrn in nrns})
+    assert {f.name for f in FILES}.issubset({m.name for m in pop})
 
     # Path path to a directory
-    nrns = utils.load_morphologies(SWC_PATH, ignored_exceptions=(MissingParentError, MorphioError))
+    pop = utils.load_morphologies(SWC_PATH, ignored_exceptions=(MissingParentError, MorphioError))
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
-    assert {f.name for f in FILES}.issubset({nrn.name for nrn in nrns})
+    assert {f.name for f in FILES}.issubset({m.name for m in pop})
 
 
 def test_ignore_exceptions():
@@ -123,13 +123,13 @@ def test_ignore_exceptions():
     assert count == 0
 
 
-def test_load_neuron():
-    nrn = utils.load_morphology(FILENAMES[0])
+def test_load_morphology():
+    m = utils.load_morphology(FILENAMES[0])
     assert isinstance(NRN, Morphology)
     assert NRN.name == 'Neuron.swc'
-    _check_neurites_have_no_parent(nrn)
+    _check_neurites_have_no_parent(m)
 
-    neuron_str = u""" 1 1  0  0 0 1. -1
+    morphology_str = u""" 1 1  0  0 0 1. -1
                       2 3  0  0 0 1.  1
                       3 3  0  5 0 1.  2
                       4 3 -5  5 0 0.  3
@@ -139,13 +139,13 @@ def test_load_neuron():
                       8 2  6 -4 0 0.  7
                       9 2 -5 -4 0 0.  7
                      """
-    utils.load_morphology(StringIO(neuron_str), reader='swc')
+    utils.load_morphology(StringIO(morphology_str), reader='swc')
 
 
-def test_neuron_name():
+def test_morphology_name():
     for fn, nn in zip(FILENAMES, NRN_NAMES):
-        nrn = utils.load_morphology(fn)
-        assert nrn.name == nn
+        m = utils.load_morphology(fn)
+        assert m.name == nn
 
 
 def test_load_bifurcating_soma_points_raises_SomaError():
@@ -155,11 +155,11 @@ def test_load_bifurcating_soma_points_raises_SomaError():
 
 def test_load_neuromorpho_3pt_soma():
     with warnings.catch_warnings(record=True):
-        nrn = utils.load_morphology(Path(SWC_PATH, 'soma', 'three_pt_soma.swc'))
-    assert len(nrn.neurites) == 4
-    assert len(nrn.soma.points) == 3
-    assert nrn.soma.radius == 2
-    _check_neurites_have_no_parent(nrn)
+        m = utils.load_morphology(Path(SWC_PATH, 'soma', 'three_pt_soma.swc'))
+    assert len(m.neurites) == 4
+    assert len(m.soma.points) == 3
+    assert m.soma.radius == 2
+    _check_neurites_have_no_parent(m)
 
 
 def test_neurites_have_no_parent():
@@ -167,12 +167,12 @@ def test_neurites_have_no_parent():
     _check_neurites_have_no_parent(NRN)
 
 
-def test_neuron_sections():
+def test_morphology_sections():
     # check no duplicates
     assert len(set(NRN.sections)) == len(list(NRN.sections))
 
 
-def test_neuron_sections_are_connected():
+def test_morphology_sections_are_connected():
     # check traversal by counting number of sections un trees
     for nrt in NRN.neurites:
         root_node = nrt.root_node
@@ -180,14 +180,14 @@ def test_neuron_sections_are_connected():
                         sum(1 for _ in NRN.sections[root_node.id].ipreorder()))
 
 
-def test_load_neuron_soma_only():
+def test_load_morphology_soma_only():
 
-    nrn = utils.load_morphology(Path(DATA_PATH, 'swc', 'Soma_origin.swc'))
-    assert len(nrn.neurites) == 0
-    assert nrn.name == 'Soma_origin.swc'
+    m = utils.load_morphology(Path(DATA_PATH, 'swc', 'Soma_origin.swc'))
+    assert len(m.neurites) == 0
+    assert m.name == 'Soma_origin.swc'
 
 
-def test_load_neuron_disconnected_points_raises():
+def test_load_morphology_disconnected_points_raises():
     try:
         set_raise_warnings(True)
         with pytest.raises(MorphioError, match='Warning: found a disconnected neurite'):
@@ -196,34 +196,34 @@ def test_load_neuron_disconnected_points_raises():
         set_raise_warnings(False)
 
 
-def test_load_neuron_missing_parents_raises():
+def test_load_morphology_missing_parents_raises():
     with pytest.raises(MissingParentError):
         utils.load_morphology(MISSING_PARENTS_FILE)
 
 
-def test_load_neurons_directory():
+def test_load_morphologies_directory():
     pop = utils.load_morphologies(VALID_DATA_PATH)
     assert len(pop) == 4
     assert pop.name == 'valid_set'
-    for nrn in pop:
-        assert isinstance(nrn, Morphology)
+    for m in pop:
+        assert isinstance(m, Morphology)
 
 
-def test_load_neurons_directory_name():
+def test_load_morphologies_directory_name():
     pop = utils.load_morphologies(VALID_DATA_PATH, name='test123')
     assert len(pop) == 4
     assert pop.name == 'test123'
-    for nrn in pop:
-        assert isinstance(nrn, Morphology)
+    for m in pop:
+        assert isinstance(m, Morphology)
 
 
-def test_load_neurons_filenames():
+def test_load_morphologies_filenames():
     pop = utils.load_morphologies(FILENAMES, name='test123')
     assert len(pop) == 2
     assert pop.name == 'test123'
-    for nrn, name in zip(pop.morphologies, NRN_NAMES):
-        assert isinstance(nrn, Morphology)
-        assert nrn.name == name
+    for m, name in zip(pop.morphologies, NRN_NAMES):
+        assert isinstance(m, Morphology)
+        assert m.name == name
 
 
 SWC_ORD_PATH = Path(DATA_PATH, 'swc', 'ordering')
@@ -234,34 +234,34 @@ def assert_items_equal(a, b):
     assert sorted(a) == sorted(b)
 
 
-def test_load_neuron_mixed_tree_swc():
-    nrn_mix = utils.load_morphology(Path(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
+def test_load_morphology_mixed_tree_swc():
+    m_mix = utils.load_morphology(Path(SWC_ORD_PATH, 'sample_mixed_tree_sections.swc'))
 
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix), [5, 3])
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix),
                        get('number_of_sections_per_neurite', SWC_ORD_REF))
-    assert get('number_of_segments', nrn_mix) == get('number_of_segments', SWC_ORD_REF)
-    assert get('total_length', nrn_mix) == get('total_length', SWC_ORD_REF)
+    assert get('number_of_segments', m_mix) == get('number_of_segments', SWC_ORD_REF)
+    assert get('total_length', m_mix) == get('total_length', SWC_ORD_REF)
 
 
-def test_load_neuron_section_order_break_swc():
-    nrn_mix = utils.load_morphology(Path(SWC_ORD_PATH, 'sample_disordered.swc'))
+def test_load_morphology_section_order_break_swc():
+    m_mix = utils.load_morphology(Path(SWC_ORD_PATH, 'sample_disordered.swc'))
 
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix), [5, 3])
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix),
                        get('number_of_sections_per_neurite', SWC_ORD_REF))
-    assert get('number_of_segments', nrn_mix) == get('number_of_segments', SWC_ORD_REF)
-    assert get('total_length', nrn_mix) == get('total_length', SWC_ORD_REF)
+    assert get('number_of_segments', m_mix) == get('number_of_segments', SWC_ORD_REF)
+    assert get('total_length', m_mix) == get('total_length', SWC_ORD_REF)
 
 
 H5_PATH = Path(DATA_PATH, 'h5', 'v1', 'ordering')
 H5_ORD_REF = utils.load_morphology(Path(H5_PATH, 'sample.h5'))
 
 
-def test_load_neuron_mixed_tree_h5():
-    nrn_mix = utils.load_morphology(Path(H5_PATH, 'sample_mixed_tree_sections.h5'))
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix), [5, 3])
-    assert_items_equal(get('number_of_sections_per_neurite', nrn_mix),
+def test_load_morphology_mixed_tree_h5():
+    m_mix = utils.load_morphology(Path(H5_PATH, 'sample_mixed_tree_sections.h5'))
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix), [5, 3])
+    assert_items_equal(get('number_of_sections_per_neurite', m_mix),
                        get('number_of_sections_per_neurite', H5_ORD_REF))
 
 
@@ -270,17 +270,17 @@ def test_load_h5_trunk_points_regression():
     # implementing PR #479, related to H5 unpacking
     # of files with non-standard soma structure.
     # See #480.
-    nrn = utils.load_morphology(Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
-    assert np.allclose(nrn.neurites[0].root_node.points[1, COLS.XYZR],
+    m = utils.load_morphology(Path(DATA_PATH, 'h5', 'v1', 'Neuron.h5'))
+    assert np.allclose(m.neurites[0].root_node.points[1, COLS.XYZR],
                        [0., 0., 0.1, 0.31646374])
 
-    assert np.allclose(nrn.neurites[1].root_node.points[1, COLS.XYZR],
+    assert np.allclose(m.neurites[1].root_node.points[1, COLS.XYZR],
                        [0., 0., 0.1, 1.84130445e-01])
 
-    assert np.allclose(nrn.neurites[2].root_node.points[1, COLS.XYZR],
+    assert np.allclose(m.neurites[2].root_node.points[1, COLS.XYZR],
                        [0., 0., 0.1, 5.62225521e-01])
 
-    assert np.allclose(nrn.neurites[3].root_node.points[1, COLS.XYZR],
+    assert np.allclose(m.neurites[3].root_node.points[1, COLS.XYZR],
                        [0., 0., 0.1, 7.28555262e-01])
 
 
@@ -292,11 +292,11 @@ def test_load_unknown_type():
 def test_NeuronLoader():
     dirpath = Path(DATA_PATH, 'h5', 'v1')
     loader = utils.MorphLoader(dirpath, file_ext='.h5', cache_size=5)
-    nrn = loader.get('Neuron')
-    assert isinstance(nrn, Morphology)
+    m = loader.get('Neuron')
+    assert isinstance(m, Morphology)
     # check caching
-    assert nrn == loader.get('Neuron')
-    assert nrn != loader.get('Neuron_2_branch')
+    assert m == loader.get('Neuron')
+    assert m != loader.get('Neuron_2_branch')
 
 
 def test_NeuronLoader_mixed_file_extensions():
@@ -311,8 +311,8 @@ def test_get_files_by_path():
     single_neurom = utils.get_files_by_path(NO_SOMA_FILE)
     assert len(single_neurom) == 1
 
-    neuron_dir = utils.get_files_by_path(VALID_DATA_PATH)
-    assert len(neuron_dir) == 4
+    morphologies_dir = utils.get_files_by_path(VALID_DATA_PATH)
+    assert len(morphologies_dir) == 4
 
     with pytest.raises(IOError):
         utils.get_files_by_path(Path('this/is/a/fake/path'))

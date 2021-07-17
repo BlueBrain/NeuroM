@@ -10,7 +10,7 @@ from numpy.testing import assert_allclose
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc'
 MORPH_FILENAME = SWC_PATH / 'Neuron.swc'
-nrn = load_morphology(MORPH_FILENAME)
+m = load_morphology(MORPH_FILENAME)
 
 
 def _reload_module(module):
@@ -30,9 +30,9 @@ def test_plotly_extra_not_installed():
                             'Please install it by doing: pip install neurom[plotly]')
 
 
-def test_plotly_draw_neuron3d():
-    plotly_impl.plot_morph3d(nrn, auto_open=False)
-    plotly_impl.plot_morph3d(nrn.neurites[0], auto_open=False)
+def test_plotly_draw_morph3d():
+    plotly_impl.plot_morph3d(m, auto_open=False)
+    plotly_impl.plot_morph3d(m.neurites[0], auto_open=False)
 
     fig = plotly_impl.plot_morph3d(load_morphology(SWC_PATH / 'simple-different-soma.swc'),
                                    auto_open=False)
@@ -45,6 +45,6 @@ def test_plotly_draw_neuron3d():
     assert_allclose(z[33, 33], 8.5)
 
 
-def test_plotly_draw_neuron2d():
-    plotly_impl.plot_morph(nrn, auto_open=False)
-    plotly_impl.plot_morph(nrn.neurites[0], auto_open=False)
+def test_plotly_draw_morph2d():
+    plotly_impl.plot_morph(m, auto_open=False)
+    plotly_impl.plot_morph(m.neurites[0], auto_open=False)

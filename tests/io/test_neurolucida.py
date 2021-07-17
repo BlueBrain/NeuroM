@@ -111,7 +111,7 @@ def test_single_neurite_no_soma():
 
 def test_skip_header():
     """Test that the header does not cause any issue"""
-    str_neuron = """(FilledCircle
+    str_morph = """(FilledCircle
                          (Color RGB (64, 0, 128))
                          (Name "Marker 11")
                          (Set "axons")
@@ -125,7 +125,7 @@ def test_skip_header():
                          (  1.2  3.7   2.0     13)
                          )"""
 
-    n = nm.load_morphology(str_neuron, reader='asc')
+    n = nm.load_morphology(str_morph, reader='asc')
     assert len(n.neurites) == 1
     assert_array_equal(n.neurites[0].points,
                        np.array([[1.2, 2.7, 1.0, 6.5],

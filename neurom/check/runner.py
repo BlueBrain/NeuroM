@@ -112,7 +112,7 @@ class CheckRunner:
 
         try:
             m = load_morphology(f)
-            result, summary = self._check_loop(m, 'morph_checks')
+            result, summary = self._check_loop(m, 'morphology_checks')
             full_result &= result
             full_summary.update(summary)
         except Exception as e:  # pylint: disable=W0703
@@ -144,8 +144,8 @@ class CheckRunner:
         """Check that the config has the correct keys, add missing keys if necessary."""
         if 'checks' in config:
             checks = config['checks']
-            if 'morph_checks' not in checks:
-                checks['morph_checks'] = []
+            if 'morphology_checks' not in checks:
+                checks['morphology_checks'] = []
         else:
             raise ConfigError('Need to have "checks" in the config')
 

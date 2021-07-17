@@ -1,4 +1,6 @@
 include requirements.txt
 include requirements_dev.txt
 include README.rst
+recursive-exclude tests *
+recursive-exclude tutorial *
 graft neurom/config

@@ -7,11 +7,11 @@ Version 3.0.0
     - ``neurom.core.neuron`` => ``neurom.core.morphology``
     - ``neurom.core.neuron.Neuron`` => ``neurom.core.morphology.Morphology``
     - ``neurom.check.neuron_checks`` => ``neurom.check.morph_checks``, replace `neuron_checks` with
-      `morph_checks` in configs for ``neurom check``
+      `morphology_checks` in configs for ``neurom check``
     - ``neurom.core.neuron.graft_neuron`` => ``neurom.core.morphology.graft_morphology``
 
 - Refactor plotting functionality. :ref:`migration-v3.0.0`.
-    - delete ``neurom.view.viewer``
+    - deprecate ``neurom.view.viewer``
     - rename ``neurom.view.view`` to ``neurom.view.matplotlib_impl``
     - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
@@ -37,6 +37,9 @@ Version 3.0.0
     - New config format. See :ref:`morph-stats-new-config`. The old format is deprecated.
     - Use `sum` instead of `total` mode in config
     - Keep feature names as is. Don't trim 's' at the end of plurals.
+
+- Delete ``neurom.check.structural_checks``, ``neurom.core.tree`` that were deprecated in v2.
+- Delete unused ``neurom.utils.memoize``
 
 Version 2.3.1
 -------------

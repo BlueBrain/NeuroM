@@ -46,7 +46,7 @@ API Documentation
    neurom.features.section
    neurom.features.bifurcation
    neurom.check.morphtree
-   neurom.check.morph_checks
+   neurom.check.morphology_checks
    neurom.core.types
    neurom.core.morphology
    neurom.core.population

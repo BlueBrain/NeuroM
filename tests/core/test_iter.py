@@ -143,7 +143,7 @@ def test_iter_sections_ileaf():
                           [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 83, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 83, 0, 1, 2])
 
 
-def test_iter_section_nrn():
+def test_iter_section_morph():
     ref = list(iter_sections(SIMPLE))
     assert len(ref) == 6
 
@@ -157,7 +157,7 @@ def test_iter_section_nrn():
     assert len(ref) == 0
 
 
-def test_iter_segments_nrn():
+def test_iter_segments_morph():
     ref = list(iter_segments(SIMPLE))
     assert len(ref) == 6
 
