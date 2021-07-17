@@ -68,7 +68,7 @@ lengths, section lengths, etc.
 For more details see :ref:`features`.
 
 Iterate over neurites with :func:`neurom.core.morphology.iter_neurites`
--------------------------------------------------------------------
+-----------------------------------------------------------------------
 
 :func:`neurom.core.morphology.iter_neurites` function allows to iterate over the neurites
 of a single morphology or a morphology population. It can also be applied to a single

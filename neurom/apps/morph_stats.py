@@ -281,7 +281,8 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     if ignored_exceptions is None:
         ignored_exceptions = ()
     ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
-    morphs = nm.load_morphologies(get_files_by_path(datapath), ignored_exceptions=ignored_exceptions)
+    morphs = nm.load_morphologies(get_files_by_path(datapath),
+                                  ignored_exceptions=ignored_exceptions)
 
     results = {}
     if as_population:

@@ -86,8 +86,8 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     # pylint: disable=too-many-branches
     is_obj_list = isinstance(obj, (list, tuple))
     if not isinstance(obj, (Neurite, Morphology, Population)) and not is_obj_list:
-        raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology can'
-                          ' be used for feature calculation')
+        raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite,'
+                          ' Morphology can be used for feature calculation')
 
     neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
     res, feature_ = None, None
