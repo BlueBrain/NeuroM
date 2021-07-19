@@ -41,6 +41,7 @@ import morphio
 from neurom.core.morphology import Morphology
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
+from neurom.utils import warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -164,6 +165,13 @@ def load_morphology(morph, reader=None):
     return Morphology(morph, Path(morph).name)
 
 
+def load_neuron(morph, reader=None):
+    """Deprecated in favor of ``load_morphology``."""
+    warn_deprecated('`neurom.io.utils.load_neuron` is deprecated in favor of '
+                    '`neurom.io.utils.load_morphology`')  # pragma: no cover
+    return load_morphology(morph, reader)  # pragma: no cover
+
+
 def load_morphologies(morphs,
                       name=None,
                       ignored_exceptions=(),
@@ -191,3 +199,10 @@ def load_morphologies(morphs,
         files = morphs
         name = name or 'Population'
     return Population(files, name, ignored_exceptions, cache)
+
+
+def load_neurons(morphs, name=None, ignored_exceptions=(), cache=False):
+    """Deprecated in favor of ``load_morphologies``."""
+    warn_deprecated('`neurom.io.utils.load_neurons` is deprecated in favor of '
+                    '`neurom.io.utils.load_morphologies`')  # pragma: no cover
+    return load_morphologies(morphs, name, ignored_exceptions, cache)  # pragma: no cover

@@ -39,6 +39,7 @@ from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.core.population import Population
+from neurom.utils import warn_deprecated
 
 
 class Section:
@@ -319,6 +320,13 @@ def graft_morphology(section):
     return Morphology(m)
 
 
+def graft_neuron(section):
+    """Deprecated in favor of ``graft_morphology``."""
+    warn_deprecated('`neurom.core.neuron.graft_neuron` is deprecated in favor of '
+                    '`neurom.core.morphology.graft_morphology`')  # pragma: no cover
+    return graft_morphology(section)  # pragma: no cover
+
+
 class Neurite:
     """Class representing a neurite tree."""
 
@@ -470,3 +478,12 @@ class Morphology(morphio.mut.Morphology):
         """Return a string representation."""
         return 'Morphology <soma: %s, n_neurites: %d>' % \
             (self.soma, len(self.neurites))
+
+
+class Neuron(Morphology):
+    """Deprecated ``Neuron`` class. Use ``Morphology`` instead."""
+    def __init__(self, filename, name=None):
+        """Dont use me."""
+        super().__init__(filename, name)  # pragma: no cover
+        warn_deprecated('`neurom.core.neuron.Neuron` is deprecated in favor of '
+                        '`neurom.core.morphology.Morphology`')  # pragma: no cover
