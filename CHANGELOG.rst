@@ -5,6 +5,7 @@ Version 3.0.0
 -------------
 - Rename all 'neuron' names to 'morphology' names, including module and package names. Previous
   'neuron' names still exist but deprecated. It is recommended to use new names:
+
     - ``neurom.check.neuron_checks`` => ``neurom.check.morphology_checks``, replace `neuron_checks`
       with `morphology_checks` in configs for ``neurom check``. This replacement is required as the
       previous 'neuron' name wasn't preserved.
