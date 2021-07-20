@@ -46,8 +46,8 @@ Analyze, visualize, and check
 =============================
 
 The :mod:`neurom` module has various helper functions and command line applications
-to simplify loading neuron morphologies from files into ``neurom`` data structures and
-obtaining morphometrics, either from single or multiple neurons.
+to simplify loading morphologies from files into ``neurom`` data structures and
+obtaining morphometrics, either from single or multiple morphologies.
 The functionality described here is limited, but it is hoped
 that it will suffice for most analyses.
 
@@ -60,18 +60,18 @@ lengths, section lengths, etc.
 .. code::
 
     import neurom as nm
-    nrn = nm.load_neuron('some/data/path/morph_file0.swc')
-    nrn_ap_seg_len = nm.features.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
-    pop = nm.load_neurons('some/data/path')
+    m = nm.load_morphology('some/data/path/morph_file0.swc')
+    m_ap_seg_len = nm.features.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
+    pop = nm.load_morphologies('some/data/path')
     pop_ap_seg_len = nm.features.get('segment_lengths', pop, neurite_type=nm.APICAL_DENDRITE)
 
 For more details see :ref:`features`.
 
-Iterate over neurites with :func:`neurom.core.neuron.iter_neurites`
--------------------------------------------------------------------
+Iterate over neurites with :func:`neurom.core.morphology.iter_neurites`
+-----------------------------------------------------------------------
 
-:func:`neurom.core.neuron.iter_neurites` function allows to iterate over the neurites
-of a single neuron or a neuron population. It can also be applied to a single
+:func:`neurom.core.morphology.iter_neurites` function allows to iterate over the neurites
+of a single morphology or a morphology population. It can also be applied to a single
 neurite or a list of neurites. It allows to optionally pass a function to be
 mapped onto each neurite, as well as a neurite filter function. In this example,
 we apply a simple user defined function to the apical dendrites in a population:
@@ -86,13 +86,13 @@ we apply a simple user defined function to the apical dendrites in a population:
 
     stuff = [x for x in nm.iter_neurites(pop, user_func, lambda n : n.type == nm.APICAL_DENDRITE)]
 
-View neurons with :mod:`neurom.viewer`
---------------------------------------
+View morphologies with :mod:`neurom.viewer`
+-------------------------------------------
 
-There are also helper functions to  plot a neuron in 2 and 3 dimensions.
+There are also helper functions to  plot a morphology in 2 and 3 dimensions.
 
 :func:`neurom.viewer.draw` function allows the user to make two and three-dimensional
-plots of neurites, somata and neurons. It also has a dendrogram neuron plotting mode.
+plots of neurites, somata and morphologies. It also has a dendrogram morphology plotting mode.
 
 
 Extract morphometrics into JSON files
@@ -148,7 +148,7 @@ Check data validity
 
 The :doc:`neurom check<morph_check>` application applies some semantic
 checks to morphology data files in order to
-determine whether it is suitable to construct a neuron structure and whether certain
+determine whether it is suitable to construct a morphology structure and whether certain
 defects within the structure are detected. It can be invoked from the command line, and
 takes as main argument the path to either a single file or a directory of morphology files.
 

@@ -1,22 +1,40 @@
 Changelog
 =========
 
-Version 2.4.0
+Version 3.0.0
 -------------
-- Refactor plotting functionality. :ref:`migration-v2.4.0`.
+- Rename all 'neuron' names to 'morphology' names, including module and package names. Previous
+  'neuron' names still exist but deprecated. It is recommended to use new names:
+
+    - ``neurom.check.neuron_checks`` => ``neurom.check.morphology_checks``, replace `neuron_checks`
+      with `morphology_checks` in configs for ``neurom check``. This replacement is required as the
+      previous 'neuron' name wasn't preserved.
+    - ``neurom.core.neuron`` => ``neurom.core.morphology``
+    - ``neurom.core.neuron.Neuron`` => ``neurom.core.morphology.Morphology``
+    - ``neurom.core.neuron.graft_neuron`` => ``neurom.core.morphology.graft_morphology``
+    - ``neurom.io.utils.load_neuron`` => ``neurom.io.utils.load_morphology``
+    - ``neurom.io.utils.load_neurons`` => ``neurom.io.utils.load_morphologies``
+
+- Refactor plotting functionality. :ref:`migration-v3.0.0`.
     - deprecate ``neurom.view.viewer``
-    - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.view``
-    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_neuron`` and
-      ``neurom.view.plotly.plot_neuron3d``.
     - rename ``neurom.view.view`` to ``neurom.view.matplotlib_impl``
     - rename ``neurom.view.plotly`` to ``neurom.view.plotly_impl``
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
+    - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.matplotlib_impl``,
+      also ``nrn`` arg is renamed to ``morph``.
+    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_morph`` and
+      ``neurom.view.plotly.plot_morph3d``.
 
 - Refactor features.
-    - Rigid classification of features. ``neuritefunc`` features must accept only a single neurite.
-      ``neuronfunc`` features must accept only a single neuron. ``populationfunc`` features must
+    - Drop 'func' suffix of all module names within `features` package:
+        - ``neurom.features.bifurcationfunc`` => ``neurom.features.bifurcation``
+        - ``neurom.features.sectionfunc`` => ``neurom.features.section``
+        - ``neurom.features.neuritefunc`` => ``neurom.features.neurite``
+        - ``neurom.features.neuronfunc`` => ``neurom.features.morphology``
+    - Rigid classification of features. ``neurite`` features must accept only a single neurite.
+      ``morphology`` features must accept only a single morphology. ``population`` features must
       accept only a collection of neurons or a neuron population.
-    - Some features were deleted, renamed, added. See :ref:`migration-v2.4.0`.
+    - Some features were deleted, renamed, added. See :ref:`migration-v3.0.0`.
     - Name consistency among private variables.
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
@@ -24,6 +42,9 @@ Version 2.4.0
     - New config format. See :ref:`morph-stats-new-config`. The old format is deprecated.
     - Use `sum` instead of `total` mode in config
     - Keep feature names as is. Don't trim 's' at the end of plurals.
+
+- Delete ``neurom.check.structural_checks``, ``neurom.core.tree`` that were deprecated in v2.
+- Delete unused ``neurom.utils.memoize``
 
 Version 2.3.1
 -------------

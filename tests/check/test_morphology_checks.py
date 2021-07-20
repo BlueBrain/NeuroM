@@ -30,8 +30,8 @@ from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 
-from neurom import check, load_neuron
-from neurom.check import neuron_checks as nrn_chk
+from neurom import check, load_morphology
+from neurom.check import morphology_checks
 from neurom.core.dataformat import COLS
 from neurom.core.types import dendrite_filter
 from neurom.exceptions import NeuroMError
@@ -44,19 +44,18 @@ ASC_PATH = DATA_PATH / 'neurolucida'
 H5V1_PATH = DATA_PATH / 'h5/v1'
 
 
-
-def _load_neuron(name):
+def _load_morphology(name):
     if name.endswith('.swc'):
         path = SWC_PATH / name
     elif name.endswith('.h5'):
         path = H5V1_PATH / name
     else:
         path = ASC_PATH / name
-    return name, load_neuron(path)
+    return name, load_morphology(path)
 
 
-def _make_monotonic(neuron):
-    for neurite in neuron.neurites:
+def _make_monotonic(morphology):
+    for neurite in morphology.neurites:
         for node in neurite.iter_sections():
             sec = node.points
             if node.parent is not None:
@@ -65,18 +64,18 @@ def _make_monotonic(neuron):
                 sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
 
 
-def _make_flat(neuron):
+def _make_flat(morphology):
 
     class Flattenizer:
         def __call__(self, points):
             points = deepcopy(points)
-            points[:, COLS.Z] = 0.;
+            points[:, COLS.Z] = 0.
             return points
 
-    return neuron.transform(Flattenizer())
+    return morphology.transform(Flattenizer())
 
 
-NEURONS = dict([_load_neuron(n) for n in ['Neuron.h5',
+NEURONS = dict([_load_morphology(n) for n in ['Neuron.h5',
                                           'Neuron_2_branch.h5',
                                           'Neuron.swc',
                                           'Neuron_small_radius.swc',
@@ -99,36 +98,30 @@ def test_has_axon_good_data():
              'Single_axon.swc',
              'Neuron.h5',
              ]
-    for n in _pick(files):
-        assert nrn_chk.has_axon(n)
+    for m in _pick(files):
+        assert morphology_checks.has_axon(m)
 
 
 def test_has_axon_bad_data():
-    files = ['Single_apical.swc',
-             'Single_basal.swc',
-             ]
-    for n in _pick(files):
-        assert not nrn_chk.has_axon(n)
+    files = ['Single_apical.swc', 'Single_basal.swc']
+    for m in _pick(files):
+        assert not morphology_checks.has_axon(m)
 
 
 def test_has_apical_dendrite_good_data():
     files = ['Neuron.swc',
              'Neuron_small_radius.swc',
              'Single_apical.swc',
-             'Neuron.h5',
-             ]
+             'Neuron.h5']
 
-    for n in _pick(files):
-        assert nrn_chk.has_apical_dendrite(n)
+    for m in _pick(files):
+        assert morphology_checks.has_apical_dendrite(m)
 
 
 def test_has_apical_dendrite_bad_data():
-    files = ['Single_axon.swc',
-             'Single_basal.swc',
-             ]
-
-    for n in _pick(files):
-        assert not nrn_chk.has_apical_dendrite(n)
+    files = ['Single_axon.swc', 'Single_basal.swc']
+    for m in _pick(files):
+        assert not morphology_checks.has_apical_dendrite(m)
 
 
 def test_has_basal_dendrite_good_data():
@@ -136,33 +129,29 @@ def test_has_basal_dendrite_good_data():
              'Neuron_small_radius.swc',
              'Single_basal.swc',
              'Neuron_2_branch.h5',
-             'Neuron.h5',
-             ]
+             'Neuron.h5']
 
-    for n in _pick(files):
-        assert nrn_chk.has_basal_dendrite(n)
+    for m in _pick(files):
+        assert morphology_checks.has_basal_dendrite(m)
 
 
 def test_has_basal_dendrite_bad_data():
-    files = ['Single_axon.swc',
-             'Single_apical.swc',
-             ]
+    files = ['Single_axon.swc', 'Single_apical.swc']
 
-    for n in _pick(files):
-        assert not nrn_chk.has_basal_dendrite(n)
+    for m in _pick(files):
+        assert not morphology_checks.has_basal_dendrite(m)
 
 
 def test_has_no_flat_neurites():
+    _, m = _load_morphology('Neuron.swc')
 
-    _, n = _load_neuron('Neuron.swc')
+    assert morphology_checks.has_no_flat_neurites(m, 1e-6, method='tolerance')
+    assert morphology_checks.has_no_flat_neurites(m, 0.1, method='ratio')
 
-    assert nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance')
-    assert nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio')
+    m = _make_flat(m)
 
-    n = _make_flat(n)
-
-    assert not nrn_chk.has_no_flat_neurites(n, 1e-6, method='tolerance')
-    assert not nrn_chk.has_no_flat_neurites(n, 0.1, method='ratio')
+    assert not morphology_checks.has_no_flat_neurites(m, 1e-6, method='tolerance')
+    assert not morphology_checks.has_no_flat_neurites(m, 0.1, method='ratio')
 
 
 def test_nonzero_neurite_radii_good_data():
@@ -173,30 +162,30 @@ def test_nonzero_neurite_radii_good_data():
              'Neuron_2_branch.h5',
              ]
 
-    for n in _pick(files):
-        ids = nrn_chk.has_all_nonzero_neurite_radii(n)
+    for m in _pick(files):
+        ids = morphology_checks.has_all_nonzero_neurite_radii(m)
         assert len(ids.info) == 0
 
 
 def test_has_all_nonzero_neurite_radii_threshold():
-    nrn = NEURONS['Neuron.swc']
+    m = NEURONS['Neuron.swc']
 
-    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn)
+    ids = morphology_checks.has_all_nonzero_neurite_radii(m)
     assert ids.status
 
-    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.25)
+    ids = morphology_checks.has_all_nonzero_neurite_radii(m, threshold=0.25)
     assert len(ids.info) == 122
 
 
 def test_nonzero_neurite_radii_bad_data():
-    nrn = NEURONS['Neuron_zero_radius.swc']
-    ids = nrn_chk.has_all_nonzero_neurite_radii(nrn, threshold=0.7)
+    m = NEURONS['Neuron_zero_radius.swc']
+    ids = morphology_checks.has_all_nonzero_neurite_radii(m, threshold=0.7)
     assert ids.info == [(0, 2)]
 
 
 def test_nonzero_segment_lengths_good_data():
-    nrn = NEURONS['Neuron.swc']
-    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+    m = NEURONS['Neuron.swc']
+    ids = morphology_checks.has_all_nonzero_segment_lengths(m)
     assert ids.status
     assert len(ids.info) == 0
 
@@ -210,20 +199,20 @@ def test_nonzero_segment_lengths_bad_data():
 
     bad_ids = [[0, 21, 42, 63], [0], [0], [0], [0]]
 
-    for i, nrn in enumerate(_pick(files)):
-        ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+    for i, m in enumerate(_pick(files)):
+        ids = morphology_checks.has_all_nonzero_segment_lengths(m)
         assert (ids.info ==
                         [(id, 0) for id in bad_ids[i]])
 
 
 def test_nonzero_segment_lengths_threshold():
-    nrn = NEURONS['Neuron.swc']
+    m = NEURONS['Neuron.swc']
 
-    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn)
+    ids = morphology_checks.has_all_nonzero_segment_lengths(m)
     assert ids.status
     assert len(ids.info) == 0
 
-    ids = nrn_chk.has_all_nonzero_segment_lengths(nrn, threshold=0.25)
+    ids = morphology_checks.has_all_nonzero_segment_lengths(m, threshold=0.25)
 
     bad_ids = [(0, 0), (21, 0), (36, 9), (42, 0), (52, 7), (60, 2), (63, 0), (70, 4), (76, 6)]
     assert (ids.info ==
@@ -237,80 +226,79 @@ def test_nonzero_section_lengths_good_data():
              'Single_axon.swc',
              ]
 
-    for i, nrn in enumerate(_pick(files)):
-        ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+    for i, m in enumerate(_pick(files)):
+        ids = morphology_checks.has_all_nonzero_section_lengths(m)
         assert ids.status
         assert len(ids.info) == 0
 
 
 def test_nonzero_section_lengths_bad_data():
-    nrn = NEURONS['Neuron_zero_length_sections.swc']
+    m = NEURONS['Neuron_zero_length_sections.swc']
 
-    ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+    ids = morphology_checks.has_all_nonzero_section_lengths(m)
     assert not ids.status
     assert ids.info == [13]
 
 
 def test_nonzero_section_lengths_threshold():
-    nrn = NEURONS['Neuron.swc']
+    m = NEURONS['Neuron.swc']
 
-    ids = nrn_chk.has_all_nonzero_section_lengths(nrn)
+    ids = morphology_checks.has_all_nonzero_section_lengths(m)
     assert ids.status
     assert len(ids.info) == 0
 
-    ids = nrn_chk.has_all_nonzero_section_lengths(nrn, threshold=15.)
+    ids = morphology_checks.has_all_nonzero_section_lengths(m, threshold=15.)
     assert not ids.status
     assert len(ids.info) == 84
 
 
 def test_has_nonzero_soma_radius():
-
-    nrn = load_neuron(SWC_PATH / 'Neuron.swc')
-    assert nrn_chk.has_nonzero_soma_radius(nrn)
+    m = load_morphology(SWC_PATH / 'Neuron.swc')
+    assert morphology_checks.has_nonzero_soma_radius(m)
 
 
 def test_has_nonzero_soma_radius_bad_data():
-    nrn = load_neuron(SWC_PATH / 'soma_zero_radius.swc')
-    assert not nrn_chk.has_nonzero_soma_radius(nrn).status
+    m = load_morphology(SWC_PATH / 'soma_zero_radius.swc')
+    assert not morphology_checks.has_nonzero_soma_radius(m).status
 
 
 def test_has_no_fat_ends():
-    _, nrn = _load_neuron('fat_end.swc')
-    assert not nrn_chk.has_no_fat_ends(nrn).status
+    _, m = _load_morphology('fat_end.swc')
+    assert not morphology_checks.has_no_fat_ends(m).status
 
     # if we only use point, there isn't a 'fat end'
     # since if the last point is 'x': x < 2*mean([x])
-    assert nrn_chk.has_no_fat_ends(nrn, final_point_count=1).status
+    assert morphology_checks.has_no_fat_ends(m, final_point_count=1).status
 
     # if the multiple of the mean is large, the end won't be fat
-    assert nrn_chk.has_no_fat_ends(nrn, multiple_of_mean=10).status
+    assert morphology_checks.has_no_fat_ends(m, multiple_of_mean=10).status
 
-    _, nrn = _load_neuron('Single_basal.swc')
-    assert nrn_chk.has_no_fat_ends(nrn).status
+    _, m = _load_morphology('Single_basal.swc')
+    assert morphology_checks.has_no_fat_ends(m).status
 
 
 def test_has_no_root_node_jumps():
-    _, nrn = _load_neuron('root_node_jump.swc')
-    check = nrn_chk.has_no_root_node_jumps(nrn)
+    _, m = _load_morphology('root_node_jump.swc')
+    check = morphology_checks.has_no_root_node_jumps(m)
     assert not check.status
     assert len(check.info) == 1
     assert check.info[0][0] == 0
     assert_array_equal(check.info[0][1], [[0, 3, 0]])
 
-    assert nrn_chk.has_no_root_node_jumps(nrn, radius_multiplier=4).status
+    assert morphology_checks.has_no_root_node_jumps(m, radius_multiplier=4).status
 
 
 def test_has_no_narrow_start():
-    _, nrn = _load_neuron('narrow_start.swc')
-    check = nrn_chk.has_no_narrow_start(nrn)
+    _, m = _load_morphology('narrow_start.swc')
+    check = morphology_checks.has_no_narrow_start(m)
     assert not check.status
     assert_array_equal(check.info[0][1][:, COLS.XYZR], [[0, 0, 2, 2]])
 
-    _, nrn = _load_neuron('narrow_start.swc')
-    assert nrn_chk.has_no_narrow_start(nrn, 0.25).status
+    _, m = _load_morphology('narrow_start.swc')
+    assert morphology_checks.has_no_narrow_start(m, 0.25).status
 
-    _, nrn = _load_neuron('fat_end.swc')  # doesn't have narrow start
-    assert nrn_chk.has_no_narrow_start(nrn, 0.25).status
+    _, m = _load_morphology('fat_end.swc')  # doesn't have narrow start
+    assert morphology_checks.has_no_narrow_start(m, 0.25).status
 
 
 def test_has_nonzero_soma_radius_threshold():
@@ -318,26 +306,26 @@ def test_has_nonzero_soma_radius_threshold():
     class Dummy:
         pass
 
-    nrn = Dummy()
-    nrn.soma = Dummy()
-    nrn.soma.radius = 1.5
+    m = Dummy()
+    m.soma = Dummy()
+    m.soma.radius = 1.5
 
-    assert nrn_chk.has_nonzero_soma_radius(nrn)
-    assert nrn_chk.has_nonzero_soma_radius(nrn, 0.25)
-    assert nrn_chk.has_nonzero_soma_radius(nrn, 0.75)
-    assert nrn_chk.has_nonzero_soma_radius(nrn, 1.25)
-    assert nrn_chk.has_nonzero_soma_radius(nrn, 1.499)
-    assert not nrn_chk.has_nonzero_soma_radius(nrn, 1.5)
-    assert not nrn_chk.has_nonzero_soma_radius(nrn, 1.75)
-    assert not nrn_chk.has_nonzero_soma_radius(nrn, 2.5)
+    assert morphology_checks.has_nonzero_soma_radius(m)
+    assert morphology_checks.has_nonzero_soma_radius(m, 0.25)
+    assert morphology_checks.has_nonzero_soma_radius(m, 0.75)
+    assert morphology_checks.has_nonzero_soma_radius(m, 1.25)
+    assert morphology_checks.has_nonzero_soma_radius(m, 1.499)
+    assert not morphology_checks.has_nonzero_soma_radius(m, 1.5)
+    assert not morphology_checks.has_nonzero_soma_radius(m, 1.75)
+    assert not morphology_checks.has_nonzero_soma_radius(m, 2.5)
 
 
 def test_has_no_jumps():
-    _, nrn = _load_neuron('z_jump.swc')
-    assert not nrn_chk.has_no_jumps(nrn).status
-    assert nrn_chk.has_no_jumps(nrn, 100).status
+    _, m = _load_morphology('z_jump.swc')
+    assert not morphology_checks.has_no_jumps(m).status
+    assert morphology_checks.has_no_jumps(m, 100).status
 
-    assert nrn_chk.has_no_jumps(nrn, 100, axis='x').status
+    assert morphology_checks.has_no_jumps(m, 100, axis='x').status
 
 
 def test_has_no_narrow_dendritic_section():
@@ -353,15 +341,15 @@ def test_has_no_narrow_dendritic_section():
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
 """)
-    nrn = load_neuron(swc_content, reader='swc')
-    res = nrn_chk.has_no_narrow_neurite_section(nrn,
+    m = load_morphology(swc_content, reader='swc')
+    res = morphology_checks.has_no_narrow_neurite_section(m,
                                                 dendrite_filter,
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
 
     assert res.status
 
-    res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
+    res = morphology_checks.has_no_narrow_neurite_section(m, dendrite_filter,
                                                 radius_threshold=7,
                                                 considered_section_min_length=0)
     assert not res.status
@@ -378,37 +366,37 @@ def test_has_no_narrow_dendritic_section():
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
 """)
-    nrn = load_neuron(swc_content, reader='swc')
-    res = nrn_chk.has_no_narrow_neurite_section(nrn, dendrite_filter,
+    m = load_morphology(swc_content, reader='swc')
+    res = morphology_checks.has_no_narrow_neurite_section(m, dendrite_filter,
                                                 radius_threshold=5,
                                                 considered_section_min_length=0)
     assert res.status, 'Narrow soma or axons should not raise bad status when checking for narrow dendrites'
 
 
 def test_has_no_dangling_branch():
-    _, nrn = _load_neuron('dangling_axon.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    _, m = _load_morphology('dangling_axon.swc')
+    res = morphology_checks.has_no_dangling_branch(m)
     assert not res.status
     assert len(res.info) == 1
     assert_array_equal(res.info[0][1][0][COLS.XYZ],
                        [0., 49.,  0.])
 
-    _, nrn = _load_neuron('dangling_dendrite.swc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    _, m = _load_morphology('dangling_dendrite.swc')
+    res = morphology_checks.has_no_dangling_branch(m)
     assert not res.status
     assert len(res.info) == 1
     assert_array_equal(res.info[0][1][0][COLS.XYZ],
                        [0., 49.,  0.])
 
-    _, nrn = _load_neuron('axon-sprout-from-dendrite.asc')
-    res = nrn_chk.has_no_dangling_branch(nrn)
+    _, m = _load_morphology('axon-sprout-from-dendrite.asc')
+    res = morphology_checks.has_no_dangling_branch(m)
     assert res.status
 
 
 def test_dangling_branch_no_soma():
     with pytest.raises(NeuroMError, match='Can\'t check for dangling neurites if there is no soma'):
-        nrn = load_neuron(SWC_PATH / 'Single_apical_no_soma.swc')
-        nrn_chk.has_no_dangling_branch(nrn)
+        m = load_morphology(SWC_PATH / 'Single_apical_no_soma.swc')
+        morphology_checks.has_no_dangling_branch(m)
 
 
 def test__bool__():
@@ -419,7 +407,7 @@ def test__bool__():
 
 
 def test_has_multifurcation():
-    nrn = load_neuron(StringIO(u"""
+    m = load_morphology(StringIO(u"""
 	((CellBody) (0 0 0 2))
 ( (Color Blue)
   (Axon)
@@ -442,7 +430,7 @@ def test_has_multifurcation():
 )
 """), reader='asc')
 
-    check_ = nrn_chk.has_multifurcation(nrn)
+    check_ = morphology_checks.has_multifurcation(m)
     assert not check_.status
     info = check_.info
     assert_array_equal(info[0][0], 0)
@@ -450,7 +438,7 @@ def test_has_multifurcation():
 
 
 def test_single_children():
-    neuron = load_neuron("""
+    m = load_morphology("""
 ( (Color Blue)
   (Axon)
   (0 5 0 2)
@@ -463,6 +451,6 @@ def test_single_children():
   )
 )
 """, "asc")
-    result = nrn_chk.has_no_single_children(neuron)
-    assert result.status == False
+    result = morphology_checks.has_no_single_children(m)
+    assert result.status is False
     assert result.info == [0]

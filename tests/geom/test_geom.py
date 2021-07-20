@@ -34,8 +34,8 @@ from neurom import geom
 from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent / 'data/swc'
-NRN = nm.load_neuron(SWC_DATA_PATH / 'Neuron.swc')
-SIMPLE = nm.load_neuron(SWC_DATA_PATH / 'simple.swc')
+NRN = nm.load_morphology(SWC_DATA_PATH / 'Neuron.swc')
+SIMPLE = nm.load_morphology(SWC_DATA_PATH / 'simple.swc')
 
 class PointObj:
     pass
@@ -54,7 +54,7 @@ def test_bounding_box():
     assert np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
 
 
-def test_bounding_box_neuron():
+def test_bounding_box_morphology():
 
     ref = np.array([[-40.32853516, -57.600172, 0.],
                     [64.74726272, 48.51626225, 54.20408797]])

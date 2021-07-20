@@ -30,23 +30,23 @@ from io import StringIO
 from pathlib import Path
 
 import neurom as nm
-from neurom import COLS, load_neuron
-from neurom.core.neuron import NeuriteIter, Section, iter_neurites, iter_sections, iter_segments
+from neurom import COLS, load_morphology
+from neurom.core.morphology import NeuriteIter, Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.population import Population
 from numpy.testing import assert_array_equal
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 
-NRN1 = load_neuron(DATA_PATH / 'swc/Neuron.swc')
+NRN1 = load_morphology(DATA_PATH / 'swc/Neuron.swc')
 
 NEURONS = [NRN1,
-           load_neuron(DATA_PATH / 'swc/Single_basal.swc'),
-           load_neuron(DATA_PATH / 'swc/Neuron_small_radius.swc'),
-           load_neuron(DATA_PATH / 'swc/Neuron_3_random_walker_branches.swc'),]
+           load_morphology(DATA_PATH / 'swc/Single_basal.swc'),
+           load_morphology(DATA_PATH / 'swc/Neuron_small_radius.swc'),
+           load_morphology(DATA_PATH / 'swc/Neuron_3_random_walker_branches.swc'), ]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 
-SIMPLE = load_neuron(DATA_PATH / 'swc/simple.swc')
-REVERSED_NEURITES = load_neuron(DATA_PATH / 'swc/ordering/reversed_NRN_neurite_order.swc')
+SIMPLE = load_morphology(DATA_PATH / 'swc/simple.swc')
+REVERSED_NEURITES = load_morphology(DATA_PATH / 'swc/ordering/reversed_NRN_neurite_order.swc')
 
 POP = Population(NEURONS, name='foo')
 
@@ -143,7 +143,7 @@ def test_iter_sections_ileaf():
                           [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 83, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 61, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 83, 0, 1, 2])
 
 
-def test_iter_section_nrn():
+def test_iter_section_morph():
     ref = list(iter_sections(SIMPLE))
     assert len(ref) == 6
 
@@ -157,7 +157,7 @@ def test_iter_section_nrn():
     assert len(ref) == 0
 
 
-def test_iter_segments_nrn():
+def test_iter_segments_morph():
     ref = list(iter_segments(SIMPLE))
     assert len(ref) == 6
 
@@ -199,7 +199,7 @@ def test_iter_segments_pop():
 
 
 def test_iter_segments_section():
-    sec = load_neuron(StringIO(u"""
+    sec = load_morphology(StringIO(u"""
 	                      ((CellBody)
 	                       (0 0 0 2))
 

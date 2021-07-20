@@ -27,17 +27,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
 import tempfile
 from pathlib import Path
 
 import matplotlib
-import mock
 
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
-from neurom import NeuriteType, load_neuron, viewer
+from neurom import NeuriteType, load_morphology, viewer
 from neurom.view import matplotlib_utils
 
 import pytest
@@ -45,72 +43,72 @@ from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent / 'data/swc'
 MORPH_FILENAME = DATA_PATH / 'Neuron.swc'
-nrn = load_neuron(MORPH_FILENAME)
+m = load_morphology(MORPH_FILENAME)
 
 
-def test_draw_neuron():
-    viewer.draw(nrn)
+def test_draw_morphology():
+    viewer.draw(m)
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_filter_neurite():
     for mode in ['2d', '3d']:
-        viewer.draw(nrn, mode=mode, neurite_type=NeuriteType.basal_dendrite)
+        viewer.draw(m, mode=mode, neurite_type=NeuriteType.basal_dendrite)
         assert_allclose(matplotlib_utils.plt.gca().get_ylim(),
                         [-30., 78], atol=5)
 
     matplotlib_utils.plt.close('all')
 
 
-def test_draw_neuron3d():
-    viewer.draw(nrn, mode='3d')
+def test_draw_morphology3d():
+    viewer.draw(m, mode='3d')
     matplotlib_utils.plt.close('all')
 
     with pytest.raises(NotImplementedError):
-        viewer.draw(nrn, mode='3d', realistic_diameters=True)
+        viewer.draw(m, mode='3d', realistic_diameters=True)
 
     # for coverage
-    viewer.draw(nrn, mode='3d', realistic_diameters=False)
+    viewer.draw(m, mode='3d', realistic_diameters=False)
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_tree():
-    viewer.draw(nrn.neurites[0])
+    viewer.draw(m.neurites[0])
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_tree3d():
-    viewer.draw(nrn.neurites[0], mode='3d')
+    viewer.draw(m.neurites[0], mode='3d')
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_soma():
-    viewer.draw(nrn.soma)
+    viewer.draw(m.soma)
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_soma3d():
-    viewer.draw(nrn.soma, mode='3d')
+    viewer.draw(m.soma, mode='3d')
     matplotlib_utils.plt.close('all')
 
 
 def test_draw_dendrogram():
-    viewer.draw(nrn, mode='dendrogram')
+    viewer.draw(m, mode='dendrogram')
     matplotlib_utils.plt.close('all')
 
-    viewer.draw(nrn.neurites[0], mode='dendrogram')
+    viewer.draw(m.neurites[0], mode='dendrogram')
     matplotlib_utils.plt.close('all')
 
 def test_draw_dendrogram_empty_segment():
-    neuron = load_neuron(DATA_PATH / 'empty_segments.swc')
-    viewer.draw(neuron, mode='dendrogram')
+    m = load_morphology(DATA_PATH / 'empty_segments.swc')
+    viewer.draw(m, mode='dendrogram')
     matplotlib_utils.plt.close('all')
 
 
 
 def test_invalid_draw_mode_raises():
     with pytest.raises(viewer.InvalidDrawModeError):
-        viewer.draw(nrn, mode='4d')
+        viewer.draw(m, mode='4d')
 
 
 def test_invalid_object_raises():
@@ -122,12 +120,12 @@ def test_invalid_object_raises():
 
 def test_invalid_combo_raises():
     with pytest.raises(viewer.NotDrawableError):
-        viewer.draw(nrn.soma, mode='dendrogram')
+        viewer.draw(m.soma, mode='dendrogram')
 
 
 def test_writing_output():
     with tempfile.TemporaryDirectory() as folder:
         output_dir = Path(folder, 'subdir')
-        viewer.draw(nrn, mode='2d', output_path=output_dir)
+        viewer.draw(m, mode='2d', output_path=output_dir)
         assert (output_dir / 'Figure.png').is_file()
         matplotlib_utils.plt.close('all')

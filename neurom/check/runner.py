@@ -27,13 +27,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Runner for neuron morphology checks."""
+"""Runner for morphology morphology checks."""
 
 import logging
 from collections import OrderedDict
 from importlib import import_module
 
-from neurom import load_neuron
+from neurom import load_morphology
 from neurom.check import check_wrapper
 from neurom.exceptions import ConfigError
 from neurom.io import utils
@@ -111,8 +111,8 @@ class CheckRunner:
         full_summary = OrderedDict()
 
         try:
-            nrn = load_neuron(f)
-            result, summary = self._check_loop(nrn, 'neuron_checks')
+            m = load_morphology(f)
+            result, summary = self._check_loop(m, 'morphology_checks')
             full_result &= result
             full_summary.update(summary)
         except Exception as e:  # pylint: disable=W0703
@@ -144,8 +144,8 @@ class CheckRunner:
         """Check that the config has the correct keys, add missing keys if necessary."""
         if 'checks' in config:
             checks = config['checks']
-            if 'neuron_checks' not in checks:
-                checks['neuron_checks'] = []
+            if 'morphology_checks' not in checks:
+                checks['morphology_checks'] = []
         else:
             raise ConfigError('Need to have "checks" in the config')
 

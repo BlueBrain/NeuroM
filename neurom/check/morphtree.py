@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Python module of NeuroM to check neuronal trees."""
+"""Python module of NeuroM to check morphology trees."""
 
 import numpy as np
 from neurom.core.dataformat import COLS
@@ -170,50 +170,50 @@ def is_back_tracking(neurite):
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    section_itr = (snode for snode in neurite.iter_sections() if snode.points.shape[0] > 2)
-    for snode in section_itr:
+    section_itr = (sec for sec in neurite.iter_sections() if sec.points.shape[0] > 2)
+    for sec in section_itr:
         # group each section's points intro triplets
-        segment_pairs = list(filter(is_not_zero_seg, pair(snode.points)))
+        segment_pairs = list(filter(is_not_zero_seg, pair(sec.points)))
 
         # filter out zero length segments
         for i, seg1 in enumerate(segment_pairs[1:]):
             # check if the end point of the segment lies within the previous
-            # ones in the current sectionmake
+            # ones in the current section
             for seg2 in segment_pairs[0: i + 1]:
                 if is_inside_cylinder(seg1, seg2):
                     return True
     return False
 
 
-def get_flat_neurites(neuron, tol=0.1, method='ratio'):
-    """Check if a neuron has neurites that are flat within a tolerance.
+def get_flat_neurites(morph, tol=0.1, method='ratio'):
+    """Check if a morphology has neurites that are flat within a tolerance.
 
     Args:
-        neurite(Neurite): neurite to operate on
+        morph(Morphology): morphology to operate on
         tol(float): the tolerance or the ratio
         method(string): 'tolerance' or 'ratio' described in :meth:`is_flat`
 
     Returns:
         Bool list corresponding to the flatness check for each neurite
-        in neuron neurites with respect to the given criteria
+        in morphology neurites with respect to the given criteria
     """
-    return [n for n in neuron.neurites if is_flat(n, tol, method)]
+    return [n for n in morph.neurites if is_flat(n, tol, method)]
 
 
-def get_nonmonotonic_neurites(neuron, tol=1e-6):
+def get_nonmonotonic_neurites(morph, tol=1e-6):
     """Get neurites that are not monotonic.
 
     Args:
-        neuron(Neuron): neuron to operate on
+        morph(Morphology): morphology to operate on
         tol(float): the tolerance or the ratio
 
     Returns:
         list of neurites that do not satisfy monotonicity test
     """
-    return [n for n in neuron.neurites if not is_monotonic(n, tol)]
+    return [n for n in morph.neurites if not is_monotonic(n, tol)]
 
 
-def get_back_tracking_neurites(neuron):
+def get_back_tracking_neurites(morph):
     """Get neurites that have back-tracks.
 
     A back-track is the placement of a point near a previous segment during
@@ -221,9 +221,9 @@ def get_back_tracking_neurites(neuron):
     cause issues with meshing algorithms.
 
     Args:
-        neuron(Neuron): neurite to operate on
+        morph(Morphology): neurite to operate on
 
     Returns:
-        List of neurons with backtracks
+        List of morphologies with backtracks
     """
-    return [n for n in neuron.neurites if is_back_tracking(n)]
+    return [n for n in morph.neurites if is_back_tracking(n)]

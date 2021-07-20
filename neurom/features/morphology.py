@@ -26,18 +26,18 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Neuron features.
+"""Morphology features.
 
 Any public function from this namespace can be called via the features mechanism. If calling
-directly the function in this namespace can only accept a neuron as its input. If you want to
-apply it to a neuron population then you must use the features mechanism e.g. ``features.get``.
+directly the function in this namespace can only accept a morphology as its input. If you want to
+apply it to a morphology population then you must use the features mechanism e.g. ``features.get``.
 The features mechanism does not allow you to apply these features to neurites.
 
 >>> import neurom
 >>> from neurom import features
->>> nrn = neurom.load_neuron('path/to/neuron')
->>> features.get('soma_surface_area', nrn)
->>> population = neurom.load_neurons('path/to/neurons')
+>>> m = neurom.load_morphology('path/to/morphology')
+>>> features.get('soma_surface_area', m)
+>>> population = neurom.load_morphologies('path/to/morphs')
 >>> features.get('sholl_crossings', population)
 
 For more details see :ref:`features`.
@@ -49,76 +49,76 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.neuron import iter_neurites, iter_segments
+from neurom.core.morphology import iter_neurites, iter_segments
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
-from neurom.features import feature, NameSpace, neuritefunc
+from neurom.features import feature, NameSpace, neurite as nf
 
 feature = partial(feature, namespace=NameSpace.NEURON)
 
 
 @feature(shape=())
-def soma_volume(neuron):
-    """Get the volume of a neuron's soma."""
-    return neuron.soma.volume
+def soma_volume(morph):
+    """Get the volume of a morphology's soma."""
+    return morph.soma.volume
 
 
 @feature(shape=())
-def soma_surface_area(neuron):
-    """Get the surface area of a neuron's soma.
+def soma_surface_area(morph):
+    """Get the surface area of a morphology's soma.
 
     Note:
         The surface area is calculated by assuming the soma is spherical.
     """
-    return 4 * math.pi * neuron.soma.radius ** 2
+    return 4 * math.pi * morph.soma.radius ** 2
 
 
 @feature(shape=())
-def soma_radius(neuron):
-    """Get the radius of a neuron's soma."""
-    return neuron.soma.radius
+def soma_radius(morph):
+    """Get the radius of a morphology's soma."""
+    return morph.soma.radius
 
 
 @feature(shape=())
-def max_radial_distance(neuron, neurite_type=NeuriteType.all):
+def max_radial_distance(morph, neurite_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = [neuritefunc.max_radial_distance(s)
-                             for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    term_radial_distances = [nf.max_radial_distance(n)
+                             for n in iter_neurites(morph, filt=is_type(neurite_type))]
     return max(term_radial_distances) if term_radial_distances else 0.
 
 
 @feature(shape=(...,))
-def number_of_sections_per_neurite(neuron, neurite_type=NeuriteType.all):
+def number_of_sections_per_neurite(morph, neurite_type=NeuriteType.all):
     """List of numbers of sections per neurite."""
-    return [neuritefunc.number_of_sections(s)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [nf.number_of_sections(n)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def total_length_per_neurite(neuron, neurite_type=NeuriteType.all):
+def total_length_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite lengths."""
-    return [neuritefunc.total_length(s)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [nf.total_length(n)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def total_area_per_neurite(neuron, neurite_type=NeuriteType.all):
+def total_area_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite areas."""
-    return [neuritefunc.total_area(s)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [nf.total_area(n)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def total_volume_per_neurite(neuron, neurite_type=NeuriteType.all):
+def total_volume_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite volumes."""
-    return [neuritefunc.total_volume(s)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [nf.total_volume(n)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def trunk_origin_azimuths(neuron, neurite_type=NeuriteType.all):
-    """Get a list of all the trunk origin azimuths of a neuron.
+def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
+    """Get a list of all the trunk origin azimuths of a morph.
 
     The azimuth is defined as Angle between x-axis and the vector
     defined by (initial tree point - soma center) on the x-z plane.
@@ -130,13 +130,13 @@ def trunk_origin_azimuths(neuron, neurite_type=NeuriteType.all):
         vector = morphmath.vector(section[0], soma.center)
         return np.arctan2(vector[COLS.Z], vector[COLS.X])
 
-    return [_azimuth(s.root_node.points, neuron.soma)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [_azimuth(n.root_node.points, morph.soma)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def trunk_origin_elevations(neuron, neurite_type=NeuriteType.all):
-    """Get a list of all the trunk origin elevations of a neuron.
+def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
+    """Get a list of all the trunk origin elevations of a morph.
 
     The elevation is defined as the angle between x-axis and the
     vector defined by (initial tree point - soma center)
@@ -153,25 +153,25 @@ def trunk_origin_elevations(neuron, neurite_type=NeuriteType.all):
             return np.arcsin(vector[COLS.Y] / norm_vector)
         raise ValueError("Norm of vector between soma center and section is almost zero.")
 
-    return [_elevation(s.root_node.points, neuron.soma)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [_elevation(n.root_node.points, morph.soma)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def trunk_vectors(neuron, neurite_type=NeuriteType.all):
-    """Calculates the vectors between all the trunks of the neuron and the soma center."""
-    return [morphmath.vector(s.root_node.points[0], neuron.soma.center)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+def trunk_vectors(morph, neurite_type=NeuriteType.all):
+    """Calculates the vectors between all the trunks of the morphology and the soma center."""
+    return [morphmath.vector(n.root_node.points[0], morph.soma.center)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def trunk_angles(neuron, neurite_type=NeuriteType.all):
-    """Calculates the angles between all the trunks of the neuron.
+def trunk_angles(morph, neurite_type=NeuriteType.all):
+    """Calculates the angles between all the trunks of the morph.
 
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
     """
-    vectors = np.array(trunk_vectors(neuron, neurite_type=neurite_type))
+    vectors = np.array(trunk_vectors(morph, neurite_type=neurite_type))
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if len(vectors) == 0:
         return []
@@ -193,37 +193,37 @@ def trunk_angles(neuron, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def trunk_origin_radii(neuron, neurite_type=NeuriteType.all):
-    """Radii of the trunk sections of neurites in a neuron."""
-    return [s.root_node.points[0][COLS.R]
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+def trunk_origin_radii(morph, neurite_type=NeuriteType.all):
+    """Radii of the trunk sections of neurites in a morph."""
+    return [n.root_node.points[0][COLS.R]
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
-def trunk_section_lengths(neuron, neurite_type=NeuriteType.all):
-    """List of lengths of trunk sections of neurites in a neuron."""
-    return [morphmath.section_length(s.root_node.points)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
+    """List of lengths of trunk sections of neurites in a morph."""
+    return [morphmath.section_length(n.root_node.points)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=())
-def number_of_neurites(neuron, neurite_type=NeuriteType.all):
-    """Number of neurites in a neuron."""
-    return sum(1 for _ in iter_neurites(neuron, filt=is_type(neurite_type)))
+def number_of_neurites(morph, neurite_type=NeuriteType.all):
+    """Number of neurites in a morph."""
+    return sum(1 for _ in iter_neurites(morph, filt=is_type(neurite_type)))
 
 
 @feature(shape=(...,))
-def neurite_volume_density(neuron, neurite_type=NeuriteType.all):
+def neurite_volume_density(morph, neurite_type=NeuriteType.all):
     """Get volume density per neurite."""
-    return [neuritefunc.volume_density(s)
-            for s in iter_neurites(neuron, filt=is_type(neurite_type))]
+    return [nf.volume_density(n)
+            for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
-def sholl_crossings(neuron, center, radii, neurite_type=NeuriteType.all):
+def sholl_crossings(morph, center, radii, neurite_type=NeuriteType.all):
     """Calculate crossings of neurites. Not a feature.
 
     Args:
-        neuron(Neuron|list): morphology or a list of neurites
+        morph(Morphology|list): morphology or a list of neurites
         center(Point): center point
         radii(iterable of floats): radii for which crossings will be counted
         neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
@@ -234,9 +234,9 @@ def sholl_crossings(neuron, center, radii, neurite_type=NeuriteType.all):
 
     This function can also be used with a list of sections, as follow::
 
-        secs = (sec for sec in nm.iter_sections(neuron) if complex_filter(sec))
+        secs = (sec for sec in nm.iter_sections(morph) if complex_filter(sec))
         sholl = nm.features.neuritefunc.sholl_crossings(secs,
-                                                        center=neuron.soma.center,
+                                                        center=morph.soma.center,
                                                         radii=np.arange(0, 1000, 100))
     """
     def _count_crossings(neurite, radius):
@@ -253,34 +253,34 @@ def sholl_crossings(neuron, center, radii, neurite_type=NeuriteType.all):
         return count
 
     return [sum(_count_crossings(neurite, r)
-                for neurite in iter_neurites(neuron, filt=is_type(neurite_type)))
+                for neurite in iter_neurites(morph, filt=is_type(neurite_type)))
             for r in radii]
 
 
 @feature(shape=(...,))
-def sholl_frequency(neuron, neurite_type=NeuriteType.all, step_size=10, bins=None):
-    """Perform Sholl frequency calculations on a neuron.
+def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
+    """Perform Sholl frequency calculations on a morph.
 
     Args:
-        neuron(Neuron): a neuron
+        morph(Morphology): a morphology
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-        intervals of step_size between min and max radii of ``neurons``.
+        intervals of step_size between min and max radii of ``morphologies``.
 
     Note:
-        Given a neuron, the soma center is used for the concentric circles,
+        Given a morphology, the soma center is used for the concentric circles,
         which range from the soma radii, and the maximum radial distance
-        in steps of `step_size`. Each segment of the neuron is tested, so a neurite that
+        in steps of `step_size`. Each segment of the morphology is tested, so a neurite that
         bends back on itself, and crosses the same Sholl radius will get counted as
         having crossed multiple times.
     """
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        min_soma_edge = neuron.soma.radius
-        max_radii = max(np.max(np.linalg.norm(s.points[:, COLS.XYZ], axis=1))
-                        for s in neuron.neurites if neurite_filter(s))
+        min_soma_edge = morph.soma.radius
+        max_radii = max(np.max(np.linalg.norm(n.points[:, COLS.XYZ], axis=1))
+                        for n in morph.neurites if neurite_filter(n))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sholl_crossings(neuron, neuron.soma.center, bins, neurite_type)
+    return sholl_crossings(morph, morph.soma.center, bins, neurite_type)

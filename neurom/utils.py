@@ -30,53 +30,9 @@
 import json
 import warnings
 from enum import Enum
-from functools import partial, update_wrapper, wraps
+from functools import wraps
 
 import numpy as np
-
-
-class memoize:
-    """cache the return value of a method.
-
-    This class is meant to be used as a decorator of methods. The return value
-    from a given method invocation will be cached on the instance whose method
-    was invoked. All arguments passed to a method decorated with memoize must
-    be hashable.
-
-    If a memoized method is invoked directly on its class the result will not
-    be cached. Instead the method will be invoked like a static method::
-
-       class Obj:
-           @memoize
-           def add_to(self, arg):
-               return self + arg
-
-       Obj.add_to(1) # not enough arguments
-       Obj.add_to(1, 2) # returns 3, result is not cached
-    """
-
-    def __init__(self, func):
-        """Initialize a memoize object."""
-        self.func = func
-        update_wrapper(self, func)
-
-    def __get__(self, obj, objtype=None):
-        """Get the attribute from the object."""
-        return partial(self, obj)
-
-    def __call__(self, *args, **kw):
-        """Callable for decorator."""
-        obj = args[0]
-        try:
-            cache = obj.__cache  # pylint: disable=protected-access
-        except AttributeError:
-            cache = obj.__cache = {}
-        key = (self.func, args[1:], frozenset(kw.items()))
-        try:
-            res = cache[key]
-        except KeyError:
-            res = cache[key] = self.func(*args, **kw)
-        return res
 
 
 def warn_deprecated(msg):

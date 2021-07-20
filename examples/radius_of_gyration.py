@@ -90,17 +90,17 @@ def mean_rad_of_gyration(neurites):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'tests/data/swc/Neuron.swc'
-    nrn = nm.load_neuron(filename)
+    m = nm.load_morphology(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
     print([(sum(len(s.points) - 1 for s in nrte.iter_sections()),
-            radius_of_gyration(nrte), nrte.type) for nrte in nrn.neurites])
+            radius_of_gyration(nrte), nrte.type) for nrte in m.neurites])
 
     # print mean radius of gyration per neurite type
     print('Mean radius of gyration for axons: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.AXON))
+          mean_rad_of_gyration(n for n in m.neurites if n.type == nm.AXON))
     print('Mean radius of gyration for basal dendrites: ',
-          mean_rad_of_gyration(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE))
+          mean_rad_of_gyration(n for n in m.neurites if n.type == nm.BASAL_DENDRITE))
     print('Mean radius of gyration for apical dendrites: ',
-          mean_rad_of_gyration(n for n in nrn.neurites
+          mean_rad_of_gyration(n for n in m.neurites
                                if n.type == nm.APICAL_DENDRITE))

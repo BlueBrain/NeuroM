@@ -29,39 +29,39 @@
 """NeuroM neurom morphology analysis package.
 
 Examples:
-    Load a neuron
+    Load a morphology
 
     >>> import neurom as nm
-    >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
+    >>> m = nm.load_morphology('some/data/path/morph_file.swc')
 
     Obtain some morphometrics using the get function
 
-    >>> ap_seg_len = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
-    >>> ax_sec_len = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
+    >>> ap_seg_len = nm.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
+    >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
-    Load neurons from a directory. This loads all SWC, HDF5 or NeuroLucida .asc\
-    files it finds and returns a list of neurons
+    Load morphs from a directory. This loads all SWC, HDF5 or NeuroLucida .asc\
+    files it finds and returns a list of morphs
 
     >>> import numpy as np  # For mean value calculation
-    >>> nrns = nm.load_neurons('some/data/directory')
-    >>> for nrn in nrns:
-    ...     print 'mean section length', np.mean(nm.get('section_lengths', nrn))
+    >>> pop = nm.load_morphologies('some/data/directory')
+    >>> for m in pop:
+    ...     print 'mean section length', np.mean(nm.get('section_lengths', m))
 
-    Apply a function to a selection of neurites in a neuron or population.
-    This example gets the number of points in each axon in a neuron population
+    Apply a function to a selection of neurites in a morphology or morphology population.
+    This example gets the number of points in each axon in a morphology population
 
     >>> import neurom as nm
     >>> filter = lambda n : n.type == nm.AXON
     >>> mapping = lambda n : len(n.points)
-    >>> n_points = [n for n in nm.iter_neurites(nrns, mapping, filter)]
+    >>> n_points = [n for n in nm.iter_neurites(pop, mapping, filter)]
 """
 
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType, NeuriteIter, NEURITES as NEURITE_TYPES
-from neurom.core.neuron import graft_neuron, iter_neurites, iter_sections, iter_segments
+from neurom.core.morphology import graft_morphology, iter_neurites, iter_sections, iter_segments
 
 from neurom.features import get
-from neurom.io.utils import NeuronLoader, load_neuron, load_neurons
+from neurom.io.utils import MorphLoader, load_morphology, load_morphologies
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite

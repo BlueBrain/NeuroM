@@ -29,12 +29,12 @@
 """Population features.
 
 Any public function from this namespace can be called via features mechanism. Functions in this
-namespace can only accept a neuron population as its input no matter how called.
+namespace can only accept a morphology population as its input no matter how called.
 
 >>> import neurom
 >>> from neurom import features
->>> nrn_population = neurom.load_neurons('path/to/neurons')
->>> features.get('sholl_frequency', nrn_population)
+>>> pop = neurom.load_morphologies('path/to/morphs')
+>>> features.get('sholl_frequency', pop)
 
 For more details see :ref:`features`.
 """
@@ -47,36 +47,36 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import feature, NameSpace
-from neurom.features.neuronfunc import sholl_crossings
+from neurom.features.morphology import sholl_crossings
 
 feature = partial(feature, namespace=NameSpace.POPULATION)
 
 
 @feature(shape=(...,))
-def sholl_frequency(neurons, neurite_type=NeuriteType.all, step_size=10, bins=None):
-    """Perform Sholl frequency calculations on a population of neurons.
+def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=None):
+    """Perform Sholl frequency calculations on a population of morphs.
 
     Args:
-        neurons(list|Population): list of neurons or neuron population
+        morphs(list|Population): list of morphologies or morphology population
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-        intervals of step_size between min and max radii of ``neurons``.
+        intervals of step_size between min and max radii of ``morphs``.
 
     Note:
         Given a population, the concentric circles range from the smallest soma radius to the
-        largest radial neurite distance in steps of `step_size`. Each segment of the neuron is
+        largest radial neurite distance in steps of `step_size`. Each segment of the morphology is
         tested, so a neurite that bends back on itself, and crosses the same Sholl radius will
         get counted as having crossed multiple times.
     """
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        min_soma_edge = min(n.soma.radius for n in neurons)
-        max_radii = max(np.max(np.linalg.norm(s.points[:, COLS.XYZ], axis=1))
-                        for n in neurons
-                        for s in n.neurites if neurite_filter(s))
+        min_soma_edge = min(n.soma.radius for n in morphs)
+        max_radii = max(np.max(np.linalg.norm(n.points[:, COLS.XYZ], axis=1))
+                        for m in morphs
+                        for n in m.neurites if neurite_filter(n))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sum(np.array(sholl_crossings(n, n.soma.center, bins, neurite_type))
-               for n in neurons)
+    return sum(np.array(sholl_crossings(m, m.soma.center, bins, neurite_type))
+               for m in morphs)

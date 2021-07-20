@@ -35,10 +35,10 @@ apply it to anything other than neurite then you must use the features mechanism
 
 >>> import neurom
 >>> from neurom import features
->>> nrn = neurom.load_neuron('path/to/neuron')
->>> features.get('max_radial_distance', nrn.neurites[0])
->>> features.get('max_radial_distance', nrn)
->>> features.get('number_of_segments', nrn.neurites, neurite_type=neurom.AXON)
+>>> m = neurom.load_morphology('path/to/morphology')
+>>> features.get('max_radial_distance', m.neurites[0])
+>>> features.get('max_radial_distance', m)
+>>> features.get('number_of_segments', m.neurites, neurite_type=neurom.AXON)
 
 For more details see :ref:`features`.
 """
@@ -50,9 +50,9 @@ from itertools import chain
 import numpy as np
 import scipy
 from neurom import morphmath
-from neurom.core.neuron import Section
+from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
-from neurom.features import bifurcationfunc, feature, sectionfunc, NameSpace
+from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
 
@@ -81,13 +81,13 @@ def number_of_segments(neurite):
 
 @feature(shape=())
 def number_of_sections(neurite, iterator_type=Section.ipreorder):
-    """Number of sections. For a neuron it will be a sum of all neurites sections numbers."""
+    """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
     return sum(1 for _ in iterator_type(neurite.root_node))
 
 
 @feature(shape=())
 def number_of_bifurcations(neurite):
-    """Number of bifurcation points."""
+    """Number of bf points."""
     return number_of_sections(neurite, iterator_type=Section.ibifurcation_point)
 
 
@@ -105,13 +105,13 @@ def number_of_leaves(neurite):
 
 @feature(shape=())
 def total_length(neurite):
-    """Neurite length. For a neuron it will be a sum of all neurite lengths."""
+    """Neurite length. For a morphology it will be a sum of all neurite lengths."""
     return sum(s.length for s in neurite.iter_sections())
 
 
 @feature(shape=())
 def total_area(neurite):
-    """Neurite surface area. For a neuron it will be a sum of all neurite areas.
+    """Neurite surface area. For a morphology it will be a sum of all neurite areas.
 
     The area is defined as the sum of the area of the sections.
     """
@@ -120,7 +120,7 @@ def total_area(neurite):
 
 @feature(shape=())
 def total_volume(neurite):
-    """Neurite volume. For a neuron it will be a sum of neurites volumes."""
+    """Neurite volume. For a morphology it will be a sum of neurites volumes."""
     return sum(s.volume for s in Section.ipreorder(neurite.root_node))
 
 
@@ -150,19 +150,19 @@ def section_bif_lengths(neurite):
 @feature(shape=(...,))
 def section_branch_orders(neurite):
     """Section branch orders."""
-    return _map_sections(sectionfunc.branch_order, neurite)
+    return _map_sections(sf.branch_order, neurite)
 
 
 @feature(shape=(...,))
 def section_bif_branch_orders(neurite):
     """Bifurcation section branch orders."""
-    return _map_sections(sectionfunc.branch_order, neurite, Section.ibifurcation_point)
+    return _map_sections(sf.branch_order, neurite, Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def section_term_branch_orders(neurite):
     """Termination section branch orders."""
-    return _map_sections(sectionfunc.branch_order, neurite, Section.ileaf)
+    return _map_sections(sf.branch_order, neurite, Section.ileaf)
 
 
 @feature(shape=(...,))
@@ -193,7 +193,7 @@ def _map_segments(func, neurite):
 @feature(shape=(...,))
 def segment_lengths(neurite):
     """Lengths of the segments."""
-    return _map_segments(sectionfunc.segment_lengths, neurite)
+    return _map_segments(sf.segment_lengths, neurite)
 
 
 @feature(shape=(...,))
@@ -249,7 +249,7 @@ def section_taper_rates(neurite):
     """Diameter taper rates of the sections from root to tip.
 
     Taper rate is defined here as the linear fit along a section.
-    It is expected to be negative for neurons.
+    It is expected to be negative for morphologies.
     """
 
     def _sec_taper_rate(sec):
@@ -263,7 +263,7 @@ def section_taper_rates(neurite):
 @feature(shape=(...,))
 def segment_meander_angles(neurite):
     """Inter-segment opening angles in a section."""
-    return list(chain.from_iterable(_map_sections(sectionfunc.section_meander_angles, neurite)))
+    return list(chain.from_iterable(_map_sections(sf.section_meander_angles, neurite)))
 
 
 @feature(shape=(..., 3))
@@ -291,7 +291,7 @@ def segment_path_lengths(neurite):
                 pathlength[section.id] = 0
         return pathlength[section.id]
 
-    result = [_get_pathlength(section) + np.cumsum(sectionfunc.segment_lengths(section))
+    result = [_get_pathlength(section) + np.cumsum(sf.segment_lengths(section))
               for section in Section.ipreorder(neurite.root_node)]
     return np.hstack(result).tolist() if result else []
 
@@ -312,23 +312,23 @@ def segment_radial_distances(neurite, origin=None):
 
 @feature(shape=(...,))
 def local_bifurcation_angles(neurite):
-    """Get a list of local bifurcation angles."""
-    return _map_sections(bifurcationfunc.local_bifurcation_angle,
+    """Get a list of local bf angles."""
+    return _map_sections(bf.local_bifurcation_angle,
                          neurite,
                          iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def remote_bifurcation_angles(neurite):
-    """Get a list of remote bifurcation angles."""
-    return _map_sections(bifurcationfunc.remote_bifurcation_angle,
+    """Get a list of remote bf angles."""
+    return _map_sections(bf.remote_bifurcation_angle,
                          neurite,
                          iterator_type=Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
-    """Partition asymmetry at bifurcation points.
+    """Partition asymmetry at bf points.
 
     Variant: length is a different definition, as the absolute difference in
     downstream path lenghts, relative to the total neurite path length
@@ -344,63 +344,63 @@ def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
 
     if variant == 'branch-order':
         return _map_sections(
-            partial(bifurcationfunc.partition_asymmetry, uylings=method == 'uylings'),
+            partial(bf.partition_asymmetry, uylings=method == 'uylings'),
             neurite,
             Section.ibifurcation_point)
 
     asymmetries = []
     neurite_length = total_length(neurite)
     for section in Section.ibifurcation_point(neurite.root_node):
-        pathlength_diff = abs(sectionfunc.downstream_pathlength(section.children[0]) -
-                              sectionfunc.downstream_pathlength(section.children[1]))
+        pathlength_diff = abs(sf.downstream_pathlength(section.children[0]) -
+                              sf.downstream_pathlength(section.children[1]))
         asymmetries.append(pathlength_diff / neurite_length)
     return asymmetries
 
 
 @feature(shape=(...,))
 def bifurcation_partitions(neurite):
-    """Partition at bifurcation points."""
-    return _map_sections(bifurcationfunc.bifurcation_partition,
+    """Partition at bf points."""
+    return _map_sections(bf.bifurcation_partition,
                          neurite,
                          Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def sibling_ratios(neurite, method='first'):
-    """Sibling ratios at bifurcation points.
+    """Sibling ratios at bf points.
 
     The sibling ratio is the ratio between the diameters of the
     smallest and the largest child. It is a real number between
     0 and 1. Method argument allows one to consider mean diameters
     along the child section instead of diameter of the first point.
     """
-    return _map_sections(partial(bifurcationfunc.sibling_ratio, method=method),
+    return _map_sections(partial(bf.sibling_ratio, method=method),
                          neurite,
                          Section.ibifurcation_point)
 
 
 @feature(shape=(..., 2))
 def partition_pairs(neurite):
-    """Partition pairs at bifurcation points.
+    """Partition pairs at bf points.
 
     Partition pair is defined as the number of bifurcations at the two
     daughters of the bifurcating section
     """
-    return _map_sections(bifurcationfunc.partition_pair,
+    return _map_sections(bf.partition_pair,
                          neurite,
                          Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def diameter_power_relations(neurite, method='first'):
-    """Calculate the diameter power relation at a bifurcation point.
+    """Calculate the diameter power relation at a bf point.
 
     Diameter power relation is defined in https://www.ncbi.nlm.nih.gov/pubmed/18568015
 
     This quantity gives an indication of how far the branching is from
     the Rall ratio (when =1).
     """
-    return _map_sections(partial(bifurcationfunc.diameter_power_relation, method=method),
+    return _map_sections(partial(bf.diameter_power_relation, method=method),
                          neurite,
                          Section.ibifurcation_point)
 
@@ -413,7 +413,7 @@ def section_radial_distances(neurite, origin=None, iterator_type=Section.ipreord
     or only bifurcations (ibifurcation_point).
     """
     pos = neurite.root_node.points[0] if origin is None else origin
-    return _map_sections(partial(sectionfunc.section_radial_distance, origin=pos),
+    return _map_sections(partial(sf.section_radial_distance, origin=pos),
                          neurite,
                          iterator_type)
 
@@ -426,14 +426,14 @@ def section_term_radial_distances(neurite, origin=None):
 
 @feature(shape=(...,))
 def section_bif_radial_distances(neurite, origin=None):
-    """Get the radial distances of the bifurcation sections."""
+    """Get the radial distances of the bf sections."""
     return section_radial_distances(neurite, origin, Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
 def terminal_path_lengths(neurite):
     """Get the path lengths to each terminal point."""
-    return _map_sections(sectionfunc.section_path_length, neurite, Section.ileaf)
+    return _map_sections(sf.section_path_length, neurite, Section.ileaf)
 
 
 @feature(shape=())
@@ -461,30 +461,30 @@ def volume_density(neurite):
 @feature(shape=(...,))
 def section_volumes(neurite):
     """Section volumes."""
-    return _map_sections(sectionfunc.section_volume, neurite)
+    return _map_sections(sf.section_volume, neurite)
 
 
 @feature(shape=(...,))
 def section_areas(neurite):
     """Section areas."""
-    return _map_sections(sectionfunc.section_area, neurite)
+    return _map_sections(sf.section_area, neurite)
 
 
 @feature(shape=(...,))
 def section_tortuosity(neurite):
     """Section tortuosities."""
-    return _map_sections(sectionfunc.section_tortuosity, neurite)
+    return _map_sections(sf.section_tortuosity, neurite)
 
 
 @feature(shape=(...,))
 def section_end_distances(neurite):
     """Section end to end distances."""
-    return _map_sections(sectionfunc.section_end_distance, neurite)
+    return _map_sections(sf.section_end_distance, neurite)
 
 
 @feature(shape=())
 def principal_direction_extents(neurite, direction=0):
-    """Principal direction extent of neurites in neurons."""
+    """Principal direction extent of neurites in morphologies."""
     points = neurite.points[:, :3]
     return morphmath.principal_direction_extent(points)[direction]
 
@@ -492,4 +492,4 @@ def principal_direction_extents(neurite, direction=0):
 @feature(shape=(...,))
 def section_strahler_orders(neurite):
     """Inter-segment opening angles in a section."""
-    return _map_sections(sectionfunc.strahler_order, neurite)
+    return _map_sections(sf.strahler_order, neurite)

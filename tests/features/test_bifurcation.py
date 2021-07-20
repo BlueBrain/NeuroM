@@ -35,18 +35,18 @@ import numpy as np
 from numpy.testing import assert_raises
 
 import neurom as nm
-from neurom import load_neuron
+from neurom import load_morphology
 from neurom.exceptions import NeuroMError
-from neurom.features import bifurcationfunc as bf
+from neurom.features import bifurcation as bf
 
 import pytest
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
-SIMPLE = nm.load_neuron(SWC_PATH / 'simple.swc')
+SIMPLE = nm.load_morphology(SWC_PATH / 'simple.swc')
 with warnings.catch_warnings(record=True):
-    SIMPLE2 = load_neuron(DATA_PATH / 'neurolucida' / 'not_too_complex.asc')
-    MULTIFURCATION = load_neuron(DATA_PATH / 'neurolucida' / 'multifurcation.asc')
+    SIMPLE2 = load_morphology(DATA_PATH / 'neurolucida' / 'not_too_complex.asc')
+    MULTIFURCATION = load_morphology(DATA_PATH / 'neurolucida' / 'multifurcation.asc')
 
 
 def test_local_bifurcation_angle():

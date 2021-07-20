@@ -41,36 +41,36 @@ except ImportError as e:
     ) from e
 
 from neurom import COLS, iter_segments, iter_neurites
-from neurom.core.neuron import Neuron
+from neurom.core.morphology import Morphology
 from neurom.view.matplotlib_impl import TREE_COLOR
 
 
-def plot_neuron(neuron, plane='xy', inline=False, **kwargs):
+def plot_morph(morph, plane='xy', inline=False, **kwargs):
     """Draw morphology in 2D.
 
     Args:
-        neuron(Neuron|Section): neuron or section
+        morph(Morphology|Section): morphology or section
         plane(str): a string representing the 2D plane (example: 'xy')
         inline(bool): must be set to True for interactive ipython notebook plotting
         **kwargs: additional plotly keyword arguments
     """
-    return _plotly(neuron, plane=plane, title='neuron-2D', inline=inline, **kwargs)
+    return _plotly(morph, plane=plane, title='morphology-2D', inline=inline, **kwargs)
 
 
-def plot_neuron3d(neuron, inline=False, **kwargs):
+def plot_morph3d(morph, inline=False, **kwargs):
     """Draw morphology in 3D.
 
     Args:
-        neuron(Neuron|Section): neuron or section
+        morph(Morphology|Section): morphology or section
         inline(bool): must be set to True for interactive ipython notebook plotting
         **kwargs: additional plotly keyword arguments
     """
-    return _plotly(neuron, plane='3d', title='neuron-3D', inline=inline, **kwargs)
+    return _plotly(morph, plane='3d', title='morphology-3D', inline=inline, **kwargs)
 
 
-def _make_trace(neuron, plane):
+def _make_trace(morph, plane):
     """Create the trace to be plotted."""
-    for neurite in iter_neurites(neuron):
+    for neurite in iter_neurites(morph):
         segments = list(iter_segments(neurite))
 
         segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in segments]
@@ -92,9 +92,9 @@ def _make_trace(neuron, plane):
         )
 
 
-def _fill_soma_data(neuron, data, plane):
+def _fill_soma_data(morph, data, plane):
     """Fill soma data if 3D plot and returns soma_2d in all cases."""
-    if not isinstance(neuron, Neuron):
+    if not isinstance(morph, Morphology):
         return []
 
     if plane != '3d':
@@ -105,10 +105,10 @@ def _fill_soma_data(neuron, data, plane):
                 'xref': 'x',
                 'yref': 'y',
                 'fillcolor': 'rgba(50, 171, 96, 0.7)',
-                'x0': neuron.soma.center[0] - neuron.soma.radius,
-                'y0': neuron.soma.center[1] - neuron.soma.radius,
-                'x1': neuron.soma.center[0] + neuron.soma.radius,
-                'y1': neuron.soma.center[1] + neuron.soma.radius,
+                'x0': morph.soma.center[0] - morph.soma.radius,
+                'y0': morph.soma.center[1] - morph.soma.radius,
+                'x1': morph.soma.center[0] + morph.soma.radius,
+                'y1': morph.soma.center[1] + morph.soma.radius,
 
                 'line': {
                     'color': 'rgba(50, 171, 96, 1)',
@@ -121,12 +121,12 @@ def _fill_soma_data(neuron, data, plane):
         point_count = 100  # Enough points so that the surface looks like a sphere
         theta = np.linspace(0, 2 * np.pi, point_count)
         phi = np.linspace(0, np.pi, point_count)
-        r = neuron.soma.radius
+        r = morph.soma.radius
         data.append(
             go.Surface(
-                x=r * np.outer(np.cos(theta), np.sin(phi)) + neuron.soma.center[0],
-                y=r * np.outer(np.sin(theta), np.sin(phi)) + neuron.soma.center[1],
-                z=r * np.outer(np.ones(point_count), np.cos(phi)) + neuron.soma.center[2],
+                x=r * np.outer(np.cos(theta), np.sin(phi)) + morph.soma.center[0],
+                y=r * np.outer(np.sin(theta), np.sin(phi)) + morph.soma.center[1],
+                z=r * np.outer(np.ones(point_count), np.cos(phi)) + morph.soma.center[2],
                 cauto=False,
                 surfacecolor=['black'] * len(phi),
                 showscale=False,
@@ -135,9 +135,9 @@ def _fill_soma_data(neuron, data, plane):
     return soma_2d
 
 
-def get_figure(neuron, plane, title):
-    """Returns the plotly figure containing the neuron."""
-    data = list(_make_trace(neuron, plane))
+def get_figure(morph, plane, title):
+    """Returns the plotly figure containing the morphology."""
+    data = list(_make_trace(morph, plane))
     axis = dict(
         gridcolor='rgb(255, 255, 255)',
         zerolinecolor='rgb(255, 255, 255)',
@@ -145,7 +145,7 @@ def get_figure(neuron, plane, title):
         backgroundcolor='rgb(230, 230,230)'
     )
 
-    soma_2d = _fill_soma_data(neuron, data, plane)
+    soma_2d = _fill_soma_data(morph, data, plane)
 
     layout = dict(
         autosize=True,
@@ -163,8 +163,8 @@ def get_figure(neuron, plane, title):
     return res
 
 
-def _plotly(neuron, plane, title, inline, **kwargs):
-    fig = get_figure(neuron, plane, title)
+def _plotly(morph, plane, title, inline, **kwargs):
+    fig = get_figure(morph, plane, title)
 
     plot_fun = iplot if inline else plot
     if inline:

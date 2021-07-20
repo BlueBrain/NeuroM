@@ -70,7 +70,7 @@ def test_morph_stat():
                                    'basal_dendrite:max_section_branch_orders',
                                    'all:max_section_lengths',
                                    'all:sum_section_lengths', 'all:sum_section_volumes',
-                                   'all:max_section_branch_orders', 'neuron:mean_soma_radius'}
+                                   'all:max_section_branch_orders', 'morphology:mean_soma_radius'}
 
 
 def test_morph_stat_full_config():
