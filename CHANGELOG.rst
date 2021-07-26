@@ -7,8 +7,7 @@ Version 3.0.0
   'neuron' names still exist but deprecated. It is recommended to use new names:
 
     - ``neurom.check.neuron_checks`` => ``neurom.check.morphology_checks``, replace `neuron_checks`
-      with `morphology_checks` in configs for ``neurom check``. This replacement is required as the
-      previous 'neuron' name wasn't preserved.
+      with `morphology_checks` in configs for ``neurom check``.
     - ``neurom.core.neuron`` => ``neurom.core.morphology``
     - ``neurom.core.neuron.Neuron`` => ``neurom.core.morphology.Morphology``
     - ``neurom.core.neuron.graft_neuron`` => ``neurom.core.morphology.graft_morphology``
