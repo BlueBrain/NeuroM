@@ -62,6 +62,7 @@ from neurom.core.morphology import graft_morphology, iter_neurites, iter_section
 
 from neurom.features import get
 from neurom.io.utils import MorphLoader, load_morphology, load_morphologies
+from neurom.io.utils import load_neuron, load_neurons
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite
