@@ -73,20 +73,20 @@ def test_tree_invalid(get_fig_2d):
     m = load_morphology(SWC_PATH / 'simple-different-section-types.swc')
     fig, ax = get_fig_2d
     with pytest.raises(AssertionError):
-        matplotlib_impl.plot_tree(m.neurites[0], ax, plane='wrong')
+        matplotlib_impl.plot_tree(m.neurites[0], ax=ax, plane='wrong')
 
 
 def test_tree_bounds(get_fig_2d):
     m = load_morphology(SWC_PATH / 'simple-different-section-types.swc')
     fig, ax = get_fig_2d
-    matplotlib_impl.plot_tree(m.neurites[0], ax)
+    matplotlib_impl.plot_tree(m.neurites[0], ax=ax)
     np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.))
 
 
 def test_morph(get_fig_2d):
     m = load_morphology(SWC_PATH / 'Neuron.swc')
     fig, ax = get_fig_2d
-    matplotlib_impl.plot_morph(m, ax)
+    matplotlib_impl.plot_morph(m, ax=ax)
     assert ax.get_title() == m.name
     assert_allclose(ax.dataLim.get_points(),
                                [[-40.32853516, -57.600172],

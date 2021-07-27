@@ -44,22 +44,21 @@ Migration to v3 version
       m = nm.load_morphology('some/data/path/morph_file.asc')
 
       # instead of: viewer.draw(m)
-      fig, ax = matplotlib_utils.get_figure()
-      matplotlib_impl.plot_morph(m, ax)
-      matplotlib_utils.plot_style(fig=fig, ax=ax)
+      matplotlib_impl.plot_morph(m)
 
       # instead of: viewer.draw(m, mode='3d')
-      fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
-      matplotlib_impl.plot_morph3d(m, ax)
-      matplotlib_utils.plot_style(fig=fig, ax=ax)
+      matplotlib_impl.plot_morph3d(m)
 
       # instead of: viewer.draw(m, mode='dendrogram')
+      matplotlib_impl.plot_dendrogram(m)
+
+      # If you used ``output_path`` with any of functions above then the solution is:
       fig, ax = matplotlib_utils.get_figure()
       matplotlib_impl.plot_dendrogram(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
-
-      # If you used ``output_path`` with any of functions above then add this line
       matplotlib_utils.save_plot(fig=fig, output_path=output_path)
+      # for other plots like `plot_morph` it is the same, you just need to call `plot_morph` instead
+      # of `plot_dendrogram`.
 
       # instead of `plotly.draw`
       from neurom import plotly_impl

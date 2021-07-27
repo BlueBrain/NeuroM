@@ -28,6 +28,7 @@
 
 """Morphology draw functions using matplotlib."""
 
+from functools import wraps
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
@@ -59,6 +60,28 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
               NeuriteType.custom10: 'orange'}
 
 
+def _implicit_ax(plot_func, params=None):
+    """Sets ``ax`` arg for plot functions if ``ax`` is not set originally."""
+
+    @wraps(plot_func)
+    def wrapper(*args, **kwargs):
+        fig = None
+        ax = kwargs.get('ax', None)
+        if ax is None and len(args) == 1:
+            fig, ax = matplotlib_utils.get_figure(params=params)
+            kwargs['ax'] = ax
+        res = plot_func(*args, **kwargs)
+        if fig:
+            matplotlib_utils.plot_style(fig=fig, ax=ax)
+        return res
+
+    return wrapper
+
+
+def _implicit_ax3d(plot_func):
+    return _implicit_ax(plot_func, {'projection': '3d'})
+
+
 def _plane2col(plane):
     """Take a string like 'xy', and return the indices from COLS.*."""
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
@@ -87,7 +110,8 @@ def _get_color(treecolor, tree_type):
     return TREE_COLOR.get(tree_type, 'green')
 
 
-def plot_tree(tree, ax, plane='xy',
+@_implicit_ax
+def plot_tree(tree, ax=None, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2d figure of the tree's segments.
@@ -146,7 +170,8 @@ def plot_tree(tree, ax, plane='xy',
     ax.add_collection(collection)
 
 
-def plot_soma(soma, ax, plane='xy',
+@_implicit_ax
+def plot_soma(soma, ax=None, plane='xy',
               soma_outline=True,
               linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA):
@@ -192,7 +217,8 @@ def plot_soma(soma, ax, plane='xy',
 
 
 # pylint: disable=too-many-arguments
-def plot_morph(morph, ax,
+@_implicit_ax
+def plot_morph(morph, ax=None,
                neurite_type=NeuriteType.all,
                plane='xy',
                soma_outline=True,
@@ -237,7 +263,8 @@ def _update_3d_datalim(ax, obj):
     ax.zz_dataLim.update_from_data_xy(z_bounds, ignore=False)
 
 
-def plot_tree3d(tree, ax,
+@_implicit_ax3d
+def plot_tree3d(tree, ax=None,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA):
     """Generates a figure of the tree in 3d.
@@ -267,7 +294,8 @@ def plot_tree3d(tree, ax,
     _update_3d_datalim(ax, tree)
 
 
-def plot_soma3d(soma, ax, color=None, alpha=_ALPHA):
+@_implicit_ax3d
+def plot_soma3d(soma, ax=None, color=None, alpha=_ALPHA):
     """Generates a 3d figure of the soma.
 
     Args:
@@ -292,7 +320,8 @@ def plot_soma3d(soma, ax, color=None, alpha=_ALPHA):
     _update_3d_datalim(ax, soma)
 
 
-def plot_morph3d(morph, ax, neurite_type=NeuriteType.all,
+@_implicit_ax3d
+def plot_morph3d(morph, ax=None, neurite_type=NeuriteType.all,
                  diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                  color=None, alpha=_ALPHA):
     """Generates a figure of the morphology, that contains a soma and a list of trees.
@@ -368,7 +397,8 @@ def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
     return shapes
 
 
-def plot_dendrogram(obj, ax, show_diameters=True):
+@_implicit_ax
+def plot_dendrogram(obj, ax=None, show_diameters=True):
     """Plots Dendrogram of `obj`.
 
     Args:
