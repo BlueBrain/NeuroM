@@ -119,16 +119,14 @@ def test_morph3d(get_fig_3d):
                                (-00.09999862, 54.20408797))
 
 
-def test_morph_no_neurites(get_fig_2d):
+def test_morph_no_neurites():
     filename = Path(SWC_PATH, 'point_soma.swc')
-    fig, ax = get_fig_2d
-    matplotlib_impl.plot_morph(load_morphology(filename), ax)
+    matplotlib_impl.plot_morph(load_morphology(filename))
 
 
-def test_morph3d_no_neurites(get_fig_3d):
+def test_morph3d_no_neurites():
     filename = Path(SWC_PATH, 'point_soma.swc')
-    fig, ax = get_fig_3d
-    matplotlib_impl.plot_morph3d(load_morphology(filename), ax)
+    matplotlib_impl.plot_morph3d(load_morphology(filename))
 
 
 def test_dendrogram(get_fig_2d):
