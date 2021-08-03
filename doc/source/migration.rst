@@ -40,7 +40,7 @@ Migration to v3 version
 
       import neurom as nm
       # instead of: from neurom import viewer
-      from neurom import matplotlib_impl, matplotlib_utils
+      from neurom.view import matplotlib_impl, matplotlib_utils
       m = nm.load_morphology('some/data/path/morph_file.asc')
 
       # instead of: viewer.draw(m)
