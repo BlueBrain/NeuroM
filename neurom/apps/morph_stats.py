@@ -169,6 +169,11 @@ def extract_stats(morphs, config):
     """
     stats = defaultdict(dict)
     neurite_features = product(['neurite'], config.get('neurite', {}).items())
+    if 'neuron' in config:    # pragma: no cover
+        warn_deprecated('Usage of "neuron" is deprecated in configs of `morph_stats` package. '
+                        'Use "morphology" instead.')
+        config['morphology'] = config['neuron']
+        del config['neuron']
     morph_features = product(['morphology'], config.get('morphology', {}).items())
     population_features = product(['population'], config.get('population', {}).items())
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
@@ -179,7 +184,7 @@ def extract_stats(morphs, config):
             kwargs = opts.get('kwargs', {})
             modes = opts.get('modes', [])
         else:
-            warn_deprecated('You are using an old config format. Please update it. See the'
+            warn_deprecated('You are using an old config format. Please update it. See the '
                             'migration documentation page.')
             kwargs = {}
             modes = opts

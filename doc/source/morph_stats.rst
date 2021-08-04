@@ -55,16 +55,16 @@ Config
 
 Old format (prior version 3.0.0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-An example config
+An example config:
 
 .. code-block:: yaml
     
     neurite:
         section_lengths:
             - max
-            - sum
+            - total
         section_volumes:
-            - sum
+            - total
         section_branch_orders:
             - max
     
@@ -74,7 +74,7 @@ An example config
         - BASAL_DENDRITE
         - ALL
     
-    morphology:
+    neuron:
         soma_radius:
             - mean
 
@@ -83,7 +83,7 @@ Here, there are two feature categories,
 
 1. ``neurite``: these are morphometrics obtained from neurites, e.g. branch orders, section
    lengths, bifurcation angles, path lengths.
-2. ``morphology``: these are morphometrics that can be applied to a whole morphology, e.g. the soma radius,
+2. ``neuron``: these are morphometrics that can be applied to a whole morphology, e.g. the soma radius,
    the trunk radii, etc.
 
 Each category sub-item (section_lengths, soma_radius, etc) corresponds to a
@@ -92,7 +92,7 @@ function, e.g.
 
 * ``raw``: array of raw values
 * ``max``, ``min``, ``mean``, ``median``, ``std``: self-explanatory.
-* ``sum``: sum of the raw values
+* ``total``: sum of the raw values
   
 An additional field ``neurite_type`` specifies the neurite types into which the morphometrics
 are to be split. It applies only to ``neurite`` features. A sample output using the above
@@ -134,10 +134,15 @@ configuration:
 
 New format (starting version 3.0.0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The new format allows to specify features arguments. For example, ``partition_asymmetry`` feature
-has additional arguments like ``method`` and ``variant`` (see
-:py:func:`neurom.features.neuritefunc.partition_asymmetries`). Before it wasn't possible to set
-them. Here is how you can set them now:
+The new format:
+
+- requires to use ``morphology`` instead of ``neuron`` key in the config.
+- requires to use ``sum`` instead of ``total`` statistic aggregating function.
+- allows to specify features arguments.
+
+For example, ``partition_asymmetry`` feature has additional arguments like ``method`` and
+``variant`` (see :py:func:`neurom.features.neurite.partition_asymmetries`). Before it wasn't
+possible to set them. Here is how you can set them now:
 
 .. code-block:: yaml
 
@@ -164,6 +169,34 @@ global setting of neurite types via ``neurite_type`` global config field. For ex
             modes:
                - max
                - sum
+
+So the example config from `Old format (prior version 3.0.0)`_ looks:
+
+.. code-block:: yaml
+
+    neurite:
+        section_lengths:
+            modes:
+               - max
+               - sum
+        section_volumes:
+            modes:
+               - sum
+        section_branch_orders:
+            modes:
+               - max
+
+    neurite_type:
+        - AXON
+        - APICAL_DENDRITE
+        - BASAL_DENDRITE
+        - ALL
+
+    morphology:
+        soma_radius:
+            modes:
+               - mean
+
 
 Features
 --------

@@ -39,7 +39,6 @@ Version 3.0.0
 
 - Refactor morphology statistics, e.g. ``neurom stats`` command.
     - New config format. See :ref:`morph-stats-new-config`. The old format is deprecated.
-    - Use `sum` instead of `total` mode in config
     - Keep feature names as is. Don't trim 's' at the end of plurals.
 
 - Delete ``neurom.check.structural_checks``, ``neurom.core.tree`` that were deprecated in v2.
