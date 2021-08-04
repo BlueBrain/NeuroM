@@ -359,8 +359,10 @@ def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
 
 @feature(shape=(...,))
 def partition_asymmetry_length(neurite, method='petilla'):
-    """Because "partition_asymmetry" feature with `variant='length'` is often used,
-    it has a dedicated feature."""
+    """'partition_asymmetry' feature with `variant='length'`.
+
+    Because it is often used, it has a dedicated feature.
+    """
     return partition_asymmetry(neurite, 'length', method)
 
 
