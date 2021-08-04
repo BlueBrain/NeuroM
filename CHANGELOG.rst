@@ -13,6 +13,7 @@ Version 3.0.0
     - ``neurom.core.neuron.graft_neuron`` => ``neurom.core.morphology.graft_morphology``
     - ``neurom.io.utils.load_neuron`` => ``neurom.io.utils.load_morphology``
     - ``neurom.io.utils.load_neurons`` => ``neurom.io.utils.load_morphologies``
+    - ``neurom.core.Population.neurons`` => ``neurom.core.Population.morphologies``
 
 - Refactor plotting functionality. :ref:`migration-v3.0.0`.
     - deprecate ``neurom.view.viewer``

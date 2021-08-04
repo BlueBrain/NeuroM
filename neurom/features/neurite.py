@@ -358,6 +358,13 @@ def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
 
 
 @feature(shape=(...,))
+def partition_asymmetry_length(neurite, method='petilla'):
+    """Because "partition_asymmetry" feature with `variant='length'` is often used,
+    it has a dedicated feature."""
+    return partition_asymmetry(neurite, 'length', method)
+
+
+@feature(shape=(...,))
 def bifurcation_partitions(neurite):
     """Partition at bf points."""
     return _map_sections(bf.bifurcation_partition,

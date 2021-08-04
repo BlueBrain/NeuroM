@@ -702,6 +702,10 @@ def test_partition_asymmetry():
         [0.9, 0.88888889, 0.875, 0.85714286, 0.83333333, 0.8, 0.75, 0.66666667, 0.5, 0.])
 
 
+def test_partition_asymmetry_length():
+    assert_allclose(features.get('partition_asymmetry_length', POP)[:1], np.array([0.853925]))
+
+
 def test_section_strahler_orders():
     path = Path(SWC_PATH, 'strahler.swc')
     n = nm.load_morphology(path)

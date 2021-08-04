@@ -82,7 +82,6 @@ Migration to v3 version
    - use `bifurcation_partitions` instead of `partition`
    - new neurite feature `total_area` that complements `total_area_per_neurite`
    - new neurite feature `volume_density` that complements `neurite_volume_density`
-   - delete `partition_asymmetry_length`, see :ref:`morph-stats-new-config`
 
 
 Migration to v2 version
