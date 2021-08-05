@@ -53,8 +53,8 @@ to go under ``--config`` option:
 Config
 ------
 
-Old format (prior version 3.0.0)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Short format (prior version 3.0.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 An example config:
 
 .. code-block:: yaml
@@ -132,8 +132,8 @@ configuration:
 
 .. _morph-stats-new-config:
 
-New format (starting version 3.0.0)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Kwargs format (starting version 3.0.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The new format:
 
 - requires to use ``morphology`` instead of ``neuron`` key in the config.
@@ -170,7 +170,7 @@ global setting of neurite types via ``neurite_type`` global config field. For ex
                - max
                - sum
 
-So the example config from `Old format (prior version 3.0.0)`_ looks:
+So the example config from `Short format (prior version 3.0.0)`_ looks:
 
 .. code-block:: yaml
 

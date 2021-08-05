@@ -39,7 +39,8 @@ Version 3.0.0
     - Delete deprecated `neurom.features.register_neurite_feature`.
 
 - Refactor morphology statistics, e.g. ``neurom stats`` command.
-    - New config format. See :ref:`morph-stats-new-config`. The old format is deprecated.
+    - New config format. See :ref:`morph-stats-new-config`. The old format is still supported.
+      The only necessary change is replace 'total' with 'sum', 'neuron' with 'morphology'.
     - Keep feature names as is. Don't trim 's' at the end of plurals.
 
 - Delete ``neurom.check.structural_checks``, ``neurom.core.tree`` that were deprecated in v2.

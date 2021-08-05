@@ -184,8 +184,6 @@ def extract_stats(morphs, config):
             kwargs = opts.get('kwargs', {})
             modes = opts.get('modes', [])
         else:
-            warn_deprecated('You are using an old config format. Please update it. See the '
-                            'migration documentation page.')
             kwargs = {}
             modes = opts
         if namespace == 'neurite':
