@@ -39,7 +39,7 @@ Examples:
     >>> ap_seg_len = nm.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
     >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
-    Load morphs from a directory. This loads all SWC, HDF5 or NeuroLucida .asc\
+    Load morphs from a directory. This loads all SWC, HDF5 or NeuroLucida .asc
     files it finds and returns a list of morphs
 
     >>> import numpy as np  # For mean value calculation

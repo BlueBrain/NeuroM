@@ -31,7 +31,7 @@
 Features
 ********
 A tool for analysing of morphologies. It allows to extract various information about morphologies.
-For example if you need to know segments lengths of a morphology then you need to call
+For example if you need to know the segment lengths of a morphology then you need to call
 ``segment_lengths`` feature. The complete list of available features is spread among pages
 :mod:`neurom.features.neurite`, :mod:`neurom.features.morphology`,
 :mod:`neurom.features.population`.

@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Extract a distribution for the selected feature of the population of morphs among
+"""Extract a distribution for the selected feature of the population of morphologies among
    the exponential, normal and uniform distribution, according to the minimum ks distance.
    """
 
