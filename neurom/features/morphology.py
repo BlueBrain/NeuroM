@@ -159,14 +159,14 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 
 @feature(shape=(...,))
 def trunk_vectors(morph, neurite_type=NeuriteType.all):
-    """Calculates the vectors between all the trunks of the morphology and the soma center."""
+    """Calculate the vectors between all the trunks of the morphology and the soma center."""
     return [morphmath.vector(n.root_node.points[0], morph.soma.center)
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
 def trunk_angles(morph, neurite_type=NeuriteType.all):
-    """Calculates the angles between all the trunks of the morph.
+    """Calculate the angles between all the trunks of the morph.
 
     The angles are defined on the x-y plane and the trees
     are sorted from the y axis and anticlock-wise.
