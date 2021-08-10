@@ -147,7 +147,7 @@ def has_all_nonzero_neurite_radii(morph, threshold=0.0):
 
     Arguments:
         morph(Morphology): the morphology to test
-        threshold: value above which a radius is considered to be non-zero
+        threshold(float): value above which a radius is considered to be non-zero
 
     Returns:
         CheckResult with result including list of (section ID, point ID) pairs
@@ -275,7 +275,7 @@ def has_no_dangling_branch(morph):
         CheckResult with a list of all first segments of dangling neurites
     """
     if len(morph.soma.points) == 0:
-        raise NeuroMError('Can\'t check for dangling neurites if there is no soma')
+        raise NeuroMError("Can't check for dangling neurites if there is no soma")
     soma_center = morph.soma.points[:, COLS.XYZ].mean(axis=0)
     recentered_soma = morph.soma.points[:, COLS.XYZ] - soma_center
     radius = np.linalg.norm(recentered_soma, axis=1)
@@ -286,7 +286,7 @@ def has_no_dangling_branch(morph):
                                                          if n.type != NeuriteType.axon)))
 
     def is_dangling(neurite):
-        """Is the neurite dangling ?."""
+        """Is the neurite dangling?"""
         starting_point = neurite.points[0][COLS.XYZ]
 
         if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
@@ -318,7 +318,7 @@ def has_no_narrow_neurite_section(morph,
         this are not taken into account
 
     Returns:
-        CheckResult with result. result.info contains the narrow section ids and their
+        CheckResult with result. `result.info` contains the narrow section ids and their
         first point
     """
     considered_sections = (sec for sec in iter_sections(morph, neurite_filter=neurite_filter)
