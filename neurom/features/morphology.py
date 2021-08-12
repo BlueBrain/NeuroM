@@ -49,7 +49,7 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import iter_neurites, iter_segments
+from neurom.core.morphology import iter_neurites, iter_segments, Morphology
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
@@ -219,13 +219,15 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
-def sholl_crossings(morph, center, radii, neurite_type=NeuriteType.all):
-    """Calculate crossings of neurites. Not a feature.
+@feature(shape=(...,))
+def sholl_crossings(morph, center=None, radii=None, neurite_type=NeuriteType.all):
+    """Calculate crossings of neurites.
 
     Args:
         morph(Morphology|list): morphology or a list of neurites
-        center(Point): center point
-        radii(iterable of floats): radii for which crossings will be counted
+        center(Point): center point, if None then soma center is taken
+        radii(iterable of floats): radii for which crossings will be counted,
+            if None then soma radius is taken
         neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
 
     Returns:
@@ -252,6 +254,14 @@ def sholl_crossings(morph, center, radii, neurite_type=NeuriteType.all):
 
         return count
 
+    if center is None or radii is None:
+        assert isinstance(morph, Morphology) and morph.soma, \
+            '`sholl_crossings` input error. If `center` or `radii` is not set then `morph` is ' \
+            'expected to be an instance of Morphology and have a soma.'
+        if center is None:
+            center = morph.soma.center
+        if radii is None:
+            radii = [morph.soma.radius]
     return [sum(_count_crossings(neurite, r)
                 for neurite in iter_neurites(morph, filt=is_type(neurite_type)))
             for r in radii]

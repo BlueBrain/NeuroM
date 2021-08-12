@@ -200,8 +200,9 @@ def test_trunk_elevation_zero_norm_vector_raises():
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
-    assert (list(morphology.sholl_crossings(SIMPLE, center, radii=radii)) ==
-            [])
+    assert (list(morphology.sholl_crossings(SIMPLE, center, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE)) == [2])
 
     radii = [1.0]
     assert ([2] ==
