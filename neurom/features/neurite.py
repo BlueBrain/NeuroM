@@ -491,7 +491,7 @@ def section_end_distances(neurite):
     return _map_sections(sf.section_end_distance, neurite)
 
 
-@feature(shape=())
+@feature(shape=(...,))
 def principal_direction_extents(neurite, direction=0):
     """Principal direction extent of neurites in morphologies."""
     points = neurite.points[:, :3]
