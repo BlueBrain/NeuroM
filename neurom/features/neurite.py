@@ -495,7 +495,7 @@ def section_end_distances(neurite):
 def principal_direction_extents(neurite, direction=0):
     """Principal direction extent of neurites in morphologies."""
     points = neurite.points[:, :3]
-    return morphmath.principal_direction_extent(points)[direction]
+    return [morphmath.principal_direction_extent(points)[direction]]
 
 
 @feature(shape=(...,))
