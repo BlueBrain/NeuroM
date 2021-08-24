@@ -22,8 +22,8 @@ Version 3.0.0
     - rename ``neurom.view.common`` to ``neurom.view.matplotlib_utils``
     - swap arguments ``ax`` and ``nrn`` of all plot functions in ``neurom.view.matplotlib_impl``,
       also ``nrn`` arg is renamed to ``morph``.
-    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly.plot_morph`` and
-      ``neurom.view.plotly.plot_morph3d``.
+    - delete ``neurom.view.plotly.draw``. Use instead ``neurom.view.plotly_impl.plot_morph`` and
+      ``neurom.view.plotly_impl.plot_morph3d``.
 
 - Refactor features.
     - Drop 'func' suffix of all module names within `features` package:
