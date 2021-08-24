@@ -45,9 +45,9 @@ from neurom.core.morphology import iter_neurites
 from neurom.core.types import NeuriteType, tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
 
-_NEURITE_FEATURES = dict()
-_MORPHOLOGY_FEATURES = dict()
-_POPULATION_FEATURES = dict()
+_NEURITE_FEATURES = {}
+_MORPHOLOGY_FEATURES = {}
+_POPULATION_FEATURES = {}
 
 
 class NameSpace(Enum):
