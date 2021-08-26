@@ -310,6 +310,8 @@ def test_angle_between_vectors():
     assert angle1 == 0.0
     angle1 = mm.angle_between_vectors((1, 0), (-1, 0))
     assert angle1 == np.pi
+    angle1 = mm.angle_between_vectors((0, 0.999999), (0, 0.999999))
+    assert angle1 == 0.0
 
 
 def soma_points(radius=5, number_points=20):
