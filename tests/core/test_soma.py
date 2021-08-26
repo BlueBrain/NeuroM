@@ -206,3 +206,30 @@ def test_Soma_Cylinders():
 
     assert list(s.center) == [0., 0., 0.]
     assert_almost_equal(s.area, 444.288293851) # cone area, not including bottom
+
+
+def test_soma_overlaps():
+    # Test with spherical soma
+    soma = load_morphology(StringIO(u"""1 1 11 22 33 44 -1"""), reader='swc').soma
+    points = [
+        [11, 22, 33],  # at soma center
+        [11, 22, 33 + 44],  # on the edge of the soma
+        [100, 100, 100],  # outside the soma
+    ]
+    np.testing.assert_array_equal(soma.overlaps(points), [True, True, False])
+    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [True, False, False])
+
+    # Test with cynlindrical soma
+    soma = load_morphology(StringIO(u"""
+                1 1 0 0 -10 40 -1
+                2 1 0 0   0 40  1
+                3 1 0 0  10 40  2"""), reader='swc').soma
+    points = [
+        [0, 0, -20],  # on the axis of the cylinder but outside it
+        [0, 0, -10],  # on the axis of the cylinder and on it's edge
+        [0, 0, -5],  # on the axis of the cylinder and inside it
+        [10, 10, 5],  # inside a cylinder
+        [100, 0, 0],  # outside all cylinders
+    ]
+    np.testing.assert_array_equal(soma.overlaps(points), [False, True, True, True, False])
+    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [False, False, True, True, False])

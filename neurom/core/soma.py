@@ -84,6 +84,15 @@ class Soma:
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
         return 4. / 3 * math.pi * self.radius ** 3
 
+    def overlaps(self, points, exclude_boundary=False):
+        """Check that the given points are located inside the soma."""
+        points = np.atleast_2d(np.asarray(points, dtype=np.float64))
+        if exclude_boundary:
+            mask = np.linalg.norm(points - self.center, axis=1) < self.radius
+        else:
+            mask = np.linalg.norm(points - self.center, axis=1) <= self.radius
+        return mask
+
 
 class SomaSinglePoint(Soma):
     """Type A: 1point soma.
@@ -148,6 +157,29 @@ class SomaCylinders(Soma):
         """Return a string representation."""
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
                 (repr(self.points), self.center, self.radius))
+
+    def overlaps(self, points, exclude_boundary=False):
+        """Check that the given points are located inside the soma."""
+        points = np.atleast_2d(np.asarray(points, dtype=np.float64))
+        mask = np.ones(len(points)).astype(bool)
+        for p1, p2 in zip(self.points[:-1], self.points[1:]):
+            vec = p2[COLS.XYZ] - p1[COLS.XYZ]
+            vec_norm = np.linalg.norm(vec)
+            dot = np.einsum("i,ji", vec, points[mask] - p1[COLS.XYZ]) / vec_norm
+
+            cross = np.linalg.norm(np.cross(vec, points[mask]), axis=1) / vec_norm
+            dot_clipped = np.clip(dot / vec_norm, a_min=0, a_max=1)
+            radii = p1[COLS.R] * (1 - dot_clipped) + p2[COLS.R] * dot_clipped
+
+            if exclude_boundary:
+                in_cylinder = (dot > 0) & (dot < vec_norm) & (cross < radii)
+            else:
+                in_cylinder = (dot >= 0) & (dot <= vec_norm) & (cross <= radii)
+            mask[np.where(mask)] = ~in_cylinder
+            if not mask.any():
+                break
+
+        return ~mask
 
 
 class SomaNeuromorphoThreePointCylinders(SomaCylinders):
