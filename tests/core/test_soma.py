@@ -233,3 +233,16 @@ def test_soma_overlaps():
     ]
     np.testing.assert_array_equal(soma.overlaps(points), [False, True, True, True, False])
     np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [False, False, True, True, False])
+
+    # Test with all points in soma for coverage
+    soma = load_morphology(StringIO(u"""
+                1 1 0 0 -10 40 -1
+                2 1 0 0   0 40  1
+                3 1 0 0  10 40  2"""), reader='swc').soma
+    points = [
+        [0, 0, -10],  # on the axis of the cylinder and on it's edge
+        [0, 0, -5],  # on the axis of the cylinder and inside it
+        [10, 10, 5],  # inside a cylinder
+    ]
+    np.testing.assert_array_equal(soma.overlaps(points), [True, True, True])
+    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [False, True, True])
