@@ -7,9 +7,9 @@
 neurite:
     section_lengths:
         - max
-        - total
+        - sum
     section_volumes:
-        - total
+        - sum
     section_branch_orders:
         - max
 
@@ -19,8 +19,8 @@ neurite_type:
     - BASAL_DENDRITE
     - ALL
 
-neuron:
-    soma_radii:
+morphology:
+    soma_radius:
         - mean
 
 ##############################################

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from morphio import RawDataError, SomaError
 import neurom as nm
-from neurom import load_neuron
+from neurom import load_morphology
 
 import pytest
 from numpy.testing import assert_array_equal
@@ -23,7 +23,7 @@ def test_soma():
                          (-1 -1 0 2 S3)
                          )
         """
-    n = nm.load_neuron(string_section, reader='asc')
+    n = nm.load_morphology(string_section, reader='asc')
 
     assert_array_equal(n.soma.points,
                        [[1, 1, 0, 0.5],
@@ -44,7 +44,7 @@ def test_unknown_token():
                          (-1 -1 0 2 S3)
                          )
         """
-        n = nm.load_neuron(string_section, reader='asc')
+        n = nm.load_morphology(string_section, reader='asc')
 
     assert obj.match("Unexpected token: Z")
     assert obj.match(":6:error")
@@ -56,7 +56,7 @@ def test_unfinished_point():
                          (Color Red)
                          (CellBody)
                          (1 1"""
-        n = nm.load_neuron(string_section, reader='asc')
+        n = nm.load_morphology(string_section, reader='asc')
 
     assert obj.match('Error converting: "" to float')
     assert obj.match(':4:error')
@@ -81,7 +81,7 @@ def test_multiple_soma():
                              (-1 -1 0 2 S3)
                              )
             """
-        load_neuron(string_section, reader='asc')
+        load_morphology(string_section, reader='asc')
     assert obj.match("A soma is already defined")
     assert obj.match(':16:error')
 
@@ -100,7 +100,7 @@ def test_single_neurite_no_soma():
 
                          Generated
                          )  ;  End of tree"""
-    n = nm.load_neuron(string_section, reader='asc')
+    n = nm.load_morphology(string_section, reader='asc')
 
     assert_array_equal(n.soma.points, np.empty((0, 4)))
     assert len(n.neurites) == 1
@@ -111,7 +111,7 @@ def test_single_neurite_no_soma():
 
 def test_skip_header():
     """Test that the header does not cause any issue"""
-    str_neuron = """(FilledCircle
+    str_morph = """(FilledCircle
                          (Color RGB (64, 0, 128))
                          (Name "Marker 11")
                          (Set "axons")
@@ -125,7 +125,7 @@ def test_skip_header():
                          (  1.2  3.7   2.0     13)
                          )"""
 
-    n = nm.load_neuron(str_neuron, reader='asc')
+    n = nm.load_morphology(str_morph, reader='asc')
     assert len(n.neurites) == 1
     assert_array_equal(n.neurites[0].points,
                        np.array([[1.2, 2.7, 1.0, 6.5],
@@ -172,7 +172,7 @@ def test_read_with_duplicates():
 # what I think the
 # https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
 # would look like
-    n = load_neuron(StringIO(with_duplicate), reader='asc')
+    n = load_morphology(StringIO(with_duplicate), reader='asc')
 
     assert len(n.neurites) == 1
 
@@ -205,8 +205,8 @@ def test_read_with_duplicates():
 
 
 def test_read_without_duplicates():
-    n_with_duplicate = load_neuron(with_duplicate, reader='asc')
-    n_without_duplicate = load_neuron(without_duplicate, reader='asc')
+    n_with_duplicate = load_morphology(with_duplicate, reader='asc')
+    n_without_duplicate = load_morphology(without_duplicate, reader='asc')
 
     assert_array_equal(n_with_duplicate.neurites[0].root_node.children[0].points,
                        n_without_duplicate.neurites[0].root_node.children[0].points)
@@ -217,7 +217,7 @@ def test_read_without_duplicates():
 
 def test_unfinished_file():
     with pytest.raises(RawDataError) as obj:
-        load_neuron("""
+        load_morphology("""
                      ((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
@@ -234,7 +234,7 @@ def test_unfinished_file():
 
 
 def test_empty_sibling():
-    n = load_neuron("""
+    n = load_morphology("""
                      ((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
@@ -260,7 +260,7 @@ def test_empty_sibling():
 
 
 def test_single_children():
-    n = load_neuron(StringIO(
+    n = load_morphology(StringIO(
                      """
                      ((Dendrite)
                       (3 -4 0 2)
@@ -291,7 +291,7 @@ def test_single_children():
 
 def test_markers():
     """Test that markers do not prevent file from being read correctly"""
-    n = load_neuron("""
+    n = load_morphology("""
 ( (Color White)  ; [10,1]
   (Dendrite)
   ( -290.87  -113.09   -16.32     2.06)  ; Root

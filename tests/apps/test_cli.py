@@ -23,17 +23,22 @@ def test_viewer_matplotlib(mock):
     mock.assert_called_once()
 
     mock.reset_mock()
+    result = runner.invoke(cli, ['view', filename, '--3d'])
+    assert result.exit_code == 0
+    mock.assert_called_once()
+
+    mock.reset_mock()
     result = runner.invoke(cli, ['view', filename, '--plane', 'xy'])
     assert result.exit_code == 0
     mock.assert_called_once()
 
 
-@patch('neurom.view.plotly.plot')
+@patch('neurom.view.plotly_impl.plot')
 def test_viewer_plotly(mock):
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')
 
-    result = runner.invoke(cli, ['view', filename,
+    result = runner.invoke(cli, ['view', filename, '--3d',
                                  '--backend', 'plotly'])
     assert result.exit_code == 0
     mock.assert_called_once()
@@ -53,26 +58,26 @@ def test_morph_stat():
         result = runner.invoke(cli, ['stats', str(filename), '--output', f.name])
         assert result.exit_code == 0
         df = pd.read_csv(f)
-        assert set(df.columns) == {'name', 'axon:max_section_length', 'axon:total_section_length',
-                                   'axon:total_section_volume', 'axon:max_section_branch_order',
-                                   'apical_dendrite:max_section_length',
-                                   'apical_dendrite:total_section_length',
-                                   'apical_dendrite:total_section_volume',
-                                   'apical_dendrite:max_section_branch_order',
-                                   'basal_dendrite:max_section_length',
-                                   'basal_dendrite:total_section_length',
-                                   'basal_dendrite:total_section_volume',
-                                   'basal_dendrite:max_section_branch_order',
-                                   'all:max_section_length',
-                                   'all:total_section_length', 'all:total_section_volume',
-                                   'all:max_section_branch_order', 'neuron:mean_soma_radius'}
+        assert set(df.columns) == {'name', 'axon:max_section_lengths', 'axon:sum_section_lengths',
+                                   'axon:sum_section_volumes', 'axon:max_section_branch_orders',
+                                   'apical_dendrite:max_section_lengths',
+                                   'apical_dendrite:sum_section_lengths',
+                                   'apical_dendrite:sum_section_volumes',
+                                   'apical_dendrite:max_section_branch_orders',
+                                   'basal_dendrite:max_section_lengths',
+                                   'basal_dendrite:sum_section_lengths',
+                                   'basal_dendrite:sum_section_volumes',
+                                   'basal_dendrite:max_section_branch_orders',
+                                   'all:max_section_lengths',
+                                   'all:sum_section_lengths', 'all:sum_section_volumes',
+                                   'all:max_section_branch_orders', 'morphology:mean_soma_radius'}
 
 
 def test_morph_stat_full_config():
     runner = CliRunner()
     filename = DATA / 'h5/v1/Neuron.h5'
     with tempfile.NamedTemporaryFile() as f:
-        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--output', f.name], catch_exceptions=False)
+        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--output', f.name])
         assert result.exit_code == 0
         df = pd.read_csv(f)
         assert not df.empty
@@ -109,7 +114,6 @@ def test_morph_stat_json():
         assert result.exit_code == 0
         content = json.load(f)
         assert content
-
 
 
 def test_morph_check():

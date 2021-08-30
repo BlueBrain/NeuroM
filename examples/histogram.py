@@ -27,16 +27,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Simple Histogram function for multiple neurons."""
+"""Simple Histogram function for multiple morphologies."""
 from itertools import chain
 
 import numpy as np
-from neurom.view import common
+from neurom.view import matplotlib_utils
 
 
 def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
     """
-    Plot a histogram of the selected feature for the population of neurons.
+    Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
     More information about the plot and how it works.
@@ -44,7 +44,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
     Parameters :
 
         neurons : list
-            List of Neurons. Single neurons must be encapsulated in a list.
+            List of Neurons. Single morphologies must be encapsulated in a list.
 
         feature : str
             The feature of interest.
@@ -73,7 +73,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
 
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     kwargs['xlabel'] = kwargs.get('xlabel', feature)
 
@@ -89,7 +89,7 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
 
     kwargs['no_legend'] = len(neu_labels) == 1
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
 
 def population_feature_values(pops, feature):
@@ -99,7 +99,7 @@ def population_feature_values(pops, feature):
 
     for pop in pops:
 
-        feature_values = [getattr(neu, 'get_' + feature)() for neu in pop.neurons]
+        feature_values = [getattr(neu, 'get_' + feature)() for neu in pop.morphologies]
 
         # ugly hack to chain in case of list of lists
         if any([isinstance(p, (list, np.ndarray)) for p in feature_values]):
@@ -113,7 +113,7 @@ def population_feature_values(pops, feature):
 
 def population_histogram(pops, feature, new_fig=True, normed=False, subplot=False, **kwargs):
     """
-    Plot a histogram of the selected feature for the population of neurons.
+    Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
     More information about the plot and how it works.
@@ -149,7 +149,7 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
     bins = kwargs.get('bins', 25)
     cumulative = kwargs.get('cumulative', False)
 
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     kwargs['xlabel'] = kwargs.get('xlabel', feature)
 
@@ -165,4 +165,4 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
 
     kwargs['no_legend'] = len(pops_labels) == 1
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)

@@ -4,10 +4,10 @@ if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
 
-from neurom.view import common
-common._get_plt()
+from neurom.view import matplotlib_utils
+matplotlib_utils._get_plt()
 
-from neurom.view.common import plt
+from neurom.view.matplotlib_utils import plt
 import pytest
 
 

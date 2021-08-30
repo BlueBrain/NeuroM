@@ -28,32 +28,11 @@
 
 """Test neurom.utils."""
 import json
-import random
 import warnings
 
 import numpy as np
 from neurom import utils as nu
 import pytest
-
-
-def test_memoize_caches():
-    class A:
-        @nu.memoize
-        def dummy(self, x, y=42):
-            return random.random()
-
-    a = A()
-    ref1 = a.dummy(42)
-    ref2 = a.dummy(42, 43)
-    ref3 = a.dummy(42, y=43)
-
-    for _ in range(10):
-        assert a.dummy(42) == ref1
-        assert A().dummy(42) != ref1
-        assert a.dummy(42, 43) == ref2
-        assert A().dummy(42, 43) != ref2
-        assert a.dummy(42, y=43) == ref3
-        assert A().dummy(42, y=43) != ref3
 
 
 def test_deprecated():
@@ -69,7 +48,7 @@ def test_deprecated():
 
 def test_deprecated_module():
     with warnings.catch_warnings(record=True) as s:
-        nu.deprecated_module('foo', msg='msg')
+        nu.deprecated_module('msg')
         assert len(s) > 0
 
 

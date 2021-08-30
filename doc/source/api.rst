@@ -40,19 +40,21 @@ API Documentation
 
    neurom.morphmath
    neurom.features
-   neurom.features.neuronfunc
-   neurom.features.neuritefunc
-   neurom.features.sectionfunc
-   neurom.features.bifurcationfunc
+   neurom.features.population
+   neurom.features.morphology
+   neurom.features.neurite
+   neurom.features.section
+   neurom.features.bifurcation
    neurom.check.morphtree
-   neurom.check.neuron_checks
+   neurom.check.morphology_checks
    neurom.core.types
-   neurom.core.neuron
+   neurom.core.morphology
    neurom.core.population
    neurom.core.soma
    neurom.core.dataformat
    neurom.io.utils
    neurom.view
-   neurom.view.common
-   neurom.view.view
-   neurom.viewer
+   neurom.view.dendrogram
+   neurom.view.matplotlib_utils
+   neurom.view.matplotlib_impl
+   neurom.view.plotly_impl

@@ -27,13 +27,13 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Box Plot function for multiple neurons."""
+"""Box Plot function for multiple morphs."""
 
-from neurom.view import common
+from neurom.view import matplotlib_utils
 
 
 def boxplot(neurons, feature, new_fig=True, subplot=False):
-    """Plot a histogram of the selected feature for the population of neurons.
+    """Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
     More information about the plot and how it works.
@@ -41,7 +41,7 @@ def boxplot(neurons, feature, new_fig=True, subplot=False):
     Parameters
     ----------
     neurons : list
-        List of Neurons. Single neurons must be encapsulated in a list.
+        List of Neurons. Single morphologies must be encapsulated in a list.
 
     feature : str
     The feature of interest.
@@ -55,7 +55,7 @@ def boxplot(neurons, feature, new_fig=True, subplot=False):
     """
     feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
 
-    _, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    _, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     ax.boxplot(feature_values)
 

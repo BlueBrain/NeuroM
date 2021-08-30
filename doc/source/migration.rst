@@ -26,11 +26,67 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.. _migration-v2:
+Migration guides
+=======================
 
-=======================
+.. _migration-v3.0.0:
+
+Migration to v3 version
+-----------------------
+
+- ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
+
+   .. code-block:: python
+
+      import neurom as nm
+      # instead of: from neurom import viewer
+      from neurom.view import matplotlib_impl, matplotlib_utils
+      m = nm.load_morphology('some/data/path/morph_file.asc')
+
+      # instead of: viewer.draw(m)
+      matplotlib_impl.plot_morph(m)
+
+      # instead of: viewer.draw(m, mode='3d')
+      matplotlib_impl.plot_morph3d(m)
+
+      # instead of: viewer.draw(m, mode='dendrogram')
+      matplotlib_impl.plot_dendrogram(m)
+
+      # If you used ``output_path`` with any of functions above then the solution is:
+      fig, ax = matplotlib_utils.get_figure()
+      matplotlib_impl.plot_dendrogram(m, ax)
+      matplotlib_utils.plot_style(fig=fig, ax=ax)
+      matplotlib_utils.save_plot(fig=fig, output_path=output_path)
+      # for other plots like `plot_morph` it is the same, you just need to call `plot_morph` instead
+      # of `plot_dendrogram`.
+
+      # instead of `plotly.draw`
+      from neurom import plotly_impl
+      plotly_impl.plot_morph(m)  # for 2d
+      plotly_impl.plot_morph3d(m)  # for 3d
+
+- breaking features changes:
+   - use `max_radial_distance` instead of `max_radial_distances`
+   - use `number_of_segments` instead of `n_segments`
+   - use `number_of_neurites` instead of `n_neurites`
+   - use `number_of_sections` instead of `n_sections`
+   - use `number_of_bifurcations` instead of `n_bifurcation_points`
+   - use `number_of_forking_points` instead of `n_forking_points`
+   - use `number_of_leaves` instead of `number_of_terminations`, `n_leaves`
+   - use `soma_radius` instead of `soma_radii`
+   - use `soma_surface_area` instead of `soma_surface_areas`
+   - use `soma_volume` instead of `soma_volumes`
+   - use `total_length_per_neurite` instead of `neurite_lengths`
+   - use `total_volume_per_neurite` instead of `neurite_volumes`
+   - use `terminal_path_lengths` instead of `terminal_path_lengths_per_neurite`
+   - use `bifurcation_partitions` instead of `partition`
+   - new neurite feature `total_area` that complements `total_area_per_neurite`
+   - new neurite feature `volume_density` that complements `neurite_volume_density`
+
+
 Migration to v2 version
-=======================
+-----------------------
+.. _migration-v2:
 
 - ``Neuron`` object now extends ``morphio.Morphology``.
 - NeuroM does not remove unifurcations on load. Unifurcation is a section with a single child. Such
@@ -40,10 +96,10 @@ Migration to v2 version
   .. code-block:: python
 
       import neurom as nm
-      nrn = nm.load_neuron('some/data/path/morph_file.asc')
+      nrn = nm.load_morphology('some/data/path/morph_file.asc')
       nrn.remove_unifurcations()
 
-- Soma is not considered as a section anymore. Soma is skipped when iterating over neuron's
+- Soma is not considered as a section anymore. Soma is skipped when iterating over morphology's
   sections. It means that section indexing offset needs to be adjusted by
   ``-(number of soma sections)`` which is usually ``-1``.
 - drop ``benchmarks``

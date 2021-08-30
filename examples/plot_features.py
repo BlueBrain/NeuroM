@@ -36,7 +36,7 @@ import argparse
 
 import numpy as np
 import neurom as nm
-from neurom.view import common as view_utils
+from neurom.view import matplotlib_utils
 import scipy.stats as _st
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -112,13 +112,13 @@ FEATURES = ('segment_lengths',
 def load_neurite_features(filepath):
     """Unpack relevant data into megadict."""
     stuff = defaultdict(lambda: defaultdict(list))
-    nrns = nm.load_neurons(filepath)
+    morphs = nm.load_morphologies(filepath)
     # unpack data into arrays
-    for nrn in nrns:
+    for m in morphs:
         for t in NEURITES_:
             for feat in FEATURES:
                 stuff[feat][str(t).split('.')[1]].extend(
-                    nm.get(feat, nrn, neurite_type=t)
+                    nm.get(feat, m, neurite_type=t)
                 )
     return stuff
 
@@ -177,7 +177,7 @@ def main(data_dir, mtype_file):  # pylint: disable=too-many-locals
             print('PLOT LIMITS:', limits)
             # print 'DATA:', data
             # print 'BIN HEIGHT', histo[0]
-            plot = Plot(*view_utils.get_figure(new_fig=True, subplot=111))
+            plot = Plot(*matplotlib_utils.get_figure(new_fig=True, subplot=111))
             plot.ax.set_xlim(*limits)
             plot.ax.bar(histo[1][:-1], histo[0], width=bin_widths(histo[1]))
             dp, bc = dist_points(histo[1], dist)

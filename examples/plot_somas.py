@@ -31,8 +31,8 @@
 
 from pathlib import Path
 
-from neurom import load_neuron
-import neurom.view.common as common
+from neurom import load_morphology
+from neurom.view import matplotlib_utils
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -47,19 +47,19 @@ def random_color():
 
 def plot_somas(somas):
     """Plot set of somas on same figure as spheres, each with different color."""
-    _, ax = common.get_figure(new_fig=True, subplot=111,
-                              params={'projection': '3d', 'aspect': 'equal'})
+    _, ax = matplotlib_utils.get_figure(new_fig=True, subplot=111,
+                                        params={'projection': '3d', 'aspect': 'equal'})
     for s in somas:
-        common.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
+        matplotlib_utils.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
     plt.show()
 
 
 if __name__ == '__main__':
-    #  define set of files containing relevant neurons
+    #  define set of files containing relevant morphs
     file_nms = [Path(SWC_PATH, file_nm) for file_nm in ['Soma_origin.swc',
                                                                 'Soma_translated_1.swc',
                                                                 'Soma_translated_2.swc']]
 
     # load from file and plot
-    sms = [load_neuron(file_nm).soma for file_nm in file_nms]
+    sms = [load_morphology(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)
