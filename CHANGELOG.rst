@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 3.0.1
+-------------
+- Ensure ``neurom.morphmath.angle_between_vectors`` always return 0 when the vectors are equal.
+
 Version 3.0.0
 -------------
 - Rename all 'neuron' names to 'morphology' names, including module and package names. Previous

@@ -244,6 +244,8 @@ def angle_between_vectors(p1, p2):
         >>> angle_between((1, 0), (-1, 0))
         3.141592653589793
     """
+    if np.equal(p1, p2).all():
+        return 0.0
     v1 = p1 / np.linalg.norm(p1)
     v2 = p2 / np.linalg.norm(p2)
     return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
