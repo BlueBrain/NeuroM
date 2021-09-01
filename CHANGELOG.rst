@@ -3,6 +3,7 @@ Changelog
 
 Version 3.0.1
 -------------
+- Add method to Soma class to check wether it overlaps a point or not.
 - Ensure ``neurom.morphmath.angle_between_vectors`` always return 0 when the vectors are equal.
 
 Version 3.0.0
