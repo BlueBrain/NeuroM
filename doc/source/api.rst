@@ -39,8 +39,6 @@ API Documentation
    :toctree: _neurom_build
 
    neurom.morphmath
-   neurom.apps.morph_check
-   neurom.apps.morph_stats
    neurom.features
    neurom.features.population
    neurom.features.morphology
