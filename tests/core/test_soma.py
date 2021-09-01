@@ -210,20 +210,22 @@ def test_Soma_Cylinders():
 
 def test_soma_overlaps():
     # Test with spherical soma
-    soma = load_morphology(StringIO(u"""1 1 11 22 33 44 -1"""), reader='swc').soma
+    sm = load_morphology(StringIO(u"""1 1 11 22 33 44 -1"""), reader='swc').soma
+    assert isinstance(sm, soma.SomaSinglePoint)
     points = [
         [11, 22, 33],  # at soma center
         [11, 22, 33 + 44],  # on the edge of the soma
         [100, 100, 100],  # outside the soma
     ]
-    np.testing.assert_array_equal(soma.overlaps(points), [True, True, False])
-    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [True, False, False])
+    np.testing.assert_array_equal(sm.overlaps(points), [True, True, False])
+    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [True, False, False])
 
     # Test with cynlindrical soma
-    soma = load_morphology(StringIO(u"""
+    sm = load_morphology(StringIO(u"""
                 1 1 0 0 -10 40 -1
                 2 1 0 0   0 40  1
                 3 1 0 0  10 40  2"""), reader='swc').soma
+    assert isinstance(sm, soma.SomaCylinders)
     points = [
         [0, 0, -20],  # on the axis of the cylinder but outside it
         [0, 0, -10],  # on the axis of the cylinder and on it's edge
@@ -231,18 +233,38 @@ def test_soma_overlaps():
         [10, 10, 5],  # inside a cylinder
         [100, 0, 0],  # outside all cylinders
     ]
-    np.testing.assert_array_equal(soma.overlaps(points), [False, True, True, True, False])
-    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [False, False, True, True, False])
+    np.testing.assert_array_equal(sm.overlaps(points), [False, True, True, True, False])
+    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [False, False, True, True, False])
 
     # Test with all points in soma for coverage
-    soma = load_morphology(StringIO(u"""
+    sm = load_morphology(StringIO(u"""
                 1 1 0 0 -10 40 -1
                 2 1 0 0   0 40  1
                 3 1 0 0  10 40  2"""), reader='swc').soma
+    assert isinstance(sm, soma.SomaCylinders)
     points = [
         [0, 0, -10],  # on the axis of the cylinder and on it's edge
         [0, 0, -5],  # on the axis of the cylinder and inside it
         [10, 10, 5],  # inside a cylinder
     ]
-    np.testing.assert_array_equal(soma.overlaps(points), [True, True, True])
-    np.testing.assert_array_equal(soma.overlaps(points, exclude_boundary=True), [False, True, True])
+    np.testing.assert_array_equal(sm.overlaps(points), [True, True, True])
+    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [False, True, True])
+
+    # Test with contour soma
+    sm = load_morphology(StringIO(u"""
+                ((CellBody)
+                    (1 0 0 1)
+                    (1 1 0 1)
+                    (-1 1 0 1)
+                    (-1 0 0 1)) """), reader='asc').soma
+    assert isinstance(sm, soma.SomaSimpleContour)
+    points = [
+        [0, 0.5, 0],  # on the center of the soma
+        [1, 0.5, 0],  # on an edge of the soma
+        [1, 0, 0],  # on a corner of the soma
+        [0.25, 0.75, 0],  # inside the soma
+        [-0.9, 0.55, 0],  # inside the soma with closest index equal to the last soma point
+        [2, 3, 0],  # outside the soma
+    ]
+    np.testing.assert_array_equal(sm.overlaps(points), [True, True, True, True, True, False])
+    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [True, False, False, True, True, False])
