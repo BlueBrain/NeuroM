@@ -29,8 +29,8 @@
 from pathlib import Path
 
 from neurom.core.population import Population
-from neurom.core.neuron import Neuron
-from neurom import load_neuron
+from neurom.core.morphology import Morphology
+from neurom import load_morphology
 
 import pytest
 
@@ -40,7 +40,7 @@ FILES = [DATA_PATH / 'swc/Neuron.swc',
          DATA_PATH / 'swc/Single_basal.swc',
          DATA_PATH / 'swc/Neuron_small_radius.swc']
 
-NEURONS = [load_neuron(f) for f in FILES]
+NEURONS = [load_morphology(f) for f in FILES]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
 populations = [Population(NEURONS, name='foo'),
                Population(FILES, name='foo', cache=True)]
@@ -48,7 +48,7 @@ populations = [Population(NEURONS, name='foo'),
 
 @pytest.mark.parametrize('pop', populations)
 def test_names(pop):
-    assert pop[0].name, 'Neuron'
+    assert pop[0].name, 'Morphology'
     assert pop[1].name, 'Single_basal'
     assert pop[2].name, 'Neuron_small_radius'
     assert pop.name == 'foo'
@@ -65,7 +65,7 @@ def test_indexing():
 def test_cache():
     pop = populations[1]
     for n in pop._files:
-        assert isinstance(n, Neuron)
+        assert isinstance(n, Morphology)
 
 
 def test_double_indexing():

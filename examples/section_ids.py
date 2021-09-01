@@ -46,9 +46,9 @@ def get_segment(neuron, section_id, segment_id):
 
 if __name__ == '__main__':
 
-    nrn = nm.load_neuron('tests/data/h5/v1/Neuron.h5')
+    m = nm.load_morphology('tests/data/h5/v1/Neuron.h5')
 
-    seg = get_segment(nrn, 3, 2)
+    seg = get_segment(m, 3, 2)
     print('Segment:\n', seg)
     print('Mid-point (x, y, z):\n', mm.linear_interpolate(seg[0], seg[1], 0.5))
     print('Mid-point R:\n', mm.interpolate_radius(seg[0][COLS.R], seg[1][COLS.R], 0.5))

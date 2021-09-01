@@ -84,6 +84,15 @@ class Soma:
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
         return 4. / 3 * math.pi * self.radius ** 3
 
+    def overlaps(self, points, exclude_boundary=False):
+        """Check that the given points are located inside the soma."""
+        points = np.atleast_2d(np.asarray(points, dtype=np.float64))
+        if exclude_boundary:
+            mask = np.linalg.norm(points - self.center, axis=1) < self.radius
+        else:
+            mask = np.linalg.norm(points - self.center, axis=1) <= self.radius
+        return mask
+
 
 class SomaSinglePoint(Soma):
     """Type A: 1point soma.
@@ -148,6 +157,29 @@ class SomaCylinders(Soma):
         """Return a string representation."""
         return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
                 (repr(self.points), self.center, self.radius))
+
+    def overlaps(self, points, exclude_boundary=False):
+        """Check that the given points are located inside the soma."""
+        points = np.atleast_2d(np.asarray(points, dtype=np.float64))
+        mask = np.ones(len(points)).astype(bool)
+        for p1, p2 in zip(self.points[:-1], self.points[1:]):
+            vec = p2[COLS.XYZ] - p1[COLS.XYZ]
+            vec_norm = np.linalg.norm(vec)
+            dot = (points[mask] - p1[COLS.XYZ]).dot(vec) / vec_norm
+
+            cross = np.linalg.norm(np.cross(vec, points[mask]), axis=1) / vec_norm
+            dot_clipped = np.clip(dot / vec_norm, a_min=0, a_max=1)
+            radii = p1[COLS.R] * (1 - dot_clipped) + p2[COLS.R] * dot_clipped
+
+            if exclude_boundary:
+                in_cylinder = (dot > 0) & (dot < vec_norm) & (cross < radii)
+            else:
+                in_cylinder = (dot >= 0) & (dot <= vec_norm) & (cross <= radii)
+            mask[np.where(mask)] = ~in_cylinder
+            if not mask.any():
+                break
+
+        return ~mask
 
 
 class SomaNeuromorphoThreePointCylinders(SomaCylinders):
@@ -226,6 +258,56 @@ class SomaSimpleContour(Soma):
         """Return a string representation."""
         return ('SomaSimpleContour(%s) <center: %s, radius: %s>' %
                 (repr(self.points), self.center, self.radius))
+
+    def overlaps(self, points, exclude_boundary=False):
+        """Check that the given points are located inside the soma.
+
+        The contour is supposed to be in the plane XY, the Z component is ignored.
+        """
+        # pylint: disable=too-many-locals
+        points = np.atleast_2d(np.asarray(points, dtype=np.float64))
+
+        # Convert points to angles from the center
+        relative_pts = points - self.center
+        pt_angles = np.arctan2(relative_pts[:, COLS.Y], relative_pts[:, COLS.X])
+
+        # Convert soma points to angles from the center
+        relative_soma_pts = self.points[:, COLS.XYZ] - self.center
+        soma_angles = np.arctan2(relative_soma_pts[:, COLS.Y], relative_soma_pts[:, COLS.X])
+
+        # Order the soma points by ascending angles
+        soma_angle_order = np.argsort(soma_angles)
+        ordered_soma_angles = soma_angles[soma_angle_order]
+        ordered_relative_soma_pts = relative_soma_pts[soma_angle_order]
+
+        # Find the two soma points which form the segment crossed by the one from the center
+        # to the point
+        angles = np.atleast_2d(pt_angles).T - ordered_soma_angles
+        closest_indices = np.argmin(np.abs(angles), axis=1)
+        neighbors = np.ones_like(closest_indices)
+        neighbors[angles[np.arange(len(closest_indices)), closest_indices] < 0] = -1
+        signs = (neighbors == 1) * 2. - 1.
+        neighbors[
+            (closest_indices >= len(relative_soma_pts) - 1)
+            & (neighbors == 1)
+        ] = -len(relative_soma_pts) + 1
+
+        # Compute the cross product and multiply by neighbors to get the same result as if all
+        # vectors were clockwise
+        cross_z = np.cross(
+            (
+                ordered_relative_soma_pts[closest_indices + neighbors]
+                - ordered_relative_soma_pts[closest_indices]
+            ),
+            relative_pts - ordered_relative_soma_pts[closest_indices],
+        )[:, COLS.Z] * signs
+
+        if exclude_boundary:
+            interior_side = (cross_z > 0)
+        else:
+            interior_side = (cross_z >= 0)
+
+        return interior_side
 
 
 def make_soma(morphio_soma):

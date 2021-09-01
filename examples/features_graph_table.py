@@ -66,12 +66,12 @@ def stylize(ax, name, feature):
 
 def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
     """
-    Plot a histogram of the selected feature for the population of neurons.
+    Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
     Parameters :
 
-        neurons : neuron list
+        morphologies : neuron list
 
         feature : str
         The feature of interest.
@@ -110,10 +110,10 @@ if __name__ == '__main__':
     args = parse_args()
 
     for morph_file in get_morph_files(args.datapath):
-        nrn = nm.load_neuron(morph_file)
+        m = nm.load_morphology(morph_file)
 
         for _feature in args.features:
-            f = plot_feature(_feature, nrn)
-            figname = "{0}_{1}.eps".format(_feature, nrn.name)
+            f = plot_feature(_feature, m)
+            figname = "{0}_{1}.eps".format(_feature, m.name)
             f.savefig(Path(args.odir, figname))
             pl.close(f)

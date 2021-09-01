@@ -31,23 +31,22 @@ from pathlib import Path
 
 import neurom as nm
 import numpy as np
-from morphio import Morphology as ImmutMorphology
-from morphio.mut import Morphology
-from neurom.core.neuron import Neuron, graft_neuron, iter_segments
+import morphio
+from neurom.core.morphology import Morphology, graft_morphology, iter_segments
 from numpy.testing import assert_array_equal
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 
 
 def test_simple():
-    nm.load_neuron(str(SWC_PATH / 'simple.swc'))
+    nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
 
-def test_load_neuron_pathlib():
-    nm.load_neuron(SWC_PATH / 'simple.swc')
+def test_load_morphology_pathlib():
+    nm.load_morphology(SWC_PATH / 'simple.swc')
 
 
-def test_load_neuron_from_other_neurons():
+def test_load_morphology_from_other_morphologies():
     filename = SWC_PATH / 'simple.swc'
 
     expected_points = [[ 0.,  0.,  0.,  1.],
@@ -63,84 +62,84 @@ def test_load_neuron_from_other_neurons():
                        [ 0., -4.,  0.,  1.],
                        [-5., -4.,  0.,  0.]]
 
-    assert_array_equal(nm.load_neuron(nm.load_neuron(filename)).points,
+    assert_array_equal(nm.load_morphology(nm.load_morphology(filename)).points,
                        expected_points)
 
-    assert_array_equal(nm.load_neuron(Morphology(filename)).points,
+    assert_array_equal(nm.load_morphology(Morphology(filename)).points,
                        expected_points)
 
-    assert_array_equal(nm.load_neuron(ImmutMorphology(filename)).points,
+    assert_array_equal(nm.load_morphology(morphio.Morphology(filename)).points,
                        expected_points)
 
 
 def test_for_morphio():
-    Neuron(Morphology())
+    Morphology(morphio.mut.Morphology())
 
-    neuron = Morphology()
-    neuron.soma.points = [[0,0,0], [1,1,1], [2,2,2]]
-    neuron.soma.diameters = [1, 1, 1]
+    morphio_m = morphio.mut.Morphology()
+    morphio_m.soma.points = [[0,0,0], [1,1,1], [2,2,2]]
+    morphio_m.soma.diameters = [1, 1, 1]
 
-    NeuroM_neuron = Neuron(neuron)
-    assert_array_equal(NeuroM_neuron.soma.points,
+    neurom_m = Morphology(morphio_m)
+    assert_array_equal(neurom_m.soma.points,
                        [[0., 0., 0., 0.5],
                         [1., 1., 1., 0.5],
                         [2., 2., 2., 0.5]])
 
-    NeuroM_neuron.soma.points = [[1, 1, 1, 1],
+    neurom_m.soma.points = [[1, 1, 1, 1],
                                  [2, 2, 2, 2]]
-    assert_array_equal(NeuroM_neuron.soma.points,
+    assert_array_equal(neurom_m.soma.points,
                        [[1, 1, 1, 1],
                         [2, 2, 2, 2]])
 
 
-def _check_cloned_neuron(nrn1, nrn2):
-    # check if two neurons are identical
+def _check_cloned_morphology(m, m2):
+    # check if two morphs are identical
 
     # soma
-    assert isinstance(nrn2.soma, type(nrn1.soma))
-    assert nrn1.soma.radius == nrn2.soma.radius
+    assert isinstance(m2.soma, type(m.soma))
+    assert m.soma.radius == m2.soma.radius
 
-    for v1, v2 in zip(nrn1.soma.iter(), nrn2.soma.iter()):
+    for v1, v2 in zip(m.soma.iter(), m2.soma.iter()):
         assert np.allclose(v1, v2)
 
     # neurites
-    for v1, v2 in zip(iter_segments(nrn1), iter_segments(nrn2)):
+    for v1, v2 in zip(iter_segments(m), iter_segments(m2)):
         (v1_start, v1_end), (v2_start, v2_end) = v1, v2
         assert np.allclose(v1_start, v2_start)
         assert np.allclose(v1_end, v2_end)
 
     # check if the ids are different
     # somata
-    assert nrn1.soma is not nrn2.soma
+    assert m.soma is not m2.soma
 
     # neurites
-    for neu1, neu2 in zip(nrn1.neurites, nrn2.neurites):
+    for neu1, neu2 in zip(m.neurites, m2.neurites):
         assert neu1 is not neu2
 
-    # check if changes are propagated between neurons
-    nrn2.soma.radius = 10.
-    assert nrn1.soma.radius != nrn2.soma.radius
+    # check if changes are propagated between morphs
+    m2.soma.radius = 10.
+    assert m.soma.radius != m2.soma.radius
 
 
 def test_copy():
-    nrn = nm.load_neuron(SWC_PATH / 'simple.swc')
-    _check_cloned_neuron(nrn, copy(nrn))
+    m = nm.load_morphology(SWC_PATH / 'simple.swc')
+    _check_cloned_morphology(m, copy(m))
 
 
 def test_deepcopy():
-    nrn = nm.load_neuron(SWC_PATH / 'simple.swc')
-    _check_cloned_neuron(nrn, deepcopy(nrn))
+    m = nm.load_morphology(SWC_PATH / 'simple.swc')
+    _check_cloned_morphology(m, deepcopy(m))
 
 
-def test_graft_neuron():
-    nrn1 = nm.load_neuron(SWC_PATH / 'simple.swc')
-    basal_dendrite = nrn1.neurites[0]
-    nrn2 = graft_neuron(basal_dendrite.root_node)
-    assert len(nrn2.neurites) == 1
-    assert basal_dendrite == nrn2.neurites[0]
+def test_graft_morphology():
+    m = nm.load_morphology(SWC_PATH / 'simple.swc')
+    basal_dendrite = m.neurites[0]
+    m2 = graft_morphology(basal_dendrite.root_node)
+    assert len(m2.neurites) == 1
+    assert basal_dendrite == m2.neurites[0]
 
 
 def test_str():
-    n = nm.load_neuron(SWC_PATH / 'simple.swc')
-    assert 'Neuron' in str(n)
+    n = nm.load_morphology(SWC_PATH / 'simple.swc')
+    assert 'Morphology' in str(n)
     assert 'Section' in str(n.neurites[0].root_node)

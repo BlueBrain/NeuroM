@@ -32,80 +32,115 @@ Examples:
     Obtain some morphometrics
     >>> import neurom
     >>> from neurom import features
-    >>> nrn = neurom.load_neuron('path/to/neuron')
-    >>> ap_seg_len = features.get('segment_lengths', nrn, neurite_type=neurom.APICAL_DENDRITE)
-    >>> ax_sec_len = features.get('section_lengths', nrn, neurite_type=neurom.AXON)
+    >>> m = neurom.load_morphology('path/to/morphology')
+    >>> ap_seg_len = features.get('segment_lengths', m, neurite_type=neurom.APICAL_DENDRITE)
+    >>> ax_sec_len = features.get('section_lengths', m, neurite_type=neurom.AXON)
 """
+import operator
+from enum import Enum
+from functools import reduce
 
-import numpy as np
-
-from neurom.core.types import NeuriteType, tree_type_checker
-from neurom.core.neuron import iter_neurites
+from neurom.core import Population, Morphology, Neurite
+from neurom.core.morphology import iter_neurites
+from neurom.core.types import NeuriteType, tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
-from neurom.utils import deprecated
 
-NEURITEFEATURES = dict()
-NEURONFEATURES = dict()
-
-
-@deprecated(
-    '`register_neurite_feature`',
-    'Please use the decorator `neurom.features.register.feature` to register custom features')
-def register_neurite_feature(name, func):
-    """Register a feature to be applied to neurites.
-
-    .. warning:: This feature has been deprecated in 1.6.0
-
-    Arguments:
-        name: name of the feature, used for access via get() function.
-        func: single parameter function of a neurite.
-
-    """
-    def _fun(neurites, neurite_type=NeuriteType.all):
-        """Wrap neurite function from outer scope and map into list."""
-        return list(func(n) for n in iter_neurites(neurites, filt=tree_type_checker(neurite_type)))
-
-    _register_feature('NEURITEFEATURES', name, _fun, shape=(...,))
+_NEURITE_FEATURES = {}
+_MORPHOLOGY_FEATURES = {}
+_POPULATION_FEATURES = {}
 
 
-def _find_feature_func(feature_name):
-    """Returns the python function used when getting a feature with `neurom.get(feature_name)`."""
-    for feature_dict in (NEURITEFEATURES, NEURONFEATURES):
-        if feature_name in feature_dict:
-            return feature_dict[feature_name]
-    raise NeuroMError(f'Unable to find feature: {feature_name}')
+class NameSpace(Enum):
+    """The level of morphology abstraction that feature applies to."""
+    NEURITE = 'neurite'
+    NEURON = 'morphology'
+    POPULATION = 'population'
+
+
+def _flatten_feature(feature_shape, feature_value):
+    """Flattens feature values. Applies for population features for backward compatibility."""
+    if feature_shape == ():
+        return feature_value
+    return reduce(operator.concat, feature_value, [])
+
+
+def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
+    """Collects neurite feature values appropriately to feature's shape."""
+    kwargs.pop('neurite_type', None)  # there is no 'neurite_type' arg in _NEURITE_FEATURES
+    return reduce(operator.add,
+                  (feature_(n, **kwargs) for n in iter_neurites(obj, filt=neurite_filter)),
+                  0 if feature_.shape == () else [])
 
 
 def _get_feature_value_and_func(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
-        feature(string): feature to extract
-        obj: a neuron, population or neurite tree
+        feature_name(string): feature to extract
+        obj (Neurite|Morphology|Population): neurite, morphology or population
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
         A tuple (feature, func) of the feature value and its function
     """
-    feat = _find_feature_func(feature_name)
+    # pylint: disable=too-many-branches
+    is_obj_list = isinstance(obj, (list, tuple))
+    if not isinstance(obj, (Neurite, Morphology, Population)) and not is_obj_list:
+        raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite,'
+                          ' Morphology can be used for feature calculation')
 
-    res = feat(obj, **kwargs)
-    if len(feat.shape) != 0:
-        res = np.array(list(res))
+    neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
+    res, feature_ = None, None
 
-    return res, feat
+    if isinstance(obj, Neurite) or (is_obj_list and isinstance(obj[0], Neurite)):
+        # input is a neurite or a list of neurites
+        if feature_name in _NEURITE_FEATURES:
+            assert 'neurite_type' not in kwargs, 'Cant apply "neurite_type" arg to a neurite with' \
+                                                 ' a neurite feature'
+            feature_ = _NEURITE_FEATURES[feature_name]
+            if isinstance(obj, Neurite):
+                res = feature_(obj, **kwargs)
+            else:
+                res = [feature_(s, **kwargs) for s in obj]
+    elif isinstance(obj, Morphology):
+        # input is a morphology
+        if feature_name in _MORPHOLOGY_FEATURES:
+            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            res = feature_(obj, **kwargs)
+        elif feature_name in _NEURITE_FEATURES:
+            feature_ = _NEURITE_FEATURES[feature_name]
+            res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
+    elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
+        # input is a morphology population or a list of morphs
+        if feature_name in _POPULATION_FEATURES:
+            feature_ = _POPULATION_FEATURES[feature_name]
+            res = feature_(obj, **kwargs)
+        elif feature_name in _MORPHOLOGY_FEATURES:
+            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
+        elif feature_name in _NEURITE_FEATURES:
+            feature_ = _NEURITE_FEATURES[feature_name]
+            res = _flatten_feature(
+                feature_.shape,
+                [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
+
+    if res is None or feature_ is None:
+        raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
+                          'and can be applied to your input. See the features documentation page.')
+
+    return res, feature_
 
 
 def get(feature_name, obj, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
-    Features can be either Neurite features or Neuron features. For the list of Neurite features
-    see :mod:`neurom.features.neuritefunc`. For the list of Neuron features see
-    :mod:`neurom.features.neuronfunc`.
+    Features can be either Neurite, Morphology or Population features. For Neurite features see
+    :mod:`neurom.features.neurite`. For Morphology features see :mod:`neurom.features.morphology`.
+    For Population features see :mod:`neurom.features.population`.
 
     Arguments:
         feature_name(string): feature to extract
-        obj: a neuron, a neuron population or a neurite tree
+        obj: a morphology, a morphology population or a neurite tree
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
@@ -114,41 +149,43 @@ def get(feature_name, obj, **kwargs):
     return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
 
 
-def _register_feature(namespace, name, func, shape):
+def _register_feature(namespace: NameSpace, name, func, shape):
     """Register a feature to be applied.
 
     Upon registration, an attribute 'shape' containing the expected
     shape of the function return is added to 'func'.
 
     Arguments:
-        namespace(string): a namespace (must be 'NEURITEFEATURES' or 'NEURONFEATURES')
+        namespace(string): a namespace, see :class:`NameSpace`
         name(string): name of the feature, used to access the feature via `neurom.features.get()`.
         func(callable): single parameter function of a neurite.
         shape(tuple): the expected shape of the feature values
     """
     setattr(func, 'shape', shape)
+    _map = {NameSpace.NEURITE: _NEURITE_FEATURES,
+            NameSpace.NEURON: _MORPHOLOGY_FEATURES,
+            NameSpace.POPULATION: _POPULATION_FEATURES}
+    if name in _map[namespace]:
+        raise NeuroMError(f'A feature is already registered under "{name}"')
+    _map[namespace][name] = func
 
-    assert namespace in {'NEURITEFEATURES', 'NEURONFEATURES'}
-    feature_dict = globals()[namespace]
 
-    if name in feature_dict:
-        raise NeuroMError('Attempt to hide registered feature %s' % name)
-    feature_dict[name] = func
-
-
-def feature(shape, namespace=None, name=None):
+def feature(shape, namespace: NameSpace, name=None):
     """Feature decorator to automatically register the feature in the appropriate namespace.
 
     Arguments:
         shape(tuple): the expected shape of the feature values
-        namespace(string): a namespace (must be 'NEURITEFEATURES' or 'NEURONFEATURES')
+        namespace(string): a namespace, see :class:`NameSpace`
         name(string): name of the feature, used to access the feature via `neurom.features.get()`.
     """
+
     def inner(func):
         _register_feature(namespace, name or func.__name__, func, shape)
         return func
+
     return inner
 
 
 # These imports are necessary in order to register the features
-from neurom.features import neuritefunc, neuronfunc  # noqa, pylint: disable=wrong-import-position
+from neurom.features import neurite, morphology, \
+    population  # noqa, pylint: disable=wrong-import-position

@@ -129,7 +129,7 @@ def rotate(obj, axis, angle, origin=None):
     """Rotation around unit vector following the right hand rule.
 
     Arguments:
-        obj : obj to be rotated (e.g. neurite, neuron).
+        obj : obj to be rotated (e.g. neurite, morphology).
             Must implement a transform method.
         axis : unit vector for the axis of rotation
         angle : rotation angle in rads

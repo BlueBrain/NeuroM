@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 
 from morphio import RawDataError, MorphioError
-from neurom import load_neuron, NeuriteType
+from neurom import load_morphology, NeuriteType
 
 import pytest
 from numpy.testing import assert_array_equal
@@ -43,16 +43,16 @@ SWC_SOMA_PATH = SWC_PATH / 'soma'
 
 def test_repeated_id():
     with pytest.raises(RawDataError):
-        load_neuron(SWC_PATH / 'repeated_id.swc')
+        load_morphology(SWC_PATH / 'repeated_id.swc')
 
 
 def test_neurite_followed_by_soma():
     with pytest.raises(MorphioError, match='Found a soma point with a neurite as parent'):
-        load_neuron(SWC_PATH / 'soma_with_neurite_parent.swc')
+        load_morphology(SWC_PATH / 'soma_with_neurite_parent.swc')
 
 
 def test_read_single_neurite():
-    n = load_neuron(SWC_PATH / 'point_soma_single_neurite.swc')
+    n = load_morphology(SWC_PATH / 'point_soma_single_neurite.swc')
     assert len(n.neurites) == 1
     assert n.neurites[0].root_node.id == 0
     assert_array_equal(n.soma.points,
@@ -67,7 +67,7 @@ def test_read_single_neurite():
 
 
 def test_read_split_soma():
-    n = load_neuron(SWC_PATH / 'split_soma_two_neurites.swc')
+    n = load_morphology(SWC_PATH / 'split_soma_two_neurites.swc')
 
     assert_array_equal(n.soma.points,
                        [[1, 0, 1, 4.0],
@@ -92,7 +92,7 @@ def test_read_split_soma():
 
 def test_weird_indent():
 
-    n = load_neuron("""
+    n = load_morphology("""
 
                  # this is the same as simple.swc
 
@@ -114,14 +114,14 @@ def test_weird_indent():
  9 2 -5 -4 0 0.  7
 """, reader='swc')
 
-    simple = load_neuron(SWC_PATH / 'simple.swc')
+    simple = load_morphology(SWC_PATH / 'simple.swc')
     assert_array_equal(simple.points,
                        n.points)
 
 
 def test_cyclic():
     with pytest.raises(RawDataError):
-        load_neuron("""
+        load_morphology("""
         1 1  0  0 0 1. -1
         2 3  0  0 0 1.  1
         3 3  0  5 0 1.  2
@@ -134,7 +134,7 @@ def test_cyclic():
 
 
 def test_simple_reversed():
-    n = load_neuron(SWC_PATH / 'simple_reversed.swc')
+    n = load_morphology(SWC_PATH / 'simple_reversed.swc')
     assert_array_equal(n.soma.points,
                        [[0, 0, 0, 1]])
     assert len(n.neurites) == 2
@@ -152,10 +152,10 @@ def test_simple_reversed():
 
 
 def test_custom_type():
-    neuron = load_neuron(Path(SWC_PATH, 'custom_type.swc'))
-    assert neuron.neurites[1].type == NeuriteType.custom5
+    m = load_morphology(Path(SWC_PATH, 'custom_type.swc'))
+    assert m.neurites[1].type == NeuriteType.custom5
 
 
 def test_undefined_type():
     with pytest.raises(RawDataError, match='Unsupported section type: 0'):
-        load_neuron(SWC_PATH / 'undefined_type.swc')
+        load_morphology(SWC_PATH / 'undefined_type.swc')

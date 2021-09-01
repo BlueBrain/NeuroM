@@ -32,7 +32,7 @@ import pylab as plt
 import numpy as np
 
 from neurom import get as get_feat
-from neurom.view import (common, view)
+from neurom.view import matplotlib_utils, matplotlib_impl
 from neurom.core.types import NeuriteType
 
 
@@ -54,7 +54,7 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
     """Plots the 2d histogram of the center
        coordinates of segments in the selected plane.
     """
-    fig, ax = common.get_figure(new_fig=new_fig, subplot=subplot)
+    fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     H1, xedges1, yedges1 = extract_density(population, plane=plane, bins=bins,
                                            neurite_type=neurite_type)
@@ -77,7 +77,7 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
     kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
     kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
 
-    return common.plot_style(fig=fig, ax=ax, **kwargs)
+    return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
 
 def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
@@ -89,9 +89,9 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
        coordinates of segments in the selected plane
        and superimposes the view of the first neurite of the collection.
     """
-    _, ax = common.get_figure(new_fig=new_fig)
+    _, ax = matplotlib_utils.get_figure(new_fig=new_fig)
 
-    view.plot_tree(ax, population.neurites[0])
+    matplotlib_impl.plot_tree(population.neurites[0], ax)
 
     return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,

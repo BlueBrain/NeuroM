@@ -74,19 +74,19 @@ def calculate_and_plot_end_to_end_distance(neurite):
 if __name__ == '__main__':
     #  load a neuron from an SWC file
     filename = 'tests/data/swc/Neuron_3_random_walker_branches.swc'
-    nrn = nm.load_neuron(filename)
+    m = nm.load_morphology(filename)
 
     # print mean end-to-end distance per neurite type
     print('Mean end-to-end distance for axons: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == nm.AXON))
+          mean_end_to_end_dist(n for n in m.neurites if n.type == nm.AXON))
     print('Mean end-to-end distance for basal dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites if n.type == nm.BASAL_DENDRITE))
+          mean_end_to_end_dist(n for n in m.neurites if n.type == nm.BASAL_DENDRITE))
     print('Mean end-to-end distance for apical dendrites: ',
-          mean_end_to_end_dist(n for n in nrn.neurites
+          mean_end_to_end_dist(n for n in m.neurites
                                if n.type == nm.APICAL_DENDRITE))
 
     print('End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):')
-    for nrte in nrn.neurites:
+    for nrte in m.neurites:
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)

@@ -46,7 +46,7 @@ setup(
         'scipy>=1.2.0',
         'tqdm>=4.8.4',
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests',)),
     license='BSD',
     entry_points={
         'console_scripts': ['neurom=neurom.apps.cli:cli']

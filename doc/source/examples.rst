@@ -38,30 +38,30 @@ Examples
 Fast analysis with :py:mod:`neurom`
 ***********************************
 
-Here we load a neuron and obtain some information from it:
+Here we load a morphology and obtain some information from it:
 
 .. code-block:: python
 
     >>> import neurom as nm
-    >>> nrn = nm.load_neuron('some/data/path/morph_file.swc')
-    >>> ap_seg_len = nm.get('segment_lengths', nrn, neurite_type=nm.APICAL_DENDRITE)
-    >>> ax_sec_len = nm.get('section_lengths', nrn, neurite_type=nm.AXON)
+    >>> m = nm.load_morphology('some/data/path/morph_file.swc')
+    >>> ap_seg_len = nm.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
+    >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
 
 Morphology visualization with the :py:mod:`neurom.viewer` module
 ****************************************************************
 
-Here we visualize a neuronal morphology:
+Here we visualize a morphology:
 
 
 .. code-block:: python
 
-    >>> # Initialize nrn as above
+    >>> # Initialize m as above
     >>> from neurom import viewer
-    >>> fig, ax = viewer.draw(nrn)
+    >>> fig, ax = viewer.draw(m)
     >>> fig.show()
     >>>
-    >>> fig, ax = viewer.draw(nrn, mode='3d') # valid modes '2d', '3d', 'dendrogram'
+    >>> fig, ax = viewer.draw(m, mode='3d') # valid modes '2d', '3d', 'dendrogram'
     >>> fig.show()
 
 Advanced iterator-based feature extraction example
@@ -79,7 +79,7 @@ All of the examples in the previous sections can be implemented
 in a similar way to those presented here.
 
 
-.. literalinclude:: ../../examples/neuron_iteration_analysis.py
+.. literalinclude:: ../../examples/iteration_analysis.py
     :lines: 30-
 
 Getting Log Information

@@ -32,10 +32,10 @@ import csv
 import json
 import logging
 import multiprocessing
-import numbers
 import os
 import warnings
 from collections import defaultdict
+from collections.abc import Sized
 from functools import partial
 from itertools import chain, product
 from pathlib import Path
@@ -47,11 +47,12 @@ from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
-from neurom.core.neuron import Neuron
+from neurom.core.morphology import Morphology
 from neurom.exceptions import ConfigError
-from neurom.features import NEURITEFEATURES, NEURONFEATURES, _get_feature_value_and_func
+from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
+    _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path
-from neurom.utils import NeuromJSON
+from neurom.utils import NeuromJSON, warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -59,61 +60,28 @@ EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
-def eval_stats(values, mode):
-    """Extract a summary statistic from an array of list of values.
-
-    Arguments:
-        values: A numpy array of values
-        mode: A summary stat to extract. One of:
-            ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-
-    .. note:: If values is empty, mode `raw` returns `[]`, `total` returns `0.0`
-    and the other modes return `None`.
-    """
-    if mode == 'raw':
-        return values.tolist()
-    if mode == 'total':
-        mode = 'sum'
-    if len(values) == 0 and mode not in {'raw', 'sum'}:
-        return None
-
-    return getattr(np, mode)(values, axis=0)
-
-
-def _stat_name(feat_name, stat_mode):
-    """Set stat name based on feature name and stat mode."""
-    if feat_name[-1] == 's':
-        feat_name = feat_name[:-1]
-    if feat_name == 'soma_radii':
-        feat_name = 'soma_radius'
-    if stat_mode == 'raw':
-        return feat_name
-
-    return '%s_%s' % (stat_mode, feat_name)
-
-
-def _run_extract_stats(nrn, config):
+def _run_extract_stats(morph, config):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
-    if not isinstance(nrn, Neuron):
-        nrn = nm.load_neuron(nrn)
-    return nrn.name, extract_stats(nrn, config)
+    if not isinstance(morph, Morphology):
+        morph = nm.load_morphology(morph)
+    return morph.name, extract_stats(morph, config)
 
 
-def extract_dataframe(neurons, config, n_workers=1):
-    """Extract stats grouped by neurite type from neurons.
+def extract_dataframe(morphs, config, n_workers=1):
+    """Extract stats grouped by neurite type from morphs.
 
     Arguments:
-        neurons: a neuron, population, neurite tree or list of neuron paths
+        morphs: a morphology, population, neurite tree or list of morphology paths
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
             - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
-                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-            - neuron: same as neurite entry, but it will not be run on each neurite_type,
-              but only once on the whole neuron.
-        n_workers (int): number of workers for multiprocessing (on collection of neurons)
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
+            - morphology: same as neurite entry, but it will not be run on each neurite_type,
+              but only once on the whole morphology.
+        n_workers (int): number of workers for multiprocessing (on collection of morphs)
 
     Returns:
         The extracted statistics
@@ -123,18 +91,18 @@ def extract_dataframe(neurons, config, n_workers=1):
 
     {config_path}
     """
-    if isinstance(neurons, Neuron):
-        neurons = [neurons]
+    if isinstance(morphs, Morphology):
+        morphs = [morphs]
     config = config.copy()
 
     func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
-        stats = list(map(func, neurons))
+        stats = list(map(func, morphs))
     else:
         if n_workers > os.cpu_count():
             warnings.warn(f'n_workers ({n_workers}) > os.cpu_count() ({os.cpu_count()}))')
         with multiprocessing.Pool(n_workers) as pool:
-            stats = list(pool.imap(func, neurons))
+            stats = list(pool.imap(func, morphs))
 
     columns = [('property', 'name')] + [
         (key1, key2) for key1, data in stats[0][1].items() for key2 in data
@@ -147,20 +115,49 @@ def extract_dataframe(neurons, config, n_workers=1):
 extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
 
 
-def extract_stats(neurons, config):
-    """Extract stats from neurons.
+def _get_feature_stats(feature_name, morphs, modes, kwargs):
+    """Insert the stat data in the dict.
+
+    If the feature is 2-dimensional, the feature is flattened on its last axis
+    """
+    data = {}
+    value, func = _get_feature_value_and_func(feature_name, morphs, **kwargs)
+    shape = func.shape
+    if len(shape) > 2:
+        raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
+
+    for mode in modes:
+        stat_name = f'{mode}_{feature_name}'
+
+        stat = value
+        if isinstance(value, Sized):
+            if len(value) == 0 and mode not in {'raw', 'sum'}:
+                stat = None
+            else:
+                stat = getattr(np, mode)(value, axis=0)
+
+        if len(shape) == 2:
+            for i in range(shape[1]):
+                data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
+        else:
+            data[stat_name] = stat
+    return data
+
+
+def extract_stats(morphs, config):
+    """Extract stats from morphs.
 
     Arguments:
-        neurons: a neuron, population, neurite tree or list of neuron paths/str
+        morphs: a morphology, population, neurite tree or list of morphology paths/str
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used.
             - neurite: a dictionary {{neurite_feature: mode}} where:
                 - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
-                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'total']
-            - neuron: same as neurite entry, but it will not be run on each neurite_type,
-              but only once on the whole neuron.
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
+            - morphology: same as neurite entry, but it will not be run on each neurite_type,
+              but only once on the whole morphology.
 
     Returns:
         The extracted statistics
@@ -170,43 +167,37 @@ def extract_stats(neurons, config):
 
     {config_path}
     """
-
-    def _fill_stats_dict(data, stat_name, stat, shape):
-        """Insert the stat data in the dict.
-
-        If the feature is 2-dimensional, the feature is flattened on its last axis
-        """
-        if len(shape) == 2:
-            for i in range(shape[1]):
-                data[f'{stat_name}_{i}'] = stat[i] if stat is not None else None
-        elif len(shape) > 2:
-            raise ValueError(f'Feature with wrong shape: {shape}')  # pragma: no cover
-        else:
-            data[stat_name] = stat
-
     stats = defaultdict(dict)
+    neurite_features = product(['neurite'], config.get('neurite', {}).items())
+    if 'neuron' in config:    # pragma: no cover
+        warn_deprecated('Usage of "neuron" is deprecated in configs of `morph_stats` package. '
+                        'Use "morphology" instead.')
+        config['morphology'] = config['neuron']
+        del config['neuron']
+    morph_features = product(['morphology'], config.get('morphology', {}).items())
+    population_features = product(['population'], config.get('population', {}).items())
+    neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
-    for (feature_name, modes), neurite_type in product(config['neurite'].items(),
-                                                       config.get('neurite_type',
-                                                                  _NEURITE_MAP.keys())):
-        neurite_type = _NEURITE_MAP[neurite_type]
-        feature, func = _get_feature_value_and_func(feature_name, neurons,
-                                                    neurite_type=neurite_type)
-        if isinstance(feature, numbers.Number):
-            feature = [feature]
-        for mode in modes:
-            stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats[neurite_type.name], stat_name, stat, func.shape)
+    for namespace, (feature_name, opts) in chain(neurite_features, morph_features,
+                                                 population_features):
+        if isinstance(opts, dict):
+            kwargs = opts.get('kwargs', {})
+            modes = opts.get('modes', [])
+        else:
+            kwargs = {}
+            modes = opts
+        if namespace == 'neurite':
+            if 'neurite_type' not in kwargs and neurite_types:
+                for t in neurite_types:
+                    kwargs['neurite_type'] = t
+                    stats[t.name].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
+            else:
+                t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
+                kwargs['neurite_type'] = t
+                stats[t.name].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
+        else:
+            stats[namespace].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
 
-    for feature_name, modes in config.get('neuron', {}).items():
-        feature, func = _get_feature_value_and_func(feature_name, neurons)
-        if isinstance(feature, numbers.Number):
-            feature = [feature]
-        for mode in modes:
-            stat_name = _stat_name(feature_name, mode)
-            stat = eval_stats(feature, mode)
-            _fill_stats_dict(stats['neuron'], stat_name, stat, func.shape)
     return dict(stats)
 
 
@@ -248,8 +239,9 @@ def full_config():
     """Returns a config with all features, all modes, all neurite types."""
     modes = ['min', 'max', 'median', 'mean', 'std']
     return {
-        'neurite': {feature: modes for feature in NEURITEFEATURES},
-        'neuron': {feature: modes for feature in NEURONFEATURES},
+        'neurite': {feature: modes for feature in _NEURITE_FEATURES},
+        'morphology': {feature: modes for feature in _MORPHOLOGY_FEATURES},
+        'population': {feature: modes for feature in _POPULATION_FEATURES},
         'neurite_type': list(_NEURITE_MAP.keys()),
     }
 
@@ -262,8 +254,8 @@ def sanitize_config(config):
     else:
         config['neurite'] = {}
 
-    if 'neuron' not in config:
-        config['neuron'] = {}
+    if 'morphology' not in config:
+        config['morphology'] = {}
 
     return config
 
@@ -292,14 +284,15 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     if ignored_exceptions is None:
         ignored_exceptions = ()
     ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
-    neurons = nm.load_neurons(get_files_by_path(datapath), ignored_exceptions=ignored_exceptions)
+    morphs = nm.load_morphologies(get_files_by_path(datapath),
+                                  ignored_exceptions=ignored_exceptions)
 
     results = {}
     if as_population:
-        results[datapath] = extract_stats(neurons, config)
+        results[datapath] = extract_stats(morphs, config)
     else:
-        for neuron in tqdm(neurons):
-            results[neuron.name] = extract_stats(neuron, config)
+        for m in tqdm(morphs):
+            results[m.name] = extract_stats(m, config)
 
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))

@@ -28,13 +28,14 @@
 
 """The morph-tool command line launcher."""
 import logging
+from functools import partial
 
 import click
 import matplotlib.pyplot as plt
 
 from neurom.apps import morph_stats, morph_check
-from neurom import load_neuron
-from neurom.viewer import draw as pyplot_draw
+from neurom import load_morphology
+from neurom.view import matplotlib_impl, matplotlib_utils
 
 
 @click.group()
@@ -48,28 +49,34 @@ def cli(verbose):
 
 @cli.command()
 @click.argument('input_file')
-@click.option('--plane', type=click.Choice(['3d', 'xy', 'yx', 'yz', 'zy', 'xz', 'zx']),
-              default='3d')
-@click.option('--backend', type=click.Choice(['plotly', 'matplotlib']),
-              default='matplotlib')
+@click.option('--3d', 'is_3d', is_flag=True)
+@click.option('--plane', type=click.Choice(['xy', 'yx', 'yz', 'zy', 'xz', 'zx']), default='xy')
+@click.option('--backend', type=click.Choice(['plotly', 'matplotlib']), default='matplotlib')
 @click.option('-r', '--realistic-diameters/--no-realistic-diameters', default=False,
               help='Scale diameters according to the plot axis\n'
                    'Warning: Only works with the matplotlib backend')
-def view(input_file, plane, backend, realistic_diameters):
-    """A simple neuron viewer."""
+def view(input_file, is_3d, plane, backend, realistic_diameters):
+    """CLI interface to draw morphologies."""
     # pylint: disable=import-outside-toplevel
-    if backend == 'matplotlib':
-        kwargs = {
-            'mode': '3d' if plane == '3d' else '2d',
-            'realistic_diameters': realistic_diameters,
-        }
-        if plane != '3d':
-            kwargs['plane'] = plane
-        pyplot_draw(load_neuron(input_file), **kwargs)
-        plt.show()
+    is_matplotlib = backend == 'matplotlib'
+    if is_matplotlib:
+        if is_3d:
+            _, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
+            plot = partial(matplotlib_impl.plot_morph3d, ax=ax)
+        else:
+            _, ax = matplotlib_utils.get_figure()
+            plot = partial(matplotlib_impl.plot_morph, ax=ax,
+                           plane=plane, realistic_diameters=realistic_diameters)
     else:
-        from neurom.view.plotly import draw as plotly_draw
-        plotly_draw(load_neuron(input_file), plane=plane)
+        from neurom.view import plotly_impl
+        if is_3d:
+            plot = plotly_impl.plot_morph3d
+        else:
+            plot = partial(plotly_impl.plot_morph, plane=plane)
+
+    plot(load_morphology(input_file))
+    if is_matplotlib:
+        plt.show()
 
 
 @cli.command(short_help='Morphology statistics extractor, more details at'

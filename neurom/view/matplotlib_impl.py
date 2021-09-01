@@ -25,21 +25,24 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""Visualize morphologies."""
+
+"""Morphology draw functions using matplotlib."""
+
+from functools import wraps
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
 from neurom import NeuriteType, geom
-from neurom.core.neuron import iter_neurites, iter_sections, iter_segments
+from neurom.core.morphology import iter_neurites, iter_sections, iter_segments
 from neurom.core.soma import SomaCylinders
 from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
 from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
 
-from neurom.view import common
+from neurom.view import matplotlib_utils
 
 _LINEWIDTH = 1.2
 _ALPHA = 0.8
@@ -55,6 +58,28 @@ TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
               NeuriteType.custom8: 'orange',
               NeuriteType.custom9: 'orange',
               NeuriteType.custom10: 'orange'}
+
+
+def _implicit_ax(plot_func, params=None):
+    """Sets ``ax`` arg for plot functions if ``ax`` is not set originally."""
+
+    @wraps(plot_func)
+    def wrapper(*args, **kwargs):
+        fig = None
+        ax = kwargs.get('ax', None)
+        if ax is None and len(args) == 1:
+            fig, ax = matplotlib_utils.get_figure(params=params)
+            kwargs['ax'] = ax
+        res = plot_func(*args, **kwargs)
+        if fig:
+            matplotlib_utils.plot_style(fig=fig, ax=ax)
+        return res
+
+    return wrapper
+
+
+def _implicit_ax3d(plot_func):
+    return _implicit_ax(plot_func, {'projection': '3d'})
 
 
 def _plane2col(plane):
@@ -85,14 +110,15 @@ def _get_color(treecolor, tree_type):
     return TREE_COLOR.get(tree_type, 'green')
 
 
-def plot_tree(ax, tree, plane='xy',
+@_implicit_ax
+def plot_tree(tree, ax=None, plane='xy',
               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA, realistic_diameters=False):
     """Plots a 2d figure of the tree's segments.
 
     Args:
-        ax(matplotlib axes): on what to plot
         tree(neurom.core.Section or neurom.core.Neurite): plotted tree
+        ax(matplotlib axes): on what to plot
         plane(str): Any pair of 'xyz'
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -144,15 +170,16 @@ def plot_tree(ax, tree, plane='xy',
     ax.add_collection(collection)
 
 
-def plot_soma(ax, soma, plane='xy',
+@_implicit_ax
+def plot_soma(soma, ax=None, plane='xy',
               soma_outline=True,
               linewidth=_LINEWIDTH,
               color=None, alpha=_ALPHA):
     """Generates a 2d figure of the soma.
 
     Args:
-        ax(matplotlib axes): on what to plot
         soma(neurom.core.Soma): plotted soma
+        ax(matplotlib axes): on what to plot
         plane(str): Any pair of 'xyz'
         soma_outline(bool): should the soma be drawn as an outline
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -164,10 +191,11 @@ def plot_soma(ax, soma, plane='xy',
 
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
-            common.project_cylinder_onto_2d(ax, (plane0, plane1),
-                                            start=start[COLS.XYZ], end=end[COLS.XYZ],
-                                            start_radius=start[COLS.R], end_radius=end[COLS.R],
-                                            color=color, alpha=alpha)
+            matplotlib_utils.project_cylinder_onto_2d(
+                ax, (plane0, plane1),
+                start=start[COLS.XYZ], end=end[COLS.XYZ],
+                start_radius=start[COLS.R], end_radius=end[COLS.R],
+                color=color, alpha=alpha)
     else:
         if soma_outline:
             ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
@@ -189,18 +217,19 @@ def plot_soma(ax, soma, plane='xy',
 
 
 # pylint: disable=too-many-arguments
-def plot_neuron(ax, nrn,
-                neurite_type=NeuriteType.all,
-                plane='xy',
-                soma_outline=True,
-                diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA, realistic_diameters=False):
-    """Plots a 2D figure of the neuron, that contains a soma and the neurites.
+@_implicit_ax
+def plot_morph(morph, ax=None,
+               neurite_type=NeuriteType.all,
+               plane='xy',
+               soma_outline=True,
+               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+               color=None, alpha=_ALPHA, realistic_diameters=False):
+    """Plots a 2D figure of the morphology, that contains a soma and the neurites.
 
     Args:
-        ax(matplotlib axes): on what to plot
         neurite_type(NeuriteType|tuple): an optional filter on the neurite type
-        nrn(neuron): neuron to be plotted
+        ax(matplotlib axes): on what to plot
+        morph(Morphology): morphology to be plotted
         soma_outline(bool): should the soma be drawn as an outline
         plane(str): Any pair of 'xyz'
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
@@ -209,15 +238,15 @@ def plot_neuron(ax, nrn,
         alpha(float): Transparency of plotted values
         realistic_diameters(bool): scale linewidths with axis data coordinates
     """
-    plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
+    plot_soma(morph.soma, ax, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
               color=color, alpha=alpha)
 
-    for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
-        plot_tree(ax, neurite, plane=plane,
+    for neurite in iter_neurites(morph, filt=tree_type_checker(neurite_type)):
+        plot_tree(neurite, ax, plane=plane,
                   diameter_scale=diameter_scale, linewidth=linewidth,
                   color=color, alpha=alpha, realistic_diameters=realistic_diameters)
 
-    ax.set_title(nrn.name)
+    ax.set_title(morph.name)
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
 
@@ -234,7 +263,8 @@ def _update_3d_datalim(ax, obj):
     ax.zz_dataLim.update_from_data_xy(z_bounds, ignore=False)
 
 
-def plot_tree3d(ax, tree,
+@_implicit_ax3d
+def plot_tree3d(tree, ax=None,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                 color=None, alpha=_ALPHA):
     """Generates a figure of the tree in 3d.
@@ -243,8 +273,8 @@ def plot_tree3d(ax, tree,
     since no segments can be constructed.
 
     Args:
-        ax(matplotlib axes): on what to plot
         tree(neurom.core.Section or neurom.core.Neurite): plotted tree
+        ax(matplotlib axes): on what to plot
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
@@ -264,12 +294,13 @@ def plot_tree3d(ax, tree,
     _update_3d_datalim(ax, tree)
 
 
-def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
+@_implicit_ax3d
+def plot_soma3d(soma, ax=None, color=None, alpha=_ALPHA):
     """Generates a 3d figure of the soma.
 
     Args:
-        ax(matplotlib axes): on what to plot
         soma(neurom.core.Soma): plotted soma
+        ax(matplotlib axes): on what to plot
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
@@ -277,40 +308,41 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
 
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
-            common.plot_cylinder(ax,
-                                 start=start[COLS.XYZ], end=end[COLS.XYZ],
-                                 start_radius=start[COLS.R], end_radius=end[COLS.R],
-                                 color=color, alpha=alpha)
+            matplotlib_utils.plot_cylinder(ax,
+                                           start=start[COLS.XYZ], end=end[COLS.XYZ],
+                                           start_radius=start[COLS.R], end_radius=end[COLS.R],
+                                           color=color, alpha=alpha)
     else:
-        common.plot_sphere(ax, center=soma.center[COLS.XYZ], radius=soma.radius,
-                           color=color, alpha=alpha)
+        matplotlib_utils.plot_sphere(ax, center=soma.center[COLS.XYZ], radius=soma.radius,
+                                     color=color, alpha=alpha)
 
     # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
     _update_3d_datalim(ax, soma)
 
 
-def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
-                  diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                  color=None, alpha=_ALPHA):
-    """Generates a figure of the neuron, that contains a soma and a list of trees.
+@_implicit_ax3d
+def plot_morph3d(morph, ax=None, neurite_type=NeuriteType.all,
+                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
+                 color=None, alpha=_ALPHA):
+    """Generates a figure of the morphology, that contains a soma and a list of trees.
 
     Args:
+        morph(Morphology): morphology to be plotted
         ax(matplotlib axes): on what to plot
-        nrn(neuron): neuron to be plotted
         neurite_type(NeuriteType): an optional filter on the neurite type
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
-    plot_soma3d(ax, nrn.soma, color=color, alpha=alpha)
+    plot_soma3d(morph.soma, ax, color=color, alpha=alpha)
 
-    for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
-        plot_tree3d(ax, neurite,
+    for neurite in iter_neurites(morph, filt=tree_type_checker(neurite_type)):
+        plot_tree3d(neurite, ax,
                     diameter_scale=diameter_scale, linewidth=linewidth,
                     color=color, alpha=alpha)
 
-    ax.set_title(nrn.name)
+    ax.set_title(morph.name)
 
 
 def _get_dendrogram_legend(dendrogram):
@@ -365,12 +397,13 @@ def _get_dendrogram_shapes(dendrogram, positions, show_diameters):
     return shapes
 
 
-def plot_dendrogram(ax, obj, show_diameters=True):
+@_implicit_ax
+def plot_dendrogram(obj, ax=None, show_diameters=True):
     """Plots Dendrogram of `obj`.
 
     Args:
+        obj (neurom.Morphology, neurom.Section): morphology or section
         ax: matplotlib axes
-        obj (neurom.Neuron, neurom.Section): neuron or section
         show_diameters (bool): whether to show node diameters or not
     """
     dendrogram = Dendrogram(obj)

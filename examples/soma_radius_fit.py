@@ -28,8 +28,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Extract a distribution for the soma radii of the population (list) of neurons.
-   for the soma radii of the population (list) of neurons.
+"""Extract a distribution for the soma radii of the population (list) of morphologies.
+   for the soma radii of the population (list) of morphologies.
    """
 
 import argparse
@@ -55,12 +55,12 @@ def test_multiple_distr(filepath):
        the optimal distribution along with the corresponding parameters.
     """
     #  load a neuron from an SWC file
-    population = nm.load_neurons(filepath)
+    population = nm.load_morphologies(filepath)
 
     # Create a list of basic distributions
     distr_to_check = ('norm', 'expon', 'uniform')
 
-    # Get the soma radii of a population of neurons
+    # Get the soma radii of a population of morphs
     soma_size = nm.get('soma_radii', population)
 
     # Find the best fit distribution

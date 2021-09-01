@@ -31,26 +31,29 @@
 
 Examples:
     >>> from neurom import viewer
-    >>> nrn = ... # load a neuron
-    >>> viewer.draw(nrn)                    # 2d plot
-    >>> viewer.draw(nrn, mode='3d')         # 3d plot
-    >>> viewer.draw(nrn.neurites[0])        # 2d plot of neurite tree
-    >>> viewer.draw(nrn, mode='dendrogram') # dendrogram plot
+    >>> m = ... # load a neuron
+    >>> viewer.draw(m)                    # 2d plot
+    >>> viewer.draw(m, mode='3d')         # 3d plot
+    >>> viewer.draw(m.neurites[0])        # 2d plot of neurite tree
+    >>> viewer.draw(m, mode='dendrogram') # dendrogram plot
 """
 
-from neurom.view.view import (plot_neuron, plot_neuron3d,
-                              plot_tree, plot_tree3d,
-                              plot_soma, plot_soma3d,
-                              plot_dendrogram)
-from neurom.view import common
-from neurom.core.neuron import Section, Neurite, Neuron
+from neurom.view.matplotlib_impl import (plot_morph, plot_morph3d,
+                                         plot_tree, plot_tree3d,
+                                         plot_soma, plot_soma3d,
+                                         plot_dendrogram)
+from neurom.view import matplotlib_utils
+from neurom.core.morphology import Section, Neurite, Morphology
 from neurom.core.soma import Soma
+from neurom.utils import deprecated_module
+
+deprecated_module('Module `viewer` is deprecated. See the documentation\'s migration page.')
 
 MODES = ('2d', '3d', 'dendrogram')
 
 _VIEWERS = {
-    'neuron_3d': plot_neuron3d,
-    'neuron_2d': plot_neuron,
+    'neuron_3d': plot_morph3d,
+    'neuron_2d': plot_morph,
     'neuron_dendrogram': plot_dendrogram,
     'tree_3d': plot_tree3d,
     'tree_2d': plot_tree,
@@ -86,13 +89,14 @@ def draw(obj, mode='2d', **kwargs):
         NotDrawableError if obj type and mode combination is not drawable
 
     Examples:
-        >>> nrn = ... # load a neuron
-        >>> fig, _ = viewer.draw(nrn)             # 2d plot
+        >>> from neurom import viewer, load_morphology
+        >>> m = load_morphology('/path/to/morphology') # load a neuron
+        >>> fig, _ = viewer.draw(m)             # 2d plot
         >>> fig.show()
-        >>> fig3d, _ = viewer.draw(nrn, mode='3d') # 3d plot
+        >>> fig3d, _ = viewer.draw(m, mode='3d') # 3d plot
         >>> fig3d.show()
-        >>> fig, _ = viewer.draw(nrn.neurites[0]) # 2d plot of neurite tree
-        >>> dend, _ = viewer.draw(nrn, mode='dendrogram')
+        >>> fig, _ = viewer.draw(m.neurites[0]) # 2d plot of neurite tree
+        >>> dend, _ = viewer.draw(m, mode='dendrogram')
     """
     if mode not in MODES:
         raise InvalidDrawModeError('Invalid drawing mode %s' % mode)
@@ -102,10 +106,10 @@ def draw(obj, mode='2d', **kwargs):
             raise NotImplementedError('Option realistic_diameter not implemented for 3D plots')
         del kwargs['realistic_diameters']
 
-    fig, ax = (common.get_figure() if mode in ('2d', 'dendrogram')
-               else common.get_figure(params={'projection': '3d'}))
+    fig, ax = (matplotlib_utils.get_figure() if mode in ('2d', 'dendrogram')
+               else matplotlib_utils.get_figure(params={'projection': '3d'}))
 
-    if isinstance(obj, Neuron):
+    if isinstance(obj, Morphology):
         tag = 'neuron'
     elif isinstance(obj, (Section, Neurite)):
         tag = 'tree'
@@ -121,12 +125,12 @@ def draw(obj, mode='2d', **kwargs):
         raise NotDrawableError('No drawer for class %s, mode=%s' % (obj.__class__, mode)) from e
 
     output_path = kwargs.pop('output_path', None)
-    plotter(ax, obj, **kwargs)
+    plotter(obj, ax, **kwargs)
 
     if mode != 'dendrogram':
-        common.plot_style(fig=fig, ax=ax, **kwargs)
+        matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
     if output_path:
-        common.save_plot(fig=fig, output_path=output_path, **kwargs)
+        matplotlib_utils.save_plot(fig=fig, output_path=output_path, **kwargs)
 
     return fig, ax

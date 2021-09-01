@@ -37,7 +37,7 @@ import pytest
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 CONFIG = {
     'checks': {
-        'neuron_checks': [
+        'morphology_checks': [
             'has_basal_dendrite',
             'has_axon',
             'has_apical_dendrite',
@@ -77,19 +77,19 @@ ref = dict([
     ("ALL", True)
 ])
 
-def test_ok_neuron():
+def test_ok_morphology():
     _run_test(SWC_PATH / 'Neuron.swc',
               ref,
               should_pass=True)
 
-def test_ok_neuron_color():
+def test_ok_morphology_color():
     _run_test(SWC_PATH / 'Neuron.swc',
               ref,
               CONFIG_COLOR,
               should_pass=True)
 
 
-def test_zero_length_sections_neuron():
+def test_zero_length_sections_morphology():
     expected = dict([
                   ("Has basal dendrite", True),
                   ("Has axon", True),
@@ -104,7 +104,7 @@ def test_zero_length_sections_neuron():
               expected)
 
 
-def test_single_apical_neuron():
+def test_single_apical_morphology():
     expected = dict([
                   ("Has basal dendrite", False),
                   ("Has axon", False),
@@ -119,7 +119,7 @@ def test_single_apical_neuron():
               expected)
 
 
-def test_single_basal_neuron():
+def test_single_basal_morphology():
     expected = dict(
                   ([
                       ("Has basal dendrite", True),
@@ -135,7 +135,7 @@ def test_single_basal_neuron():
               expected)
 
 
-def test_single_axon_neuron():
+def test_single_axon_morphology():
     expected = dict([
                   ("Has basal dendrite", False),
                   ("Has axon", True),
@@ -184,7 +184,7 @@ def test__sanitize_config():
     new_config = CheckRunner._sanitize_config({'checks': {}})
     assert new_config == {'checks':
                         {
-                         'neuron_checks': [],
+                         'morphology_checks': [],
                          },
                         'options': {},
                         'color': False,

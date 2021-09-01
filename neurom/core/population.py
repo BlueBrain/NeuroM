@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Neuron Population Classes and Functions."""
+"""Morphology Population Classes and Functions."""
 import logging
 
 from morphio import MorphioError
@@ -38,24 +38,24 @@ L = logging.getLogger(__name__)
 
 
 class Population:
-    """Neuron Population Class.
+    """Morphology Population Class.
 
-    Offers an iterator over neurons within population, neurites of neurons, somas of neurons.
-    It does not store the loaded neuron in memory unless the neuron has been already passed
-    as loaded (instance of ``Neuron``).
+    Offers an iterator over morphs within population, neurites of morphs, somas of morphs.
+    It does not store the loaded morphology in memory unless the morphology has been already passed
+    as loaded (instance of ``Morphology``).
     """
     def __init__(self, files, name='Population', ignored_exceptions=(), cache=False):
-        """Construct a neuron population.
+        """Construct a morphology population.
 
         Arguments:
-            files (collections.abc.Sequence[str|Path|Neuron]): collection of neuron files or
-                paths to them or instances of ``Neuron``.
+            files (collections.abc.Sequence[str|Path|Morphology]): collection of morphology files or
+                paths to them or instances of ``Morphology``.
             name (str): Optional name for this Population
             ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
-                loading neurons.
-            cache (bool): whether to cache the loaded neurons in memory. If false then a neuron
+                loading morphs.
+            cache (bool): whether to cache the loaded morphs in memory. If false then a morphology
                 will be loaded everytime it is accessed within the population. Which is good when
-                population is big. If true then all neurons will be loaded upon the construction
+                population is big. If true then all morphs will be loaded upon the construction
                 and kept in memory.
         """
         self._ignored_exceptions = ignored_exceptions
@@ -66,8 +66,8 @@ class Population:
             self._files = files
 
     @property
-    def neurons(self):
-        """Iterator to populations's somas."""
+    def morphologies(self):
+        """Iterator to populations's morphologies."""
         return (n for n in self)
 
     @property
@@ -81,31 +81,31 @@ class Population:
         return (neurite for n in self for neurite in n.neurites)
 
     def _load_file(self, f):
-        if isinstance(f, neurom.core.neuron.Neuron):
+        if isinstance(f, neurom.core.morphology.Morphology):
             return f
         try:
-            return neurom.load_neuron(f)
+            return neurom.load_morphology(f)
         except (NeuroMError, MorphioError) as e:
             if isinstance(e, self._ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s', e, f.name)
             else:
-                raise NeuroMError('`load_neurons` failed') from e
+                raise NeuroMError('`load_morphologies` failed') from e
         return None
 
     def __iter__(self):
-        """Iterator to populations's neurons."""
+        """Iterator to populations's morphs."""
         for f in self._files:
-            nrn = self._load_file(f)
-            if nrn is None:
+            m = self._load_file(f)
+            if m is None:
                 continue
-            yield nrn
+            yield m
 
     def __len__(self):
-        """Length of neuron collection."""
+        """Length of morphology collection."""
         return len(self._files)
 
     def __getitem__(self, idx):
-        """Get neuron at index idx."""
+        """Get morphology at index idx."""
         if idx > len(self):
             raise ValueError(
                 f'no {idx} index in "{self.name}" population, max possible index is {len(self)}')
@@ -113,4 +113,4 @@ class Population:
 
     def __str__(self):
         """Return a string representation."""
-        return 'Population <name: %s, nneurons: %d>' % (self.name, len(self))
+        return f'Population <name: {self.name}, n_morphologies: {len(self)}>'

@@ -28,7 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Extract a distribution for the selected feature of the population of neurons among
+"""Extract a distribution for the selected feature of the population of morphologies among
    the exponential, normal and uniform distribution, according to the minimum ks distance.
    """
 
@@ -57,12 +57,12 @@ def parse_args():
 
 
 def extract_data(data_path, feature):
-    """Loads a list of neurons, extracts feature
+    """Loads a list of morphologies, extracts feature
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution, corresponding parameters,
        minimun and maximum values.
     """
-    population = nm.load_neurons(data_path)
+    population = nm.load_morphologies(data_path)
 
     feature_data = [nm.get(feature, n) for n in population]
     feature_data = list(chain(*feature_data))

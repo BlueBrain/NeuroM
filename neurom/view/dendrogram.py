@@ -27,9 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Dendrogram helper functions and class."""
+
 import numpy as np
 from neurom import NeuriteType
-from neurom.core.neuron import Neurite, Neuron
+from neurom.core.morphology import Neurite, Morphology
 from neurom.core.dataformat import COLS
 from neurom.morphmath import interval_lengths
 
@@ -41,9 +42,9 @@ class Dendrogram:
         """Dendrogram for NeuroM section tree.
 
         Args:
-            neurom_section (Neurite|Neuron|Section): tree to build dendrogram for.
+            neurom_section (Neurite|Morphology|Section): tree to build dendrogram for.
         """
-        if isinstance(neurom_section, Neuron):
+        if isinstance(neurom_section, Morphology):
             self.neurite_type = NeuriteType.soma
             self.height = 1
             self.width = 1

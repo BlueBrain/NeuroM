@@ -6,7 +6,7 @@
 #R0903 - Too Few public methods
 #W0511 - TODO in code
 #R0401 - cyclic-import
-disable=C0103,R0903,W0511,R0401
+disable=C0103,R0903,W0511,R0401,unspecified-encoding
 
 [FORMAT]
 # Maximum number of characters on a single line.

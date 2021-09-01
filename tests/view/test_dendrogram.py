@@ -3,7 +3,7 @@ from collections import namedtuple
 
 import numpy as np
 import neurom.view.dendrogram as dm
-from neurom import load_neuron, get
+from neurom import load_morphology, get
 from neurom.core.types import NeuriteType
 
 from numpy.testing import assert_array_almost_equal
@@ -12,9 +12,9 @@ DATA_PATH = Path(__file__).parent.parent / 'data'
 NEURON_PATH = DATA_PATH / 'h5/v1/Neuron.h5'
 
 
-def test_create_dendrogram_neuron():
-    neuron = load_neuron(NEURON_PATH)
-    dendrogram = dm.Dendrogram(neuron)
+def test_create_dendrogram_morphology():
+    m = load_morphology(NEURON_PATH)
+    dendrogram = dm.Dendrogram(m)
     assert NeuriteType.soma == dendrogram.neurite_type
     soma_len = 1.0
     assert soma_len == dendrogram.height
@@ -22,7 +22,7 @@ def test_create_dendrogram_neuron():
     assert_array_almost_equal(
         [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
         dendrogram.coords)
-    assert len(neuron.neurites) == len(dendrogram.children)
+    assert len(m.neurites) == len(dendrogram.children)
 
 
 def test_dendrogram_get_coords():
@@ -41,8 +41,8 @@ def test_create_dendrogram_neurite():
             section = neurom_section.children[i]
             assert section.type == d.neurite_type
 
-    neuron = load_neuron(NEURON_PATH)
-    neurite = neuron.neurites[0]
+    m = load_morphology(NEURON_PATH)
+    neurite = m.neurites[0]
     dendrogram = dm.Dendrogram(neurite)
     assert neurite.type == dendrogram.neurite_type
     assert_trees(neurite.root_node, dendrogram)
@@ -82,17 +82,15 @@ def test_layout_dendrogram():
                     .5 * (next_child.width + child.width))
             assert_layout(child)
 
-    neuron = load_neuron(NEURON_PATH)
-    dendrogram = dm.Dendrogram(neuron)
+    m = load_morphology(NEURON_PATH)
+    dendrogram = dm.Dendrogram(m)
     positions = dm.layout_dendrogram(dendrogram, np.array([0, 0]))
     assert_layout(dendrogram)
 
 
-def test_neuron_not_corrupted():
-    # Regression for #492: dendrogram was corrupting
-    # neuron used to construct it.
-    # This caused the section path distance calculation
-    # to raise a KeyError exception.
-    neuron = load_neuron(NEURON_PATH)
-    dm.Dendrogram(neuron)
-    assert get('section_path_distances', neuron).size > 0
+def test_morphology_not_corrupted():
+    # Regression for #492: dendrogram was corrupting morphology used to construct it.
+    # This caused the section path distance calculation to raise a KeyError exception.
+    m = load_morphology(NEURON_PATH)
+    dm.Dendrogram(m)
+    assert len(get('section_path_distances', m)) > 0

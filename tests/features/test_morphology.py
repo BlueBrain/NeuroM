@@ -1,0 +1,280 @@
+# Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# All rights reserved.
+#
+# This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     1. Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#     3. Neither the name of the copyright holder nor the names of
+#        its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""Test ``features.morphology``."""
+from math import pi, sqrt
+import tempfile
+import warnings
+from io import StringIO
+from pathlib import Path
+
+import numpy as np
+from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
+from neurom.features import morphology, section
+
+import pytest
+from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
+
+DATA_PATH = Path(__file__).parent.parent / 'data'
+H5_PATH = DATA_PATH / 'h5/v1'
+NRN = load_morphology(H5_PATH / 'Neuron.h5')
+SWC_PATH = DATA_PATH / 'swc'
+SIMPLE = load_morphology(SWC_PATH / 'simple.swc')
+SIMPLE_TRUNK = load_morphology(SWC_PATH / 'simple_trunk.swc')
+SWC_NRN = load_morphology(SWC_PATH / 'Neuron.swc')
+with warnings.catch_warnings(record=True):
+    SWC_NRN_3PT = load_morphology(SWC_PATH / 'soma' / 'three_pt_soma.swc')
+
+
+def test_soma_volume():
+    with warnings.catch_warnings(record=True):
+        # SomaSinglePoint
+        ret = morphology.soma_volume(SIMPLE)
+        assert_almost_equal(ret, 4.1887902047863905)
+        # SomaCylinders
+        ret = morphology.soma_volume(SWC_NRN)
+        assert_almost_equal(ret, 0.010726068245337955)
+        # SomaSimpleContour
+        ret = morphology.soma_volume(NRN)
+        assert_almost_equal(ret, 0.0033147000251481135)
+        # SomaNeuromorphoThreePointCylinders
+        ret = morphology.soma_volume(SWC_NRN_3PT)
+        assert_almost_equal(ret, 50.26548245743669)
+
+
+def test_soma_surface_area():
+    assert_allclose(morphology.soma_surface_area(SIMPLE), 12.566370614359172)
+    assert_allclose(morphology.soma_surface_area(NRN), 0.1075095256160432)
+
+
+def test_soma_radius():
+    assert morphology.soma_radius(SIMPLE) == 1
+    assert_allclose(morphology.soma_radius(NRN), 0.09249506049313666)
+
+
+def test_total_area_per_neurite():
+    def surface(r0, r1, h):
+        return pi * (r0 + r1) * sqrt((r0 - r1) ** 2 + h ** 2)
+
+    basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = morphology.total_area_per_neurite(SIMPLE, neurite_type=BASAL_DENDRITE)
+    assert_almost_equal(ret[0], basal_area)
+
+    axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
+    ret = morphology.total_area_per_neurite(SIMPLE, neurite_type=AXON)
+    assert_almost_equal(ret[0], axon_area)
+
+    ret = morphology.total_area_per_neurite(SIMPLE)
+    assert np.allclose(ret, [basal_area, axon_area])
+
+
+def test_total_volume_per_neurite():
+    vol = morphology.total_volume_per_neurite(NRN)
+    assert len(vol) == 4
+
+    # calculate the volumes by hand and compare
+    vol2 = [sum(section.section_volume(s) for s in n.iter_sections())
+            for n in NRN.neurites]
+    assert vol == vol2
+
+    # regression test
+    ref_vol = [271.94122143951864, 281.24754646913954,
+               274.98039928781355, 276.73860261723024]
+    assert np.allclose(vol, ref_vol)
+
+
+def test_total_length_per_neurite():
+    total_lengths = morphology.total_length_per_neurite(SIMPLE)
+    assert total_lengths == [5. + 5. + 6., 4. + 5. + 6.]
+
+
+def test_number_of_neurites():
+    assert morphology.number_of_neurites(SIMPLE) == 2
+
+
+def test_total_volume_per_neurite():
+    # note: cannot use SIMPLE since it lies in a plane
+    total_volumes = morphology.total_volume_per_neurite(NRN)
+    assert_allclose(total_volumes,
+                    [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024])
+
+
+def test_number_of_sections_per_neurite():
+    sections = morphology.number_of_sections_per_neurite(SIMPLE)
+    assert_allclose(sections, (3, 3))
+
+
+def test_trunk_section_lengths():
+    ret = morphology.trunk_section_lengths(SIMPLE)
+    assert ret == [5.0, 4.0]
+
+
+def test_trunk_origin_radii():
+    ret = morphology.trunk_origin_radii(SIMPLE)
+    assert ret == [1.0, 1.0]
+
+
+def test_trunk_origin_azimuths():
+    ret = morphology.trunk_origin_azimuths(SIMPLE)
+    assert ret == [0.0, 0.0]
+
+
+def test_trunk_angles():
+    ret = morphology.trunk_angles(SIMPLE_TRUNK)
+    assert_array_almost_equal(ret, [np.pi/2, np.pi/2, np.pi/2, np.pi/2])
+    ret = morphology.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.basal_dendrite)
+    assert_array_almost_equal(ret, [np.pi, np.pi])
+    ret = morphology.trunk_angles(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    assert_array_almost_equal(ret, [0.0])
+    ret = morphology.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
+    assert_array_almost_equal(ret, [])
+
+
+def test_trunk_vectors():
+    ret = morphology.trunk_vectors(SIMPLE_TRUNK)
+    assert_array_equal(ret[0], [0., -1.,  0.])
+    assert_array_equal(ret[1], [1.,  0.,  0.])
+    assert_array_equal(ret[2], [-1.,  0.,  0.])
+    assert_array_equal(ret[3], [0.,  1.,  0.])
+    ret = morphology.trunk_vectors(SIMPLE_TRUNK, neurite_type=NeuriteType.axon)
+    assert_array_equal(ret[0], [0., -1.,  0.])
+
+
+def test_trunk_origin_elevations():
+    n0 = load_morphology(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 1 0 0 2 1
+    3 3 2 1 1 2 2
+    4 3 0 1 0 2 1
+    5 3 1 2 1 2 4
+    """), reader='swc')
+
+    n1 = load_morphology(StringIO(u"""
+    1 1 0 0 0 4 -1
+    2 3 0 -1 0 2 1
+    3 3 -1 -2 -1 2 2
+    """), reader='swc')
+
+    pop = [n0, n1]
+    assert_allclose(morphology.trunk_origin_elevations(n0), [0.0, np.pi / 2.])
+    assert_allclose(morphology.trunk_origin_elevations(n1), [-np.pi / 2.])
+    assert_allclose(morphology.trunk_origin_elevations(n0, NeuriteType.basal_dendrite), [0.0, np.pi / 2.])
+    assert_allclose(morphology.trunk_origin_elevations(n1, NeuriteType.basal_dendrite), [-np.pi / 2.])
+
+    assert morphology.trunk_origin_elevations(n0, NeuriteType.axon) == []
+    assert morphology.trunk_origin_elevations(n1, NeuriteType.axon) == []
+    assert morphology.trunk_origin_elevations(n0, NeuriteType.apical_dendrite) == []
+    assert morphology.trunk_origin_elevations(n1, NeuriteType.apical_dendrite) == []
+
+
+def test_trunk_elevation_zero_norm_vector_raises():
+    with pytest.raises(Exception):
+        morphology.trunk_origin_elevations(SWC_NRN)
+
+
+def test_sholl_crossings_simple():
+    center = SIMPLE.soma.center
+    radii = []
+    assert (list(morphology.sholl_crossings(SIMPLE, center, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE)) == [2])
+
+    radii = [1.0]
+    assert ([2] ==
+            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+
+    radii = [1.0, 5.1]
+    assert ([2, 4] ==
+            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+
+    radii = [1., 4., 5.]
+    assert ([2, 4, 5] ==
+            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+    
+    assert ([1, 1, 2] ==
+            list(morphology.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
+
+
+def load_swc(string):
+    with tempfile.NamedTemporaryFile(prefix='test_morphology', mode='w', suffix='.swc') as fd:
+        fd.write(string)
+        fd.flush()
+        return load_morphology(fd.name)
+
+
+def test_sholl_analysis_custom():
+    # recreate morphs from Fig 2 of
+    # http://dx.doi.org/10.1016/j.jneumeth.2014.01.016
+    radii = np.arange(10, 81, 10)
+    center = 0, 0, 0
+    morph_A = load_swc("""\
+ 1 1   0  0  0 1. -1
+ 2 3   0  0  0 1.  1
+ 3 3  80  0  0 1.  2
+ 4 4   0  0  0 1.  1
+ 5 4 -80  0  0 1.  4""")
+    assert (list(morphology.sholl_crossings(morph_A, center, radii=radii)) ==
+            [2, 2, 2, 2, 2, 2, 2, 2])
+
+    morph_B = load_swc("""\
+ 1 1   0   0  0 1. -1
+ 2 3   0   0  0 1.  1
+ 3 3  35   0  0 1.  2
+ 4 3  51  10  0 1.  3
+ 5 3  51   5  0 1.  3
+ 6 3  51   0  0 1.  3
+ 7 3  51  -5  0 1.  3
+ 8 3  51 -10  0 1.  3
+ 9 4 -35   0  0 1.  2
+10 4 -51  10  0 1.  9
+11 4 -51   5  0 1.  9
+12 4 -51   0  0 1.  9
+13 4 -51  -5  0 1.  9
+14 4 -51 -10  0 1.  9
+                       """)
+    assert (list(morphology.sholl_crossings(morph_B, center, radii=radii)) ==
+            [2, 2, 2, 10, 10, 0, 0, 0])
+
+    morph_C = load_swc("""\
+ 1 1   0   0  0 1. -1
+ 2 3   0   0  0 1.  1
+ 3 3  65   0  0 1.  2
+ 4 3  85  10  0 1.  3
+ 5 3  85   5  0 1.  3
+ 6 3  85   0  0 1.  3
+ 7 3  85  -5  0 1.  3
+ 8 3  85 -10  0 1.  3
+ 9 4  65   0  0 1.  2
+10 4  85  10  0 1.  9
+11 4  85   5  0 1.  9
+12 4  85   0  0 1.  9
+13 4  85  -5  0 1.  9
+14 4  85 -10  0 1.  9
+                       """)
+    assert (list(morphology.sholl_crossings(morph_C, center, radii=radii)) ==
+            [2, 2, 2, 2, 2, 2, 10, 10])
