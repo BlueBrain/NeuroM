@@ -147,6 +147,7 @@ autodoc_default_options = {
     'imported-members': False,
     'show-inheritance': True,
 }
+autosummary_mock_imports = ['plotly']
 
 #autoclass_content = 'both'
 
