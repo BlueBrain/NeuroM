@@ -47,9 +47,9 @@ NeuroM documentation is built and hosted on [readthedocs](https://readthedocs.or
 * [latest snapshot](http://neurom.readthedocs.org/en/latest/)
 * [latest release](http://neurom.readthedocs.org/en/stable/)
 
-## Migration to v2
+## Migration to v2 or v3 versions
 
-Refer to [the doc page](https://neurom.readthedocs.io/en/latest/migration_v2.html) on this topic.
+Refer to [the doc page](https://neurom.readthedocs.io/en/latest/migration.html) on this topic.
 
 ## Reporting issues
 
