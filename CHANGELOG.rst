@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 3.0.2
+-------------
+- Fix 'raw' mode in ``neurom stats``.
+- Add example astrocyte analysis notebook.
+- Fix readthedocs documentation build.
+
 Version 3.0.1
 -------------
 - Add method to Soma class to check wether it overlaps a point or not.
