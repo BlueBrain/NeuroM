@@ -46,7 +46,7 @@ REF_CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'sum'],
         'section_volumes': ['sum'],
-        'section_branch_orders': ['max'],
+        'section_branch_orders': ['max', 'raw'],
         'segment_midpoints': ['max'],
         'max_radial_distance': ['mean'],
     },
@@ -61,7 +61,7 @@ REF_CONFIG_NEW = {
     'neurite': {
         'section_lengths': {'modes': ['max', 'sum']},
         'section_volumes': {'modes': ['sum']},
-        'section_branch_orders': {'modes': ['max']},
+        'section_branch_orders': {'modes': ['max', 'raw']},
         'segment_midpoints': {'modes': ['max']},
         'max_radial_distance': {'modes': ['mean']},
     },
@@ -81,6 +81,7 @@ REF_OUT = {
         'sum_section_lengths': 207.87975220908129,
         'max_section_lengths': 11.018460736176685,
         'max_section_branch_orders': 10,
+        'raw_section_branch_orders': [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10],
         'sum_section_volumes': 276.73857657289523,
         'max_segment_midpoints_0': 0.0,
         'max_segment_midpoints_1': 0.0,
@@ -91,6 +92,7 @@ REF_OUT = {
         'sum_section_lengths': 840.68521442251949,
         'max_section_lengths': 11.758281556059444,
         'max_section_branch_orders': 10,
+        'raw_section_branch_orders': [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10],
         'sum_section_volumes': 1104.9077419665782,
         'max_segment_midpoints_0': 64.401674984050004,
         'max_segment_midpoints_1': 48.48197694465,
@@ -101,6 +103,7 @@ REF_OUT = {
         'sum_section_lengths': 214.37304577550353,
         'max_section_lengths': 11.758281556059444,
         'max_section_branch_orders': 10,
+        'raw_section_branch_orders': [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10],
         'sum_section_volumes': 271.9412385728449,
         'max_segment_midpoints_0': 64.401674984050004,
         'max_segment_midpoints_1': 0.0,
@@ -111,6 +114,7 @@ REF_OUT = {
         'sum_section_lengths': 418.43241643793476,
         'max_section_lengths': 11.652508126101711,
         'max_section_branch_orders': 10,
+        'raw_section_branch_orders': [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10],
         'sum_section_volumes': 556.22792682083821,
         'max_segment_midpoints_0': 64.007872333250006,
         'max_segment_midpoints_1': 48.48197694465,
@@ -178,12 +182,16 @@ def test_extract_dataframe():
     # Vanilla test
     morphs = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
     actual = ms.extract_dataframe(morphs, REF_CONFIG_NEW)
+    # drop raw features as they require too much test data to mock
+    actual = actual.drop(columns='raw_section_branch_orders', level=1)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
     assert_frame_equal(actual, expected, check_dtype=False)
 
     # Test with a single morphology in the population
     morphs = nm.load_morphologies(SWC_PATH / 'Neuron.swc')
     actual = ms.extract_dataframe(morphs, REF_CONFIG_NEW)
+    # drop raw features as they require too much test data to mock
+    actual = actual.drop(columns='raw_section_branch_orders', level=1)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
 
     # Test with a config without the 'morphology' key
@@ -233,12 +241,16 @@ def test_extract_dataframe_multiproc():
             for name in ['Neuron.swc', 'simple.swc']]
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=2)
+        # drop raw features as they require too much test data to mock
+        actual = actual.drop(columns='raw_section_branch_orders', level=1)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
 
     assert_frame_equal(actual, expected, check_dtype=False)
 
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=os.cpu_count() + 1)
+        # drop raw features as they require too much test data to mock
+        actual = actual.drop(columns='raw_section_branch_orders', level=1)
         assert len(w) == 1, "Warning not emitted"
     assert_frame_equal(actual, expected, check_dtype=False)
 
@@ -249,7 +261,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    assert 1 + 2 + 4 * (4 + 4) == len(header)  # name + everything in REF_OUT
+    assert 1 + 2 + 4 * (4 + 5) == len(header)  # name + everything in REF_OUT
     assert 'name' in header
     assert 'morphology:mean_soma_radius' in header
 
@@ -262,7 +274,7 @@ def test_generate_flattened_dict():
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
     assert 3 == len(rows)  # one for fake_name[0-2]
-    assert 1 + 2 + 4 * (4 + 4) == len(rows[0])  # name + everything in REF_OUT
+    assert 1 + 2 + 4 * (4 + 5) == len(rows[0])  # name + everything in REF_OUT
 
 
 def test_full_config():
