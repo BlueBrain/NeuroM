@@ -131,10 +131,10 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
 
         stat = value
         if isinstance(value, Sized):
-            if len(value) == 0:
+            if len(value) == 0 and mode not in {'raw', 'sum'}:
                 stat = None
             elif mode == 'raw':
-                stat = value
+                stat = value.to_list()
             else:
                 stat = getattr(np, mode)(value, axis=0)
 
