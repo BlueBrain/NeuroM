@@ -81,7 +81,8 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
-        A tuple (feature, func) of the feature value and its function
+        Tuple(List|Number, function): A tuple (feature, func) of the feature value and its function.
+          Feature value can be a list or a number.
     """
     # pylint: disable=too-many-branches
     is_obj_list = isinstance(obj, (list, tuple))
@@ -144,7 +145,7 @@ def get(feature_name, obj, **kwargs):
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
-        features as a 1D, 2D or 3D numpy array.
+        List|Number: feature value as a list or a single number.
     """
     return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
 
