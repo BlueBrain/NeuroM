@@ -53,7 +53,7 @@ REF_CONFIG = {
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'morphology': {
         'soma_radius': ['mean'],
-        'max_radial_distance': ['mean'],
+        'max_radial_distance': ['mean', 'raw'],
     }
 }
 
@@ -68,7 +68,7 @@ REF_CONFIG_NEW = {
     'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
     'morphology': {
         'soma_radius': {'modes': ['mean']},
-        'max_radial_distance': {'modes': ['mean']},
+        'max_radial_distance': {'modes': ['mean', 'raw']},
     }
 }
 
@@ -76,6 +76,7 @@ REF_OUT = {
     'morphology': {
         'mean_soma_radius': 0.13065629648763766,
         'mean_max_radial_distance': 99.5894610648815,
+        'raw_max_radial_distance': 99.5894610648815,
     },
     'axon': {
         'sum_section_lengths': 207.87975220908129,
@@ -249,7 +250,7 @@ def test_get_header():
                     'fake_name2': REF_OUT,
                     }
     header = ms.get_header(fake_results)
-    assert 1 + 2 + 4 * (4 + 4) == len(header)  # name + everything in REF_OUT
+    assert 1 + 3 + 4 * (4 + 4) == len(header)  # name + everything in REF_OUT
     assert 'name' in header
     assert 'morphology:mean_soma_radius' in header
 
@@ -262,7 +263,7 @@ def test_generate_flattened_dict():
     header = ms.get_header(fake_results)
     rows = list(ms.generate_flattened_dict(header, fake_results))
     assert 3 == len(rows)  # one for fake_name[0-2]
-    assert 1 + 2 + 4 * (4 + 4) == len(rows[0])  # name + everything in REF_OUT
+    assert 1 + 3 + 4 * (4 + 4) == len(rows[0])  # name + everything in REF_OUT
 
 
 def test_full_config():
