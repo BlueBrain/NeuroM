@@ -198,6 +198,14 @@ def _spherical_from_vector(vect):
     return np.array([phi, theta])
 
 
+def _angles_to_pi_interval(angle):
+    """Convert any angle into the [-pi, pi] interval."""
+    mod_angle = np.fmod(angle, 2. * np.pi)
+    mod_angle = np.where(mod_angle <= -np.pi, mod_angle + 2 * np.pi, mod_angle)
+    mod_angle = np.where(mod_angle > np.pi, mod_angle - 2 * np.pi, mod_angle)
+    return mod_angle
+
+
 @feature(shape=(...,))
 def trunk_angles(
     morph,
@@ -252,7 +260,7 @@ def trunk_angles_inter_types(
     morph,
     source_neurite_type=NeuriteType.apical_dendrite,
     target_neurite_type=NeuriteType.basal_dendrite,
-    closest_only=True,
+    closest_component=None,
 ):
     """Calculate the angles between the trunks of the morph of a given type to another type.
 
@@ -261,8 +269,11 @@ def trunk_angles_inter_types(
     * the phi angle between the two vectors.
     * the theta angle between the two vectors.
 
-    If ``closest_only`` is set to True, only one element is returned for each neurite of source
-    type (the one with the lower absolute 3d angle).
+    If ``closest_component`` is set not ``None``, only one element is returned for each neurite of
+    source type:
+    * if set to 0, the one with the lowest absolute 3d angle is returned.
+    * if set to 1, the one with the lowest absolute phi angle is returned.
+    * if set to 2, the one with the lowest absolute theta angle is returned.
     """
     source_vectors = np.array(trunk_vectors(morph, neurite_type=source_neurite_type))
     target_vectors = np.array(trunk_vectors(morph, neurite_type=target_neurite_type))
@@ -276,7 +287,7 @@ def trunk_angles_inter_types(
             np.concatenate(
                 [
                     [morphmath.angle_between_vectors(i, j)],
-                    np.fmod(_spherical_from_vector(j) - _spherical_from_vector(i), 2. * np.pi)
+                    _spherical_from_vector(j) - _spherical_from_vector(i)
                 ]
             )
             for j in target_vectors
@@ -284,8 +295,10 @@ def trunk_angles_inter_types(
         for i in source_vectors
     ]
 
-    if closest_only:
-        angles = [i[[np.argmin(i[:, 0])]] for i in angles if len(i) > 0]
+    angles = _angles_to_pi_interval(angles)
+
+    if closest_component is not None:
+        angles = [i[[np.argmin(np.abs(i[:, closest_component]))]] for i in angles if len(i) > 0]
 
     return [i.tolist() for i in angles]
 

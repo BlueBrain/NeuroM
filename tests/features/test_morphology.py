@@ -177,9 +177,6 @@ def test_trunk_angles():
 
 
 def test_trunk_angles_inter_types():
-    ret = morphology.trunk_angles_inter_types(SIMPLE, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
-    assert_array_almost_equal(ret, [])
-
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
     phi = np.pi / 4
     theta = np.pi / 3
@@ -190,14 +187,16 @@ def test_trunk_angles_inter_types():
     point_lvl = PointLevel(new_pts, [1])
     morph.append_root_section(point_lvl, SectionType.basal_dendrite)
 
-    ret = morphology.trunk_angles_inter_types(morph, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
-    assert_array_almost_equal(ret, [[[0.91173826, -np.pi/4, -np.pi/6]]])
+    # Test with no source
+    ret = morphology.trunk_angles_inter_types(SIMPLE, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
+    assert_array_almost_equal(ret, [])
 
+    # Test default
     ret = morphology.trunk_angles_inter_types(
         morph,
         NeuriteType.apical_dendrite,
         NeuriteType.basal_dendrite,
-        closest_only=False,
+        closest_component=None,
     )
     assert_array_almost_equal(
         ret,
@@ -208,7 +207,22 @@ def test_trunk_angles_inter_types():
         ]]
     )
 
-    ret = morphology.trunk_angles_inter_types(morph, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite)
+    # Test with closest component equal to 3d angle
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite,
+        closest_component=0,
+    )
+    assert_array_almost_equal(ret, [[[0.91173826, -np.pi/4, -np.pi/6]]])
+
+    # Test with only one target per source
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.basal_dendrite,
+        NeuriteType.apical_dendrite,
+        closest_component=None,
+    )
     assert_array_almost_equal(
         ret,
         [
@@ -218,11 +232,13 @@ def test_trunk_angles_inter_types():
         ]
     )
 
+    # Test with only one target per source and closest component equal to 3d angle
     ret = morphology.trunk_angles_inter_types(
         morph,
         NeuriteType.basal_dendrite,
         NeuriteType.apical_dendrite,
-        closest_only=False,)
+        closest_component=0,
+    )
     assert_array_almost_equal(
         ret,
         [
