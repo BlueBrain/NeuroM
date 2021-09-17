@@ -165,8 +165,47 @@ def trunk_vectors(morph, neurite_type=NeuriteType.all):
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
+def _str_to_plane(plane):
+    """Transform a plane string into a list of coordinates."""
+    if plane is not None:
+        coords = []
+        plane = plane.lower()
+        if "x" in plane:
+            coords.append(COLS.X)
+        if "y" in plane:
+            coords.append(COLS.Y)
+        if "z" in plane:
+            coords.append(COLS.Z)
+    else:  # pragma: no cover
+        coords = [COLS.X, COLS.Y, COLS.Z]
+    return coords
+
+
+def _sort_angle(p1, p2):
+    """Angle between p1-p2 to sort vectors."""
+    ang1 = np.arctan2(*p1[::-1])
+    ang2 = np.arctan2(*p2[::-1])
+    return ang1 - ang2
+
+
+def _spherical_from_vector(vect):
+    """Returns the spherical coordinates of a vector: phi, theta."""
+    x, y, z = vect
+
+    phi = np.arctan2(y, x)
+    theta = np.arccos(z / np.linalg.norm(vect))
+
+    return np.array([phi, theta])
+
+
 @feature(shape=(...,))
-def trunk_angles(morph, neurite_type=NeuriteType.all):
+def trunk_angles(
+    morph,
+    neurite_type=NeuriteType.all,
+    coords_only="xy",
+    sort_along="xy",
+    consecutive_only=True,
+):
     """Calculate the angles between all the trunks of the morph.
 
     The angles are defined on the x-y plane and the trees
@@ -177,20 +216,78 @@ def trunk_angles(morph, neurite_type=NeuriteType.all):
     if len(vectors) == 0:
         return []
 
-    def _sort_angle(p1, p2):
-        """Angle between p1-p2 to sort vectors."""
-        ang1 = np.arctan2(*p1[::-1])
-        ang2 = np.arctan2(*p2[::-1])
-        return ang1 - ang2
+    if sort_along is not None:
+        # Sorting angles according to the given plane
+        sort_coords = _str_to_plane(sort_along)
+        order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
+                                     for i in vectors[:, sort_coords]]))
 
-    # Sorting angles according to x-y plane
-    order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
-                                 for i in vectors[:, 0:2]]))
+        vectors = vectors[order]
 
-    ordered_vectors = vectors[order][:, [COLS.X, COLS.Y]]
+    # Select coordinates to consider
+    if coords_only:
+        coords = _str_to_plane(coords_only)
+        vectors = vectors[:, coords]
 
-    return [morphmath.angle_between_vectors(ordered_vectors[i], ordered_vectors[i - 1])
-            for i, _ in enumerate(ordered_vectors)]
+    # Compute angles between each trunk and the next ones
+    cycling_vectors = np.vstack([vectors, vectors])
+    angles = [
+        (num_i, [
+            morphmath.angle_between_vectors(i, j)
+            for num_j, j in enumerate(cycling_vectors[num_i: num_i + len(vectors)])
+        ])
+        for num_i, i in enumerate(vectors)
+    ]
+
+    if consecutive_only:
+        angles = [sorted(i[1])[:2][-1] for i in angles if i[1]]
+    else:
+        angles = [i[1] for i in angles]
+
+    return angles
+
+
+@feature(shape=(...,))
+def trunk_angles_inter_types(
+    morph,
+    source_neurite_type=NeuriteType.apical_dendrite,
+    target_neurite_type=NeuriteType.basal_dendrite,
+    closest_only=True,
+):
+    """Calculate the angles between the trunks of the morph of a given type to another type.
+
+    For each couple of neurite, an array with 3 elements is returned:
+    * the absolute 3d angle between the two vectors.
+    * the phi angle between the two vectors.
+    * the theta angle between the two vectors.
+
+    If ``closest_only`` is set to True, only one element is returned for each neurite of source
+    type (the one with the lower absolute 3d angle).
+    """
+    source_vectors = np.array(trunk_vectors(morph, neurite_type=source_neurite_type))
+    target_vectors = np.array(trunk_vectors(morph, neurite_type=target_neurite_type))
+
+    # In order to avoid the failure of the process in case the neurite_type does not exist
+    if len(source_vectors) == 0 or len(target_vectors) == 0:
+        return []
+
+    angles = [
+        np.vstack([
+            np.concatenate(
+                [
+                    [morphmath.angle_between_vectors(i, j)],
+                    np.fmod(_spherical_from_vector(j) - _spherical_from_vector(i), 2. * np.pi)
+                ]
+            )
+            for j in target_vectors
+        ])
+        for i in source_vectors
+    ]
+
+    if closest_only:
+        angles = [i[[np.argmin(i[:, 0])]] for i in angles if len(i) > 0]
+
+    return [i.tolist() for i in angles]
 
 
 @feature(shape=(...,))
