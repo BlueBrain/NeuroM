@@ -117,6 +117,7 @@ def tree_type_checker(*ref):
 
 def dendrite_filter(n):
     """Select only dendrites."""
+    # pylint: disable=consider-using-in
     return n.type == NeuriteType.basal_dendrite or n.type == NeuriteType.apical_dendrite
 
 
