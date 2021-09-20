@@ -54,6 +54,7 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.features import feature, NameSpace, neurite as nf
+from neurom.utils import str_to_plane
 
 
 feature = partial(feature, namespace=NameSpace.NEURON)
@@ -165,47 +166,6 @@ def trunk_vectors(morph, neurite_type=NeuriteType.all):
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
-def _str_to_plane(plane):
-    """Transform a plane string into a list of coordinates."""
-    if plane is not None:
-        coords = []
-        plane = plane.lower()
-        if "x" in plane:
-            coords.append(COLS.X)
-        if "y" in plane:
-            coords.append(COLS.Y)
-        if "z" in plane:
-            coords.append(COLS.Z)
-    else:  # pragma: no cover
-        coords = [COLS.X, COLS.Y, COLS.Z]
-    return coords
-
-
-def _sort_angle(p1, p2):
-    """Angle between p1-p2 to sort vectors."""
-    ang1 = np.arctan2(*p1[::-1])
-    ang2 = np.arctan2(*p2[::-1])
-    return ang1 - ang2
-
-
-def _spherical_from_vector(vect):
-    """Returns the spherical coordinates of a vector: phi, theta."""
-    x, y, z = vect
-
-    phi = np.arctan2(y, x)
-    theta = np.arccos(z / np.linalg.norm(vect))
-
-    return np.array([phi, theta])
-
-
-def _angles_to_pi_interval(angle):
-    """Convert any angle into the [-pi, pi] interval."""
-    mod_angle = np.fmod(angle, 2. * np.pi)
-    mod_angle = np.where(mod_angle <= -np.pi, mod_angle + 2 * np.pi, mod_angle)
-    mod_angle = np.where(mod_angle > np.pi, mod_angle - 2 * np.pi, mod_angle)
-    return mod_angle
-
-
 @feature(shape=(...,))
 def trunk_angles(
     morph,
@@ -224,17 +184,17 @@ def trunk_angles(
     if len(vectors) == 0:
         return []
 
-    if sort_along is not None:
+    if sort_along:
         # Sorting angles according to the given plane
-        sort_coords = _str_to_plane(sort_along)
-        order = np.argsort(np.array([_sort_angle(i / np.linalg.norm(i), [0, 1])
+        sort_coords = str_to_plane(sort_along)
+        order = np.argsort(np.array([morphmath.between_angle_plane(i / np.linalg.norm(i), [0, 1])
                                      for i in vectors[:, sort_coords]]))
 
         vectors = vectors[order]
 
     # Select coordinates to consider
     if coords_only:
-        coords = _str_to_plane(coords_only)
+        coords = str_to_plane(coords_only)
         vectors = vectors[:, coords]
 
     # Compute angles between each trunk and the next ones
@@ -287,7 +247,7 @@ def trunk_angles_inter_types(
             np.concatenate(
                 [
                     [morphmath.angle_between_vectors(i, j)],
-                    _spherical_from_vector(j) - _spherical_from_vector(i)
+                    morphmath.spherical_from_vector(j) - morphmath.spherical_from_vector(i)
                 ]
             )
             for j in target_vectors
@@ -295,12 +255,15 @@ def trunk_angles_inter_types(
         for i in source_vectors
     ]
 
-    angles = _angles_to_pi_interval(angles)
+    angles = morphmath.angles_to_pi_interval(angles)
 
     if closest_component is not None:
-        angles = [i[[np.argmin(np.abs(i[:, closest_component]))]] for i in angles if len(i) > 0]
+        angles = angles[
+            np.arange(len(angles)),
+            np.argmin(np.abs(angles[:, :, closest_component]), axis=1)
+        ][:, np.newaxis, :]
 
-    return [i.tolist() for i in angles]
+    return angles.tolist()
 
 
 @feature(shape=(...,))
@@ -331,15 +294,15 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_crossings(morph, center=None, radii=None, neurite_type=NeuriteType.all):
+def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None):
     """Calculate crossings of neurites.
 
     Args:
         morph(Morphology|list): morphology or a list of neurites
+        neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
         center(Point): center point, if None then soma center is taken
         radii(iterable of floats): radii for which crossings will be counted,
             if None then soma radius is taken
-        neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
 
     Returns:
         Array of same length as radii, with a count of the number of crossings
@@ -404,7 +367,7 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
                         for n in morph.neurites if neurite_filter(n))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return sholl_crossings(morph, morph.soma.center, bins, neurite_type)
+    return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
 
 
 def _extent_along_axis(morph, axis, neurite_type):

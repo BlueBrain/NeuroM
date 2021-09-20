@@ -34,6 +34,8 @@ from functools import wraps
 
 import numpy as np
 
+from neurom.core.dataformat import COLS
+
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
@@ -113,3 +115,19 @@ class OrderedEnum(Enum):
         if self.__class__ is other.__class__:
             return self.value < other.value
         raise NotImplementedError
+
+
+def str_to_plane(plane):
+    """Transform a plane string into a list of coordinates."""
+    if plane is not None:
+        coords = []
+        plane = plane.lower()
+        if "x" in plane:
+            coords.append(COLS.X)
+        if "y" in plane:
+            coords.append(COLS.Y)
+        if "z" in plane:
+            coords.append(COLS.Z)
+    else:  # pragma: no cover
+        coords = COLS.XYZ
+    return coords

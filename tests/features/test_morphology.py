@@ -294,24 +294,24 @@ def test_trunk_elevation_zero_norm_vector_raises():
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
-    assert (list(morphology.sholl_crossings(SIMPLE, center, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)) == [])
     assert (list(morphology.sholl_crossings(SIMPLE, radii=radii)) == [])
     assert (list(morphology.sholl_crossings(SIMPLE)) == [2])
 
     radii = [1.0]
     assert ([2] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
 
     radii = [1.0, 5.1]
     assert ([2, 4] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
 
     radii = [1., 4., 5.]
     assert ([2, 4, 5] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
 
     assert ([1, 1, 2] ==
-            list(morphology.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE.sections[:2], center=center, radii=radii)))
 
 
 def load_swc(string):
@@ -332,7 +332,7 @@ def test_sholl_analysis_custom():
  3 3  80  0  0 1.  2
  4 4   0  0  0 1.  1
  5 4 -80  0  0 1.  4""")
-    assert (list(morphology.sholl_crossings(morph_A, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_A, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 2, 2])
 
     morph_B = load_swc("""\
@@ -351,7 +351,7 @@ def test_sholl_analysis_custom():
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
                        """)
-    assert (list(morphology.sholl_crossings(morph_B, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_B, center=center, radii=radii)) ==
             [2, 2, 2, 10, 10, 0, 0, 0])
 
     morph_C = load_swc("""\
@@ -370,7 +370,7 @@ def test_sholl_analysis_custom():
 13 4  85  -5  0 1.  9
 14 4  85 -10  0 1.  9
                        """)
-    assert (list(morphology.sholl_crossings(morph_C, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_C, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
 
 
