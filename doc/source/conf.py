@@ -53,34 +53,20 @@ VERSION = get_distribution('neurom').version
 
 # -- General configuration ------------------------------------------------
 
-# If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.1'
-
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_autorun',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
-
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
-
-# The master toctree document.
-master_doc = 'index'
 
 # General information about the project.
 project = u'NeuroM'
@@ -127,25 +113,17 @@ exclude_patterns = []
 # output. They are ignored by default.
 #show_authors = False
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
-
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
-# If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = True
 suppress_warnings = ["ref.python"]
 autosummary_generate = True
-autosummary_imported_members = False
 autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
-    'imported-members': False,
-    'show-inheritance': True,
 }
 autosummary_mock_imports = ['plotly']
 
@@ -165,8 +143,6 @@ html_theme_options = {
     "repo_name": "BlueBrain/NeuroM"
 }
 
-# Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -249,32 +225,7 @@ html_show_sourcelink = False
 # implements a search results scorer. If empty, the default will be used.
 #html_search_scorer = 'scorer.js'
 
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'NeuroMdoc'
-
 # -- Options for LaTeX output ---------------------------------------------
-
-latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
-
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
-
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
-
-# Latex figure (float) alignment
-#'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-  (master_doc, 'NeuroM.tex', u'NeuroM Documentation',
-   u'HBP Algorithm Development Section', 'manual'),
-]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -299,27 +250,10 @@ latex_documents = [
 
 # -- Options for manual page output ---------------------------------------
 
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'neurom', u'NeuroM Documentation',
-     [author], 1)
-]
-
 # If true, show URL addresses after external links.
 #man_show_urls = False
 
 
-# -- Options for Texinfo output -------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-  (master_doc, 'NeuroM', u'NeuroM Documentation',
-   author, 'NeuroM', 'One line description of project.',
-   'Miscellaneous'),
-]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
@@ -329,30 +263,3 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
-
-# If true, do not generate a @detailmenu in the "Top" node's menu.
-#texinfo_no_detailmenu = False
-from sphinx.ext.autosummary import Autosummary
-
-class AutosummaryOverride(Autosummary):
-    """Extends Autosummary to ensure the nosignatures option is set."""
-
-    def run(self):
-        """Wrap the autodoc output in a div with autodoc class."""
-        self.options["nosignatures"] = self.options.get("nosignatures", True)
-        result = super(AutosummaryOverride, self).run()
-        return result
-
-def add_autosummary_override(app):
-    """Override the autosummary definition to ensure no signatures."""
-    if "sphinx.ext.autosummary" in app.extensions:
-        app.add_directive("autosummary", AutosummaryOverride, override=True)
-
-def allow_only_neurom(app, what, name, obj, skip, options):
-    """Check that the member is part of neurom, exlude otherwise."""
-    if what in {"module", "class", "exception", "function"} and "neurom" not in getattr(obj, "__module__", ""):
-        return True
-
-def setup(app):
-    app.connect('builder-inited', add_autosummary_override)
-    app.connect('autodoc-skip-member', allow_only_neurom)
