@@ -45,58 +45,36 @@ Running the tests
 -----------------
 
 The tests require that you have cloned the repository, since the test code is
-not distributed in the package. It is recommended to use ``pytest`` for
-this. There are two options:
-
-Use the provided ``Makefile`` to run the tests using ``make``:
+not distributed in the package. It is recommended to use ``tox`` for this.
 
 .. code-block:: bash
 
     $ git clone https://github.com/BlueBrain/NeuroM.git
     $ cd NeuroM
-    $ make test
+    $ tox
 
-This runs ``pep8``, ``pylint`` and the unit tests in sequence.
-
-This method takes care of
-installing all extra dependencies needed for running the tests, diagnosing the results,
-performing linting on the source code. These dependencies are installed into a
-``virtuanelv`` named ``neurom_test_venv``:
-
-The ``Makefile`` also has targets for running only ``pylint`` and ``pep8`` individually:
+This method takes care of installing all extra dependencies needed for tests, diagnosing results,
+etc. It runs documentation check, pylint and the tests in sequence. Also it can run them
+individually:
 
 .. code-block:: bash
 
-        $ make lint       # runs pep8 and pylint if that succeeds
-        $ make run_pep8   # run only pep8
-        $ make run_pylint # run only pylint
+        $ tox -e py36-lint       # runs only pylint
+        $ tox -e py36-docs       # run only documentation check
+        $ tox -e py36            # run only the tests
 
-
-Note that you can also install the test dependencies and run the tests inside of your
-own ``virtualenv``:
-
-.. code-block:: bash
-
-    (nrm)$ pip install -r requirements_dev.txt
-
-This installs the following packages into your ``virtualenv``
-unless they are already installed:
-
-.. literalinclude:: ../../requirements_dev.txt
-    :lines: 29-36
-
-Then, run the tests manually in the ``virtualenv``. For example,
+You can also run tests manually via `pylint` but you need to make sure that you have installed
+all required dependencies in your virtual environment:
 
 .. code-block:: bash
 
-    (nrm)$ pytest --cov-report term-missing --cov-report xml --cov-report html --cov=neurom neurom
+    (your virtual env name)$ pip install neurom[plotly] pytest mock
 
-.. warning::
+Then, run the tests manually. For example,
 
-    To ensure that the test requirements are the same as those run in continuous
-    integration, you should run the tests using the ``make test`` command. This is the
-    same command used in continuous integration. Failure to pass means will result in
-    a pull request being rejected.
+.. code-block:: bash
+
+    (your virtual env name)$ pytest tests
 
 .. include:: documentation.rst
 

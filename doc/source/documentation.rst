@@ -35,8 +35,8 @@ To build documentation, go into project's ``doc`` folder.
 
     $ cd doc  # assuming that you start from the project's root.
 
-Make sure you have installed into your virtual environment libraries from ``requirements_docs.txt``
-in the project's root. Run the command:
+Make sure you have installed into your virtual environment libraries from `docs` extras:
+``pip install neurom[docs]``. The run the command in the ``doc`` folder:
 
 .. code-block:: bash
 
