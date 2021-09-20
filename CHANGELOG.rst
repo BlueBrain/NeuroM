@@ -10,8 +10,9 @@ Version 3.0.2
 - Fix 'raw' mode in ``neurom stats``.
 - Add example astrocyte analysis notebook.
 - Fix readthedocs documentation build.
-- Delete all requirements txt files and update documentation accordingly
+- Delete all requirements txt files and update documentation accordingly.
 - Adding back unifurcation check
+- Add ``neurom.features.morphology.trunk_angles_inter_types`` feature and make trunk_angles more generic.
 
 Version 3.0.1
 -------------
