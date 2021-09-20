@@ -53,8 +53,8 @@ setup(
     },
     name='neurom',
     extras_require={
-        'plotly': ['plotly>=3.6.0',
-                   'psutil>=5.5.1'],  # for plotly image saving
+        'plotly': ['plotly>=3.6.0', 'psutil>=5.5.1'],  # for plotly image saving
+        'docs': ['sphinx', 'sphinx-bluebrain-theme', 'sphinx-autorun'],
     },
     include_package_data=True,
     python_requires='>=3.5',
