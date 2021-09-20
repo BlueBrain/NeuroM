@@ -6,6 +6,7 @@ Version 3.0.2
 - Fix 'raw' mode in ``neurom stats``.
 - Add example astrocyte analysis notebook.
 - Fix readthedocs documentation build.
+- Delete all requirements txt files and update documentation accordingly
 
 Version 3.0.1
 -------------
