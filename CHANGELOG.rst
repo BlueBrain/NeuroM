@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 3.2.0
+-------------
+- Add ``neurom.features.morphology.trunk_angles_inter_types`` and
+  ``neurom.features.morphology.trunk_angles_from_vector`` features and make
+  ``neurom.features.morphology.trunk_angles`` more generic.
+
 Version 3.1.0
 -------------
 - Add morphology features total_width, total_height and total_depth
@@ -12,9 +18,6 @@ Version 3.0.2
 - Fix readthedocs documentation build.
 - Delete all requirements txt files and update documentation accordingly.
 - Adding back unifurcation check
-- Add ``neurom.features.morphology.trunk_angles_inter_types`` and
-  ``neurom.features.morphology.trunk_angles_from_vector`` features and make
-  ``neurom.features.morphology.trunk_angles`` more generic.
 
 Version 3.0.1
 -------------
