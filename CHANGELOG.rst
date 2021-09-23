@@ -12,7 +12,9 @@ Version 3.0.2
 - Fix readthedocs documentation build.
 - Delete all requirements txt files and update documentation accordingly.
 - Adding back unifurcation check
-- Add ``neurom.features.morphology.trunk_angles_inter_types`` feature and make trunk_angles more generic.
+- Add ``neurom.features.morphology.trunk_angles_inter_types`` and
+  ``neurom.features.morphology.trunk_angles_from_vector`` features and make
+  ``neurom.features.morphology.trunk_angles`` more generic.
 
 Version 3.0.1
 -------------

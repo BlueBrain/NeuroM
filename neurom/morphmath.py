@@ -251,6 +251,31 @@ def angle_between_vectors(p1, p2):
     return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
 
 
+def between_angle_plane(p1, p2):
+    """Angle between p1-p2 to sort 2d vectors."""
+    ang1 = np.arctan2(*p1[::-1])
+    ang2 = np.arctan2(*p2[::-1])
+    return ang1 - ang2
+
+
+def spherical_from_vector(vect):
+    """Returns the spherical coordinates of a vector: theta, phi."""
+    x, y, z = vect
+
+    phi = np.arctan2(y, x)
+    theta = np.arccos(z / np.linalg.norm(vect))
+
+    return np.array([theta, phi])
+
+
+def angles_to_pi_interval(angles):
+    """Convert any angles into the [-pi, pi] interval."""
+    mod_angle = np.fmod(angles, 2. * np.pi)
+    mod_angle = np.where(mod_angle <= -np.pi, mod_angle + 2 * np.pi, mod_angle)
+    mod_angle = np.where(mod_angle > np.pi, mod_angle - 2 * np.pi, mod_angle)
+    return mod_angle
+
+
 def polygon_diameter(points):
     """Compute the maximun euclidian distance between any two points in a list of points."""
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))
@@ -431,28 +456,3 @@ def principal_direction_extent(points):
             extent -= scalar_projs[0]
 
     return extent
-
-
-def between_angle_plane(p1, p2):
-    """Angle between p1-p2 to sort 2d vectors."""
-    ang1 = np.arctan2(*p1[::-1])
-    ang2 = np.arctan2(*p2[::-1])
-    return ang1 - ang2
-
-
-def spherical_from_vector(vect):
-    """Returns the spherical coordinates of a vector: phi, theta."""
-    x, y, z = vect
-
-    phi = np.arctan2(y, x)
-    theta = np.arccos(z / np.linalg.norm(vect))
-
-    return np.array([phi, theta])
-
-
-def angles_to_pi_interval(angle):
-    """Convert any angle into the [-pi, pi] interval."""
-    mod_angle = np.fmod(angle, 2. * np.pi)
-    mod_angle = np.where(mod_angle <= -np.pi, mod_angle + 2 * np.pi, mod_angle)
-    mod_angle = np.where(mod_angle > np.pi, mod_angle - 2 * np.pi, mod_angle)
-    return mod_angle

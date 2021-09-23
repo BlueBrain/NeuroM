@@ -226,14 +226,14 @@ def trunk_angles_inter_types(
 
     For each couple of neurite, an array with 3 elements is returned:
     * the absolute 3d angle between the two vectors.
-    * the phi angle between the two vectors.
-    * the theta angle between the two vectors.
+    * the theta angle (polar angle) between the two vectors.
+    * the phi angle (azimuthal angle) between the two vectors.
 
-    If ``closest_component`` is set not ``None``, only one element is returned for each neurite of
+    If ``closest_component`` is not ``None``, only one element is returned for each neurite of
     source type:
     * if set to 0, the one with the lowest absolute 3d angle is returned.
-    * if set to 1, the one with the lowest absolute phi angle is returned.
-    * if set to 2, the one with the lowest absolute theta angle is returned.
+    * if set to 1, the one with the lowest absolute theta angle is returned.
+    * if set to 2, the one with the lowest absolute phi angle is returned.
     """
     source_vectors = np.array(trunk_vectors(morph, neurite_type=source_neurite_type))
     target_vectors = np.array(trunk_vectors(morph, neurite_type=target_neurite_type))
@@ -262,6 +262,45 @@ def trunk_angles_inter_types(
             np.arange(len(angles)),
             np.argmin(np.abs(angles[:, :, closest_component]), axis=1)
         ][:, np.newaxis, :]
+
+    return angles.tolist()
+
+
+@feature(shape=(...,))
+def trunk_angles_from_vector(
+    morph,
+    neurite_type=NeuriteType.all,
+    vector=None,
+):
+    """Calculate the angles between the trunks of the morph of a given type and a given vector.
+
+    For each neurite, an array with 3 elements is returned:
+    * the absolute 3d angle between the two vectors.
+    * the theta angle (polar angle) between the two vectors.
+    * the phi angle (azimuthal angle) between the two vectors.
+
+    If ``vector`` is ``None``, the reference vector is set to `(0, 1, 0)`.
+    """
+    if vector is None:
+        vector = (0, 1, 0)
+
+    vectors = np.array(trunk_vectors(morph, neurite_type=neurite_type))
+
+    # In order to avoid the failure of the process in case the neurite_type does not exist
+    if len(vectors) == 0:
+        return []
+
+    angles = [
+        np.concatenate(
+            [
+                [morphmath.angle_between_vectors(vector, j)],
+                morphmath.spherical_from_vector(j) - morphmath.spherical_from_vector(vector)
+            ]
+        )
+        for j in vectors
+    ]
+
+    angles = morphmath.angles_to_pi_interval(angles)
 
     return angles.tolist()
 

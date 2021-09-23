@@ -178,17 +178,25 @@ def test_trunk_angles():
 
 def test_trunk_angles_inter_types():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
-    phi = np.pi / 4
-    theta = np.pi / 3
-    new_pts = np.array(
-        [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
-        ndmin=2
-    )
-    point_lvl = PointLevel(new_pts, [1])
-    morph.append_root_section(point_lvl, SectionType.basal_dendrite)
+
+    # Add two basals
+    def add_basal(morph, theta, phi):
+        new_pts = np.array(
+            [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
+            ndmin=2
+        )
+        point_lvl = PointLevel(new_pts, [1])
+        morph.append_root_section(point_lvl, SectionType.basal_dendrite)
+
+    add_basal(morph, np.pi / 3, np.pi / 4)
+    add_basal(morph, 2 * np.pi / 3, 7 * np.pi / 4)
 
     # Test with no source
-    ret = morphology.trunk_angles_inter_types(SIMPLE, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
+    ret = morphology.trunk_angles_inter_types(
+        SIMPLE,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite,
+    )
     assert_array_almost_equal(ret, [])
 
     # Test default
@@ -201,9 +209,10 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [[
-            [np.pi/2, -np.pi/2, 0],
-            [np.pi/2, np.pi/2, 0],
-            [0.91173826, -np.pi/4, -np.pi/6],
+            [np.pi/2, 0, -np.pi/2],
+            [np.pi/2, 0, np.pi/2],
+            [0.91173826, -np.pi/6, -np.pi/4],
+            [2.22985439, np.pi/6, -3 * np.pi/4],
         ]]
     )
 
@@ -214,7 +223,7 @@ def test_trunk_angles_inter_types():
         NeuriteType.basal_dendrite,
         closest_component=0,
     )
-    assert_array_almost_equal(ret, [[[0.91173826, -np.pi/4, -np.pi/6]]])
+    assert_array_almost_equal(ret, [[[0.91173826, -np.pi/6, -np.pi/4]]])
 
     # Test with only one target per source
     ret = morphology.trunk_angles_inter_types(
@@ -226,9 +235,10 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [
-            [[np.pi/2, np.pi/2, 0]],
-            [[np.pi/2, -np.pi/2, 0]],
-            [[0.91173826, np.pi/4, np.pi/6]],
+            [[np.pi/2, 0, np.pi/2]],
+            [[np.pi/2, 0, -np.pi/2]],
+            [[0.91173826, np.pi/6, np.pi/4]],
+            [[2.22985439, -np.pi/6, 3 * np.pi/4]],
         ]
     )
 
@@ -242,9 +252,64 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [
-            [[np.pi/2, np.pi/2, 0]],
-            [[np.pi/2, -np.pi/2, 0]],
-            [[0.91173826, np.pi/4, np.pi/6]],
+            [[np.pi/2, 0, np.pi/2]],
+            [[np.pi/2, 0, -np.pi/2]],
+            [[0.91173826, np.pi/6, np.pi/4]],
+            [[2.22985439, -np.pi/6, 3 * np.pi/4]],
+        ]
+    )
+
+
+def test_trunk_angles_from_vector():
+    morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
+
+    # Add two basals
+    def add_basal(morph, theta, phi):
+        new_pts = np.array(
+            [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
+            ndmin=2
+        )
+        point_lvl = PointLevel(new_pts, [1])
+        morph.append_root_section(point_lvl, SectionType.basal_dendrite)
+
+    add_basal(morph, np.pi / 3, np.pi / 4)
+    add_basal(morph, 2 * np.pi / 3, 7 * np.pi / 4)
+
+    # Test with no neurite selected
+    ret = morphology.trunk_angles_from_vector(
+        SIMPLE,
+        NeuriteType.apical_dendrite,
+    )
+    assert_array_almost_equal(ret, [])
+
+    # Test default
+    ret = morphology.trunk_angles_from_vector(
+        morph,
+        NeuriteType.basal_dendrite,
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [np.pi/2, 0, -np.pi/2],
+            [np.pi/2, 0, np.pi/2],
+            [0.91173826, -np.pi/6, -np.pi/4],
+            [2.22985439, np.pi/6, -3 * np.pi/4],
+        ]
+    )
+
+    # Test with given vector
+    ret = morphology.trunk_angles_from_vector(
+        morph,
+        NeuriteType.basal_dendrite,
+        vector=(0, -1, 0)
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [np.pi/2, 0, np.pi/2],
+            [np.pi/2, 0, -np.pi/2],
+            [2.22985439, -np.pi/6, 3 * np.pi/4],
+            [0.91173826, np.pi/6, np.pi/4],
         ]
     )
 

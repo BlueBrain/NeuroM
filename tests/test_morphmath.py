@@ -305,12 +305,32 @@ def test_angle_3points_collinear_returns_zero():
 
 def test_angle_between_vectors():
     angle1 = mm.angle_between_vectors((1, 0), (0, 1))
-    assert angle1 == np.pi/2
+    assert angle1 == np.pi / 2
     angle1 = mm.angle_between_vectors((1, 0), (1, 0))
     assert angle1 == 0.0
     angle1 = mm.angle_between_vectors((1, 0), (-1, 0))
     assert angle1 == np.pi
     angle1 = mm.angle_between_vectors((0, 0.999999), (0, 0.999999))
+    assert angle1 == 0.0
+
+    # 3d vectors
+    angle1 = mm.angle_between_vectors((1, 0, 0), (0, 1, 0))
+    assert angle1 == np.pi / 2
+    angle1 = mm.angle_between_vectors((1, 0, 0), (1, 0, 0))
+    assert angle1 == 0.0
+    angle1 = mm.angle_between_vectors((1, 0, 0), (-1, 0, 0))
+    assert angle1 == np.pi
+    angle1 = mm.angle_between_vectors((0, 0, 1), (0, 0, -1))
+    assert angle1 == np.pi
+    angle1 = mm.angle_between_vectors((0, 0, 1), (0, 1, 0))
+    assert angle1 == np.pi / 2
+    angle1 = mm.angle_between_vectors((0, 1, 1), (0, 1, 0))
+    assert_almost_equal(angle1, np.pi / 4)
+    angle1 = mm.angle_between_vectors((0, 1, 1), (1, 0, 1))
+    assert_almost_equal(angle1, 1.04719755)
+    angle1 = mm.angle_between_vectors((0, 0.999999, 0), (0, 0.999999, 0))
+    assert angle1 == 0.0
+    angle1 = mm.angle_between_vectors((0, 0.999999, 1), (0, 0.999999, 1))
     assert angle1 == 0.0
 
 
