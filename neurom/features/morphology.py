@@ -306,9 +306,32 @@ def trunk_angles_from_vector(
 
 
 @feature(shape=(...,))
-def trunk_origin_radii(morph, neurite_type=NeuriteType.all):
-    """Radii of the trunk sections of neurites in a morph."""
-    return [n.root_node.points[0][COLS.R]
+def trunk_origin_radii(
+    morph,
+    neurite_type=NeuriteType.all,
+    min_length_filter=None,
+    max_length_filter=None,
+):
+    """Radii of the trunk sections of neurites in a morph.
+
+    If ``min_length_filter`` and / or ``max_length_filter`` is given, the points are filtered and
+    the mean radii of the remaining points is returned.
+    """
+    if max_length_filter is None and min_length_filter is None:
+        return [n.root_node.points[0][COLS.R]
+                for n in iter_neurites(morph, filt=is_type(neurite_type))]
+
+    def _mean_radius(points):
+        interval_lengths = morphmath.interval_lengths(points)
+        path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
+        valid_pts = np.ones(len(path_lengths), dtype=bool)
+        if min_length_filter is not None:
+            valid_pts = (valid_pts & (path_lengths >= min_length_filter))
+        if max_length_filter is not None:
+            valid_pts = (valid_pts & (path_lengths <= max_length_filter))
+        return points[valid_pts, COLS.R].mean()
+
+    return [_mean_radius(n.points)
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 

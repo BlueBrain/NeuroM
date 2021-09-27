@@ -4,8 +4,9 @@ Changelog
 Version 3.2.0
 -------------
 - Add ``neurom.features.morphology.trunk_angles_inter_types`` and
-  ``neurom.features.morphology.trunk_angles_from_vector`` features and make
-  ``neurom.features.morphology.trunk_angles`` more generic.
+  ``neurom.features.morphology.trunk_angles_from_vector`` features, make
+  ``neurom.features.morphology.trunk_angles`` more generic and add length filter to
+  ``neurom.features.morphology.trunk_origin_radii``.
 
 Version 3.1.0
 -------------

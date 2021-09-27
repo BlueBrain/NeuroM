@@ -139,6 +139,15 @@ def test_trunk_origin_radii():
     ret = morphology.trunk_origin_radii(SIMPLE)
     assert ret == [1.0, 1.0]
 
+    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5)
+    assert_array_almost_equal(ret, [1.0 / 3, 0.0])
+
+    ret = morphology.trunk_origin_radii(SIMPLE, max_length_filter=15)
+    assert_array_almost_equal(ret, [2.0 / 3, 2.0 / 3])
+
+    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5, max_length_filter=15)
+    assert_array_almost_equal(ret, [0.5, 0])
+
 
 def test_trunk_origin_azimuths():
     ret = morphology.trunk_origin_azimuths(SIMPLE)
