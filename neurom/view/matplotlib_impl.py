@@ -245,7 +245,7 @@ def plot_morph(morph, ax=None,
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
 
-    bounding_box = geom.bounding_box(morph)
+    bounding_box = geom.bounding_box(morph if hasattr(morph, 'points') else morph.soma)
     plane0, plane1 = _plane2col(plane)
     ax.set_xlim(bounding_box[0][plane0], bounding_box[1][plane0])
     ax.set_ylim(bounding_box[0][plane1], bounding_box[1][plane1])
