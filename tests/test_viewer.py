@@ -55,7 +55,7 @@ def test_draw_filter_neurite():
     for mode in ['2d', '3d']:
         viewer.draw(m, mode=mode, neurite_type=NeuriteType.basal_dendrite)
         assert_allclose(matplotlib_utils.plt.gca().get_ylim(),
-                        [-30., 78], atol=5)
+                        [-87., 78], atol=5)
 
     matplotlib_utils.plt.close('all')
 

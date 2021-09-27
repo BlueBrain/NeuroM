@@ -202,11 +202,11 @@ def test_filter_neurite():
     fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
     matplotlib_impl.plot_morph3d(m, ax, neurite_type=NeuriteType.basal_dendrite)
     matplotlib_utils.plot_style(fig=fig, ax=ax)
-    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-87., 78], atol=5)
     matplotlib_utils.plt.close('all')
 
     fig, ax = matplotlib_utils.get_figure()
     matplotlib_impl.plot_morph(m, ax, neurite_type=NeuriteType.basal_dendrite)
     matplotlib_utils.plot_style(fig=fig, ax=ax)
-    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-87., 78], atol=5)
     matplotlib_utils.plt.close('all')
