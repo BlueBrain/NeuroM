@@ -210,11 +210,6 @@ def plot_soma(soma, ax=None, plane='xy',
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
 
-    bounding_box = geom.bounding_box(soma)
-    ax.dataLim.update_from_data_xy(np.vstack(([bounding_box[0][plane0], bounding_box[0][plane1]],
-                                              [bounding_box[1][plane0], bounding_box[1][plane1]])),
-                                   ignore=False)
-
 
 # pylint: disable=too-many-arguments
 @_implicit_ax
@@ -249,6 +244,11 @@ def plot_morph(morph, ax=None,
     ax.set_title(morph.name)
     ax.set_xlabel(plane[0])
     ax.set_ylabel(plane[1])
+
+    bounding_box = geom.bounding_box(morph)
+    plane0, plane1 = _plane2col(plane)
+    ax.set_xlim(bounding_box[0][plane0], bounding_box[1][plane0])
+    ax.set_ylim(bounding_box[0][plane1], bounding_box[1][plane1])
 
 
 def _update_3d_datalim(ax, obj):
