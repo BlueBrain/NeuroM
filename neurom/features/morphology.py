@@ -130,7 +130,7 @@ def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
     def _azimuth(section, soma):
         """Azimuth of a section."""
         vector = morphmath.vector(section[0], soma.center)
-        return np.arctan2(vector[COLS.Z], vector[COLS.X])
+        return morphmath.azimuth_from_vector(vector)
 
     return [_azimuth(n.root_node.points, morph.soma)
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
@@ -149,11 +149,7 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
     def _elevation(section, soma):
         """Elevation of a section."""
         vector = morphmath.vector(section[0], soma.center)
-        norm_vector = np.linalg.norm(vector)
-
-        if norm_vector >= np.finfo(type(norm_vector)).eps:
-            return np.arcsin(vector[COLS.Y] / norm_vector)
-        raise ValueError("Norm of vector between soma center and section is almost zero.")
+        return morphmath.elevation_from_vector(vector)
 
     return [_elevation(n.root_node.points, morph.soma)
             for n in iter_neurites(morph, filt=is_type(neurite_type))]
@@ -226,14 +222,14 @@ def trunk_angles_inter_types(
 
     For each couple of neurite, an array with 3 elements is returned:
     * the absolute 3d angle between the two vectors.
-    * the theta angle (polar angle) between the two vectors.
-    * the phi angle (azimuthal angle) between the two vectors.
+    * the elevation angle (or polar angle) between the two vectors.
+    * the azimuth angle between the two vectors.
 
     If ``closest_component`` is not ``None``, only one element is returned for each neurite of
     source type:
     * if set to 0, the one with the lowest absolute 3d angle is returned.
-    * if set to 1, the one with the lowest absolute theta angle is returned.
-    * if set to 2, the one with the lowest absolute phi angle is returned.
+    * if set to 1, the one with the lowest absolute elevation angle is returned.
+    * if set to 2, the one with the lowest absolute azimuth angle is returned.
     """
     source_vectors = np.array(trunk_vectors(morph, neurite_type=source_neurite_type))
     target_vectors = np.array(trunk_vectors(morph, neurite_type=target_neurite_type))
@@ -242,7 +238,7 @@ def trunk_angles_inter_types(
     if len(source_vectors) == 0 or len(target_vectors) == 0:
         return []
 
-    angles = [
+    angles = np.array([
         np.vstack([
             np.concatenate(
                 [
@@ -253,9 +249,13 @@ def trunk_angles_inter_types(
             for j in target_vectors
         ])
         for i in source_vectors
-    ]
+    ])
 
-    angles = morphmath.angles_to_pi_interval(angles)
+    # Ensure elevation differences are in [-pi, pi]
+    angles[:, :, 1] = morphmath.angles_to_pi_interval(angles[:, :, 1])
+
+    # Ensure azimuth differences are in [-2pi, 2pi]
+    angles[:, :, 2] = morphmath.angles_to_pi_interval(angles[:, :, 2], scale=2.0)
 
     if closest_component is not None:
         angles = angles[
@@ -276,8 +276,8 @@ def trunk_angles_from_vector(
 
     For each neurite, an array with 3 elements is returned:
     * the absolute 3d angle between the two vectors.
-    * the theta angle (polar angle) between the two vectors.
-    * the phi angle (azimuthal angle) between the two vectors.
+    * the elevation angle (or polar angle) between the two vectors.
+    * the azimuth angle between the two vectors.
 
     If ``vector`` is ``None``, the reference vector is set to `(0, 1, 0)`.
     """
@@ -290,7 +290,7 @@ def trunk_angles_from_vector(
     if len(vectors) == 0:
         return []
 
-    angles = [
+    angles = np.array([
         np.concatenate(
             [
                 [morphmath.angle_between_vectors(vector, j)],
@@ -298,9 +298,13 @@ def trunk_angles_from_vector(
             ]
         )
         for j in vectors
-    ]
+    ])
 
-    angles = morphmath.angles_to_pi_interval(angles)
+    # Ensure elevation difference are in [-pi, pi]
+    angles[:, 1] = morphmath.angles_to_pi_interval(angles[:, 1])
+
+    # Ensure azimuth difference are in [-2pi, 2pi]
+    angles[:, 2] = morphmath.angles_to_pi_interval(angles[:, 2], scale=2)
 
     return angles.tolist()
 

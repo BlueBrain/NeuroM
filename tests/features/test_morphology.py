@@ -34,12 +34,18 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
+import pytest
 from morphio import PointLevel, SectionType
+from morphio.mut import Morphology
+from numpy.testing import assert_allclose
+from numpy.testing import assert_almost_equal
+from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_equal
+
+from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
 from neurom.features import morphology, section
 
-import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -50,6 +56,16 @@ SIMPLE_TRUNK = load_morphology(SWC_PATH / 'simple_trunk.swc')
 SWC_NRN = load_morphology(SWC_PATH / 'Neuron.swc')
 with warnings.catch_warnings(record=True):
     SWC_NRN_3PT = load_morphology(SWC_PATH / 'soma' / 'three_pt_soma.swc')
+
+
+def add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
+    """Add a neurite from the elevation and azimuth to a given morphology."""
+    new_pts = np.array(
+        morphmath.vector_from_spherical(elevation, azimuth),
+        ndmin=2
+    )
+    point_lvl = PointLevel(new_pts, [1])
+    morph.append_root_section(point_lvl, neurite_type)
 
 
 def test_soma_volume():
@@ -189,16 +205,8 @@ def test_trunk_angles_inter_types():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    def add_basal(morph, theta, phi):
-        new_pts = np.array(
-            [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
-            ndmin=2
-        )
-        point_lvl = PointLevel(new_pts, [1])
-        morph.append_root_section(point_lvl, SectionType.basal_dendrite)
-
-    add_basal(morph, np.pi / 3, np.pi / 4)
-    add_basal(morph, 2 * np.pi / 3, 7 * np.pi / 4)
+    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no source
     ret = morphology.trunk_angles_inter_types(
@@ -218,10 +226,10 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [[
-            [np.pi/2, 0, -np.pi/2],
-            [np.pi/2, 0, np.pi/2],
-            [0.91173826, -np.pi/6, -np.pi/4],
-            [2.22985439, np.pi/6, -3 * np.pi/4],
+            [np.pi / 2, -np.pi / 2, 0],
+            [np.pi / 2, -np.pi / 2, np.pi],
+            [np.pi / 6, -np.pi / 6, np.pi / 4],
+            [5 * np.pi / 6, -5 * np.pi / 6, -np.pi / 4],
         ]]
     )
 
@@ -232,7 +240,7 @@ def test_trunk_angles_inter_types():
         NeuriteType.basal_dendrite,
         closest_component=0,
     )
-    assert_array_almost_equal(ret, [[[0.91173826, -np.pi/6, -np.pi/4]]])
+    assert_array_almost_equal(ret, [[[np.pi / 6, -np.pi / 6, np.pi / 4]]])
 
     # Test with only one target per source
     ret = morphology.trunk_angles_inter_types(
@@ -244,10 +252,10 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [
-            [[np.pi/2, 0, np.pi/2]],
-            [[np.pi/2, 0, -np.pi/2]],
-            [[0.91173826, np.pi/6, np.pi/4]],
-            [[2.22985439, -np.pi/6, 3 * np.pi/4]],
+            [[np.pi / 2, np.pi / 2, 0]],
+            [[np.pi / 2, np.pi / 2, -np.pi]],
+            [[np.pi / 6, np.pi / 6, -np.pi / 4]],
+            [[5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4]],
         ]
     )
 
@@ -261,10 +269,10 @@ def test_trunk_angles_inter_types():
     assert_array_almost_equal(
         ret,
         [
-            [[np.pi/2, 0, np.pi/2]],
-            [[np.pi/2, 0, -np.pi/2]],
-            [[0.91173826, np.pi/6, np.pi/4]],
-            [[2.22985439, -np.pi/6, 3 * np.pi/4]],
+            [[np.pi / 2, np.pi / 2, 0]],
+            [[np.pi / 2, np.pi / 2, -np.pi]],
+            [[np.pi / 6, np.pi / 6, -np.pi / 4]],
+            [[5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4]],
         ]
     )
 
@@ -273,16 +281,8 @@ def test_trunk_angles_from_vector():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    def add_basal(morph, theta, phi):
-        new_pts = np.array(
-            [np.sin(theta) * np.cos(phi), np.sin(theta) * np.sin(phi), np.cos(theta)],
-            ndmin=2
-        )
-        point_lvl = PointLevel(new_pts, [1])
-        morph.append_root_section(point_lvl, SectionType.basal_dendrite)
-
-    add_basal(morph, np.pi / 3, np.pi / 4)
-    add_basal(morph, 2 * np.pi / 3, 7 * np.pi / 4)
+    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no neurite selected
     ret = morphology.trunk_angles_from_vector(
@@ -299,10 +299,10 @@ def test_trunk_angles_from_vector():
     assert_array_almost_equal(
         ret,
         [
-            [np.pi/2, 0, -np.pi/2],
-            [np.pi/2, 0, np.pi/2],
-            [0.91173826, -np.pi/6, -np.pi/4],
-            [2.22985439, np.pi/6, -3 * np.pi/4],
+            [np.pi / 2, -np.pi / 2, 0],
+            [np.pi / 2, -np.pi / 2, np.pi],
+            [np.pi / 6, -np.pi / 6, np.pi / 4],
+            [5 * np.pi / 6, -5 * np.pi / 6, -np.pi / 4],
         ]
     )
 
@@ -315,10 +315,10 @@ def test_trunk_angles_from_vector():
     assert_array_almost_equal(
         ret,
         [
-            [np.pi/2, 0, np.pi/2],
-            [np.pi/2, 0, -np.pi/2],
-            [2.22985439, -np.pi/6, 3 * np.pi/4],
-            [0.91173826, np.pi/6, np.pi/4],
+            [np.pi / 2, np.pi / 2, 0],
+            [np.pi / 2, np.pi / 2, np.pi],
+            [5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4],
+            [np.pi / 6, np.pi / 6, -np.pi / 4],
         ]
     )
 

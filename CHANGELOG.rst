@@ -7,6 +7,7 @@ Version 3.2.0
   ``neurom.features.morphology.trunk_angles_from_vector`` features, make
   ``neurom.features.morphology.trunk_angles`` more generic and add length filter to
   ``neurom.features.morphology.trunk_origin_radii``.
+- Add doc on spherical coordinates.
 
 Version 3.1.0
 -------------

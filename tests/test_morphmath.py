@@ -510,3 +510,25 @@ def test_interval_lengths():
     assert_array_almost_equal(mm.interval_lengths([[0, 0, 0], [1, 1, 0], [2, 11, 0]],
                                                   prepend_zero=True),
                               [0, 1.414214, 10.049876])
+
+
+def test_spherical_coordinates():
+    data = [
+        (0, 0, (1, 0, 0)),
+        (0, np.pi, (-1, 0, 0)),
+        (np.pi / 2, 0, (0, 1, 0)),
+        (-np.pi / 2, 0, (0, -1, 0)),
+        (0, np.pi / 2, (0, 0, 1)),
+        (0, -np.pi / 2, (0, 0, -1)),
+        (np.pi / 4, 0, (1 / np.sqrt(2), 1 / np.sqrt(2), 0)),
+        (np.pi / 4, np.pi, (-1 / np.sqrt(2), 1 / np.sqrt(2), 0)),
+        (0, np.pi / 4, (1 / np.sqrt(2), 0, 1 / np.sqrt(2))),
+        (0, -np.pi / 4, (1 / np.sqrt(2), 0, -1 / np.sqrt(2))),
+    ]
+
+    for elevation, azimuth, expected_pt in data:
+        vect = mm.vector_from_spherical(elevation, azimuth)
+        assert np.allclose(vect, expected_pt)
+
+        new_elevation, new_azimuth = mm.spherical_from_vector(vect)
+        assert np.allclose([elevation, azimuth], [new_elevation, new_azimuth])
