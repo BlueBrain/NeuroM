@@ -200,6 +200,47 @@ def test_trunk_angles():
             [0., np.pi, np.pi/2, np.pi/2],
         ])
 
+    morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
+
+    # Add two basals
+    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+
+    ret = morphology.trunk_angles(morph)
+    assert_array_almost_equal(ret, [np.pi / 2, 0.387596, 1.183199, 1.183199, 0.387596, np.pi / 2])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.basal_dendrite)
+    assert_array_almost_equal(ret, [1.958393, 1.183199, 1.183199, 1.958393])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.axon)
+    assert_array_almost_equal(ret, [0.0])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.apical_dendrite)
+    assert_array_almost_equal(ret, [0.0])
+
+    ret = morphology.trunk_angles(morph, coords_only=None, sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0.0, np.pi / 2, np.pi / 2, np.pi, 2.617993, np.pi / 6],
+            [0.0, np.pi, np.pi / 2, 1.209429, 1.209429, np.pi / 2],
+            [0.0, np.pi / 2, 1.932163, 1.932163, np.pi / 2, np.pi],
+            [0.0, np.pi / 6, 2.617993, np.pi, np.pi / 2, np.pi / 2],
+            [0.0, 2.418858, 2.617993, 1.209429, 1.932163, np.pi / 6],
+            [0.0, np.pi / 6, 1.209429, 1.932163, 2.617993, 2.418858],
+        ]
+    )
+
+    ret = morphology.trunk_angles(morph, coords_only="xyz", sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0.0, np.pi / 2, np.pi / 2, np.pi, 2.617993, np.pi / 6],
+            [0.0, np.pi, np.pi / 2, 1.209429, 1.209429, np.pi / 2],
+            [0.0, np.pi / 2, 1.932163, 1.932163, np.pi / 2, np.pi],
+            [0.0, np.pi / 6, 2.617993, np.pi, np.pi / 2, np.pi / 2],
+            [0.0, 2.418858, 2.617993, 1.209429, 1.932163, np.pi / 6],
+            [0.0, np.pi / 6, 1.209429, 1.932163, 2.617993, 2.418858],
+        ]
+    )
+
 
 def test_trunk_angles_inter_types():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')

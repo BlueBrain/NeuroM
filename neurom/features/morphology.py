@@ -198,13 +198,13 @@ def trunk_angles(
     angles = [
         (num_i, [
             morphmath.angle_between_vectors(i, j)
-            for num_j, j in enumerate(cycling_vectors[num_i: num_i + len(vectors)])
+            for j in cycling_vectors[num_i: num_i + len(vectors)]
         ])
         for num_i, i in enumerate(vectors)
     ]
 
     if consecutive_only:
-        angles = [sorted(i[1])[:2][-1] for i in angles if i[1]]
+        angles = [i[1][-1] for i in angles if i[1]]
     else:
         angles = [i[1] for i in angles]
 
