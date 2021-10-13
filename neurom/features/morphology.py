@@ -183,8 +183,14 @@ def trunk_angles(
     if sort_along:
         # Sorting angles according to the given plane
         sort_coords = str_to_plane(sort_along)
-        order = np.argsort(np.array([morphmath.between_angle_plane(i / np.linalg.norm(i), [0, 1])
-                                     for i in vectors[:, sort_coords]]))
+        order = np.argsort(
+            np.array(
+                [
+                    morphmath.angle_between_projections(i / np.linalg.norm(i), [0, 1])
+                    for i in vectors[:, sort_coords]
+                ]
+            )
+        )
 
         vectors = vectors[order]
 

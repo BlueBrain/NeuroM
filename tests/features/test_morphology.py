@@ -36,7 +36,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
-from morphio.mut import Morphology
 from numpy.testing import assert_allclose
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
@@ -58,7 +57,7 @@ with warnings.catch_warnings(record=True):
     SWC_NRN_3PT = load_morphology(SWC_PATH / 'soma' / 'three_pt_soma.swc')
 
 
-def add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
+def _add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
     """Add a neurite from the elevation and azimuth to a given morphology."""
     new_pts = np.array(
         morphmath.vector_from_spherical(elevation, azimuth),
@@ -203,8 +202,8 @@ def test_trunk_angles():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     ret = morphology.trunk_angles(morph)
     assert_array_almost_equal(ret, [np.pi / 2, 0.387596, 1.183199, 1.183199, 0.387596, np.pi / 2])
@@ -246,8 +245,8 @@ def test_trunk_angles_inter_types():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no source
     ret = morphology.trunk_angles_inter_types(
@@ -322,8 +321,8 @@ def test_trunk_angles_from_vector():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no neurite selected
     ret = morphology.trunk_angles_from_vector(

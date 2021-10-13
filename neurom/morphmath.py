@@ -251,8 +251,8 @@ def angle_between_vectors(p1, p2):
     return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
 
 
-def between_angle_plane(p1, p2):
-    """Angle between p1-p2 to sort 2d vectors."""
+def angle_between_projections(p1, p2):
+    """Angle between the projections p1 and p2 (2d vectors)."""
     ang1 = np.arctan2(*p1[::-1])
     ang2 = np.arctan2(*p2[::-1])
     return ang1 - ang2
@@ -263,7 +263,7 @@ def elevation_from_vector(vec):
     norm_vector = np.linalg.norm(vec)
 
     if norm_vector >= np.finfo(type(norm_vector)).eps:
-        return np.arcsin(vec[COLS.Y] / norm_vector)
+        return np.arcsin(np.clip(vec[COLS.Y] / norm_vector, -1.0, 1.0))
     raise ValueError("Norm of vector between soma center and section is almost zero.")
 
 
