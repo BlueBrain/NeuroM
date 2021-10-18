@@ -437,6 +437,35 @@ def test_has_multifurcation():
     assert_array_equal(info[0][1][:, COLS.XYZR], [[0.0, 13.0, 0.0, 1.0]])
 
 
+def test_has_unifurcation():
+    m = load_morphology(StringIO(u"""
+("CellBody"
+ (Color Red)
+ (CellBody)
+ (0 0 0 2)
+ )
+
+ ((Dendrite)
+  (0 0 0 2)
+  (0 5 0 2)
+  (
+   (-5 5 0 3)
+   (
+    (-10 5 0 3)
+   )
+   |
+   (6 5 0 3)
+   )
+  )
+"""), reader='asc')
+
+    check_ = morphology_checks.has_unifurcation(m)
+    assert not check_.status
+    info = check_.info
+    assert_array_equal(info[0][0], 1)
+    assert_array_equal(info[0][1][:, COLS.XYZR], [[-5.0, 5.0, 0.0, 1.5]])
+
+
 def test_single_children():
     m = load_morphology("""
 ( (Color Blue)
