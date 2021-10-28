@@ -54,6 +54,8 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.features import feature, NameSpace, neurite as nf
+from neurom.geom import bounding_box
+
 
 feature = partial(feature, namespace=NameSpace.NEURON)
 
@@ -294,3 +296,21 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
     return sholl_crossings(morph, morph.soma.center, bins, neurite_type)
+
+
+@feature(shape=())
+def total_width(morph):
+    """Extent of morphology along axis x"""
+    return abs(np.diff(bounding_box(morph))[0][0])
+
+
+@feature(shape=())
+def total_height(morph):
+    """Extent of morphology along axis y"""
+    return abs(np.diff(bounding_box(morph))[0][1])
+
+
+@feature(shape=())
+def total_depth(morph):
+    """Extent of morphology along axis z"""
+    return abs(np.diff(bounding_box(morph))[0][2])
