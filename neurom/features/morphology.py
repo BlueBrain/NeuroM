@@ -54,7 +54,6 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.features import feature, NameSpace, neurite as nf
-from neurom.geom import bounding_box
 
 
 feature = partial(feature, namespace=NameSpace.NEURON)
