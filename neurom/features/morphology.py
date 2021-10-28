@@ -299,17 +299,17 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
 
 @feature(shape=())
 def total_width(morph):
-    """Extent of morphology along axis x"""
+    """Extent of morphology along axis x."""
     return abs(np.ptp(morph.points[:, COLS.X]))
 
 
 @feature(shape=())
 def total_height(morph):
-    """Extent of morphology along axis y"""
+    """Extent of morphology along axis y."""
     return abs(np.ptp(morph.points[:, COLS.Y]))
 
 
 @feature(shape=())
 def total_depth(morph):
-    """Extent of morphology along axis z"""
+    """Extent of morphology along axis z."""
     return abs(np.ptp(morph.points[:, COLS.Z]))
