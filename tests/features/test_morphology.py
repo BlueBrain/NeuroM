@@ -281,12 +281,40 @@ def test_sholl_analysis_custom():
 
 
 def test_total_width():
-    assert_almost_equal(morphology.total_width(SIMPLE), 11.0)
+    morph = load_swc("""
+        1 1   0  0   0 1. -1
+        2 3   0  -60 0 1.  1
+        3 3  80  0   2 1.  2
+        4 4   0  60  3 1.  1
+        5 4 -80  0.  0 1.  4
+    """)
+
+    assert_almost_equal(morphology.total_width(morph), 160)
+    assert_almost_equal(morphology.total_width(morph, neurite_type=NeuriteType.basal_dendrite), 80.0)
+    assert_almost_equal(morphology.total_width(morph, neurite_type=NeuriteType.apical_dendrite), 80.0)
 
 
 def test_total_height():
-    assert_almost_equal(morphology.total_height(SIMPLE), 9.0)
+    morph = load_swc("""
+        1 1   0  0   0 1. -1
+        2 3   0  -60 0 1.  1
+        3 3  80  0   2 1.  2
+        4 4   0  60  3 1.  1
+        5 4 -80  0.  0 1.  4
+    """)
+    assert_almost_equal(morphology.total_height(morph), 120.0)
+    assert_almost_equal(morphology.total_height(morph, neurite_type=NeuriteType.basal_dendrite), 60.0)
+    assert_almost_equal(morphology.total_height(morph, neurite_type=NeuriteType.apical_dendrite), 60.0)
 
 
 def test_total_depth():
-    assert_almost_equal(morphology.total_depth(SIMPLE), 0.0)
+    morph = load_swc("""
+        1 1   0  0   0 1. -1
+        2 3   0  -60 0 1.  1
+        3 3  80  0   2 1.  2
+        4 4   0  60  3 1.  1
+        5 4 -80  0.  0 1.  4
+    """)
+    assert_almost_equal(morphology.total_depth(morph), 3.0)
+    assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.basal_dendrite), 2.0)
+    assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.apical_dendrite), 3.0)

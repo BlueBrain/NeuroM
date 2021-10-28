@@ -298,18 +298,42 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
 
 
 @feature(shape=())
-def total_width(morph):
+def total_width(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis x."""
-    return abs(np.ptp(morph.points[:, COLS.X]))
+    return abs(
+        np.ptp(
+            [
+                p
+                for n in iter_neurites(morph, filt=is_type(neurite_type))
+                for p in n.points[:, COLS.X]
+            ]
+        )
+    )
 
 
 @feature(shape=())
-def total_height(morph):
+def total_height(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis y."""
-    return abs(np.ptp(morph.points[:, COLS.Y]))
+    return abs(
+        np.ptp(
+            [
+                p
+                for n in iter_neurites(morph, filt=is_type(neurite_type))
+                for p in n.points[:, COLS.Y]
+            ]
+        )
+    )
 
 
 @feature(shape=())
-def total_depth(morph):
+def total_depth(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis z."""
-    return abs(np.ptp(morph.points[:, COLS.Z]))
+    return abs(
+        np.ptp(
+            [
+                p
+                for n in iter_neurites(morph, filt=is_type(neurite_type))
+                for p in n.points[:, COLS.Z]
+            ]
+        )
+    )
