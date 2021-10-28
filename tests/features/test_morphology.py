@@ -278,3 +278,15 @@ def test_sholl_analysis_custom():
                        """)
     assert (list(morphology.sholl_crossings(morph_C, center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
+
+
+def test_total_width():
+    assert_almost_equal(morphology.total_width(SIMPLE), 11.0)
+
+
+def test_total_height():
+    assert_almost_equal(morphology.total_height(SIMPLE), 9.0)
+
+
+def test_total_depth():
+    assert_almost_equal(morphology.total_depth(SIMPLE), 0.0)

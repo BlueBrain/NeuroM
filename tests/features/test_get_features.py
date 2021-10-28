@@ -756,3 +756,22 @@ def test_principal_direction_extents():
              346.83281498399697]
     p = features.get('principal_direction_extents', m)
     assert_allclose(p, p_ref, rtol=1e-6)
+
+
+def test_total_width_height_depth():
+
+    assert_allclose(
+        features.get('total_width', NRN),
+        105.0758
+    )
+
+    assert_allclose(
+        features.get('total_height', NRN),
+        106.11643
+    )
+
+    assert_allclose(
+        features.get('total_depth', NRN),
+        54.204086
+    )
+
