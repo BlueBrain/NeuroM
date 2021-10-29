@@ -3,6 +3,8 @@
 *.pyc
 *~
 .coverage
+.coverage.*
+coverage.xml
 *venv*
 *egg-info*
 .eggs
@@ -16,3 +18,5 @@ dist/*
 .ipynb_checkpoints
 .tox
 pip-wheel-metadata
+morphology-2D.html
+morphology-3D.html

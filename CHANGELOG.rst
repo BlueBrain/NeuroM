@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 3.1.0
+-------------
+- Add morphology features total_width, total_height and total_depth
+
 Version 3.0.2
 -------------
 - Fix 'raw' mode in ``neurom stats``.

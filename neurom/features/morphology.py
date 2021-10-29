@@ -55,6 +55,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.features import feature, NameSpace, neurite as nf
 
+
 feature = partial(feature, namespace=NameSpace.NEURON)
 
 
@@ -294,3 +295,39 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
     return sholl_crossings(morph, morph.soma.center, bins, neurite_type)
+
+
+def _extent_along_axis(morph, axis, neurite_type):
+    """Returns the total extent of the morpholog neurites.
+
+    The morphology is filtered by neurite type and the extent is calculated
+    along the coordinate axis direction (e.g. COLS.X).
+    """
+    it_points = (
+            p
+            for n in iter_neurites(morph, filt=is_type(neurite_type))
+            for p in n.points[:, axis]
+    )
+    try:
+        return abs(np.ptp(np.fromiter(it_points, dtype=np.float32)))
+    except ValueError:
+        # a ValueError is thrown when there are no points passed to ptp
+        return 0.0
+
+
+@feature(shape=())
+def total_width(morph, neurite_type=NeuriteType.all):
+    """Extent of morphology along axis x."""
+    return _extent_along_axis(morph, axis=COLS.X, neurite_type=neurite_type)
+
+
+@feature(shape=())
+def total_height(morph, neurite_type=NeuriteType.all):
+    """Extent of morphology along axis y."""
+    return _extent_along_axis(morph, axis=COLS.Y, neurite_type=neurite_type)
+
+
+@feature(shape=())
+def total_depth(morph, neurite_type=NeuriteType.all):
+    """Extent of morphology along axis z."""
+    return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)

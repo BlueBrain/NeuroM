@@ -756,3 +756,56 @@ def test_principal_direction_extents():
              346.83281498399697]
     p = features.get('principal_direction_extents', m)
     assert_allclose(p, p_ref, rtol=1e-6)
+
+
+def test_total_width():
+
+    assert_allclose(
+        features.get('total_width', NRN),
+        105.0758
+    )
+
+    assert_allclose(
+        features.get('total_width', NRN, neurite_type=nm.AXON),
+        33.25306
+    )
+
+    assert_allclose(
+        features.get('total_width', NRN, neurite_type=nm.BASAL_DENDRITE),
+        104.57807
+    )
+
+
+def test_total_height():
+
+    assert_allclose(
+        features.get('total_height', NRN),
+        106.11643
+    )
+
+    assert_allclose(
+        features.get('total_height', NRN, neurite_type=nm.AXON),
+        57.60017
+    )
+
+    assert_allclose(
+        features.get('total_height', NRN, neurite_type=nm.BASAL_DENDRITE),
+        48.516262
+    )
+
+def test_total_depth():
+
+    assert_allclose(
+        features.get('total_depth', NRN),
+        54.204086
+    )
+
+    assert_allclose(
+        features.get('total_depth', NRN, neurite_type=nm.AXON),
+        49.70138
+    )
+
+    assert_allclose(
+        features.get('total_depth', NRN, neurite_type=nm.BASAL_DENDRITE),
+        51.64143
+    )
