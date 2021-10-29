@@ -298,8 +298,11 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
 
 
 def _extent_along_axis(morph, axis, neurite_type):
-    """Returns the a extent of the morphology, filtered by neurite_type,
-    along the direction of the coordinate axis (e.g. COLS.X)"""
+    """Returns the total extent of the morpholog neurites.
+
+    The morphology is filtered by neurite type and the extent is calculated
+    along the coordinate axis direction (e.g. COLS.X).
+    """
     it_points = (
             p
             for n in iter_neurites(morph, filt=is_type(neurite_type))
