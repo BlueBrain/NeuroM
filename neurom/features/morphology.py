@@ -297,43 +297,34 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
     return sholl_crossings(morph, morph.soma.center, bins, neurite_type)
 
 
+def _extent_along_axis(morph, axis, neurite_type):
+    """Returns the a extent of the morphology, filtered by neurite_type,
+    along the direction of the coordinate axis (e.g. COLS.X)"""
+    it_points = (
+            p
+            for n in iter_neurites(morph, filt=is_type(neurite_type))
+            for p in n.points[:, axis]
+    )
+    try:
+        return abs(np.ptp(np.fromiter(it_points, dtype=np.float32)))
+    except ValueError:
+        # a ValueError is thrown when there are no points passed to ptp
+        return 0.0
+
+
 @feature(shape=())
 def total_width(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis x."""
-    return abs(
-        np.ptp(
-            [
-                p
-                for n in iter_neurites(morph, filt=is_type(neurite_type))
-                for p in n.points[:, COLS.X]
-            ]
-        )
-    )
+    return _extent_along_axis(morph, axis=COLS.X, neurite_type=neurite_type)
 
 
 @feature(shape=())
 def total_height(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis y."""
-    return abs(
-        np.ptp(
-            [
-                p
-                for n in iter_neurites(morph, filt=is_type(neurite_type))
-                for p in n.points[:, COLS.Y]
-            ]
-        )
-    )
+    return _extent_along_axis(morph, axis=COLS.Y, neurite_type=neurite_type)
 
 
 @feature(shape=())
 def total_depth(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis z."""
-    return abs(
-        np.ptp(
-            [
-                p
-                for n in iter_neurites(morph, filt=is_type(neurite_type))
-                for p in n.points[:, COLS.Z]
-            ]
-        )
-    )
+    return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)

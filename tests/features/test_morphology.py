@@ -280,6 +280,19 @@ def test_sholl_analysis_custom():
             [2, 2, 2, 2, 2, 2, 10, 10])
 
 
+def test_extent_along_axis():
+    morph = load_swc("""
+        1 1   0  0   0 1. -1
+        2 3   0  -60 0 1.  1
+        3 3  80  0   2 1.  2
+        4 4   0  60  3 1.  1
+        5 4 -80  0.  0 1.  4
+    """)
+    assert_almost_equal(morphology._extent_along_axis(morph, 0, NeuriteType.all), 160.0)
+    assert_almost_equal(morphology._extent_along_axis(morph, 1, NeuriteType.all), 120.0)
+    assert_almost_equal(morphology._extent_along_axis(morph, 2, NeuriteType.all), 3.0)
+
+
 def test_total_width():
     morph = load_swc("""
         1 1   0  0   0 1. -1
@@ -288,8 +301,7 @@ def test_total_width():
         4 4   0  60  3 1.  1
         5 4 -80  0.  0 1.  4
     """)
-
-    assert_almost_equal(morphology.total_width(morph), 160)
+    assert_almost_equal(morphology.total_width(morph, neurite_type=NeuriteType.axon), 0.0)
     assert_almost_equal(morphology.total_width(morph, neurite_type=NeuriteType.basal_dendrite), 80.0)
     assert_almost_equal(morphology.total_width(morph, neurite_type=NeuriteType.apical_dendrite), 80.0)
 
@@ -302,7 +314,7 @@ def test_total_height():
         4 4   0  60  3 1.  1
         5 4 -80  0.  0 1.  4
     """)
-    assert_almost_equal(morphology.total_height(morph), 120.0)
+    assert_almost_equal(morphology.total_height(morph, neurite_type=NeuriteType.axon), 0.0)
     assert_almost_equal(morphology.total_height(morph, neurite_type=NeuriteType.basal_dendrite), 60.0)
     assert_almost_equal(morphology.total_height(morph, neurite_type=NeuriteType.apical_dendrite), 60.0)
 
@@ -315,6 +327,6 @@ def test_total_depth():
         4 4   0  60  3 1.  1
         5 4 -80  0.  0 1.  4
     """)
-    assert_almost_equal(morphology.total_depth(morph), 3.0)
+    assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.axon), 0.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.basal_dendrite), 2.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.apical_dendrite), 3.0)
