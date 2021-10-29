@@ -7,6 +7,7 @@ Version 3.0.2
 - Add example astrocyte analysis notebook.
 - Fix readthedocs documentation build.
 - Delete all requirements txt files and update documentation accordingly
+- Adding back unifurcation check
 
 Version 3.0.1
 -------------
