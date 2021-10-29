@@ -342,8 +342,11 @@ def has_multifurcation(morph):
 
 def has_unifurcation(neuron):
     """Check if a section has 1 child."""
-    bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(neuron)
-               if len(section.children) == 1]
+    bad_ids = [
+        (section.id, section.points[np.newaxis, -1])
+        for section in iter_sections(neuron)
+        if len(section.children) == 1
+    ]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
