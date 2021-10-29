@@ -340,6 +340,16 @@ def has_multifurcation(morph):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
+def has_unifurcation(neuron):
+    """Check if a section has 1 child."""
+    bad_ids = [
+        (section.id, section.points[np.newaxis, -1])
+        for section in iter_sections(neuron)
+        if len(section.children) == 1
+    ]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
 def has_no_single_children(morph):
     """Check if the morphology has sections with only one child section."""
     bad_ids = [section.id for section in iter_sections(morph) if len(section.children) == 1]
