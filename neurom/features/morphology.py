@@ -172,8 +172,25 @@ def trunk_angles(
 ):
     """Calculate the angles between all the trunks of the morph.
 
-    The angles are defined on the x-y plane and the trees
-    are sorted from the y axis and anticlock-wise.
+    By default, the angles are defined on the x-y plane and the trees are sorted from the y axis
+    and anticlock-wise.
+
+    Args:
+        morph: The morphology to process.
+        neurite_type: Only the neurites of this type are considered.
+        coords_only: Consider only the coordinates listed in this argument (should be a combination
+            of 'x', 'y' and 'z').
+        sort_along: Sort angles according to the given plane (should be 'xy', 'xz' or 'yz') before
+            computing the angles between the trunks.
+        consecutive_only: Compute only the angles between consecutive trunks (the default order of
+            neurite trunks is the same as the one used by
+            :func:`neurom.core.morphology.iter_neurites` but this order can be changed using the
+            `sort_along` parameter).
+
+    Returns:
+        list[[float]] or list[float]:
+            The angles between each trunk and all the others. If ``consecutive_only`` is ``True``,
+            only the angle with the next trunk is returned for each trunk.
     """
     vectors = np.array(trunk_vectors(morph, neurite_type=neurite_type))
     # In order to avoid the failure of the process in case the neurite_type does not exist
@@ -184,14 +201,13 @@ def trunk_angles(
         # Sorting angles according to the given plane
         sort_coords = str_to_plane(sort_along)
         order = np.argsort(
-            np.array(
-                [
+            np.fromiter(
+                (
                     morphmath.angle_between_projections(i / np.linalg.norm(i), [0, 1])
-                    for i in vectors[:, sort_coords]
-                ]
-            )
+                   for i in vectors[:, sort_coords]
+                ),
+                dtype=float)
         )
-
         vectors = vectors[order]
 
     # Select coordinates to consider
@@ -200,11 +216,12 @@ def trunk_angles(
         vectors = vectors[:, coords]
 
     # Compute angles between each trunk and the next ones
+    n_vectors = len(vectors)
     cycling_vectors = np.vstack([vectors, vectors])
     angles = [
         (num_i, [
             morphmath.angle_between_vectors(i, j)
-            for j in cycling_vectors[num_i: num_i + len(vectors)]
+            for j in cycling_vectors[num_i: num_i + n_vectors]
         ])
         for num_i, i in enumerate(vectors)
     ]
@@ -224,38 +241,47 @@ def trunk_angles_inter_types(
     target_neurite_type=NeuriteType.basal_dendrite,
     closest_component=None,
 ):
-    """Calculate the angles between the trunks of the morph of a given type to another type.
+    """Calculate the angles between the trunks of the morph of a source type to target type.
 
-    For each couple of neurite, an array with 3 elements is returned:
-    * the absolute 3d angle between the two vectors.
-    * the elevation angle (or polar angle) between the two vectors.
-    * the azimuth angle between the two vectors.
+    Args:
+        morph: The morphology to process.
+        source_neurite_type: Only the neurites of this type are considered as sources.
+        target_neurite_type: Only the neurites of this type are considered as targets.
+        closest_component:
+            If ``closest_component`` is not ``None``, only one element is returned for each neurite
+            of source type:
 
-    If ``closest_component`` is not ``None``, only one element is returned for each neurite of
-    source type:
-    * if set to 0, the one with the lowest absolute 3d angle is returned.
-    * if set to 1, the one with the lowest absolute elevation angle is returned.
-    * if set to 2, the one with the lowest absolute azimuth angle is returned.
+            * if set to 0, the one with the lowest absolute 3d angle is returned.
+            * if set to 1, the one with the lowest absolute elevation angle is returned.
+            * if set to 2, the one with the lowest absolute azimuth angle is returned.
+
+    Returns:
+        list[list[float]] or list[float]:
+            If ``closest_component`` is ``None``, a list of 3 elements is returned for each couple
+            of neurites:
+
+            * the absolute 3d angle between the two vectors.
+            * the elevation angle (or polar angle) between the two vectors.
+            * the azimuth angle between the two vectors.
+
+            If ``closest_component`` is not ``None``, only one of these values is returned for each
+            couple.
     """
-    source_vectors = np.array(trunk_vectors(morph, neurite_type=source_neurite_type))
-    target_vectors = np.array(trunk_vectors(morph, neurite_type=target_neurite_type))
+    source_vectors = trunk_vectors(morph, neurite_type=source_neurite_type)
+    target_vectors = trunk_vectors(morph, neurite_type=target_neurite_type)
 
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if len(source_vectors) == 0 or len(target_vectors) == 0:
         return []
 
-    angles = np.array([
-        np.vstack([
-            np.concatenate(
-                [
-                    [morphmath.angle_between_vectors(i, j)],
-                    morphmath.spherical_from_vector(j) - morphmath.spherical_from_vector(i)
-                ]
+    angles = np.empty((len(source_vectors), len(target_vectors), 3), dtype=np.float)
+
+    for i, source in enumerate(source_vectors):
+        for j, target in enumerate(target_vectors):
+            angles[i, j, 0] = morphmath.angle_between_vectors(source, target)
+            angles[i, j, [1, 2]] = (
+                morphmath.spherical_from_vector(target) - morphmath.spherical_from_vector(source)
             )
-            for j in target_vectors
-        ])
-        for i in source_vectors
-    ])
 
     # Ensure elevation differences are in [-pi, pi]
     angles[:, :, 1] = morphmath.angles_to_pi_interval(angles[:, :, 1])
@@ -280,12 +306,18 @@ def trunk_angles_from_vector(
 ):
     """Calculate the angles between the trunks of the morph of a given type and a given vector.
 
-    For each neurite, an array with 3 elements is returned:
-    * the absolute 3d angle between the two vectors.
-    * the elevation angle (or polar angle) between the two vectors.
-    * the azimuth angle between the two vectors.
+    Args:
+        morph: The morphology to process.
+        neurite_type: Only the neurites of this type are considered.
+        vector: The reference vector. If ``None``, the reference vector is set to ``(0, 1, 0)``.
 
-    If ``vector`` is ``None``, the reference vector is set to `(0, 1, 0)`.
+    Returns:
+        list[list[float]]:
+            For each neurite, an array with 3 elements is returned:
+
+            * the absolute 3d angle between the two vectors.
+            * the elevation angle (or polar angle) between the two vectors.
+            * the azimuth angle between the two vectors.
     """
     if vector is None:
         vector = (0, 1, 0)
@@ -296,15 +328,10 @@ def trunk_angles_from_vector(
     if len(vectors) == 0:
         return []
 
-    angles = np.array([
-        np.concatenate(
-            [
-                [morphmath.angle_between_vectors(vector, j)],
-                morphmath.spherical_from_vector(j) - morphmath.spherical_from_vector(vector)
-            ]
-        )
-        for j in vectors
-    ])
+    angles = np.empty((len(vectors), 3), dtype=float)
+    for i, i_vec in enumerate(vectors):
+        angles[i, 0] = morphmath.angle_between_vectors(vector, i_vec)
+        angles[i, (1, 2)] = morphmath.spherical_from_vector(i_vec) - morphmath.spherical_from_vector(vector)
 
     # Ensure elevation difference are in [-pi, pi]
     angles[:, 1] = morphmath.angles_to_pi_interval(angles[:, 1])
@@ -324,8 +351,22 @@ def trunk_origin_radii(
 ):
     """Radii of the trunk sections of neurites in a morph.
 
-    If ``min_length_filter`` and / or ``max_length_filter`` is given, the points are filtered and
-    the mean radii of the remaining points is returned.
+    .. warning::
+        If ``min_length_filter`` and / or ``max_length_filter`` is given, the points are filtered
+        and the mean radii of the remaining points is returned.
+
+    Args:
+        morph: The morphology to process.
+        neurite_type: Only the neurites of this type are considered.
+        min_length_filter: The min length from which the neurite points are considered.
+        max_length_filter: The max length from which the neurite points are considered.
+
+    Returns:
+        list[float]:
+            * if ``min_length_filter`` and ``max_length_filter`` are ``None``, the radii of the
+              first point of each neurite are returned.
+            * else the mean radius of the points between the given ``min_length_filter`` and
+              ``max_length_filter`` are returned.
     """
     if max_length_filter is None and min_length_filter is None:
         return [n.root_node.points[0][COLS.R]
