@@ -204,7 +204,7 @@ def trunk_angles(
             np.fromiter(
                 (
                     morphmath.angle_between_projections(i / np.linalg.norm(i), [0, 1])
-                   for i in vectors[:, sort_coords]
+                    for i in vectors[:, sort_coords]
                 ),
                 dtype=float)
         )
@@ -331,7 +331,9 @@ def trunk_angles_from_vector(
     angles = np.empty((len(vectors), 3), dtype=float)
     for i, i_vec in enumerate(vectors):
         angles[i, 0] = morphmath.angle_between_vectors(vector, i_vec)
-        angles[i, (1, 2)] = morphmath.spherical_from_vector(i_vec) - morphmath.spherical_from_vector(vector)
+        angles[i, (1, 2)] = (
+            morphmath.spherical_from_vector(i_vec) - morphmath.spherical_from_vector(vector)
+        )
 
     # Ensure elevation difference are in [-pi, pi]
     angles[:, 1] = morphmath.angles_to_pi_interval(angles[:, 1])
