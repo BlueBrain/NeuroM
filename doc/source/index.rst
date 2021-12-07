@@ -44,6 +44,7 @@ NeuroM is a Python-based toolkit for the analysis and processing of morphologies
    validation
    tutorial
    features
+   spherical_coordinates
    examples
    cli
    definitions

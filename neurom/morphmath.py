@@ -251,6 +251,67 @@ def angle_between_vectors(p1, p2):
     return np.arccos(np.clip(np.dot(v1, v2), -1.0, 1.0))
 
 
+def angle_between_projections(p1, p2):
+    """Angle between the projections p1 and p2 (2d vectors)."""
+    ang1 = np.arctan2(*p1[::-1])
+    ang2 = np.arctan2(*p2[::-1])
+    return ang1 - ang2
+
+
+def elevation_from_vector(vec):
+    """Return the elevation of a vector."""
+    norm_vector = np.linalg.norm(vec)
+
+    if norm_vector >= np.finfo(type(norm_vector)).eps:
+        return np.arcsin(np.clip(vec[COLS.Y] / norm_vector, -1.0, 1.0))
+    raise ValueError("Norm of vector between soma center and section is almost zero.")
+
+
+def azimuth_from_vector(vec):
+    """Return the azimuth of a vector."""
+    return np.arctan2(vec[COLS.Z], vec[COLS.X])
+
+
+def spherical_from_vector(vec):
+    """Return the spherical coordinates of a vector: elevation and azimuth.
+
+    .. note::
+
+        * the elevation is the angle between the vector and its projection on the XZ plane.
+        * the azimuth is the angle between the X axis and the projection of the vector on the XZ
+          plane.
+
+    .. warning:: This frame is not the usual spherical frame (see :ref:`spherical_coordinates`).
+    """
+    # Azimuth is in [-pi, pi]
+    azimuth = azimuth_from_vector(vec)
+
+    # Elevation is in [-pi/2, pi/2]
+    elevation = elevation_from_vector(vec)
+
+    return np.array([elevation, azimuth])
+
+
+def vector_from_spherical(elevation, azimuth, radius=1.0):
+    """Return a vector from the frame center to the point in given direction and given radius.
+
+    .. warning:: The frame is not the usual spherical frame (see :ref:`spherical_coordinates`).
+    """
+    x = np.cos(elevation) * np.cos(azimuth)
+    y = np.sin(elevation)
+    z = np.cos(elevation) * np.sin(azimuth)
+
+    return radius * np.array([x, y, z])
+
+
+def angles_to_pi_interval(angles, scale=1.0):
+    """Convert any angles into the ]-scale * pi, scale * pi] interval."""
+    mod_angle = np.fmod(angles, 2.0 * scale * np.pi)
+    mod_angle = np.where(mod_angle <= -scale * np.pi, mod_angle + 2 * scale * np.pi, mod_angle)
+    mod_angle = np.where(mod_angle > scale * np.pi, mod_angle - 2 * scale * np.pi, mod_angle)
+    return mod_angle
+
+
 def polygon_diameter(points):
     """Compute the maximun euclidian distance between any two points in a list of points."""
     return max(point_dist(p0, p1) for (p0, p1) in combinations(points, 2))

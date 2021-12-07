@@ -1,0 +1,71 @@
+% This file is used to generate the spherical_coordinates.svg file with the following commands:
+%
+%   > pdflatex spherical_coordinates.tex
+%   > pdf2svg spherical_coordinates.pdf spherical_coordinates.svg
+%
+% Don't forget to regenerate the SVG file if you upgrade this one.
+%
+\documentclass{article}
+\usepackage[pdftex, active, floats, tightpage]{preview}
+\setlength\PreviewBorder{5pt}%
+
+\usepackage{tikz}
+\usepackage{tikz-3dplot}
+
+\begin{document}
+\tdplotsetmaincoords{60}{110}
+%
+\pgfmathsetmacro{\rvec}{1}
+\pgfmathsetmacro{\thetavec}{60}
+\pgfmathsetmacro{\phivec}{30}
+%
+\begin{preview}
+\begin{tikzpicture}[scale=5,tdplot_main_coords]
+    % Rotate coordinates
+    \tdplotsetrotatedcoords{0}{90}{90}
+
+    % Axis
+    \coordinate (O) at (0,0,0);
+    \begin{scope}[tdplot_rotated_coords]
+        \draw[thick,->] (0,0,0) -- (1.2,0,0) node[anchor=north]{$x$};
+        \draw[thick,->] (0,0,0) -- (0,0.8,0) node[anchor=north west]{$y$};
+        \draw[thick,->] (0,0,0) -- (0,0,1.2) node[anchor=north]{$z$};
+
+        % Vector
+        \tdplotsetcoord{P}{\rvec}{\thetavec}{\phivec}
+        \draw[-stealth,color=red] (O) -- (P) node[right] {$P$};
+
+        % Dashed segments to mark coordinates
+        \draw[dashed, color=orange] (O) -- (Pxy);
+        \draw[dashed, color=orange] (P) -- (Pxy);
+        \draw[dashed, color=orange] (Pxy) -- (Px);
+        \draw[dashed, color=orange] (Pxy) -- (Py);
+
+        \draw[dashed, color=blue] (O) -- (Pxz);
+        \draw[dashed, color=blue] (P) -- (Pxz);
+        \draw[dashed, color=blue] (Pxz) -- (Px);
+        \draw[dashed, color=blue] (Pxz) -- (Pz);
+
+        \draw[dashed, color=green] (O) -- (Pyz);
+        \draw[dashed, color=green] (P) -- (Pyz);
+        \draw[dashed, color=green] (Pyz) -- (Py);
+        \draw[dashed, color=green] (Pyz) -- (Pz);
+
+    \end{scope}
+
+    % Angle arcs
+    \tdplotdrawarc[tdplot_rotated_coords, color=teal]{(O)}{0.86}{0}{\phivec}{anchor=west}{$\phi$}
+    \tdplotsetrotatedthetaplanecoords{\phivec}
+    \tdplotdrawarc[tdplot_rotated_coords, color=teal]{(0,0,0)}{1}{0}{\thetavec}{anchor=north}{$\theta$}
+
+    \tdplotsetrotatedcoords{0}{0}{60}
+    \tdplotsetrotatedthetaplanecoords{0}
+    \tdplotdrawarc[tdplot_rotated_coords, text height=1.2cm, color=purple]{(O)}{0.7}{65}{94}{anchor=north}{elevation}
+
+    \tdplotsetrotatedcoords{0}{0}{0}
+    \tdplotdrawarc[tdplot_rotated_coords, color=purple]{(O)}{0.9}{56}{90}{anchor=north west}{azimuth}
+
+
+\end{tikzpicture}
+\end{preview}
+\end{document}

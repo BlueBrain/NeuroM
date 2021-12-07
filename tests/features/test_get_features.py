@@ -311,6 +311,21 @@ def test_total_length():
         214.37304578)
 
 
+def test_trunk_angles():
+    trunk_angles_pop = features.get('trunk_angles', POP, neurite_type=NeuriteType.basal_dendrite)
+    trunk_angles_morphs = features.get(
+        'trunk_angles',
+        [i for i in POP],
+        neurite_type=NeuriteType.basal_dendrite
+    )
+    trunk_angles_morphs_2 = np.concatenate([
+        features.get('trunk_angles', i, neurite_type=NeuriteType.basal_dendrite)
+        for i in POP
+    ]).tolist()
+
+    assert trunk_angles_pop == trunk_angles_morphs == trunk_angles_morphs_2
+
+
 def test_neurite_lengths():
     actual = features.get('total_length_per_neurite', POP, neurite_type=NeuriteType.basal_dendrite)
     expected = [207.31504917144775, 211.11737489700317, 211.02336168289185,

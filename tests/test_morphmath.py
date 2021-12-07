@@ -305,12 +305,32 @@ def test_angle_3points_collinear_returns_zero():
 
 def test_angle_between_vectors():
     angle1 = mm.angle_between_vectors((1, 0), (0, 1))
-    assert angle1 == np.pi/2
+    assert angle1 == np.pi / 2
     angle1 = mm.angle_between_vectors((1, 0), (1, 0))
     assert angle1 == 0.0
     angle1 = mm.angle_between_vectors((1, 0), (-1, 0))
     assert angle1 == np.pi
     angle1 = mm.angle_between_vectors((0, 0.999999), (0, 0.999999))
+    assert angle1 == 0.0
+
+    # 3d vectors
+    angle1 = mm.angle_between_vectors((1, 0, 0), (0, 1, 0))
+    assert angle1 == np.pi / 2
+    angle1 = mm.angle_between_vectors((1, 0, 0), (1, 0, 0))
+    assert angle1 == 0.0
+    angle1 = mm.angle_between_vectors((1, 0, 0), (-1, 0, 0))
+    assert angle1 == np.pi
+    angle1 = mm.angle_between_vectors((0, 0, 1), (0, 0, -1))
+    assert angle1 == np.pi
+    angle1 = mm.angle_between_vectors((0, 0, 1), (0, 1, 0))
+    assert angle1 == np.pi / 2
+    angle1 = mm.angle_between_vectors((0, 1, 1), (0, 1, 0))
+    assert_almost_equal(angle1, np.pi / 4)
+    angle1 = mm.angle_between_vectors((0, 1, 1), (1, 0, 1))
+    assert_almost_equal(angle1, 1.04719755)
+    angle1 = mm.angle_between_vectors((0, 0.999999, 0), (0, 0.999999, 0))
+    assert angle1 == 0.0
+    angle1 = mm.angle_between_vectors((0, 0.999999, 1), (0, 0.999999, 1))
     assert angle1 == 0.0
 
 
@@ -490,3 +510,25 @@ def test_interval_lengths():
     assert_array_almost_equal(mm.interval_lengths([[0, 0, 0], [1, 1, 0], [2, 11, 0]],
                                                   prepend_zero=True),
                               [0, 1.414214, 10.049876])
+
+
+def test_spherical_coordinates():
+    data = [
+        (0, 0, (1, 0, 0)),
+        (0, np.pi, (-1, 0, 0)),
+        (np.pi / 2, 0, (0, 1, 0)),
+        (-np.pi / 2, 0, (0, -1, 0)),
+        (0, np.pi / 2, (0, 0, 1)),
+        (0, -np.pi / 2, (0, 0, -1)),
+        (np.pi / 4, 0, (1 / np.sqrt(2), 1 / np.sqrt(2), 0)),
+        (np.pi / 4, np.pi, (-1 / np.sqrt(2), 1 / np.sqrt(2), 0)),
+        (0, np.pi / 4, (1 / np.sqrt(2), 0, 1 / np.sqrt(2))),
+        (0, -np.pi / 4, (1 / np.sqrt(2), 0, -1 / np.sqrt(2))),
+    ]
+
+    for elevation, azimuth, expected_pt in data:
+        vect = mm.vector_from_spherical(elevation, azimuth)
+        assert np.allclose(vect, expected_pt)
+
+        new_elevation, new_azimuth = mm.spherical_from_vector(vect)
+        assert np.allclose([elevation, azimuth], [new_elevation, new_azimuth])

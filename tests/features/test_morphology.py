@@ -34,11 +34,17 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
+import pytest
+from morphio import PointLevel, SectionType
+from numpy.testing import assert_allclose
+from numpy.testing import assert_almost_equal
+from numpy.testing import assert_array_almost_equal
+from numpy.testing import assert_array_equal
+
+from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
 from neurom.features import morphology, section
 
-import pytest
-from numpy.testing import assert_almost_equal, assert_array_almost_equal, assert_array_equal, assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 H5_PATH = DATA_PATH / 'h5/v1'
@@ -49,6 +55,16 @@ SIMPLE_TRUNK = load_morphology(SWC_PATH / 'simple_trunk.swc')
 SWC_NRN = load_morphology(SWC_PATH / 'Neuron.swc')
 with warnings.catch_warnings(record=True):
     SWC_NRN_3PT = load_morphology(SWC_PATH / 'soma' / 'three_pt_soma.swc')
+
+
+def _add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
+    """Add a neurite from the elevation and azimuth to a given morphology."""
+    new_pts = np.array(
+        morphmath.vector_from_spherical(elevation, azimuth),
+        ndmin=2
+    )
+    point_lvl = PointLevel(new_pts, [1])
+    morph.append_root_section(point_lvl, neurite_type)
 
 
 def test_soma_volume():
@@ -138,6 +154,15 @@ def test_trunk_origin_radii():
     ret = morphology.trunk_origin_radii(SIMPLE)
     assert ret == [1.0, 1.0]
 
+    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5)
+    assert_array_almost_equal(ret, [1.0 / 3, 0.0])
+
+    ret = morphology.trunk_origin_radii(SIMPLE, max_length_filter=15)
+    assert_array_almost_equal(ret, [2.0 / 3, 2.0 / 3])
+
+    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5, max_length_filter=15)
+    assert_array_almost_equal(ret, [0.5, 0])
+
 
 def test_trunk_origin_azimuths():
     ret = morphology.trunk_origin_azimuths(SIMPLE)
@@ -153,6 +178,189 @@ def test_trunk_angles():
     assert_array_almost_equal(ret, [0.0])
     ret = morphology.trunk_angles(SIMPLE, neurite_type=NeuriteType.apical_dendrite)
     assert_array_almost_equal(ret, [])
+
+    ret = morphology.trunk_angles(SIMPLE_TRUNK, coords_only=None, sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0., np.pi/2, np.pi/2, np.pi],
+            [0., np.pi, np.pi/2, np.pi/2],
+            [0., np.pi/2, np.pi/2, np.pi],
+            [0., np.pi, np.pi/2, np.pi/2],
+        ])
+
+    ret = morphology.trunk_angles(SIMPLE_TRUNK, coords_only="xyz", sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0., np.pi/2, np.pi/2, np.pi],
+            [0., np.pi, np.pi/2, np.pi/2],
+            [0., np.pi/2, np.pi/2, np.pi],
+            [0., np.pi, np.pi/2, np.pi/2],
+        ])
+
+    morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
+
+    # Add two basals
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+
+    ret = morphology.trunk_angles(morph)
+    assert_array_almost_equal(ret, [np.pi / 2, 0.387596, 1.183199, 1.183199, 0.387596, np.pi / 2])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.basal_dendrite)
+    assert_array_almost_equal(ret, [1.958393, 1.183199, 1.183199, 1.958393])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.axon)
+    assert_array_almost_equal(ret, [0.0])
+    ret = morphology.trunk_angles(morph, neurite_type=NeuriteType.apical_dendrite)
+    assert_array_almost_equal(ret, [0.0])
+
+    ret = morphology.trunk_angles(morph, coords_only=None, sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0.0, np.pi / 2, np.pi / 2, np.pi, 2.617993, np.pi / 6],
+            [0.0, np.pi, np.pi / 2, 1.209429, 1.209429, np.pi / 2],
+            [0.0, np.pi / 2, 1.932163, 1.932163, np.pi / 2, np.pi],
+            [0.0, np.pi / 6, 2.617993, np.pi, np.pi / 2, np.pi / 2],
+            [0.0, 2.418858, 2.617993, 1.209429, 1.932163, np.pi / 6],
+            [0.0, np.pi / 6, 1.209429, 1.932163, 2.617993, 2.418858],
+        ]
+    )
+
+    ret = morphology.trunk_angles(morph, coords_only="xyz", sort_along=None, consecutive_only=False)
+    assert_array_almost_equal(
+        ret,
+        [
+            [0.0, np.pi / 2, np.pi / 2, np.pi, 2.617993, np.pi / 6],
+            [0.0, np.pi, np.pi / 2, 1.209429, 1.209429, np.pi / 2],
+            [0.0, np.pi / 2, 1.932163, 1.932163, np.pi / 2, np.pi],
+            [0.0, np.pi / 6, 2.617993, np.pi, np.pi / 2, np.pi / 2],
+            [0.0, 2.418858, 2.617993, 1.209429, 1.932163, np.pi / 6],
+            [0.0, np.pi / 6, 1.209429, 1.932163, 2.617993, 2.418858],
+        ]
+    )
+
+
+def test_trunk_angles_inter_types():
+    morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
+
+    # Add two basals
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+
+    # Test with no source
+    ret = morphology.trunk_angles_inter_types(
+        SIMPLE,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite,
+    )
+    assert_array_almost_equal(ret, [])
+
+    # Test default
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite,
+        closest_component=None,
+    )
+    assert_array_almost_equal(
+        ret,
+        [[
+            [np.pi / 2, -np.pi / 2, 0],
+            [np.pi / 2, -np.pi / 2, np.pi],
+            [np.pi / 6, -np.pi / 6, np.pi / 4],
+            [5 * np.pi / 6, -5 * np.pi / 6, -np.pi / 4],
+        ]]
+    )
+
+    # Test with closest component equal to 3d angle
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.apical_dendrite,
+        NeuriteType.basal_dendrite,
+        closest_component=0,
+    )
+    assert_array_almost_equal(ret, [[[np.pi / 6, -np.pi / 6, np.pi / 4]]])
+
+    # Test with only one target per source
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.basal_dendrite,
+        NeuriteType.apical_dendrite,
+        closest_component=None,
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [[np.pi / 2, np.pi / 2, 0]],
+            [[np.pi / 2, np.pi / 2, -np.pi]],
+            [[np.pi / 6, np.pi / 6, -np.pi / 4]],
+            [[5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4]],
+        ]
+    )
+
+    # Test with only one target per source and closest component equal to 3d angle
+    ret = morphology.trunk_angles_inter_types(
+        morph,
+        NeuriteType.basal_dendrite,
+        NeuriteType.apical_dendrite,
+        closest_component=0,
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [[np.pi / 2, np.pi / 2, 0]],
+            [[np.pi / 2, np.pi / 2, -np.pi]],
+            [[np.pi / 6, np.pi / 6, -np.pi / 4]],
+            [[5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4]],
+        ]
+    )
+
+
+def test_trunk_angles_from_vector():
+    morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
+
+    # Add two basals
+    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+
+    # Test with no neurite selected
+    ret = morphology.trunk_angles_from_vector(
+        SIMPLE,
+        NeuriteType.apical_dendrite,
+    )
+    assert_array_almost_equal(ret, [])
+
+    # Test default
+    ret = morphology.trunk_angles_from_vector(
+        morph,
+        NeuriteType.basal_dendrite,
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [np.pi / 2, -np.pi / 2, 0],
+            [np.pi / 2, -np.pi / 2, np.pi],
+            [np.pi / 6, -np.pi / 6, np.pi / 4],
+            [5 * np.pi / 6, -5 * np.pi / 6, -np.pi / 4],
+        ]
+    )
+
+    # Test with given vector
+    ret = morphology.trunk_angles_from_vector(
+        morph,
+        NeuriteType.basal_dendrite,
+        vector=(0, -1, 0)
+    )
+    assert_array_almost_equal(
+        ret,
+        [
+            [np.pi / 2, np.pi / 2, 0],
+            [np.pi / 2, np.pi / 2, np.pi],
+            [5 * np.pi / 6, 5 * np.pi / 6, np.pi / 4],
+            [np.pi / 6, np.pi / 6, -np.pi / 4],
+        ]
+    )
 
 
 def test_trunk_vectors():
@@ -200,24 +408,24 @@ def test_trunk_elevation_zero_norm_vector_raises():
 def test_sholl_crossings_simple():
     center = SIMPLE.soma.center
     radii = []
-    assert (list(morphology.sholl_crossings(SIMPLE, center, radii=radii)) == [])
+    assert (list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)) == [])
     assert (list(morphology.sholl_crossings(SIMPLE, radii=radii)) == [])
     assert (list(morphology.sholl_crossings(SIMPLE)) == [2])
 
     radii = [1.0]
     assert ([2] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
 
     radii = [1.0, 5.1]
     assert ([2, 4] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
 
     radii = [1., 4., 5.]
     assert ([2, 4, 5] ==
-            list(morphology.sholl_crossings(SIMPLE, center, radii=radii)))
-    
+            list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)))
+
     assert ([1, 1, 2] ==
-            list(morphology.sholl_crossings(SIMPLE.sections[:2], center, radii=radii)))
+            list(morphology.sholl_crossings(SIMPLE.sections[:2], center=center, radii=radii)))
 
 
 def load_swc(string):
@@ -238,7 +446,7 @@ def test_sholl_analysis_custom():
  3 3  80  0  0 1.  2
  4 4   0  0  0 1.  1
  5 4 -80  0  0 1.  4""")
-    assert (list(morphology.sholl_crossings(morph_A, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_A, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 2, 2])
 
     morph_B = load_swc("""\
@@ -257,7 +465,7 @@ def test_sholl_analysis_custom():
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
                        """)
-    assert (list(morphology.sholl_crossings(morph_B, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_B, center=center, radii=radii)) ==
             [2, 2, 2, 10, 10, 0, 0, 0])
 
     morph_C = load_swc("""\
@@ -276,7 +484,7 @@ def test_sholl_analysis_custom():
 13 4  85  -5  0 1.  9
 14 4  85 -10  0 1.  9
                        """)
-    assert (list(morphology.sholl_crossings(morph_C, center, radii=radii)) ==
+    assert (list(morphology.sholl_crossings(morph_C, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
 
 
