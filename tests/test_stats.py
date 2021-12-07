@@ -102,7 +102,7 @@ def test_get_test():
 
     # stest does not exist in the available tests defined within the function
     with pytest.raises(TypeError):
-        st.get_test(stest=5)
+        st.get_test(stest="UNKNOWN")
 
 
 def test_fit_results_dict_uniform():
