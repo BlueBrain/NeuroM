@@ -100,7 +100,7 @@ def test_get_test():
     for i, stat_test in enumerate(stat_test_enums):
         assert st.get_test(stest=stat_test) == expected_stat_test_strings[i]
 
-    # stest does not exist in StatTests
+    # stest does not exist in the available tests defined within the function
     with pytest.raises(TypeError):
         st.get_test(stest=5)
 
