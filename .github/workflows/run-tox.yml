@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -28,10 +28,10 @@ jobs:
       run: |
         tox
     - name: Upload to codecov
-      if: ${{matrix.python-version == '3.6'}}
+      if: ${{matrix.python-version == '3.8'}}
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: false
         files: ./coverage.xml
         flags: pytest
-        name: "neurom-py36"
+        name: "neurom-py38"

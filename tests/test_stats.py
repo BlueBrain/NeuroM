@@ -92,6 +92,19 @@ def test_optimal_distribution_uniform():
     assert optimal.type == 'uniform'
 
 
+def test_get_test():
+
+    stat_test_enums = (st.StatTests.ks, st.StatTests.wilcoxon, st.StatTests.ttest)
+    expected_stat_test_strings = ("ks_2samp", "wilcoxon", "ttest_ind")
+
+    for i, stat_test in enumerate(stat_test_enums):
+        assert st.get_test(stest=stat_test) == expected_stat_test_strings[i]
+
+    # stest does not exist in the available tests defined within the function
+    with pytest.raises(TypeError):
+        st.get_test(stest="UNKNOWN")
+
+
 def test_fit_results_dict_uniform():
     a = st.FitResults(params=[1, 2], errs=[3,4], type='uniform')
     d = st.fit_results_to_dict(a)
