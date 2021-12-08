@@ -438,20 +438,17 @@ class Morphology(morphio.mut.Morphology):
         self.name = name if name else 'Morphology'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
-        self.initial_sections = self.get_initial_sections(only_root=only_root)
+        self.only_root = only_root  # set True for legacy
+        self.initial_sections = self.get_initial_sections()
 
     @property
     def soma(self):
         """Corresponding soma."""
         return self.neurom_soma
 
-    def get_initial_sections(self, only_root=False):
-        """Get sections to initiate neurites.
-
-        Args:
-            only_root (bool): is True, only considers root sections (legacy)
-        """
-        if only_root:
+    def get_initial_sections(self):
+        """Get sections to initiate neurites."""
+        if self.only_root:
             return self.root_sections
         initial_sections = []
         for root_section in self.root_sections:
@@ -463,6 +460,10 @@ class Morphology(morphio.mut.Morphology):
                     prev_type = section.type
         return initial_sections
 
+    def append_root_section(self, *args):
+        """Update initial sections if we append new root sections."""
+        super().append_root_section(*args)
+        self.initial_sections = self.get_initial_sections()
 
     @property
     def neurites(self):
