@@ -45,9 +45,10 @@ from neurom.utils import warn_deprecated
 class Section:
     """Simple recursive tree class."""
 
-    def __init__(self, morphio_section):
+    def __init__(self, morphio_section, only_root=False):
         """The section constructor."""
         self.morphio_section = morphio_section
+        self.only_root = only_root  # for legacy
 
     @property
     def id(self):
@@ -58,6 +59,9 @@ class Section:
     def parent(self):
         """Returns the parent section if non root section else None."""
         if self.morphio_section.is_root:
+            return None
+
+        if not self.only_root and self.morphio_section.parent.type != self.type:
             return None
         return Section(self.morphio_section.parent)
 
@@ -423,7 +427,7 @@ class Neurite:
 class Morphology(morphio.mut.Morphology):
     """Class representing a simple morphology."""
 
-    def __init__(self, filename, name=None):
+    def __init__(self, filename, name=None, only_root=False):
         """Morphology constructor.
 
         Args:
@@ -434,16 +438,36 @@ class Morphology(morphio.mut.Morphology):
         self.name = name if name else 'Morphology'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
+        self.initial_sections = self.get_initial_sections(only_root=only_root)
 
     @property
     def soma(self):
         """Corresponding soma."""
         return self.neurom_soma
 
+    def get_initial_sections(self, only_root=False):
+        """Get sections to initiate neurites.
+
+        Args:
+            only_root (bool): is True, only considers root sections (legacy)
+        """
+        if only_root:
+            return self.root_sections
+        initial_sections = []
+        for root_section in self.root_sections:
+            initial_sections.append(root_section)
+            prev_type = root_section.type
+            for section in root_section.iter():
+                if section.type != prev_type:
+                    initial_sections.append(section)
+                    prev_type = section.type
+        return initial_sections
+
+
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self.root_sections]
+        return [Neurite(root_section) for root_section in self.initial_sections]
 
     @property
     def sections(self):
