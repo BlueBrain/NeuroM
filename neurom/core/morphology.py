@@ -433,12 +433,13 @@ class Morphology(morphio.mut.Morphology):
         Args:
             filename (str|Path): a filename
             name (str): a option morphology name
+            only_root (bool): set to True for not considering neurites on neurites
         """
         super().__init__(filename)
         self.name = name if name else 'Morphology'
         self.morphio_soma = super().soma
         self.neurom_soma = make_soma(self.morphio_soma)
-        self.only_root = only_root  # set True for legacy
+        self.only_root = only_root
         self.initial_sections = self.get_initial_sections()
 
     @property
