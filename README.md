@@ -38,7 +38,7 @@ NeuroM is a Python toolkit for the analysis and processing of neuron morphologie
 [![license](https://img.shields.io/pypi/l/neurom.svg)](https://github.com/BlueBrain/NeuroM/blob/master/LICENSE.txt)
 [![codecov.io](https://codecov.io/github/BlueBrain/NeuroM/coverage.svg?branch=master)](https://codecov.io/github/BlueBrain/NeuroM?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/neurom/badge/?version=latest)](http://neurom.readthedocs.io/en/latest/?badge=latest)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.209498.svg)](https://doi.org/10.5281/zenodo.209498)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597333.svg)](https://doi.org/10.5281/zenodo.597333)
 
 ## Documentation
 
@@ -65,10 +65,16 @@ with
   error stack trace is extremely useful.
 * The commit ID of the version used. This is particularly important if reporting an error
   from an older version of NeuroM.
-* If reporting a regression, the commit ID of the change that introduced the problem 
+* If reporting a regression, the commit ID of the change that introduced the problem
 * If the issue depends on data, a data sample which reproduces the problem should be
   up-loaded. But check first whether the error can be reproduced with any of the data
   samples available in the `tests/data` directory.
+
+## Citation
+
+When you use the NeuroM software, we ask you to cite the following (**this includes poster presentations**):
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.597333.svg)](https://doi.org/10.5281/zenodo.597333)
+
 
 ## Funding & Acknowledgements
 
