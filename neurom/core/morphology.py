@@ -66,16 +66,6 @@ class Section:
         """Returns a list of child section."""
         return [Section(child) for child in self.morphio_section.children]
 
-    def append_section(self, section):
-        """Appends a section to the current section object.
-
-        Args:
-            section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
-        """
-        if isinstance(section, Section):
-            return self.morphio_section.append_section(section.morphio_section)
-        return self.morphio_section.append_section(section)
-
     def is_forking_point(self):
         """Is this section a forking point?"""
         return len(self.children) > 1
@@ -161,11 +151,12 @@ class Section:
                                self.morphio_section.diameters[:, np.newaxis] / 2.),
                               axis=1)
 
-    @points.setter
-    def points(self, value):
-        """Set the points."""
-        self.morphio_section.points = np.copy(value[:, COLS.XYZ])
-        self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
+    #TODO: readonly
+    #@points.setter
+    #def points(self, value):
+    #    """Set the points."""
+    #    self.morphio_section.points = np.copy(value[:, COLS.XYZ])
+    #    self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
 
     @property
     def type(self):
@@ -320,13 +311,6 @@ def graft_morphology(section):
     return Morphology(m)
 
 
-def graft_neuron(section):
-    """Deprecated in favor of ``graft_morphology``."""
-    warn_deprecated('`neurom.core.neuron.graft_neuron` is deprecated in favor of '
-                    '`neurom.core.morphology.graft_morphology`')  # pragma: no cover
-    return graft_morphology(section)  # pragma: no cover
-
-
 class Neurite:
     """Class representing a neurite tree."""
 
@@ -336,7 +320,11 @@ class Neurite:
         Args:
             root_node (morphio.Section): root section
         """
-        self.morphio_root_node = root_node
+        self._root_node = root_node
+
+    @property
+    def morphio_root_node(self):
+        return self._root_node
 
     @property
     def root_node(self):
@@ -420,20 +408,19 @@ class Neurite:
         return 'Neurite <type: %s>' % self.type
 
 
-class Morphology(morphio.mut.Morphology):
+class Morphology:
     """Class representing a simple morphology."""
 
     def __init__(self, filename, name=None):
         """Morphology constructor.
 
         Args:
-            filename (str|Path): a filename
-            name (str): a option morphology name
+            filename (str|Path): a filename or morphio.{,mut.}Morphology object
+            name (str): a optional morphology name
         """
-        super().__init__(filename)
+        self._morph = morphio.Morphology(filename)
         self.name = name if name else 'Morphology'
-        self.morphio_soma = super().soma
-        self.neurom_soma = make_soma(self.morphio_soma)
+        self.neurom_soma = make_soma(self._morph.soma)
 
     @property
     def soma(self):
@@ -443,7 +430,7 @@ class Morphology(morphio.mut.Morphology):
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self.root_sections]
+        return [Neurite(root_section) for root_section in self._morph.root_sections]
 
     @property
     def sections(self):
@@ -458,21 +445,22 @@ class Morphology(morphio.mut.Morphology):
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
-        obj = Morphology(self)
-        obj.morphio_soma.points = trans(obj.morphio_soma.points)
+        mut = self._morph.as_mutable()
+        mut.soma.points = trans(mut.soma.points)
 
-        for section in obj.sections:
-            section.morphio_section.points = trans(section.morphio_section.points)
-        return obj
+        for section in mut.iter():
+            section.points = trans(section.points)
+
+        return Morphology(mut)
 
     def __copy__(self):
         """Creates a deep copy of Morphology instance."""
-        return Morphology(self, self.name)
+        return Morphology(self._morph, self.name)
 
     def __deepcopy__(self, memodict={}):
         """Creates a deep copy of Morphology instance."""
         # pylint: disable=dangerous-default-value
-        return Morphology(self, self.name)
+        return Morphology(self._morph, self.name)
 
     def __repr__(self):
         """Return a string representation."""
