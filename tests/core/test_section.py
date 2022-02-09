@@ -49,6 +49,7 @@ def test_section_base_func():
 def test_section_tree():
     m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
+    import morphio
     assert m.sections[0].parent is None
     assert m.sections[0] == m.sections[0].children[0].parent
 
@@ -76,31 +77,3 @@ def test_section_tree():
                        [0])
     assert_array_equal([s.id for s in m.neurites[0].root_node.ibifurcation_point()],
                        [0])
-
-
-def test_append_section():
-    n = nm.load_morphology(SWC_PATH / 'simple.swc')
-    s = n.sections[0]
-
-    s.append_section(n.sections[-1])
-    assert len(s.children) == 3
-    assert s.children[-1].id == 6
-    assert s.children[-1].type == n.sections[-1].type
-
-    s.append_section(n.sections[-1].morphio_section)
-    assert len(s.children) == 4
-    assert s.children[-1].id == 7
-    assert s.children[-1].type == n.sections[-1].type
-
-
-def test_set_points():
-    n = nm.load_morphology(SWC_PATH / 'simple.swc')
-    s = n.sections[0]
-    s.points = np.array([
-        [0, 5, 0, 2],
-        [0, 7, 0, 2],
-    ])
-    assert_array_equal(s.points, np.array([
-        [0, 5, 0, 2],
-        [0, 7, 0, 2],
-    ]))

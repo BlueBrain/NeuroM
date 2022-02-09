@@ -71,13 +71,6 @@ class Soma:
                                self._morphio_soma.diameters[:, np.newaxis] / 2.),
                               axis=1)
 
-    @points.setter
-    def points(self, values):
-        """Set the points."""
-        values = np.asarray(values)
-        self._morphio_soma.points = np.copy(values[:, COLS.XYZ])
-        self._morphio_soma.diameters = np.copy(values[:, COLS.R]) * 2
-
     @property
     def volume(self):
         """Gets soma volume assuming it is a sphere."""

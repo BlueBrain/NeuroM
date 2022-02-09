@@ -43,6 +43,8 @@ from numpy.testing import assert_array_equal
 
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
+
+from neurom.core import Morphology
 from neurom.features import morphology, section
 
 
@@ -59,12 +61,14 @@ with warnings.catch_warnings(record=True):
 
 def _add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
     """Add a neurite from the elevation and azimuth to a given morphology."""
+    mut = morph.to_morphio().as_mutable()
     new_pts = np.array(
         morphmath.vector_from_spherical(elevation, azimuth),
         ndmin=2
     )
     point_lvl = PointLevel(new_pts, [1])
-    morph.append_root_section(point_lvl, neurite_type)
+    mut.append_root_section(point_lvl, neurite_type)
+    return Morphology(mut)
 
 
 def test_soma_volume():

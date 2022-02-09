@@ -47,24 +47,28 @@ class Section:
 
     def __init__(self, morphio_section):
         """The section constructor."""
-        self.morphio_section = morphio_section
+        self._morphio_section = morphio_section
+
+    def to_morphio(self):
+        """Returns the morphio section"""
+        return self._morphio_section
 
     @property
     def id(self):
         """Returns the section ID."""
-        return self.morphio_section.id
+        return self._morphio_section.id
 
     @property
     def parent(self):
         """Returns the parent section if non root section else None."""
-        if self.morphio_section.is_root:
+        if self._morphio_section.is_root:
             return None
-        return Section(self.morphio_section.parent)
+        return Section(self._morphio_section.parent)
 
     @property
     def children(self):
         """Returns a list of child section."""
-        return [Section(child) for child in self.morphio_section.children]
+        return [Section(child) for child in self._morphio_section.children]
 
     def is_forking_point(self):
         """Is this section a forking point?"""
@@ -132,7 +136,7 @@ class Section:
 
     def __eq__(self, other):
         """Equal when its morphio section is equal."""
-        return self.morphio_section == other.morphio_section
+        return self._morphio_section == other._morphio_section
 
     def __hash__(self):
         """Hash of its id."""
@@ -140,28 +144,21 @@ class Section:
 
     def __nonzero__(self):
         """If has children."""
-        return self.morphio_section is not None
+        return self._morphio_section is not None
 
     __bool__ = __nonzero__
 
     @property
     def points(self):
         """Returns the section list of points the NeuroM way (points + radius)."""
-        return np.concatenate((self.morphio_section.points,
-                               self.morphio_section.diameters[:, np.newaxis] / 2.),
+        return np.concatenate((self._morphio_section.points,
+                               self._morphio_section.diameters[:, np.newaxis] / 2.),
                               axis=1)
-
-    #TODO: readonly
-    #@points.setter
-    #def points(self, value):
-    #    """Set the points."""
-    #    self.morphio_section.points = np.copy(value[:, COLS.XYZ])
-    #    self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
 
     @property
     def type(self):
         """Returns the section type."""
-        return NeuriteType(int(self.morphio_section.type))
+        return NeuriteType(int(self._morphio_section.type))
 
     @property
     def length(self):
@@ -307,7 +304,7 @@ def graft_morphology(section):
     """Returns a morphology starting at section."""
     assert isinstance(section, Section)
     m = morphio.mut.Morphology()
-    m.append_root_section(section.morphio_section)
+    m.append_root_section(section.to_morphio())
     return Morphology(m)
 
 
@@ -418,19 +415,26 @@ class Morphology:
             filename (str|Path): a filename or morphio.{,mut.}Morphology object
             name (str): a optional morphology name
         """
-        self._morph = morphio.Morphology(filename)
+        self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
         self.name = name if name else 'Morphology'
-        self.neurom_soma = make_soma(self._morph.soma)
+
+    def to_morphio(self):
+        """Returns the morphio morphology object"""
+        return self._morphio_morph
 
     @property
     def soma(self):
         """Corresponding soma."""
-        return self.neurom_soma
+        return make_soma(self._morphio_morph.soma)
 
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self._morph.root_sections]
+        return [Neurite(root_section) for root_section in self._morphio_morph.root_sections]
+
+    def section(self, section_id):
+        """Returns the section with the given id"""
+        return Section(self._morphio_morph.section(section_id))
 
     @property
     def sections(self):
@@ -445,7 +449,7 @@ class Morphology:
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
-        mut = self._morph.as_mutable()
+        mut = self._morphio_morph.as_mutable()
         mut.soma.points = trans(mut.soma.points)
 
         for section in mut.iter():
@@ -455,12 +459,12 @@ class Morphology:
 
     def __copy__(self):
         """Creates a deep copy of Morphology instance."""
-        return Morphology(self._morph, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __deepcopy__(self, memodict={}):
         """Creates a deep copy of Morphology instance."""
         # pylint: disable=dangerous-default-value
-        return Morphology(self._morph, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __repr__(self):
         """Return a string representation."""
