@@ -417,15 +417,11 @@ class Morphology:
         """
         self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
         self.name = name if name else 'Morphology'
+        self.soma = make_soma(self._morphio_morph.soma)
 
     def to_morphio(self):
         """Returns the morphio morphology object"""
         return self._morphio_morph
-
-    @property
-    def soma(self):
-        """Corresponding soma."""
-        return make_soma(self._morphio_morph.soma)
 
     @property
     def neurites(self):
