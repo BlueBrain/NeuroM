@@ -26,39 +26,15 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 
 import numpy as np
 from neurom import load_morphology
 from neurom.check import morphtree as mt
-from neurom.core.dataformat import COLS
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
-
-
-def _make_flat(morphology):
-
-    class Flattenizer:
-        def __call__(self, points):
-            points = deepcopy(points)
-            points[:, COLS.Z] = 0.
-            return points
-
-    return morphology.transform(Flattenizer())
-
-
-def _make_monotonic(morphology):
-    for neurite in morphology.neurites:
-        for section in neurite.iter_sections():
-            points = section.points
-            if section.parent is not None:
-                points[0][COLS.R] = section.parent.points[-1][COLS.R] / 2
-            for point_id in range(len(points) - 1):
-                points[point_id + 1][COLS.R] = points[point_id][COLS.R] / 2.
-            section.points = points
 
 
 def _generate_back_track_tree(n, dev):
@@ -182,7 +158,7 @@ def test_get_flat_neurites():
     assert len(mt.get_flat_neurites(m, 1e-6, method='tolerance')) == 0
     assert len(mt.get_flat_neurites(m, 0.1, method='ratio')) == 0
 
-    m = _make_flat(m)
+    m = load_morphology(Path(SWC_PATH, 'Neuron-flat.swc'))
     assert len(mt.get_flat_neurites(m, 1e-6, method='tolerance')) == 4
     assert len(mt.get_flat_neurites(m, 0.1, method='ratio')) == 4
 
@@ -190,7 +166,8 @@ def test_get_flat_neurites():
 def test_get_nonmonotonic_neurites():
     m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
     assert len(mt.get_nonmonotonic_neurites(m)) == 4
-    _make_monotonic(m)
+
+    m = load_morphology(Path(SWC_PATH, 'Neuron-monotonic.swc'))
     assert len(mt.get_nonmonotonic_neurites(m)) == 0
 
 

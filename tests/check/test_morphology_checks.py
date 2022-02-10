@@ -26,7 +26,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 
@@ -53,26 +52,6 @@ def _load_morphology(name):
         path = ASC_PATH / name
     return name, load_morphology(path)
 
-
-def _make_monotonic(morphology):
-    for neurite in morphology.neurites:
-        for node in neurite.iter_sections():
-            sec = node.points
-            if node.parent is not None:
-                sec[0][COLS.R] = node.parent.points[-1][COLS.R] / 2.
-            for point_id in range(len(sec) - 1):
-                sec[point_id + 1][COLS.R] = sec[point_id][COLS.R] / 2.
-
-
-def _make_flat(morphology):
-
-    class Flattenizer:
-        def __call__(self, points):
-            points = deepcopy(points)
-            points[:, COLS.Z] = 0.
-            return points
-
-    return morphology.transform(Flattenizer())
 
 
 NEURONS = dict([_load_morphology(n) for n in ['Neuron.h5',
@@ -148,7 +127,7 @@ def test_has_no_flat_neurites():
     assert morphology_checks.has_no_flat_neurites(m, 1e-6, method='tolerance')
     assert morphology_checks.has_no_flat_neurites(m, 0.1, method='ratio')
 
-    m = _make_flat(m)
+    _, m = _load_morphology('Neuron-flat.swc')
 
     assert not morphology_checks.has_no_flat_neurites(m, 1e-6, method='tolerance')
     assert not morphology_checks.has_no_flat_neurites(m, 0.1, method='ratio')
