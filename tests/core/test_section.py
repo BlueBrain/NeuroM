@@ -49,7 +49,6 @@ def test_section_base_func():
 def test_section_tree():
     m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
-    import morphio
     assert m.sections[0].parent is None
     assert m.sections[0] == m.sections[0].children[0].parent
 
