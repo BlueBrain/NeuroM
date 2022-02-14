@@ -48,19 +48,22 @@ from functools import partial
 
 import numpy as np
 from neurom import morphmath
+from neurom.core.types import NeuriteType
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.morphmath import convex_hull
+from neurom.core.types import tree_type_checker as is_type
+
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 
 L = logging.getLogger(__name__)
 
 
-def _map_sections(fun, neurite, iterator_type=Section.ipreorder):
+def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-    return list(map(fun, iterator_type(neurite.root_node)))
+    return list(map(fun, filter(is_type(section_type), iterator_type(neurite.root_node))))
 
 
 @feature(shape=())
@@ -77,9 +80,9 @@ def number_of_segments(neurite):
 
 
 @feature(shape=())
-def number_of_sections(neurite, iterator_type=Section.ipreorder):
+def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
-    return len(_map_sections(lambda s: s, neurite, iterator_type=iterator_type))
+    return len(_map_sections(lambda s: s, neurite, iterator_type=iterator_type, section_type=section_type))
 
 
 @feature(shape=())
