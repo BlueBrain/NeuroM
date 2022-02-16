@@ -60,7 +60,6 @@ from neurom.utils import str_to_plane
 from neurom.morphmath import convex_hull
 
 from neurom.core.morphology import Neurite
-from collections import OrderedDict
 
 feature = partial(feature, namespace=NameSpace.NEURON)
 
@@ -72,7 +71,7 @@ def _homogeneous_subtrees(neurite):
 
     Note: Only two different mixed types are allowed
     """
-    homogeneous_neurites = OrderedDict([(neurite.root_node.type, neurite)])
+    homogeneous_neurites = {neurite.root_node.type: neurite}
     for section in neurite.root_node.ipreorder():
         if section.type not in homogeneous_neurites:
             homogeneous_neurites[section.type] = Neurite(section)
