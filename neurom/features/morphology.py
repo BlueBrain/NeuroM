@@ -107,7 +107,7 @@ def _map_neurites(function, morph, neurite_type=NeuriteType.all, use_subtrees=Fa
             if neurite.morphio_root_node.is_heterogeneous():
                 yield from _map_homogeneous_subtrees(function, neurite, neurite_type)
             else:
-                if istype(neurite_type)(neurite):
+                if is_type(neurite_type)(neurite):
                     yield function(neurite)
     else:
         yield from iter_neurites(morph, mapfun=function, filt=is_type(neurite_type))

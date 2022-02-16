@@ -644,23 +644,33 @@ def test_section_radial_distances_origin():
 
 
 def test_number_of_sections_per_neurite():
-    nsecs = features.get('number_of_sections_per_neurite', NEURON)
-    assert len(nsecs) == 4
-    assert np.all(nsecs == [21, 21, 21, 21])
+    for use_subtrees in (True, False):
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 4
+        assert np.all(nsecs == [21, 21, 21, 21])
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.axon)
-    assert len(nsecs) == 1
-    assert nsecs == [21]
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.axon,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 1
+        assert nsecs == [21]
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON,
-                         neurite_type=NeuriteType.basal_dendrite)
-    assert len(nsecs) == 2
-    assert np.all(nsecs == [21, 21])
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.basal_dendrite,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 2
+        assert np.all(nsecs == [21, 21])
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON,
-                         neurite_type=NeuriteType.apical_dendrite)
-    assert len(nsecs) == 1
-    assert np.all(nsecs == [21])
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.apical_dendrite,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 1
+        assert np.all(nsecs == [21])
 
 
 def test_trunk_origin_radii():
