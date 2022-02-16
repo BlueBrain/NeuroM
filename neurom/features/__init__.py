@@ -132,7 +132,7 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
     return res, feature_
 
 
-def get(feature_name, obj, **kwargs):
+def get(feature_name, obj, use_subtrees=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite, Morphology or Population features. For Neurite features see
@@ -147,7 +147,7 @@ def get(feature_name, obj, **kwargs):
     Returns:
         List|Number: feature value as a list or a single number.
     """
-    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
+    return _get_feature_value_and_func(feature_name, obj, use_subtrees=use_subtrees, **kwargs)[0]
 
 
 def _register_feature(namespace: NameSpace, name, func, shape):
