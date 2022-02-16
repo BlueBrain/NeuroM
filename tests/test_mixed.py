@@ -3,30 +3,48 @@ import neurom
 from neurom import NeuriteType
 from neurom.features import get
 
+
 @pytest.fixture
 def mixed_morph():
+    """
+    basal_dendrite: homogeneous
+    axon_on_basal_dendrite: heterogeneous
+    apical_dendrite: homogeneous
+    """
     return neurom.load_morphology(
     """
-    1 1 0 0 0 1.0 -1
-    2 3 0 1 0 2.2 1
-    3 3 1 2 0 2.2 2
-    4 3 1 4 0 2.2 3
-    5 2 2 3 0 2.2 3
-    6 2 2 4 0 2.2 5
-    7 2 3 3 0 2.1 5
+    1  1    0  0  0    0.5 -1
+    2  3   -1  0  0    0.1  1
+    3  3   -2  0  0    0.1  2
+    4  3    0 -3  0    0.1  3
+    5  3   -2  1  0    0.1  3
+    6  3    0  1  0    0.1  1
+    7  3    1  2  0    0.1  6
+    8  3    1  4  0    0.1  7
+    9  2    2  3  0    0.1  7
+    10 2    2  4  0    0.1  9
+    11 2    3  3  0    0.1  9
+    12 4    0 -1  0    0.1  1
+    13 4    0 -2  0    0.1 12
+    14 4    0 -3  0    0.1 13
+    15 4    1 -2  0    0.1 13
     """,
     reader="swc")
 
 
 def test_morph_number_of_sections_per_neurite(mixed_morph):
-    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=False) == [5]
-    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=True) == [2, 3]
 
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=False) == [5]
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=True) == [2]
+    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=False) == [3, 5, 3]
+    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=True) == [3, 2, 3, 3]
+
+    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=False) == [3, 5]
+    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=True) == [3, 2]
 
     assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.axon, use_subtrees=False) == []
     assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.axon, use_subtrees=True) == [3]
+
+    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.apical_dendrite, use_subtrees=False) == [3]
+    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.apical_dendrite, use_subtrees=True) == [3]
 
 """
 def test_mixed__segment_lengths(mixed_morph):
