@@ -72,7 +72,7 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
                   0 if feature_.shape == () else [])
 
 
-def _get_feature_value_and_func(feature_name, obj, **kwargs):
+def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
@@ -89,11 +89,6 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     if not isinstance(obj, (Neurite, Morphology, Population)) and not is_obj_list:
         raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite,'
                           ' Morphology can be used for feature calculation')
-
-    use_subtrees = False
-    if "use_subtrees" in kwargs:
-        use_subtrees = kwargs["use_subtrees"]
-        del kwargs["use_subtrees"]
 
     neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
     res, feature_ = None, None
