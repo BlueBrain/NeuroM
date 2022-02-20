@@ -94,23 +94,40 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
     res, feature_ = None, None
 
     if isinstance(obj, Neurite) or (is_obj_list and isinstance(obj[0], Neurite)):
+
         # input is a neurite or a list of neurites
         if feature_name in _NEURITE_FEATURES:
-            assert 'neurite_type' not in kwargs, 'Cant apply "neurite_type" arg to a neurite with' \
-                                                 ' a neurite feature'
+
+            assert 'neurite_type' not in kwargs, (
+                'Cant apply "neurite_type" arg to a neurite with a neurite feature'
+            )
+
             feature_ = _NEURITE_FEATURES[feature_name]
+
             if isinstance(obj, Neurite):
                 res = feature_(obj, **kwargs)
             else:
                 res = [feature_(s, **kwargs) for s in obj]
+
     elif isinstance(obj, Morphology):
+
         # input is a morphology
         if feature_name in _MORPHOLOGY_FEATURES:
+
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
-            res = feature_(obj, use_subtrees=use_subtrees, **kwargs)
+
+            import inspect
+
+            if "use_subtrees" in inspect.signature(feature_).parameters:
+                kwargs["use_subtrees"] = use_subtrees
+
+            res = feature_(obj, **kwargs)
+
         elif feature_name in _NEURITE_FEATURES:
+
             feature_ = _NEURITE_FEATURES[feature_name]
             res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
+
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
         if feature_name in _POPULATION_FEATURES:
