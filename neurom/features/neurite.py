@@ -107,9 +107,9 @@ def number_of_leaves(neurite):
 
 
 @feature(shape=())
-def total_length(neurite):
+def total_length(neurite, section_type=NeuriteType.all):
     """Neurite length. For a morphology it will be a sum of all neurite lengths."""
-    return sum(_map_sections(sf.section_length, neurite))
+    return sum(_map_sections(sf.section_length, neurite, section_type=section_type))
 
 
 @feature(shape=())

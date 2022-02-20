@@ -150,9 +150,11 @@ def number_of_sections_per_neurite(morph, neurite_type=NeuriteType.all, use_subt
 
 
 @feature(shape=(...,))
-def total_length_per_neurite(morph, neurite_type=NeuriteType.all):
+def total_length_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Neurite lengths."""
-    return _map_neurites(nf.total_length, morph, neurite_type)
+    return list(
+        map_neurites(nf.total_length, morph, neurite_type, use_subtrees)
+    )
 
 
 @feature(shape=(...,))

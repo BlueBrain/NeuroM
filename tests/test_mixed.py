@@ -18,7 +18,7 @@ def mixed_morph():
     1  1    0  0  0    0.5 -1
     2  3   -1  0  0    0.1  1
     3  3   -2  0  0    0.1  2
-    4  3    0 -3  0    0.1  3
+    4  3   -3  0  0    0.1  3
     5  3   -2  1  0    0.1  3
     6  3    0  1  0    0.1  1
     7  3    1  2  0    0.1  6
@@ -97,6 +97,28 @@ def _morphology_features():
                 "kwargs": {"origin": np.array([0., 0., 0.])},
                 "expected_wout_subtrees": 0.0,
                 "expected_with_subtrees": 4.47213595499958,  # [2, 4] - [0, 0]
+            }
+        ],
+        "total_length_per_neurite": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [3., 6.82842712474619, 3.],
+                "expected_with_subtrees": [3., 3.414213562373095, 3.414213562373095, 3],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [3., 6.82842712474619],
+                "expected_with_subtrees": [3., 3.414213562373095],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [3.414213562373095],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [3.],
+                "expected_with_subtrees": [3.],
             }
         ]
     }
