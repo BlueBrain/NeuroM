@@ -158,9 +158,11 @@ def total_length_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=F
 
 
 @feature(shape=(...,))
-def total_area_per_neurite(morph, neurite_type=NeuriteType.all):
+def total_area_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Neurite areas."""
-    return _map_neurites(nf.total_area, morph, neurite_type)
+    return list(
+        map_neurites(nf.total_area, morph, neurite_type, use_subtrees)
+    )
 
 
 @feature(shape=(...,))

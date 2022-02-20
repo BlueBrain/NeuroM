@@ -120,6 +120,28 @@ def _morphology_features():
                 "expected_wout_subtrees": [3.],
                 "expected_with_subtrees": [3.],
             }
+        ],
+        "total_area_per_neurite" : [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [1.884956, 4.290427, 1.884956],  # total_length * 2piR
+                "expected_with_subtrees": [1.884956, 2.145214, 2.145214, 1.884956],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [1.884956, 4.290427],
+                "expected_with_subtrees": [1.884956, 2.145214],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [2.145214],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [1.884956],
+                "expected_with_subtrees": [1.884956],
+            }
         ]
     }
 
@@ -134,8 +156,8 @@ def _morphology_features():
 @pytest.mark.parametrize("feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees", _morphology_features())
 def test_features__morphology(feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees, mixed_morph):
 
-    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=False, **kwargs), expected_wout_subtrees)
-    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=True, **kwargs), expected_with_subtrees)
+    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=False, **kwargs), expected_wout_subtrees, rtol=1e-6)
+    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=True, **kwargs), expected_with_subtrees, rtol=1e-6)
 
 """
 def test_mixed__segment_lengths(mixed_morph):

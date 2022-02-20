@@ -368,7 +368,8 @@ class Neurite:
 
         The length is defined as the sum of lengths of the sections.
         """
-        return sum(s.length for s in self.iter_sections())
+        from neurom.features.neurite import total_length
+        return total_length(self)
 
     @property
     def area(self):
@@ -376,7 +377,8 @@ class Neurite:
 
         The area is defined as the sum of area of the sections.
         """
-        return sum(s.area for s in self.iter_sections())
+        from neurom.features.neurite import total_area
+        return total_area(self)
 
     @property
     def volume(self):

@@ -113,12 +113,12 @@ def total_length(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=())
-def total_area(neurite):
+def total_area(neurite, section_type=NeuriteType.all):
     """Neurite surface area. For a morphology it will be a sum of all neurite areas.
 
     The area is defined as the sum of the area of the sections.
     """
-    return sum(_map_sections(sf.section_area, neurite))
+    return sum(_map_sections(sf.section_area, neurite, section_type=section_type))
 
 
 @feature(shape=())
