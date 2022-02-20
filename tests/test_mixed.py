@@ -1,5 +1,7 @@
 import pytest
 import neurom
+import numpy as np
+import numpy.testing as npt
 from neurom import NeuriteType
 from neurom.features import get
 
@@ -32,19 +34,86 @@ def mixed_morph():
     reader="swc")
 
 
-def test_morph_number_of_sections_per_neurite(mixed_morph):
+def _morphology_features():
 
-    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=False) == [3, 5, 3]
-    assert get("number_of_sections_per_neurite", mixed_morph, use_subtrees=True) == [3, 2, 3, 3]
+    features = {
+        "number_of_sections_per_neurite": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [3, 5, 3],
+                "expected_with_subtrees": [3, 2, 3, 3],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [3, 5],
+                "expected_with_subtrees": [3, 2],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [3],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [3],
+                "expected_with_subtrees": [3],
+            }
+        ],
+        "max_radial_distance": [
+            {
+                # without subtrees AoD is considered a single tree, with [3, 3] being the furthest
+                # with subtrees AoD subtrees are considered separately and the distance is calculated
+                # from their respective roots. [1, 4] is the furthest point in this case
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": 3.60555127546398,
+                "expected_with_subtrees": 3.16227766016837,
+            },
+            {
+                # with a global origin, AoD axon subtree [2, 4] is always furthest from soma
+                "neurite_type": NeuriteType.all,
+                "kwargs": {"origin": np.array([0., 0., 0.])},
+                "expected_wout_subtrees": 4.47213595499958,
+                "expected_with_subtrees": 4.47213595499958,
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": 3.60555127546398,  # [3, 3] - [0, 1]
+                "expected_with_subtrees": 3.16227766016837,  # [1, 4] - [0, 1]
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "kwargs": {"origin": np.array([0., 0., 0.])},
+                "expected_wout_subtrees": 4.47213595499958,  # [2, 4] - [0, 0]
+                "expected_with_subtrees": 4.12310562561766,  # [1, 4] - [0, 0]
 
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=False) == [3, 5]
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.basal_dendrite, use_subtrees=True) == [3, 2]
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 2.23606797749979,  # [3, 3] - [1, 2]
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "kwargs": {"origin": np.array([0., 0., 0.])},
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 4.47213595499958,  # [2, 4] - [0, 0]
+            }
+        ]
+    }
 
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.axon, use_subtrees=False) == []
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.axon, use_subtrees=True) == [3]
+    # TODO: Add check here to ensure that there are no features not addressed
 
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.apical_dendrite, use_subtrees=False) == [3]
-    assert get("number_of_sections_per_neurite", mixed_morph, neurite_type=NeuriteType.apical_dendrite, use_subtrees=True) == [3]
+    for feature_name, configurations in features.items():
+        for cfg in configurations:
+            kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
+            yield feature_name, cfg["neurite_type"], kwargs, cfg["expected_wout_subtrees"], cfg["expected_with_subtrees"]
+
+
+@pytest.mark.parametrize("feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees", _morphology_features())
+def test_features__morphology(feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees, mixed_morph):
+
+    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=False, **kwargs), expected_wout_subtrees)
+    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=True, **kwargs), expected_with_subtrees)
 
 """
 def test_mixed__segment_lengths(mixed_morph):
