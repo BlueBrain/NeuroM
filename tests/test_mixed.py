@@ -37,6 +37,27 @@ def mixed_morph():
 def _morphology_features():
 
     features = {
+        "soma_radius": [
+            {
+                "neurite_type": None,
+                "expected_wout_subtrees": 0.5,
+                "expected_with_subtrees": 0.5,
+            }
+        ],
+        "soma_surface_area": [
+            {
+                "neurite_type": None,
+                "expected_wout_subtrees": np.pi,
+                "expected_with_subtrees": np.pi,
+            }
+        ],
+        "soma_volume": [
+            {
+                "neurite_type": None,
+                "expected_wout_subtrees": np.pi / 6.,
+                "expected_with_subtrees": np.pi / 6.,
+            }
+        ],
         "number_of_sections_per_neurite": [
             {
                 "neurite_type": NeuriteType.all,
@@ -156,8 +177,23 @@ def _morphology_features():
 @pytest.mark.parametrize("feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees", _morphology_features())
 def test_features__morphology(feature_name, neurite_type, kwargs, expected_wout_subtrees, expected_with_subtrees, mixed_morph):
 
-    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=False, **kwargs), expected_wout_subtrees, rtol=1e-6)
-    npt.assert_allclose(get(feature_name, mixed_morph, neurite_type=neurite_type, use_subtrees=True, **kwargs), expected_with_subtrees, rtol=1e-6)
+    kwargs["use_subtrees"] = False
+
+    if neurite_type is not None:
+        kwargs["neurite_type"] = neurite_type
+
+    npt.assert_allclose(
+        get(feature_name, mixed_morph, **kwargs),
+        expected_wout_subtrees,
+        rtol=1e-6
+    )
+
+    kwargs["use_subtrees"] = True
+    npt.assert_allclose(
+        get(feature_name, mixed_morph, **kwargs),
+        expected_with_subtrees,
+        rtol=1e-6
+    )
 
 """
 def test_mixed__segment_lengths(mixed_morph):
