@@ -68,13 +68,12 @@ def _homogeneous_subtrees(neurite):
     """Returns a dictionary the keys of which are section types and the values are the
     sub-neurites. A sub-neurite can be either the entire tree or a homogeneous downstream
     sub-tree.
-
     Note: Only two different mixed types are allowed
     """
     homogeneous_neurites = {neurite.root_node.type: neurite}
     for section in neurite.root_node.ipreorder():
         if section.type not in homogeneous_neurites:
-            homogeneous_neurites[section.type] = Neurite(section)
+            homogeneous_neurites[section.type] = Neurite(section.morphio_section)
     if len(homogeneous_neurites) != 2:
         raise TypeError(
             f"Subtree types must be exactly two. Found {len(homogeneous_neurites)} instead.")
@@ -84,32 +83,32 @@ def _homogeneous_subtrees(neurite):
 def _map_homogeneous_subtrees(function, neurite, neurite_type):
 
     check_type = is_type(neurite_type)
-    for neurite_type, sub_neurite in _homogeneous_subtrees(neurite).items():
-        if check_type(sub_neurite):
-            yield function(sub_neurite, section_type=neurite_type)
+
+    yield from (
+        function(subtree, section_type=section_type)
+        for section_type, subtree in _homogeneous_subtrees(neurite).items()
+        if check_type(subtree)
+    )
 
 
-def _map_neurites(function, morph, neurite_type=NeuriteType.all, use_subtrees=False):
+def map_neurites(function, obj, neurite_type=NeuriteType.all, use_subtrees=False):
     """
     If `use_subtrees` is enabled, each neurite that is inhomogeneous, is traversed and the
     subtrees with their respective types are returned. For each of these subtrees the features
     need to be calculated with a section filter, to ensure no sections from other subtrees are
     traversed.
     """
-    if use_subtrees:
-        # we don't know a priori the types of the subtrees in the neurites, thus we cannot
-        # filter by time at the neurite level yet
-        for neurite in iter_neurites(morph):
+    check_type = is_type(neurite_type)
 
-            # map the function for each subtree with homogeneous type, propagating the type
-            # for a section level filtering
-            if neurite.morphio_root_node.is_heterogeneous():
+    if use_subtrees:
+        for neurite in iter_neurites(obj):
+            if neurite.is_heterogeneous():
                 yield from _map_homogeneous_subtrees(function, neurite, neurite_type)
             else:
-                if is_type(neurite_type)(neurite):
+                if check_type(neurite):
                     yield function(neurite)
     else:
-        yield from iter_neurites(morph, mapfun=function, filt=is_type(neurite_type))
+        yield from iter_neurites(obj, mapfun=function, filt=is_type(neurite_type))
 
 
 @feature(shape=())
@@ -135,17 +134,19 @@ def soma_radius(morph):
 
 
 @feature(shape=())
-def max_radial_distance(morph, neurite_type=NeuriteType.all):
+def max_radial_distance(morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False):
     """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = _map_neurites(nf.max_radial_distance, morph, neurite_type)
-
-    return max(term_radial_distances) if term_radial_distances else 0.0
+    function = partial(nf.max_radial_distance, origin=origin)
+    term_radial_distances = list(
+        map_neurites(function, morph, neurite_type, use_subtrees)
+    )
+    return max(term_radial_distances) if term_radial_distances else 0.
 
 
 @feature(shape=(...,))
 def number_of_sections_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """List of numbers of sections per neurite."""
-    return list(_map_neurites(nf.number_of_sections, morph, neurite_type, use_subtrees))
+    return list(map_neurites(nf.number_of_sections, morph, neurite_type, use_subtrees))
 
 
 @feature(shape=(...,))

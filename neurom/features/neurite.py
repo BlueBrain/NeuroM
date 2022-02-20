@@ -67,9 +67,11 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 
 
 @feature(shape=())
-def max_radial_distance(neurite, section_type=NeuriteType.all):
+def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = section_term_radial_distances(neurite, section_type=section_type)
+    term_radial_distances = section_term_radial_distances(
+        neurite, origin=origin, section_type=section_type
+    )
     return max(term_radial_distances) if term_radial_distances else 0.
 
 
@@ -378,7 +380,9 @@ def diameter_power_relations(neurite, method='first'):
 
 
 @feature(shape=(...,))
-def section_radial_distances(neurite, origin=None, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
+def section_radial_distances(
+    neurite, origin=None, iterator_type=Section.ipreorder, section_type=NeuriteType.all
+):
     """Section radial distances.
 
     The iterator_type can be used to select only terminal sections (ileaf)

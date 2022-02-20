@@ -36,6 +36,8 @@ Examples:
     >>> ap_seg_len = features.get('segment_lengths', m, neurite_type=neurom.APICAL_DENDRITE)
     >>> ax_sec_len = features.get('section_lengths', m, neurite_type=neurom.AXON)
 """
+
+import inspect
 import operator
 from enum import Enum
 from functools import reduce
@@ -115,8 +117,6 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
         if feature_name in _MORPHOLOGY_FEATURES:
 
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
-
-            import inspect
 
             if "use_subtrees" in inspect.signature(feature_).parameters:
                 kwargs["use_subtrees"] = use_subtrees
