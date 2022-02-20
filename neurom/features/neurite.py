@@ -67,16 +67,17 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 
 
 @feature(shape=())
-def max_radial_distance(neurite):
+def max_radial_distance(neurite, section_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = section_term_radial_distances(neurite)
+    term_radial_distances = section_term_radial_distances(neurite, section_type=section_type)
     return max(term_radial_distances) if term_radial_distances else 0.
 
 
 @feature(shape=())
-def number_of_segments(neurite):
+def number_of_segments(neurite, section_type=NeuriteType.all):
     """Number of segments."""
-    return sum(_map_sections(sf.number_of_segments, neurite))
+    count_segments = lambda s: len(s.points) - 1
+    return sum(_map_sections(count_segments, neurite, section_type=section_type))
 
 
 @feature(shape=())
@@ -377,7 +378,7 @@ def diameter_power_relations(neurite, method='first'):
 
 
 @feature(shape=(...,))
-def section_radial_distances(neurite, origin=None, iterator_type=Section.ipreorder):
+def section_radial_distances(neurite, origin=None, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Section radial distances.
 
     The iterator_type can be used to select only terminal sections (ileaf)
@@ -386,13 +387,14 @@ def section_radial_distances(neurite, origin=None, iterator_type=Section.ipreord
     pos = neurite.root_node.points[0] if origin is None else origin
     return _map_sections(partial(sf.section_radial_distance, origin=pos),
                          neurite,
-                         iterator_type)
+                         iterator_type,
+                         section_type=section_type)
 
 
 @feature(shape=(...,))
-def section_term_radial_distances(neurite, origin=None):
+def section_term_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the termination sections."""
-    return section_radial_distances(neurite, origin, Section.ileaf)
+    return section_radial_distances(neurite, origin, Section.ileaf, section_type=section_type)
 
 
 @feature(shape=(...,))
