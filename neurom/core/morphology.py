@@ -386,6 +386,10 @@ class Neurite:
         """
         return sum(s.volume for s in self.iter_sections())
 
+    def is_heterogeneous(self) -> bool:
+        """Returns true if the neurite consists of more that one section types"""
+        return self.morphio_root_node.is_heterogeneous()
+
     def iter_sections(self, order=Section.ipreorder, neurite_order=NeuriteIter.FileOrder):
         """Iteration over section nodes.
 
