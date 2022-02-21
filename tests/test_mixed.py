@@ -185,7 +185,58 @@ def _morphology_features():
                 "expected_wout_subtrees": [0.09424778],
                 "expected_with_subtrees": [0.09424778],
             }
-        ]
+        ],
+        "trunk_origin_azimuths": [  # Not applicable to distal subtrees
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [3.1415927, 0.0, 0.0],
+                "expected_with_subtrees": [3.1415927, 0.0, 0.0],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [3.1415927, 0.0],
+                "expected_with_subtrees": [3.1415927, 0.0],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [],
+            },
+        ],
+        "trunk_origin_elevations": [  # Not applicable to distal subtrees
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [0.0, 1.5707964, -1.5707964],
+                "expected_with_subtrees": [0.0, 1.5707964, -1.5707964],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [0.0, 1.5707964],
+                "expected_with_subtrees": [0.0, 1.5707964],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [],
+            },
+        ],
+        "trunk_angles": [ # Not applicable to distal subtrees
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [1.570796, 3.141592, 1.570796],
+                "expected_with_subtrees": [1.570796, 3.141592, 1.570796],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [1.5707964, 1.570796],
+                "expected_with_subtrees": [1.5707964, 1.570796],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [],
+            },
+        ],
     }
 
     # TODO: Add check here to ensure that there are no features not addressed
@@ -218,27 +269,6 @@ def test_features__morphology(feature_name, neurite_type, kwargs, expected_wout_
     )
 
 """
-def test_mixed__segment_lengths(mixed_morph):
-
-    axon_on_dendrite = mixed_morph.neurites[0]
-
-    get("segment_lengths", process_inhomogeneous_subtrees=True, neurite_type=NeuriteType.axon)
-
-def test_features(mixed_morph):
-
-    # the traditional way processes each tree as a whole
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=False) == 1
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=False, neurite_type=NeuriteType.basal_dendrite) == 1
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=False, neurite_type=NeuriteType.axon) == 0
-
-    # the new way checks for inhomogeneous subtrees anc counts them as separate neurites
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=True) == 2
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=True, neurite_type=NeuriteType.basal_dendrite) == 1
-    assert get("number_of_neurites", mixed_morph, process_inhomogeneous_subtrees=True, neurite_type=NeuriteType.axon) == 1
-
-
-
-
 def test_mixed_types(mixed_morph):
 
     from neurom import NeuriteType
