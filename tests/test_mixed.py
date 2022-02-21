@@ -163,6 +163,28 @@ def _morphology_features():
                 "expected_wout_subtrees": [1.884956],
                 "expected_with_subtrees": [1.884956],
             }
+        ],
+        "total_volume_per_neurite": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [0.09424778, 0.21452136, 0.09424778],  # total_length * piR^2
+                "expected_with_subtrees": [0.09424778, 0.10726068, 0.10726068, 0.09424778],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [0.09424778, 0.21452136],
+                "expected_with_subtrees": [0.09424778, 0.10726068],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [0.10726068],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [0.09424778],
+                "expected_with_subtrees": [0.09424778],
+            }
         ]
     }
 

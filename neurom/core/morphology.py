@@ -368,6 +368,7 @@ class Neurite:
 
         The length is defined as the sum of lengths of the sections.
         """
+        # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_length
         return total_length(self)
 
@@ -377,6 +378,7 @@ class Neurite:
 
         The area is defined as the sum of area of the sections.
         """
+        # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_area
         return total_area(self)
 
@@ -386,7 +388,9 @@ class Neurite:
 
         The volume is defined as the sum of volumes of the sections.
         """
-        return sum(s.volume for s in self.iter_sections())
+        # pylint: disable=import-outside-toplevel
+        from neurom.features.neurite import total_volume
+        return total_volume(self)
 
     def is_heterogeneous(self) -> bool:
         """Returns true if the neurite consists of more that one section types"""

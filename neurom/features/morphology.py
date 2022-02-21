@@ -166,9 +166,11 @@ def total_area_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=Fal
 
 
 @feature(shape=(...,))
-def total_volume_per_neurite(morph, neurite_type=NeuriteType.all):
+def total_volume_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Neurite volumes."""
-    return _map_neurites(nf.total_volume, morph, neurite_type)
+    return list(
+        map_neurites(nf.total_volume, morph, neurite_type, use_subtrees)
+    )
 
 
 @feature(shape=(...,))

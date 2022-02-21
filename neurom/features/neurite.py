@@ -122,9 +122,15 @@ def total_area(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=())
-def total_volume(neurite):
+def total_volume(neurite, section_type=NeuriteType.all):
     """Neurite volume. For a morphology it will be a sum of neurites volumes."""
-    return sum(_map_sections(sf.section_volume, neurite))
+    return sum(_map_sections(sf.section_volume, neurite, section_type=section_type))
+
+
+def _section_length(section):
+    """Get section length of `section`."""
+    return morphmath.section_length(section.points)
+>>>>>>> Convert total_volume_per_neurite feature
 
 
 @feature(shape=(...,))
