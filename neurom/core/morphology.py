@@ -256,7 +256,8 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
 def iter_sections(neurites,
                   iterator_type=Section.ipreorder,
                   neurite_filter=None,
-                  neurite_order=NeuriteIter.FileOrder):
+                  neurite_order=NeuriteIter.FileOrder,
+                  section_filter=None):
     """Iterator to the sections in a neurite, morphology or morphology population.
 
     Arguments:
@@ -282,10 +283,12 @@ def iter_sections(neurites,
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-    return flatten(
-        iterator_type(neurite.root_node)
-        for neurite in iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
+    sections = flatten(
+        iterator_type(neurite.root_node) for neurite in
+        iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
     )
+
+    return sections if section_filter is None else filter(section_filter, sections)
 
 
 def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
