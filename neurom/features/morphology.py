@@ -45,12 +45,13 @@ For more details see :ref:`features`.
 
 import warnings
 
+from itertools import chain
 from functools import partial
 import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import iter_neurites, iter_segments, Morphology
+from neurom.core.morphology import iter_neurites, iter_sections, iter_segments, Morphology
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
@@ -80,15 +81,28 @@ def _homogeneous_subtrees(neurite):
     return homogeneous_neurites
 
 
+def _iter_subneurites(obj, neurite_type=NeuriteType.all, use_subtrees=False):
+
+    def extract_subneurites(neurite):
+        if neurite.is_heterogeneous():
+            return [subtree for _, subtree in _homogeneous_subtrees(neurite).items()]
+        return [neurite]
+
+    neurites = iter_neurites(obj)
+
+    if use_subtrees:
+        neurites = chain.from_iterable(map(extract_subneurites, neurites))
+
+    yield from filter(is_type(neurite_type), neurites)
+
+
 def _map_homogeneous_subtrees(function, neurite, neurite_type):
 
     check_type = is_type(neurite_type)
 
-    yield from (
-        function(subtree, section_type=section_type)
-        for section_type, subtree in _homogeneous_subtrees(neurite).items()
-        if check_type(subtree)
-    )
+    for section_type, subtree in _homogeneous_subtrees(neurite).items():
+        if check_type(subtree):
+            yield function(subtree, section_type=section_type)
 
 
 def map_neurites(function, obj, neurite_type=NeuriteType.all, use_subtrees=False):
@@ -211,12 +225,12 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def trunk_vectors(morph, neurite_type=NeuriteType.all):
+def trunk_vectors(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Calculate the vectors between all the trunks of the morphology and the soma center."""
     def vector_to_root_node(neurite):
         return morphmath.vector(neurite.root_node.points[0], morph.soma.center)
 
-    return _map_neurites(vector_to_root_node, morph, neurite_type)
+    return _map_neurites(vector_to_root_node, morph, neurite_type, use_subtrees)
 
 
 @feature(shape=(...,))
@@ -407,6 +421,7 @@ def trunk_origin_radii(
     neurite_type=NeuriteType.all,
     min_length_filter=None,
     max_length_filter=None,
+    use_subtrees=False,
 ):
     """Radii of the trunk sections of neurites in a morph.
 
@@ -429,9 +444,8 @@ def trunk_origin_radii(
             * else the mean radius of the points between the given ``min_length_filter`` and
               ``max_length_filter`` are returned.
     """
-    if max_length_filter is None and min_length_filter is None:
-        return [n.root_node.points[0][COLS.R]
-                for n in iter_neurites(morph, filt=is_type(neurite_type))]
+    def trunk_first_radius(neurite):
+        return neurite.root_node.points[0][COLS.R]
 
     if min_length_filter is not None and min_length_filter <= 0:
         raise NeuroMError(
@@ -455,11 +469,14 @@ def trunk_origin_radii(
             "'max_length_filter' value."
         )
 
-    def _mean_radius(neurite):
+    def trunk_mean_radius(neurite):
+
         points = neurite.root_node.points
+
         interval_lengths = morphmath.interval_lengths(points)
         path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
         valid_pts = np.ones(len(path_lengths), dtype=bool)
+
         if min_length_filter is not None:
             valid_pts = (valid_pts & (path_lengths >= min_length_filter))
             if not valid_pts.any():
@@ -469,6 +486,7 @@ def trunk_origin_radii(
                     "point is returned."
                 )
                 return points[-1, COLS.R]
+
         if max_length_filter is not None:
             valid_max = (path_lengths <= max_length_filter)
             valid_pts = (valid_pts & valid_max)
@@ -478,26 +496,33 @@ def trunk_origin_radii(
                     "values excluded all the points of the section so the radius of the first "
                     "point after the 'min_length_filter' path distance is returned."
                 )
-                # pylint: disable=invalid-unary-operand-type
                 return points[~valid_max, COLS.R][0]
+
         return points[valid_pts, COLS.R].mean()
 
-    return _map_neurites(_mean_radius, morph, neurite_type)
+    function = (
+        trunk_first_radius
+        if max_length_filter is None and min_length_filter is None
+        else trunk_mean_radius
+    )
+
+    return map_neurites(function, morph, neurite_type, use_subtrees)
 
 
 @feature(shape=(...,))
-def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
+def trunk_section_lengths(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """List of lengths of trunk sections of neurites in a morph."""
     def trunk_section_length(neurite):
         return morphmath.section_length(neurite.root_node.points)
 
-    return _map_neurites(trunk_section_length, morph, neurite_type)
+    return [morphmath.section_length(n.root_node.points)
+            for n in _iter_subneurites(morph, neurite_type, use_subtrees)]
 
 
 @feature(shape=())
-def number_of_neurites(morph, neurite_type=NeuriteType.all):
+def number_of_neurites(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Number of neurites in a morph."""
-    return len(_map_neurites(lambda n: n, morph, neurite_type))
+    return len(map_neurites(lambda n: n, morph, neurite_type, use_subtrees))
 
 
 @feature(shape=(...,))
@@ -593,38 +618,46 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
     return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
 
 
-def _extent_along_axis(morph, axis, neurite_type):
+def _extent_along_axis(morph, axis, neurite_type, use_subtrees=False):
     """Returns the total extent of the morpholog neurites.
 
     The morphology is filtered by neurite type and the extent is calculated
     along the coordinate axis direction (e.g. COLS.X).
     """
-    it_points = (
-            p
-            for n in iter_neurites(morph, filt=is_type(neurite_type))
-            for p in n.points[:, axis]
+    def iter_coordinates(neurite, section_type=NeuriteType.all):
+        return (
+            coordinate
+            for section in iter_sections(neurite, section_filter=is_type(section_type))
+            for coordinate in section.points[:, axis]
+        )
+
+    axis_coordinates = np.fromiter(
+        chain.from_iterable(
+            map_neurites(iter_coordinates, morph, neurite_type, use_subtrees)
+        ),
+        dtype=np.float32
     )
-    try:
-        return abs(np.ptp(np.fromiter(it_points, dtype=np.float32)))
-    except ValueError:
-        # a ValueError is thrown when there are no points passed to ptp
+
+    if len(axis_coordinates) == 0:
         return 0.0
 
+    return abs(np.ptp(axis_coordinates))
+
 
 @feature(shape=())
-def total_width(morph, neurite_type=NeuriteType.all):
+def total_width(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Extent of morphology along axis x."""
-    return _extent_along_axis(morph, axis=COLS.X, neurite_type=neurite_type)
+    return _extent_along_axis(morph, COLS.X, neurite_type, use_subtrees)
 
 
 @feature(shape=())
-def total_height(morph, neurite_type=NeuriteType.all):
+def total_height(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Extent of morphology along axis y."""
-    return _extent_along_axis(morph, axis=COLS.Y, neurite_type=neurite_type)
+    return _extent_along_axis(morph, COLS.Y, neurite_type, use_subtrees)
 
 
 @feature(shape=())
-def total_depth(morph, neurite_type=NeuriteType.all):
+def total_depth(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Extent of morphology along axis z."""
     return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)
 

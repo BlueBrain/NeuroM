@@ -220,6 +220,29 @@ def _morphology_features():
                 "expected_with_subtrees": [],
             },
         ],
+        "trunk_vectors": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [[-1., 0., 0.], [0., 1., 0.], [0., -1., 0.]],
+                "expected_with_subtrees": [[-1., 0., 0.], [0., 1., 0.], [1., 2., 0.], [0., -1., 0.]],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [[-1., 0., 0.], [0., 1., 0.]],
+                "expected_with_subtrees": [[-1., 0., 0.], [0., 1., 0.]],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [[1., 2., 0.]],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [[0., -1., 0.]],
+                "expected_with_subtrees": [[0., -1., 0.]],
+            },
+
+        ],
         "trunk_angles": [ # Not applicable to distal subtrees
             {
                 "neurite_type": NeuriteType.all,
@@ -235,6 +258,138 @@ def _morphology_features():
                 "neurite_type": NeuriteType.axon,
                 "expected_wout_subtrees": [],
                 "expected_with_subtrees": [],
+            },
+        ],
+        "trunk_origin_radii": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [0.1, 0.1, 0.1],
+                "expected_with_subtrees": [0.1, 0.1, 0.1, 0.1],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [0.1, 0.1],
+                "expected_with_subtrees": [0.1, 0.1],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [0.1],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [0.1],
+                "expected_with_subtrees": [0.1],
+            },
+        ],
+        "trunk_section_lengths": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [1., 1.414213, 1.],
+                "expected_with_subtrees": [1., 1.414213, 1.414213, 1.],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [1., 1.414213],
+                "expected_with_subtrees": [1., 1.414213],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [1.414213],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [1.],
+                "expected_with_subtrees": [1.],
+            },
+        ],
+        "number_of_neurites": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": 3,
+                "expected_with_subtrees": 4,
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": 2,
+                "expected_with_subtrees": 2,
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": 1,
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": 1,
+                "expected_with_subtrees": 1,
+            },
+        ],
+        "total_width": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": 6.0,
+                "expected_with_subtrees": 6.0,
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": 6.0,
+                "expected_with_subtrees": 4.0,
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 2.0,
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": 1.0,
+                "expected_with_subtrees": 1.0,
+            },
+        ],
+        "total_height": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": 7.0,
+                "expected_with_subtrees": 7.0,
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": 4.0,
+                "expected_with_subtrees": 4.0,
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 2.0,
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": 2.0,
+                "expected_with_subtrees": 2.0,
+            },
+        ],
+        "total_depth": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 0.0,
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 0.0,
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 0.0,
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": 0.0,
+                "expected_with_subtrees": 0.0,
             },
         ],
     }
