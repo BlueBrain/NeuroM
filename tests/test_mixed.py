@@ -4,7 +4,7 @@ import numpy as np
 import numpy.testing as npt
 from neurom import NeuriteType
 from neurom.features import get
-
+from neurom.features import _MORPHOLOGY_FEATURES
 
 @pytest.fixture
 def mixed_morph():
@@ -260,6 +260,47 @@ def _morphology_features():
                 "expected_with_subtrees": [],
             },
         ],
+        "trunk_angles_from_vector": [
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [
+                    [np.pi / 2., - np.pi / 2, np.pi],
+                    [0., 0., 0.],
+                    [np.pi, np.pi, 0.],
+                ],
+                "expected_with_subtrees": [
+                    [np.pi / 2., - np.pi / 2, np.pi],
+                    [0., 0., 0.],
+                    [0.463648, -0.463648,  0.],
+                    [np.pi, np.pi, 0.],
+                ],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [[np.pi / 2., - np.pi / 2, np.pi], [0., 0., 0.]],
+                "expected_with_subtrees": [[np.pi / 2., - np.pi / 2, np.pi], [0., 0., 0.]],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [[0.463648, -0.463648,  0.]],
+            },
+
+        ],
+        "trunk_angles_inter_types": [
+            {
+                "neurite_type": None,
+                "kwargs": {
+                    "source_neurite_type": NeuriteType.basal_dendrite,
+                    "target_neurite_type": NeuriteType.axon,
+                },
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [
+                    [[ 2.034444,  1.107149, -3.141593]],
+                    [[ 0.463648, -0.463648,  0.      ]],
+                ],
+            },
+        ],
         "trunk_origin_radii": [
             {
                 "neurite_type": NeuriteType.all,
@@ -325,6 +366,59 @@ def _morphology_features():
                 "expected_wout_subtrees": 1,
                 "expected_with_subtrees": 1,
             },
+        ],
+        "sholl_crossings": [
+            {
+                "neurite_type": NeuriteType.all,
+                "kwargs": {"radii": [1.5, 3.5]},
+                "expected_wout_subtrees": [3, 2],
+                "expected_with_subtrees": [3, 2],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "kwargs": {"radii": [1.5, 3.5]},
+                "expected_wout_subtrees": [2, 2],
+                "expected_with_subtrees": [2, 1],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "kwargs": {"radii": [1.5, 3.5]},
+                "expected_wout_subtrees": [0, 0],
+                "expected_with_subtrees": [0, 1],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "kwargs": {"radii": [1.5, 3.5]},
+                "expected_wout_subtrees": [1, 0],
+                "expected_with_subtrees": [1, 0],
+            },
+        ],
+        "sholl_frequency": [
+            {
+                "neurite_type": NeuriteType.all,
+                "kwargs": {"step_size": 3},
+                "expected_wout_subtrees": [0, 2],
+                "expected_with_subtrees": [0, 2],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "kwargs": {"step_size": 3},
+                "expected_wout_subtrees": [0, 2],
+                "expected_with_subtrees": [0, 1],
+            },
+#            { see #987
+#                "neurite_type": NeuriteType.axon,
+#                "kwargs": {"step_size": 3},
+#                "expected_wout_subtrees": [0, 0],
+#                "expected_with_subtrees": [0, 1],
+#            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "kwargs": {"step_size": 2},
+                "expected_wout_subtrees": [0, 1],
+                "expected_with_subtrees": [0, 1],
+            },
+
         ],
         "total_width": [
             {
@@ -394,7 +488,12 @@ def _morphology_features():
         ],
     }
 
-    # TODO: Add check here to ensure that there are no features not addressed
+    #features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
+
+    #assert not features_not_tested, (
+    #    "The following morphology tests need to be included in the mixed morphology tests:\n"
+    #    f"{features_not_tested}"
+    #)
 
     for feature_name, configurations in features.items():
         for cfg in configurations:

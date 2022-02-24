@@ -311,6 +311,7 @@ def trunk_angles_inter_types(
     source_neurite_type=NeuriteType.apical_dendrite,
     target_neurite_type=NeuriteType.basal_dendrite,
     closest_component=None,
+    use_subtrees=False,
 ):
     """Calculate the angles between the trunks of the morph of a source type to target type.
 
@@ -338,8 +339,12 @@ def trunk_angles_inter_types(
             If ``closest_component`` is not ``None``, only one of these values is returned for each
             couple.
     """
-    source_vectors = trunk_vectors(morph, neurite_type=source_neurite_type)
-    target_vectors = trunk_vectors(morph, neurite_type=target_neurite_type)
+    source_vectors = trunk_vectors(
+        morph, neurite_type=source_neurite_type, use_subtrees=use_subtrees
+    )
+    target_vectors = trunk_vectors(
+        morph, neurite_type=target_neurite_type, use_subtrees=use_subtrees
+    )
 
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if len(source_vectors) == 0 or len(target_vectors) == 0:
@@ -374,6 +379,7 @@ def trunk_angles_from_vector(
     morph,
     neurite_type=NeuriteType.all,
     vector=None,
+    use_subtrees=False,
 ):
     """Calculate the angles between the trunks of the morph of a given type and a given vector.
 
@@ -393,7 +399,7 @@ def trunk_angles_from_vector(
     if vector is None:
         vector = (0, 1, 0)
 
-    vectors = np.array(trunk_vectors(morph, neurite_type=neurite_type))
+    vectors = np.array(trunk_vectors(morph, neurite_type=neurite_type, use_subtrees=use_subtrees))
 
     # In order to avoid the failure of the process in case the neurite_type does not exist
     if len(vectors) == 0:
@@ -532,7 +538,9 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None):
+def sholl_crossings(
+    morph, neurite_type=NeuriteType.all, center=None, radii=None, use_subtrees=False
+):
     """Calculate crossings of neurites.
 
     Args:
@@ -553,11 +561,11 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
                                                         center=morph.soma.center,
                                                         radii=np.arange(0, 1000, 100))
     """
-    def _count_crossings(neurite, radius):
+    def count_crossings(section, radius):
         """Used to count_crossings of segments in neurite with radius."""
         r2 = radius ** 2
         count = 0
-        for start, end in iter_segments(neurite):
+        for start, end in iter_segments(section):
             start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
                                       morphmath.point_dist2(center, end))
 
@@ -574,13 +582,25 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
             center = morph.soma.center
         if radii is None:
             radii = [morph.soma.radius]
-    return [sum(_count_crossings(neurite, r)
-                for neurite in iter_neurites(morph, filt=is_type(neurite_type)))
-            for r in radii]
+
+    if use_subtrees:
+        sections = iter_sections(morph, section_filter=is_type(neurite_type))
+    else:
+        sections = iter_sections(morph, neurite_filter=is_type(neurite_type))
+
+    counts_per_radius = [0 for _ in range(len(radii))]
+
+    for section in sections:
+        for i, radius in enumerate(radii):
+            counts_per_radius[i] += count_crossings(section, radius)
+
+    return counts_per_radius
 
 
 @feature(shape=(...,))
-def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
+def sholl_frequency(
+    morph, neurite_type=NeuriteType.all, step_size=10, bins=None, use_subtrees=False
+):
     """Perform Sholl frequency calculations on a morph.
 
     Args:
@@ -600,22 +620,25 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         If a `neurite_type` is specified and there are no trees corresponding to it, an empty
         list will be returned.
     """
-    neurite_filter = is_type(neurite_type)
-
     if bins is None:
         min_soma_edge = morph.soma.radius
 
-        max_radius_per_neurite = [
-            np.max(np.linalg.norm(n.points[:, COLS.XYZ] - morph.soma.center, axis=1))
-            for n in morph.neurites if neurite_filter(n)
+        if use_subtrees:
+            sections = iter_sections(morph, section_filter=is_type(neurite_type))
+        else:
+            sections = iter_sections(morph, neurite_filter=is_type(neurite_type))
+
+        max_radius_per_section = [
+            np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))
+            for section in sections
         ]
 
-        if not max_radius_per_neurite:
+        if not max_radius_per_section:
             return []
 
-        bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_neurite), step_size)
+        bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_section), step_size)
 
-    return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
+    return sholl_crossings(morph, neurite_type, morph.soma.center, bins, use_subtrees=use_subtrees)
 
 
 def _extent_along_axis(morph, axis, neurite_type, use_subtrees=False):
