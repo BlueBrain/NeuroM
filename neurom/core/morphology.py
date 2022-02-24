@@ -291,7 +291,7 @@ def iter_sections(neurites,
     return sections if section_filter is None else filter(section_filter, sections)
 
 
-def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
+def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder, section_filter=None):
     """Return an iterator to the segments in a collection of neurites.
 
     Arguments:
@@ -309,7 +309,8 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
     sections = iter((obj,) if isinstance(obj, Section) else
                     iter_sections(obj,
                                   neurite_filter=neurite_filter,
-                                  neurite_order=neurite_order))
+                                  neurite_order=neurite_order,
+                                  section_filter=section_filter))
 
     return flatten(
         zip(section.points[:-1], section.points[1:])
