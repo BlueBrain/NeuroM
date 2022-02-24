@@ -49,7 +49,7 @@ from functools import partial
 import numpy as np
 from neurom import morphmath
 from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section
+from neurom.core.morphology import Section, iter_sections
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.morphmath import convex_hull
@@ -420,7 +420,7 @@ def terminal_path_lengths(neurite):
 
 
 @feature(shape=())
-def volume_density(neurite):
+def volume_density(neurite, section_type=NeuriteType.all):
     """Get the volume density.
 
     The volume density is defined as the ratio of the neurite volume and
@@ -431,8 +431,29 @@ def volume_density(neurite):
 
     .. note:: Returns `np.nan` if the convex hull computation fails.
     """
-    neurite_hull = convex_hull(neurite.points[:, COLS.XYZ])
-    return neurite.volume / neurite_hull.volume if neurite_hull is not None else np.nan
+    try:
+
+        if section_type != NeuriteType.all:
+
+            sections = list(iter_sections(neurite, section_filter=is_type(section_type)))
+            points = [
+                point
+                for section in sections
+                for point in section.points[:, COLS.XYZ]
+            ]
+            volume = convex_hull(points).volume
+            neurite_volume = sum(s.volume for s in sections)
+
+        else:
+            volume = convex_hull(neurite).volume
+            neurite_volume = neurite.volume
+
+    except scipy.spatial.qhull.QhullError:
+        L.exception('Failure to compute neurite volume using the convex hull. '
+                    'Feature `volume_density` will return `np.nan`.\n')
+        return np.nan
+
+    return neurite_volume / volume
 
 
 @feature(shape=(...,))

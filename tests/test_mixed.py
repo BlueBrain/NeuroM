@@ -1,3 +1,4 @@
+import warnings
 import pytest
 import neurom
 import numpy as np
@@ -367,6 +368,28 @@ def _morphology_features():
                 "expected_with_subtrees": 1,
             },
         ],
+        "neurite_volume_density": [  # our morphology is flat :(
+            {
+                "neurite_type": NeuriteType.all,
+                "expected_wout_subtrees": [np.nan, np.nan, np.nan],
+                "expected_with_subtrees": [np.nan, np.nan, np.nan, np.nan],
+            },
+            {
+                "neurite_type": NeuriteType.basal_dendrite,
+                "expected_wout_subtrees": [np.nan, np.nan],
+                "expected_with_subtrees": [np.nan, np.nan],
+            },
+            {
+                "neurite_type": NeuriteType.axon,
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [np.nan],
+            },
+            {
+                "neurite_type": NeuriteType.apical_dendrite,
+                "expected_wout_subtrees": [np.nan],
+                "expected_with_subtrees": [np.nan],
+            },
+        ],
         "sholl_crossings": [
             {
                 "neurite_type": NeuriteType.all,
@@ -488,12 +511,12 @@ def _morphology_features():
         ],
     }
 
-    #features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
+    features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
 
-    #assert not features_not_tested, (
-    #    "The following morphology tests need to be included in the mixed morphology tests:\n"
-    #    f"{features_not_tested}"
-    #)
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the mixed morphology tests:\n"
+        f"{features_not_tested}"
+    )
 
     for feature_name, configurations in features.items():
         for cfg in configurations:
@@ -509,18 +532,21 @@ def test_features__morphology(feature_name, neurite_type, kwargs, expected_wout_
     if neurite_type is not None:
         kwargs["neurite_type"] = neurite_type
 
-    npt.assert_allclose(
-        get(feature_name, mixed_morph, **kwargs),
-        expected_wout_subtrees,
-        rtol=1e-6
-    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
 
-    kwargs["use_subtrees"] = True
-    npt.assert_allclose(
-        get(feature_name, mixed_morph, **kwargs),
-        expected_with_subtrees,
-        rtol=1e-6
-    )
+        npt.assert_allclose(
+            get(feature_name, mixed_morph, **kwargs),
+            expected_wout_subtrees,
+            rtol=1e-6
+        )
+
+        kwargs["use_subtrees"] = True
+        npt.assert_allclose(
+            get(feature_name, mixed_morph, **kwargs),
+            expected_with_subtrees,
+            rtol=1e-6
+        )
 
 """
 def test_mixed_types(mixed_morph):

@@ -47,6 +47,7 @@ import warnings
 
 from itertools import chain
 from functools import partial
+from collections.abc import Iterable
 import math
 import numpy as np
 
@@ -532,9 +533,9 @@ def number_of_neurites(morph, neurite_type=NeuriteType.all, use_subtrees=False):
 
 
 @feature(shape=(...,))
-def neurite_volume_density(morph, neurite_type=NeuriteType.all):
+def neurite_volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Get volume density per neurite."""
-    return _map_neurites(nf.volume_density, morph, neurite_type)
+    return list(map_neurites(nf.volume_density, morph, neurite_type, use_subtrees))
 
 
 @feature(shape=(...,))
@@ -583,10 +584,13 @@ def sholl_crossings(
         if radii is None:
             radii = [morph.soma.radius]
 
-    if use_subtrees:
-        sections = iter_sections(morph, section_filter=is_type(neurite_type))
+    if isinstance(morph, Iterable):
+        sections = filter(is_type(neurite_type), morph)
     else:
-        sections = iter_sections(morph, neurite_filter=is_type(neurite_type))
+        if use_subtrees:
+            sections = iter_sections(morph, section_filter=is_type(neurite_type))
+        else:
+            sections = iter_sections(morph, neurite_filter=is_type(neurite_type))
 
     counts_per_radius = [0 for _ in range(len(radii))]
 
