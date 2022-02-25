@@ -377,6 +377,28 @@ def trunk_origin_radii(
         return [n.root_node.points[0][COLS.R]
                 for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
+    if min_length_filter is not None and min_length_filter <= 0:
+        raise ValueError(
+            "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
+            "than 0."
+        )
+
+    if max_length_filter is not None and max_length_filter <= 0:
+        raise ValueError(
+            "In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
+            "than 0."
+        )
+
+    if (
+        min_length_filter is not None
+        and max_length_filter is not None
+        and min_length_filter >= max_length_filter
+    ):
+        raise ValueError(
+            "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the "
+            "'max_length_filter' value."
+        )
+
     def _mean_radius(neurite):
         points = neurite.root_node.points
         interval_lengths = morphmath.interval_lengths(points)
@@ -392,7 +414,16 @@ def trunk_origin_radii(
                 )
                 valid_pts[-1] = True
         if max_length_filter is not None:
-            valid_pts = (valid_pts & (path_lengths <= max_length_filter))
+            valid_max = (path_lengths <= max_length_filter)
+            valid_pts = (valid_pts & valid_max)
+            if not valid_pts.any():
+                warnings.warn(
+                    "In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
+                    "values excluded all the points of the section so the radius of the first "
+                    "point after the 'min_length_filter' path distance is returned."
+                )
+                # pylint: disable=invalid-unary-operand-type
+                valid_pts[np.argwhere(~valid_max)[0][0]] = True
         return points[valid_pts, COLS.R].mean()
 
     return [_mean_radius(n) for n in iter_neurites(morph, filt=is_type(neurite_type))]

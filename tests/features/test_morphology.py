@@ -179,6 +179,37 @@ def test_trunk_origin_radii():
     ret = morphology.trunk_origin_radii(morph, min_length_filter=1, max_length_filter=15)
     assert_array_almost_equal(ret, [0.5, 0.25])
 
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=0.1, max_length_filter=0.2)
+    assert_array_almost_equal(ret, [0.5, 0.25])
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
+            r"than 0."
+
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=-999)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
+            r"than 0."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, max_length_filter=-999)
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the"
+            r" 'max_length_filter' value."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=15, max_length_filter=5)
+
 
 def test_trunk_origin_azimuths():
     ret = morphology.trunk_origin_azimuths(SIMPLE)
