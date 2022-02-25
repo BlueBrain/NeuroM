@@ -706,6 +706,17 @@ def test_sholl_frequency():
     assert len(features.get('sholl_frequency', POP)) == 108
 
 
+    # check that the soma is taken into account for calculating max radius and num bins
+    m = nm.load_morphology(
+        """
+        1  1  -10  0  0    5.0 -1
+        2  3    0  0  0    0.1  1
+        3  3   10  0  0    0.1  2
+        """, reader="swc",
+    )
+
+    assert features.get('sholl_frequency', m, step_size=5.0) == [0, 1, 1, 1]
+
 def test_bifurcation_partitions():
     assert_allclose(features.get('bifurcation_partitions', POP)[:10],
                     [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
