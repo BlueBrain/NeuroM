@@ -44,6 +44,7 @@ from numpy.testing import assert_array_equal
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
 from neurom.core import Morphology
+from neurom.exceptions import NeuroMError
 from neurom.features import morphology, section
 
 
@@ -183,7 +184,7 @@ def test_trunk_origin_radii():
     assert_array_almost_equal(ret, [0.5, 0.25])
 
     with pytest.raises(
-        ValueError,
+        NeuroMError,
         match=(
             r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
             r"than 0."
@@ -193,7 +194,7 @@ def test_trunk_origin_radii():
         ret = morphology.trunk_origin_radii(morph, min_length_filter=-999)
 
     with pytest.raises(
-        ValueError,
+        NeuroMError,
         match=(
             r"In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
             r"than 0."
@@ -202,7 +203,7 @@ def test_trunk_origin_radii():
         ret = morphology.trunk_origin_radii(morph, max_length_filter=-999)
 
     with pytest.raises(
-        ValueError,
+        NeuroMError,
         match=(
             r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the"
             r" 'max_length_filter' value."

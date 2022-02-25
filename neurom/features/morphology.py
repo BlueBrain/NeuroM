@@ -54,6 +54,7 @@ from neurom.core.morphology import iter_neurites, iter_segments, Morphology
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
+from neurom.exceptions import NeuroMError
 from neurom.features import feature, NameSpace, neurite as nf
 from neurom.utils import str_to_plane
 
@@ -378,13 +379,13 @@ def trunk_origin_radii(
                 for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
     if min_length_filter is not None and min_length_filter <= 0:
-        raise ValueError(
+        raise NeuroMError(
             "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
             "than 0."
         )
 
     if max_length_filter is not None and max_length_filter <= 0:
-        raise ValueError(
+        raise NeuroMError(
             "In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
             "than 0."
         )
@@ -394,7 +395,7 @@ def trunk_origin_radii(
         and max_length_filter is not None
         and min_length_filter >= max_length_filter
     ):
-        raise ValueError(
+        raise NeuroMError(
             "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the "
             "'max_length_filter' value."
         )
@@ -412,7 +413,7 @@ def trunk_origin_radii(
                     "path distance of the last point of the last section so the radius of this "
                     "point is returned."
                 )
-                valid_pts[-1] = True
+            return points[-1, COLS.R]
         if max_length_filter is not None:
             valid_max = (path_lengths <= max_length_filter)
             valid_pts = (valid_pts & valid_max)
