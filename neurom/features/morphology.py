@@ -377,7 +377,8 @@ def trunk_origin_radii(
         return [n.root_node.points[0][COLS.R]
                 for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
-    def _mean_radius(points):
+    def _mean_radius(neurite):
+        points = neurite.root_node.points
         interval_lengths = morphmath.interval_lengths(points)
         path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
         valid_pts = np.ones(len(path_lengths), dtype=bool)
@@ -394,8 +395,7 @@ def trunk_origin_radii(
             valid_pts = (valid_pts & (path_lengths <= max_length_filter))
         return points[valid_pts, COLS.R].mean()
 
-    return [_mean_radius(next(n.iter_sections()).points)
-            for n in iter_neurites(morph, filt=is_type(neurite_type))]
+    return [_mean_radius(n) for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))
