@@ -278,7 +278,6 @@ def iter_neurites(
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
-    print("use_Subtrees:", use_subtrees)
     if use_subtrees:
         neurites = chain.from_iterable(map(extract_subneurites, neurites))
 
