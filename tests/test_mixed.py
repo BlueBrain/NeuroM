@@ -5,7 +5,7 @@ import numpy as np
 import numpy.testing as npt
 from neurom import NeuriteType
 from neurom.features import get
-from neurom.features import _MORPHOLOGY_FEATURES
+from neurom.features import _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 
 @pytest.fixture
 def mixed_morph():
@@ -35,7 +35,7 @@ def mixed_morph():
     reader="swc")
 
 
-def _morphology_features():
+def _morphology_features(mode):
 
     features = {
         "soma_radius": [
@@ -507,10 +507,66 @@ def _morphology_features():
     for feature_name, configurations in features.items():
         for cfg in configurations:
             kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
+
+            if mode == "with-subtrees":
+                expected = cfg["expected_with_subtrees"]
+            elif mode == "wout-subtrees":
+                expected = cfg["expected_wout_subtrees"]
+            else:
+                raise ValueError("Uknown mode")
+
+            yield feature_name, kwargs, expected
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees"))
+def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+
+        kwargs["use_subtrees"] = False
+
+        npt.assert_allclose(
+            get(feature_name, mixed_morph, **kwargs),
+            expected,
+            rtol=1e-6
+        )
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="with-subtrees"))
+def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, expected, mixed_morph):
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+
+        kwargs["use_subtrees"] = True
+
+        npt.assert_allclose(
+            get(feature_name, mixed_morph, **kwargs),
+            expected,
+            rtol=1e-6
+        )
+
+"""
+def _neurite_features():
+
+    features = {}
+
+    features_not_tested = set(_NEURITE_FEATURES) - set(features.keys())
+
+    #assert not features_not_tested, (
+    #    "The following morphology tests need to be included in the mixed morphology tests:\n"
+    #    f"{features_not_tested}"
+    #)
+
+    for feature_name, configurations in features.items():
+        for cfg in configurations:
+            kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
             yield feature_name, kwargs, cfg["expected_wout_subtrees"], cfg["expected_with_subtrees"]
 
 
-@pytest.mark.parametrize("feature_name, kwargs, expected_wout_subtrees, expected_with_subtrees", _morphology_features())
+
+@pytest.mark.parametrize("feature_name, kwargs, expected_wout_subtrees, expected_with_subtrees", _neurite_features())
 def test_morphology__morphology_features(feature_name, kwargs, expected_wout_subtrees, expected_with_subtrees, mixed_morph):
 
     kwargs["use_subtrees"] = False
@@ -532,16 +588,5 @@ def test_morphology__morphology_features(feature_name, kwargs, expected_wout_sub
             rtol=1e-6
         )
 
-"""
-def test_mixed_types(mixed_morph):
 
-    from neurom import NeuriteType
-    from neurom.features import get
-
-    types = [neurite.type for neurite in mixed_morph.neurites]
-
-    res = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.axon)
-
-    print(types, res)
-    assert False
 """

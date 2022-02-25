@@ -211,7 +211,25 @@ NRN_ORDER = {NeuriteType.soma: 0,
              NeuriteType.undefined: 4}
 
 
-def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
+def _homogeneous_subtrees(neurite):
+    """Returns a dictionary the keys of which are section types and the values are the
+    sub-neurites. A sub-neurite can be either the entire tree or a homogeneous downstream
+    sub-tree.
+    Note: Only two different mixed types are allowed
+    """
+    homogeneous_neurites = {neurite.root_node.type: neurite}
+    for section in neurite.root_node.ipreorder():
+        if section.type not in homogeneous_neurites:
+            homogeneous_neurites[section.type] = Neurite(section.morphio_section)
+    if len(homogeneous_neurites) != 2:
+        raise TypeError(
+            f"Subtree types must be exactly two. Found {len(homogeneous_neurites)} instead.")
+    return list(homogeneous_neurites.values())
+
+
+def iter_neurites(
+    obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder, use_subtrees=False
+):
     """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
@@ -240,8 +258,19 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
-    neurites = ((obj,) if isinstance(obj, Neurite) else
-                obj.neurites if hasattr(obj, 'neurites') else obj)
+    def extract_subneurites(neurite):
+        if neurite.is_heterogeneous():
+            return _homogeneous_subtrees(neurite)
+        return [neurite]
+
+    neurites = (
+        (obj,)
+        if isinstance(obj, Neurite)
+        else obj.neurites
+        if hasattr(obj, "neurites")
+        else obj
+    )
+
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
             warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
@@ -249,8 +278,19 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
+    print("use_Subtrees:", use_subtrees)
+    if use_subtrees:
+        neurites = chain.from_iterable(map(extract_subneurites, neurites))
+
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
-    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
+
+    if mapfun is None:
+        return neurite_iter
+
+    if use_subtrees:
+        return (mapfun(neurite, section_type=neurite.type) for neurite in neurite_iter)
+
+    return map(mapfun, neurite_iter)
 
 
 def iter_sections(neurites,
@@ -283,11 +323,8 @@ def iter_sections(neurites,
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-    sections = flatten(
-        iterator_type(neurite.root_node) for neurite in
-        iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
-    )
-
+    neurites = iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
+    sections = flatten(iterator_type(neurite.root_node) for neurite in neurites)
     return sections if section_filter is None else filter(section_filter, sections)
 
 
