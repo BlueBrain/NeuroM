@@ -89,9 +89,11 @@ def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=Ne
 
 
 @feature(shape=())
-def number_of_bifurcations(neurite):
+def number_of_bifurcations(neurite, section_type=NeuriteType.all):
     """Number of bf points."""
-    return number_of_sections(neurite, iterator_type=Section.ibifurcation_point)
+    return number_of_sections(
+        neurite, iterator_type=Section.ibifurcation_point, section_type=section_type
+    )
 
 
 @feature(shape=())
@@ -101,9 +103,9 @@ def number_of_forking_points(neurite):
 
 
 @feature(shape=())
-def number_of_leaves(neurite):
+def number_of_leaves(neurite, section_type=NeuriteType.all):
     """Number of leaves points."""
-    return number_of_sections(neurite, iterator_type=Section.ileaf)
+    return number_of_sections(neurite, iterator_type=Section.ileaf, section_type=section_type)
 
 
 @feature(shape=())
@@ -134,15 +136,15 @@ def _section_length(section):
 
 
 @feature(shape=(...,))
-def section_lengths(neurite):
+def section_lengths(neurite, section_type=NeuriteType.all):
     """Section lengths."""
-    return _map_sections(sf.section_length, neurite)
+    return _map_sections(_section_length, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def section_term_lengths(neurite):
+def section_term_lengths(neurite, section_type=NeuriteType.all):
     """Termination section lengths."""
-    return _map_sections(sf.section_length, neurite, Section.ileaf)
+    return _map_sections(_section_length, neurite, Section.ileaf, section_type)
 
 
 @feature(shape=(...,))
@@ -185,7 +187,7 @@ def section_path_distances(neurite):
 ################################################################################
 
 
-def _map_segments(func, neurite):
+def _map_segments(func, neurite, section_type=NeuriteType.all):
     """Map `func` to all the segments.
 
     `func` accepts a section and returns list of values corresponding to each segment.
@@ -198,36 +200,36 @@ def _map_segments(func, neurite):
 
 
 @feature(shape=(...,))
-def segment_lengths(neurite):
+def segment_lengths(neurite, section_type=NeuriteType.all):
     """Lengths of the segments."""
-    return _map_segments(sf.segment_lengths, neurite)
+    return _map_segments(sf.segment_lengths, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def segment_areas(neurite):
+def segment_areas(neurite, section_type=NeuriteType.all):
     """Areas of the segments."""
-    return _map_segments(sf.segment_areas, neurite)
+    return _map_segments(sf.segment_areas, neurite, section_type)
 
 
 @feature(shape=(...,))
-def segment_volumes(neurite):
+def segment_volumes(neurite, section_type=NeuriteType.all):
     """Volumes of the segments."""
-    return _map_segments(sf.segment_volumes, neurite)
+    return _map_segments(sf.segment_volumes, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def segment_radii(neurite):
+def segment_radii(neurite, section_type=NeuriteType.all):
     """Arithmetic mean of the radii of the points in segments."""
-    return _map_segments(sf.segment_mean_radii, neurite)
+    return _map_segments(sf.segment_radii, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def segment_taper_rates(neurite):
+def segment_taper_rates(neurite, section_type=NeuriteType.all):
     """Diameters taper rates of the segments.
 
     The taper rate is defined as the absolute radii differences divided by length of the section
     """
-    return _map_segments(sf.segment_taper_rates, neurite)
+    return _map_segments(sf.segment_taper_rates, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
@@ -457,27 +459,27 @@ def volume_density(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def section_volumes(neurite):
+def section_volumes(neurite, section_type=NeuriteType.all):
     """Section volumes."""
-    return _map_sections(sf.section_volume, neurite)
+    return _map_sections(sf.section_volume, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def section_areas(neurite):
+def section_areas(neurite, section_type=NeuriteType.all):
     """Section areas."""
-    return _map_sections(sf.section_area, neurite)
+    return _map_sections(sf.section_area, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def section_tortuosity(neurite):
+def section_tortuosity(neurite, section_type=NeuriteType.all):
     """Section tortuosities."""
-    return _map_sections(sf.section_tortuosity, neurite)
+    return _map_sections(sf.section_tortuosity, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
-def section_end_distances(neurite):
+def section_end_distances(neurite, section_type=NeuriteType.all):
     """Section end to end distances."""
-    return _map_sections(sf.section_end_distance, neurite)
+    return _map_sections(sf.section_end_distance, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))

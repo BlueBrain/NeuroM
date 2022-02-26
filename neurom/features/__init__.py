@@ -40,7 +40,7 @@ Examples:
 import inspect
 import operator
 from enum import Enum
-from functools import reduce
+from functools import reduce, partial
 
 from neurom.core import Population, Morphology, Neurite
 from neurom.core.morphology import iter_neurites
@@ -66,12 +66,22 @@ def _flatten_feature(feature_shape, feature_value):
     return reduce(operator.concat, feature_value, [])
 
 
-def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
+def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs, use_subtrees):
     """Collects neurite feature values appropriately to feature's shape."""
     kwargs.pop('neurite_type', None)  # there is no 'neurite_type' arg in _NEURITE_FEATURES
-    return reduce(operator.add,
-                  (feature_(n, **kwargs) for n in iter_neurites(obj, filt=neurite_filter)),
-                  0 if feature_.shape == () else [])
+
+    return reduce(
+        operator.add,
+        (
+            iter_neurites(
+                obj,
+                mapfun=partial(feature_, **kwargs),
+                filt=neurite_filter,
+                use_subtrees=use_subtrees,
+            )
+        ),
+        0 if feature_.shape == () else []
+    )
 
 
 def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs):
@@ -126,7 +136,7 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
         elif feature_name in _NEURITE_FEATURES:
 
             feature_ = _NEURITE_FEATURES[feature_name]
-            res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
+            res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs, use_subtrees)
 
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
@@ -140,7 +150,11 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
             feature_ = _NEURITE_FEATURES[feature_name]
             res = _flatten_feature(
                 feature_.shape,
-                [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
+                [
+                    _get_neurites_feature_value(feature_, n, neurite_filter, kwargs, use_subtrees)
+                    for n in obj
+                ]
+            )
 
     if res is None or feature_ is None:
         raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
