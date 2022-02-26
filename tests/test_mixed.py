@@ -944,28 +944,72 @@ def _neurite_features(mode):
                 "expected_with_subtrees": [0.0] * 3,
             },
         ],
-#        "number_of_bifurcations": [
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.all},
-#                "expected_wout_subtrees": 4,
-#                "expected_with_subtrees": 4,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-#                "expected_wout_subtrees": 3,
-#                "expected_with_subtrees": 1,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.axon},
-#                "expected_wout_subtrees": 0,
-#                "expected_with_subtrees": 1,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-#                "expected_wout_subtrees": 1,
-#                "expected_with_subtrees": 1,
-#            },
-#        ]
+        "number_of_bifurcations": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 4,
+                "expected_with_subtrees": 3,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 3,
+                "expected_with_subtrees": 1,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": 0,
+                "expected_with_subtrees": 1,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 1,
+                "expected_with_subtrees": 1,
+            },
+        ],
+        "number_of_forking_points": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 4,
+                "expected_with_subtrees": 3,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 3,
+                "expected_with_subtrees": 1,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": 0,
+                "expected_with_subtrees": 1,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 1,
+                "expected_with_subtrees": 1,
+            },
+        ],
+        "section_bif_lengths": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": [1., 1.414214, 1.414214, 1.],
+                "expected_with_subtrees": [1., 1.414214, 1.],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": [1., 1.414214, 1.414214],
+                "expected_with_subtrees": [1.],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [1.414214],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": [1.],
+                "expected_with_subtrees": [1.],
+            }
+        ],
     }
 
     features_not_tested = set(_NEURITE_FEATURES) - set(features.keys())

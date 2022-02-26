@@ -63,7 +63,18 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-    return list(map(fun, filter(is_type(section_type), iterator_type(neurite.root_node))))
+
+    check_type = is_type(section_type)
+
+    if (
+        iterator_type in (Section.ibifurcation_point, Section.iforking_point)
+        and section_type != NeuriteType.all
+    ):
+        filt = lambda s: check_type(s) and Section.is_homogeneous_point(s)
+    else:
+        filt = check_type
+
+    return list(map(fun, filter(filt, iterator_type(neurite.root_node))))
 
 
 @feature(shape=())
@@ -97,9 +108,11 @@ def number_of_bifurcations(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=())
-def number_of_forking_points(neurite):
+def number_of_forking_points(neurite, section_type=NeuriteType.all):
     """Number of forking points."""
-    return number_of_sections(neurite, iterator_type=Section.iforking_point)
+    return number_of_sections(
+        neurite, iterator_type=Section.iforking_point, section_type=section_type
+    )
 
 
 @feature(shape=())
@@ -148,9 +161,9 @@ def section_term_lengths(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def section_bif_lengths(neurite):
+def section_bif_lengths(neurite, section_type=NeuriteType.all):
     """Bifurcation section lengths."""
-    return _map_sections(sf.section_length, neurite, Section.ibifurcation_point)
+    return _map_sections(sf.section_length, neurite, Section.ibifurcation_point, section_type)
 
 
 @feature(shape=(...,))

@@ -75,6 +75,10 @@ class Section:
             return self.morphio_section.append_section(section.morphio_section)
         return self.morphio_section.append_section(section)
 
+    def is_homogeneous_point(self):
+        """A section is homogeneous if it has the same type with its children"""
+        return all(c.type == self.type for c in self.children)
+
     def is_forking_point(self):
         """Is this section a forking point?"""
         return len(self.children) > 1
