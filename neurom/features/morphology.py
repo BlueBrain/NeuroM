@@ -43,6 +43,7 @@ The features mechanism does not allow you to apply these features to neurites.
 For more details see :ref:`features`.
 """
 
+import warnings
 
 from functools import partial
 import math
@@ -53,6 +54,7 @@ from neurom.core.morphology import iter_neurites, iter_segments, Morphology
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
+from neurom.exceptions import NeuroMError
 from neurom.features import feature, NameSpace, neurite as nf
 from neurom.utils import str_to_plane
 
@@ -356,6 +358,8 @@ def trunk_origin_radii(
     .. warning::
         If ``min_length_filter`` and / or ``max_length_filter`` is given, the points are filtered
         and the mean radii of the remaining points is returned.
+        Note that if the ``min_length_filter`` is greater than the path distance of the last point
+        of the first section, the radius of this last point is returned.
 
     Args:
         morph: The morphology to process.
@@ -374,18 +378,56 @@ def trunk_origin_radii(
         return [n.root_node.points[0][COLS.R]
                 for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
-    def _mean_radius(points):
+    if min_length_filter is not None and min_length_filter <= 0:
+        raise NeuroMError(
+            "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
+            "than 0."
+        )
+
+    if max_length_filter is not None and max_length_filter <= 0:
+        raise NeuroMError(
+            "In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
+            "than 0."
+        )
+
+    if (
+        min_length_filter is not None
+        and max_length_filter is not None
+        and min_length_filter >= max_length_filter
+    ):
+        raise NeuroMError(
+            "In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the "
+            "'max_length_filter' value."
+        )
+
+    def _mean_radius(neurite):
+        points = neurite.root_node.points
         interval_lengths = morphmath.interval_lengths(points)
         path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
         valid_pts = np.ones(len(path_lengths), dtype=bool)
         if min_length_filter is not None:
             valid_pts = (valid_pts & (path_lengths >= min_length_filter))
+            if not valid_pts.any():
+                warnings.warn(
+                    "In 'trunk_origin_radii': the 'min_length_filter' value is greater than the "
+                    "path distance of the last point of the last section so the radius of this "
+                    "point is returned."
+                )
+                return points[-1, COLS.R]
         if max_length_filter is not None:
-            valid_pts = (valid_pts & (path_lengths <= max_length_filter))
+            valid_max = (path_lengths <= max_length_filter)
+            valid_pts = (valid_pts & valid_max)
+            if not valid_pts.any():
+                warnings.warn(
+                    "In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
+                    "values excluded all the points of the section so the radius of the first "
+                    "point after the 'min_length_filter' path distance is returned."
+                )
+                # pylint: disable=invalid-unary-operand-type
+                return points[~valid_max, COLS.R][0]
         return points[valid_pts, COLS.R].mean()
 
-    return [_mean_radius(n.points)
-            for n in iter_neurites(morph, filt=is_type(neurite_type))]
+    return [_mean_radius(n) for n in iter_neurites(morph, filt=is_type(neurite_type))]
 
 
 @feature(shape=(...,))

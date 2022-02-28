@@ -43,6 +43,8 @@ from numpy.testing import assert_array_equal
 
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
+from neurom.core import Morphology
+from neurom.exceptions import NeuroMError
 from neurom.features import morphology, section
 
 
@@ -151,17 +153,71 @@ def test_trunk_section_lengths():
 
 
 def test_trunk_origin_radii():
-    ret = morphology.trunk_origin_radii(SIMPLE)
+    morph = Morphology(SIMPLE)
+    morph.section(0).diameters = [2, 1]
+    morph.section(3).diameters = [2, 0.5]
+
+    ret = morphology.trunk_origin_radii(morph)
     assert ret == [1.0, 1.0]
 
-    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5)
-    assert_array_almost_equal(ret, [1.0 / 3, 0.0])
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1)
+    assert_array_almost_equal(ret, [0.5, 0.25])
 
-    ret = morphology.trunk_origin_radii(SIMPLE, max_length_filter=15)
-    assert_array_almost_equal(ret, [2.0 / 3, 2.0 / 3])
+    with pytest.warns(
+        UserWarning,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value is greater than the "
+            r"path distance of the last point of the last section so the radius of this "
+            r"point is returned\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=999)
+    assert_array_almost_equal(ret, [0.5, 0.25])
 
-    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5, max_length_filter=15)
-    assert_array_almost_equal(ret, [0.5, 0])
+    ret = morphology.trunk_origin_radii(morph, max_length_filter=15)
+    assert_array_almost_equal(ret, [3.0 / 4, 5.0 / 8])
+
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1, max_length_filter=15)
+    assert_array_almost_equal(ret, [0.5, 0.25])
+
+    with pytest.warns(
+        UserWarning,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
+            r"values excluded all the points of the section so the radius of the first "
+            r"point after the 'min_length_filter' path distance is returned\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=0.1, max_length_filter=0.2)
+    assert_array_almost_equal(ret, [0.5, 0.25])
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
+            r"than 0\."
+
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=-999)
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
+            r"than 0\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, max_length_filter=-999)
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the"
+            r" 'max_length_filter' value\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=15, max_length_filter=5)
 
 
 def test_trunk_origin_azimuths():
