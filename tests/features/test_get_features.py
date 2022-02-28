@@ -717,6 +717,10 @@ def test_sholl_frequency():
 
     assert features.get('sholl_frequency', m, step_size=5.0) == [0, 1, 1, 1]
 
+    # check that if there is not neurite of specific type an empty list is returned
+    assert features.get('sholl_frequency', m, neurite_type=NeuriteType.axon) == []
+
+
 def test_bifurcation_partitions():
     assert_allclose(features.get('bifurcation_partitions', POP)[:10],
                     [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
