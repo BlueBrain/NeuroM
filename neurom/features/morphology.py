@@ -424,7 +424,7 @@ def trunk_origin_radii(
                     "point after the 'min_length_filter' path distance is returned."
                 )
                 # pylint: disable=invalid-unary-operand-type
-                return points[np.argwhere(~valid_max)[0][0], COLS.R]
+                return points[~valid_max, COLS.R][0]
         return points[valid_pts, COLS.R].mean()
 
     return [_mean_radius(n) for n in iter_neurites(morph, filt=is_type(neurite_type))]
