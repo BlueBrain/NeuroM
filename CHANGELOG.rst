@@ -3,10 +3,18 @@ Changelog
 
 Version 3.2.0
 -------------
+- Fix ``neurom.features.morphology.sholl_frequency`` to return an empty list when a
+  neurite_type that is not present in the morphology is specified.
+- Fix ``neurom.features.morphology.trunk_origin_radii`` to warn and use only the root
+  section for the calculation of the path distances. Edge cases from the combination
+  of ``min_length_filter`` and ``max_length_filter`` are addressed.
+- Fix ``neurom.features.morphology.sholl_frequency`` to use soma center in distance
+  calculation, instead of using the origin.
 - Add ``neurom.features.morphology.trunk_angles_inter_types`` and
   ``neurom.features.morphology.trunk_angles_from_vector`` features, make
   ``neurom.features.morphology.trunk_angles`` more generic and add length filter to
   ``neurom.features.morphology.trunk_origin_radii``.
+- Deprecate python3.6
 - Add doc on spherical coordinates.
 
 Version 3.1.0
