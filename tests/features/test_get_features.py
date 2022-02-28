@@ -717,7 +717,7 @@ def test_sholl_frequency():
 
     assert features.get('sholl_frequency', m, step_size=5.0) == [0, 1, 1, 1]
 
-    # check that if there is not neurite of specific type an empty list is returned
+    # check that if there is no neurite of a specific type, an empty list is returned
     assert features.get('sholl_frequency', m, neurite_type=NeuriteType.axon) == []
 
 
