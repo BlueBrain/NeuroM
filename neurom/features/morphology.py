@@ -515,16 +515,24 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         in steps of `step_size`. Each segment of the morphology is tested, so a neurite that
         bends back on itself, and crosses the same Sholl radius will get counted as
         having crossed multiple times.
+
+        If a `neurite_type` is specified and there are no trees corresponding to it, an empty
+        list will be returned.
     """
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
         min_soma_edge = morph.soma.radius
-        max_radii = max(
+
+        max_radius_per_neurite = [
             np.max(np.linalg.norm(n.points[:, COLS.XYZ] - morph.soma.center, axis=1))
             for n in morph.neurites if neurite_filter(n)
-        )
-        bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
+        ]
+
+        if not max_radius_per_neurite:
+            return []
+
+        bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_neurite), step_size)
 
     return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
 
