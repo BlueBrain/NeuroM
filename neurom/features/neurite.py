@@ -1,4 +1,4 @@
-# Copyright (c) 2020, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+    # Copyright (c) 2020, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
@@ -63,14 +63,16 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-
     check_type = is_type(section_type)
+
+    def homogeneous_filter(section):
+        return check_type(section) and Section.is_homogeneous_point(section)
 
     if (
         iterator_type in (Section.ibifurcation_point, Section.iforking_point)
         and section_type != NeuriteType.all
     ):
-        filt = lambda s: check_type(s) and Section.is_homogeneous_point(s)
+        filt = homogeneous_filter
     else:
         filt = check_type
 
@@ -89,14 +91,17 @@ def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
 @feature(shape=())
 def number_of_segments(neurite, section_type=NeuriteType.all):
     """Number of segments."""
-    count_segments = lambda s: len(s.points) - 1
+    def count_segments(section):
+        return len(section.points) - 1
     return sum(_map_sections(count_segments, neurite, section_type=section_type))
 
 
 @feature(shape=())
 def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
-    return len(_map_sections(lambda s: s, neurite, iterator_type=iterator_type, section_type=section_type))
+    return len(
+        _map_sections(lambda s: s, neurite, iterator_type=iterator_type, section_type=section_type)
+    )
 
 
 @feature(shape=())
@@ -187,14 +192,22 @@ def section_term_branch_orders(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def section_path_distances(neurite):
+def section_path_distances(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Path lengths."""
+
+    def takeuntil(predicate, iterable):
+        """Similar to itertools.takewhile but it returns the last element before stopping."""
+        for x in iterable:
+            yield x
+            if predicate(x):
+                break
 
     def pl2(node):
         """Calculate the path length using cached section lengths."""
-        return sum(n.length for n in node.iupstream())
+        sections = takeuntil(lambda s: s.id == neurite.root_node.id, node.iupstream())
+        return sum(n.length for n in sections)
 
-    return _map_sections(pl2, neurite)
+    return _map_sections(pl2, neurite, iterator_type=iterator_type, section_type=section_type)
 
 
 ################################################################################
@@ -445,9 +458,9 @@ def section_bif_radial_distances(neurite, origin=None, section_type=NeuriteType.
 
 
 @feature(shape=(...,))
-def terminal_path_lengths(neurite):
+def terminal_path_lengths(neurite, section_type=NeuriteType.all):
     """Get the path lengths to each terminal point."""
-    return _map_sections(sf.section_path_length, neurite, Section.ileaf)
+    return section_path_distances(neurite, iterator_type=Section.ileaf, section_type=section_type)
 
 
 @feature(shape=())

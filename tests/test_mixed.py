@@ -1490,6 +1490,52 @@ def _neurite_features(mode):
                 "expected_with_subtrees": [1.0],
             },
         ],
+        "section_path_distances": [
+            {
+                # subtree path distances are calculated to the root of the subtree
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": [
+                    1.0, 2.0, 2.0, 1.414213, 3.414216, 2.828427, 3.828427, 3.828427, 1.0, 2.0, 2.0
+                ],
+                "expected_with_subtrees": [
+                    1.0, 2.0, 2.0, 1.414213, 3.414216, 1.414213, 2.414213, 2.414213, 1.0, 2.0, 2.0
+                ]
+
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": [
+                    1.0, 2.0, 2.0, 1.414213, 3.414216, 2.828427, 3.828427, 3.828427],
+                "expected_with_subtrees": [1.0, 2.0, 2.0, 1.414213, 3.414216],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [1.414213, 2.414213, 2.414213],
+            },
+        ],
+        "terminal_path_lengths": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": [2.0, 2.0, 3.414213, 3.828427, 3.828427, 2.0, 2.0],
+                "expected_with_subtrees": [2.0, 2.0, 3.414213, 2.414213, 2.414213, 2.0, 2.0],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": [2.0, 2.0, 3.414213, 3.828427, 3.828427],
+                "expected_with_subtrees": [2.0, 2.0, 3.414213],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [2.414213, 2.414213],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": [2.0, 2.0],
+                "expected_with_subtrees": [2.0, 2.0],
+            },
+        ],
     }
 
     features_not_tested = list(

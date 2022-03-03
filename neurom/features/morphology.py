@@ -484,6 +484,7 @@ def trunk_origin_radii(
                     "values excluded all the points of the section so the radius of the first "
                     "point after the 'min_length_filter' path distance is returned."
                 )
+                # pylint: disable = invalid-unary-operand-type
                 return points[~valid_max, COLS.R][0]
 
         return points[valid_pts, COLS.R].mean()
@@ -605,6 +606,7 @@ def sholl_frequency(
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
         intervals of step_size between min and max radii of ``morphologies``.
+        use_subtrees: Enable mixed subtree processing
 
     Note:
         Given a morphology, the soma center is used for the concentric circles,

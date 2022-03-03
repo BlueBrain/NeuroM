@@ -76,7 +76,7 @@ class Section:
         return self.morphio_section.append_section(section)
 
     def is_homogeneous_point(self):
-        """A section is homogeneous if it has the same type with its children"""
+        """A section is homogeneous if it has the same type with its children."""
         return all(c.type == self.type for c in self.children)
 
     def is_forking_point(self):
@@ -216,9 +216,11 @@ NRN_ORDER = {NeuriteType.soma: 0,
 
 
 def _homogeneous_subtrees(neurite):
-    """Returns a dictionary the keys of which are section types and the values are the
-    sub-neurites. A sub-neurite can be either the entire tree or a homogeneous downstream
+    """Returns a dictionary the keys of which are section types and the values are the sub-neurites.
+
+    A sub-neurite can be either the entire tree or a homogeneous downstream
     sub-tree.
+
     Note: Only two different mixed types are allowed
     """
     homogeneous_neurites = {neurite.root_node.type: neurite}
@@ -342,6 +344,7 @@ def iter_segments(
         neurite_order: order upon which neurite should be iterated. Values:
             - NeuriteIter.FileOrder: order of appearance in the file
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter
 
     Note:
         This is a convenience function provided for generic access to
@@ -439,7 +442,7 @@ class Neurite:
         return total_volume(self)
 
     def is_heterogeneous(self) -> bool:
-        """Returns true if the neurite consists of more that one section types"""
+        """Returns true if the neurite consists of more that one section types."""
         return self.morphio_root_node.is_heterogeneous()
 
     def iter_sections(self, order=Section.ipreorder, neurite_order=NeuriteIter.FileOrder):
