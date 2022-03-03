@@ -227,9 +227,6 @@ def _homogeneous_subtrees(neurite):
     for section in neurite.root_node.ipreorder():
         if section.type not in homogeneous_neurites:
             homogeneous_neurites[section.type] = Neurite(section.morphio_section)
-    if len(homogeneous_neurites) != 2:
-        raise TypeError(
-            f"Subtree types must be exactly two. Found {len(homogeneous_neurites)} instead.")
     return list(homogeneous_neurites.values())
 
 
