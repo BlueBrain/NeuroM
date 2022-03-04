@@ -480,6 +480,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
     def get_points(section):
         return section.points[:, COLS.XYZ].tolist()
 
+    # note: duplicate points included but not affect the convex hull calculation
     points = list(
         chain.from_iterable(_map_sections(get_points, neurite, section_type=section_type))
     )
@@ -521,14 +522,22 @@ def section_end_distances(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def principal_direction_extents(neurite, direction=0):
+def principal_direction_extents(neurite, direction=0, section_type=NeuriteType.all):
     """Principal direction extent of neurites in morphologies.
 
     Note:
         Principal direction extents are always sorted in descending order. Therefore,
         by default the maximal principal direction extent is returned.
     """
-    return [morphmath.principal_direction_extent(neurite.points[:, COLS.XYZ])[direction]]
+    def get_points(section):
+        return section.points[:, COLS.XYZ].tolist()
+
+    # Note: duplicate points are included and need to be removed
+    points = list(
+        chain.from_iterable(_map_sections(get_points, neurite, section_type=section_type))
+    )
+
+    return [morphmath.principal_direction_extent(np.unique(points, axis=0))[direction]]
 
 
 @feature(shape=(...,))

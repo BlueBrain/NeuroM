@@ -1536,16 +1536,39 @@ def _neurite_features(mode):
                 "expected_with_subtrees": [2.0, 2.0],
             },
         ],
+        "principal_direction_extents": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": [2.25, 3.395976, 2.0],
+                "expected_with_subtrees": [2.25, 2.359056, 2.828427, 2.0],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": [2.25, 3.395976],
+                "expected_with_subtrees": [2.25, 2.359056],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [2.828427],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": [2.0],
+                "expected_with_subtrees": [2.0],
+            },
+        ]
+
     }
 
     features_not_tested = list(
         set(_NEURITE_FEATURES) - set(features.keys()) - set(_MORPHOLOGY_FEATURES)
     )
 
-#    assert not features_not_tested, (
-#        "The following morphology tests need to be included in the tests:\n\n" +
-#        "\n".join(sorted(features_not_tested)) + "\n"
-#    )
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the tests:\n\n" +
+        "\n".join(sorted(features_not_tested)) + "\n"
+    )
 
     return _dispatch_features(features, mode)
 
