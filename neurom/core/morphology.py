@@ -390,7 +390,7 @@ class Neurite:
         Arguments:
             order: section iteration order within a given neurite. Must be one of:
                 Section.ipreorder: Depth-first pre-order iteration of tree nodes
-                Section.ipreorder: Depth-first post-order iteration of tree nodes
+                Section.ipostorder: Depth-first post-order iteration of tree nodes
                 Section.iupstream: Iterate from a tree node to the root nodes
                 Section.ibifurcation_point: Iterator to bifurcation points
                 Section.ileaf: Iterator to all leaves of a tree
