@@ -457,11 +457,7 @@ def volume_density(neurite):
     .. note:: Returns `np.nan` if the convex hull computation fails.
     """
     neurite_hull = convex_hull(neurite.points[:, COLS.XYZ])
-
-    if neurite_hull is None:
-        return np.nan
-
-    return neurite.volume / neurite_hull.volume
+    return neurite.volume / neurite_hull.volume if neurite_hull is not None else np.nan
 
 
 @feature(shape=(...,))
