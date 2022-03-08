@@ -48,7 +48,6 @@ from functools import partial
 from itertools import chain
 
 import numpy as np
-import scipy
 from neurom import morphmath
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS

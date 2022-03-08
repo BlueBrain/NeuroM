@@ -51,7 +51,7 @@ def bounding_box(obj):
 
 
 def convex_hull(point_data):
-    """Get the convex hull from point data
+    """Get the convex hull from point data.
 
     Returns:
         scipy.spatial.ConvexHull object if successful, otherwise None
