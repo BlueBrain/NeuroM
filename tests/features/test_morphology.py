@@ -619,7 +619,7 @@ def test_volume_density():
     """)
 
     # the neurites sprout from the center of a cube to its vertices, therefore the convex hull
-    # is the cube itself of side 2.0
+    # is the cube itself of side 1.0
     expected_hull_volume = 1.0
 
     # diagonal - radius
