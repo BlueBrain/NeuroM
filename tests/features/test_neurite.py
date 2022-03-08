@@ -65,7 +65,7 @@ def test_number_of_leaves():
 
 def test_neurite_volume_density():
     vol = np.array(morphology.total_volume_per_neurite(NRN))
-    hull_vol = np.array([convex_hull(n).volume for n in nm.iter_neurites(NRN)])
+    hull_vol = np.array([convex_hull(n.points).volume for n in nm.iter_neurites(NRN)])
 
     vol_density = [neurite.volume_density(s) for s in NRN.neurites]
     assert len(vol_density) == 4
@@ -77,10 +77,18 @@ def test_neurite_volume_density():
 
 
 def test_neurite_volume_density_failed_convex_hull():
-    with patch('neurom.features.neurite.convex_hull',
-               side_effect=scipy.spatial.qhull.QhullError('boom')):
-        vol_density = neurite.volume_density(NRN)
-        assert vol_density, np.nan
+
+    flat_neuron = nm.load_morphology(
+    """
+    1  1   0  0  0  0.5 -1
+    2  3   1  0  0  0.1  1
+    3  3   2  0  0  0.1  2
+    """,
+    reader="swc")
+
+    assert np.isnan(
+        neurite.volume_density(flat_neuron.neurites[0])
+    )
 
 
 def test_terminal_path_length_per_neurite():

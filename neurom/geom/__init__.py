@@ -28,10 +28,16 @@
 
 """Geometrical Operations for NeuroM."""
 
+import logging
+
 import numpy as np
 from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
 from neurom.core.dataformat import COLS
 from neurom.geom.transform import translate, rotate
+
+
+L = logging.getLogger(__name__)
 
 
 def bounding_box(obj):
@@ -44,10 +50,18 @@ def bounding_box(obj):
                      np.max(obj.points[:, COLS.XYZ], axis=0)])
 
 
-def convex_hull(obj):
-    """Get the convex hull of an object containing points.
+def convex_hull(point_data):
+    """Get the convex hull from point data
 
     Returns:
-        scipy.spatial.ConvexHull object built from obj.points
+        scipy.spatial.ConvexHull object if successful, otherwise None
     """
-    return ConvexHull(obj.points[:, COLS.XYZ])
+    assert len(point_data) > 0, "Empty array passed to convex hull function."
+
+    points = np.asarray(point_data)[:, COLS.XYZ]
+    try:
+        return ConvexHull(points)
+    except QhullError:
+        L.exception('Failure to compute neurite volume using the convex hull. '
+                    'Feature `volume_density` will return `np.nan`.\n')
+        return None

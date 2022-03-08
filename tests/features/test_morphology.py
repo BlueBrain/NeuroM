@@ -594,3 +594,74 @@ def test_total_depth():
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.axon), 0.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.basal_dendrite), 2.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.apical_dendrite), 3.0)
+
+
+def test_volume_density():
+
+    morph = load_swc("""
+        1  1   0.5      0.5      0.5        0.5 -1
+        2  3   0.211324 0.211324 0.788675   0.1  1
+        3  3   0.0      0.0      1.0        0.1  2
+        4  3   0.211324 0.788675 0.788675   0.1  1
+        5  3   0.0      1.0      1.0        0.1  4
+        6  3   0.788675 0.211324 0.788675   0.1  1
+        7  3   1.0      0.0      1.0        0.1  6
+        8  3   0.211324 0.211324 0.211324   0.1  1
+        9  3   0.0      0.0      0.0        0.1  8
+       10  3   0.211324 0.788675 0.211324   0.1  1
+       11  3   0.0      1.0      0.0        0.1  10
+       12  5   0.788675 0.788675 0.211324   0.1  1
+       13  5   1.0      1.0      0.0        0.1  12
+       14  2   0.788675 0.211324 0.211324   0.1  1
+       15  2   1.0      0.0      0.0        0.1  14
+       16  3   0.788675 0.788675 0.788675   0.1  1
+       17  3   1.0      1.0      1.0        0.1  16
+    """)
+
+    # the neurites sprout from the center of a cube to its vertices, therefore the convex hull
+    # is the cube itself of side 2.0
+    expected_hull_volume = 1.0
+
+    # diagonal - radius
+    expected_neurite_length = np.sqrt(3) * 0.5 - 0.5
+
+    # distance from center of unit cube to its vertices is sqrt(3)
+    expected_neurite_volume = np.pi * 0.1**2 * expected_neurite_length * 8
+
+    expected_volume_density = expected_neurite_volume / expected_hull_volume
+
+    assert_almost_equal(
+        morphology.volume_density(morph),
+        expected_volume_density,
+        decimal=5
+    )
+    assert_almost_equal(
+        morphology.volume_density(morph, neurite_type=NeuriteType.all),
+        expected_volume_density,
+        decimal=5
+    )
+
+    # (0 0 1) (0 1 1) (0 0 0) (0 1 0) (1 0 1)(1 1 1)
+    # form a triangular prism
+    # Volume = triangle_area * depth = 0.5 * 1. * 1. * 1.
+    expected_hull_volume = 0.5
+
+    expected_neurite_volume = np.pi * 0.1**2 * expected_neurite_length * 6
+
+    expected_volume_density = expected_neurite_volume / expected_hull_volume
+
+    assert_almost_equal(
+        morphology.volume_density(morph, neurite_type=NeuriteType.basal_dendrite),
+        expected_volume_density,
+        decimal=5
+    )
+
+    # invalid convex hull
+    assert np.isnan(
+        morphology.volume_density(morph, neurite_type=NeuriteType.axon),
+    )
+
+    # no points
+    assert np.isnan(
+        morphology.volume_density(morph, neurite_type=NeuriteType.apical_dendrite),
+    )
