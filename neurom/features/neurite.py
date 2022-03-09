@@ -334,7 +334,9 @@ def remote_bifurcation_angles(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
+def partition_asymmetry(
+    neurite, variant='branch-order', method='petilla', section_type=NeuriteType.all
+):
     """Partition asymmetry at bf points.
 
     Variant: length is a different definition, as the absolute difference in
@@ -350,10 +352,25 @@ def partition_asymmetry(neurite, variant='branch-order', method='petilla'):
                          'either "petilla" or "uylings"')
 
     if variant == 'branch-order':
+
+        def it_type(section):
+
+            if section_type == NeuriteType.all:
+                return Section.ipreorder(section)
+
+            check = is_type(section_type)
+            return (s for s in section.ipreorder() if check(s))
+
+        function = partial(
+            bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type
+        )
+
         return _map_sections(
-            partial(bf.partition_asymmetry, uylings=method == 'uylings'),
+            function,
             neurite,
-            Section.ibifurcation_point)
+            iterator_type=Section.ibifurcation_point,
+            section_type=section_type
+        )
 
     asymmetries = []
     neurite_length = total_length(neurite)
