@@ -441,10 +441,10 @@ def segment_taper_rate(seg):
 def pca(points):
     """Estimate the principal components of the covariance on the given point cloud.
 
-    Input
-        A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
+    Args:
+        points: A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
 
-    Ouptut
+    Returns:
         Eigenvalues and respective eigenvectors
     """
     return np.linalg.eig(np.cov(points.transpose()))
@@ -474,8 +474,10 @@ def principal_direction_extent(points):
         eigs : eigenvalues of the covariance matrix
         eigv : respective eigenvectors of the covariance matrix
     """
+    # pca can be biased by duplicate points
+    points = np.unique(points, axis=0)
+
     # center the points around 0.0
-    points = np.copy(points)
     points -= np.mean(points, axis=0)
 
     # principal components
