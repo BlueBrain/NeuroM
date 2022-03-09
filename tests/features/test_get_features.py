@@ -496,7 +496,7 @@ def test_morphology_volume_density():
         features.get("volume_density", neu) for neu in NEURON.neurites
     )
 
-    # calculating the convex hull per neurite, results into smaller hull volumes and higher
+    # calculating the convex hull per neurite results into smaller hull volumes and higher
     # neurite_volume / hull_volume ratios
     assert not np.isclose(volume_density, volume_density_from_neurites)
     assert volume_density < volume_density_from_neurites
