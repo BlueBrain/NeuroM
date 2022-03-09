@@ -579,7 +579,7 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     """Get the volume density.
 
     The volume density is defined as the ratio of the neurite volume and
-    the volume of the neurite's enclosing convex hull
+    the volume of the morphology's enclosing convex hull
 
     .. note:: Returns `np.nan` if the convex hull computation fails or there are not points
               available due to neurite type filtering.
