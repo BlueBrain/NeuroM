@@ -87,3 +87,8 @@ def test_convex_hull_volume():
     # to re-test scipy, so simply regression test the volume
     hull = geom.convex_hull(NRN.points[:, COLS.XYZ])
     assert_almost_equal(hull.volume, 208641, decimal=0)
+
+
+def test_convex_hull_invalid():
+    assert geom.convex_hull([]) is None
+    assert geom.convex_hull([[1., 0., 0.], [1., 0., 0.]]) is None

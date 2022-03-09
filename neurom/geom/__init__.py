@@ -56,12 +56,18 @@ def convex_hull(point_data):
     Returns:
         scipy.spatial.ConvexHull object if successful, otherwise None
     """
-    assert len(point_data) > 0, "Empty array passed to convex hull function."
+    if len(point_data) == 0:
+        L.exception(
+            "Failure to compute convex hull because there are no points"
+        )
+        return None
 
     points = np.asarray(point_data)[:, COLS.XYZ]
+
     try:
         return ConvexHull(points)
     except QhullError:
-        L.exception('Failure to compute neurite volume using the convex hull. '
-                    'Feature `volume_density` will return `np.nan`.\n')
+        L.exception(
+            "Failure to compute convex hull because points like on a 2D plane."
+        )
         return None
