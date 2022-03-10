@@ -115,12 +115,13 @@ def partition_asymmetry(bif_point, uylings=False):
 
     n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
     m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    c = 0
-    if uylings:
-        c = 2
-        if n + m <= c:
-            raise NeuroMError('Partition asymmetry cant be calculated by Uylings because the sum of'
-                              'terminal tips is less than 2.')
+
+    if n == m == 1:
+        # By definition the asymmetry A(1, 1) is zero
+        return 0.0
+
+    c = 2.0 if uylings else 0.0
+
     return abs(n - m) / abs(n + m - c)
 
 

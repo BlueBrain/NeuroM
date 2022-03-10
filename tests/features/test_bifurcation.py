@@ -80,8 +80,7 @@ def test_partition_asymmetry():
     assert bf.partition_asymmetry(root) == 0.5
     assert bf.partition_asymmetry(root.children[0]) == 0.0
     assert bf.partition_asymmetry(root, True) == 1.0
-    with pytest.raises(NeuroMError, match='Uylings'):
-        bf.partition_asymmetry(root.children[0], True)
+    assert bf.partition_asymmetry(root.children[0], True) == 0.0
 
     leaf = root.children[0].children[0]
     assert_raises(NeuroMError, bf.partition_asymmetry, leaf)
