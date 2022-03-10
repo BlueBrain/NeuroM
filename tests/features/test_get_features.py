@@ -486,6 +486,22 @@ def test_neurite_density():
         (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469))
 
 
+def test_morphology_volume_density():
+
+    volume_density = features.get("volume_density", NEURON)
+
+    # volume density should not be calculated as the sum of the neurite volume densities,
+    # because it is not additive
+    volume_density_from_neurites = sum(
+        features.get("volume_density", neu) for neu in NEURON.neurites
+    )
+
+    # calculating the convex hull per neurite results into smaller hull volumes and higher
+    # neurite_volume / hull_volume ratios
+    assert not np.isclose(volume_density, volume_density_from_neurites)
+    assert volume_density < volume_density_from_neurites
+
+
 def test_section_lengths():
     ref_seclen = [n.length for n in iter_sections(NEURON)]
     seclen = features.get('section_lengths', NEURON)

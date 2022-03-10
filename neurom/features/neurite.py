@@ -48,7 +48,6 @@ from functools import partial
 from itertools import chain
 
 import numpy as np
-import scipy
 from neurom import morphmath
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
@@ -457,14 +456,8 @@ def volume_density(neurite):
 
     .. note:: Returns `np.nan` if the convex hull computation fails.
     """
-    try:
-        volume = convex_hull(neurite).volume
-    except scipy.spatial.qhull.QhullError:
-        L.exception('Failure to compute neurite volume using the convex hull. '
-                    'Feature `volume_density` will return `np.nan`.\n')
-        return np.nan
-
-    return neurite.volume / volume
+    neurite_hull = convex_hull(neurite.points[:, COLS.XYZ])
+    return neurite.volume / neurite_hull.volume if neurite_hull is not None else np.nan
 
 
 @feature(shape=(...,))

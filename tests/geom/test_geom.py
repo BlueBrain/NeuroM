@@ -31,6 +31,7 @@ from pathlib import Path
 import neurom as nm
 import numpy as np
 from neurom import geom
+from neurom.core.dataformat import COLS
 from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent / 'data/swc'
@@ -76,7 +77,7 @@ def test_convex_hull_points():
 
     # This leverages scipy ConvexHull and we don't want
     # to re-test scipy, so simply check that the points are the same.
-    hull = geom.convex_hull(NRN)
+    hull = geom.convex_hull(NRN.points[:, COLS.XYZ])
     assert np.alltrue(hull.points == NRN.points[:, :3])
 
 
@@ -84,5 +85,10 @@ def test_convex_hull_volume():
 
     # This leverages scipy ConvexHull and we don't want
     # to re-test scipy, so simply regression test the volume
-    hull = geom.convex_hull(NRN)
+    hull = geom.convex_hull(NRN.points[:, COLS.XYZ])
     assert_almost_equal(hull.volume, 208641, decimal=0)
+
+
+def test_convex_hull_invalid():
+    assert geom.convex_hull([]) is None
+    assert geom.convex_hull([[1., 0., 0.], [1., 0., 0.]]) is None

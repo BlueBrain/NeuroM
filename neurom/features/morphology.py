@@ -57,6 +57,7 @@ from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
 from neurom.features import feature, NameSpace, neurite as nf
 from neurom.utils import str_to_plane
+from neurom.geom import convex_hull
 
 
 feature = partial(feature, namespace=NameSpace.NEURON)
@@ -276,7 +277,7 @@ def trunk_angles_inter_types(
     if len(source_vectors) == 0 or len(target_vectors) == 0:
         return []
 
-    angles = np.empty((len(source_vectors), len(target_vectors), 3), dtype=np.float)
+    angles = np.empty((len(source_vectors), len(target_vectors), 3), dtype=float)
 
     for i, source in enumerate(source_vectors):
         for j, target in enumerate(target_vectors):
@@ -571,3 +572,34 @@ def total_height(morph, neurite_type=NeuriteType.all):
 def total_depth(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis z."""
     return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)
+
+
+@feature(shape=())
+def volume_density(morph, neurite_type=NeuriteType.all):
+    """Get the volume density.
+
+    The volume density is defined as the ratio of the neurite volume and
+    the volume of the morphology's enclosing convex hull
+
+    .. note:: Returns `np.nan` if the convex hull computation fails or there are not points
+              available due to neurite type filtering.
+    """
+
+    def get_points(neurite):
+        return neurite.points[:, COLS.XYZ]
+
+    # note: duplicate points are present but do not affect convex hull calculation
+    points = [
+        point
+        for point_list in iter_neurites(morph, mapfun=get_points, filt=is_type(neurite_type))
+        for point in point_list
+    ]
+
+    morph_hull = convex_hull(points)
+
+    if morph_hull is None:
+        return np.nan
+
+    total_volume = sum(iter_neurites(morph, mapfun=nf.total_volume, filt=is_type(neurite_type)))
+
+    return total_volume / morph_hull.volume
