@@ -502,16 +502,9 @@ def volume_density(neurite, section_type=NeuriteType.all):
         chain.from_iterable(_map_sections(get_points, neurite, section_type=section_type))
     )
 
-    try:
+    hull = convex_hull(points)
 
-        volume = convex_hull(points).volume
-
-    except scipy.spatial.qhull.QhullError:
-        L.exception('Failure to compute neurite volume using the convex hull. '
-                    'Feature `volume_density` will return `np.nan`.\n')
-        return np.nan
-
-    return neurite_volume / volume
+    return neurite_volume / hull.volume if hull is not None else np.nan
 
 
 @feature(shape=(...,))

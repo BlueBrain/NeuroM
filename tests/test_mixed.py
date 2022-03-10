@@ -578,6 +578,28 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 2.0,
             },
         ],
+        "volume_density": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 0.01570426,
+                "expected_with_subtrees": 0.01570426,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 0.02983588,
+                "expected_with_subtrees": 0.04907583,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": np.nan,
+                "expected_with_subtrees": 0.17009254,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 0.23561945,
+                "expected_with_subtrees": 0.23561945,
+            },
+        ],
     }
 
     features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
@@ -1443,28 +1465,6 @@ def _neurite_features(mode):
                 "expected_with_subtrees": 2,
             },
         ],
-#        "volume_density": [
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.all},
-#                "expected_wout_subtrees": 0.5350236198351997,
-#                "expected_with_subtrees": 0.5350236198351997,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-#                "expected_wout_subtrees": np.nan,
-#                "expected_with_subtrees": np.nan,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.axon},
-#                "expected_wout_subtrees": 0,
-#                "expected_with_subtrees": np.nan,
-#            },
-#            {
-#                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-#                "expected_wout_subtrees": np.nan,
-#                "expected_with_subtrees": np.nan,
-#            },
-#        ],
         "local_bifurcation_angles": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},

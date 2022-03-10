@@ -685,11 +685,11 @@ def total_height(morph, neurite_type=NeuriteType.all, use_subtrees=False):
 @feature(shape=())
 def total_depth(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Extent of morphology along axis z."""
-    return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)
+    return _extent_along_axis(morph, COLS.Z, neurite_type, use_subtrees)
 
 
 @feature(shape=())
-def volume_density(morph, neurite_type=NeuriteType.all):
+def volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Get the volume density.
 
     The volume density is defined as the ratio of the neurite volume and
@@ -698,11 +698,36 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     .. note:: Returns `np.nan` if the convex hull computation fails or there are not points
               available due to neurite type filtering.
     """
+<<<<<<< HEAD
     # note: duplicate points are present but do not affect convex hull calculation
     points = [
         point
         for point_list in iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
         for point in point_list
+=======
+
+    def get_points(neurite, section_type=NeuriteType.all):
+
+        if section_type == NeuriteType.all:
+            return neurite.points[:, COLS.XYZ]
+
+        return [
+            point
+            for section in neurite.root_node.ipreorder() if section.type == section_type
+            for point in section.points[:, COLS.XYZ]
+        ]
+
+    # note: duplicate points are present but do not affect convex hull calculation
+    points = [
+        point
+        for list_of_points in iter_neurites(
+            morph,
+            mapfun=get_points,
+            filt=is_type(neurite_type),
+            use_subtrees=use_subtrees,
+        )
+        for point in list_of_points
+>>>>>>> Add more complex test morph, update features
     ]
 
     if not points:
@@ -713,7 +738,9 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     if morph_hull is None:
         return np.nan
 
-    total_volume = sum(iter_neurites(morph, mapfun=nf.total_volume, filt=is_type(neurite_type)))
+    total_volume = sum(total_volume_per_neurite(
+        morph, neurite_type=neurite_type, use_subtrees=use_subtrees)
+    )
 
     return total_volume / morph_hull.volume
 
