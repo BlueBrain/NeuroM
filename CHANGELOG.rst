@@ -4,6 +4,7 @@ Changelog
 Version 3.2.0
 -------------
 
+- Fix warning system so that it doesn't change the pre-existing warnings configuration
 - Fix ``neurom.features.bifurcation.partition_asymmetry`` Uylings variant to not throw
   for bifurcations with leaves.
 - Fix ``neurom.features.neurite.principal_direction_extents`` to remove duplicate points

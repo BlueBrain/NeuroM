@@ -39,9 +39,9 @@ from neurom.core.dataformat import COLS
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
-    warnings.simplefilter('always', DeprecationWarning)
-    warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
-    warnings.simplefilter('default', DeprecationWarning)
+    with warnings.catch_warnings():
+        warnings.simplefilter("always", DeprecationWarning)
+        warnings.warn(msg, category=DeprecationWarning, stacklevel=3)
 
 
 def deprecated(fun_name=None, msg=""):

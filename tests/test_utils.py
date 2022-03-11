@@ -29,10 +29,25 @@
 """Test neurom.utils."""
 import json
 import warnings
+from copy import deepcopy
 
 import numpy as np
 from neurom import utils as nu
 import pytest
+
+
+def test_warn_deprecated():
+
+    with pytest.warns(DeprecationWarning, match="foo"):
+
+        warnings.simplefilter("error")
+        pre_existing_filters = deepcopy(warnings.filters)
+
+        nu.warn_deprecated(msg="foo")
+
+        # ensure that the warning didn't change the
+        # pre_existing warnings configuration
+        assert pre_existing_filters == warnings.filters, "Pre-existing configuration is changed."
 
 
 def test_deprecated():
