@@ -40,7 +40,7 @@ from neurom.core.dataformat import COLS
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
     with warnings.catch_warnings():
-        warnings.simplefilter("always", DeprecationWarning)
+        warnings.simplefilter("once", DeprecationWarning)
         warnings.warn(msg, category=DeprecationWarning, stacklevel=3)
 
 
