@@ -38,4 +38,4 @@ class ConfigError(NeuroMError):
 
 
 class NeuroMDeprecationWarning(UserWarning):
-    """NeuroM deprecation warning"""
+    """NeuroM deprecation warning for users."""

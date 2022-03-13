@@ -37,8 +37,6 @@ import numpy as np
 from neurom.core.dataformat import COLS
 from neurom.exceptions import NeuroMDeprecationWarning
 
-import warnings
-
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
