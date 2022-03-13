@@ -55,6 +55,7 @@ Examples:
     >>> mapping = lambda n : len(n.points)
     >>> n_points = [n for n in nm.iter_neurites(pop, mapping, filter)]
 """
+import warnings
 
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType, NeuriteIter, NEURITES as NEURITE_TYPES
@@ -63,6 +64,11 @@ from neurom.core.morphology import graft_morphology, iter_neurites, iter_section
 from neurom.features import get
 from neurom.io.utils import MorphLoader, load_morphology, load_morphologies
 from neurom.io.utils import load_neuron, load_neurons
+from neurom.exceptions import NeuroMDeprecationWarning
+
+warnings.filterwarnings(
+    "once", message=".*", category=NeuroMDeprecationWarning, module="neurom.*"
+)
 
 APICAL_DENDRITE = NeuriteType.apical_dendrite
 BASAL_DENDRITE = NeuriteType.basal_dendrite

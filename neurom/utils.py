@@ -35,13 +35,14 @@ from functools import wraps
 import numpy as np
 
 from neurom.core.dataformat import COLS
+from neurom.exceptions import NeuroMDeprecationWarning
+
+import warnings
 
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
-    with warnings.catch_warnings():
-        warnings.simplefilter("always", DeprecationWarning)
-        warnings.warn(msg, category=DeprecationWarning, stacklevel=3)
+    warnings.warn(msg, category=NeuroMDeprecationWarning, stacklevel=2)
 
 
 def deprecated(fun_name=None, msg=""):
