@@ -1723,7 +1723,69 @@ def _neurite_features(mode):
                 "expected_wout_subtrees": [0.5, 0.0],
                 "expected_with_subtrees": [0.5, 0.0],
             },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.all,
+                    "variant": "length",
+                },
+                "expected_wout_subtrees": [0.4, 0.0, 0.130601, 0.0, 0.184699, 0.0, 0.4, 0.0],
+                "expected_with_subtrees": [0.4, 0.0, 0.0, 0.369398, 0.0, 0.4, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.basal_dendrite,
+                    "variant": "length",
+                },
+                "expected_wout_subtrees": [0.4, 0.0, 0.130601, 0.0, 0.184699, 0.0],
+                "expected_with_subtrees": [0.4, 0.0, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.axon,
+                    "variant": "length",
+                },
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [0.369398, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.apical_dendrite,
+                    "variant": "length",
+                },
+                "expected_wout_subtrees": [0.4, 0.0],
+                "expected_with_subtrees": [0.4, 0.0],
+            },
         ],
+        "partition_asymmetry_length": [
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.all,
+                },
+                "expected_wout_subtrees": [0.4, 0.0, 0.130601, 0.0, 0.184699, 0.0, 0.4, 0.0],
+                "expected_with_subtrees": [0.4, 0.0, 0.0, 0.369398, 0.0, 0.4, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.basal_dendrite,
+                },
+                "expected_wout_subtrees": [0.4, 0.0, 0.130601, 0.0, 0.184699, 0.0],
+                "expected_with_subtrees": [0.4, 0.0, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.axon,
+                },
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [0.369398, 0.0],
+            },
+            {
+                "kwargs": {
+                    "neurite_type": NeuriteType.apical_dendrite,
+                },
+                "expected_wout_subtrees": [0.4, 0.0],
+                "expected_with_subtrees": [0.4, 0.0],
+            },
+        ]
     }
 
     features_not_tested = list(
@@ -1737,13 +1799,13 @@ def _neurite_features(mode):
 
     return _dispatch_features(features, mode)
 
-
+'''
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _neurite_features(mode="wout-subtrees")
 )
 def test_morphology__neurite_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
     _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=False)
-
+'''
 
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _neurite_features(mode="with-subtrees")

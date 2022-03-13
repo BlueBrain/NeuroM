@@ -69,7 +69,7 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
         return check_type(section) and Section.is_homogeneous_point(section)
 
     if (
-        iterator_type in (Section.ibifurcation_point, Section.iforking_point)
+        iterator_type in {Section.ibifurcation_point, Section.iforking_point}
         and section_type != NeuriteType.all
     ):
         filt = homogeneous_filter
@@ -351,15 +351,15 @@ def partition_asymmetry(
         raise ValueError('Please provide a valid method for partition asymmetry,'
                          'either "petilla" or "uylings"')
 
+    def it_type(section):
+
+        if section_type == NeuriteType.all:
+            return Section.ipreorder(section)
+
+        check = is_type(section_type)
+        return (s for s in section.ipreorder() if check(s))
+
     if variant == 'branch-order':
-
-        def it_type(section):
-
-            if section_type == NeuriteType.all:
-                return Section.ipreorder(section)
-
-            check = is_type(section_type)
-            return (s for s in section.ipreorder() if check(s))
 
         function = partial(
             bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type
@@ -372,22 +372,30 @@ def partition_asymmetry(
             section_type=section_type
         )
 
-    asymmetries = []
-    neurite_length = total_length(neurite)
-    for section in Section.ibifurcation_point(neurite.root_node):
-        pathlength_diff = abs(sf.downstream_pathlength(section.children[0]) -
-                              sf.downstream_pathlength(section.children[1]))
-        asymmetries.append(pathlength_diff / neurite_length)
-    return asymmetries
+    neurite_length = total_length(neurite, section_type=section_type)
+
+    def pathlength_asymmetry_ratio(section):
+        pathlength_diff = abs(
+            sf.downstream_pathlength(section.children[0], iterator_type=it_type) -
+            sf.downstream_pathlength(section.children[1], iterator_type=it_type)
+        )
+        return pathlength_diff / neurite_length
+
+    return _map_sections(
+        pathlength_asymmetry_ratio,
+        neurite,
+        iterator_type=Section.ibifurcation_point,
+        section_type=section_type
+    )
 
 
 @feature(shape=(...,))
-def partition_asymmetry_length(neurite, method='petilla'):
+def partition_asymmetry_length(neurite, method='petilla', section_type=NeuriteType.all):
     """'partition_asymmetry' feature with `variant='length'`.
 
     Because it is often used, it has a dedicated feature.
     """
-    return partition_asymmetry(neurite, 'length', method)
+    return partition_asymmetry(neurite, 'length', method, section_type=section_type)
 
 
 @feature(shape=(...,))

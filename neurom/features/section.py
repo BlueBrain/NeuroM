@@ -33,6 +33,7 @@ import numpy as np
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
+from neurom.core.morphology import Section
 from neurom.morphmath import interval_lengths
 
 
@@ -213,6 +214,6 @@ def section_mean_radius(section):
     return np.sum(mean_radii * lengths) / np.sum(lengths)
 
 
-def downstream_pathlength(section):
+def downstream_pathlength(section, iterator_type=Section.ipreorder):
     """Compute the total downstream length starting from a section."""
-    return sum(sec.length for sec in section.ipreorder())
+    return sum(sec.length for sec in iterator_type(section))
