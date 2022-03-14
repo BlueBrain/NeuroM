@@ -45,15 +45,18 @@ import numpy as np
 
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
+from neurom.core.morphology import iter_sections
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import feature, NameSpace
-from neurom.features.morphology import sholl_crossings
+from neurom.features import morphology as mf
 
 feature = partial(feature, namespace=NameSpace.POPULATION)
 
 
 @feature(shape=(...,))
-def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=None):
+def sholl_frequency(
+    morphs, neurite_type=NeuriteType.all, step_size=10, bins=None, use_subtrees=False
+):
     """Perform Sholl frequency calculations on a population of morphs.
 
     Args:
@@ -62,6 +65,7 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
         intervals of step_size between min and max radii of ``morphs``.
+        use_subtrees (bool): Enable mixed subtree processing.
 
     Note:
         Given a population, the concentric circles range from the smallest soma radius to the
@@ -72,13 +76,27 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
+
+        section_iterator = (
+            partial(iter_sections, section_filter=neurite_filter)
+            if use_subtrees
+            else partial(iter_sections, neurite_filter=neurite_filter)
+        )
+
+        max_radius_per_section = [
+            np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))
+            for morph in morphs
+            for section in section_iterator(morph)
+        ]
+
+        if not max_radius_per_section:
+            return []
+
         min_soma_edge = min(n.soma.radius for n in morphs)
-        max_radii = max(np.max(np.linalg.norm(n.points[:, COLS.XYZ], axis=1))
-                        for m in morphs
-                        for n in m.neurites if neurite_filter(n))
-        bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
+
+        bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_section), step_size)
 
     return np.array([
-        sholl_crossings(m, neurite_type, m.soma.center, bins)
+        mf.sholl_crossings(m, neurite_type, m.soma.center, bins, use_subtrees=use_subtrees)
         for m in morphs
-    ]).sum(axis=0)
+    ]).sum(axis=0).tolist()

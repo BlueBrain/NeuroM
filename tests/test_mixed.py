@@ -6,7 +6,8 @@ import numpy as np
 import numpy.testing as npt
 from neurom import NeuriteType
 from neurom.features import get
-from neurom.features import _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
+from neurom.core import Population
+from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 import collections.abc
 
 
@@ -44,6 +45,11 @@ def mixed_morph():
     23 4   1 -2  0   0.1 19
     """,
     reader="swc")
+
+
+@pytest.fixture
+def population(mixed_morph):
+    return Population([mixed_morph, mixed_morph])
 
 
 def _assert_feature_equal(obj, feature_name, expected_values, kwargs, use_subtrees):
@@ -100,6 +106,56 @@ def _dispatch_features(features, mode):
                 raise ValueError("Uknown mode")
 
             yield feature_name, kwargs, expected
+
+
+def _population_features(mode):
+
+    features = {
+        "sholl_frequency": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all, "step_size": 3},
+                "expected_wout_subtrees": [0, 4],
+                "expected_with_subtrees": [0, 4],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite, "step_size": 3},
+                "expected_wout_subtrees": [0, 4],
+                "expected_with_subtrees": [0, 2],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon, "step_size": 3},
+                "expected_wout_subtrees": [],
+                "expected_with_subtrees": [0, 2],
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite, "step_size": 2},
+                "expected_wout_subtrees": [0, 2],
+                "expected_with_subtrees": [0, 2],
+            },
+
+        ],
+    }
+
+    features_not_tested = list(
+        set(_POPULATION_FEATURES) - set(features.keys())
+    )
+
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the tests:\n\n" +
+        "\n".join(sorted(features_not_tested)) + "\n"
+    )
+
+    return _dispatch_features(features, mode)
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="wout-subtrees"))
+def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
+    _assert_feature_equal(population, feature_name, expected, kwargs, use_subtrees=False)
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="with-subtrees"))
+def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
+    _assert_feature_equal(population, feature_name, expected, kwargs, use_subtrees=True)
 
 
 def _morphology_features(mode):

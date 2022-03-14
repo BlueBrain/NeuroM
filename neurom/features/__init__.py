@@ -99,8 +99,10 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
     # pylint: disable=too-many-branches
     is_obj_list = isinstance(obj, (list, tuple))
     if not isinstance(obj, (Neurite, Morphology, Population)) and not is_obj_list:
-        raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite,'
-                          ' Morphology can be used for feature calculation')
+        raise NeuroMError(
+            "Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology"
+            f"can be used for feature calculation. Got: {obj}"
+        )
 
     neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
     res, feature_ = None, None
@@ -142,9 +144,17 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
         # input is a morphology population or a list of morphs
         if feature_name in _POPULATION_FEATURES:
             feature_ = _POPULATION_FEATURES[feature_name]
+
+            if "use_subtrees" in inspect.signature(feature_).parameters:
+                kwargs["use_subtrees"] = use_subtrees
+
             res = feature_(obj, **kwargs)
         elif feature_name in _MORPHOLOGY_FEATURES:
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
+
+            if "use_subtrees" in inspect.signature(feature_).parameters:
+                kwargs["use_subtrees"] = use_subtrees
+
             res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
         elif feature_name in _NEURITE_FEATURES:
             feature_ = _NEURITE_FEATURES[feature_name]
