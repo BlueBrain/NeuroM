@@ -282,7 +282,7 @@ def iter_neurites(
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     if use_subtrees:
-        neurites = chain.from_iterable(map(extract_subneurites, neurites))
+        neurites = flatten(map(extract_subneurites, neurites))
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 

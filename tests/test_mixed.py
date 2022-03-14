@@ -1785,17 +1785,32 @@ def _neurite_features(mode):
                 "expected_wout_subtrees": [0.4, 0.0],
                 "expected_with_subtrees": [0.4, 0.0],
             },
-        ]
+        ],
+        "segment_path_lengths": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees":
+                    [1.0, 2.0, 3.0, 3.0, 2.0] +
+                    [1.414213, 3.414213, 4.414213, 4.414213] +
+                    [2.828427, 3.828427, 3.828427, 4.828427, 4.828427] +
+                    [1.0, 2.0, 3.0, 3.0, 2.0],
+                "expected_with_subtrees":
+                    [1.0, 2.0, 3.0, 3.0, 2.0] +
+                    [1.414213, 3.414213, 4.414213, 4.414213] +
+                    [1.414214, 2.414214, 2.414214, 3.414214, 3.414214] +
+                    [1.0, 2.0, 3.0, 3.0, 2.0],
+            },
+        ],
     }
 
     features_not_tested = list(
         set(_NEURITE_FEATURES) - set(features.keys()) - set(_MORPHOLOGY_FEATURES)
     )
 
-    #assert not features_not_tested, (
-    #    "The following morphology tests need to be included in the tests:\n\n" +
-    #    "\n".join(sorted(features_not_tested)) + "\n"
-    #)
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the tests:\n\n" +
+        "\n".join(sorted(features_not_tested)) + "\n"
+    )
 
     return _dispatch_features(features, mode)
 

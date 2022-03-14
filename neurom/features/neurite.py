@@ -48,6 +48,7 @@ from functools import partial
 
 import numpy as np
 from neurom import morphmath
+from neurom.utils import flatten
 from neurom.core.types import NeuriteType
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
@@ -220,11 +221,7 @@ def _map_segments(func, neurite, section_type=NeuriteType.all):
 
     `func` accepts a section and returns list of values corresponding to each segment.
     """
-    return [
-        segment_value
-        for section in Section.ipreorder(neurite.root_node)
-        for segment_value in func(section)
-    ]
+    return list(flatten(_map_sections(func, neurite, section_type=section_type)))
 
 
 @feature(shape=(...,))
@@ -283,19 +280,22 @@ def segment_midpoints(neurite, section_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def segment_path_lengths(neurite):
+def segment_path_lengths(neurite, section_type=NeuriteType.all):
     """Returns pathlengths between all non-root points and their root point."""
     pathlength = {}
 
-    def segments_pathlength(section):
+    def segments_path_length(section):
         if section.id not in pathlength:
-            if section.parent:
-                pathlength[section.id] = section.parent.length + pathlength[section.parent.id]
-            else:
-                pathlength[section.id] = 0
+
+            pathlength[section.id] = (
+                0.0
+                if section.id == neurite.root_node.id
+                else section.parent.length + pathlength[section.parent.id]
+            )
+
         return pathlength[section.id] + np.cumsum(sf.segment_lengths(section))
 
-    return _map_segments(segments_pathlength, neurite)
+    return _map_segments(segments_path_length, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
@@ -507,7 +507,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
 
     # note: duplicate points included but not affect the convex hull calculation
     points = list(
-        chain.from_iterable(_map_sections(get_points, neurite, section_type=section_type))
+        flatten(_map_sections(get_points, neurite, section_type=section_type))
     )
 
     hull = convex_hull(points)
@@ -552,7 +552,7 @@ def principal_direction_extents(neurite, direction=0, section_type=NeuriteType.a
 
     # Note: duplicate points are included and need to be removed
     points = list(
-        chain.from_iterable(_map_sections(get_points, neurite, section_type=section_type))
+        flatten(_map_sections(get_points, neurite, section_type=section_type))
     )
 
     return [morphmath.principal_direction_extent(np.unique(points, axis=0))[direction]]
