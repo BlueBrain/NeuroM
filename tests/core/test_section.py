@@ -45,6 +45,8 @@ def test_section_base_func():
     assert_almost_equal(section.area, 31.41592653589793)
     assert_almost_equal(section.volume, 15.707963267948964)
 
+    # __nonzero__
+    assert section
 
 def test_section_tree():
     m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
