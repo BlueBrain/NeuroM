@@ -1814,13 +1814,13 @@ def _neurite_features(mode):
 
     return _dispatch_features(features, mode)
 
-'''
+
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _neurite_features(mode="wout-subtrees")
 )
 def test_morphology__neurite_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
     _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=False)
-'''
+
 
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _neurite_features(mode="with-subtrees")
