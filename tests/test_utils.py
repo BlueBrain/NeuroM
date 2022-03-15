@@ -29,10 +29,19 @@
 """Test neurom.utils."""
 import json
 import warnings
+from copy import deepcopy
 
 import numpy as np
 from neurom import utils as nu
 import pytest
+
+from neurom.exceptions import NeuroMDeprecationWarning
+
+
+def test_warn_deprecated():
+
+    with pytest.warns(NeuroMDeprecationWarning, match="foo"):
+        nu.warn_deprecated(msg="foo")
 
 
 def test_deprecated():
