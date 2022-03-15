@@ -50,7 +50,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.utils import flatten
 from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section
+from neurom.core.morphology import Section, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.morphmath import convex_hull
