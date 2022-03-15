@@ -52,7 +52,7 @@ from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
     _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path
-from neurom.utils import NeuromJSON, warn_deprecated
+from neurom.utils import flatten, NeuromJSON, warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -107,7 +107,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     columns = [('property', 'name')] + [
         (key1, key2) for key1, data in stats[0][1].items() for key2 in data
     ]
-    rows = [[name] + list(chain.from_iterable(features.values() for features in data.values()))
+    rows = [[name] + list(flatten(features.values() for features in data.values()))
             for name, data in stats]
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 

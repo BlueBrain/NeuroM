@@ -30,7 +30,7 @@
 
 Contains functions for checking validity of morphology neurites and somata.
 """
-from itertools import chain, islice
+from itertools import islice
 
 import numpy as np
 from neurom import NeuriteType
@@ -40,6 +40,7 @@ from neurom.core.morphology import Section, iter_neurites, iter_sections, iter_s
 from neurom.core.dataformat import COLS
 from neurom.exceptions import NeuroMError
 from neurom.morphmath import section_length, segment_length
+from neurom.utils import flatten
 
 
 def _read_neurite_type(neurite):
@@ -281,9 +282,9 @@ def has_no_dangling_branch(morph):
     radius = np.linalg.norm(recentered_soma, axis=1)
     soma_max_radius = radius.max()
 
-    dendritic_points = np.array(list(chain.from_iterable(n.points
-                                                         for n in iter_neurites(morph)
-                                                         if n.type != NeuriteType.axon)))
+    dendritic_points = np.array(list(flatten(n.points
+                                             for n in iter_neurites(morph)
+                                             if n.type != NeuriteType.axon)))
 
     def is_dangling(neurite):
         """Is the neurite dangling?"""

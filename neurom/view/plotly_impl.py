@@ -17,7 +17,7 @@
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 501ARE
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 # DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -28,9 +28,8 @@
 
 """Morphology draw functions using plotly."""
 
-from itertools import chain
-
 import numpy as np
+
 
 try:
     import plotly.graph_objs as go
@@ -43,6 +42,7 @@ except ImportError as e:
 from neurom import COLS, iter_segments, iter_neurites
 from neurom.core.morphology import Morphology
 from neurom.view.matplotlib_impl import TREE_COLOR
+from neurom.utils import flatten
 
 
 def plot_morph(morph, plane='xy', inline=False, **kwargs):
@@ -75,9 +75,9 @@ def _make_trace(morph, plane):
 
         segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in segments]
 
-        coords = dict(x=list(chain.from_iterable((p1[0], p2[0], None) for p1, p2 in segs)),
-                      y=list(chain.from_iterable((p1[1], p2[1], None) for p1, p2 in segs)),
-                      z=list(chain.from_iterable((p1[2], p2[2], None) for p1, p2 in segs)))
+        coords = dict(x=list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
+                      y=list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
+                      z=list(flatten((p1[2], p2[2], None) for p1, p2 in segs)))
 
         color = TREE_COLOR.get(neurite.root_node.type, 'black')
         if plane.lower() == '3d':
