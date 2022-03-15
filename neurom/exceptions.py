@@ -37,5 +37,5 @@ class ConfigError(NeuroMError):
     """Exception class for configuration data in apps errors."""
 
 
-class NeuroMDeprecationWarning(UserWarning):
+class NeuroMDeprecationWarning(DeprecationWarning):
     """NeuroM deprecation warning for users."""

@@ -40,7 +40,7 @@ from neurom.exceptions import NeuroMDeprecationWarning
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
-    warnings.warn(msg, category=NeuroMDeprecationWarning, stacklevel=2)
+    warnings.warn(msg, category=NeuroMDeprecationWarning, stacklevel=3)
 
 
 def deprecated(fun_name=None, msg=""):
