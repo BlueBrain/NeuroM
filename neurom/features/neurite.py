@@ -83,6 +83,7 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 @feature(shape=())
 def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
+
     term_radial_distances = section_term_radial_distances(
         neurite, origin=origin, section_type=section_type
     )
@@ -148,22 +149,16 @@ def total_volume(neurite, section_type=NeuriteType.all):
     return sum(_map_sections(sf.section_volume, neurite, section_type=section_type))
 
 
-def _section_length(section):
-    """Get section length of `section`."""
-    return morphmath.section_length(section.points)
->>>>>>> Convert total_volume_per_neurite feature
-
-
 @feature(shape=(...,))
 def section_lengths(neurite, section_type=NeuriteType.all):
     """Section lengths."""
-    return _map_sections(_section_length, neurite, section_type=section_type)
+    return _map_sections(sf.section_length, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
 def section_term_lengths(neurite, section_type=NeuriteType.all):
     """Termination section lengths."""
-    return _map_sections(_section_length, neurite, Section.ileaf, section_type)
+    return _map_sections(sf.section_length, neurite, Section.ileaf, section_type)
 
 
 @feature(shape=(...,))
