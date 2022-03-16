@@ -32,19 +32,44 @@ import math
 import warnings
 from io import StringIO
 from pathlib import Path
+from unittest.mock import Mock
 
+import pytest
 import numpy as np
+from numpy import testing as npt
+from mock import Mock
+
 from neurom import load_morphology, iter_sections
 from neurom import morphmath
 from neurom.features import section
-
-import pytest
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 H5_PATH = DATA_PATH / 'h5/v1/'
 SWC_PATH = DATA_PATH / 'swc/'
 NRN = load_morphology(H5_PATH / 'Neuron.h5')
 SECTION_ID = 0
+
+
+def test_section_length():
+    sec = Mock(length=3.2)
+    npt.assert_almost_equal(section.section_length(sec), 3.2)
+
+
+def test_number_of_segments():
+    sec = Mock(points=np.array([[0., 1., 2., 1.], [3., 4., 5., 1.], [6., 7., 8., 1.]]))
+    npt.assert_almost_equal(section.number_of_segments(sec), 2)
+
+
+def test_section_taper_rate():
+    # Note: taper rate is calculated on the diameters
+    sec = Mock(points=np.array([[0., 0., 0., 2.], [1., 0., 0., 1.], [2., 0., 0., 0.]]))
+    npt.assert_almost_equal(section.taper_rate(sec), -2.)
+
+
+def test_segment_taper_rates():
+    # Note: taper rate is calculated on the diameters
+    sec = Mock(points=np.array([[0., 0., 0., 2.], [1., 0., 0., 1.], [2., 0., 0., 0.]]))
+    npt.assert_almost_equal(section.segment_taper_rates(sec), [-2., -2.])
 
 
 def test_section_area():
@@ -54,6 +79,46 @@ def test_section_area():
                                      (1 0 0 2))"""), reader='asc').sections[SECTION_ID]
     area = section.section_area(sec)
     assert math.pi * 1 * 2 * 1 == area
+
+
+def test_segment_areas():
+    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+                                    ((Dendrite)
+                                     (0 0 0 4)
+                                     (1 0 0 4)
+                                     (2 0 0 4))"""), reader='asc').sections[SECTION_ID]
+
+    npt.assert_allclose(section.segment_areas(sec), [2. * np.pi * 2. * 1.] * 2)
+
+
+def test_segment_volumes():
+    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+                                    ((Dendrite)
+                                     (0 0 0 4)
+                                     (1 0 0 4)
+                                     (2 0 0 4))"""), reader='asc').sections[SECTION_ID]
+
+    npt.assert_allclose(section.segment_areas(sec), [np.pi * 4. * 1.] * 2)
+
+
+def test_segment_mean_radii():
+    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+                                    ((Dendrite)
+                                     (0 0 0 2)
+                                     (1 0 0 4)
+                                     (2 0 0 6))"""), reader='asc').sections[SECTION_ID]
+
+    npt.assert_allclose(section.segment_mean_radii(sec), [1.5, 2.5])
+
+
+def test_segment_midpoints():
+    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+                                    ((Dendrite)
+                                     (0 0 0 2)
+                                     (1 0 0 4)
+                                     (2 0 0 6))"""), reader='asc').sections[SECTION_ID]
+
+    npt.assert_allclose(section.segment_midpoints(sec), [[0.5, 0., 0.], [1.5, 0., 0.]])
 
 
 def test_section_tortuosity():
