@@ -83,7 +83,6 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 @feature(shape=())
 def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
-
     term_radial_distances = section_term_radial_distances(
         neurite, origin=origin, section_type=section_type
     )
