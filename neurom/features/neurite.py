@@ -45,7 +45,6 @@ For more details see :ref:`features`.
 
 import logging
 from functools import partial
-from itertools import chain
 
 import numpy as np
 from neurom import morphmath
@@ -54,6 +53,7 @@ from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.geom import convex_hull
 from neurom.morphmath import interval_lengths
+from neurom.utils import flatten
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 
@@ -262,7 +262,7 @@ def section_taper_rates(neurite):
 @feature(shape=(...,))
 def segment_meander_angles(neurite):
     """Inter-segment opening angles in a section."""
-    return list(chain.from_iterable(_map_sections(sf.section_meander_angles, neurite)))
+    return list(flatten(_map_sections(sf.section_meander_angles, neurite)))
 
 
 @feature(shape=(..., 3))

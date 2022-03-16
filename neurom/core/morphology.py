@@ -29,7 +29,6 @@
 """Morphology classes and functions."""
 
 from collections import deque
-from itertools import chain
 import warnings
 
 import morphio
@@ -39,7 +38,7 @@ from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.core.population import Population
-from neurom.utils import warn_deprecated
+from neurom.utils import flatten, warn_deprecated
 
 
 class Section:
@@ -283,9 +282,10 @@ def iter_sections(neurites,
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-    return chain.from_iterable(
-        iterator_type(neurite.root_node) for neurite in
-        iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order))
+    return flatten(
+        iterator_type(neurite.root_node)
+        for neurite in iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
+    )
 
 
 def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
@@ -308,8 +308,10 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
                                   neurite_filter=neurite_filter,
                                   neurite_order=neurite_order))
 
-    return chain.from_iterable(zip(sec.points[:-1], sec.points[1:])
-                               for sec in sections)
+    return flatten(
+        zip(section.points[:-1], section.points[1:])
+        for section in sections
+    )
 
 
 def graft_morphology(section):

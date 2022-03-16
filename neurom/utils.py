@@ -31,6 +31,7 @@ import json
 import warnings
 from enum import Enum
 from functools import wraps
+from itertools import chain
 
 import numpy as np
 
@@ -130,3 +131,8 @@ def str_to_plane(plane):
     else:  # pragma: no cover
         coords = COLS.XYZ
     return coords
+
+
+def flatten(list_of_lists):
+    """Flatten one level of nesting."""
+    return chain.from_iterable(list_of_lists)

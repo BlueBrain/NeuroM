@@ -106,3 +106,10 @@ def test_ordered_enum():
         Grade.__gt__(Grade.A, 1)
     with pytest.raises(NotImplementedError):
         Grade.__lt__(Grade.A, 1)
+
+
+def test_flatten():
+
+    a = [[1, 2], [3, 4, 5], [6], [7, 8, 9, 10]]
+
+    assert list(nu.flatten(a)) == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
