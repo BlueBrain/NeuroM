@@ -447,7 +447,7 @@ def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
 @feature(shape=())
 def number_of_neurites(morph, neurite_type=NeuriteType.all):
     """Number of neurites in a morph."""
-    return sum(_map_neurites(lambda _: 1, morph, neurite_type))
+    return len(_map_neurites(lambda n: n, morph, neurite_type))
 
 
 @feature(shape=(...,))
