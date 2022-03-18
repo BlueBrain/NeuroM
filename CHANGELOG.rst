@@ -4,6 +4,7 @@ Changelog
 Version 3.2.0
 -------------
 
+- Fix ``neurom.features.neurite.segment_taper_rates`` to return signed taper rates.
 - Fix warning system so that it doesn't change the pre-existing warnings configuration
 - Fix ``neurom.features.bifurcation.partition_asymmetry`` Uylings variant to not throw
   for bifurcations with leaves.

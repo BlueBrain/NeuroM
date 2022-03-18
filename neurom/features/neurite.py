@@ -52,8 +52,6 @@ from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.geom import convex_hull
-from neurom.morphmath import interval_lengths
-from neurom.utils import flatten
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 
@@ -62,7 +60,7 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder):
     """Map `fun` to all the sections."""
-    return list(map(fun, (s for s in iterator_type(neurite.root_node))))
+    return list(map(fun, iterator_type(neurite.root_node)))
 
 
 @feature(shape=())
@@ -75,13 +73,13 @@ def max_radial_distance(neurite):
 @feature(shape=())
 def number_of_segments(neurite):
     """Number of segments."""
-    return sum(len(s.points) - 1 for s in Section.ipreorder(neurite.root_node))
+    return sum(_map_sections(sf.number_of_segments, neurite))
 
 
 @feature(shape=())
 def number_of_sections(neurite, iterator_type=Section.ipreorder):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
-    return sum(1 for _ in iterator_type(neurite.root_node))
+    return len(_map_sections(lambda s: s, neurite, iterator_type=iterator_type))
 
 
 @feature(shape=())
@@ -105,7 +103,7 @@ def number_of_leaves(neurite):
 @feature(shape=())
 def total_length(neurite):
     """Neurite length. For a morphology it will be a sum of all neurite lengths."""
-    return sum(s.length for s in neurite.iter_sections())
+    return sum(_map_sections(sf.section_length, neurite))
 
 
 @feature(shape=())
@@ -114,36 +112,31 @@ def total_area(neurite):
 
     The area is defined as the sum of the area of the sections.
     """
-    return neurite.area
+    return sum(_map_sections(sf.section_area, neurite))
 
 
 @feature(shape=())
 def total_volume(neurite):
     """Neurite volume. For a morphology it will be a sum of neurites volumes."""
-    return sum(s.volume for s in Section.ipreorder(neurite.root_node))
-
-
-def _section_length(section):
-    """Get section length of `section`."""
-    return morphmath.section_length(section.points)
+    return sum(_map_sections(sf.section_volume, neurite))
 
 
 @feature(shape=(...,))
 def section_lengths(neurite):
     """Section lengths."""
-    return _map_sections(_section_length, neurite)
+    return _map_sections(sf.section_length, neurite)
 
 
 @feature(shape=(...,))
 def section_term_lengths(neurite):
     """Termination section lengths."""
-    return _map_sections(_section_length, neurite, Section.ileaf)
+    return _map_sections(sf.section_length, neurite, Section.ileaf)
 
 
 @feature(shape=(...,))
 def section_bif_lengths(neurite):
     """Bifurcation section lengths."""
-    return _map_sections(_section_length, neurite, Section.ibifurcation_point)
+    return _map_sections(sf.section_length, neurite, Section.ibifurcation_point)
 
 
 @feature(shape=(...,))
@@ -185,8 +178,11 @@ def _map_segments(func, neurite):
 
     `func` accepts a section and returns list of values corresponding to each segment.
     """
-    tmp = [mapped_seg for s in Section.ipreorder(neurite.root_node) for mapped_seg in func(s)]
-    return tmp
+    return [
+        segment_value
+        for section in Section.ipreorder(neurite.root_node)
+        for segment_value in func(section)
+    ]
 
 
 @feature(shape=(...,))
@@ -198,32 +194,19 @@ def segment_lengths(neurite):
 @feature(shape=(...,))
 def segment_areas(neurite):
     """Areas of the segments."""
-    return [morphmath.segment_area(seg)
-            for s in Section.ipreorder(neurite.root_node)
-            for seg in zip(s.points[:-1], s.points[1:])]
+    return _map_segments(sf.segment_areas, neurite)
 
 
 @feature(shape=(...,))
 def segment_volumes(neurite):
     """Volumes of the segments."""
-
-    def _func(sec):
-        """List of segment volumes of a section."""
-        return [morphmath.segment_volume(seg) for seg in zip(sec.points[:-1], sec.points[1:])]
-
-    return _map_segments(_func, neurite)
+    return _map_segments(sf.segment_volumes, neurite)
 
 
 @feature(shape=(...,))
 def segment_radii(neurite):
     """Arithmetic mean of the radii of the points in segments."""
-
-    def _seg_radii(sec):
-        """Vectorized mean radii."""
-        pts = sec.points[:, COLS.R]
-        return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
-
-    return _map_segments(_seg_radii, neurite)
+    return _map_segments(sf.segment_mean_radii, neurite)
 
 
 @feature(shape=(...,))
@@ -232,15 +215,7 @@ def segment_taper_rates(neurite):
 
     The taper rate is defined as the absolute radii differences divided by length of the section
     """
-
-    def _seg_taper_rates(sec):
-        """Vectorized taper rates."""
-        pts = sec.points[:, COLS.XYZR]
-        diff = np.diff(pts, axis=0)
-        distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
-        return np.divide(2 * np.abs(diff[:, COLS.R]), distance)
-
-    return _map_segments(_seg_taper_rates, neurite)
+    return _map_segments(sf.segment_taper_rates, neurite)
 
 
 @feature(shape=(...,))
@@ -250,31 +225,19 @@ def section_taper_rates(neurite):
     Taper rate is defined here as the linear fit along a section.
     It is expected to be negative for morphologies.
     """
-
-    def _sec_taper_rate(sec):
-        """Taper rate from fit along a section."""
-        path_distances = np.cumsum(interval_lengths(sec.points, prepend_zero=True))
-        return np.polynomial.polynomial.polyfit(path_distances, 2 * sec.points[:, COLS.R], 1)[1]
-
-    return _map_sections(_sec_taper_rate, neurite)
+    return _map_sections(sf.taper_rate, neurite)
 
 
 @feature(shape=(...,))
 def segment_meander_angles(neurite):
     """Inter-segment opening angles in a section."""
-    return list(flatten(_map_sections(sf.section_meander_angles, neurite)))
+    return _map_segments(sf.section_meander_angles, neurite)
 
 
 @feature(shape=(..., 3))
 def segment_midpoints(neurite):
     """Return a list of segment mid-points."""
-
-    def _seg_midpoint(sec):
-        """Return the mid-points of segments in a section."""
-        pts = sec.points[:, COLS.XYZ]
-        return np.divide(np.add(pts[:-1], pts[1:]), 2.0)
-
-    return _map_segments(_seg_midpoint, neurite)
+    return _map_segments(sf.segment_midpoints, neurite)
 
 
 @feature(shape=(...,))
@@ -282,31 +245,28 @@ def segment_path_lengths(neurite):
     """Returns pathlengths between all non-root points and their root point."""
     pathlength = {}
 
-    def _get_pathlength(section):
+    def segments_pathlength(section):
         if section.id not in pathlength:
             if section.parent:
-                pathlength[section.id] = section.parent.length + _get_pathlength(section.parent)
+                pathlength[section.id] = section.parent.length + pathlength[section.parent.id]
             else:
                 pathlength[section.id] = 0
-        return pathlength[section.id]
+        return pathlength[section.id] + np.cumsum(sf.segment_lengths(section))
 
-    result = [_get_pathlength(section) + np.cumsum(sf.segment_lengths(section))
-              for section in Section.ipreorder(neurite.root_node)]
-    return np.hstack(result).tolist() if result else []
+    return _map_segments(segments_pathlength, neurite)
 
 
 @feature(shape=(...,))
 def segment_radial_distances(neurite, origin=None):
     """Returns the list of distances between all segment mid points and origin."""
+    pos = neurite.root_node.points[0] if origin is None else origin
 
-    def _radial_distances(sec, pos):
+    def radial_distances(section):
         """List of distances between the mid point of each segment and pos."""
-        mid_pts = 0.5 * (sec.points[:-1, COLS.XYZ] + sec.points[1:, COLS.XYZ])
+        mid_pts = 0.5 * (section.points[:-1, COLS.XYZ] + section.points[1:, COLS.XYZ])
         return np.linalg.norm(mid_pts - pos[COLS.XYZ], axis=1)
 
-    pos = neurite.root_node.points[0] if origin is None else origin
-    # return [s for ss in n.iter_sections() for s in _radial_distances(ss, pos)]
-    return [d for s in Section.ipreorder(neurite.root_node) for d in _radial_distances(s, pos)]
+    return _map_segments(radial_distances, neurite)
 
 
 @feature(shape=(...,))
@@ -487,8 +447,7 @@ def section_end_distances(neurite):
 @feature(shape=(...,))
 def principal_direction_extents(neurite, direction=0):
     """Principal direction extent of neurites in morphologies."""
-    points = neurite.points[:, :3]
-    return [morphmath.principal_direction_extent(points)[direction]]
+    return [morphmath.principal_direction_extent(neurite.points[:, COLS.XYZ])[direction]]
 
 
 @feature(shape=(...,))
