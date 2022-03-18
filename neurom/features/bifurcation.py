@@ -133,8 +133,8 @@ def partition_pair(bif_point, iterator_type=Section.ipreorder):
     at each branch point.
     """
     return (
-        float(sum(1 for _ in iterator_type(bif_point.children[0]))),
-        float(sum(1 for _ in iterator_type(bif_point.children[1]))),
+        float(len(list(iterator_type(bif_point.children[0])))),
+        float(len(list(iterator_type(bif_point.children[1])))),
     )
 
 
