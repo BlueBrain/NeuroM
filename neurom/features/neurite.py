@@ -1,4 +1,4 @@
-    # Copyright (c) 2020, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# Copyright (c) 2020, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
@@ -50,7 +50,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.utils import flatten
 from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section, iter_segments
+from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.morphmath import convex_hull
@@ -92,9 +92,7 @@ def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
 @feature(shape=())
 def number_of_segments(neurite, section_type=NeuriteType.all):
     """Number of segments."""
-    def count_segments(section):
-        return len(section.points) - 1
-    return sum(_map_sections(count_segments, neurite, section_type=section_type))
+    return sum(_map_sections(sf.number_of_segments, neurite, section_type=section_type))
 
 
 @feature(shape=())
@@ -239,7 +237,7 @@ def segment_volumes(neurite, section_type=NeuriteType.all):
 @feature(shape=(...,))
 def segment_radii(neurite, section_type=NeuriteType.all):
     """Arithmetic mean of the radii of the points in segments."""
-    return _map_segments(sf.segment_radii, neurite, section_type=section_type)
+    return _map_segments(sf.segment_mean_radii, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
@@ -270,7 +268,7 @@ def segment_meander_angles(neurite, section_type=NeuriteType.all):
 @feature(shape=(..., 3))
 def segment_midpoints(neurite, section_type=NeuriteType.all):
     """Return a list of segment mid-points."""
-    return _map_segments(sf.segment_midpoints neurite, section_type=section_type)
+    return _map_segments(sf.segment_midpoints, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
@@ -302,7 +300,7 @@ def segment_radial_distances(neurite, origin=None, section_type=NeuriteType.all)
         mid_pts = 0.5 * (section.points[:-1, COLS.XYZ] + section.points[1:, COLS.XYZ])
         return np.linalg.norm(mid_pts - pos[COLS.XYZ], axis=1)
 
-    return _map_segments(_radial_distances, neurite, section_type=section_type)
+    return _map_segments(radial_distances, neurite, section_type=section_type)
 
 
 @feature(shape=(...,))
