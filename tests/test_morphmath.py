@@ -29,6 +29,7 @@
 from math import fabs, pi, sqrt
 
 import numpy as np
+from numpy import testing as npt
 from neurom import morphmath as mm
 from neurom.core.dataformat import Point
 from numpy.random import uniform
@@ -532,3 +533,59 @@ def test_spherical_coordinates():
 
         new_elevation, new_azimuth = mm.spherical_from_vector(vect)
         assert np.allclose([elevation, azimuth], [new_elevation, new_azimuth])
+
+
+def test_principal_direction_extent():
+
+    # test with points on a circle with radius 0.5, and center at 0.0
+    circle_points = np.array([
+        [ 5.0e-01,  0.0e+00,  0.0e+00],
+        [ 4.7e-01,  1.6e-01,  0.0e+00],
+        [ 3.9e-01,  3.1e-01,  0.0e+00],
+        [ 2.7e-01,  4.2e-01,  0.0e+00],
+        [ 1.2e-01,  4.8e-01,  0.0e+00],
+        [-4.1e-02,  5.0e-01,  0.0e+00],
+        [-2.0e-01,  4.6e-01,  0.0e+00],
+        [-3.4e-01,  3.7e-01,  0.0e+00],
+        [-4.4e-01,  2.4e-01,  0.0e+00],
+        [-5.0e-01,  8.2e-02,  0.0e+00],
+        [-5.0e-01, -8.2e-02,  0.0e+00],
+        [-4.4e-01, -2.4e-01,  0.0e+00],
+        [-3.4e-01, -3.7e-01,  0.0e+00],
+        [-2.0e-01, -4.6e-01,  0.0e+00],
+        [-4.1e-02, -5.0e-01,  0.0e+00],
+        [ 1.2e-01, -4.8e-01,  0.0e+00],
+        [ 2.7e-01, -4.2e-01,  0.0e+00],
+        [ 3.9e-01, -3.1e-01,  0.0e+00],
+        [ 4.7e-01, -1.6e-01,  0.0e+00],
+        [ 5.0e-01, -1.2e-16,  0.0e+00]
+    ])
+
+    npt.assert_allclose(
+        mm.principal_direction_extent(circle_points),
+        [1., 1., 0.], atol=1e-6,
+    )
+
+    # extent should be invariant to translations
+    npt.assert_allclose(
+        mm.principal_direction_extent(circle_points + 100.),
+        [1., 1., 0.], atol=1e-6,
+    )
+    npt.assert_allclose(
+        mm.principal_direction_extent(circle_points - 100.),
+        [1., 1., 0.], atol=1e-6,
+    )
+
+    cross_3D_points = np.array([
+        [-5.2, 0.0, 0.0],
+        [ 4.8, 0.0, 0.0],
+        [ 0.0,-1.3, 0.0],
+        [ 0.0, 4.7, 0.0],
+        [ 0.0, 0.0,-11.2],
+        [ 0.0, 0.0, 0.8],
+    ])
+
+    npt.assert_allclose(
+        sorted(mm.principal_direction_extent(cross_3D_points)),
+        [6.0, 10.0, 12.0], atol=0.1,
+    )

@@ -462,17 +462,17 @@ section_length = path_distance
 def principal_direction_extent(points):
     """Calculate the extent of a set of 3D points.
 
-    The extent is defined as the maximum distance between
-    the projections on the principal directions of the covariance matrix
-    of the points.
+    The extent is defined as the maximum distance between the projections on the principal
+    directions of the covariance matrix of the points.
 
-    Parameter:
-        points : a 2D numpy array of points
+    Args:
+        points : a 2D numpy array of points with 2 or 3 columns for (x, y, z)
 
     Returns:
         extents : the extents for each of the eigenvectors of the cov matrix
-        eigs : eigenvalues of the covariance matrix
-        eigv : respective eigenvectors of the covariance matrix
+
+    Note:
+        Direction extents are not ordered from largest to smallest.
     """
     # pca can be biased by duplicate points
     points = np.unique(points, axis=0)
@@ -483,14 +483,8 @@ def principal_direction_extent(points):
     # principal components
     _, eigv = pca(points)
 
-    extent = np.zeros(3)
+    # for each eigenvector calculate the scalar projection of the points on it (n_points, n_eigv)
+    scalar_projections = points.dot(eigv)
 
-    for i in range(eigv.shape[1]):
-        # orthogonal projection onto the direction of the v component
-        scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
-        extent[i] = scalar_projs[-1]
-
-        if scalar_projs[0] < 0.:
-            extent -= scalar_projs[0]
-
-    return extent
+    # and return the range of the projections (abs(max - min)) along each column (eigenvector)
+    return np.ptp(scalar_projections, axis=0)
