@@ -471,8 +471,6 @@ def principal_direction_extent(points):
 
     Returns:
         extents : the extents for each of the eigenvectors of the cov matrix
-        eigs : eigenvalues of the covariance matrix
-        eigv : respective eigenvectors of the covariance matrix
     """
     # pca can be biased by duplicate points
     points = np.unique(points, axis=0)
@@ -483,14 +481,8 @@ def principal_direction_extent(points):
     # principal components
     _, eigv = pca(points)
 
-    extent = np.zeros(3)
-
-    for i in range(eigv.shape[1]):
-        # orthogonal projection onto the direction of the v component
-        scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
-        extent[i] = scalar_projs[-1]
-
-        if scalar_projs[0] < 0.:
-            extent -= scalar_projs[0]
-
-    return extent
+    # for each eigenvector calculate the range of the scalar projections of all points on it
+    return np.fromiter(
+        (np.ptp(np.inner(points, eigv[:, i])) for i in range(eigv.shape[1])),
+        dtype=float,
+    )

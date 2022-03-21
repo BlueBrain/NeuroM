@@ -793,18 +793,18 @@ def test_section_term_radial_distances():
 def test_principal_direction_extents():
     m = nm.load_morphology(SWC_PATH / 'simple.swc')
     principal_dir = features.get('principal_direction_extents', m)
-    assert_allclose(principal_dir, [14.736052694538641, 12.105102672688004])
+    assert_allclose(principal_dir, [10.99514 , 10.997688])
 
     # test with a realistic morphology
     m = nm.load_morphology(DATA_PATH / 'h5/v1' / 'bio_neuron-000.h5')
     p_ref = [
-        1672.969491,
-        142.437047,
-        224.607978,
-        415.50613,
-        429.830081,
-        165.954097,
-        346.832825,
+        1210.569727,
+        38.493958,
+        147.098687,
+        288.226628,
+        330.166506,
+        152.396521,
+        293.913857
     ]
     p = features.get('principal_direction_extents', m)
     assert_allclose(p, p_ref, rtol=1e-6)
