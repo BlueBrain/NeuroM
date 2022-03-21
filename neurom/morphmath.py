@@ -481,8 +481,8 @@ def principal_direction_extent(points):
     # principal components
     _, eigv = pca(points)
 
-    # for each eigenvector calculate the range of the scalar projections of all points on it
-    return np.fromiter(
-        (np.ptp(np.inner(points, eigv[:, i])) for i in range(eigv.shape[1])),
-        dtype=float,
-    )
+    # for each eigenvector calculate the scalar projection of the points on it (n_points, n_eigv)
+    scalar_projections = points.dot(eigv)
+
+    # and return the range of the projections (abs(max - min)) along each column (eigenvector)
+    return np.ptp(scalar_projections, axis=0)
