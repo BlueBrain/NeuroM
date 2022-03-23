@@ -49,6 +49,9 @@ SWC_PATH = DATA_PATH / 'swc/'
 NRN = load_morphology(H5_PATH / 'Neuron.h5')
 SECTION_ID = 0
 
+def test_section_points():
+    sec = Mock(points=np.array([[0., 1., 2., 1.], [3., 4., 5., 1.], [6., 7., 8., 1.]]))
+    npt.assert_almost_equal(section.section_points(sec), [[0., 1., 2.], [3., 4., 5.], [6., 7., 8.]])
 
 def test_section_length():
     sec = Mock(length=3.2)
