@@ -28,11 +28,17 @@
 
 """Mathematical and geometrical functions used to compute morphometrics."""
 import math
+import logging
 from itertools import combinations
 
 import numpy as np
+from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
 
 from neurom.core.dataformat import COLS
+
+
+L = logging.getLogger(__name__)
 
 
 def vector(p1, p2):
@@ -488,3 +494,30 @@ def principal_direction_extent(points):
 
     # and return the range of the projections (abs(max - min)) along each column (eigenvector)
     return np.ptp(scalar_projections, axis=0)
+
+
+def convex_hull(points):
+    """Get the convex hull from an array of points.
+
+    Returns:
+        scipy.spatial.ConvexHull object if successful, otherwise None
+    """
+    if len(points) == 0:
+        L.exception(
+            "Failure to compute convex hull because there are no points"
+        )
+        return None
+
+    try:
+        return ConvexHull(points)
+    except QhullError:
+        L.exception(
+            "Failure to compute convex hull because of geometrical degeneracy."
+        )
+        return None
+
+
+def aspect_ratio(points):
+    """Computes the min/max ratio of the principal direction extents."""
+    extents = principal_direction_extent(points)
+    return float(extents.min() / extents.max())

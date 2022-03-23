@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pathlib import Path
 from math import fabs, pi, sqrt
 
 import numpy as np
@@ -588,4 +589,117 @@ def test_principal_direction_extent():
     npt.assert_allclose(
         sorted(mm.principal_direction_extent(cross_3D_points)),
         [6.0, 10.0, 12.0], atol=0.1,
+    )
+
+
+def test_convex_hull_invalid():
+
+    assert mm.convex_hull([]) is None
+    assert mm.convex_hull([[1., 0., 0.], [1., 0., 0.]]) is None
+
+
+def test_aspect_ratio():
+
+    # check it works in 3D
+    cross_3D_points = np.array([
+        [-5.2, 0.0, 0.0],
+        [ 4.8, 0.0, 0.0],
+        [ 0.0,-1.3, 0.0],
+        [ 0.0, 4.7, 0.0],
+        [ 0.0, 0.0,-11.2],
+        [ 0.0, 0.0, 0.8],
+    ])
+
+    npt.assert_allclose(
+        mm.aspect_ratio(cross_3D_points),
+        0.5,
+        atol=1e-5
+    )
+
+    # check it works in 2D
+    cross_3D_points = np.array([
+        [ 0.0, 0.0],
+        [ 0.0, 0.0],
+        [-1.3, 0.0],
+        [ 4.7, 0.0],
+        [ 0.0,-11.2],
+        [ 0.0, 0.8],
+    ])
+
+    npt.assert_allclose(
+        mm.aspect_ratio(cross_3D_points),
+        0.5,
+        atol=1e-5
+    )
+    circle = np.array([
+        [ 5.0e-01,  0.0e+00],
+        [ 4.7e-01,  1.6e-01],
+        [ 3.9e-01,  3.1e-01],
+        [ 2.7e-01,  4.2e-01],
+        [ 1.2e-01,  4.8e-01],
+        [-4.1e-02,  5.0e-01],
+        [-2.0e-01,  4.6e-01],
+        [-3.4e-01,  3.7e-01],
+        [-4.4e-01,  2.4e-01],
+        [-5.0e-01,  8.2e-02],
+        [-5.0e-01, -8.2e-02],
+        [-4.4e-01, -2.4e-01],
+        [-3.4e-01, -3.7e-01],
+        [-2.0e-01, -4.6e-01],
+        [-4.1e-02, -5.0e-01],
+        [ 1.2e-01, -4.8e-01],
+        [ 2.7e-01, -4.2e-01],
+        [ 3.9e-01, -3.1e-01],
+        [ 4.7e-01, -1.6e-01],
+        [ 5.0e-01, -1.2e-16],
+    ])
+
+    npt.assert_allclose(
+        mm.aspect_ratio(circle),
+        1.0,
+        atol=1e-5
+    )
+
+    square = np.array([
+        [ 0.0, 0.0 ],
+        [ 5.0, 0.0 ],
+        [10.0, 0.0 ],
+        [ 0.0, 5.0 ],
+        [ 0.0, 10.0],
+        [ 5.0, 10.0],
+        [10.0, 10.0],
+        [10.0, 5.0 ],
+    ])
+
+    npt.assert_allclose(
+        mm.aspect_ratio(square),
+        1.0,
+        atol=1e-5
+    )
+
+    rectangle = np.array([
+        [ 0.0, 0.0 ],
+        [ 5.0, 0.0 ],
+        [20.0, 0.0 ],
+        [ 0.0, 5.0 ],
+        [ 0.0, 10.0],
+        [ 5.0, 10.0],
+        [20.0, 10.0],
+        [20.0, 5.0 ],
+    ])
+
+    npt.assert_allclose(
+        mm.aspect_ratio(rectangle),
+        0.5,
+        atol=1e-5
+    )
+
+    # ellipse: x = acost, y = bcost
+    oval = circle.copy()
+    oval[:, 1] *= 3.0
+
+    npt.assert_allclose(
+        mm.aspect_ratio(oval),
+        0.333333,
+        atol=1e-5
     )
