@@ -51,7 +51,7 @@ from neurom import morphmath
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
-from neurom.geom import convex_hull
+from neurom.morphmath import convex_hull
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 

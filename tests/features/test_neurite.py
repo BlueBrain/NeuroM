@@ -65,7 +65,7 @@ def test_number_of_leaves():
 
 def test_neurite_volume_density():
     vol = np.array(morphology.total_volume_per_neurite(NRN))
-    hull_vol = np.array([convex_hull(n.points).volume for n in nm.iter_neurites(NRN)])
+    hull_vol = np.array([convex_hull(n).volume for n in nm.iter_neurites(NRN)])
 
     vol_density = [neurite.volume_density(s) for s in NRN.neurites]
     assert len(vol_density) == 4
