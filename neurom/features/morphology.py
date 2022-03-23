@@ -55,9 +55,9 @@ from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
-from neurom.features import feature, NameSpace, neurite as nf
+from neurom.features import feature, NameSpace, neurite as nf, section as sf
 from neurom.utils import str_to_plane
-from neurom.geom import convex_hull
+from neurom.morphmath import convex_hull
 
 
 feature = partial(feature, namespace=NameSpace.NEURON)
@@ -589,14 +589,10 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     .. note:: Returns `np.nan` if the convex hull computation fails or there are not points
               available due to neurite type filtering.
     """
-
-    def get_points(neurite):
-        return neurite.points[:, COLS.XYZ]
-
     # note: duplicate points are present but do not affect convex hull calculation
     points = [
         point
-        for point_list in iter_neurites(morph, mapfun=get_points, filt=is_type(neurite_type))
+        for point_list in iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
         for point in point_list
     ]
 
@@ -608,3 +604,42 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     total_volume = sum(iter_neurites(morph, mapfun=nf.total_volume, filt=is_type(neurite_type)))
 
     return total_volume / morph_hull.volume
+
+
+@feature(shape=())
+def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+    """Calculates the min/max ratio of the principal direction extents along the selected plane.
+
+    Args:
+        morph: Morphology object.
+        neurite_type: The neurite type to use. By default all neurite types are used.
+        projection_plane: Projection plane to use for the calculation. One of ('xy', 'xz', 'yz').
+
+    Returns:
+        The aspect ratio feature of the morphology.
+    """
+    def get_projection_axes(projection_plane):
+
+        key = "".join(sorted(projection_plane.lower()))
+
+        try:
+            return {"xy": COLS.XY, "xz": COLS.XZ, "yz": COLS.YZ}[key]
+
+        except KeyError as e:
+
+            raise NeuroMError(
+                f"Invalid 'projection_plane' argument {projection_plane}. "
+                f"Please select 'xy', 'xz', or 'yz'."
+            ) from e
+
+    points = [
+        point
+        for point_list in iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
+        for point in point_list
+    ]
+
+    if not points:
+        return []
+
+    axes = get_projection_axes(projection_plane)
+    return morphmath.aspect_ratio(np.unique(points, axis=0)[:, axes])
