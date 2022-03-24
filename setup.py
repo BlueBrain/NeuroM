@@ -55,7 +55,7 @@ setup(
     extras_require={
         'plotly': ['plotly>=3.6.0', 'psutil>=5.5.1'],  # for plotly image saving
         'docs': [
-            'Jinja==3.0.3',  # New release 3.1.0 breaks sphinx-bluebrain-theme
+            'Jinja2==3.0.3',  # New release 3.1.0 breaks sphinx-bluebrain-theme
             'sphinx',
             'sphinx-bluebrain-theme',
             'sphinx-autorun',
