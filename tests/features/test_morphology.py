@@ -664,5 +664,5 @@ def test_volume_density():
     # no points
     assert np.isnan(
         morphology.volume_density(morph, neurite_type=NeuriteType.apical_dendrite),
-    
+    )
 
