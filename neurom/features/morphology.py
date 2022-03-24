@@ -606,31 +606,19 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     return total_volume / morph_hull.volume
 
 
-@feature(shape=())
-def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
-    """Calculates the min/max ratio of the principal direction extents along the selected plane.
+def _unique_projected_points(morph, projection_plane,  neurite_type):
 
-    Args:
-        morph: Morphology object.
-        neurite_type: The neurite type to use. By default all neurite types are used.
-        projection_plane: Projection plane to use for the calculation. One of ('xy', 'xz', 'yz').
+    key = "".join(sorted(projection_plane.lower()))
 
-    Returns:
-        The aspect ratio feature of the morphology.
-    """
-    def get_projection_axes(projection_plane):
+    try:
+        axes = {"xy": COLS.XY, "xz": COLS.XZ, "yz": COLS.YZ}[key]
 
-        key = "".join(sorted(projection_plane.lower()))
+    except KeyError as e:
 
-        try:
-            return {"xy": COLS.XY, "xz": COLS.XZ, "yz": COLS.YZ}[key]
-
-        except KeyError as e:
-
-            raise NeuroMError(
-                f"Invalid 'projection_plane' argument {projection_plane}. "
-                f"Please select 'xy', 'xz', or 'yz'."
-            ) from e
+        raise NeuroMError(
+            f"Invalid 'projection_plane' argument {projection_plane}. "
+            f"Please select 'xy', 'xz', or 'yz'."
+        ) from e
 
     points = [
         point
@@ -639,7 +627,63 @@ def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     ]
 
     if not points:
-        return []
+        return np.empty(shape=(0, 3), dtype=np.float32)
 
-    axes = get_projection_axes(projection_plane)
-    return morphmath.aspect_ratio(np.unique(points, axis=0)[:, axes])
+    return np.unique(points, axis=0)[:, axes]
+
+
+@feature(shape=())
+def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+    """Calculates the min/max ratio of the principal direction extents along
+    the selected plane.
+
+    Args:
+        morph: Morphology object.
+        neurite_type: The neurite type to use. By default all neurite types are used.
+        projection_plane: Projection plane to use for the calculation. One of ('xy', 'xz', 'yz').
+
+    Returns:
+        The aspect ratio feature of the morphology points.
+    """
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    return [] if len(projected_points) == 0 else morphmath.aspect_ratio(projected_points)
+
+
+@feature(shape=())
+def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+    """Calculates the circularity of the morphology points along the selected plane.
+
+    The circularity is defined as the 4 * pi * area of the convex hull area over its
+    perimeter.
+
+    Args:
+        morph: Morphology object.
+        neurite_type: The neurite type to use. By default all neurite types are used.
+        projection_plane: Projection plane to use for the calculation. One of
+            ('xy', 'xz', 'yz').
+
+    Returns:
+        The circularity of the morphology points.
+    """
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    return [] if len(projected_points) == 0 else morphmath.circularity(projected_points)
+
+
+@feature(shape=())
+def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+    """Calculates the shape factor of the morphology points along the selected plane.
+
+    The shape factor is defined as the ratio of the convex hull area over max squared
+    pairwise distance of the morphology points.
+
+    Args:
+        morph: Morphology object.
+        neurite_type: The neurite type to use. By default all neurite types are used.
+        projection_plane: Projection plane to use for the calculation. One of
+            ('xy', 'xz', 'yz').
+
+    Returns:
+        The shape factor of the morphology points.
+    """
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    return [] if len(projected_points) == 0 else morphmath.shape_factor(projected_points)
