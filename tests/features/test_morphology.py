@@ -664,15 +664,5 @@ def test_volume_density():
     # no points
     assert np.isnan(
         morphology.volume_density(morph, neurite_type=NeuriteType.apical_dendrite),
-    )
+    
 
-
-def test_aspect_ratio():
-
-    result = morphology.aspect_ratio(NRN)
-
-    result = morphology.aspect_ratio(NRN, neurite_type=NeuriteType.axon)
-    result = morphology.aspect_ratio(NRN, neurite_type=NeuriteType.basal_dendrite)
-    result = morphology.aspect_ratio(NRN, neurite_type=NeuriteType.apical_dendrite)
-
-    raise NotImplementedError

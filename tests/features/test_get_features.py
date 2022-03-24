@@ -41,6 +41,7 @@ from neurom.exceptions import NeuroMError
 from neurom.features import neurite, NameSpace
 
 import pytest
+from numpy import testing as npt
 from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
@@ -860,4 +861,82 @@ def test_total_depth():
     assert_allclose(
         features.get('total_depth', NRN, neurite_type=nm.BASAL_DENDRITE),
         51.64143
+    )
+
+
+def test_aspect_ratio():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.710877,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.222268,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.315263,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph),
+        0.731076,
+        decimal=6
+    )
+
+
+def test_circularity():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.722613,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.378692,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.527657,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph),
+        0.730983,
+        decimal=6
+    )
+
+
+def test_shape_factor():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.356192,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.131547,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.194558,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph),
+        0.364678,
+        decimal=6
     )
