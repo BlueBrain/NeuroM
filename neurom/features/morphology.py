@@ -650,7 +650,7 @@ def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
 def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     """Calculates the circularity of the morphology points along the plane.
 
-    The circularity is defined as the 4 * pi * area of the convex hull area over its
+    The circularity is defined as the 4 * pi * area of the convex hull over its
     perimeter.
 
     Args:
