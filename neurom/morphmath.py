@@ -525,19 +525,21 @@ def aspect_ratio(points):
 
 
 def circularity(points):
-    """Computes circularity as 4 * pi * areas / perimeter^2
+    """Computes circularity as 4 * pi * area / perimeter^2.
 
-    Note: For 2D points, ConvexHull.volume corresponds to its area and ConvexHull.area to its
-        perimeter.
+    Note: For 2D points, ConvexHull.volume corresponds to its area and ConvexHull.area
+        to its perimeter.
     """
     hull = convex_hull(points)
-    return 4.0  * np.pi * hull.volume / hull.area**2
+    return 4.0 * np.pi * hull.volume / hull.area**2
 
 
 def shape_factor(points):
     """Computes area over max pairwise distance squared.
 
-    doi: 10.1109/ICoAC44903.2018.8939083
+    Defined in doi: 10.1109/ICoAC44903.2018.8939083
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area.
     """
     hull = convex_hull(points)
     hull_points = points[hull.vertices]

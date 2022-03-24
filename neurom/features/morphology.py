@@ -634,8 +634,7 @@ def _unique_projected_points(morph, projection_plane,  neurite_type):
 
 @feature(shape=())
 def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
-    """Calculates the min/max ratio of the principal direction extents along
-    the selected plane.
+    """Calculates the min/max ratio of the principal direction extents along the plane.
 
     Args:
         morph: Morphology object.
@@ -651,7 +650,7 @@ def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
 
 @feature(shape=())
 def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
-    """Calculates the circularity of the morphology points along the selected plane.
+    """Calculates the circularity of the morphology points along the plane.
 
     The circularity is defined as the 4 * pi * area of the convex hull area over its
     perimeter.
@@ -671,7 +670,7 @@ def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
 
 @feature(shape=())
 def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
-    """Calculates the shape factor of the morphology points along the selected plane.
+    """Calculates the shape factor of the morphology points along the plane.
 
     The shape factor is defined as the ratio of the convex hull area over max squared
     pairwise distance of the morphology points.
