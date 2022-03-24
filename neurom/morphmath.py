@@ -34,6 +34,7 @@ from itertools import combinations
 import numpy as np
 from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
+from scipy.spatial.distance import cdist
 
 from neurom.core.dataformat import COLS
 
@@ -531,3 +532,16 @@ def circularity(points):
     """
     hull = convex_hull(points)
     return 4.0  * np.pi * hull.volume / hull.area**2
+
+
+def shape_factor(points):
+    """Computes area over max pairwise distance squared.
+
+    doi: 10.1109/ICoAC44903.2018.8939083
+    """
+    hull = convex_hull(points)
+    hull_points = points[hull.vertices]
+
+    max_pairwise_distance = np.max(cdist(hull_points, hull_points))
+
+    return hull.volume / max_pairwise_distance**2

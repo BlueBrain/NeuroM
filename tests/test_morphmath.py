@@ -754,3 +754,37 @@ def test_circularity():
         0.658071,
         atol=1e-5
     )
+
+def test_shape_factor():
+    shapes = _shape_datasets()
+
+    npt.assert_allclose(
+        mm.shape_factor(shapes["cross-3D"]),
+        0.786988,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.shape_factor(shapes["cross-2D"]),
+        0.244018,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.shape_factor(shapes["circle-2D"]),
+        0.766784,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.shape_factor(shapes["square-2D"]),
+        0.5,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.shape_factor(shapes["rectangle-2D"]),
+        0.4,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.shape_factor(shapes["oval-2D"]),
+        0.257313,
+        atol=1e-5
+    )
