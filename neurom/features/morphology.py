@@ -620,16 +620,14 @@ def _unique_projected_points(morph, projection_plane,  neurite_type):
             f"Please select 'xy', 'xz', or 'yz'."
         ) from e
 
-    points = [
-        point
-        for point_list in iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
-        for point in point_list
-    ]
+    points = list(
+        iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
+    )
 
-    if not points:
+    if len(points) == 0:
         return np.empty(shape=(0, 3), dtype=np.float32)
 
-    return np.unique(points, axis=0)[:, axes]
+    return np.unique(np.vstack(points), axis=0)[:, axes]
 
 
 @feature(shape=())
