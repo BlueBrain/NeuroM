@@ -521,3 +521,13 @@ def aspect_ratio(points):
     """Computes the min/max ratio of the principal direction extents."""
     extents = principal_direction_extent(points)
     return float(extents.min() / extents.max())
+
+
+def circularity(points):
+    """Computes circularity as 4 * pi * areas / perimeter^2
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area and ConvexHull.area to its
+        perimeter.
+    """
+    hull = convex_hull(points)
+    return 4.0  * np.pi * hull.volume / hull.area**2

@@ -598,108 +598,159 @@ def test_convex_hull_invalid():
     assert mm.convex_hull([[1., 0., 0.], [1., 0., 0.]]) is None
 
 
+def _shape_datasets():
+
+    return {
+        "cross-3D": np.array([
+            [-5.2, 0.0, 0.0],
+            [ 4.8, 0.0, 0.0],
+            [ 0.0,-1.3, 0.0],
+            [ 0.0, 4.7, 0.0],
+            [ 0.0, 0.0,-11.2],
+            [ 0.0, 0.0, 0.8],
+        ]),
+        "cross-2D": np.array([
+            [ 0.0, 0.0],
+            [ 0.0, 0.0],
+            [-1.3, 0.0],
+            [ 4.7, 0.0],
+            [ 0.0,-11.2],
+            [ 0.0, 0.8],
+        ]),
+        "circle-2D": np.array([
+            [ 5.0e-01,  0.0e+00],
+            [ 4.7e-01,  1.6e-01],
+            [ 3.9e-01,  3.1e-01],
+            [ 2.7e-01,  4.2e-01],
+            [ 1.2e-01,  4.8e-01],
+            [-4.1e-02,  5.0e-01],
+            [-2.0e-01,  4.6e-01],
+            [-3.4e-01,  3.7e-01],
+            [-4.4e-01,  2.4e-01],
+            [-5.0e-01,  8.2e-02],
+            [-5.0e-01, -8.2e-02],
+            [-4.4e-01, -2.4e-01],
+            [-3.4e-01, -3.7e-01],
+            [-2.0e-01, -4.6e-01],
+            [-4.1e-02, -5.0e-01],
+            [ 1.2e-01, -4.8e-01],
+            [ 2.7e-01, -4.2e-01],
+            [ 3.9e-01, -3.1e-01],
+            [ 4.7e-01, -1.6e-01],
+            [ 5.0e-01, -1.2e-16],
+        ]),
+        "square-2D": np.array([
+            [ 0.0, 0.0 ],
+            [ 5.0, 0.0 ],
+            [10.0, 0.0 ],
+            [ 0.0, 5.0 ],
+            [ 0.0, 10.0],
+            [ 5.0, 10.0],
+            [10.0, 10.0],
+            [10.0, 5.0 ],
+        ]),
+        "rectangle-2D": np.array([
+            [ 0.0, 0.0 ],
+            [ 5.0, 0.0 ],
+            [20.0, 0.0 ],
+            [ 0.0, 5.0 ],
+            [ 0.0, 10.0],
+            [ 5.0, 10.0],
+            [20.0, 10.0],
+            [20.0, 5.0 ],
+        ]),
+        "oval-2D": np.array([
+            [ 5.00e-01,  0.00e+00],
+            [ 4.70e-01,  4.80e-01],
+            [ 3.90e-01,  9.30e-01],
+            [ 2.70e-01,  1.26e+00],
+            [ 1.20e-01,  1.44e+00],
+            [-4.10e-02,  1.50e+00],
+            [-2.00e-01,  1.38e+00],
+            [-3.40e-01,  1.11e+00],
+            [-4.40e-01,  7.20e-01],
+            [-5.00e-01,  2.46e-01],
+            [-5.00e-01, -2.46e-01],
+            [-4.40e-01, -7.20e-01],
+            [-3.40e-01, -1.11e+00],
+            [-2.00e-01, -1.38e+00],
+            [-4.10e-02, -1.50e+00],
+            [ 1.20e-01, -1.44e+00],
+            [ 2.70e-01, -1.26e+00],
+            [ 3.90e-01, -9.30e-01],
+            [ 4.70e-01, -4.80e-01],
+            [ 5.00e-01, -3.60e-16]
+        ]),
+    }
+
+
 def test_aspect_ratio():
 
-    # check it works in 3D
-    cross_3D_points = np.array([
-        [-5.2, 0.0, 0.0],
-        [ 4.8, 0.0, 0.0],
-        [ 0.0,-1.3, 0.0],
-        [ 0.0, 4.7, 0.0],
-        [ 0.0, 0.0,-11.2],
-        [ 0.0, 0.0, 0.8],
-    ])
+    shapes = _shape_datasets()
 
     npt.assert_allclose(
-        mm.aspect_ratio(cross_3D_points),
+        mm.aspect_ratio(shapes["cross-3D"]),
         0.5,
         atol=1e-5
     )
-
-    # check it works in 2D
-    cross_3D_points = np.array([
-        [ 0.0, 0.0],
-        [ 0.0, 0.0],
-        [-1.3, 0.0],
-        [ 4.7, 0.0],
-        [ 0.0,-11.2],
-        [ 0.0, 0.8],
-    ])
-
     npt.assert_allclose(
-        mm.aspect_ratio(cross_3D_points),
+        mm.aspect_ratio(shapes["cross-2D"]),
         0.5,
         atol=1e-5
     )
-    circle = np.array([
-        [ 5.0e-01,  0.0e+00],
-        [ 4.7e-01,  1.6e-01],
-        [ 3.9e-01,  3.1e-01],
-        [ 2.7e-01,  4.2e-01],
-        [ 1.2e-01,  4.8e-01],
-        [-4.1e-02,  5.0e-01],
-        [-2.0e-01,  4.6e-01],
-        [-3.4e-01,  3.7e-01],
-        [-4.4e-01,  2.4e-01],
-        [-5.0e-01,  8.2e-02],
-        [-5.0e-01, -8.2e-02],
-        [-4.4e-01, -2.4e-01],
-        [-3.4e-01, -3.7e-01],
-        [-2.0e-01, -4.6e-01],
-        [-4.1e-02, -5.0e-01],
-        [ 1.2e-01, -4.8e-01],
-        [ 2.7e-01, -4.2e-01],
-        [ 3.9e-01, -3.1e-01],
-        [ 4.7e-01, -1.6e-01],
-        [ 5.0e-01, -1.2e-16],
-    ])
-
     npt.assert_allclose(
-        mm.aspect_ratio(circle),
+        mm.aspect_ratio(shapes["circle-2D"]),
         1.0,
         atol=1e-5
     )
-
-    square = np.array([
-        [ 0.0, 0.0 ],
-        [ 5.0, 0.0 ],
-        [10.0, 0.0 ],
-        [ 0.0, 5.0 ],
-        [ 0.0, 10.0],
-        [ 5.0, 10.0],
-        [10.0, 10.0],
-        [10.0, 5.0 ],
-    ])
-
     npt.assert_allclose(
-        mm.aspect_ratio(square),
+        mm.aspect_ratio(shapes["square-2D"]),
         1.0,
         atol=1e-5
     )
-
-    rectangle = np.array([
-        [ 0.0, 0.0 ],
-        [ 5.0, 0.0 ],
-        [20.0, 0.0 ],
-        [ 0.0, 5.0 ],
-        [ 0.0, 10.0],
-        [ 5.0, 10.0],
-        [20.0, 10.0],
-        [20.0, 5.0 ],
-    ])
-
     npt.assert_allclose(
-        mm.aspect_ratio(rectangle),
+        mm.aspect_ratio(shapes["rectangle-2D"]),
         0.5,
         atol=1e-5
     )
-
-    # ellipse: x = acost, y = bcost
-    oval = circle.copy()
-    oval[:, 1] *= 3.0
-
     npt.assert_allclose(
-        mm.aspect_ratio(oval),
+        mm.aspect_ratio(shapes["oval-2D"]),
         0.333333,
+        atol=1e-5
+    )
+
+
+def test_circularity():
+
+    shapes = _shape_datasets()
+
+    npt.assert_allclose(
+        mm.circularity(shapes["cross-3D"]),
+        0.051904,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.circularity(shapes["cross-2D"]),
+        0.512329,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.circularity(shapes["circle-2D"]),
+        0.99044,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.circularity(shapes["square-2D"]),
+        0.785398,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.circularity(shapes["rectangle-2D"]),
+        0.698132,
+        atol=1e-5
+    )
+    npt.assert_allclose(
+        mm.circularity(shapes["oval-2D"]),
+        0.658071,
         atol=1e-5
     )
