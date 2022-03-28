@@ -36,6 +36,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
+from numpy import testing as npt
 from numpy.testing import assert_allclose
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
@@ -665,3 +666,62 @@ def test_volume_density():
     assert np.isnan(
         morphology.volume_density(morph, neurite_type=NeuriteType.apical_dendrite),
     )
+
+
+def test_unique_projected_points():
+
+    morph = load_swc("""
+        1  1   0.5 0.5 0.5   0.5 -1
+        2  3   0.2 0.2 0.7   0.1  1
+        3  3   0.0 0.0 1.0   0.1  2
+        4  3   0.2 0.7 0.7   0.1  1
+        5  3   0.0 1.0 1.0   0.1  4
+        6  3   0.7 0.2 0.7   0.1  1
+        7  3   1.0 0.0 1.0   0.1  6
+        8  3   0.2 0.2 0.2   0.1  1
+        9  3   0.0 0.0 0.0   0.1  8
+       10  3   0.2 0.7 0.2   0.1  1
+       11  3   0.0 1.0 0.0   0.1  10
+       12  5   0.7 0.7 0.2   0.1  1
+       13  5   1.0 1.0 0.0   0.1  12
+       14  2   0.7 0.2 0.2   0.1  1
+       15  2   1.0 0.0 0.0   0.1  14
+       16  3   0.7 0.7 0.7   0.1  1
+       17  3   1.0 1.0 1.0   0.1  16
+    """)
+
+    for plane, enalp in zip(("xy", "xz", "yz"), ("yx", "zx", "zy")):
+        npt.assert_allclose(
+            morphology._unique_projected_points(morph, plane, NeuriteType.all),
+            morphology._unique_projected_points(morph, enalp, NeuriteType.all),
+        )
+
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "xy", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 0. ], [0. , 1. ], [0. , 1. ], [0.2, 0.2], [0.2, 0.2],
+            [0.2, 0.7], [0.2, 0.7], [0.7, 0.2], [0.7, 0.2], [0.7, 0.7], [0.7, 0.7],
+            [1. , 0. ], [1. , 0. ], [1. , 1. ], [1. , 1. ],
+        ]
+    )
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "xz", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 1. ], [0. , 0. ], [0. , 1. ], [0.2, 0.2], [0.2, 0.7],
+            [0.2, 0.2], [0.2, 0.7], [0.7, 0.2], [0.7, 0.7], [0.7, 0.2], [0.7, 0.7],
+            [1. , 0. ], [1. , 1. ], [1. , 0. ], [1. , 1. ],
+        ]
+    )
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "yz", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 1. ], [1. , 0. ], [1. , 1. ], [0.2, 0.2], [0.2, 0.7],
+            [0.7, 0.2], [0.7, 0.7], [0.2, 0.2], [0.2, 0.7], [0.7, 0.2], [0.7, 0.7],
+            [0. , 0. ], [0. , 1. ], [1. , 0. ], [1. , 1. ],
+       ]
+    )
+
+    with pytest.raises(NeuroMError):
+        morphology._unique_projected_points(morph, "airplane", NeuriteType.all)
+
+    assert len(morphology._unique_projected_points(morph, "yz", NeuriteType.apical_dendrite)) == 0

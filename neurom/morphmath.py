@@ -28,11 +28,18 @@
 
 """Mathematical and geometrical functions used to compute morphometrics."""
 import math
+import logging
 from itertools import combinations
 
 import numpy as np
+from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
+from scipy.spatial.distance import cdist
 
 from neurom.core.dataformat import COLS
+
+
+L = logging.getLogger(__name__)
 
 
 def vector(p1, p2):
@@ -488,3 +495,55 @@ def principal_direction_extent(points):
 
     # and return the range of the projections (abs(max - min)) along each column (eigenvector)
     return np.ptp(scalar_projections, axis=0)
+
+
+def convex_hull(points):
+    """Get the convex hull from an array of points.
+
+    Returns:
+        scipy.spatial.ConvexHull object if successful, otherwise None
+    """
+    if len(points) == 0:
+        L.exception(
+            "Failure to compute convex hull because there are no points"
+        )
+        return None
+
+    try:
+        return ConvexHull(points)
+    except QhullError:
+        L.exception(
+            "Failure to compute convex hull because of geometrical degeneracy."
+        )
+        return None
+
+
+def aspect_ratio(points):
+    """Computes the min/max ratio of the principal direction extents."""
+    extents = principal_direction_extent(points)
+    return float(extents.min() / extents.max())
+
+
+def circularity(points):
+    """Computes circularity as 4 * pi * area / perimeter^2.
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area and ConvexHull.area
+        to its perimeter.
+    """
+    hull = convex_hull(points)
+    return 4.0 * np.pi * hull.volume / hull.area**2
+
+
+def shape_factor(points):
+    """Computes area over max pairwise distance squared.
+
+    Defined in doi: 10.1109/ICoAC44903.2018.8939083
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area.
+    """
+    hull = convex_hull(points)
+    hull_points = points[hull.vertices]
+
+    max_pairwise_distance = np.max(cdist(hull_points, hull_points))
+
+    return hull.volume / max_pairwise_distance**2

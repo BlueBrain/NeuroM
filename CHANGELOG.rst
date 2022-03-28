@@ -4,6 +4,7 @@ Changelog
 Version 3.2.0
 -------------
 
+- Add features ``neurom.features.morphology.(aspect_ration, circularity, shape_factor)```
 - Fix ``neurom.morphmath.principal_direction_extent`` to calculate correctly the pca extent.
 - Fix ``neurom.features.neurite.segment_taper_rates`` to return signed taper rates.
 - Fix warning system so that it doesn't change the pre-existing warnings configuration

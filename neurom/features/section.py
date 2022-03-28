@@ -36,6 +36,11 @@ from neurom.core.morphology import iter_segments
 from neurom.morphmath import interval_lengths
 
 
+def section_points(section):
+    """Returns the points in the section."""
+    return section.points[:, COLS.XYZ]
+
+
 def section_path_length(section):
     """Path length from section to root."""
     return sum(s.length for s in section.iupstream())
