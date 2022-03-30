@@ -195,17 +195,17 @@ from neurom.features import neurite, morphology, \
 def _features_catalogue():
     """Returns a string with all the available builtin features."""
     indentation = "\t"
-    title = "\n    Builtin Features:\n"
+    preamble = "\n    .. Builtin Features:\n"
 
     def format_category(category):
-        separator = "=" * len(category)
+        separator = "-" * len(category)
         return f"\n{indentation}{category}\n{indentation}{separator}"
 
     def format_features(features):
         prefix = f"\n{indentation}* "
         return prefix + f"{prefix}".join(sorted(features))
 
-    return title + "".join(
+    return preamble + "".join(
         [
             format_category(category) + format_features(features) + "\n"
             for category, features in zip(
