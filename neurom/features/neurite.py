@@ -446,7 +446,12 @@ def section_end_distances(neurite):
 
 @feature(shape=(...,))
 def principal_direction_extents(neurite, direction=0):
-    """Principal direction extent of neurites in morphologies."""
+    """Principal direction extent of neurites in morphologies.
+
+    Note:
+        Principal direction extents are always sorted in descending order. Therefore,
+        by default the maximal principal direction extent is returned.
+    """
     return [morphmath.principal_direction_extent(neurite.points[:, COLS.XYZ])[direction]]
 
 

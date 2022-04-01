@@ -798,18 +798,46 @@ def test_principal_direction_extents():
 
     # test with a realistic morphology
     m = nm.load_morphology(DATA_PATH / 'h5/v1' / 'bio_neuron-000.h5')
-    p_ref = [
-        1210.569727,
-        38.493958,
-        147.098687,
-        288.226628,
-        330.166506,
-        152.396521,
-        293.913857
-    ]
-    p = features.get('principal_direction_extents', m)
-    assert_allclose(p, p_ref, rtol=1e-6)
 
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=0),
+        [
+            1210.569727,
+            117.988454,
+            147.098687,
+            288.226628,
+            330.166506,
+            152.396521,
+            293.913857,
+        ],
+        atol=1e-6
+    )
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=1),
+        [
+            851.730088,
+            99.108911,
+            116.949436,
+            157.171734,
+            137.328019,
+            20.66982,
+            67.157249,
+        ],
+        atol=1e-6
+    )
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=2),
+        [
+            282.961199,
+            38.493958,
+            40.715183,
+            94.061625,
+            51.120255,
+            10.793167,
+            62.808188
+        ],
+        atol=1e-6
+    )
 
 def test_total_width():
 

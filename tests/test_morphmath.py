@@ -587,8 +587,8 @@ def test_principal_direction_extent():
     ])
 
     npt.assert_allclose(
-        sorted(mm.principal_direction_extent(cross_3D_points)),
-        [6.0, 10.0, 12.0], atol=0.1,
+        mm.principal_direction_extent(cross_3D_points),
+        [12.0, 10.0, 6.0], atol=0.1,
     )
 
 

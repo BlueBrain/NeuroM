@@ -479,7 +479,7 @@ def principal_direction_extent(points):
         extents : the extents for each of the eigenvectors of the cov matrix
 
     Note:
-        Direction extents are not ordered from largest to smallest.
+        Direction extents are ordered from largest to smallest.
     """
     # pca can be biased by duplicate points
     points = np.unique(points, axis=0)
@@ -488,13 +488,17 @@ def principal_direction_extent(points):
     points -= np.mean(points, axis=0)
 
     # principal components
-    _, eigv = pca(points)
+    _, eigenvectors = pca(points)
 
     # for each eigenvector calculate the scalar projection of the points on it (n_points, n_eigv)
-    scalar_projections = points.dot(eigv)
+    scalar_projections = points.dot(eigenvectors)
 
-    # and return the range of the projections (abs(max - min)) along each column (eigenvector)
-    return np.ptp(scalar_projections, axis=0)
+    # range of the projections (abs(max - min)) along each column (eigenvector)
+    extents = np.ptp(scalar_projections, axis=0)
+
+    descending_order = np.argsort(extents)[::-1]
+
+    return extents[descending_order]
 
 
 def convex_hull(points):
