@@ -190,3 +190,31 @@ def feature(shape, namespace: NameSpace, name=None):
 # These imports are necessary in order to register the features
 from neurom.features import neurite, morphology, \
     population  # noqa, pylint: disable=wrong-import-position
+
+
+def _features_catalogue():
+    """Returns a string with all the available builtin features."""
+    indentation = "\t"
+    preamble = "\n    .. Builtin Features:\n"
+
+    def format_category(category):
+        separator = "-" * len(category)
+        return f"\n{indentation}{category}\n{indentation}{separator}"
+
+    def format_features(features):
+        prefix = f"\n{indentation}* "
+        return prefix + f"{prefix}".join(sorted(features))
+
+    return preamble + "".join(
+        [
+            format_category(category) + format_features(features) + "\n"
+            for category, features in zip(
+                ("Population", "Morphology", "Neurite"),
+                (_POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES),
+            )
+        ]
+    )
+
+
+# Update the get docstring to include all available builtin features
+get.__doc__ += _features_catalogue()
