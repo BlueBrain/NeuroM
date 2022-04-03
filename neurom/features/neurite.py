@@ -50,7 +50,7 @@ import numpy as np
 from neurom import morphmath
 from neurom.utils import flatten
 from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section
+from neurom.core.morphology import Section, iter_points
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
 from neurom.morphmath import convex_hull
@@ -539,13 +539,7 @@ def principal_direction_extents(neurite, direction=0, section_type=NeuriteType.a
         Principal direction extents are always sorted in descending order. Therefore,
         by default the maximal principal direction extent is returned.
     """
-    def get_points(section):
-        return section.points[:, COLS.XYZ].tolist()
-
-    # Note: duplicate points are included and need to be removed
-    points = list(
-        flatten(_map_sections(get_points, neurite, section_type=section_type))
-    )
+    points = list(iter_points(neurite, section_filter=is_type(section_type)))
 
     return [morphmath.principal_direction_extent(np.unique(points, axis=0))[direction]]
 

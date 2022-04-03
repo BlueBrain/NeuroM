@@ -52,16 +52,16 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import iter_neurites, iter_sections, iter_segments, Morphology
+from neurom.core.morphology import (
+    iter_neurites, iter_sections, iter_segments, iter_points, Morphology
+)
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
-from neurom.features import feature, NameSpace, neurite as nf, section as sf
+from neurom.features import feature, NameSpace, neurite as nf
 from neurom.utils import str_to_plane
 from neurom.morphmath import convex_hull
-
-from neurom.core.morphology import Neurite
 
 
 feature = partial(feature, namespace=NameSpace.NEURON)
@@ -75,6 +75,14 @@ def _map_neurites(function, morph, neurite_type, use_subtrees=False):
             filt=is_type(neurite_type),
             use_subtrees=use_subtrees,
         )
+    )
+
+
+def _get_points(morph, neurite_type, use_subtrees=False):
+    return list(
+        iter_points(morph, section_filter=is_type(neurite_type))
+        if use_subtrees
+        else iter_points(morph, neurite_filter=is_type(neurite_type))
     )
 
 
@@ -655,37 +663,7 @@ def volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     .. note:: Returns `np.nan` if the convex hull computation fails or there are not points
               available due to neurite type filtering.
     """
-<<<<<<< HEAD
-    # note: duplicate points are present but do not affect convex hull calculation
-    points = [
-        point
-        for point_list in iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
-        for point in point_list
-=======
-
-    def get_points(neurite, section_type=NeuriteType.all):
-
-        if section_type == NeuriteType.all:
-            return neurite.points[:, COLS.XYZ]
-
-        return [
-            point
-            for section in neurite.root_node.ipreorder() if section.type == section_type
-            for point in section.points[:, COLS.XYZ]
-        ]
-
-    # note: duplicate points are present but do not affect convex hull calculation
-    points = [
-        point
-        for list_of_points in iter_neurites(
-            morph,
-            mapfun=get_points,
-            filt=is_type(neurite_type),
-            use_subtrees=use_subtrees,
-        )
-        for point in list_of_points
->>>>>>> Add more complex test morph, update features
-    ]
+    points = _get_points(morph, neurite_type, use_subtrees)
 
     if not points:
         return np.nan
@@ -702,7 +680,7 @@ def volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     return total_volume / morph_hull.volume
 
 
-def _unique_projected_points(morph, projection_plane,  neurite_type):
+def _unique_projected_points(morph, projection_plane,  neurite_type, use_subtrees=False):
 
     key = "".join(sorted(projection_plane.lower()))
 
@@ -716,9 +694,7 @@ def _unique_projected_points(morph, projection_plane,  neurite_type):
             f"Please select 'xy', 'xz', or 'yz'."
         ) from e
 
-    points = list(
-        iter_neurites(morph, mapfun=sf.section_points, filt=is_type(neurite_type))
-    )
+    points = _get_points(morph, neurite_type, use_subtrees)
 
     if len(points) == 0:
         return np.empty(shape=(0, 3), dtype=np.float32)
@@ -727,23 +703,24 @@ def _unique_projected_points(morph, projection_plane,  neurite_type):
 
 
 @feature(shape=())
-def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy", use_subtrees=False):
     """Calculates the min/max ratio of the principal direction extents along the plane.
 
     Args:
         morph: Morphology object.
         neurite_type: The neurite type to use. By default all neurite types are used.
         projection_plane: Projection plane to use for the calculation. One of ('xy', 'xz', 'yz').
+        use_subtrees: Enable mixed subtree processing
 
     Returns:
         The aspect ratio feature of the morphology points.
     """
-    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type, use_subtrees)
     return np.nan if len(projected_points) == 0 else morphmath.aspect_ratio(projected_points)
 
 
 @feature(shape=())
-def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy", use_subtrees=False):
     """Calculates the circularity of the morphology points along the plane.
 
     The circularity is defined as the 4 * pi * area of the convex hull over its
@@ -754,16 +731,17 @@ def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
         neurite_type: The neurite type to use. By default all neurite types are used.
         projection_plane: Projection plane to use for the calculation. One of
             ('xy', 'xz', 'yz').
+        use_subtrees: Enable mixed subtree processing
 
     Returns:
         The circularity of the morphology points.
     """
-    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type, use_subtrees)
     return np.nan if len(projected_points) == 0 else morphmath.circularity(projected_points)
 
 
 @feature(shape=())
-def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
+def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy", use_subtrees=False):
     """Calculates the shape factor of the morphology points along the plane.
 
     The shape factor is defined as the ratio of the convex hull area over max squared
@@ -774,11 +752,12 @@ def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
         neurite_type: The neurite type to use. By default all neurite types are used.
         projection_plane: Projection plane to use for the calculation. One of
             ('xy', 'xz', 'yz').
+        use_subtrees: Enable mixed subtree processing
 
     Returns:
         The shape factor of the morphology points.
     """
-    projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
+    projected_points = _unique_projected_points(morph, projection_plane, neurite_type, use_subtrees)
     return np.nan if len(projected_points) == 0 else morphmath.shape_factor(projected_points)
 
 

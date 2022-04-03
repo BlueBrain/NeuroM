@@ -360,6 +360,35 @@ def iter_segments(
     )
 
 
+def iter_points(
+    obj,
+    neurite_filter=None,
+    neurite_order=NeuriteIter.FileOrder,
+    section_filter=None
+):
+    """Return an iterator to the points in a population, morphology, neurites, or section.
+
+    Args:
+        obj: population, morphology, neurite, section or iterable containing
+        neurite_filter: optional top level filter on properties of neurite neurite objects
+        neurite_order: order upon which neurite should be iterated. Values:
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter
+    """
+    sections = (
+        iter((obj,)) if isinstance(obj, Section)
+        else iter_sections(
+            obj,
+            neurite_filter=neurite_filter,
+            neurite_order=neurite_order,
+            section_filter=section_filter
+        )
+    )
+
+    return flatten(s.points[:, COLS.XYZ] for s in sections)
+
+
 def graft_morphology(section):
     """Returns a morphology starting at section."""
     assert isinstance(section, Section)

@@ -656,6 +656,72 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 0.23561945,
             },
         ],
+        "aspect_ratio":[
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 0.630311,
+                "expected_with_subtrees": 0.630311,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 0.305701,
+                "expected_with_subtrees": 0.284467,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": np.nan,
+                "expected_with_subtrees": 0.666667,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 0.5,
+                "expected_with_subtrees": 0.5,
+            },
+        ],
+        "circularity": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 0.739583,
+                "expected_with_subtrees": 0.739583,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 0.525588,
+                "expected_with_subtrees": 0.483687,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": np.nan,
+                "expected_with_subtrees": 0.544013,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 0.539012,
+                "expected_with_subtrees": 0.539012,
+            },
+        ],
+        "shape_factor": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 0.40566,
+                "expected_with_subtrees": 0.40566,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 0.21111,
+                "expected_with_subtrees": 0.18750,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.axon},
+                "expected_wout_subtrees": np.nan,
+                "expected_with_subtrees": 0.3,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
+                "expected_wout_subtrees": 0.25,
+                "expected_with_subtrees": 0.25,
+            },
+        ]
     }
 
     features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
@@ -1723,23 +1789,23 @@ def _neurite_features(mode):
         "principal_direction_extents": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [3.321543, 5.470702, 3.421831],
-                "expected_with_subtrees": [3.321543, 2.735383, 3.549779, 3.421831],
+                "expected_wout_subtrees": [2., 3.596771, 2.],
+                "expected_with_subtrees": [2., 3.154926, 2.235207, 2.],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [3.321543, 5.470702],
-                "expected_with_subtrees": [3.321543, 2.735383],
+                "expected_wout_subtrees": [2., 3.596771],
+                "expected_with_subtrees": [2., 3.154926],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [3.549779],
+                "expected_with_subtrees": [2.235207],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [3.421831],
-                "expected_with_subtrees": [3.421831],
+                "expected_wout_subtrees": [2.],
+                "expected_with_subtrees": [2.],
             },
         ],
         "partition_asymmetry": [
