@@ -404,7 +404,7 @@ def terminal_path_lengths(neurite):
     return _map_sections(sf.section_path_length, neurite, Section.ileaf)
 
 
-@feature(shape=())
+@feature(shape=(), is_reducible=False)
 def volume_density(neurite):
     """Get the volume density.
 

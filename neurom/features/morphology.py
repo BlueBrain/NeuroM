@@ -504,7 +504,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
             for r in radii]
 
 
-@feature(shape=(...,))
+@feature(shape=(...,), is_reducible=False)
 def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a morph.
 
@@ -580,7 +580,7 @@ def total_depth(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=())
-def volume_density(morph, neurite_type=NeuriteType.all):
+def volume_density(morph, neurite_type=NeuriteType.all, is_redusible=False):
     """Get the volume density.
 
     The volume density is defined as the ratio of the neurite volume and
