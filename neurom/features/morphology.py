@@ -643,7 +643,7 @@ def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
         The aspect ratio feature of the morphology points.
     """
     projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
-    return [] if len(projected_points) == 0 else morphmath.aspect_ratio(projected_points)
+    return np.nan if len(projected_points) == 0 else morphmath.aspect_ratio(projected_points)
 
 
 @feature(shape=())
@@ -663,7 +663,7 @@ def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
         The circularity of the morphology points.
     """
     projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
-    return [] if len(projected_points) == 0 else morphmath.circularity(projected_points)
+    return np.nan if len(projected_points) == 0 else morphmath.circularity(projected_points)
 
 
 @feature(shape=())
@@ -683,4 +683,4 @@ def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
         The shape factor of the morphology points.
     """
     projected_points = _unique_projected_points(morph, projection_plane, neurite_type)
-    return [] if len(projected_points) == 0 else morphmath.shape_factor(projected_points)
+    return np.nan if len(projected_points) == 0 else morphmath.shape_factor(projected_points)

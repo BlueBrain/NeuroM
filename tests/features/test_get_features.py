@@ -916,6 +916,7 @@ def test_aspect_ratio():
         0.731076,
         decimal=6
     )
+    assert np.isnan(features.get("aspect_ratio", morph, neurite_type=nm.NeuriteType.custom5))
 
 
 def test_circularity():
@@ -942,6 +943,7 @@ def test_circularity():
         0.730983,
         decimal=6
     )
+    assert np.isnan(features.get("circularity", morph, neurite_type=nm.NeuriteType.custom5))
 
 
 def test_shape_factor():
@@ -968,3 +970,4 @@ def test_shape_factor():
         0.364678,
         decimal=6
     )
+    assert np.isnan(features.get("shape_factor", morph, neurite_type=nm.NeuriteType.custom5))
