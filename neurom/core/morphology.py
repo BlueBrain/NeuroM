@@ -313,6 +313,8 @@ def iter_sections(neurites,
         neurite_order (NeuriteIter): order upon which neurites should be iterated
             - NeuriteIter.FileOrder: order of appearance in the file
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter. Please note that neurite_filter takes
+            precedence over the section_filter.
 
 
     Examples:
