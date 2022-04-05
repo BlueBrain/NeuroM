@@ -216,12 +216,10 @@ NRN_ORDER = {NeuriteType.soma: 0,
 
 
 def _homogeneous_subtrees(neurite):
-    """Returns a dictionary the keys of which are section types and the values are the sub-neurites.
+    """Returns a list of the root nodes of the sub-neurites.
 
     A sub-neurite can be either the entire tree or a homogeneous downstream
     sub-tree.
-
-    Note: Only two different mixed types are allowed
     """
     homogeneous_neurites = {neurite.root_node.type: neurite}
     for section in neurite.root_node.ipreorder():
