@@ -65,10 +65,9 @@ def _stats(seq):
 
 
 def test_get_raises():
-    with pytest.raises(NeuroMError,
-                       match='Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology'):
+    with pytest.raises(NeuroMError, match="Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology"):
         features.get('soma_radius', (n for n in POP))
-    with pytest.raises(NeuroMError, match='Cant apply "invalid" feature'):
+    with pytest.raises(NeuroMError, match="Cant apply 'invalid' feature"):
         features.get('invalid', NRN)
 
 
