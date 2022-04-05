@@ -1,4 +1,4 @@
-# Copyright (c) 2019, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+# Copyright (c) 2020, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
 # This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
@@ -459,7 +459,7 @@ def trunk_origin_radii(
                     "values excluded all the points of the section so the radius of the first "
                     "point after the 'min_length_filter' path distance is returned."
                 )
-                # pylint: disable = invalid-unary-operand-type
+                # pylint: disable=invalid-unary-operand-type
                 return points[~valid_max, COLS.R][0]
 
         return points[valid_pts, COLS.R].mean()
