@@ -259,11 +259,6 @@ def iter_neurites(
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
-    def extract_subneurites(neurite):
-        if neurite.is_heterogeneous():
-            return _homogeneous_subtrees(neurite)
-        return [neurite]
-
     neurites = (
         (obj,)
         if isinstance(obj, Neurite)
@@ -280,7 +275,11 @@ def iter_neurites(
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     if use_subtrees:
-        neurites = flatten(map(extract_subneurites, neurites))
+
+        neurites = flatten(
+            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
+            for neurite in neurites
+        )
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 
