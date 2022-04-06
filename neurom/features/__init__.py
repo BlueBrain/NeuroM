@@ -84,6 +84,11 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs, use_subtr
     )
 
 
+def _is_subtree_processing_applicable(feature_function):
+    """Returns true if feature's signature supports the use_subtrees kwarg."""
+    return "use_subtrees" in inspect.signature(feature_function).parameters
+
+
 def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
@@ -130,7 +135,7 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
 
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
 
-            if "use_subtrees" in inspect.signature(feature_).parameters:
+            if _is_subtree_processing_applicable(feature_):
                 kwargs["use_subtrees"] = use_subtrees
 
             res = feature_(obj, **kwargs)
@@ -145,14 +150,14 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
         if feature_name in _POPULATION_FEATURES:
             feature_ = _POPULATION_FEATURES[feature_name]
 
-            if "use_subtrees" in inspect.signature(feature_).parameters:
+            if _is_subtree_processing_applicable(feature_):
                 kwargs["use_subtrees"] = use_subtrees
 
             res = feature_(obj, **kwargs)
         elif feature_name in _MORPHOLOGY_FEATURES:
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
 
-            if "use_subtrees" in inspect.signature(feature_).parameters:
+            if _is_subtree_processing_applicable(feature_):
                 kwargs["use_subtrees"] = use_subtrees
 
             res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
