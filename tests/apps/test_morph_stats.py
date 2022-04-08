@@ -279,6 +279,8 @@ def test_extract_dataframe_with_kwargs():
     assert_frame_equal(actual, expected, check_dtype=False)
 
 
+
+
 def test_extract_dataframe_multiproc():
     morphs = [Path(SWC_PATH, name)
             for name in ['Neuron.swc', 'simple.swc']]
@@ -329,13 +331,51 @@ def test_full_config():
     assert set(entry[0] for entry in config['population']) == set(_POPULATION_FEATURES.keys())
 
 
+def test_convert_to_kwargs_modes_layout():
+    """Converts the config category entries (e.g. neurite, morphology, population) to using
+    the kwarg and modes layout.
+    """
+    # from short format
+    entry = {"f1": ["min", "max"], "f2": ["min"], "f3": []}
+    assert ms._kwargs_modes_layout(entry) == [
+        ["f1", {"kwargs": {}, "modes": ["min", "max"]}],
+        ["f2", {"kwargs": {}, "modes": ["min"]}],
+        ["f3", {"kwargs": {}, "modes": []}],
+    ]
+
+    # from kwarg/modes with missing options
+    entry = {
+        "f1": {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]},
+        "f2": {"modes": ["min", "median"]},
+        "f3": {"kwargs": {"a1": 1, "a2": 2}},
+        "f4": {},
+    }
+    assert ms._kwargs_modes_layout(entry) == [
+        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
+        ["f2", {"kwargs": {}, "modes": ["min", "median"]}],
+        ["f3", {"kwargs": {"a1": 1, "a2": 2}, "modes": []}],
+        ["f4", {"kwargs": {}, "modes": []}],
+    ]
+
+    # from list layout
+    entry = [
+        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
+        ["f2", {"modes": ["min", "median"]}],
+        ["f3", {"kwargs": {"a1": 1, "a2": 2}}],
+        ["f4", {}],
+    ]
+    assert ms._kwargs_modes_layout(entry) == [
+        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
+        ["f2", {"kwargs": {}, "modes": ["min", "median"]}],
+        ["f3", {"kwargs": {"a1": 1, "a2": 2}, "modes": []}],
+        ["f4", {"kwargs": {}, "modes": []}],
+    ]
+
+
 def test_sanitize_config():
 
-    #with pytest.raises(ConfigError):
-    #    ms.sanitize_config({'neurite': []})
-
-    new_config = ms.sanitize_config({})  # empty
-    assert 2 == len(new_config)  # neurite & morphology created
+    new_config = ms._sanitize_config({})  # empty
+    assert 3 == len(new_config)  # neurite & morphology & population created
 
     full_config = {
         'neurite': {
@@ -348,8 +388,20 @@ def test_sanitize_config():
             'soma_radius': ['mean']
         }
     }
-    new_config = ms.sanitize_config(full_config)
-    assert 3 == len(new_config)  # neurite, neurite_type & morphology
+    new_config = ms._sanitize_config(full_config)
+
+    assert new_config == {
+        'neurite': [
+            ['section_lengths', {"kwargs": {}, "modes": ['max', 'sum']}],
+            ['section_volumes', {"kwargs": {}, "modes": ['sum']}],
+            ['section_branch_orders', {"kwargs": {}, "modes": ['max']}],
+        ],
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': [
+            ['soma_radius', {"kwargs": {}, "modes": ["mean"]}],
+        ],
+        "population": [],
+    }
 
 
 def test_multidimensional_features():

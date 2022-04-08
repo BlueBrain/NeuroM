@@ -40,7 +40,6 @@ from copy import deepcopy
 from functools import partial
 from pathlib import Path
 import pkg_resources
-from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from morphio import SomaError
@@ -241,32 +240,29 @@ def full_config():
     }
 
 
-def _convert_to_kwargs_modes_layout(entry):
-
+def _kwargs_modes_layout(category_features):
+    """Converts a dictionary or iterable of features to a list of feature name and option pairs.
+    """
     def standardize_options(options):
-
+        """Returns options as a dict with two keys: 'kwargs' and 'modes'"""
         # convert from short format
         if isinstance(options, list):
             return {"kwargs": {}, "modes": options}
 
         return {"kwargs": options.get("kwargs", {}), "modes": options.get("modes", [])}
 
-    return [[feature_name, standardize_options(options)] for feature_name, options in entry.items()]
+    # either a dict or an iterable of feature_name, options pairs
+    pairs = category_features.items() if isinstance(category_features, dict) else category_features
+
+    return [[name, standardize_options(options)] for name, options in pairs]
 
 
 def _sanitize_config(config):
     """Check that the config has the correct keys, add missing keys if necessary."""
     config = deepcopy(config)
 
-    # convert dictionaries of features into lists of features
     for category in ("neurite", "morphology", "population"):
-
-        if category not in config:
-            config[category] = []
-            continue
-
-        if isinstance(config[category], dict):
-            config[category] = _convert_to_kwargs_modes_layout(config[category])
+        config[category] = _kwargs_modes_layout(config[category]) if category in config else []
 
     return config
 
@@ -282,10 +278,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
         as_population (bool): treat ``datapath`` as directory of morphologies population
         ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
     """
-    if is_full_config:
-        config = full_config()
-    else:
-        config = get_config(config, EXAMPLE_CONFIG)
+    config = full_config() if is_full_config else get_config(config, EXAMPLE_CONFIG)
 
     if 'neurite' in config and 'neurite_type' not in config:
         error = ConfigError('"neurite_type" missing from config, but "neurite" set')
@@ -295,17 +288,15 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     if ignored_exceptions is None:
         ignored_exceptions = ()
 
-    ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+    morphs = nm.load_morphologies(
+        get_files_by_path(datapath),
+        ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+    )
 
-    morphs = nm.load_morphologies(get_files_by_path(datapath),
-                                  ignored_exceptions=ignored_exceptions)
-
-    results = {}
     if as_population:
-        results[datapath] = extract_stats(morphs, config)
+        results = {datapath: extract_stats(morphs, config)}
     else:
-        for m in tqdm(morphs):
-            results[m.name] = extract_stats(m, config)
+        results = {m.name: extract_stats(m, config) for m in morphs}
 
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))
