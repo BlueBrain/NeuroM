@@ -181,6 +181,109 @@ def test_extract_stats_scalar_feature():
                    'morphology': {'sum_soma_volume': 1424.4383771584492}}
 
 
+
+def test_extract_stats__kwarg_modes_multiple_features():
+
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    config = {
+        'neurite': [
+            ['principal_direction_extents', {'kwargs': {"direction": 2}, 'modes': ['sum', "min"]}],
+            ['principal_direction_extents', {'kwargs': {"direction": 1}, 'modes': ['sum', "max"]}],
+            ['principal_direction_extents', {'kwargs': {"direction": 0}, 'modes': ['mean']}],
+        ],
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': [
+            ['soma_radius', {'modes': ['mean']}],
+            ['partition_asymmetry', {
+                'kwargs': {'variant': 'branch-order', 'method': 'petilla'},
+                'modes': ['min', 'max'],
+            }],
+            ['partition_asymmetry', {
+                'kwargs': {'variant': 'length', 'method': 'uylings'},
+                'modes': ['min', 'max'],
+            }]
+        ]
+    }
+
+    res = ms.extract_stats(m, config)
+
+    assert set(res.keys()) == {"axon", "basal_dendrite", "apical_dendrite", "all", "morphology"}
+
+    for key in ("axon", "basal_dendrite", "apical_dendrite", "all"):
+
+        assert set(res[key].keys()) == {
+            "sum_principal_direction_extents__direction:2",
+            "min_principal_direction_extents__direction:2",
+            "sum_principal_direction_extents__direction:1",
+            "max_principal_direction_extents__direction:1",
+            "mean_principal_direction_extents__direction:0",
+        }
+
+    assert set(res["morphology"].keys()) == {
+        "mean_soma_radius",
+        "min_partition_asymmetry__variant:branch-order_method:petilla",
+        "max_partition_asymmetry__variant:branch-order_method:petilla",
+        "min_partition_asymmetry__variant:length_method:uylings",
+        "max_partition_asymmetry__variant:length_method:uylings",
+    }
+
+
+def test_extract_dataframe__kwarg_modes_multiple_features():
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    config = {
+        'neurite': [
+            ['principal_direction_extents', {'kwargs': {"direction": 2}, 'modes': ['sum', "min"]}],
+            ['principal_direction_extents', {'kwargs': {"direction": 1}, 'modes': ['sum', "max"]}],
+            ['principal_direction_extents', {'kwargs': {"direction": 0}, 'modes': ['mean']}],
+        ],
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': [
+            ['soma_radius', {'modes': ['mean']}],
+            ['partition_asymmetry', {
+                'kwargs': {'variant': 'branch-order', 'method': 'petilla'},
+                'modes': ['min', 'max'],
+            }],
+            ['partition_asymmetry', {
+                'kwargs': {'variant': 'length', 'method': 'uylings'},
+                'modes': ['min', 'max'],
+            }]
+        ]
+    }
+
+    res = ms.extract_dataframe(m, config)
+
+    expected_columns = pd.MultiIndex.from_tuples([
+        ('property', 'name'),
+        ('axon', 'sum_principal_direction_extents__direction:2'),
+        ('axon', 'min_principal_direction_extents__direction:2'),
+        ('axon', 'sum_principal_direction_extents__direction:1'),
+        ('axon', 'max_principal_direction_extents__direction:1'),
+        ('axon', 'mean_principal_direction_extents__direction:0'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:2'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:2'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:1'),
+        ('apical_dendrite', 'max_principal_direction_extents__direction:1'),
+        ('apical_dendrite', 'mean_principal_direction_extents__direction:0'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:2'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:2'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:1'),
+        ('basal_dendrite', 'max_principal_direction_extents__direction:1'),
+        ('basal_dendrite', 'mean_principal_direction_extents__direction:0'),
+        ('all', 'sum_principal_direction_extents__direction:2'),
+        ('all', 'min_principal_direction_extents__direction:2'),
+        ('all', 'sum_principal_direction_extents__direction:1'),
+        ('all', 'max_principal_direction_extents__direction:1'),
+        ('all', 'mean_principal_direction_extents__direction:0'),
+        ('morphology', 'mean_soma_radius'),
+        ('morphology', 'min_partition_asymmetry__variant:branch-order_method:petilla'),
+        ('morphology', 'max_partition_asymmetry__variant:branch-order_method:petilla'),
+        ('morphology', 'min_partition_asymmetry__variant:length_method:uylings'),
+        ('morphology', 'max_partition_asymmetry__variant:length_method:uylings'),
+    ])
+
+    pd.testing.assert_index_equal(res.columns, expected_columns)
+
+
 def test_extract_dataframe():
     # Vanilla test
     initial_config = deepcopy(REF_CONFIG_NEW)

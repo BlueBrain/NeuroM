@@ -118,6 +118,17 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
 
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
+    def stat_name_format(mode, feature_name, kwargs):
+
+        suffix = "_".join(
+            [f"{key}:{value}" for key, value in kwargs.items() if key != "neurite_type"]
+        )
+
+        if suffix:
+            return f"{mode}_{feature_name}__{suffix}"
+
+        return f"{mode}_{feature_name}"
+
     data = {}
     value, func = _get_feature_value_and_func(feature_name, morphs, **kwargs)
     shape = func.shape
@@ -125,7 +136,8 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
         raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
 
     for mode in modes:
-        stat_name = f'{mode}_{feature_name}'
+
+        stat_name = stat_name_format(mode, feature_name, kwargs)
 
         stat = value
         if isinstance(value, Sized):
@@ -173,22 +185,25 @@ def extract_stats(morphs, config):
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
     for category in ("neurite", "morphology", "population"):
-        for feature_name, opts in config.get(category, []):
+        for feature_name, opts in config[category]:
 
-            kwargs = deepcopy(opts.get('kwargs', {}))
-            modes = opts.get('modes', [])
+            kwargs = deepcopy(opts["kwargs"])
+            modes = opts["modes"]
 
             if category == 'neurite':
-                if 'neurite_type' not in kwargs and neurite_types:
-                    for t in neurite_types:
-                        kwargs['neurite_type'] = t
-                        stats[t.name].update(
-                            _get_feature_stats(feature_name, morphs, modes, kwargs)
-                        )
-                else:
-                    t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
-                    kwargs['neurite_type'] = t
-                    stats[t.name].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
+
+                neurite_types = (
+                    neurite_types
+                    if 'neurite_type' not in kwargs and neurite_types
+                    else [_NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]]
+                )
+
+                for neurite_type in neurite_types:
+                    kwargs["neurite_type"] = neurite_type
+                    stats[neurite_type.name].update(
+                        _get_feature_stats(feature_name, morphs, modes, kwargs)
+                    )
+
             else:
                 stats[category].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
 
@@ -241,10 +256,9 @@ def full_config():
 
 
 def _kwargs_modes_layout(category_features):
-    """Converts a dictionary or iterable of features to a list of feature name and option pairs.
-    """
+    """Converts a dictionary or iterable of features to a list of feature name and option pairs."""
     def standardize_options(options):
-        """Returns options as a dict with two keys: 'kwargs' and 'modes'"""
+        """Returns options as a dict with two keys: 'kwargs' and 'modes'."""
         # convert from short format
         if isinstance(options, list):
             return {"kwargs": {}, "modes": options}
