@@ -36,6 +36,7 @@ import os
 import warnings
 from collections import defaultdict
 from collections.abc import Sized
+from copy import deepcopy
 from functools import partial
 from itertools import chain, product
 from pathlib import Path
@@ -93,7 +94,6 @@ def extract_dataframe(morphs, config, n_workers=1):
     """
     if isinstance(morphs, Morphology):
         morphs = [morphs]
-    config = config.copy()
 
     func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
@@ -183,7 +183,7 @@ def extract_stats(morphs, config):
     for namespace, (feature_name, opts) in chain(neurite_features, morph_features,
                                                  population_features):
         if isinstance(opts, dict):
-            kwargs = opts.get('kwargs', {})
+            kwargs = deepcopy(opts.get('kwargs', {}))
             modes = opts.get('modes', [])
         else:
             kwargs = {}

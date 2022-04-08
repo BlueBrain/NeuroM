@@ -28,6 +28,7 @@
 
 import os
 import warnings
+from copy import deepcopy
 from pathlib import Path
 
 import neurom as nm
@@ -155,8 +156,10 @@ def test_stats_new_format_set_arg():
             'soma_radius': {'modes': ['mean']},
         }
     }
+    initial_config = deepcopy(config)
 
     res = ms.extract_stats(m, config)
+    assert config == initial_config
     assert set(res.keys()) == {'morphology', 'axon'}
     assert set(res['axon'].keys()) == {'max_section_lengths', 'sum_section_lengths'}
     assert set(res['morphology'].keys()) == {'mean_soma_radius'}
@@ -180,12 +183,16 @@ def test_extract_stats_scalar_feature():
 
 def test_extract_dataframe():
     # Vanilla test
+    initial_config = deepcopy(REF_CONFIG_NEW)
+
     morphs = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
     actual = ms.extract_dataframe(morphs, REF_CONFIG_NEW)
+
     # drop raw features as they require too much test data to mock
     actual = actual.drop(columns='raw_section_branch_orders', level=1)
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)
     assert_frame_equal(actual, expected, check_dtype=False)
+    assert REF_CONFIG_NEW == initial_config
 
     # Test with a single morphology in the population
     morphs = nm.load_morphologies(SWC_PATH / 'Neuron.swc')
@@ -193,35 +200,42 @@ def test_extract_dataframe():
     # drop raw features as they require too much test data to mock
     actual = actual.drop(columns='raw_section_branch_orders', level=1)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
+    assert REF_CONFIG_NEW == initial_config
 
     # Test with a config without the 'morphology' key
     morphs = nm.load_morphologies([Path(SWC_PATH, name)
                                  for name in ['Neuron.swc', 'simple.swc']])
     config = {'neurite': {'section_lengths': ['sum']},
               'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL']}
+    initial_config = deepcopy(config)
     actual = ms.extract_dataframe(morphs, config)
     idx = pd.IndexSlice
     expected = expected.loc[:, idx[:, ['name', 'sum_section_lengths']]]
     assert_frame_equal(actual, expected, check_dtype=False)
+    assert config == initial_config
 
     # Test with a Morphology argument
     m = nm.load_morphology(Path(SWC_PATH, 'Neuron.swc'))
     actual = ms.extract_dataframe(m, config)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
+    assert config == initial_config
 
     # Test with a List[Morphology] argument
     morphs = [nm.load_morphology(Path(SWC_PATH, name))
             for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(morphs, config)
     assert_frame_equal(actual, expected, check_dtype=False)
+    assert config == initial_config
 
     # Test with a List[Path] argument
     morphs = [Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']]
     actual = ms.extract_dataframe(morphs, config)
     assert_frame_equal(actual, expected, check_dtype=False)
+    assert config == initial_config
 
     # Test without any neurite_type keys, it should pick the defaults
     config = {'neurite': {'total_length_per_neurite': ['sum']}}
+    initial_config = deepcopy(config)
     actual = ms.extract_dataframe(morphs, config)
     expected_columns = pd.MultiIndex.from_tuples(
         [('property', 'name'),
@@ -233,6 +247,35 @@ def test_extract_dataframe():
         columns=expected_columns,
         data=[['Neuron.swc', 207.87975221, 418.43241644, 214.37304578, 840.68521442],
               ['simple.swc', 15.,          16.,           0.,          31., ]])
+    assert_frame_equal(actual, expected, check_dtype=False)
+    assert config == initial_config
+
+
+def test_extract_dataframe_with_kwargs():
+    config = {
+        'neurite': {
+            'section_lengths': {'kwargs': {'neurite_type': 'AXON'}, 'modes': ['max', 'sum']},
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': {
+            'soma_radius': {'modes': ['mean']},
+        }
+    }
+    initial_config = deepcopy(config)
+
+    morphs = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'])
+    actual = ms.extract_dataframe(morphs, config)
+
+    assert config == initial_config
+
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), header=[0, 1], index_col=0)[
+        [
+            ("property", "name"),
+            ("axon", "max_section_lengths"),
+            ("axon", "sum_section_lengths"),
+            ("morphology", "mean_soma_radius"),
+        ]
+    ]
     assert_frame_equal(actual, expected, check_dtype=False)
 
 
