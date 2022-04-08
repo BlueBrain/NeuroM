@@ -38,7 +38,6 @@ from collections import defaultdict
 from collections.abc import Sized
 from copy import deepcopy
 from functools import partial
-from itertools import chain, product
 from pathlib import Path
 import pkg_resources
 from tqdm import tqdm
@@ -53,7 +52,7 @@ from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
     _get_feature_value_and_func
 from neurom.io.utils import get_files_by_path
-from neurom.utils import flatten, NeuromJSON, warn_deprecated
+from neurom.utils import flatten, NeuromJSON
 
 L = logging.getLogger(__name__)
 
@@ -170,35 +169,29 @@ def extract_stats(morphs, config):
     {config_path}
     """
     stats = defaultdict(dict)
-    neurite_features = product(['neurite'], config.get('neurite', {}).items())
-    if 'neuron' in config:    # pragma: no cover
-        warn_deprecated('Usage of "neuron" is deprecated in configs of `morph_stats` package. '
-                        'Use "morphology" instead.')
-        config['morphology'] = config['neuron']
-        del config['neuron']
-    morph_features = product(['morphology'], config.get('morphology', {}).items())
-    population_features = product(['population'], config.get('population', {}).items())
+    config = _sanitize_config(config)
+
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
-    for namespace, (feature_name, opts) in chain(neurite_features, morph_features,
-                                                 population_features):
-        if isinstance(opts, dict):
+    for category in ("neurite", "morphology", "population"):
+        for feature_name, opts in config.get(category, []):
+
             kwargs = deepcopy(opts.get('kwargs', {}))
             modes = opts.get('modes', [])
-        else:
-            kwargs = {}
-            modes = opts
-        if namespace == 'neurite':
-            if 'neurite_type' not in kwargs and neurite_types:
-                for t in neurite_types:
+
+            if category == 'neurite':
+                if 'neurite_type' not in kwargs and neurite_types:
+                    for t in neurite_types:
+                        kwargs['neurite_type'] = t
+                        stats[t.name].update(
+                            _get_feature_stats(feature_name, morphs, modes, kwargs)
+                        )
+                else:
+                    t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
                     kwargs['neurite_type'] = t
                     stats[t.name].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
             else:
-                t = _NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]
-                kwargs['neurite_type'] = t
-                stats[t.name].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
-        else:
-            stats[namespace].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
+                stats[category].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
 
     return dict(stats)
 
@@ -241,23 +234,39 @@ def full_config():
     """Returns a config with all features, all modes, all neurite types."""
     modes = ['min', 'max', 'median', 'mean', 'std']
     return {
-        'neurite': {feature: modes for feature in _NEURITE_FEATURES},
-        'morphology': {feature: modes for feature in _MORPHOLOGY_FEATURES},
-        'population': {feature: modes for feature in _POPULATION_FEATURES},
-        'neurite_type': list(_NEURITE_MAP.keys()),
+        "neurite": [[name, {"kwargs": {}, "modes": modes}] for name in _NEURITE_FEATURES],
+        "morphology": [[name, {"kwargs": {}, "modes": modes}] for name in _MORPHOLOGY_FEATURES],
+        "population": [[name, {"kwargs": {}, "modes": modes}] for name in _POPULATION_FEATURES],
+        "neurite_type": list(_NEURITE_MAP.keys()),
     }
 
 
-def sanitize_config(config):
-    """Check that the config has the correct keys, add missing keys if necessary."""
-    if 'neurite' in config:
-        if 'neurite_type' not in config:
-            raise ConfigError('"neurite_type" missing from config, but "neurite" set')
-    else:
-        config['neurite'] = {}
+def _convert_to_kwargs_modes_layout(entry):
 
-    if 'morphology' not in config:
-        config['morphology'] = {}
+    def standardize_options(options):
+
+        # convert from short format
+        if isinstance(options, list):
+            return {"kwargs": {}, "modes": options}
+
+        return {"kwargs": options.get("kwargs", {}), "modes": options.get("modes", [])}
+
+    return [[feature_name, standardize_options(options)] for feature_name, options in entry.items()]
+
+
+def _sanitize_config(config):
+    """Check that the config has the correct keys, add missing keys if necessary."""
+    config = deepcopy(config)
+
+    # convert dictionaries of features into lists of features
+    for category in ("neurite", "morphology", "population"):
+
+        if category not in config:
+            config[category] = []
+            continue
+
+        if isinstance(config[category], dict):
+            config[category] = _convert_to_kwargs_modes_layout(config[category])
 
     return config
 
@@ -276,16 +285,18 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     if is_full_config:
         config = full_config()
     else:
-        try:
-            config = get_config(config, EXAMPLE_CONFIG)
-            config = sanitize_config(config)
-        except ConfigError as e:
-            L.error(e)
-            raise
+        config = get_config(config, EXAMPLE_CONFIG)
+
+    if 'neurite' in config and 'neurite_type' not in config:
+        error = ConfigError('"neurite_type" missing from config, but "neurite" set')
+        L.error(error)
+        raise error
 
     if ignored_exceptions is None:
         ignored_exceptions = ()
+
     ignored_exceptions = tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+
     morphs = nm.load_morphologies(get_files_by_path(datapath),
                                   ignored_exceptions=ignored_exceptions)
 
