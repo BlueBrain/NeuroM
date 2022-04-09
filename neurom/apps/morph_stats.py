@@ -119,8 +119,12 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
     def stat_name_format(mode, feature_name, kwargs):
+        """Returns the key name for the data dictionary.
 
-        suffix = "_".join(
+        The key is a combination of the mode, feature_name and an optional suffix of all the extra
+        kwargs that are passed in the feature function (apart from neurite_type).
+        """
+        suffix = "__".join(
             [f"{key}:{value}" for key, value in kwargs.items() if key != "neurite_type"]
         )
 
@@ -179,11 +183,11 @@ def extract_stats(morphs, config):
 
     {config_path}
     """
-    stats = defaultdict(dict)
     config = _sanitize_config(config)
 
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
 
+    stats = defaultdict(dict)
     for category in ("neurite", "morphology", "population"):
         for feature_name, opts in config[category]:
 
@@ -213,17 +217,18 @@ def extract_stats(morphs, config):
 extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
 
 
-def get_header(results):
+def _get_header(results):
     """Extracts the headers, using the first value in the dict as the template."""
-    ret = ['name', ]
     values = next(iter(results.values()))
-    for k, v in values.items():
-        for metric in v.keys():
-            ret.append('%s:%s' % (k, metric))
-    return ret
+
+    return ['name'] + [
+        f'{k}:{metric}'
+        for k, v in values.items()
+        for metric in v.keys()
+    ]
 
 
-def generate_flattened_dict(headers, results):
+def _generate_flattened_dict(headers, results):
     """Extract from results the fields in the headers list."""
     for name, values in results.items():
         row = []
@@ -231,7 +236,9 @@ def generate_flattened_dict(headers, results):
             if header == 'name':
                 row.append(name)
             else:
-                neurite_type, metric = header.split(':')
+                # split on first occurence of `:` because feature kwargs may
+                # use a colon for separating key and value.
+                neurite_type, metric = header.split(':', 1)
                 row.append(values[neurite_type][metric])
         yield row
 
@@ -320,7 +327,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     else:
         with open(output_file, 'w') as f:
             csvwriter = csv.writer(f)
-            header = get_header(results)
+            header = _get_header(results)
             csvwriter.writerow(header)
-            for line in generate_flattened_dict(header, dict(results)):
+            for line in _generate_flattened_dict(header, dict(results)):
                 csvwriter.writerow(line)
