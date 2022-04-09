@@ -640,7 +640,7 @@ def test_sanitize_config():
     }
     new_config = ms._sanitize_config(full_config)
 
-    assert new_config == {
+    expected_config = {
         'neurite': [
             ['section_lengths', {"kwargs": {}, "modes": ['max', 'sum']}],
             ['section_volumes', {"kwargs": {}, "modes": ['sum']}],
@@ -652,6 +652,11 @@ def test_sanitize_config():
         ],
         "population": [],
     }
+    assert new_config == expected_config
+
+    # check that legacy neuron entries are converted to morphology ones
+    full_config["neuron"] = full_config.pop("morphology")
+    assert ms._sanitize_config(full_config) == expected_config
 
     # check that all formats are converted to the same sanitized config:
     assert (

@@ -287,6 +287,9 @@ def _sanitize_config(config):
     """Check that the config has the correct keys, add missing keys if necessary."""
     config = deepcopy(config)
 
+    if "neuron" in config:
+        config["morphology"] = config.pop("neuron")
+
     for category in ("neurite", "morphology", "population"):
         config[category] = _kwargs_modes_layout(config[category]) if category in config else []
 
