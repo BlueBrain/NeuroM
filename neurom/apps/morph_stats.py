@@ -74,9 +74,11 @@ def extract_dataframe(morphs, config, n_workers=1):
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
-            - neurite: a dictionary {{neurite_feature: mode}} where:
-                - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
-                - mode is an aggregation operation provided as a string such as:
+            - neurite:
+                Either a list of features: [feature_name, {kwargs: {}, modes: []}] or
+                a dictionary of features {feature_name: {kwargs: {}, modes: []}}.
+                - kwargs is an optional entry allowing to pass kwargs to the feature function
+                - modes is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
             - morphology: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole morphology.
@@ -88,7 +90,6 @@ def extract_dataframe(morphs, config, n_workers=1):
     Note:
         An example config can be found at:
 
-    {config_path}
     """
     if isinstance(morphs, Morphology):
         morphs = [morphs]
@@ -110,7 +111,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
-extract_dataframe.__doc__ = extract_dataframe.__doc__.format(config_path=EXAMPLE_CONFIG)
+extract_dataframe.__doc__ += str(EXAMPLE_CONFIG)
 
 
 def _get_feature_stats(feature_name, morphs, modes, kwargs):
@@ -168,7 +169,12 @@ def extract_stats(morphs, config):
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used.
-            - neurite: a dictionary {{neurite_feature: mode}} where:
+            - neurite:
+                Either a list of features: [feature_name, {kwargs: {}, modes: []}] or
+                a dictionary of features {feature_name: {kwargs: {}, modes: []}}.
+                - kwargs is an optional entry allowing to pass kwargs to the feature function
+                - modes is an aggregation operation provided as a string such as:
+                  ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
                 - neurite_feature is a string from NEURITEFEATURES or NEURONFEATURES
                 - mode is an aggregation operation provided as a string such as:
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
@@ -181,7 +187,6 @@ def extract_stats(morphs, config):
     Note:
         An example config can be found at:
 
-    {config_path}
     """
     config = _sanitize_config(config)
 
@@ -214,7 +219,7 @@ def extract_stats(morphs, config):
     return dict(stats)
 
 
-extract_stats.__doc__ = extract_stats.__doc__.format(config_path=EXAMPLE_CONFIG)
+extract_stats.__doc__ += str(EXAMPLE_CONFIG)
 
 
 def _get_header(results):

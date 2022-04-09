@@ -58,7 +58,7 @@ Short format (prior version 3.0.0)
 An example config:
 
 .. code-block:: yaml
-    
+
     neurite:
         section_lengths:
             - max
@@ -67,13 +67,13 @@ An example config:
             - total
         section_branch_orders:
             - max
-    
+
     neurite_type:
         - AXON
         - APICAL_DENDRITE
         - BASAL_DENDRITE
         - ALL
-    
+
     neuron:
         soma_radius:
             - mean
@@ -93,7 +93,7 @@ function, e.g.
 * ``raw``: array of raw values
 * ``max``, ``min``, ``mean``, ``median``, ``std``: self-explanatory.
 * ``total``: sum of the raw values
-  
+
 An additional field ``neurite_type`` specifies the neurite types into which the morphometrics
 are to be split. It applies only to ``neurite`` features. A sample output using the above
 configuration:
@@ -196,6 +196,66 @@ So the example config from `Short format (prior version 3.0.0)`_ looks:
         soma_radius:
             modes:
                - mean
+
+
+List of features format (starting version 3.2.0)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The kwargs format was extended to allow the listing of the same feature multiple times with different kwargs.
+
+The ``partition_asymmetry`` feature in the example above can be specified multiple times with different arguments as follows:
+
+.. code-block:: yaml
+
+    neurite:
+    - - partion_asymmetry:
+      - kwargs:
+          variant: 'length'
+          method: 'petilla'
+        modes:
+          - max
+          - sum
+    - - partion_asymmetry:
+      - kwargs:
+          variant: 'branch-order'
+          method: 'uylings'
+        modes:
+          - min
+          - sum
+
+To allow differentiation between the features multiples, the keys and values of the kwargs are appended at the end of the feature name:
+
+.. code-block::
+
+    partition_asymmetry__variant:length__method:petilla
+    partition_asymmetry__variant:branch-order__method:uylings
+
+The example config from `Short format (prior version 3.0.0)`_ becomes:
+
+.. code-block:: yaml
+
+  neurite:
+  - - section_lengths
+    - modes:
+      - max
+      - sum
+  - - section_volumes:
+    - modes:
+      - sum
+  - - section_branch_orders:
+    - modes:
+      - max
+
+  neurite_type:
+    - AXON
+    - APICAL_DENDRITE
+    - BASAL_DENDRITE
+    - ALL
+
+  morphology:
+  - - soma_radius:
+    - modes:
+      - mean
 
 
 Features
