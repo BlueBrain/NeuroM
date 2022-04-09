@@ -43,6 +43,7 @@ from pandas.testing import assert_frame_equal
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
+
 REF_CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'sum'],
@@ -72,6 +73,23 @@ REF_CONFIG_NEW = {
         'max_radial_distance': {'modes': ['mean']},
     }
 }
+
+REF_CONFIG_LIST_FEATURES = {
+    'neurite': [
+        ['section_lengths', {'modes': ['max', 'sum']}],
+        ['section_volumes', {'modes': ['sum']}],
+        ['section_branch_orders', {'modes': ['max', 'raw']}],
+        ['segment_midpoints', {'modes': ['max']}],
+        ['max_radial_distance', {'modes': ['mean']}],
+    ],
+    'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+    'morphology': [
+        ['soma_radius', {'modes': ['mean']}],
+        ['max_radial_distance', {'modes': ['mean']}],
+    ],
+}
+
+
 
 REF_OUT = {
     'morphology': {
@@ -634,6 +652,13 @@ def test_sanitize_config():
         ],
         "population": [],
     }
+
+    # check that all formats are converted to the same sanitized config:
+    assert (
+        ms._sanitize_config(REF_CONFIG)
+        == ms._sanitize_config(REF_CONFIG_NEW)
+        == ms._sanitize_config(REF_CONFIG_LIST_FEATURES)
+    )
 
 
 def test_multidimensional_features():
