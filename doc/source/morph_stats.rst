@@ -201,29 +201,22 @@ So the example config from `Short format (prior version 3.0.0)`_ looks:
 List of features format (starting version 3.2.0)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The kwargs format was extended to allow the listing of the same feature multiple times with different kwargs.
-
-The ``partition_asymmetry`` feature in the example above can be specified multiple times with different arguments as follows:
+The kwargs entry was converted into a list to allow running the same feature with different arguments. The ``partition_asymmetry`` feature in the example above can be specified multiple times with different arguments as follows:
 
 .. code-block:: yaml
 
     neurite:
-    - - partion_asymmetry:
-      - kwargs:
-          variant: 'length'
-          method: 'petilla'
+      partition_asymmetry:
+        kwargs:
+        - method: petilla
+          variant: length
+        - method: uylings
+          variant: branch-order
         modes:
-          - max
-          - sum
-    - - partion_asymmetry:
-      - kwargs:
-          variant: 'branch-order'
-          method: 'uylings'
-        modes:
-          - min
-          - sum
+        - max
+        - sum
 
-To allow differentiation between the features multiples, the keys and values of the kwargs are appended at the end of the feature name:
+To allow differentiation between the feature multiples, the keys and values of the kwargs are appended at the end of the feature name:
 
 .. code-block::
 
@@ -234,28 +227,34 @@ The example config from `Short format (prior version 3.0.0)`_ becomes:
 
 .. code-block:: yaml
 
-  neurite:
-  - - section_lengths
-    - modes:
-      - max
-      - sum
-  - - section_volumes:
-    - modes:
-      - sum
-  - - section_branch_orders:
-    - modes:
-      - max
-
-  neurite_type:
+    neurite:
+      section_branch_orders:
+        kwargs:
+        - {}
+        modes:
+        - max
+      section_lengths:
+        kwargs:
+        - {}
+        modes:
+        - max
+        - sum
+      section_volumes:
+        kwargs:
+        - {}
+        modes:
+        - sum
+    morphology:
+      soma_radius:
+        kwargs:
+        - {}
+        modes:
+        - mean
+    neurite_type:
     - AXON
     - APICAL_DENDRITE
     - BASAL_DENDRITE
     - ALL
-
-  morphology:
-  - - soma_radius:
-    - modes:
-      - mean
 
 
 Features

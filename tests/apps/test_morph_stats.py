@@ -74,21 +74,6 @@ REF_CONFIG_NEW = {
     }
 }
 
-REF_CONFIG_LIST_FEATURES = {
-    'neurite': [
-        ['section_lengths', {'modes': ['max', 'sum']}],
-        ['section_volumes', {'modes': ['sum']}],
-        ['section_branch_orders', {'modes': ['max', 'raw']}],
-        ['segment_midpoints', {'modes': ['max']}],
-        ['max_radial_distance', {'modes': ['mean']}],
-    ],
-    'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
-    'morphology': [
-        ['soma_radius', {'modes': ['mean']}],
-        ['max_radial_distance', {'modes': ['mean']}],
-    ],
-}
-
 
 
 REF_OUT = {
@@ -204,23 +189,27 @@ def test_extract_stats__kwarg_modes_multiple_features():
 
     m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     config = {
-        'neurite': [
-            ['principal_direction_extents', {'kwargs': {"direction": 2}, 'modes': ['sum', "min"]}],
-            ['principal_direction_extents', {'kwargs': {"direction": 1}, 'modes': ['sum', "max"]}],
-            ['principal_direction_extents', {'kwargs': {"direction": 0}, 'modes': ['mean']}],
-        ],
+        'neurite': {
+            'principal_direction_extents': {
+                'kwargs': [
+                    {"direction": 2},
+                    {"direction": 1},
+                    {"direction": 0},
+                ],
+                'modes': ['sum', "min"]
+            },
+        },
         'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
-        'morphology': [
-            ['soma_radius', {'modes': ['mean']}],
-            ['partition_asymmetry', {
-                'kwargs': {'variant': 'branch-order', 'method': 'petilla'},
+        'morphology': {
+            'soma_radius': {'modes': ['mean']},
+            'partition_asymmetry': {
+                'kwargs': [
+                    {'variant': 'branch-order', 'method': 'petilla'},
+                    {'variant': 'length', 'method': 'uylings'},
+                ],
                 'modes': ['min', 'max'],
-            }],
-            ['partition_asymmetry', {
-                'kwargs': {'variant': 'length', 'method': 'uylings'},
-                'modes': ['min', 'max'],
-            }]
-        ]
+            },
+        }
     }
 
     res = ms.extract_stats(m, config)
@@ -233,8 +222,9 @@ def test_extract_stats__kwarg_modes_multiple_features():
             "sum_principal_direction_extents__direction:2",
             "min_principal_direction_extents__direction:2",
             "sum_principal_direction_extents__direction:1",
-            "max_principal_direction_extents__direction:1",
-            "mean_principal_direction_extents__direction:0",
+            "min_principal_direction_extents__direction:1",
+            "sum_principal_direction_extents__direction:0",
+            "min_principal_direction_extents__direction:0",
         }
 
     assert set(res["morphology"].keys()) == {
@@ -249,23 +239,27 @@ def test_extract_stats__kwarg_modes_multiple_features():
 def test_extract_dataframe__kwarg_modes_multiple_features():
     m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     config = {
-        'neurite': [
-            ['principal_direction_extents', {'kwargs': {"direction": 2}, 'modes': ['sum', "min"]}],
-            ['principal_direction_extents', {'kwargs': {"direction": 1}, 'modes': ['sum', "max"]}],
-            ['principal_direction_extents', {'kwargs': {"direction": 0}, 'modes': ['mean']}],
-        ],
+        'neurite': {
+            'principal_direction_extents': {
+                'kwargs': [
+                    {"direction": 2},
+                    {"direction": 1},
+                    {"direction": 0},
+                ],
+                'modes': ['sum', "min"],
+            },
+        },
         'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
-        'morphology': [
-            ['soma_radius', {'modes': ['mean']}],
-            ['partition_asymmetry', {
-                'kwargs': {'variant': 'branch-order', 'method': 'petilla'},
+        'morphology': {
+            'soma_radius': {'modes': ['mean']},
+            'partition_asymmetry': {
+                'kwargs': [
+                    {'variant': 'branch-order', 'method': 'petilla'},
+                    {'variant': 'length', 'method': 'uylings'},
+                ],
                 'modes': ['min', 'max'],
-            }],
-            ['partition_asymmetry', {
-                'kwargs': {'variant': 'length', 'method': 'uylings'},
-                'modes': ['min', 'max'],
-            }]
-        ]
+            },
+        },
     }
 
     res = ms.extract_dataframe(m, config)
@@ -275,23 +269,27 @@ def test_extract_dataframe__kwarg_modes_multiple_features():
         ('axon', 'sum_principal_direction_extents__direction:2'),
         ('axon', 'min_principal_direction_extents__direction:2'),
         ('axon', 'sum_principal_direction_extents__direction:1'),
-        ('axon', 'max_principal_direction_extents__direction:1'),
-        ('axon', 'mean_principal_direction_extents__direction:0'),
+        ('axon', 'min_principal_direction_extents__direction:1'),
+        ('axon', 'sum_principal_direction_extents__direction:0'),
+        ('axon', 'min_principal_direction_extents__direction:0'),
         ('apical_dendrite', 'sum_principal_direction_extents__direction:2'),
         ('apical_dendrite', 'min_principal_direction_extents__direction:2'),
         ('apical_dendrite', 'sum_principal_direction_extents__direction:1'),
-        ('apical_dendrite', 'max_principal_direction_extents__direction:1'),
-        ('apical_dendrite', 'mean_principal_direction_extents__direction:0'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:1'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:0'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:0'),
         ('basal_dendrite', 'sum_principal_direction_extents__direction:2'),
         ('basal_dendrite', 'min_principal_direction_extents__direction:2'),
         ('basal_dendrite', 'sum_principal_direction_extents__direction:1'),
-        ('basal_dendrite', 'max_principal_direction_extents__direction:1'),
-        ('basal_dendrite', 'mean_principal_direction_extents__direction:0'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:1'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:0'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:0'),
         ('all', 'sum_principal_direction_extents__direction:2'),
         ('all', 'min_principal_direction_extents__direction:2'),
         ('all', 'sum_principal_direction_extents__direction:1'),
-        ('all', 'max_principal_direction_extents__direction:1'),
-        ('all', 'mean_principal_direction_extents__direction:0'),
+        ('all', 'min_principal_direction_extents__direction:1'),
+        ('all', 'sum_principal_direction_extents__direction:0'),
+        ('all', 'min_principal_direction_extents__direction:0'),
         ('morphology', 'mean_soma_radius'),
         ('morphology', 'min_partition_asymmetry__variant:branch-order__method:petilla'),
         ('morphology', 'max_partition_asymmetry__variant:branch-order__method:petilla'),
@@ -576,22 +574,22 @@ def test_full_config():
     config = ms.full_config()
     assert set(config.keys()) == {'neurite', 'population', 'morphology', 'neurite_type'}
 
-    assert set(entry[0] for entry in config['neurite']) == set(_NEURITE_FEATURES.keys())
-    assert set(entry[0] for entry in config['morphology']) == set(_MORPHOLOGY_FEATURES.keys())
-    assert set(entry[0] for entry in config['population']) == set(_POPULATION_FEATURES.keys())
+    assert set(config['neurite'].keys()) == set(_NEURITE_FEATURES.keys())
+    assert set(config['morphology'].keys()) == set(_MORPHOLOGY_FEATURES.keys())
+    assert set(config['population'].keys()) == set(_POPULATION_FEATURES.keys())
 
 
-def test_convert_to_kwargs_modes_layout():
+def test_standardize_layout():
     """Converts the config category entries (e.g. neurite, morphology, population) to using
     the kwarg and modes layout.
     """
     # from short format
     entry = {"f1": ["min", "max"], "f2": ["min"], "f3": []}
-    assert ms._kwargs_modes_layout(entry) == [
-        ["f1", {"kwargs": {}, "modes": ["min", "max"]}],
-        ["f2", {"kwargs": {}, "modes": ["min"]}],
-        ["f3", {"kwargs": {}, "modes": []}],
-    ]
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min"]},
+        "f3": {"kwargs": [{}], "modes": []},
+    }
 
     # from kwarg/modes with missing options
     entry = {
@@ -600,26 +598,26 @@ def test_convert_to_kwargs_modes_layout():
         "f3": {"kwargs": {"a1": 1, "a2": 2}},
         "f4": {},
     }
-    assert ms._kwargs_modes_layout(entry) == [
-        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
-        ["f2", {"kwargs": {}, "modes": ["min", "median"]}],
-        ["f3", {"kwargs": {"a1": 1, "a2": 2}, "modes": []}],
-        ["f4", {"kwargs": {}, "modes": []}],
-    ]
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}], "modes": []},
+        "f4": {"kwargs": [{}], "modes": []},
+    }
 
-    # from list layout
-    entry = [
-        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
-        ["f2", {"modes": ["min", "median"]}],
-        ["f3", {"kwargs": {"a1": 1, "a2": 2}}],
-        ["f4", {}],
-    ]
-    assert ms._kwargs_modes_layout(entry) == [
-        ["f1", {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]}],
-        ["f2", {"kwargs": {}, "modes": ["min", "median"]}],
-        ["f3", {"kwargs": {"a1": 1, "a2": 2}, "modes": []}],
-        ["f4", {"kwargs": {}, "modes": []}],
-    ]
+    # from list of kwargs format
+    entry = {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}]},
+        "f4": {},
+    }
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}], "modes": []},
+        "f4": {"kwargs": [{}], "modes": []},
+    }
 
 
 def test_sanitize_config():
@@ -641,16 +639,16 @@ def test_sanitize_config():
     new_config = ms._sanitize_config(full_config)
 
     expected_config = {
-        'neurite': [
-            ['section_lengths', {"kwargs": {}, "modes": ['max', 'sum']}],
-            ['section_volumes', {"kwargs": {}, "modes": ['sum']}],
-            ['section_branch_orders', {"kwargs": {}, "modes": ['max']}],
-        ],
+        'neurite': {
+            'section_lengths': {"kwargs": [{}], "modes": ['max', 'sum']},
+            'section_volumes': {"kwargs": [{}], "modes": ['sum']},
+            'section_branch_orders': {"kwargs": [{}], "modes": ['max']},
+        },
         'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
-        'morphology': [
-            ['soma_radius', {"kwargs": {}, "modes": ["mean"]}],
-        ],
-        "population": [],
+        'morphology': {
+            'soma_radius': {"kwargs": [{}], "modes": ["mean"]},
+        },
+        "population": {},
     }
     assert new_config == expected_config
 
@@ -659,11 +657,7 @@ def test_sanitize_config():
     assert ms._sanitize_config(full_config) == expected_config
 
     # check that all formats are converted to the same sanitized config:
-    assert (
-        ms._sanitize_config(REF_CONFIG)
-        == ms._sanitize_config(REF_CONFIG_NEW)
-        == ms._sanitize_config(REF_CONFIG_LIST_FEATURES)
-    )
+    assert ms._sanitize_config(REF_CONFIG) == ms._sanitize_config(REF_CONFIG_NEW)
 
 
 def test_multidimensional_features():

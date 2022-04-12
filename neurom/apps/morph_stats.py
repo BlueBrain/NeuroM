@@ -194,27 +194,34 @@ def extract_stats(morphs, config):
 
     stats = defaultdict(dict)
     for category in ("neurite", "morphology", "population"):
-        for feature_name, opts in config[category]:
+        for feature_name, opts in config[category].items():
 
-            kwargs = deepcopy(opts["kwargs"])
+            list_of_kwargs = opts["kwargs"]
             modes = opts["modes"]
 
-            if category == 'neurite':
+            for feature_kwargs in list_of_kwargs:
 
-                neurite_types = (
-                    neurite_types
-                    if 'neurite_type' not in kwargs and neurite_types
-                    else [_NEURITE_MAP[kwargs.get('neurite_type', 'ALL')]]
-                )
+                if category == 'neurite':
 
-                for neurite_type in neurite_types:
-                    kwargs["neurite_type"] = neurite_type
-                    stats[neurite_type.name].update(
-                        _get_feature_stats(feature_name, morphs, modes, kwargs)
+                    # mutated below, need a copy
+                    feature_kwargs = deepcopy(feature_kwargs)
+
+                    types = (
+                        neurite_types
+                        if 'neurite_type' not in feature_kwargs and neurite_types
+                        else [_NEURITE_MAP[feature_kwargs.get('neurite_type', 'ALL')]]
                     )
 
-            else:
-                stats[category].update(_get_feature_stats(feature_name, morphs, modes, kwargs))
+                    for neurite_type in types:
+                        feature_kwargs["neurite_type"] = neurite_type
+                        stats[neurite_type.name].update(
+                            _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                        )
+
+                else:
+                    stats[category].update(
+                        _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                    )
 
     return dict(stats)
 
@@ -259,28 +266,72 @@ _NEURITE_MAP = {
 def full_config():
     """Returns a config with all features, all modes, all neurite types."""
     modes = ['min', 'max', 'median', 'mean', 'std']
-    return {
-        "neurite": [[name, {"kwargs": {}, "modes": modes}] for name in _NEURITE_FEATURES],
-        "morphology": [[name, {"kwargs": {}, "modes": modes}] for name in _MORPHOLOGY_FEATURES],
-        "population": [[name, {"kwargs": {}, "modes": modes}] for name in _POPULATION_FEATURES],
-        "neurite_type": list(_NEURITE_MAP.keys()),
+
+    categories = {
+        "neurite": _NEURITE_FEATURES,
+        "morphology": _MORPHOLOGY_FEATURES,
+        "population": _POPULATION_FEATURES
     }
 
+    config = {
+        category: {name: {"kwargs": [{}], "modes": modes} for name in features}
+        for category, features in categories.items()
+    }
 
-def _kwargs_modes_layout(category_features):
-    """Converts a dictionary or iterable of features to a list of feature name and option pairs."""
+    config["neurite_type"] = list(_NEURITE_MAP.keys())
+
+    return config
+
+
+def _standardize_layout(category_features):
+    """Standardizes the dictionary of features to a single format.
+
+    Args:
+        category_features: A dictionary the keys of which are features names and its values are
+        either a list of modes ([]), a dictionary of kwargs and modes {kwargs: {}, modes: []}, or
+        the standardized layout where the kwargs take a list of dicts {kwargs: [{}], modes: []}.
+
+    Returns:
+        The standardized features layout {feature: {kwargs: [{}], modes: []}}
+
+    Notes:
+        And example of the final layout is:
+
+            - feature1:
+                kwargs:
+                  - kwargs1
+                  - kwargs2
+                modes:
+                  - mode1
+                  - mode2
+            - feature2:
+                kwargs:
+                  - kwargs1
+                  - kwargs2
+                modes:
+                  - mode1
+                  - mode2
+    """
     def standardize_options(options):
         """Returns options as a dict with two keys: 'kwargs' and 'modes'."""
-        # convert from short format
+        # convert short format
         if isinstance(options, list):
-            return {"kwargs": {}, "modes": options}
+            return {"kwargs": [{}], "modes": options}
 
-        return {"kwargs": options.get("kwargs", {}), "modes": options.get("modes", [])}
+        modes = options.get("modes", [])
 
-    # either a dict or an iterable of feature_name, options pairs
-    pairs = category_features.items() if isinstance(category_features, dict) else category_features
+        if "kwargs" not in options:
+            return {"kwargs": [{}], "modes": modes}
 
-    return [[name, standardize_options(options)] for name, options in pairs]
+        kwargs = options["kwargs"]
+
+        # previous format where kwargs were a single entry
+        if isinstance(kwargs, dict):
+            return {"kwargs": [kwargs], "modes": modes}
+
+        return {"kwargs": kwargs, "modes": modes}
+
+    return {name: standardize_options(options) for name, options in category_features.items()}
 
 
 def _sanitize_config(config):
@@ -291,7 +342,7 @@ def _sanitize_config(config):
         config["morphology"] = config.pop("neuron")
 
     for category in ("neurite", "morphology", "population"):
-        config[category] = _kwargs_modes_layout(config[category]) if category in config else []
+        config[category] = _standardize_layout(config[category]) if category in config else {}
 
     return config
 
