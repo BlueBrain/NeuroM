@@ -10,6 +10,8 @@ from neurom.core import Population
 from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 import collections.abc
 
+from neurom.core import morphology as tested
+
 
 @pytest.fixture
 def mixed_morph():
@@ -45,6 +47,61 @@ def mixed_morph():
     23 4   1 -2  0   0.1 19
     """,
     reader="swc")
+
+
+def test_heterogeneous_neurite(mixed_morph):
+
+    assert not mixed_morph.neurites[0].is_heterogeneous()
+    assert mixed_morph.neurites[1].is_heterogeneous()
+    assert not mixed_morph.neurites[2].is_heterogeneous()
+
+
+def test_is_homogeneous_point(mixed_morph):
+
+    heterogeneous_neurite = mixed_morph.neurites[1]
+
+    sections = list(heterogeneous_neurite.iter_sections())
+
+    # first section has one axon and one basal children
+    assert not sections[0].is_homogeneous_point()
+
+    # second section is pure basal
+    assert sections[1].is_homogeneous_point()
+
+
+def test_homogeneous_subtrees(mixed_morph):
+
+    basal, axon_on_basal, apical = mixed_morph.neurites
+
+    assert tested._homogeneous_subtrees(basal) == [basal]
+
+    sections = list(axon_on_basal.iter_sections())
+
+    subtrees = tested._homogeneous_subtrees(axon_on_basal)
+
+    assert subtrees[0].root_node.id == axon_on_basal.root_node.id
+    assert subtrees[0].root_node.type == NeuriteType.basal_dendrite
+
+    assert subtrees[1].root_node.id == sections[4].id
+    assert subtrees[1].root_node.type == NeuriteType.axon
+
+
+def test_iter_neurites__heterogeneous(mixed_morph):
+
+    subtrees = list(tested.iter_neurites(mixed_morph, use_subtrees=False))
+
+    assert len(subtrees) == 3
+    assert subtrees[0].type == NeuriteType.basal_dendrite
+    assert subtrees[1].type == NeuriteType.basal_dendrite
+    assert subtrees[2].type == NeuriteType.apical_dendrite
+
+    subtrees =  list(tested.iter_neurites(mixed_morph, use_subtrees=True))
+
+    assert len(subtrees) == 4
+    assert subtrees[0].type == NeuriteType.basal_dendrite
+    assert subtrees[1].type == NeuriteType.basal_dendrite
+    assert subtrees[2].type == NeuriteType.axon
+    assert subtrees[3].type == NeuriteType.apical_dendrite
 
 
 @pytest.fixture
