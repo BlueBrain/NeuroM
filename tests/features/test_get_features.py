@@ -990,7 +990,7 @@ def test_length_fraction_from_soma(neurite_type, axis, expected_value):
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     npt.assert_almost_equal(
-        features.get("length_fraction_above_soma", morph, neurite_type=neurite_type, axis=axis),
+        features.get("length_fraction_above_soma", morph, neurite_type=neurite_type, up=axis),
         expected_value,
         decimal=2
     )
@@ -1001,4 +1001,4 @@ def test_length_fraction_from_soma__wrong_axis():
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     with pytest.raises(NeuroMError):
-        features.get("length_fraction_above_soma", morph, axis='K')
+        features.get("length_fraction_above_soma", morph, up='K')

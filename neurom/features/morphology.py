@@ -687,18 +687,18 @@ def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
 
 
 @feature(shape=())
-def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, axis="Y"):
+def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
     """Returns the length fraction of the segments that have their midpoints higher than the soma.
 
     Args:
         morph: Morphology object.
         neurite_type: The neurite type to use. By default all neurite types are used.
-        axis: The axis along which the computation is performed. One of ('X', 'Y', 'Z').
+        up: The axis along which the computation is performed. One of ('X', 'Y', 'Z').
 
     Returns:
         The fraction of neurite length that lies on the right of the soma along the given axis.
     """
-    axis = axis.upper()
+    axis = up.upper()
 
     if axis not in ("X", "Y", "Z"):
         raise NeuroMError(f"Unknown axis {axis}. Please choose 'X', 'Y', or 'Z'.")
