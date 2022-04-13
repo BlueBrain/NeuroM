@@ -4,7 +4,7 @@ Changelog
 Version 3.2.0
 -------------
 
-- Add ``neurom.featuyre
+- Add ``neurom.features.morphology.length_fraction_above_soma`` feature.
 - List of multiple kwargs configurations are now allowed in``neurom.apps.morph_stats``.
 - ``neurom.features.neurite.principal_direction_extents`` directions correspond to extents
   ordered in a descending order.
