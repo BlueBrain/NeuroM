@@ -700,7 +700,7 @@ def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
     """
     axis = up.upper()
 
-    if axis not in ("X", "Y", "Z"):
+    if axis not in {"X", "Y", "Z"}:
         raise NeuroMError(f"Unknown axis {axis}. Please choose 'X', 'Y', or 'Z'.")
 
     col = getattr(COLS, axis)
