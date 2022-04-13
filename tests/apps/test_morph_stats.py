@@ -43,6 +43,7 @@ from pandas.testing import assert_frame_equal
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
+
 REF_CONFIG = {
     'neurite': {
         'section_lengths': ['max', 'sum'],
@@ -72,6 +73,8 @@ REF_CONFIG_NEW = {
         'max_radial_distance': {'modes': ['mean']},
     }
 }
+
+
 
 REF_OUT = {
     'morphology': {
@@ -181,6 +184,122 @@ def test_extract_stats_scalar_feature():
                    'morphology': {'sum_soma_volume': 1424.4383771584492}}
 
 
+
+def test_extract_stats__kwarg_modes_multiple_features():
+
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    config = {
+        'neurite': {
+            'principal_direction_extents': {
+                'kwargs': [
+                    {"direction": 2},
+                    {"direction": 1},
+                    {"direction": 0},
+                ],
+                'modes': ['sum', "min"]
+            },
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': {
+            'soma_radius': {'modes': ['mean']},
+            'partition_asymmetry': {
+                'kwargs': [
+                    {'variant': 'branch-order', 'method': 'petilla'},
+                    {'variant': 'length', 'method': 'uylings'},
+                ],
+                'modes': ['min', 'max'],
+            },
+        }
+    }
+
+    res = ms.extract_stats(m, config)
+
+    assert set(res.keys()) == {"axon", "basal_dendrite", "apical_dendrite", "all", "morphology"}
+
+    for key in ("axon", "basal_dendrite", "apical_dendrite", "all"):
+
+        assert set(res[key].keys()) == {
+            "sum_principal_direction_extents__direction:2",
+            "min_principal_direction_extents__direction:2",
+            "sum_principal_direction_extents__direction:1",
+            "min_principal_direction_extents__direction:1",
+            "sum_principal_direction_extents__direction:0",
+            "min_principal_direction_extents__direction:0",
+        }
+
+    assert set(res["morphology"].keys()) == {
+        "mean_soma_radius",
+        "min_partition_asymmetry__variant:branch-order__method:petilla",
+        "max_partition_asymmetry__variant:branch-order__method:petilla",
+        "min_partition_asymmetry__variant:length__method:uylings",
+        "max_partition_asymmetry__variant:length__method:uylings",
+    }
+
+
+def test_extract_dataframe__kwarg_modes_multiple_features():
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    config = {
+        'neurite': {
+            'principal_direction_extents': {
+                'kwargs': [
+                    {"direction": 2},
+                    {"direction": 1},
+                    {"direction": 0},
+                ],
+                'modes': ['sum', "min"],
+            },
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': {
+            'soma_radius': {'modes': ['mean']},
+            'partition_asymmetry': {
+                'kwargs': [
+                    {'variant': 'branch-order', 'method': 'petilla'},
+                    {'variant': 'length', 'method': 'uylings'},
+                ],
+                'modes': ['min', 'max'],
+            },
+        },
+    }
+
+    res = ms.extract_dataframe(m, config)
+
+    expected_columns = pd.MultiIndex.from_tuples([
+        ('property', 'name'),
+        ('axon', 'sum_principal_direction_extents__direction:2'),
+        ('axon', 'min_principal_direction_extents__direction:2'),
+        ('axon', 'sum_principal_direction_extents__direction:1'),
+        ('axon', 'min_principal_direction_extents__direction:1'),
+        ('axon', 'sum_principal_direction_extents__direction:0'),
+        ('axon', 'min_principal_direction_extents__direction:0'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:2'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:2'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:1'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:1'),
+        ('apical_dendrite', 'sum_principal_direction_extents__direction:0'),
+        ('apical_dendrite', 'min_principal_direction_extents__direction:0'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:2'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:2'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:1'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:1'),
+        ('basal_dendrite', 'sum_principal_direction_extents__direction:0'),
+        ('basal_dendrite', 'min_principal_direction_extents__direction:0'),
+        ('all', 'sum_principal_direction_extents__direction:2'),
+        ('all', 'min_principal_direction_extents__direction:2'),
+        ('all', 'sum_principal_direction_extents__direction:1'),
+        ('all', 'min_principal_direction_extents__direction:1'),
+        ('all', 'sum_principal_direction_extents__direction:0'),
+        ('all', 'min_principal_direction_extents__direction:0'),
+        ('morphology', 'mean_soma_radius'),
+        ('morphology', 'min_partition_asymmetry__variant:branch-order__method:petilla'),
+        ('morphology', 'max_partition_asymmetry__variant:branch-order__method:petilla'),
+        ('morphology', 'min_partition_asymmetry__variant:length__method:uylings'),
+        ('morphology', 'max_partition_asymmetry__variant:length__method:uylings'),
+    ])
+
+    pd.testing.assert_index_equal(res.columns, expected_columns)
+
+
 def test_extract_dataframe():
     # Vanilla test
     initial_config = deepcopy(REF_CONFIG_NEW)
@@ -279,6 +398,8 @@ def test_extract_dataframe_with_kwargs():
     assert_frame_equal(actual, expected, check_dtype=False)
 
 
+
+
 def test_extract_dataframe_multiproc():
     morphs = [Path(SWC_PATH, name)
             for name in ['Neuron.swc', 'simple.swc']]
@@ -303,10 +424,82 @@ def test_get_header():
                     'fake_name1': REF_OUT,
                     'fake_name2': REF_OUT,
                     }
-    header = ms.get_header(fake_results)
+    header = ms._get_header(fake_results)
+
     assert 1 + 2 + 4 * (4 + 5) == len(header)  # name + everything in REF_OUT
     assert 'name' in header
     assert 'morphology:mean_soma_radius' in header
+
+
+def test_get_header__with_kwargs():
+
+    fake_results = {
+        "fake_name0": {
+            'axon': {
+                'sum_principal_direction_extents__direction:2': 4.236138323156951,
+                'min_principal_direction_extents__direction:2': 4.236138323156951,
+                'sum_principal_direction_extents__direction:1': 8.070668782620396,
+                'max_principal_direction_extents__direction:1': 8.070668782620396,
+                'mean_principal_direction_extents__direction:0': 82.38543140446015
+            },
+            'apical_dendrite': {
+                'sum_principal_direction_extents__direction:2': 3.6493184467335213,
+                'min_principal_direction_extents__direction:2': 3.6493184467335213,
+                'sum_principal_direction_extents__direction:1': 5.5082642304864695,
+                'max_principal_direction_extents__direction:1': 5.5082642304864695,
+                'mean_principal_direction_extents__direction:0': 99.57940514500457
+            },
+            'basal_dendrite': {
+                'sum_principal_direction_extents__direction:2': 7.32638745131256,
+                'min_principal_direction_extents__direction:2': 3.10141343122575,
+                'sum_principal_direction_extents__direction:1': 11.685447149154676,
+                'max_principal_direction_extents__direction:1': 6.410958014733595,
+                'mean_principal_direction_extents__direction:0': 87.2112016874677
+            },
+            'all': {
+                'sum_principal_direction_extents__direction:2': 15.211844221203034,
+                'min_principal_direction_extents__direction:2': 3.10141343122575,
+                'sum_principal_direction_extents__direction:1': 25.26438016226154,
+                'max_principal_direction_extents__direction:1': 8.070668782620396,
+                'mean_principal_direction_extents__direction:0': 89.09680998110002
+            },
+            'morphology': {
+                'mean_soma_radius': 0.13065629977308288,
+                'min_partition_asymmetry__variant:branch-order__method:petilla': 0.0,
+                'max_partition_asymmetry__variant:branch-order__method:petilla': 0.9,
+                'min_partition_asymmetry__variant:length__method:uylings': 0.00030289197373727377,
+                'max_partition_asymmetry__variant:length__method:uylings': 0.8795344229855895}
+            }
+    }
+
+    assert ms._get_header(fake_results) == [
+        'name',
+        'axon:sum_principal_direction_extents__direction:2',
+        'axon:min_principal_direction_extents__direction:2',
+        'axon:sum_principal_direction_extents__direction:1',
+        'axon:max_principal_direction_extents__direction:1',
+        'axon:mean_principal_direction_extents__direction:0',
+        'apical_dendrite:sum_principal_direction_extents__direction:2',
+        'apical_dendrite:min_principal_direction_extents__direction:2',
+        'apical_dendrite:sum_principal_direction_extents__direction:1',
+        'apical_dendrite:max_principal_direction_extents__direction:1',
+        'apical_dendrite:mean_principal_direction_extents__direction:0',
+        'basal_dendrite:sum_principal_direction_extents__direction:2',
+        'basal_dendrite:min_principal_direction_extents__direction:2',
+        'basal_dendrite:sum_principal_direction_extents__direction:1',
+        'basal_dendrite:max_principal_direction_extents__direction:1',
+        'basal_dendrite:mean_principal_direction_extents__direction:0',
+        'all:sum_principal_direction_extents__direction:2',
+        'all:min_principal_direction_extents__direction:2',
+        'all:sum_principal_direction_extents__direction:1',
+        'all:max_principal_direction_extents__direction:1',
+        'all:mean_principal_direction_extents__direction:0',
+        'morphology:mean_soma_radius',
+        'morphology:min_partition_asymmetry__variant:branch-order__method:petilla',
+        'morphology:max_partition_asymmetry__variant:branch-order__method:petilla',
+        'morphology:min_partition_asymmetry__variant:length__method:uylings',
+        'morphology:max_partition_asymmetry__variant:length__method:uylings'
+    ]
 
 
 def test_generate_flattened_dict():
@@ -314,10 +507,67 @@ def test_generate_flattened_dict():
                     'fake_name1': REF_OUT,
                     'fake_name2': REF_OUT,
                     }
-    header = ms.get_header(fake_results)
-    rows = list(ms.generate_flattened_dict(header, fake_results))
+    header = ms._get_header(fake_results)
+    rows = list(ms._generate_flattened_dict(header, fake_results))
     assert 3 == len(rows)  # one for fake_name[0-2]
     assert 1 + 2 + 4 * (4 + 5) == len(rows[0])  # name + everything in REF_OUT
+
+
+def test_generate_flattened_dict__with_kwargs():
+
+    results = {
+        'axon': {
+            'sum_principal_direction_extents__direction:2': 0.0,
+            'min_principal_direction_extents__direction:2': 1.0,
+            'sum_principal_direction_extents__direction:1': 2.0,
+            'max_principal_direction_extents__direction:1': 3.0,
+            'mean_principal_direction_extents__direction:0': 4.0,
+        },
+        'apical_dendrite': {
+            'sum_principal_direction_extents__direction:2': 5.0,
+            'min_principal_direction_extents__direction:2': 6.0,
+            'sum_principal_direction_extents__direction:1': 7.0,
+            'max_principal_direction_extents__direction:1': 8.0,
+            'mean_principal_direction_extents__direction:0': 9.0,
+        },
+        'basal_dendrite': {
+            'sum_principal_direction_extents__direction:2': 1.0,
+            'min_principal_direction_extents__direction:2': 2.0,
+            'sum_principal_direction_extents__direction:1': 3.0,
+            'max_principal_direction_extents__direction:1': 4.0,
+            'mean_principal_direction_extents__direction:0': 5.0,
+        },
+        'all': {
+            'sum_principal_direction_extents__direction:2': 6.0,
+            'min_principal_direction_extents__direction:2': 7.0,
+            'sum_principal_direction_extents__direction:1': 8.0,
+            'max_principal_direction_extents__direction:1': 9.0,
+            'mean_principal_direction_extents__direction:0': 1.0,
+        },
+        'morphology': {
+            'mean_soma_radius': 2.0,
+            'min_partition_asymmetry__variant:branch-order__method:petilla': 3.0,
+            'max_partition_asymmetry__variant:branch-order__method:petilla': 4.0,
+            'min_partition_asymmetry__variant:length__method:uylings': 5.0,
+            'max_partition_asymmetry__variant:length__method:uylings': 6.0,
+        }
+    }
+
+    fake_results = {
+        "fake_name0": results,
+        "fake_name1": results,
+    }
+
+    header = ms._get_header(fake_results)
+
+    assert list(ms._generate_flattened_dict(header, fake_results)) == [
+        [
+            'fake_name0', 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 1.0, 2.0, 3.0, 4.0,
+            5.0, 6.0, 7.0, 8.0, 9.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+        [
+            'fake_name1', 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 1.0, 2.0, 3.0, 4.0,
+            5.0, 6.0, 7.0, 8.0, 9.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    ]
 
 
 def test_full_config():
@@ -329,13 +579,51 @@ def test_full_config():
     assert set(config['population'].keys()) == set(_POPULATION_FEATURES.keys())
 
 
+def test_standardize_layout():
+    """Converts the config category entries (e.g. neurite, morphology, population) to using
+    the kwarg and modes layout.
+    """
+    # from short format
+    entry = {"f1": ["min", "max"], "f2": ["min"], "f3": []}
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min"]},
+        "f3": {"kwargs": [{}], "modes": []},
+    }
+
+    # from kwarg/modes with missing options
+    entry = {
+        "f1": {"kwargs": {"a1": 1, "a2": 2}, "modes": ["min", "max"]},
+        "f2": {"modes": ["min", "median"]},
+        "f3": {"kwargs": {"a1": 1, "a2": 2}},
+        "f4": {},
+    }
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}], "modes": []},
+        "f4": {"kwargs": [{}], "modes": []},
+    }
+
+    # from list of kwargs format
+    entry = {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}]},
+        "f4": {},
+    }
+    assert ms._standardize_layout(entry) == {
+        "f1": {"kwargs": [{"a1": 1, "a2": 2}], "modes": ["min", "max"]},
+        "f2": {"kwargs": [{}], "modes": ["min", "median"]},
+        "f3": {"kwargs": [{"a1": 1, "a2": 2}], "modes": []},
+        "f4": {"kwargs": [{}], "modes": []},
+    }
+
+
 def test_sanitize_config():
 
-    with pytest.raises(ConfigError):
-        ms.sanitize_config({'neurite': []})
-
-    new_config = ms.sanitize_config({})  # empty
-    assert 2 == len(new_config)  # neurite & morphology created
+    new_config = ms._sanitize_config({})  # empty
+    assert 3 == len(new_config)  # neurite & morphology & population created
 
     full_config = {
         'neurite': {
@@ -348,8 +636,28 @@ def test_sanitize_config():
             'soma_radius': ['mean']
         }
     }
-    new_config = ms.sanitize_config(full_config)
-    assert 3 == len(new_config)  # neurite, neurite_type & morphology
+    new_config = ms._sanitize_config(full_config)
+
+    expected_config = {
+        'neurite': {
+            'section_lengths': {"kwargs": [{}], "modes": ['max', 'sum']},
+            'section_volumes': {"kwargs": [{}], "modes": ['sum']},
+            'section_branch_orders': {"kwargs": [{}], "modes": ['max']},
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': {
+            'soma_radius': {"kwargs": [{}], "modes": ["mean"]},
+        },
+        "population": {},
+    }
+    assert new_config == expected_config
+
+    # check that legacy neuron entries are converted to morphology ones
+    full_config["neuron"] = full_config.pop("morphology")
+    assert ms._sanitize_config(full_config) == expected_config
+
+    # check that all formats are converted to the same sanitized config:
+    assert ms._sanitize_config(REF_CONFIG) == ms._sanitize_config(REF_CONFIG_NEW)
 
 
 def test_multidimensional_features():

@@ -4,6 +4,7 @@ Changelog
 Version 3.2.0
 -------------
 
+- List of multiple kwargs configurations are now allowed in``neurom.apps.morph_stats``.
 - ``neurom.features.neurite.principal_direction_extents`` directions correspond to extents
   ordered in a descending order.
 - Add features ``neurom.features.morphology.(aspect_ration, circularity, shape_factor)```
