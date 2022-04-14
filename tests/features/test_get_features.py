@@ -971,3 +971,34 @@ def test_shape_factor():
         decimal=6
     )
     assert np.isnan(features.get("shape_factor", morph, neurite_type=nm.NeuriteType.custom5))
+
+
+@pytest.mark.parametrize("neurite_type, axis, expected_value", [
+    (nm.AXON, "X", 0.50),
+    (nm.AXON, "Y", 0.74),
+    (nm.AXON, "Z", 0.16),
+    (nm.APICAL_DENDRITE, "X", np.nan),
+    (nm.APICAL_DENDRITE, "Y", np.nan),
+    (nm.APICAL_DENDRITE, "Z", np.nan),
+    (nm.BASAL_DENDRITE, "X", 0.50),
+    (nm.BASAL_DENDRITE, "Y", 0.59),
+    (nm.BASAL_DENDRITE, "Z", 0.48),
+]
+)
+def test_length_fraction_from_soma(neurite_type, axis, expected_value):
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("length_fraction_above_soma", morph, neurite_type=neurite_type, up=axis),
+        expected_value,
+        decimal=2
+    )
+
+
+def test_length_fraction_from_soma__wrong_axis():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    with pytest.raises(NeuroMError):
+        features.get("length_fraction_above_soma", morph, up='K')
