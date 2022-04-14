@@ -596,6 +596,9 @@ def volume_density(morph, neurite_type=NeuriteType.all):
         for point in point_list
     ]
 
+    if not points:
+        return np.nan
+
     morph_hull = convex_hull(points)
 
     if morph_hull is None:
