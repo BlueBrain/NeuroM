@@ -48,7 +48,7 @@ from functools import partial
 
 import numpy as np
 from neurom import morphmath
-from neurom.utils import flatten
+from neurom import utils
 from neurom.core.types import NeuriteType
 from neurom.core.morphology import Section, iter_points
 from neurom.core.dataformat import COLS
@@ -69,6 +69,7 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
     def homogeneous_filter(section):
         return check_type(section) and Section.is_homogeneous_point(section)
 
+    # forking sections cannot be heterogeneous
     if (
         iterator_type in {Section.ibifurcation_point, Section.iforking_point}
         and section_type != NeuriteType.all
@@ -188,19 +189,14 @@ def section_term_branch_orders(neurite, section_type=NeuriteType.all):
 def section_path_distances(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Path lengths."""
 
-    def takeuntil(predicate, iterable):
-        """Similar to itertools.takewhile but it returns the last element before stopping."""
-        for x in iterable:
-            yield x
-            if predicate(x):
-                break
-
-    def pl2(node):
+    def path_length(node):
         """Calculate the path length using cached section lengths."""
-        sections = takeuntil(lambda s: s.id == neurite.root_node.id, node.iupstream())
+        sections = utils.takeuntil(lambda s: s.id == neurite.root_node.id, node.iupstream())
         return sum(n.length for n in sections)
 
-    return _map_sections(pl2, neurite, iterator_type=iterator_type, section_type=section_type)
+    return _map_sections(
+        path_length, neurite, iterator_type=iterator_type, section_type=section_type
+    )
 
 
 ################################################################################
@@ -213,7 +209,7 @@ def _map_segments(func, neurite, section_type=NeuriteType.all):
 
     `func` accepts a section and returns list of values corresponding to each segment.
     """
-    return list(flatten(_map_sections(func, neurite, section_type=section_type)))
+    return list(utils.flatten(_map_sections(func, neurite, section_type=section_type)))
 
 
 @feature(shape=(...,))
@@ -293,14 +289,12 @@ def segment_path_lengths(neurite, section_type=NeuriteType.all):
 @feature(shape=(...,))
 def segment_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Returns the list of distances between all segment mid points and origin."""
-    pos = neurite.root_node.points[0] if origin is None else origin
-
-    def radial_distances(section):
-        """List of distances between the mid point of each segment and pos."""
-        mid_pts = 0.5 * (section.points[:-1, COLS.XYZ] + section.points[1:, COLS.XYZ])
-        return np.linalg.norm(mid_pts - pos[COLS.XYZ], axis=1)
-
-    return _map_segments(radial_distances, neurite, section_type=section_type)
+    origin = neurite.root_node.points[0, COLS.XYZ] if origin is None else origin
+    return _map_segments(
+        func=partial(sf.segment_midpoint_radial_distances, origin=origin),
+        neurite=neurite,
+        section_type=section_type
+    )
 
 
 @feature(shape=(...,))
@@ -337,44 +331,33 @@ def partition_asymmetry(
     :func:`neurom.features.bifurcationfunc.partition_asymmetry`
     """
     if variant not in {'branch-order', 'length'}:
-        raise ValueError('Please provide a valid variant for partition asymmetry,'
-                         f'found {variant}')
+        raise ValueError(
+            "Please provide a valid variant for partition asymmetry. "
+            f"Expected 'branch-order' or 'length', got {variant}."
+        )
     if method not in {'petilla', 'uylings'}:
-        raise ValueError('Please provide a valid method for partition asymmetry,'
-                         'either "petilla" or "uylings"')
-
-    def it_type(section):
-
-        if section_type == NeuriteType.all:
-            return Section.ipreorder(section)
-
-        check = is_type(section_type)
-        return (s for s in section.ipreorder() if check(s))
-
-    if variant == 'branch-order':
-
-        function = partial(
-            bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type
+        raise ValueError(
+            "Please provide a valid method for partition asymmetry. "
+            f"Expected 'petilla' or 'uylings', got {method}."
         )
 
+    # create a downstream iterator that is filtered by the section type
+    it_type = utils.filtered_iterator(is_type(section_type), Section.ipreorder)
+
+    if variant == 'branch-order':
         return _map_sections(
-            function,
+            partial(bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type),
             neurite,
             iterator_type=Section.ibifurcation_point,
             section_type=section_type
         )
 
-    neurite_length = total_length(neurite, section_type=section_type)
-
-    def pathlength_asymmetry_ratio(section):
-        pathlength_diff = abs(
-            sf.downstream_pathlength(section.children[0], iterator_type=it_type) -
-            sf.downstream_pathlength(section.children[1], iterator_type=it_type)
-        )
-        return pathlength_diff / neurite_length
-
     return _map_sections(
-        pathlength_asymmetry_ratio,
+        partial(
+            bf.downstream_pathlength_asymmetry,
+            normalization_length=total_length(neurite, section_type=section_type),
+            iterator_type=it_type,
+        ),
         neurite,
         iterator_type=Section.ibifurcation_point,
         section_type=section_type
@@ -499,7 +482,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
 
     # note: duplicate points included but not affect the convex hull calculation
     points = list(
-        flatten(_map_sections(get_points, neurite, section_type=section_type))
+        utils.flatten(_map_sections(get_points, neurite, section_type=section_type))
     )
 
     hull = convex_hull(points)

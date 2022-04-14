@@ -138,6 +138,13 @@ def segment_midpoints(section):
     return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
 
 
+def segment_midpoint_radial_distances(section, origin=None):
+    """Returns the list of segment midpoint radial distances to the origin."""
+    origin = np.zeros(3, dtype=float) if origin is None else origin
+    midpoints = np.array(segment_midpoints(section))
+    return np.linalg.norm(midpoints - origin, axis=1).tolist()
+
+
 def segment_taper_rates(section):
     """Returns the list of segment taper rates within the section."""
     pts = section.points[:, COLS.XYZR]
