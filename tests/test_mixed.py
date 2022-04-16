@@ -10,15 +10,59 @@ from neurom.core import Population
 from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 import collections.abc
 
-from neurom.core import morphology as tested
+from neurom.core.types import tree_type_checker as is_type
+
+import neurom.core.morphology
+import neurom.features.neurite
 
 
 @pytest.fixture
 def mixed_morph():
     """
+                                                               (1, 4, 1)
+                                                                   |
+                                                             S7:B  |
+                                                                   |
+                                                (1, 4, -1)-----(1, 4, 0)    (2, 4, 0)     (3, 3, 1)
+                                                           S8:B    |            |             |
+                                                                   |     S10:A  |      S12:A  |
+                                                                   |            |   S11:A     |
+                                                             S6:B  |        (2, 3, 0)-----(3, 3, 0)
+                                                                   |            /             |
+                                                                   |   S9:A  /         S13:A  |
+                                                                   |      /                   |
+                                                               (1, 2, 0)                  (3, 3, -1)
+                                                                  /
+                                                        S5:B   /
+                                                            /       Axon on basal dendrite
+    (-3, 0, 1)     (-2, 1, 0)                    (0, 1, 0)
+         |              |
+      S2 |           S4 |
+         |     S1       |     S0
+    (-3, 0, 0)-----(-2, 0, 0)-----(-1, 0, 0)     (0, 0, 0) Soma
+         |
+      S3 |           Basal Dendrite
+         |
+    (-3, 0, -1)                                 (0, -1, 0)
+                                                     |
+                                                S14  |
+                                                     |     S17
+                            Apical Dendrite     (0, -2, 0)-----(1, -2, 0)
+                                                     |
+                                                S15  |
+                                            S17      |     S16
+                                (0, -3, -1)-----(0, -3, 0)-----(0, -3, 1)
+
     basal_dendrite: homogeneous
+        section ids: [0, 1, 2, 3, 4]
+
     axon_on_basal_dendrite: heterogeneous
-    apical_dendrite: homogeneous
+        section_ids:
+            - basal: [5, 6, 7, 8]
+            - axon : [9, 10, 11, 12, 13]
+
+    apical_dendrite: homogeneous:
+        section_ids: [14, 15, 16, 17, 18]
     """
     return neurom.load_morphology(
     """
@@ -73,11 +117,11 @@ def test_homogeneous_subtrees(mixed_morph):
 
     basal, axon_on_basal, apical = mixed_morph.neurites
 
-    assert tested._homogeneous_subtrees(basal) == [basal]
+    assert neurom.core.morphology._homogeneous_subtrees(basal) == [basal]
 
     sections = list(axon_on_basal.iter_sections())
 
-    subtrees = tested._homogeneous_subtrees(axon_on_basal)
+    subtrees = neurom.core.morphology._homogeneous_subtrees(axon_on_basal)
 
     assert subtrees[0].root_node.id == axon_on_basal.root_node.id
     assert subtrees[0].root_node.type == NeuriteType.basal_dendrite
@@ -88,20 +132,88 @@ def test_homogeneous_subtrees(mixed_morph):
 
 def test_iter_neurites__heterogeneous(mixed_morph):
 
-    subtrees = list(tested.iter_neurites(mixed_morph, use_subtrees=False))
+    subtrees = list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=False))
 
     assert len(subtrees) == 3
     assert subtrees[0].type == NeuriteType.basal_dendrite
     assert subtrees[1].type == NeuriteType.basal_dendrite
     assert subtrees[2].type == NeuriteType.apical_dendrite
 
-    subtrees =  list(tested.iter_neurites(mixed_morph, use_subtrees=True))
+    subtrees =  list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=True))
 
     assert len(subtrees) == 4
     assert subtrees[0].type == NeuriteType.basal_dendrite
     assert subtrees[1].type == NeuriteType.basal_dendrite
     assert subtrees[2].type == NeuriteType.axon
     assert subtrees[3].type == NeuriteType.apical_dendrite
+
+
+def test_core_iter_sections__heterogeneous(mixed_morph):
+
+    def assert_sections(neurite, section_type, expected_section_ids):
+
+        it = neurom.core.morphology.iter_sections(neurite, section_filter=is_type(section_type))
+        assert [s.id for s in it] == expected_section_ids
+
+    basal, axon_on_basal, apical = mixed_morph.neurites
+
+    assert_sections(basal, NeuriteType.all, [0, 1, 2, 3, 4])
+    assert_sections(basal, NeuriteType.basal_dendrite, [0, 1, 2, 3, 4])
+    assert_sections(basal, NeuriteType.axon, [])
+
+    assert_sections(axon_on_basal, NeuriteType.all, [5, 6, 7, 8, 9, 10, 11, 12, 13])
+    assert_sections(axon_on_basal, NeuriteType.basal_dendrite, [5, 6, 7, 8])
+    assert_sections(axon_on_basal, NeuriteType.axon, [9, 10, 11, 12, 13])
+
+    assert_sections(apical, NeuriteType.all, [14, 15, 16, 17, 18])
+    assert_sections(apical, NeuriteType.apical_dendrite, [14, 15, 16, 17, 18])
+
+
+def test_features_neurite_map_sections__heterogeneous(mixed_morph):
+
+    def assert_sections(neurite, section_type, iterator_type, expected_section_ids):
+        function = lambda section: section.id
+        section_ids = neurom.features.neurite._map_sections(
+            function, neurite, iterator_type=iterator_type, section_type=section_type
+        )
+        assert section_ids == expected_section_ids
+
+    basal, axon_on_basal, apical = mixed_morph.neurites
+
+    # homogeneous tree, no difference between all and basal_dendrite types.
+    assert_sections(
+        basal, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        [0, 1],
+    )
+    assert_sections(
+        basal, NeuriteType.basal_dendrite, neurom.core.morphology.Section.ibifurcation_point,
+        [0, 1],
+    )
+    # heterogeneous tree, forks cannot be heterogeneous if a type other than all is specified
+    # Section with id 5 is the transition section, which has a basal and axon children sections
+    assert_sections(
+        axon_on_basal, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        [5, 6, 9, 11],
+    )
+    assert_sections(
+        axon_on_basal, NeuriteType.basal_dendrite,
+        neurom.core.morphology.Section.ibifurcation_point,
+        [6],
+    )
+    assert_sections(
+        axon_on_basal, NeuriteType.axon,
+        neurom.core.morphology.Section.ibifurcation_point,
+        [9, 11],
+    )
+    # homogeneous tree, no difference between all and basal_dendrite types.
+    assert_sections(
+        apical, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        [14, 15],
+    )
+    assert_sections(
+        apical, NeuriteType.apical_dendrite, neurom.core.morphology.Section.ibifurcation_point,
+        [14, 15],
+    )
 
 
 @pytest.fixture
@@ -778,7 +890,19 @@ def _morphology_features(mode):
                 "expected_wout_subtrees": 0.25,
                 "expected_with_subtrees": 0.25,
             },
-        ]
+        ],
+        "length_fraction_above_soma": [
+            {
+                "kwargs": {"neurite_type": NeuriteType.all},
+                "expected_wout_subtrees": 0.567898,
+                "expected_with_subtrees": 0.567898,
+            },
+            {
+                "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
+                "expected_wout_subtrees": 0.61591,
+                "expected_with_subtrees": 0.74729,
+            },
+        ],
     }
 
     features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())

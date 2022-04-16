@@ -762,7 +762,7 @@ def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy", use
 
 
 @feature(shape=())
-def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
+def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y", use_subtrees=False):
     """Returns the length fraction of the segments that have their midpoints higher than the soma.
 
     Args:
@@ -779,7 +779,11 @@ def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
         raise NeuroMError(f"Unknown axis {axis}. Please choose 'X', 'Y', or 'Z'.")
 
     col = getattr(COLS, axis)
-    segments = list(iter_segments(morph, neurite_filter=is_type(neurite_type)))
+
+    if use_subtrees:
+        segments = list(iter_segments(morph, neurite_filter=is_type(neurite_type)))
+    else:
+        segments = list(iter_segments(morph, section_filter=is_type(neurite_type)))
 
     if not segments:
         return np.nan

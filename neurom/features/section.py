@@ -35,6 +35,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
 from neurom.core.morphology import Section
 from neurom.morphmath import interval_lengths
+from neurom import utils
 
 
 def section_points(section):
@@ -42,9 +43,19 @@ def section_points(section):
     return section.points[:, COLS.XYZ]
 
 
-def section_path_length(section):
-    """Path length from section to root."""
-    return sum(s.length for s in section.iupstream())
+def section_path_length(section, stop_node=None):
+    """Path length from section to root.
+
+    Args:
+        section: Section object.
+        stop_node: Node to stop the upstream traversal. If None, it stops when no parent is found.
+    """
+    it = section.iupstream()
+
+    if stop_node:
+        it = utils.takeuntil(lambda s: s.id == stop_node.id, it)
+
+    return sum(map(section_length, it))
 
 
 def section_length(section):

@@ -188,14 +188,10 @@ def section_term_branch_orders(neurite, section_type=NeuriteType.all):
 @feature(shape=(...,))
 def section_path_distances(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Path lengths."""
-
-    def path_length(node):
-        """Calculate the path length using cached section lengths."""
-        sections = utils.takeuntil(lambda s: s.id == neurite.root_node.id, node.iupstream())
-        return sum(n.length for n in sections)
-
     return _map_sections(
-        path_length, neurite, iterator_type=iterator_type, section_type=section_type
+        partial(sf.section_path_length, stop_node=neurite.root_node),
+        neurite,
+        iterator_type=iterator_type, section_type=section_type
     )
 
 
