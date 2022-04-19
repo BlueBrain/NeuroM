@@ -116,12 +116,25 @@ class Section:
                 children.pop()
                 yield cur_node
 
-    def iupstream(self):
-        """Iterate from a tree node to the root nodes."""
-        t = self
-        while t is not None:
-            yield t
-            t = t.parent
+    def iupstream(self, stop_node=None):
+        """Iterate from a tree node to the root nodes.
+
+        Args:
+            stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
+        """
+        def stop_if_no_parent(section):
+            return section.parent is None
+
+        def stop_at_node(section):
+            return section == stop_node
+
+        stop_condition = stop_if_no_parent if stop_node is None else stop_at_node
+
+        current_section = self
+        while not stop_condition(current_section):
+            yield current_section
+            current_section = current_section.parent
+        yield current_section
 
     def ileaf(self):
         """Iterator to all leaves of a tree."""
