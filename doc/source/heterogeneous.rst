@@ -80,11 +80,15 @@ For example:
 
     print(basal.type, axon_carrying_dendrite.type, apical.type)
 
-would print the types ``(basal_dendrite, basal_dendrite, apical_dendrite)``.
+Prints::
+
+    NeuriteType.basal_dendrite NeuriteType.basal_dendrite NeuriteType.apical_dendrite
+
 I.E. the axon-carrying dendrite would be treated as a basal dendrite.
 For feature extraction and checks, the axon-carrying dendrite is treated as a basal dendrite.
 Features, for which an axon neurite type is passed, do not have access to the axonal part of the neurite.
 For instance, the number of basal and axon neurites will be two and zero respectively.
+A features such as ``total_volume`` would include the entire axon-carrying dendrite, without separating between basal and axon types.
 
 Sub-neurite mode
 ~~~~~~~~~~~~~~~~
