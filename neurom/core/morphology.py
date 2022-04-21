@@ -122,13 +122,12 @@ class Section:
         Args:
             stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
         """
-        def stop_if_no_parent(section):
-            return section.parent is None
-
-        def stop_at_node(section):
-            return section == stop_node
-
-        stop_condition = stop_if_no_parent if stop_node is None else stop_at_node
+        if stop_node is None:
+            def stop_condition(section):
+                return section.parent is None
+        else:
+            def stop_condition(section):
+                return section == stop_node
 
         current_section = self
         while not stop_condition(current_section):
