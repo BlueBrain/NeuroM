@@ -286,7 +286,6 @@ def iter_neurites(
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     if use_subtrees:
-
         neurites = flatten(
             _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
             for neurite in neurites
