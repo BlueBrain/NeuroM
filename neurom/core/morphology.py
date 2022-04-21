@@ -271,13 +271,12 @@ def iter_neurites(
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
-    neurites = (
-        (obj,)
-        if isinstance(obj, Neurite)
-        else obj.neurites
-        if hasattr(obj, "neurites")
-        else obj
-    )
+    if isinstance(obj, Neurite):
+        neurites = (obj,)
+    elif hasattr(obj, "neurites"):
+        neurites = obj.neurites
+    else:
+        neurites = obj
 
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
