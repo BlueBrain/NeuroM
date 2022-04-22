@@ -237,6 +237,16 @@ def _homogeneous_subtrees(neurite):
     for section in neurite.root_node.ipreorder():
         if section.type not in homogeneous_neurites:
             homogeneous_neurites[section.type] = Neurite(section.morphio_section)
+
+    if len(homogeneous_neurites) >= 2 and homogeneous_neurites.keys() != {
+        NeuriteType.axon,
+        NeuriteType.basal_dendrite,
+    }:
+        warnings.warn(
+                f"{neurite} is not an axon-carrying dendrite. "
+                f"Types found {list(homogeneous_neurites.keys())}",
+                stacklevel=2
+        )
     return list(homogeneous_neurites.values())
 
 

@@ -92,8 +92,25 @@ def mixed_morph():
     """,
     reader="swc")
 
+@pytest.fixture
+def three_types_neurite_morph():
+    return neurom.load_morphology(
+    """
+    1    1   0  0  0   0.5 -1
+    2    3   0  1  0   0.1  1
+    3    3   1  2  0   0.1  2
+    4   3   1  4  0   0.1  3
+    5   3   1  4  1   0.1  4
+    6   3   1  4 -1   0.1  4
+    7   2   2  3  0   0.1  3
+    8   2   2  4  0   0.1  7
+    9   2   3  3  0   0.1  7
+    10   2   3  3  1   0.1  9
+    11   4   3  3 -1   0.1  9
+    """,
+    reader="swc")
 
-def test_heterogeneous_neurite(mixed_morph):
+def test_heterogeneous_neurites(mixed_morph):
 
     assert not mixed_morph.neurites[0].is_heterogeneous()
     assert mixed_morph.neurites[1].is_heterogeneous()
@@ -113,7 +130,7 @@ def test_is_homogeneous_point(mixed_morph):
     assert sections[1].is_homogeneous_point()
 
 
-def test_homogeneous_subtrees(mixed_morph):
+def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
 
     basal, axon_on_basal, apical = mixed_morph.neurites
 
@@ -128,6 +145,13 @@ def test_homogeneous_subtrees(mixed_morph):
 
     assert subtrees[1].root_node.id == sections[4].id
     assert subtrees[1].root_node.type == NeuriteType.axon
+
+    with pytest.warns(
+        UserWarning,
+        match="Neurite <type: NeuriteType.basal_dendrite> is not an axon-carrying dendrite."
+    ):
+        three_types_neurite, = three_types_neurite_morph.neurites
+        neurom.core.morphology._homogeneous_subtrees(three_types_neurite)
 
 
 def test_iter_neurites__heterogeneous(mixed_morph):
