@@ -233,21 +233,25 @@ def _homogeneous_subtrees(neurite):
     A sub-neurite can be either the entire tree or a homogeneous downstream
     sub-tree.
     """
-    homogeneous_neurites = {neurite.root_node.type: neurite}
-    for section in neurite.root_node.ipreorder():
-        if section.type not in homogeneous_neurites:
-            homogeneous_neurites[section.type] = Neurite(section.morphio_section)
+    it = neurite.root_node.ipreorder()
+    homogeneous_neurites = [Neurite(next(it).morphio_section)]
 
-    if len(homogeneous_neurites) >= 2 and homogeneous_neurites.keys() != {
+    for section in it:
+        if section.type != section.parent.type:
+            homogeneous_neurites.append(Neurite(section.morphio_section))
+
+    homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
+
+    if len(homogeneous_neurites) >= 2 and homogeneous_types != [
         NeuriteType.axon,
         NeuriteType.basal_dendrite,
-    }:
+    ]:
         warnings.warn(
                 f"{neurite} is not an axon-carrying dendrite. "
-                f"Types found {list(homogeneous_neurites.keys())}",
+                f"Subtree types found {homogeneous_types}",
                 stacklevel=2
         )
-    return list(homogeneous_neurites.values())
+    return homogeneous_neurites
 
 
 def iter_neurites(
