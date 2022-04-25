@@ -41,6 +41,7 @@ from neurom.exceptions import NeuroMError
 from neurom.features import neurite, NameSpace
 
 import pytest
+from numpy import testing as npt
 from numpy.testing import assert_allclose
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
@@ -486,6 +487,22 @@ def test_neurite_density():
         (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469))
 
 
+def test_morphology_volume_density():
+
+    volume_density = features.get("volume_density", NEURON)
+
+    # volume density should not be calculated as the sum of the neurite volume densities,
+    # because it is not additive
+    volume_density_from_neurites = sum(
+        features.get("volume_density", neu) for neu in NEURON.neurites
+    )
+
+    # calculating the convex hull per neurite results into smaller hull volumes and higher
+    # neurite_volume / hull_volume ratios
+    assert not np.isclose(volume_density, volume_density_from_neurites)
+    assert volume_density < volume_density_from_neurites
+
+
 def test_section_lengths():
     ref_seclen = [n.length for n in iter_sections(NEURON)]
     seclen = features.get('section_lengths', NEURON)
@@ -627,23 +644,33 @@ def test_section_radial_distances_origin():
 
 
 def test_number_of_sections_per_neurite():
-    nsecs = features.get('number_of_sections_per_neurite', NEURON)
-    assert len(nsecs) == 4
-    assert np.all(nsecs == [21, 21, 21, 21])
+    for use_subtrees in (True, False):
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 4
+        assert np.all(nsecs == [21, 21, 21, 21])
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON, neurite_type=NeuriteType.axon)
-    assert len(nsecs) == 1
-    assert nsecs == [21]
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.axon,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 1
+        assert nsecs == [21]
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON,
-                         neurite_type=NeuriteType.basal_dendrite)
-    assert len(nsecs) == 2
-    assert np.all(nsecs == [21, 21])
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.basal_dendrite,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 2
+        assert np.all(nsecs == [21, 21])
 
-    nsecs = features.get('number_of_sections_per_neurite', NEURON,
-                         neurite_type=NeuriteType.apical_dendrite)
-    assert len(nsecs) == 1
-    assert np.all(nsecs == [21])
+        nsecs = features.get('number_of_sections_per_neurite',
+                             NEURON,
+                             neurite_type=NeuriteType.apical_dendrite,
+                             use_subtrees=use_subtrees)
+        assert len(nsecs) == 1
+        assert np.all(nsecs == [21])
 
 
 def test_trunk_origin_radii():
@@ -706,6 +733,21 @@ def test_sholl_frequency():
     assert len(features.get('sholl_frequency', POP)) == 108
 
 
+    # check that the soma is taken into account for calculating max radius and num bins
+    m = nm.load_morphology(
+        """
+        1  1  -10  0  0    5.0 -1
+        2  3    0  0  0    0.1  1
+        3  3   10  0  0    0.1  2
+        """, reader="swc",
+    )
+
+    assert features.get('sholl_frequency', m, step_size=5.0) == [0, 1, 1, 1]
+
+    # check that if there is no neurite of a specific type, an empty list is returned
+    assert features.get('sholl_frequency', m, neurite_type=NeuriteType.axon) == []
+
+
 def test_bifurcation_partitions():
     assert_allclose(features.get('bifurcation_partitions', POP)[:10],
                     [19., 17., 15., 13., 11., 9., 7., 5., 3., 1.])
@@ -762,16 +804,50 @@ def test_section_term_radial_distances():
 def test_principal_direction_extents():
     m = nm.load_morphology(SWC_PATH / 'simple.swc')
     principal_dir = features.get('principal_direction_extents', m)
-    assert_allclose(principal_dir, [14.736052694538641, 12.105102672688004])
+    assert_allclose(principal_dir, [10.99514 , 10.997688])
 
     # test with a realistic morphology
     m = nm.load_morphology(DATA_PATH / 'h5/v1' / 'bio_neuron-000.h5')
-    p_ref = [1672.9694359427331, 142.43704397865031, 226.45895382204986,
-             415.50612748523838, 429.83008974193206, 165.95410536922873,
-             346.83281498399697]
-    p = features.get('principal_direction_extents', m)
-    assert_allclose(p, p_ref, rtol=1e-6)
 
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=0),
+        [
+            1210.569727,
+            117.988454,
+            147.098687,
+            288.226628,
+            330.166506,
+            152.396521,
+            293.913857,
+        ],
+        atol=1e-6
+    )
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=1),
+        [
+            851.730088,
+            99.108911,
+            116.949436,
+            157.171734,
+            137.328019,
+            20.66982,
+            67.157249,
+        ],
+        atol=1e-6
+    )
+    assert_allclose(
+        features.get('principal_direction_extents', m, direction=2),
+        [
+            282.961199,
+            38.493958,
+            40.715183,
+            94.061625,
+            51.120255,
+            10.793167,
+            62.808188
+        ],
+        atol=1e-6
+    )
 
 def test_total_width():
 
@@ -824,3 +900,115 @@ def test_total_depth():
         features.get('total_depth', NRN, neurite_type=nm.BASAL_DENDRITE),
         51.64143
     )
+
+
+def test_aspect_ratio():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.710877,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.222268,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.315263,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("aspect_ratio", morph),
+        0.731076,
+        decimal=6
+    )
+    assert np.isnan(features.get("aspect_ratio", morph, neurite_type=nm.NeuriteType.custom5))
+
+
+def test_circularity():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.722613,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.378692,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.527657,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("circularity", morph),
+        0.730983,
+        decimal=6
+    )
+    assert np.isnan(features.get("circularity", morph, neurite_type=nm.NeuriteType.custom5))
+
+
+def test_shape_factor():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="xy"),
+        0.356192,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="xz"),
+        0.131547,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph, neurite_type=nm.AXON, projection_plane="yz"),
+        0.194558,
+        decimal=6
+    )
+    npt.assert_almost_equal(
+        features.get("shape_factor", morph),
+        0.364678,
+        decimal=6
+    )
+    assert np.isnan(features.get("shape_factor", morph, neurite_type=nm.NeuriteType.custom5))
+
+
+@pytest.mark.parametrize("neurite_type, axis, expected_value", [
+    (nm.AXON, "X", 0.50),
+    (nm.AXON, "Y", 0.74),
+    (nm.AXON, "Z", 0.16),
+    (nm.APICAL_DENDRITE, "X", np.nan),
+    (nm.APICAL_DENDRITE, "Y", np.nan),
+    (nm.APICAL_DENDRITE, "Z", np.nan),
+    (nm.BASAL_DENDRITE, "X", 0.50),
+    (nm.BASAL_DENDRITE, "Y", 0.59),
+    (nm.BASAL_DENDRITE, "Z", 0.48),
+]
+)
+def test_length_fraction_from_soma(neurite_type, axis, expected_value):
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    npt.assert_almost_equal(
+        features.get("length_fraction_above_soma", morph, neurite_type=neurite_type, up=axis),
+        expected_value,
+        decimal=2
+    )
+
+
+def test_length_fraction_from_soma__wrong_axis():
+
+    morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
+
+    with pytest.raises(NeuroMError):
+        features.get("length_fraction_above_soma", morph, up='K')

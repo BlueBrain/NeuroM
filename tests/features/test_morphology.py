@@ -36,6 +36,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
+from numpy import testing as npt
 from numpy.testing import assert_allclose
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
@@ -43,8 +44,8 @@ from numpy.testing import assert_array_equal
 
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
-
 from neurom.core import Morphology
+from neurom.exceptions import NeuroMError
 from neurom.features import morphology, section
 
 
@@ -156,17 +157,71 @@ def test_trunk_section_lengths():
 
 
 def test_trunk_origin_radii():
-    ret = morphology.trunk_origin_radii(SIMPLE)
+    morph = Morphology(SIMPLE)
+    morph.section(0).diameters = [2, 1]
+    morph.section(3).diameters = [2, 0.5]
+
+    ret = morphology.trunk_origin_radii(morph)
     assert ret == [1.0, 1.0]
 
-    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5)
-    assert_array_almost_equal(ret, [1.0 / 3, 0.0])
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1)
+    assert_array_almost_equal(ret, [0.5, 0.25])
 
-    ret = morphology.trunk_origin_radii(SIMPLE, max_length_filter=15)
-    assert_array_almost_equal(ret, [2.0 / 3, 2.0 / 3])
+    with pytest.warns(
+        UserWarning,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value is greater than the "
+            r"path distance of the last point of the last section so the radius of this "
+            r"point is returned\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=999)
+    assert_array_almost_equal(ret, [0.5, 0.25])
 
-    ret = morphology.trunk_origin_radii(SIMPLE, min_length_filter=5, max_length_filter=15)
-    assert_array_almost_equal(ret, [0.5, 0])
+    ret = morphology.trunk_origin_radii(morph, max_length_filter=15)
+    assert_array_almost_equal(ret, [3.0 / 4, 5.0 / 8])
+
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1, max_length_filter=15)
+    assert_array_almost_equal(ret, [0.5, 0.25])
+
+    with pytest.warns(
+        UserWarning,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
+            r"values excluded all the points of the section so the radius of the first "
+            r"point after the 'min_length_filter' path distance is returned\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=0.1, max_length_filter=0.2)
+    assert_array_almost_equal(ret, [0.5, 0.25])
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly greater "
+            r"than 0\."
+
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=-999)
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'max_length_filter' value must be strictly greater "
+            r"than 0\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, max_length_filter=-999)
+
+    with pytest.raises(
+        NeuroMError,
+        match=(
+            r"In 'trunk_origin_radii': the 'min_length_filter' value must be strictly less than the"
+            r" 'max_length_filter' value\."
+        )
+    ):
+        ret = morphology.trunk_origin_radii(morph, min_length_filter=15, max_length_filter=5)
 
 
 def test_trunk_origin_azimuths():
@@ -543,3 +598,133 @@ def test_total_depth():
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.axon), 0.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.basal_dendrite), 2.0)
     assert_almost_equal(morphology.total_depth(morph, neurite_type=NeuriteType.apical_dendrite), 3.0)
+
+
+def test_volume_density():
+
+    morph = load_swc("""
+        1  1   0.5      0.5      0.5        0.5 -1
+        2  3   0.211324 0.211324 0.788675   0.1  1
+        3  3   0.0      0.0      1.0        0.1  2
+        4  3   0.211324 0.788675 0.788675   0.1  1
+        5  3   0.0      1.0      1.0        0.1  4
+        6  3   0.788675 0.211324 0.788675   0.1  1
+        7  3   1.0      0.0      1.0        0.1  6
+        8  3   0.211324 0.211324 0.211324   0.1  1
+        9  3   0.0      0.0      0.0        0.1  8
+       10  3   0.211324 0.788675 0.211324   0.1  1
+       11  3   0.0      1.0      0.0        0.1  10
+       12  5   0.788675 0.788675 0.211324   0.1  1
+       13  5   1.0      1.0      0.0        0.1  12
+       14  2   0.788675 0.211324 0.211324   0.1  1
+       15  2   1.0      0.0      0.0        0.1  14
+       16  3   0.788675 0.788675 0.788675   0.1  1
+       17  3   1.0      1.0      1.0        0.1  16
+    """)
+
+    # the neurites sprout from the center of a cube to its vertices, therefore the convex hull
+    # is the cube itself of side 1.0
+    expected_hull_volume = 1.0
+
+    # diagonal - radius
+    expected_neurite_length = np.sqrt(3) * 0.5 - 0.5
+
+    # distance from center of unit cube to its vertices is sqrt(3)
+    expected_neurite_volume = np.pi * 0.1**2 * expected_neurite_length * 8
+
+    expected_volume_density = expected_neurite_volume / expected_hull_volume
+
+    assert_almost_equal(
+        morphology.volume_density(morph),
+        expected_volume_density,
+        decimal=5
+    )
+    assert_almost_equal(
+        morphology.volume_density(morph, neurite_type=NeuriteType.all),
+        expected_volume_density,
+        decimal=5
+    )
+
+    # (0 0 1) (0 1 1) (0 0 0) (0 1 0) (1 0 1)(1 1 1)
+    # form a triangular prism
+    # Volume = triangle_area * depth = 0.5 * 1. * 1. * 1.
+    expected_hull_volume = 0.5
+
+    expected_neurite_volume = np.pi * 0.1**2 * expected_neurite_length * 6
+
+    expected_volume_density = expected_neurite_volume / expected_hull_volume
+
+    assert_almost_equal(
+        morphology.volume_density(morph, neurite_type=NeuriteType.basal_dendrite),
+        expected_volume_density,
+        decimal=5
+    )
+
+    # invalid convex hull
+    assert np.isnan(
+        morphology.volume_density(morph, neurite_type=NeuriteType.axon),
+    )
+
+    # no points
+    assert np.isnan(
+        morphology.volume_density(morph, neurite_type=NeuriteType.apical_dendrite),
+    )
+
+
+def test_unique_projected_points():
+
+    morph = load_swc("""
+        1  1   0.5 0.5 0.5   0.5 -1
+        2  3   0.2 0.2 0.7   0.1  1
+        3  3   0.0 0.0 1.0   0.1  2
+        4  3   0.2 0.7 0.7   0.1  1
+        5  3   0.0 1.0 1.0   0.1  4
+        6  3   0.7 0.2 0.7   0.1  1
+        7  3   1.0 0.0 1.0   0.1  6
+        8  3   0.2 0.2 0.2   0.1  1
+        9  3   0.0 0.0 0.0   0.1  8
+       10  3   0.2 0.7 0.2   0.1  1
+       11  3   0.0 1.0 0.0   0.1  10
+       12  5   0.7 0.7 0.2   0.1  1
+       13  5   1.0 1.0 0.0   0.1  12
+       14  2   0.7 0.2 0.2   0.1  1
+       15  2   1.0 0.0 0.0   0.1  14
+       16  3   0.7 0.7 0.7   0.1  1
+       17  3   1.0 1.0 1.0   0.1  16
+    """)
+
+    for plane, enalp in zip(("xy", "xz", "yz"), ("yx", "zx", "zy")):
+        npt.assert_allclose(
+            morphology._unique_projected_points(morph, plane, NeuriteType.all),
+            morphology._unique_projected_points(morph, enalp, NeuriteType.all),
+        )
+
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "xy", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 0. ], [0. , 1. ], [0. , 1. ], [0.2, 0.2], [0.2, 0.2],
+            [0.2, 0.7], [0.2, 0.7], [0.7, 0.2], [0.7, 0.2], [0.7, 0.7], [0.7, 0.7],
+            [1. , 0. ], [1. , 0. ], [1. , 1. ], [1. , 1. ],
+        ]
+    )
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "xz", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 1. ], [0. , 0. ], [0. , 1. ], [0.2, 0.2], [0.2, 0.7],
+            [0.2, 0.2], [0.2, 0.7], [0.7, 0.2], [0.7, 0.7], [0.7, 0.2], [0.7, 0.7],
+            [1. , 0. ], [1. , 1. ], [1. , 0. ], [1. , 1. ],
+        ]
+    )
+    npt.assert_allclose(
+        morphology._unique_projected_points(morph, "yz", NeuriteType.all),
+        [
+            [0. , 0. ], [0. , 1. ], [1. , 0. ], [1. , 1. ], [0.2, 0.2], [0.2, 0.7],
+            [0.7, 0.2], [0.7, 0.7], [0.2, 0.2], [0.2, 0.7], [0.7, 0.2], [0.7, 0.7],
+            [0. , 0. ], [0. , 1. ], [1. , 0. ], [1. , 1. ],
+       ]
+    )
+
+    with pytest.raises(NeuroMError):
+        morphology._unique_projected_points(morph, "airplane", NeuriteType.all)
+
+    assert len(morphology._unique_projected_points(morph, "yz", NeuriteType.apical_dendrite)) == 0

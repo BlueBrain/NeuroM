@@ -31,6 +31,7 @@ from pathlib import Path
 import neurom as nm
 import numpy as np
 from neurom import geom
+from neurom.core.dataformat import COLS
 from numpy.testing import assert_almost_equal
 
 SWC_DATA_PATH = Path(__file__).parent.parent / 'data/swc'

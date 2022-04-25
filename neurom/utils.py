@@ -31,17 +31,17 @@ import json
 import warnings
 from enum import Enum
 from functools import wraps
+from itertools import chain
 
 import numpy as np
 
 from neurom.core.dataformat import COLS
+from neurom.exceptions import NeuroMDeprecationWarning
 
 
 def warn_deprecated(msg):
     """Issue a deprecation warning."""
-    warnings.simplefilter('always', DeprecationWarning)
-    warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
-    warnings.simplefilter('default', DeprecationWarning)
+    warnings.warn(msg, category=NeuroMDeprecationWarning, stacklevel=3)
 
 
 def deprecated(fun_name=None, msg=""):
@@ -131,3 +131,16 @@ def str_to_plane(plane):
     else:  # pragma: no cover
         coords = COLS.XYZ
     return coords
+
+
+def flatten(list_of_lists):
+    """Flatten one level of nesting."""
+    return chain.from_iterable(list_of_lists)
+
+
+def filtered_iterator(predicate, iterator_type):
+    """Returns an iterator function that is filtered by the predicate."""
+    @wraps(iterator_type)
+    def composed(*args, **kwargs):
+        return filter(predicate, iterator_type(*args, **kwargs))
+    return composed

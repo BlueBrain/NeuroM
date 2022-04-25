@@ -3,10 +3,35 @@ Changelog
 
 Version 3.2.0
 -------------
+
+- Add ``neurom.features.morphology.length_fraction_above_soma`` feature.
+- List of multiple kwargs configurations are now allowed in``neurom.apps.morph_stats``.
+- ``neurom.features.neurite.principal_direction_extents`` directions correspond to extents
+  ordered in a descending order.
+- Add features ``neurom.features.morphology.(aspect_ration, circularity, shape_factor)```
+- Fix ``neurom.morphmath.principal_direction_extent`` to calculate correctly the pca extent.
+- Fix ``neurom.features.neurite.segment_taper_rates`` to return signed taper rates.
+- Fix warning system so that it doesn't change the pre-existing warnings configuration
+- Fix ``neurom.features.bifurcation.partition_asymmetry`` Uylings variant to not throw
+  for bifurcations with leaves.
+- Fix ``neurom.features.neurite.principal_direction_extents`` to remove duplicate points
+  when calculated.
+- Add ``neurom.features.morphology.volume_density`` feature so that it is calculated
+  correctly when the entire morphology is taken into account instead of summing the per
+  neurite volume densities.
+- Add support for py39 and py310 testing.
+- Fix ``neurom.features.morphology.sholl_frequency`` to return an empty list when a
+  neurite_type that is not present in the morphology is specified.
+- Fix ``neurom.features.morphology.trunk_origin_radii`` to warn and use only the root
+  section for the calculation of the path distances. Edge cases from the combination
+  of ``min_length_filter`` and ``max_length_filter`` are addressed.
+- Fix ``neurom.features.morphology.sholl_frequency`` to use soma center in distance
+  calculation, instead of using the origin.
 - Add ``neurom.features.morphology.trunk_angles_inter_types`` and
   ``neurom.features.morphology.trunk_angles_from_vector`` features, make
   ``neurom.features.morphology.trunk_angles`` more generic and add length filter to
   ``neurom.features.morphology.trunk_origin_radii``.
+- Deprecate python3.6
 - Add doc on spherical coordinates.
 
 Version 3.1.0

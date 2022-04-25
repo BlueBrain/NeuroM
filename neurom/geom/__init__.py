@@ -28,10 +28,15 @@
 
 """Geometrical Operations for NeuroM."""
 
+import logging
+
 import numpy as np
-from scipy.spatial import ConvexHull
+
+import neurom.morphmath
 from neurom.core.dataformat import COLS
 from neurom.geom.transform import translate, rotate
+
+L = logging.getLogger(__name__)
 
 
 def bounding_box(obj):
@@ -45,9 +50,9 @@ def bounding_box(obj):
 
 
 def convex_hull(obj):
-    """Get the convex hull of an object containing points.
+    """Get the convex hull from object containing points.
 
     Returns:
-        scipy.spatial.ConvexHull object built from obj.points
+        scipy.spatial.ConvexHull object if successful, otherwise None
     """
-    return ConvexHull(obj.points[:, COLS.XYZ])
+    return neurom.morphmath.convex_hull(obj.points[:, COLS.XYZ])

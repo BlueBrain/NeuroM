@@ -32,12 +32,29 @@ import numpy as np
 
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
+from neurom.core.morphology import iter_segments
+from neurom.core.morphology import Section
 from neurom.morphmath import interval_lengths
 
 
-def section_path_length(section):
-    """Path length from section to root."""
-    return sum(s.length for s in section.iupstream())
+def section_points(section):
+    """Returns the points in the section."""
+    return section.points[:, COLS.XYZ]
+
+
+def section_path_length(section, stop_node=None):
+    """Path length from section to root.
+
+    Args:
+        section: Section object.
+        stop_node: Node to stop the upstream traversal. If None, it stops when no parent is found.
+    """
+    return sum(map(section_length, section.iupstream(stop_node=stop_node)))
+
+
+def section_length(section):
+    """Length of a section."""
+    return section.length
 
 
 def section_volume(section):
@@ -87,9 +104,58 @@ def branch_order(section):
     return sum(1 for _ in section.iupstream()) - 1
 
 
+def taper_rate(section):
+    """Taper rate from fit along a section."""
+    pts = section.points
+    path_distances = np.cumsum(interval_lengths(pts, prepend_zero=True))
+    return np.polynomial.polynomial.polyfit(path_distances, 2.0 * pts[:, COLS.R], 1)[1]
+
+
+def number_of_segments(section):
+    """Returns the number of segments within a section."""
+    return len(section.points) - 1
+
+
 def segment_lengths(section, prepend_zero=False):
     """Returns the list of segment lengths within the section."""
     return interval_lengths(section.points, prepend_zero=prepend_zero)
+
+
+def segment_areas(section):
+    """Returns the list of segment areas within the section."""
+    return [mm.segment_area(seg) for seg in iter_segments(section)]
+
+
+def segment_volumes(section):
+    """Returns the list of segment volumes within the section."""
+    return [mm.segment_volume(seg) for seg in iter_segments(section)]
+
+
+def segment_mean_radii(section):
+    """Returns the list of segment mean radii within the section."""
+    pts = section.points[:, COLS.R]
+    return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
+
+
+def segment_midpoints(section):
+    """Returns the list of segment midpoints within the section."""
+    pts = section.points[:, COLS.XYZ]
+    return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
+
+
+def segment_midpoint_radial_distances(section, origin=None):
+    """Returns the list of segment midpoint radial distances to the origin."""
+    origin = np.zeros(3, dtype=float) if origin is None else origin
+    midpoints = np.array(segment_midpoints(section))
+    return np.linalg.norm(midpoints - origin, axis=1).tolist()
+
+
+def segment_taper_rates(section):
+    """Returns the list of segment taper rates within the section."""
+    pts = section.points[:, COLS.XYZR]
+    diff = np.diff(pts, axis=0)
+    distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
+    return np.divide(2.0 * diff[:, COLS.R], distance).tolist()
 
 
 def section_radial_distance(section, origin):
@@ -160,6 +226,6 @@ def section_mean_radius(section):
     return np.sum(mean_radii * lengths) / np.sum(lengths)
 
 
-def downstream_pathlength(section):
+def downstream_pathlength(section, iterator_type=Section.ipreorder):
     """Compute the total downstream length starting from a section."""
-    return sum(sec.length for sec in section.ipreorder())
+    return sum(sec.length for sec in iterator_type(section))

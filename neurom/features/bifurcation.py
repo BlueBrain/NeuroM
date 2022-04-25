@@ -29,10 +29,12 @@
 """Bifurcation point functions."""
 
 import numpy as np
+
+import neurom.features.section
 from neurom import morphmath
-from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
-from neurom.features.section import section_mean_radius
+from neurom.core.morphology import Section
+from neurom.exceptions import NeuroMError
 
 
 def _raise_if_not_bifurcation(section):
@@ -84,7 +86,7 @@ def remote_bifurcation_angle(bif_point):
                                    bif_point.children[1].points[-1])
 
 
-def bifurcation_partition(bif_point):
+def bifurcation_partition(bif_point, iterator_type=Section.ipreorder):
     """Calculate the partition at a bifurcation point.
 
     We first ensure that the input point has only two children.
@@ -94,12 +96,12 @@ def bifurcation_partition(bif_point):
     """
     _raise_if_not_bifurcation(bif_point)
 
-    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
-    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
+    n, m = partition_pair(bif_point, iterator_type=iterator_type)
+
     return max(n, m) / min(n, m)
 
 
-def partition_asymmetry(bif_point, uylings=False):
+def partition_asymmetry(bif_point, uylings=False, iterator_type=Section.ipreorder):
     """Calculate the partition asymmetry at a bifurcation point.
 
     By default partition asymmetry is defined as in https://www.ncbi.nlm.nih.gov/pubmed/18568015.
@@ -113,27 +115,28 @@ def partition_asymmetry(bif_point, uylings=False):
     """
     _raise_if_not_bifurcation(bif_point)
 
-    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
-    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    c = 0
-    if uylings:
-        c = 2
-        if n + m <= c:
-            raise NeuroMError('Partition asymmetry cant be calculated by Uylings because the sum of'
-                              'terminal tips is less than 2.')
+    n, m = partition_pair(bif_point, iterator_type=iterator_type)
+
+    if n == m == 1:
+        # By definition the asymmetry A(1, 1) is zero
+        return 0.0
+
+    c = 2.0 if uylings else 0.0
+
     return abs(n - m) / abs(n + m - c)
 
 
-def partition_pair(bif_point):
+def partition_pair(bif_point, iterator_type=Section.ipreorder):
     """Calculate the partition pairs at a bifurcation point.
 
     The number of nodes in each child tree is counted. The partition
     pairs is the number of bifurcations in the two child subtrees
     at each branch point.
     """
-    n = float(sum(1 for _ in bif_point.children[0].ipreorder()))
-    m = float(sum(1 for _ in bif_point.children[1].ipreorder()))
-    return (n, m)
+    return (
+        float(len(list(iterator_type(bif_point.children[0])))),
+        float(len(list(iterator_type(bif_point.children[1])))),
+    )
 
 
 def sibling_ratio(bif_point, method='first'):
@@ -154,8 +157,8 @@ def sibling_ratio(bif_point, method='first'):
         n = bif_point.children[0].points[1, COLS.R]
         m = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        n = section_mean_radius(bif_point.children[0])
-        m = section_mean_radius(bif_point.children[1])
+        n = neurom.features.section.section_mean_radius(bif_point.children[0])
+        m = neurom.features.section.section_mean_radius(bif_point.children[1])
     return min(n, m) / max(n, m)
 
 
@@ -180,7 +183,35 @@ def diameter_power_relation(bif_point, method='first'):
         d_child1 = bif_point.children[0].points[1, COLS.R]
         d_child2 = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        d_child = section_mean_radius(bif_point)
-        d_child1 = section_mean_radius(bif_point.children[0])
-        d_child2 = section_mean_radius(bif_point.children[1])
+        d_child = neurom.features.section.section_mean_radius(bif_point)
+        d_child1 = neurom.features.section.section_mean_radius(bif_point.children[0])
+        d_child2 = neurom.features.section.section_mean_radius(bif_point.children[1])
     return (d_child / d_child1)**(1.5) + (d_child / d_child2)**(1.5)
+
+
+def downstream_pathlength_asymmetry(
+    bif_point, normalization_length=1.0, iterator_type=Section.ipreorder
+):
+    """Calculates the downstream pathlength asymmetry at a bifurcation point.
+
+    Args:
+        bif_point: Bifurcation section.
+        normalization_length: Constant to divide the result with.
+        iterator_type: Iterator type that specifies how the two subtrees are traversed.
+
+    Returns:
+        The absolute difference between the downstream path distances of the two children, divided
+        by the normalization length.
+    """
+    _raise_if_not_bifurcation(bif_point)
+    return (
+        abs(
+            neurom.features.section.downstream_pathlength(
+                bif_point.children[0], iterator_type=iterator_type
+            )
+            - neurom.features.section.downstream_pathlength(
+                bif_point.children[1], iterator_type=iterator_type
+            ),
+        )
+        / normalization_length
+    )

@@ -77,10 +77,18 @@ def test_neurite_volume_density():
 
 
 def test_neurite_volume_density_failed_convex_hull():
-    with patch('neurom.features.neurite.convex_hull',
-               side_effect=scipy.spatial.qhull.QhullError('boom')):
-        vol_density = neurite.volume_density(NRN)
-        assert vol_density, np.nan
+
+    flat_neuron = nm.load_morphology(
+    """
+    1  1   0  0  0  0.5 -1
+    2  3   1  0  0  0.1  1
+    3  3   2  0  0  0.1  2
+    """,
+    reader="swc")
+
+    assert np.isnan(
+        neurite.volume_density(flat_neuron.neurites[0])
+    )
 
 
 def test_terminal_path_length_per_neurite():

@@ -29,10 +29,19 @@
 """Test neurom.utils."""
 import json
 import warnings
+from copy import deepcopy
 
 import numpy as np
 from neurom import utils as nu
 import pytest
+
+from neurom.exceptions import NeuroMDeprecationWarning
+
+
+def test_warn_deprecated():
+
+    with pytest.warns(NeuroMDeprecationWarning, match="foo"):
+        nu.warn_deprecated(msg="foo")
 
 
 def test_deprecated():
@@ -97,3 +106,10 @@ def test_ordered_enum():
         Grade.__gt__(Grade.A, 1)
     with pytest.raises(NotImplementedError):
         Grade.__lt__(Grade.A, 1)
+
+
+def test_flatten():
+
+    a = [[1, 2], [3, 4, 5], [6], [7, 8, 9, 10]]
+
+    assert list(nu.flatten(a)) == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

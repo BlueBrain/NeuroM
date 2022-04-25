@@ -107,7 +107,7 @@ def stats(datapath, config, output, full_config, as_population, ignored_exceptio
               default=morph_check.EXAMPLE_CONFIG, show_default=True,
               help='Configuration File')
 @click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
-              help='Path to output json summary file')
+              help='Path to output json summary file', required=True)
 def check(datapath, config, output):
     """Cli for apps/morph_check."""
     morph_check.main(datapath, config, output)

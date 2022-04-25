@@ -54,18 +54,24 @@ setup(
     name='neurom',
     extras_require={
         'plotly': ['plotly>=3.6.0', 'psutil>=5.5.1'],  # for plotly image saving
-        'docs': ['sphinx', 'sphinx-bluebrain-theme', 'sphinx-autorun'],
+        'docs': [
+            'Jinja2<3.1',  # New release 3.1.0 breaks sphinx-bluebrain-theme
+            'sphinx',
+            'sphinx-bluebrain-theme',
+            'sphinx-autorun',
+        ],
     },
     include_package_data=True,
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     classifiers=[
         'Development Status :: 6 - Mature',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     use_scm_version={"local_scheme": "no-local-version"},

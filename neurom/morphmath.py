@@ -28,11 +28,18 @@
 
 """Mathematical and geometrical functions used to compute morphometrics."""
 import math
+import logging
 from itertools import combinations
 
 import numpy as np
+from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
+from scipy.spatial.distance import cdist
 
 from neurom.core.dataformat import COLS
+
+
+L = logging.getLogger(__name__)
 
 
 def vector(p1, p2):
@@ -441,10 +448,10 @@ def segment_taper_rate(seg):
 def pca(points):
     """Estimate the principal components of the covariance on the given point cloud.
 
-    Input
-        A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
+    Args:
+        points: A numpy array of points of the form ((x1,y1,z1), (x2, y2, z2)...)
 
-    Ouptut
+    Returns:
         Eigenvalues and respective eigenvectors
     """
     return np.linalg.eig(np.cov(points.transpose()))
@@ -462,33 +469,85 @@ section_length = path_distance
 def principal_direction_extent(points):
     """Calculate the extent of a set of 3D points.
 
-    The extent is defined as the maximum distance between
-    the projections on the principal directions of the covariance matrix
-    of the points.
+    The extent is defined as the maximum distance between the projections on the principal
+    directions of the covariance matrix of the points.
 
-    Parameter:
-        points : a 2D numpy array of points
+    Args:
+        points : a 2D numpy array of points with 2 or 3 columns for (x, y, z)
 
     Returns:
         extents : the extents for each of the eigenvectors of the cov matrix
-        eigs : eigenvalues of the covariance matrix
-        eigv : respective eigenvectors of the covariance matrix
+
+    Note:
+        Direction extents are ordered from largest to smallest.
     """
+    # pca can be biased by duplicate points
+    points = np.unique(points, axis=0)
+
     # center the points around 0.0
-    points = np.copy(points)
     points -= np.mean(points, axis=0)
 
     # principal components
-    _, eigv = pca(points)
+    _, eigenvectors = pca(points)
 
-    extent = np.zeros(3)
+    # for each eigenvector calculate the scalar projection of the points on it (n_points, n_eigv)
+    scalar_projections = points.dot(eigenvectors)
 
-    for i in range(eigv.shape[1]):
-        # orthogonal projection onto the direction of the v component
-        scalar_projs = np.sort(np.array([np.dot(p, eigv[:, i]) for p in points]))
-        extent[i] = scalar_projs[-1]
+    # range of the projections (abs(max - min)) along each column (eigenvector)
+    extents = np.ptp(scalar_projections, axis=0)
 
-        if scalar_projs[0] < 0.:
-            extent -= scalar_projs[0]
+    descending_order = np.argsort(extents)[::-1]
 
-    return extent
+    return extents[descending_order]
+
+
+def convex_hull(points):
+    """Get the convex hull from an array of points.
+
+    Returns:
+        scipy.spatial.ConvexHull object if successful, otherwise None
+    """
+    if len(points) == 0:
+        L.exception(
+            "Failure to compute convex hull because there are no points"
+        )
+        return None
+
+    try:
+        return ConvexHull(points)
+    except QhullError:
+        L.exception(
+            "Failure to compute convex hull because of geometrical degeneracy."
+        )
+        return None
+
+
+def aspect_ratio(points):
+    """Computes the min/max ratio of the principal direction extents."""
+    extents = principal_direction_extent(points)
+    return float(extents.min() / extents.max())
+
+
+def circularity(points):
+    """Computes circularity as 4 * pi * area / perimeter^2.
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area and ConvexHull.area
+        to its perimeter.
+    """
+    hull = convex_hull(points)
+    return 4.0 * np.pi * hull.volume / hull.area**2
+
+
+def shape_factor(points):
+    """Computes area over max pairwise distance squared.
+
+    Defined in doi: 10.1109/ICoAC44903.2018.8939083
+
+    Note: For 2D points, ConvexHull.volume corresponds to its area.
+    """
+    hull = convex_hull(points)
+    hull_points = points[hull.vertices]
+
+    max_pairwise_distance = np.max(cdist(hull_points, hull_points))
+
+    return hull.volume / max_pairwise_distance**2
