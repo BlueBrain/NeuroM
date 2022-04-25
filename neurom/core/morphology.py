@@ -75,6 +75,10 @@ class Section:
             return self.morphio_section.append_section(section.morphio_section)
         return self.morphio_section.append_section(section)
 
+    def is_homogeneous_point(self):
+        """A section is homogeneous if it has the same type with its children."""
+        return all(c.type == self.type for c in self.children)
+
     def is_forking_point(self):
         """Is this section a forking point?"""
         return len(self.children) > 1
@@ -112,12 +116,24 @@ class Section:
                 children.pop()
                 yield cur_node
 
-    def iupstream(self):
-        """Iterate from a tree node to the root nodes."""
-        t = self
-        while t is not None:
-            yield t
-            t = t.parent
+    def iupstream(self, stop_node=None):
+        """Iterate from a tree node to the root nodes.
+
+        Args:
+            stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
+        """
+        if stop_node is None:
+            def stop_condition(section):
+                return section.parent is None
+        else:
+            def stop_condition(section):
+                return section == stop_node
+
+        current_section = self
+        while not stop_condition(current_section):
+            yield current_section
+            current_section = current_section.parent
+        yield current_section
 
     def ileaf(self):
         """Iterator to all leaves of a tree."""
@@ -211,7 +227,36 @@ NRN_ORDER = {NeuriteType.soma: 0,
              NeuriteType.undefined: 4}
 
 
-def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
+def _homogeneous_subtrees(neurite):
+    """Returns a list of the root nodes of the sub-neurites.
+
+    A sub-neurite can be either the entire tree or a homogeneous downstream
+    sub-tree.
+    """
+    it = neurite.root_node.ipreorder()
+    homogeneous_neurites = [Neurite(next(it).morphio_section)]
+
+    for section in it:
+        if section.type != section.parent.type:
+            homogeneous_neurites.append(Neurite(section.morphio_section))
+
+    homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
+
+    if len(homogeneous_neurites) >= 2 and homogeneous_types != [
+        NeuriteType.axon,
+        NeuriteType.basal_dendrite,
+    ]:
+        warnings.warn(
+                f"{neurite} is not an axon-carrying dendrite. "
+                f"Subtree types found {homogeneous_types}",
+                stacklevel=2
+        )
+    return homogeneous_neurites
+
+
+def iter_neurites(
+    obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder, use_subtrees=False
+):
     """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
@@ -240,8 +285,13 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
-    neurites = ((obj,) if isinstance(obj, Neurite) else
-                obj.neurites if hasattr(obj, 'neurites') else obj)
+    if isinstance(obj, Neurite):
+        neurites = (obj,)
+    elif hasattr(obj, "neurites"):
+        neurites = obj.neurites
+    else:
+        neurites = obj
+
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
             warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
@@ -249,14 +299,28 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
+    if use_subtrees:
+        neurites = flatten(
+            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
+            for neurite in neurites
+        )
+
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
-    return neurite_iter if mapfun is None else map(mapfun, neurite_iter)
+
+    if mapfun is None:
+        return neurite_iter
+
+    if use_subtrees:
+        return (mapfun(neurite, section_type=neurite.type) for neurite in neurite_iter)
+
+    return map(mapfun, neurite_iter)
 
 
 def iter_sections(neurites,
                   iterator_type=Section.ipreorder,
                   neurite_filter=None,
-                  neurite_order=NeuriteIter.FileOrder):
+                  neurite_order=NeuriteIter.FileOrder,
+                  section_filter=None):
     """Iterator to the sections in a neurite, morphology or morphology population.
 
     Arguments:
@@ -272,6 +336,8 @@ def iter_sections(neurites,
         neurite_order (NeuriteIter): order upon which neurites should be iterated
             - NeuriteIter.FileOrder: order of appearance in the file
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter. Please note that neurite_filter takes
+            precedence over the section_filter.
 
 
     Examples:
@@ -282,13 +348,14 @@ def iter_sections(neurites,
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-    return flatten(
-        iterator_type(neurite.root_node)
-        for neurite in iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
-    )
+    neurites = iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
+    sections = flatten(iterator_type(neurite.root_node) for neurite in neurites)
+    return sections if section_filter is None else filter(section_filter, sections)
 
 
-def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder):
+def iter_segments(
+    obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder, section_filter=None
+):
     """Return an iterator to the segments in a collection of neurites.
 
     Arguments:
@@ -297,6 +364,7 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
         neurite_order: order upon which neurite should be iterated. Values:
             - NeuriteIter.FileOrder: order of appearance in the file
             - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter
 
     Note:
         This is a convenience function provided for generic access to
@@ -306,12 +374,42 @@ def iter_segments(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder)
     sections = iter((obj,) if isinstance(obj, Section) else
                     iter_sections(obj,
                                   neurite_filter=neurite_filter,
-                                  neurite_order=neurite_order))
+                                  neurite_order=neurite_order,
+                                  section_filter=section_filter))
 
     return flatten(
         zip(section.points[:-1], section.points[1:])
         for section in sections
     )
+
+
+def iter_points(
+    obj,
+    neurite_filter=None,
+    neurite_order=NeuriteIter.FileOrder,
+    section_filter=None
+):
+    """Return an iterator to the points in a population, morphology, neurites, or section.
+
+    Args:
+        obj: population, morphology, neurite, section or iterable containing
+        neurite_filter: optional top level filter on properties of neurite neurite objects
+        neurite_order: order upon which neurite should be iterated. Values:
+            - NeuriteIter.FileOrder: order of appearance in the file
+            - NeuriteIter.NRN: NRN simulator order: soma -> axon -> basal -> apical
+        section_filter: optional section level filter
+    """
+    sections = (
+        iter((obj,)) if isinstance(obj, Section)
+        else iter_sections(
+            obj,
+            neurite_filter=neurite_filter,
+            neurite_order=neurite_order,
+            section_filter=section_filter
+        )
+    )
+
+    return flatten(s.points[:, COLS.XYZ] for s in sections)
 
 
 def graft_morphology(section):
@@ -368,7 +466,9 @@ class Neurite:
 
         The length is defined as the sum of lengths of the sections.
         """
-        return sum(s.length for s in self.iter_sections())
+        # pylint: disable=import-outside-toplevel
+        from neurom.features.neurite import total_length
+        return total_length(self)
 
     @property
     def area(self):
@@ -376,7 +476,9 @@ class Neurite:
 
         The area is defined as the sum of area of the sections.
         """
-        return sum(s.area for s in self.iter_sections())
+        # pylint: disable=import-outside-toplevel
+        from neurom.features.neurite import total_area
+        return total_area(self)
 
     @property
     def volume(self):
@@ -384,7 +486,13 @@ class Neurite:
 
         The volume is defined as the sum of volumes of the sections.
         """
-        return sum(s.volume for s in self.iter_sections())
+        # pylint: disable=import-outside-toplevel
+        from neurom.features.neurite import total_volume
+        return total_volume(self)
+
+    def is_heterogeneous(self) -> bool:
+        """Returns true if the neurite consists of more that one section types."""
+        return self.morphio_root_node.is_heterogeneous()
 
     def iter_sections(self, order=Section.ipreorder, neurite_order=NeuriteIter.FileOrder):
         """Iteration over section nodes.

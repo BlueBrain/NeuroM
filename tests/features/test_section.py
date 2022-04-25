@@ -37,7 +37,6 @@ from unittest.mock import Mock
 import pytest
 import numpy as np
 from numpy import testing as npt
-from mock import Mock
 
 from neurom import load_morphology, iter_sections
 from neurom import morphmath
@@ -73,6 +72,21 @@ def test_segment_taper_rates():
     # Note: taper rate is calculated on the diameters
     sec = Mock(points=np.array([[0., 0., 0., 2.], [1., 0., 0., 1.], [2., 0., 0., 0.]]))
     npt.assert_almost_equal(section.segment_taper_rates(sec), [-2., -2.])
+
+def test_section_path_length():
+    m = load_morphology(
+    """
+    1  1    0  0  0    0.5 -1
+    2  3    1  0  0    0.1  1
+    3  3    2  0  0    0.1  2
+    4  3    3  0  0    0.1  3
+    5  3    2  1  0    0.1  3
+    """,
+    reader="swc",
+    )
+
+    sec = m.sections[1]
+    npt.assert_almost_equal(section.section_path_length(sec), 2.0)
 
 
 def test_section_area():

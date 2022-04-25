@@ -33,6 +33,7 @@ import numpy as np
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
+from neurom.core.morphology import Section
 from neurom.morphmath import interval_lengths
 
 
@@ -41,9 +42,14 @@ def section_points(section):
     return section.points[:, COLS.XYZ]
 
 
-def section_path_length(section):
-    """Path length from section to root."""
-    return sum(s.length for s in section.iupstream())
+def section_path_length(section, stop_node=None):
+    """Path length from section to root.
+
+    Args:
+        section: Section object.
+        stop_node: Node to stop the upstream traversal. If None, it stops when no parent is found.
+    """
+    return sum(map(section_length, section.iupstream(stop_node=stop_node)))
 
 
 def section_length(section):
@@ -137,6 +143,13 @@ def segment_midpoints(section):
     return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
 
 
+def segment_midpoint_radial_distances(section, origin=None):
+    """Returns the list of segment midpoint radial distances to the origin."""
+    origin = np.zeros(3, dtype=float) if origin is None else origin
+    midpoints = np.array(segment_midpoints(section))
+    return np.linalg.norm(midpoints - origin, axis=1).tolist()
+
+
 def segment_taper_rates(section):
     """Returns the list of segment taper rates within the section."""
     pts = section.points[:, COLS.XYZR]
@@ -213,6 +226,6 @@ def section_mean_radius(section):
     return np.sum(mean_radii * lengths) / np.sum(lengths)
 
 
-def downstream_pathlength(section):
+def downstream_pathlength(section, iterator_type=Section.ipreorder):
     """Compute the total downstream length starting from a section."""
-    return sum(sec.length for sec in section.ipreorder())
+    return sum(sec.length for sec in iterator_type(section))

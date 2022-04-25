@@ -36,9 +36,11 @@ Examples:
     >>> ap_seg_len = features.get('segment_lengths', m, neurite_type=neurom.APICAL_DENDRITE)
     >>> ax_sec_len = features.get('section_lengths', m, neurite_type=neurom.AXON)
 """
+
+import inspect
 import operator
 from enum import Enum
-from functools import reduce
+from functools import reduce, partial
 
 from neurom.core import Population, Morphology, Neurite
 from neurom.core.morphology import iter_neurites
@@ -64,15 +66,30 @@ def _flatten_feature(feature_shape, feature_value):
     return reduce(operator.concat, feature_value, [])
 
 
-def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
+def _get_neurites_feature_value(feature_, obj, neurite_filter, use_subtrees, **kwargs):
     """Collects neurite feature values appropriately to feature's shape."""
     kwargs.pop('neurite_type', None)  # there is no 'neurite_type' arg in _NEURITE_FEATURES
-    return reduce(operator.add,
-                  (feature_(n, **kwargs) for n in iter_neurites(obj, filt=neurite_filter)),
-                  0 if feature_.shape == () else [])
+
+    return reduce(
+        operator.add,
+        (
+            iter_neurites(
+                obj,
+                mapfun=partial(feature_, **kwargs),
+                filt=neurite_filter,
+                use_subtrees=use_subtrees,
+            )
+        ),
+        0 if feature_.shape == () else []
+    )
 
 
-def _get_feature_value_and_func(feature_name, obj, **kwargs):
+def _is_subtree_processing_applicable(feature_function):
+    """Returns true if feature's signature supports the use_subtrees kwarg."""
+    return "use_subtrees" in inspect.signature(feature_function).parameters
+
+
+def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
@@ -87,43 +104,72 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     # pylint: disable=too-many-branches
     is_obj_list = isinstance(obj, (list, tuple))
     if not isinstance(obj, (Neurite, Morphology, Population)) and not is_obj_list:
-        raise NeuroMError('Only Neurite, Morphology, Population or list, tuple of Neurite,'
-                          ' Morphology can be used for feature calculation')
+        raise NeuroMError(
+            "Only Neurite, Morphology, Population or list, tuple of Neurite, Morphology"
+            f"can be used for feature calculation. Got: {obj}"
+        )
 
     neurite_filter = is_type(kwargs.get('neurite_type', NeuriteType.all))
     res, feature_ = None, None
 
     if isinstance(obj, Neurite) or (is_obj_list and isinstance(obj[0], Neurite)):
+
         # input is a neurite or a list of neurites
         if feature_name in _NEURITE_FEATURES:
-            assert 'neurite_type' not in kwargs, 'Cant apply "neurite_type" arg to a neurite with' \
-                                                 ' a neurite feature'
+
+            assert 'neurite_type' not in kwargs, (
+                'Cant apply "neurite_type" arg to a neurite with a neurite feature'
+            )
+
             feature_ = _NEURITE_FEATURES[feature_name]
+
             if isinstance(obj, Neurite):
                 res = feature_(obj, **kwargs)
             else:
                 res = [feature_(s, **kwargs) for s in obj]
+
     elif isinstance(obj, Morphology):
+
         # input is a morphology
         if feature_name in _MORPHOLOGY_FEATURES:
+
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
+
+            if _is_subtree_processing_applicable(feature_):
+                kwargs["use_subtrees"] = use_subtrees
+
             res = feature_(obj, **kwargs)
+
         elif feature_name in _NEURITE_FEATURES:
+
             feature_ = _NEURITE_FEATURES[feature_name]
-            res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
+            res = _get_neurites_feature_value(feature_, obj, neurite_filter, use_subtrees, **kwargs)
+
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
         if feature_name in _POPULATION_FEATURES:
             feature_ = _POPULATION_FEATURES[feature_name]
+
+            if _is_subtree_processing_applicable(feature_):
+                kwargs["use_subtrees"] = use_subtrees
+
             res = feature_(obj, **kwargs)
         elif feature_name in _MORPHOLOGY_FEATURES:
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
+
+            if _is_subtree_processing_applicable(feature_):
+                kwargs["use_subtrees"] = use_subtrees
+
             res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
         elif feature_name in _NEURITE_FEATURES:
             feature_ = _NEURITE_FEATURES[feature_name]
             res = _flatten_feature(
                 feature_.shape,
-                [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
+                [
+                    _get_neurites_feature_value(feature_, n, neurite_filter, use_subtrees, **kwargs)
+                    for n in obj
+                ]
+            )
 
     if res is None or feature_ is None:
         raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
@@ -132,7 +178,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     return res, feature_
 
 
-def get(feature_name, obj, **kwargs):
+def get(feature_name, obj, use_subtrees=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite, Morphology or Population features. For Neurite features see
@@ -147,7 +193,7 @@ def get(feature_name, obj, **kwargs):
     Returns:
         List|Number: feature value as a list or a single number.
     """
-    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
+    return _get_feature_value_and_func(feature_name, obj, use_subtrees=use_subtrees, **kwargs)[0]
 
 
 def _register_feature(namespace: NameSpace, name, func, shape):
