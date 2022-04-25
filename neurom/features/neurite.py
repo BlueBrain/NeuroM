@@ -64,21 +64,7 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-    check_type = is_type(section_type)
-
-    def homogeneous_filter(section):
-        return check_type(section) and Section.is_homogeneous_point(section)
-
-    # forking sections cannot be heterogeneous
-    if (
-        iterator_type in {Section.ibifurcation_point, Section.iforking_point}
-        and section_type != NeuriteType.all
-    ):
-        filt = homogeneous_filter
-    else:
-        filt = check_type
-
-    return list(map(fun, filter(filt, iterator_type(neurite.root_node))))
+    return list(map(fun, filter(is_type(section_type), iterator_type(neurite.root_node))))
 
 
 @feature(shape=())

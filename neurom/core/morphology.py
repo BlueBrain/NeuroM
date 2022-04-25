@@ -81,11 +81,11 @@ class Section:
 
     def is_forking_point(self):
         """Is this section a forking point?"""
-        return len(self.children) > 1
+        return self.is_homogeneous_point() and len(self.children) > 1
 
     def is_bifurcation_point(self):
         """Is tree a bifurcation point?"""
-        return len(self.children) == 2
+        return self.is_homogeneous_point() and len(self.children) == 2
 
     def is_leaf(self):
         """Is tree a leaf?"""
