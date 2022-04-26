@@ -49,7 +49,7 @@ class Section:
         self._morphio_section = morphio_section
 
     def to_morphio(self):
-        """Returns the morphio section"""
+        """Returns the morphio section."""
         return self._morphio_section
 
     @property
@@ -419,6 +419,7 @@ class Neurite:
 
     @property
     def morphio_root_node(self):
+        """Returns the morphio root section."""
         return self._root_node
 
     @property
@@ -528,7 +529,7 @@ class Morphology:
         self.soma = make_soma(self._morphio_morph.soma)
 
     def to_morphio(self):
-        """Returns the morphio morphology object"""
+        """Returns the morphio morphology object."""
         return self._morphio_morph
 
     @property
@@ -537,7 +538,7 @@ class Morphology:
         return [Neurite(root_section) for root_section in self._morphio_morph.root_sections]
 
     def section(self, section_id):
-        """Returns the section with the given id"""
+        """Returns the section with the given id."""
         return Section(self._morphio_morph.section(section_id))
 
     @property
