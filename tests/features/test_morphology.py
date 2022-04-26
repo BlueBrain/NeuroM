@@ -157,14 +157,23 @@ def test_trunk_section_lengths():
 
 
 def test_trunk_origin_radii():
-    morph = Morphology(SIMPLE)
-    morph.section(0).diameters = [2, 1]
-    morph.section(3).diameters = [2, 0.5]
-
+    morph = load_swc(
+    """
+     1 1  0  0 0 1. -1
+     2 3  0  0 0 1.0  1
+     3 3  0  5 0 0.5  2
+     4 3 -5  5 0 0.  3
+     5 3  6  5 0 0.  3
+     6 2  0  0 0 1.0  1
+     7 2  0 -4 0 0.25  6
+     8 2  6 -4 0 0.  7
+     9 2 -5 -4 0 0.  7
+    """
+    )
     ret = morphology.trunk_origin_radii(morph)
     assert ret == [1.0, 1.0]
 
-    ret = morphology.trunk_origin_radii(morph, min_length_filter=1)
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1.0)
     assert_array_almost_equal(ret, [0.5, 0.25])
 
     with pytest.warns(
