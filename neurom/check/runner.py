@@ -146,7 +146,7 @@ class CheckRunner:
             checks = config['checks']
             if 'morphology_checks' not in checks:
                 checks['morphology_checks'] = []
-            if 'neuron_checks' in checks:
+            if 'neuron_checks' in checks: # pragma: no cover
                 raise NeuroMError(
                     "'neuron_checks' is not supported. Please rename it into 'morphology_checks'"
                 )
