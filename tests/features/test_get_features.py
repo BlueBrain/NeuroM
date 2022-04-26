@@ -112,23 +112,23 @@ def test_number_of_sections():
 def test_max_radial_distance():
     assert_allclose(
         features.get('max_radial_distance', POP),
-        [99.58945832, 94.43342439, 1053.77939245])
+        [99.62086,   94.43019, 1072.9137])
     assert_allclose(
         features.get('max_radial_distance', POP, neurite_type=NeuriteType.all),
-        [99.58945832, 94.43342439, 1053.77939245])
+        [99.62086,   94.43019, 1072.9137])
     assert_allclose(
         features.get('max_radial_distance', POP, neurite_type=NeuriteType.axon),
-        [82.442545, 82.442545, 1053.779392])
+        [82.52528,   82.44438, 1072.9137])
     assert_allclose(
         features.get('max_radial_distance', POP, neurite_type=NeuriteType.basal_dendrite),
-        [94.43342563, 94.43342439, 207.56977859])
+        [94.36033,  94.43019, 209.92587])
 
     assert_allclose(
-        features.get('max_radial_distance', NRN), 99.58945832)
+        features.get('max_radial_distance', NRN), 99.62086)
     assert_allclose(
-        features.get('max_radial_distance', NRN, neurite_type=NeuriteType.all), 99.58945832)
+        features.get('max_radial_distance', NRN, neurite_type=NeuriteType.all), 99.62086)
     assert_allclose(features.get(
-        'max_radial_distance', NRN, neurite_type=NeuriteType.apical_dendrite), 99.589458)
+        'max_radial_distance', NRN, neurite_type=NeuriteType.apical_dendrite), 99.62086)
 
     assert_allclose(
         features.get('max_radial_distance', NRN.neurites),
@@ -786,7 +786,25 @@ def test_section_bif_radial_distances():
 
 
 def test_section_term_radial_distances():
+
     trm_rads = features.get('section_term_radial_distances', NRN, neurite_type=nm.APICAL_DENDRITE)
+
+    print(trm_rads)
+    assert_allclose(trm_rads,
+                [16.258472,
+                 26.040075,
+                 33.35425 ,
+                 42.755745,
+                 52.41365 ,
+                 59.476284,
+                 67.11225 ,
+                 80.00984 ,
+                 87.13672 ,
+                 97.284706,
+                 99.62086 ])
+
+    apical = NRN.neurites[0]
+    trm_rads = features.get('section_term_radial_distances', apical, section_type=nm.APICAL_DENDRITE)
     assert_allclose(trm_rads,
                     [16.22099879395879,
                      25.992977561564082,
