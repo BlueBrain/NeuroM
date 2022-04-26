@@ -60,9 +60,7 @@ class Section:
     @property
     def parent(self):
         """Returns the parent section if non root section else None."""
-        if self._morphio_section.is_root:
-            return None
-        return Section(self._morphio_section.parent)
+        return None if self.is_root() else Section(self._morphio_section.parent)
 
     @property
     def children(self):
@@ -87,7 +85,7 @@ class Section:
 
     def is_root(self):
         """Is tree the root node?"""
-        return self.parent is None
+        return self._morphio_section.is_root
 
     def ipreorder(self):
         """Depth-first pre-order iteration of tree nodes."""
@@ -118,10 +116,10 @@ class Section:
         """
         if stop_node is None:
             def stop_condition(section):
-                return section.parent is None
+                return section.is_root()
         else:
             def stop_condition(section):
-                return section == stop_node
+                return section.is_root() or section == stop_node
 
         current_section = self
         while not stop_condition(current_section):
@@ -151,7 +149,7 @@ class Section:
 
     def __eq__(self, other):
         """Equal when its morphio section is equal."""
-        return self._morphio_section == other._morphio_section
+        return self.to_morphio().has_same_shape(other.to_morphio())
 
     def __hash__(self):
         """Hash of its id."""
@@ -222,11 +220,11 @@ def _homogeneous_subtrees(neurite):
     sub-tree.
     """
     it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).morphio_section)]
+    homogeneous_neurites = [Neurite(next(it).to_morphio())]
 
     for section in it:
         if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.morphio_section))
+            homogeneous_neurites.append(Neurite(section.to_morphio()))
 
     homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
 
