@@ -48,10 +48,14 @@ def test_section_base_func():
     # __nonzero__
     assert section
 
+
 def test_section_tree():
     m = nm.load_morphology(str(SWC_PATH / 'simple.swc'))
 
     assert m.sections[0].parent is None
+
+    assert m.sections[0] == m.sections[0]
+
     assert m.sections[0] == m.sections[0].children[0].parent
 
     assert_array_equal([s.is_root() for s in m.sections],
@@ -69,6 +73,11 @@ def test_section_tree():
     assert_array_equal([s.id for s in m.neurites[0].root_node.iupstream()],
                        [0])
     assert_array_equal([s.id for s in m.sections[2].iupstream()],
+                       [2, 0])
+    assert_array_equal([s.id for s in m.sections[2].iupstream(stop_node=m.sections[2])],
+                       [2])
+    # if a stop node that is not upstream is given, it should stop at root
+    assert_array_equal([s.id for s in m.sections[2].iupstream(stop_node=m.sections[1])],
                        [2, 0])
     assert_array_equal([s.id for s in m.neurites[0].root_node.ileaf()],
                        [1, 2])
