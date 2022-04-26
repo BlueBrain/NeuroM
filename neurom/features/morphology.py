@@ -310,7 +310,7 @@ def trunk_angles_inter_types(
     if len(source_vectors) == 0 or len(target_vectors) == 0:
         return []
 
-    angles = np.empty((len(source_vectors), len(target_vectors), 3), dtype=np.float64)
+    angles = np.empty((len(source_vectors), len(target_vectors), 3), dtype=float)
 
     for i, source in enumerate(source_vectors):
         for j, target in enumerate(target_vectors):
