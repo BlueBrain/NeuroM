@@ -155,12 +155,6 @@ class Section:
         """Hash of its id."""
         return self.id
 
-    def __nonzero__(self):
-        """If has children."""
-        return self._morphio_section is not None
-
-    __bool__ = __nonzero__
-
     @property
     def points(self):
         """Returns the section list of points the NeuroM way (points + radius)."""
@@ -495,10 +489,6 @@ class Neurite:
         """
         return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 
-    def __nonzero__(self):
-        """If has root node."""
-        return bool(self.morphio_root_node)
-
     def __eq__(self, other):
         """If root node ids and types are equal."""
         return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
@@ -506,8 +496,6 @@ class Neurite:
     def __hash__(self):
         """Hash is made of tuple of type and root_node."""
         return hash((self.type, self.root_node))
-
-    __bool__ = __nonzero__
 
     def __repr__(self):
         """Return a string representation."""
