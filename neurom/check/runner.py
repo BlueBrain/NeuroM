@@ -35,9 +35,8 @@ from importlib import import_module
 
 from neurom import load_morphology
 from neurom.check import check_wrapper
-from neurom.exceptions import ConfigError
+from neurom.exceptions import ConfigError, NeuroMError
 from neurom.io import utils
-from neurom.utils import warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -147,10 +146,10 @@ class CheckRunner:
             checks = config['checks']
             if 'morphology_checks' not in checks:
                 checks['morphology_checks'] = []
-            if 'neuron_checks' in checks:
-                warn_deprecated('"neuron_checks" is deprecated, use "morphology_checks" instead '
-                                'for the config of `neurom.check`')  # pragma: no cover
-                checks['morphology_checks'] = config['neuron_checks']  # pragma: no cover
+            if 'neuron_checks' in checks:  # pragma: no cover
+                raise NeuroMError(
+                    "'neuron_checks' is not supported. Please rename it into 'morphology_checks'"
+                )
         else:
             raise ConfigError('Need to have "checks" in the config')
 
