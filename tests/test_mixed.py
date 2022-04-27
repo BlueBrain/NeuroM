@@ -245,7 +245,7 @@ def population(mixed_morph):
     return Population([mixed_morph, mixed_morph])
 
 
-def _assert_feature_equal(obj, feature_name, expected_values, kwargs, use_subtrees):
+def _assert_feature_equal(values, expected_values):
 
     def innermost_value(iterable):
         while isinstance(iterable, collections.abc.Iterable):
@@ -256,36 +256,31 @@ def _assert_feature_equal(obj, feature_name, expected_values, kwargs, use_subtre
                 return None
         return iterable
 
-
     assert_equal = lambda a, b: npt.assert_equal(
         a, b, err_msg=f"ACTUAL: {a}\nDESIRED: {b}", verbose=False
     )
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-
-        values = get(feature_name, obj, use_subtrees=use_subtrees, **kwargs)
-        # handle empty lists because allclose always passes in that case.
-        # See: https://github.com/numpy/numpy/issues/11071
-        if isinstance(values, collections.abc.Iterable):
-            if isinstance(expected_values, collections.abc.Iterable):
-                if isinstance(innermost_value(values), (float, np.floating)):
-                    npt.assert_allclose(values, expected_values, atol=1e-5)
-                else:
-                    assert_equal(values, expected_values)
+    # handle empty lists because allclose always passes in that case.
+    # See: https://github.com/numpy/numpy/issues/11071
+    if isinstance(values, collections.abc.Iterable):
+        if isinstance(expected_values, collections.abc.Iterable):
+            if isinstance(innermost_value(values), (float, np.floating)):
+                npt.assert_allclose(values, expected_values, atol=1e-5)
             else:
                 assert_equal(values, expected_values)
         else:
-            if isinstance(expected_values, collections.abc.Iterable):
-                assert_equal(values, expected_values)
+            assert_equal(values, expected_values)
+    else:
+        if isinstance(expected_values, collections.abc.Iterable):
+            assert_equal(values, expected_values)
+        else:
+            if isinstance(values, (float, np.floating)):
+                npt.assert_allclose(values, expected_values, atol=1e-5)
             else:
-                if isinstance(values, (float, np.floating)):
-                    npt.assert_allclose(values, expected_values, atol=1e-5)
-                else:
-                    assert_equal(values, expected_values)
+                assert_equal(values, expected_values)
 
 
-def _dispatch_features(features, mode):
+def _dispatch_features(features, mode=None):
     for feature_name, configurations in features.items():
 
         for cfg in configurations:
@@ -296,7 +291,7 @@ def _dispatch_features(features, mode):
             elif mode == "wout-subtrees":
                 expected = cfg["expected_wout_subtrees"]
             else:
-                raise ValueError("Uknown mode")
+                expected = cfg["expected"]
 
             yield feature_name, kwargs, expected
 
@@ -343,12 +338,18 @@ def _population_features(mode):
 
 @pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="wout-subtrees"))
 def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
-    _assert_feature_equal(population, feature_name, expected, kwargs, use_subtrees=False)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        values = get(feature_name, population, use_subtrees=False, **kwargs)
+        _assert_feature_equal(values, expected)
 
 
 @pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="with-subtrees"))
 def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
-    _assert_feature_equal(population, feature_name, expected, kwargs, use_subtrees=True)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        values = get(feature_name, population, use_subtrees=True, **kwargs)
+        _assert_feature_equal(values, expected)
 
 
 def _morphology_features(mode):
@@ -927,33 +928,6 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 0.74729,
             },
         ],
-    }
-
-    features_not_tested = set(_MORPHOLOGY_FEATURES) - set(features.keys())
-
-    assert not features_not_tested, (
-        "The following morphology tests need to be included in the mixed morphology tests:\n"
-        f"{features_not_tested}"
-    )
-
-    return _dispatch_features(features, mode)
-
-
-@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees"))
-def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
-    _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=False)
-
-
-@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="with-subtrees"))
-def test_morphology__morphology_features_with_subtrees(
-    feature_name, kwargs, expected, mixed_morph
-):
-    _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=True)
-
-
-def _neurite_features(mode):
-
-    features = {
         "number_of_segments": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
@@ -2130,8 +2104,88 @@ def _neurite_features(mode):
         ],
     }
 
+    features_not_tested = (set(_MORPHOLOGY_FEATURES) | set(_NEURITE_FEATURES)) - set(features.keys())
+
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the mixed morphology tests:\n"
+        f"{features_not_tested}"
+    )
+
+    return _dispatch_features(features, mode)
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees"))
+def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        values = get(feature_name, mixed_morph, use_subtrees=False, **kwargs)
+        _assert_feature_equal(values, expected)
+
+
+@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="with-subtrees"))
+def test_morphology__morphology_features_with_subtrees(
+    feature_name, kwargs, expected, mixed_morph
+):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
+        _assert_feature_equal(values, expected)
+
+
+def _neurite_features():
+
+    features = {
+        "max_radial_distance": [
+            # basal, AcD, apical
+            {
+                "kwargs": {"section_type": NeuriteType.all},
+                "expected": [2.236068, 3.7416575, 2.236068],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.all, "origin": np.array([0., 0., 0.])},
+                "expected": [3.162277, 4.472135, 3.162277],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.basal_dendrite},
+                "expected": [2.236068, 3.3166249, 0.0],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.basal_dendrite, "origin": np.array([0., 0., 0.])},
+                "expected": [3.162277, 4.242640, 0.0]
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.axon},
+                "expected": [0.      , 3.741657, 0.      ],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.axon, "origin": np.array([0., 0., 0.])},
+                "expected": [0.0, 4.472135, 0.0],
+            }
+        ],
+        "volume_density": [
+            {
+                "kwargs": {"section_type": NeuriteType.all},
+                "expected": [0.235619, 0.063784, 0.235619],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.basal_dendrite},
+                "expected": [0.235619, 0.255138, np.nan],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.axon},
+                "expected": [np.nan, 0.170092, np.nan],
+            },
+            {
+                "kwargs": {"section_type": NeuriteType.apical_dendrite},
+                "expected": [np.nan, np.nan, 0.2356194583819102],
+            },
+        ],
+    }
+
+    # features that exist in both the neurite and morphology level, which indicates a different
+    # implementation in each level
     features_not_tested = list(
-        set(_NEURITE_FEATURES) - set(features.keys()) - set(_MORPHOLOGY_FEATURES)
+        (set(_NEURITE_FEATURES)  & set(_MORPHOLOGY_FEATURES)) - features.keys()
     )
 
     assert not features_not_tested, (
@@ -2139,19 +2193,12 @@ def _neurite_features(mode):
         "\n".join(sorted(features_not_tested)) + "\n"
     )
 
-    return _dispatch_features(features, mode)
+    return _dispatch_features(features)
 
 
-@pytest.mark.parametrize(
-    "feature_name, kwargs, expected", _neurite_features(mode="wout-subtrees")
-)
-def test_morphology__neurite_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
-    _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=False)
-
-
-@pytest.mark.parametrize(
-    "feature_name, kwargs, expected", _neurite_features(mode="with-subtrees")
-)
-def test_morphology__neurite_features_with_subtrees(feature_name, kwargs, expected, mixed_morph):
-    _assert_feature_equal(mixed_morph, feature_name, expected, kwargs, use_subtrees=True)
-
+@pytest.mark.parametrize("feature_name, kwargs, expected", _neurite_features())
+def test_morphology__neurite_features(feature_name, kwargs, expected, mixed_morph):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        values = get(feature_name, mixed_morph.neurites, **kwargs)
+        _assert_feature_equal(values, expected)
