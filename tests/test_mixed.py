@@ -2116,10 +2116,10 @@ def _morphology_features(mode):
 
     features_not_tested = (set(_MORPHOLOGY_FEATURES) | set(_NEURITE_FEATURES)) - set(features.keys())
 
-    #assert not features_not_tested, (
-    #    "The following morphology tests need to be included in the mixed morphology tests:\n"
-    #    f"{features_not_tested}"
-    #)
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the mixed morphology tests:\n"
+        f"{features_not_tested}"
+    )
 
     return _dispatch_features(features, mode)
 
@@ -2136,7 +2136,7 @@ def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, exp
 def test_morphology__morphology_features_with_subtrees(
     feature_name, kwargs, expected, mixed_morph
 ):
-   # with warnings.catch_warnings():
+    with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
         _assert_feature_equal(values, expected)
@@ -2334,10 +2334,10 @@ def _neurite_features():
         (set(_NEURITE_FEATURES)  & set(_MORPHOLOGY_FEATURES)) - features.keys()
     )
 
-    #assert not features_not_tested, (
-    #    "The following morphology tests need to be included in the mixed neurite tests:\n\n" +
-    #    "\n".join(sorted(features_not_tested)) + "\n"
-    #)
+    assert not features_not_tested, (
+        "The following morphology tests need to be included in the mixed neurite tests:\n\n" +
+        "\n".join(sorted(features_not_tested)) + "\n"
+    )
 
     return _dispatch_features(features)
 
