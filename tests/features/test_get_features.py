@@ -771,7 +771,19 @@ def test_section_strahler_orders():
 
 
 def test_section_bif_radial_distances():
+
+    # the feature applied on morph calculates radial distance from soma
     trm_rads = features.get('section_bif_radial_distances', NRN, neurite_type=nm.AXON)
+
+    assert_allclose(
+        trm_rads,
+        [8.92228 , 16.825268, 23.152378, 30.262894, 36.71048 ,
+        44.049297, 52.00228 , 59.510105, 66.33529 , 74.134636]
+    )
+
+    # the feature applied per neurite calculates radial distance from root
+    trm_rads = features.get('section_bif_radial_distances', NRN.neurites[3])
+
     assert_allclose(trm_rads,
                     [8.842008561870646,
                      16.7440421479104,

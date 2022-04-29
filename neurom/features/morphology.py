@@ -118,7 +118,8 @@ def max_radial_distance(morph, origin=None, neurite_type=NeuriteType.all, use_su
     origin = morph.soma.center if origin is None else origin
 
     term_radial_distances = _map_neurites(
-        nf.max_radial_distance, morph, origin, neurite_type, use_subtrees
+        partial(nf.max_radial_distance, origin=origin),
+        morph, neurite_type, use_subtrees
     )
     return max(term_radial_distances) if term_radial_distances else 0.
 
@@ -133,12 +134,17 @@ def section_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, u
     origin = morph.soma.center if origin is None else origin
 
     return list(flatten(_map_neurites(
-        nf.section_radial_distances, morph, origin, neurite_type, use_subtrees
+        partial(nf.section_radial_distances, origin=origin),
+        morph=morph,
+        neurite_type=neurite_type,
+        use_subtrees=use_subtrees,
     )))
 
 
 @feature(shape=(...,))
-def section_term_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False):
+def section_term_radial_distances(
+    morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False
+):
     """Get the radial distances of the termination sections."""
     origin = morph.soma.center if origin is None else origin
 
@@ -151,7 +157,9 @@ def section_term_radial_distances(morph, origin=None, neurite_type=NeuriteType.a
 
 
 @feature(shape=(...,))
-def section_bif_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False):
+def section_bif_radial_distances(
+    morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False
+):
     """Get the radial distances of the bf sections."""
     origin = morph.soma.center if origin is None else origin
 
@@ -159,20 +167,24 @@ def section_bif_radial_distances(morph, origin=None, neurite_type=NeuriteType.al
         partial(nf.section_bif_radial_distances, origin=origin),
         morph=morph,
         neurite_type=neurite_type,
-        use_subtrees=use_subtrees
+        use_subtrees=use_subtrees,
     )))
 
 
 @feature(shape=(...,))
-def segment_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False):
+def segment_radial_distances(
+    morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False
+):
+    """Ger the radial distances of the segments."""
     origin = morph.soma.center if origin is None else origin
 
     return list(flatten(_map_neurites(
         partial(nf.segment_radial_distances, origin=origin),
         morph=morph,
         neurite_type=neurite_type,
-        use_subtrees=use_subtrees
+        use_subtrees=use_subtrees,
     )))
+
 
 @feature(shape=(...,))
 def number_of_sections_per_neurite(morph, neurite_type=NeuriteType.all, use_subtrees=False):

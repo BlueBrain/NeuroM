@@ -426,6 +426,7 @@ def _radial_distances(neurite, origin, iterator_type, section_type):
         section_type=section_type
     )
 
+
 @feature(shape=(...,))
 def section_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Section radial distances.
@@ -439,7 +440,7 @@ def section_radial_distances(neurite, origin=None, section_type=NeuriteType.all)
 @feature(shape=(...,))
 def section_term_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the termination sections."""
-    return _radial_distances(neurite, origin , Section.ileaf, section_type)
+    return _radial_distances(neurite, origin, Section.ileaf, section_type)
 
 
 @feature(shape=())
