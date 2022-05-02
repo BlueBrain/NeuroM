@@ -35,6 +35,7 @@ from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import Section
 from neurom.exceptions import NeuroMError
+from neurom.features import section as sf
 
 
 def _raise_if_not_bifurcation(section):
@@ -57,7 +58,7 @@ def local_bifurcation_angle(bif_point):
         p0 = sec[0]
         cur = sec[1]
         for i, p in enumerate(sec[1:]):
-            if not np.all(p[:COLS.R] == p0[:COLS.R]):
+            if not np.all(p == p0):
                 cur = sec[i + 1]
                 break
 
@@ -65,10 +66,11 @@ def local_bifurcation_angle(bif_point):
 
     _raise_if_not_bifurcation(bif_point)
 
-    ch0, ch1 = (skip_0_length(bif_point.children[0].points),
-                skip_0_length(bif_point.children[1].points))
-
-    return morphmath.angle_3points(bif_point.points[-1], ch0, ch1)
+    return morphmath.angle_3points(
+        sf.section_points(bif_point),
+        skip_0_length(sf.section_points(bif_point.children[0])),
+        skip_0_length(sf.section_points(bif_point.children[1])),
+    )
 
 
 def remote_bifurcation_angle(bif_point):

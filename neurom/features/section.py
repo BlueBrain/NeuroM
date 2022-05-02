@@ -34,7 +34,7 @@ import neurom.morphmath
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
-from neurom.core.morphology import Section
+from neurom.core import isection as Section
 
 
 
@@ -43,9 +43,14 @@ def section_points(section):
     return section.points
 
 
+def section_diameters(section):
+    """Returns the diameters of the section."""
+    return section.diameters
+
+
 def section_radii(section):
     """Returns the radii in the section."""
-    return 0.5 * section.diameters
+    return 0.5 * section_diameters(section)
 
 
 def section_path_length(section, stop_node=None):
@@ -55,7 +60,7 @@ def section_path_length(section, stop_node=None):
         section: Section object.
         stop_node: Node to stop the upstream traversal. If None, it stops when no parent is found.
     """
-    return sum(map(section_length, section.iupstream(stop_node=stop_node)))
+    return sum(map(section_length, Section.iupstream(section, stop_node=stop_node)))
 
 
 def section_length(section):
@@ -70,7 +75,7 @@ def section_volume(section):
 
 def section_area(section):
     """Surface area of a section."""
-    return neurom.morphmath.inteval_areas(section_points(section), section_radii(section)).sum()
+    return neurom.morphmath.interval_areas(section_points(section), section_radii(section)).sum()
 
 
 def section_tortuosity(section):
@@ -83,7 +88,7 @@ def section_tortuosity(section):
 
     If the section contains less than 2 points, the value 1 is returned.
     """
-    pts = section.points
+    pts = section_points(section)
     return 1 if len(pts) < 2 else mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
@@ -95,7 +100,7 @@ def section_end_distance(section):
 
     If the section contains less than 2 points, the value 0 is returned.
     """
-    pts = section.points
+    pts = section_points(section)
     return 0 if len(pts) < 2 else mm.point_dist(pts[-1], pts[0])
 
 
@@ -107,24 +112,25 @@ def branch_order(section):
     Note:
         The first level has branch order 1.
     """
-    return sum(1 for _ in section.iupstream()) - 1
+    return sum(1 for _ in Section.iupstream(section)) - 1
 
 
 def taper_rate(section):
     """Taper rate from fit along a section."""
-    pts = section.points
-    path_distances = np.cumsum(interval_lengths(pts, prepend_zero=True))
-    return np.polynomial.polynomial.polyfit(path_distances, 2.0 * pts[:, COLS.R], 1)[1]
+    pts = section_points(section)
+    diameters = section_diameters(section)
+    path_distances = np.cumsum(neurom.morphmath.interval_lengths(pts, prepend_zero=True))
+    return np.polynomial.polynomial.polyfit(path_distances, diameters, 1)[1]
 
 
 def number_of_segments(section):
     """Returns the number of segments within a section."""
-    return len(section.points) - 1
+    return len(section_points(section)) - 1
 
 
 def segment_lengths(section, prepend_zero=False):
     """Returns the list of segment lengths within the section."""
-    return interval_lengths(section.points, prepend_zero=prepend_zero)
+    return neurom.morphmath.interval_lengths(section_points(section), prepend_zero=prepend_zero)
 
 
 def segment_areas(section):
@@ -139,13 +145,13 @@ def segment_volumes(section):
 
 def segment_mean_radii(section):
     """Returns the list of segment mean radii within the section."""
-    pts = section.points[:, COLS.R]
-    return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
+    radii = section_radii(section)
+    return np.divide(np.add(radii[:-1], radii[1:]), 2.0).tolist()
 
 
 def segment_midpoints(section):
     """Returns the list of segment midpoints within the section."""
-    pts = section.points[:, COLS.XYZ]
+    pts = section_points(section)
     return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
 
 
@@ -175,14 +181,13 @@ def section_radial_distance(section, origin):
         origin: point to which distances are measured. It must have at least 3\
             components. The first 3 components are (x, y, z).
     """
-    return mm.point_dist(section.points[-1], origin)
+    return mm.point_dist(section_points(section)[-1], origin)
 
 
 def section_meander_angles(section):
     """Inter-segment opening angles in a section."""
-    p = section.points
-    return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
-            for i in range(2, len(p))]
+    p = section_points(section)
+    return [mm.angle_3points(p[i - 1], p[i - 2], p[i]) for i in range(2, len(p))]
 
 
 def strahler_order(section):
@@ -220,13 +225,13 @@ def strahler_order(section):
 
 def locate_segment_position(section, fraction):
     """Segment ID / offset corresponding to a given fraction of section length."""
-    return mm.path_fraction_id_offset(section.points, fraction)
+    return mm.path_fraction_id_offset(section_points(section), fraction)
 
 
 def section_mean_radius(section):
     """Compute the mean radius of a section weighted by segment lengths."""
-    radii = section.points[:, COLS.R]
-    points = section.points[:, COLS.XYZ]
+    radii = section_radii(section)
+    points = section_points(section)
     lengths = np.linalg.norm(points[1:] - points[:-1], axis=1)
     mean_radii = 0.5 * (radii[1:] + radii[:-1])
     return np.sum(mean_radii * lengths) / np.sum(lengths)
@@ -234,4 +239,4 @@ def section_mean_radius(section):
 
 def downstream_pathlength(section, iterator_type=Section.ipreorder):
     """Compute the total downstream length starting from a section."""
-    return sum(sec.length for sec in iterator_type(section))
+    return sum(map(section_length, iterator_type(section)))

@@ -433,11 +433,12 @@ def trunk_origin_radii(
         )
 
     def trunk_first_radius(root_node):
-        return root_node.points[0][COLS.R]
+        return 0.5 * root_node.diameters[0]
 
     def trunk_mean_radius(root_node):
 
-        points = root_node.points
+        points = sf.section_points(root_node)
+        radii = sf.section_radii(root_node)
 
         interval_lengths = morphmath.interval_lengths(points)
         path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
@@ -451,7 +452,7 @@ def trunk_origin_radii(
                     "path distance of the last point of the last section so the radius of this "
                     "point is returned."
                 )
-                return points[-1, COLS.R]
+                return radii[-1]
 
         if max_length_filter is not None:
             valid_max = (path_lengths <= max_length_filter)
@@ -463,9 +464,9 @@ def trunk_origin_radii(
                     "point after the 'min_length_filter' path distance is returned."
                 )
                 # pylint: disable=invalid-unary-operand-type
-                return points[~valid_max, COLS.R][0]
+                return radii[~valid_max][0]
 
-        return points[valid_pts, COLS.R].mean()
+        return radii[valid_pts].mean()
 
     function = (
         trunk_first_radius
@@ -590,7 +591,7 @@ def sholl_frequency(
             sections = iter_sections(morph, neurite_filter=is_type(neurite_type))
 
         max_radius_per_section = [
-            np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))
+            np.max(np.linalg.norm(section.points - morph.soma.center, axis=1))
             for section in sections
         ]
 

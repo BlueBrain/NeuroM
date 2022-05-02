@@ -1,4 +1,4 @@
-from deque import deque
+from collections import deque
 
 
 def is_homogeneous_point(section):
@@ -71,7 +71,7 @@ def iupstream(section, stop_node=None):
 
 def ileaf(section):
     """Iterator to all leaves of a tree."""
-    return filter(Section.is_leaf, Section.ipreorder(section))
+    return filter(is_leaf, ipreorder(section))
 
 
 def iforking_point(section, iter_mode=ipreorder):
@@ -80,7 +80,7 @@ def iforking_point(section, iter_mode=ipreorder):
     Args:
         iter_mode: iteration mode. Default: ipreorder.
     """
-    return filter(Section.is_forking_point, iter_mode(section))
+    return filter(is_forking_point, iter_mode(section))
 
 
 def ibifurcation_point(section, iter_mode=ipreorder):
@@ -89,4 +89,4 @@ def ibifurcation_point(section, iter_mode=ipreorder):
     Args:
         iter_mode: iteration mode. Default: ipreorder.
     """
-    return filter(Section.is_bifurcation_point, iter_mode(section))
+    return filter(is_bifurcation_point, iter_mode(section))
