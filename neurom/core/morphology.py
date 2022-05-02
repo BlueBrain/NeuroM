@@ -509,7 +509,7 @@ class Morphology:
         """Morphology constructor.
 
         Args:
-            filename (str|Path): a filename or morphio.{,mut.}Morphology object
+            filename (str|Path): a filename or morphio.{mut}.Morphology object
             name (str): a optional morphology name
         """
         self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
