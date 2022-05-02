@@ -510,7 +510,7 @@ class Morphology:
 
         Args:
             filename (str|Path): a filename or morphio.{mut}.Morphology object
-            name (str): a optional morphology name
+            name (str): an optional morphology name
         """
         self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
         self.name = name if name else 'Morphology'
