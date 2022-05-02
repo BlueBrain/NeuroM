@@ -55,7 +55,7 @@ class Dendrogram:
             if isinstance(neurom_section, Neurite):
                 neurom_section = neurom_section.root_node
             lengths = interval_lengths(neurom_section.points, prepend_zero=True)
-            radii = neurom_section.points[:, COLS.R]
+            radii = 0.5 * neurom_section.diameters
 
             self.neurite_type = neurom_section.type
             self.height = np.sum(lengths)

@@ -30,16 +30,22 @@
 
 import numpy as np
 
+import neurom.morphmath
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
 from neurom.core.morphology import Section
-from neurom.morphmath import interval_lengths
+
 
 
 def section_points(section):
     """Returns the points in the section."""
-    return section.points[:, COLS.XYZ]
+    return section.points
+
+
+def section_radii(section):
+    """Returns the radii in the section."""
+    return 0.5 * section.diameters
 
 
 def section_path_length(section, stop_node=None):
@@ -54,17 +60,17 @@ def section_path_length(section, stop_node=None):
 
 def section_length(section):
     """Length of a section."""
-    return section.length
+    return neurom.morphmath.section_length(section_points(section))
 
 
 def section_volume(section):
     """Volume of a section."""
-    return section.volume
+    return neurom.morphmath.interval_volumes(section_points(section), section_radii(section)).sum()
 
 
 def section_area(section):
     """Surface area of a section."""
-    return section.area
+    return neurom.morphmath.inteval_areas(section_points(section), section_radii(section)).sum()
 
 
 def section_tortuosity(section):
@@ -152,7 +158,7 @@ def segment_midpoint_radial_distances(section, origin=None):
 
 def segment_taper_rates(section):
     """Returns the list of segment taper rates within the section."""
-    pts = section.points[:, COLS.XYZR]
+    pts = np.column_stack((section_points(section), section_radii(section)))
     diff = np.diff(pts, axis=0)
     distance = np.linalg.norm(diff[:, COLS.XYZ], axis=1)
     return np.divide(2.0 * diff[:, COLS.R], distance).tolist()

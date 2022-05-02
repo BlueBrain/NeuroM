@@ -30,6 +30,7 @@
 
 from collections import deque
 import warnings
+import collections
 
 import morphio
 import numpy as np
@@ -39,182 +40,9 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.core.population import Population
 from neurom.utils import flatten
+from neurom.core import isection as Section
 
-
-class Section:
-    """Simple recursive tree class."""
-
-    def __init__(self, morphio_section):
-        """The section constructor."""
-        self.morphio_section = morphio_section
-
-    @property
-    def id(self):
-        """Returns the section ID."""
-        return self.morphio_section.id
-
-    @property
-    def parent(self):
-        """Returns the parent section if non root section else None."""
-        if self.morphio_section.is_root:
-            return None
-        return Section(self.morphio_section.parent)
-
-    @property
-    def children(self):
-        """Returns a list of child section."""
-        return [Section(child) for child in self.morphio_section.children]
-
-    def append_section(self, section):
-        """Appends a section to the current section object.
-
-        Args:
-            section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
-        """
-        if isinstance(section, Section):
-            return self.morphio_section.append_section(section.morphio_section)
-        return self.morphio_section.append_section(section)
-
-    def is_homogeneous_point(self):
-        """A section is homogeneous if it has the same type with its children."""
-        return all(c.type == self.type for c in self.children)
-
-    def is_forking_point(self):
-        """Is this section a forking point?"""
-        return len(self.children) > 1
-
-    def is_bifurcation_point(self):
-        """Is tree a bifurcation point?"""
-        return len(self.children) == 2
-
-    def is_leaf(self):
-        """Is tree a leaf?"""
-        return len(self.children) == 0
-
-    def is_root(self):
-        """Is tree the root node?"""
-        return self.parent is None
-
-    def ipreorder(self):
-        """Depth-first pre-order iteration of tree nodes."""
-        children = deque((self, ))
-        while children:
-            cur_node = children.pop()
-            children.extend(reversed(cur_node.children))
-            yield cur_node
-
-    def ipostorder(self):
-        """Depth-first post-order iteration of tree nodes."""
-        children = [self, ]
-        seen = set()
-        while children:
-            cur_node = children[-1]
-            if cur_node not in seen:
-                seen.add(cur_node)
-                children.extend(reversed(cur_node.children))
-            else:
-                children.pop()
-                yield cur_node
-
-    def iupstream(self, stop_node=None):
-        """Iterate from a tree node to the root nodes.
-
-        Args:
-            stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
-        """
-        if stop_node is None:
-            def stop_condition(section):
-                return section.parent is None
-        else:
-            def stop_condition(section):
-                return section == stop_node
-
-        current_section = self
-        while not stop_condition(current_section):
-            yield current_section
-            current_section = current_section.parent
-        yield current_section
-
-    def ileaf(self):
-        """Iterator to all leaves of a tree."""
-        return filter(Section.is_leaf, self.ipreorder())
-
-    def iforking_point(self, iter_mode=ipreorder):
-        """Iterator to forking points.
-
-        Args:
-            iter_mode: iteration mode. Default: ipreorder.
-        """
-        return filter(Section.is_forking_point, iter_mode(self))
-
-    def ibifurcation_point(self, iter_mode=ipreorder):
-        """Iterator to bifurcation points.
-
-        Args:
-            iter_mode: iteration mode. Default: ipreorder.
-        """
-        return filter(Section.is_bifurcation_point, iter_mode(self))
-
-    def __eq__(self, other):
-        """Equal when its morphio section is equal."""
-        return self.morphio_section == other.morphio_section
-
-    def __hash__(self):
-        """Hash of its id."""
-        return self.id
-
-    def __nonzero__(self):
-        """If has children."""
-        return self.morphio_section is not None
-
-    __bool__ = __nonzero__
-
-    @property
-    def points(self):
-        """Returns the section list of points the NeuroM way (points + radius)."""
-        return np.concatenate((self.morphio_section.points,
-                               self.morphio_section.diameters[:, np.newaxis] / 2.),
-                              axis=1)
-
-    @points.setter
-    def points(self, value):
-        """Set the points."""
-        self.morphio_section.points = np.copy(value[:, COLS.XYZ])
-        self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
-
-    @property
-    def type(self):
-        """Returns the section type."""
-        return NeuriteType(int(self.morphio_section.type))
-
-    @property
-    def length(self):
-        """Return the path length of this section."""
-        return morphmath.section_length(self.points)
-
-    @property
-    def area(self):
-        """Return the surface area of this section.
-
-        The area is calculated from the segments, as defined by this
-        section's points
-        """
-        return sum(morphmath.segment_area(s) for s in iter_segments(self))
-
-    @property
-    def volume(self):
-        """Return the volume of this section.
-
-        The volume is calculated from the segments, as defined by this
-        section's points
-        """
-        return sum(morphmath.segment_volume(s) for s in iter_segments(self))
-
-    def __repr__(self):
-        """Text representation."""
-        parent_id = None if self.parent is None else self.parent.id
-        return (f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
-                f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>')
+SectionClasses = (morphio.Section, morphio.mut.Section)
 
 
 # NRN simulator iteration order
@@ -233,12 +61,12 @@ def _homogeneous_subtrees(neurite):
     A sub-neurite can be either the entire tree or a homogeneous downstream
     sub-tree.
     """
-    it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).morphio_section)]
+    it = Section.ipreorder(neurite.root_node)
+    homogeneous_neurites = [Neurite(next(it))]
 
     for section in it:
         if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.morphio_section))
+            homogeneous_neurites.append(Neurite(section))
 
     homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
 
@@ -285,12 +113,12 @@ def iter_neurites(
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
-    if isinstance(obj, Neurite):
-        neurites = (obj,)
-    elif hasattr(obj, "neurites"):
+    if hasattr(obj, "neurites"):
         neurites = obj.neurites
-    else:
+    elif isinstance(obj, collections.Iterable):
         neurites = obj
+    else:
+        neurites = (obj,)
 
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
@@ -371,7 +199,7 @@ def iter_segments(
         morphology segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     """
-    sections = iter((obj,) if isinstance(obj, Section) else
+    sections = iter((obj,) if isinstance(obj, SectionClasses) else
                     iter_sections(obj,
                                   neurite_filter=neurite_filter,
                                   neurite_order=neurite_order,
@@ -400,7 +228,7 @@ def iter_points(
         section_filter: optional section level filter
     """
     sections = (
-        iter((obj,)) if isinstance(obj, Section)
+        iter((obj,)) if isinstance(obj, SectionClasses)
         else iter_sections(
             obj,
             neurite_filter=neurite_filter,
@@ -414,9 +242,8 @@ def iter_points(
 
 def graft_morphology(section):
     """Returns a morphology starting at section."""
-    assert isinstance(section, Section)
     m = morphio.mut.Morphology()
-    m.append_root_section(section.morphio_section)
+    m.append_root_section(section)
     return Morphology(m)
 
 
@@ -429,12 +256,11 @@ class Neurite:
         Args:
             root_node (morphio.Section): root section
         """
-        self.morphio_root_node = root_node
+        self.root_node = root_node
 
     @property
-    def root_node(self):
-        """The first section of the neurite."""
-        return Section(self.morphio_root_node)
+    def morphio_root_node(self):
+        return self.root_node
 
     @property
     def type(self):
@@ -448,9 +274,17 @@ class Neurite:
         Note: Duplicate points at section bifurcations are removed
         """
         # Neurite first point must be added manually
-        _ptr = [self.root_node.points[0][COLS.XYZR]]
+        _ptr = [self.root_node.points[0]]
         for s in iter_sections(self):
-            _ptr.append(s.points[1:, COLS.XYZR])
+            _ptr.append(s.points[1:])
+        return np.vstack(_ptr)
+
+    @property
+    def diameters(self):
+        # Neurite first point must be added manually
+        _ptr = [self.root_node.diameters[0]]
+        for s in iter_sections(self):
+            _ptr.append(s.diameters[1:])
         return np.vstack(_ptr)
 
     @property
@@ -485,7 +319,7 @@ class Neurite:
 
     def is_heterogeneous(self) -> bool:
         """Returns true if the neurite consists of more that one section types."""
-        return self.morphio_root_node.is_heterogeneous()
+        return self.root_node.is_heterogeneous()
 
     def iter_sections(self, order=Section.ipreorder, neurite_order=NeuriteIter.FileOrder):
         """Iteration over section nodes.
@@ -506,11 +340,11 @@ class Neurite:
 
     def __nonzero__(self):
         """If has root node."""
-        return bool(self.morphio_root_node)
+        return bool(self.root_node)
 
     def __eq__(self, other):
         """If root node ids and types are equal."""
-        return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
+        return self.type == other.type and self.root_node.id == other.root_node.id
 
     def __hash__(self):
         """Hash is made of tuple of type and root_node."""

@@ -95,10 +95,22 @@ def interval_lengths(points, prepend_zero=False):
         points: a list of np.array of 3D points
         prepend_zero (bool): if True, the returned array will start with a zero
     """
-    intervals = np.linalg.norm(np.diff(np.asarray(points)[:, COLS.XYZ], axis=0), axis=1)
+    intervals = np.linalg.norm(np.diff(np.asarray(points), axis=0), axis=1)
     if prepend_zero:
         return np.insert(intervals, 0, 0)
     return intervals
+
+
+def interval_areas(points, radii):
+    hs = interval_lengths(points)
+    r0s, r1s = radii[:-1], radii[1:]
+    return math.pi * (r0s + r1s) * math.sqrt((r0s - r1s) ** 2 + hs ** 2)
+
+
+def interval_volumes(points, radii):
+    hs = interval_lengths(points)
+    r0s, r1s = radii[:-1], radii[1:]
+    return math.pi * hs * ((r0s * r0s) + (r0s * r1s) + (r1s * r1s)) / 3.0
 
 
 def path_fraction_id_offset(points, fraction, relative_offset=False):
