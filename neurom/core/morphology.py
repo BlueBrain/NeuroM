@@ -243,8 +243,8 @@ def _homogeneous_subtrees(neurite):
     homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
 
     if len(homogeneous_neurites) >= 2 and homogeneous_types != [
-        NeuriteType.axon,
         NeuriteType.basal_dendrite,
+        NeuriteType.axon,
     ]:
         warnings.warn(
                 f"{neurite} is not an axon-carrying dendrite. "
