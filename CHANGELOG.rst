@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 4.0.0
+-------------
+
+- ``neurom.view.[plot_tree|plot_tree3d|plot_soma|plot_soma3D]`` were hidden from the
+  neurom.view module. They can still be imported from neurom.view.matplotlib_impl.
+- Deprecated modules and classes were removed.
+
+
 Version 3.2.0
 -------------
 
