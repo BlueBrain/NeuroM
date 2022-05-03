@@ -260,6 +260,7 @@ class Neurite:
 
     @property
     def morphio_root_node(self):
+        """Backward compat"""
         return self.root_node
 
     @property

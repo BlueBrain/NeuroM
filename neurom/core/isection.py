@@ -23,7 +23,7 @@ def is_leaf(section):
 
 def is_root(section):
     """Is tree the root node?"""
-    return section.parent is None
+    return section.is_root
 
 
 def ipreorder(section):
@@ -57,7 +57,7 @@ def iupstream(section, stop_node=None):
     """
     if stop_node is None:
         def stop_condition(section):
-            return section.parent is None
+            return section.is_root
     else:
         def stop_condition(section):
             return section == stop_node

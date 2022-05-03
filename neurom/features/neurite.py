@@ -274,7 +274,7 @@ def segment_path_lengths(neurite, section_type=NeuriteType.all):
             pathlength[section.id] = (
                 0.0
                 if section.id == neurite.root_node.id
-                else section.parent.length + pathlength[section.parent.id]
+                else sf.section_length(section.parent) + pathlength[section.parent.id]
             )
 
         return pathlength[section.id] + np.cumsum(sf.segment_lengths(section))
@@ -285,7 +285,7 @@ def segment_path_lengths(neurite, section_type=NeuriteType.all):
 @feature(shape=(...,))
 def segment_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Returns the list of distances between all segment mid points and origin."""
-    origin = neurite.root_node.points[0, COLS.XYZ] if origin is None else origin
+    origin = sf.section_points(neurite.root_node)[0] if origin is None else origin
     return _map_segments(
         func=partial(sf.segment_midpoint_radial_distances, origin=origin),
         neurite=neurite,
@@ -474,7 +474,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
     neurite_volume = total_volume(neurite, section_type=section_type)
 
     def get_points(section):
-        return section.points[:, COLS.XYZ].tolist()
+        return sf.section_points(section).tolist()
 
     # note: duplicate points included but not affect the convex hull calculation
     points = list(

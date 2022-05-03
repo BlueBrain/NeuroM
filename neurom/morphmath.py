@@ -52,7 +52,7 @@ def vector(p1, p2):
     Returns:
         3-vector from p1 - p2
     """
-    return np.subtract(p1[COLS.XYZ], p2[COLS.XYZ])
+    return np.subtract(p1, p2)
 
 
 def linear_interpolate(p1, p2, fraction):
@@ -104,7 +104,7 @@ def interval_lengths(points, prepend_zero=False):
 def interval_areas(points, radii):
     hs = interval_lengths(points)
     r0s, r1s = radii[:-1], radii[1:]
-    return math.pi * (r0s + r1s) * math.sqrt((r0s - r1s) ** 2 + hs ** 2)
+    return math.pi * (r0s + r1s) * np.sqrt((r0s - r1s) ** 2 + hs ** 2)
 
 
 def interval_volumes(points, radii):
