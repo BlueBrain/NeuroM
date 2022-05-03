@@ -160,7 +160,7 @@ def section_term_radial_distances(
 def section_bif_radial_distances(
     morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False
 ):
-    """Get the radial distances of the bf sections."""
+    """Get the radial distances of the bifurcation sections."""
     origin = morph.soma.center if origin is None else origin
 
     return list(flatten(_map_neurites(
