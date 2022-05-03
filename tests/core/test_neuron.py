@@ -85,12 +85,6 @@ def test_for_morphio():
                         [1., 1., 1., 0.5],
                         [2., 2., 2., 0.5]])
 
-    neurom_m.soma.points = [[1, 1, 1, 1],
-                                 [2, 2, 2, 2]]
-    assert_array_equal(neurom_m.soma.points,
-                       [[1, 1, 1, 1],
-                        [2, 2, 2, 2]])
-
 
 def _check_cloned_morphology(m, m2):
     # check if two morphs are identical
@@ -115,10 +109,6 @@ def _check_cloned_morphology(m, m2):
     # neurites
     for neu1, neu2 in zip(m.neurites, m2.neurites):
         assert neu1 is not neu2
-
-    # check if changes are propagated between morphs
-    m2.soma.radius = 10.
-    assert m.soma.radius != m2.soma.radius
 
 
 def test_copy():

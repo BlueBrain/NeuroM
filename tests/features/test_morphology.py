@@ -62,12 +62,15 @@ with warnings.catch_warnings(record=True):
 
 def _add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
     """Add a neurite from the elevation and azimuth to a given morphology."""
+    mut = morph.to_morphio().as_mutable()
     new_pts = np.array(
         morphmath.vector_from_spherical(elevation, azimuth),
         ndmin=2
     )
+
     point_lvl = PointLevel(new_pts, [1])
-    morph.append_root_section(point_lvl, neurite_type)
+    mut.append_root_section(point_lvl, neurite_type)
+    return Morphology(mut)
 
 
 def test_soma_volume():
@@ -154,14 +157,23 @@ def test_trunk_section_lengths():
 
 
 def test_trunk_origin_radii():
-    morph = Morphology(SIMPLE)
-    morph.section(0).diameters = [2, 1]
-    morph.section(3).diameters = [2, 0.5]
-
+    morph = load_swc(
+    """
+     1 1  0  0 0 1. -1
+     2 3  0  0 0 1.0  1
+     3 3  0  5 0 0.5  2
+     4 3 -5  5 0 0.  3
+     5 3  6  5 0 0.  3
+     6 2  0  0 0 1.0  1
+     7 2  0 -4 0 0.25  6
+     8 2  6 -4 0 0.  7
+     9 2 -5 -4 0 0.  7
+    """
+    )
     ret = morphology.trunk_origin_radii(morph)
     assert ret == [1.0, 1.0]
 
-    ret = morphology.trunk_origin_radii(morph, min_length_filter=1)
+    ret = morphology.trunk_origin_radii(morph, min_length_filter=1.0)
     assert_array_almost_equal(ret, [0.5, 0.25])
 
     with pytest.warns(
@@ -259,8 +271,8 @@ def test_trunk_angles():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    morph = _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    morph = _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     ret = morphology.trunk_angles(morph)
     assert_array_almost_equal(ret, [np.pi / 2, 0.387596, 1.183199, 1.183199, 0.387596, np.pi / 2])
@@ -302,8 +314,8 @@ def test_trunk_angles_inter_types():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    morph = _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    morph = _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no source
     ret = morphology.trunk_angles_inter_types(
@@ -378,8 +390,8 @@ def test_trunk_angles_from_vector():
     morph = load_morphology(SWC_PATH / 'simple_trunk.swc')
 
     # Add two basals
-    _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
-    _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
+    morph = _add_neurite_trunk(morph, np.pi / 3, np.pi / 4)
+    morph = _add_neurite_trunk(morph, -np.pi / 3, -np.pi / 4)
 
     # Test with no neurite selected
     ret = morphology.trunk_angles_from_vector(

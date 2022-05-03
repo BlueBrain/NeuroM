@@ -46,34 +46,26 @@ class Section:
 
     def __init__(self, morphio_section):
         """The section constructor."""
-        self.morphio_section = morphio_section
+        self._morphio_section = morphio_section
+
+    def to_morphio(self):
+        """Returns the morphio section."""
+        return self._morphio_section
 
     @property
     def id(self):
         """Returns the section ID."""
-        return self.morphio_section.id
+        return self._morphio_section.id
 
     @property
     def parent(self):
         """Returns the parent section if non root section else None."""
-        if self.morphio_section.is_root:
-            return None
-        return Section(self.morphio_section.parent)
+        return None if self.is_root() else Section(self._morphio_section.parent)
 
     @property
     def children(self):
         """Returns a list of child section."""
-        return [Section(child) for child in self.morphio_section.children]
-
-    def append_section(self, section):
-        """Appends a section to the current section object.
-
-        Args:
-            section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
-        """
-        if isinstance(section, Section):
-            return self.morphio_section.append_section(section.morphio_section)
-        return self.morphio_section.append_section(section)
+        return [Section(child) for child in self._morphio_section.children]
 
     def is_homogeneous_point(self):
         """A section is homogeneous if it has the same type with its children."""
@@ -93,7 +85,7 @@ class Section:
 
     def is_root(self):
         """Is tree the root node?"""
-        return self.parent is None
+        return self._morphio_section.is_root
 
     def ipreorder(self):
         """Depth-first pre-order iteration of tree nodes."""
@@ -124,10 +116,10 @@ class Section:
         """
         if stop_node is None:
             def stop_condition(section):
-                return section.parent is None
+                return section.is_root()
         else:
             def stop_condition(section):
-                return section == stop_node
+                return section.is_root() or section == stop_node
 
         current_section = self
         while not stop_condition(current_section):
@@ -157,35 +149,23 @@ class Section:
 
     def __eq__(self, other):
         """Equal when its morphio section is equal."""
-        return self.morphio_section == other.morphio_section
+        return self.to_morphio().has_same_shape(other.to_morphio())
 
     def __hash__(self):
         """Hash of its id."""
         return self.id
 
-    def __nonzero__(self):
-        """If has children."""
-        return self.morphio_section is not None
-
-    __bool__ = __nonzero__
-
     @property
     def points(self):
         """Returns the section list of points the NeuroM way (points + radius)."""
-        return np.concatenate((self.morphio_section.points,
-                               self.morphio_section.diameters[:, np.newaxis] / 2.),
+        return np.concatenate((self._morphio_section.points,
+                               self._morphio_section.diameters[:, np.newaxis] / 2.),
                               axis=1)
-
-    @points.setter
-    def points(self, value):
-        """Set the points."""
-        self.morphio_section.points = np.copy(value[:, COLS.XYZ])
-        self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
 
     @property
     def type(self):
         """Returns the section type."""
-        return NeuriteType(int(self.morphio_section.type))
+        return NeuriteType(int(self._morphio_section.type))
 
     @property
     def length(self):
@@ -234,11 +214,11 @@ def _homogeneous_subtrees(neurite):
     sub-tree.
     """
     it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).morphio_section)]
+    homogeneous_neurites = [Neurite(next(it).to_morphio())]
 
     for section in it:
         if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.morphio_section))
+            homogeneous_neurites.append(Neurite(section.to_morphio()))
 
     homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
 
@@ -416,7 +396,7 @@ def graft_morphology(section):
     """Returns a morphology starting at section."""
     assert isinstance(section, Section)
     m = morphio.mut.Morphology()
-    m.append_root_section(section.morphio_section)
+    m.append_root_section(section.to_morphio())
     return Morphology(m)
 
 
@@ -429,7 +409,12 @@ class Neurite:
         Args:
             root_node (morphio.Section): root section
         """
-        self.morphio_root_node = root_node
+        self._root_node = root_node
+
+    @property
+    def morphio_root_node(self):
+        """Returns the morphio root section."""
+        return self._root_node
 
     @property
     def root_node(self):
@@ -504,10 +489,6 @@ class Neurite:
         """
         return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 
-    def __nonzero__(self):
-        """If has root node."""
-        return bool(self.morphio_root_node)
-
     def __eq__(self, other):
         """If root node ids and types are equal."""
         return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
@@ -516,37 +497,37 @@ class Neurite:
         """Hash is made of tuple of type and root_node."""
         return hash((self.type, self.root_node))
 
-    __bool__ = __nonzero__
-
     def __repr__(self):
         """Return a string representation."""
         return 'Neurite <type: %s>' % self.type
 
 
-class Morphology(morphio.mut.Morphology):
+class Morphology:
     """Class representing a simple morphology."""
 
     def __init__(self, filename, name=None):
         """Morphology constructor.
 
         Args:
-            filename (str|Path): a filename
-            name (str): a option morphology name
+            filename (str|Path): a filename or morphio.{mut}.Morphology object
+            name (str): an optional morphology name
         """
-        super().__init__(filename)
+        self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
         self.name = name if name else 'Morphology'
-        self.morphio_soma = super().soma
-        self.neurom_soma = make_soma(self.morphio_soma)
+        self.soma = make_soma(self._morphio_morph.soma)
 
-    @property
-    def soma(self):
-        """Corresponding soma."""
-        return self.neurom_soma
+    def to_morphio(self):
+        """Returns the morphio morphology object."""
+        return self._morphio_morph
 
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self.root_sections]
+        return [Neurite(root_section) for root_section in self._morphio_morph.root_sections]
+
+    def section(self, section_id):
+        """Returns the section with the given id."""
+        return Section(self._morphio_morph.section(section_id))
 
     @property
     def sections(self):
@@ -561,21 +542,22 @@ class Morphology(morphio.mut.Morphology):
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
-        obj = Morphology(self)
-        obj.morphio_soma.points = trans(obj.morphio_soma.points)
+        mut = self._morphio_morph.as_mutable()
+        mut.soma.points = trans(mut.soma.points)
 
-        for section in obj.sections:
-            section.morphio_section.points = trans(section.morphio_section.points)
-        return obj
+        for section in mut.iter():
+            section.points = trans(section.points)
+
+        return Morphology(mut)
 
     def __copy__(self):
         """Creates a deep copy of Morphology instance."""
-        return Morphology(self, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __deepcopy__(self, memodict={}):
         """Creates a deep copy of Morphology instance."""
         # pylint: disable=dangerous-default-value
-        return Morphology(self, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __repr__(self):
         """Return a string representation."""

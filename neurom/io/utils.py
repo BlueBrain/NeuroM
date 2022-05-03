@@ -155,7 +155,10 @@ def load_morphology(morph, reader=None):
                                                    )
                                                    )'''), reader='asc')
     """
-    if isinstance(morph, (Morphology, morphio.Morphology, morphio.mut.Morphology)):
+    if isinstance(morph, Morphology):
+        return Morphology(morph.to_morphio())
+
+    if isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
         return Morphology(morph)
 
     if reader:

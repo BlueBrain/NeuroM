@@ -98,10 +98,8 @@ def test_iter_population():
 
 
 def test_iter_sections_default():
-
-    ref = [s for n in POP.neurites for s in n.iter_sections()]
-    assert (ref ==
-                          [n for n in iter_sections(POP)])
+    ref = [s.id for n in POP.neurites for s in n.iter_sections()]
+    assert (ref == [n.id for n in iter_sections(POP)])
 
 def test_iter_sections_default_pop():
     ref = [s.id for n in POP.neurites for s in n.iter_sections()]
