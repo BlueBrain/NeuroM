@@ -82,15 +82,6 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 
 
 @feature(shape=())
-def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
-    """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = section_term_radial_distances(
-        neurite, origin=origin, section_type=section_type
-    )
-    return max(term_radial_distances) if term_radial_distances else 0.
-
-
-@feature(shape=())
 def number_of_segments(neurite, section_type=NeuriteType.all):
     """Number of segments."""
     return sum(_map_sections(sf.number_of_segments, neurite, section_type=section_type))
@@ -423,34 +414,48 @@ def diameter_power_relations(neurite, method='first', section_type=NeuriteType.a
     )
 
 
+def _radial_distances(neurite, origin, iterator_type, section_type):
+
+    if origin is None:
+        origin = neurite.root_node.points[0]
+
+    return _map_sections(
+        partial(sf.section_radial_distance, origin=origin),
+        neurite=neurite,
+        iterator_type=iterator_type,
+        section_type=section_type
+    )
+
+
 @feature(shape=(...,))
-def section_radial_distances(
-    neurite, origin=None, iterator_type=Section.ipreorder, section_type=NeuriteType.all
-):
+def section_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Section radial distances.
 
     The iterator_type can be used to select only terminal sections (ileaf)
     or only bifurcations (ibifurcation_point).
     """
-    pos = neurite.root_node.points[0] if origin is None else origin
-    return _map_sections(partial(sf.section_radial_distance, origin=pos),
-                         neurite,
-                         iterator_type,
-                         section_type=section_type)
+    return _radial_distances(neurite, origin, Section.ipreorder, section_type)
 
 
 @feature(shape=(...,))
 def section_term_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the termination sections."""
-    return section_radial_distances(neurite, origin, Section.ileaf, section_type=section_type)
+    return _radial_distances(neurite, origin, Section.ileaf, section_type)
+
+
+@feature(shape=())
+def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
+    """Get the maximum radial distances of the termination sections."""
+    term_radial_distances = section_term_radial_distances(
+        neurite, origin=origin, section_type=section_type
+    )
+    return max(term_radial_distances) if term_radial_distances else 0.
 
 
 @feature(shape=(...,))
 def section_bif_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the bf sections."""
-    return section_radial_distances(
-        neurite, origin, Section.ibifurcation_point, section_type=section_type
-    )
+    return _radial_distances(neurite, origin, Section.ibifurcation_point, section_type)
 
 
 @feature(shape=(...,))
