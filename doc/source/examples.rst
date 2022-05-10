@@ -35,15 +35,15 @@ Examples
     started *with the virtualenv activated*. That gives access to the ``neurom``
     installation.
 
-Fast analysis with :py:mod:`neurom`
+Analysis with :py:mod:`neurom`
 ***********************************
 
 Here we load a morphology and obtain some information from it:
 
-.. code-block:: python
+.. doctest:: [examples]
 
     >>> import neurom as nm
-    >>> m = nm.load_morphology('some/data/path/morph_file.swc')
+    >>> m = nm.load_morphology("tests/data/swc/Neuron.swc")
     >>> ap_seg_len = nm.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
     >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
@@ -54,7 +54,7 @@ Morphology visualization with the :py:mod:`neurom.viewer` module
 Here we visualize a morphology:
 
 
-.. code-block:: python
+.. doctest:: [examples]
 
     >>> # Initialize m as above
     >>> from neurom import viewer
@@ -89,7 +89,7 @@ Getting Log Information
 They are emitted in the ``neurom`` namespace, and can thus be filtered based
 on this.  An example of setting up a handler is:
 
-.. code-block:: python
+.. doctest::
 
     >>> import logging
     >>> # setup which namespace will be examined, and at what level

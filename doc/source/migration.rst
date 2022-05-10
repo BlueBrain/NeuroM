@@ -36,12 +36,12 @@ Migration to v3 version
 
 - ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 
-   .. code-block:: python
+   .. testcode::
 
       import neurom as nm
       # instead of: from neurom import viewer
       from neurom.view import matplotlib_impl, matplotlib_utils
-      m = nm.load_morphology('some/data/path/morph_file.asc')
+      m = nm.load_morphology('tests/data/swc/Neuron.swc')
 
       # instead of: viewer.draw(m)
       matplotlib_impl.plot_morph(m)
@@ -56,12 +56,13 @@ Migration to v3 version
       fig, ax = matplotlib_utils.get_figure()
       matplotlib_impl.plot_dendrogram(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
-      matplotlib_utils.save_plot(fig=fig, output_path=output_path)
+      matplotlib_utils.save_plot(fig=fig, output_path="output-directory-path")
+
       # for other plots like `plot_morph` it is the same, you just need to call `plot_morph` instead
       # of `plot_dendrogram`.
 
       # instead of `plotly.draw`
-      from neurom import plotly_impl
+      from neurom.view import plotly_impl
       plotly_impl.plot_morph(m)  # for 2d
       plotly_impl.plot_morph3d(m)  # for 3d
 

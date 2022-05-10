@@ -48,18 +48,25 @@ only to a morphology or a morphology population.
 
 An example for ``neurite``:
 
-.. code-block:: python
+.. testcode::
 
-   from neurom import load_morphology, features
-   from neurom.features.neurite import max_radial_distance
+    from neurom import load_morphology, features
+    from neurom.features.neurite import max_radial_distance
 
-   m = load_morphology('path/to/morphology')
-   # valid input
-   max_radial_distance(m.neurites[0])
-   # invalid input
-   max_radial_distance(m)
-   # valid input
-   features.get('max_radial_distance', m)
+    m = load_morphology(morphology_path)
+
+    # valid input
+    rd = max_radial_distance(m.neurites[0])
+
+    # invalid input
+    try:
+        rd = max_radial_distance(m)
+    except Exception as e:
+        pass
+
+    # valid input
+    rd = features.get('max_radial_distance', m)
+
 
 The features mechanism assumes that a neurite feature must be summed if it returns a number, and
 concatenated if it returns a list. Other types of returns are invalid. For example lets take
@@ -69,33 +76,39 @@ Calling it on a morphology population will return a list of ``number_of_segments
 within the population.
 
 
-.. code-block:: python
+.. testcode::
 
-   from neurom import load_morphology, features
+   from neurom import load_morphology, load_morphologies, features
 
-   m = load_morphology('path/to/morphology')
+   m = load_morphology(morphology_path)
+
    # a single number
    features.get('number_of_segments', m.neurites[0])
+
    # a single number that is a sum for all `m.neurites`.
    features.get('number_of_segments', m)
 
-   pop = load_morphology('path/to/morphology population')
+   pop = load_morphologies(morphologies_dir)
+
    # a list of numbers
    features.get('number_of_segments', pop)
 
 if a list is returned then the feature results are concatenated.
 
-.. code-block:: python
+.. testcode::
 
-   from neurom import load_morphology, features
+   from neurom import load_morphology, load_morphologies, features
 
-   m = load_morphology('path/to/morphology')
+   m = load_morphology(morphology_path)
+
    # a list of lengths in a neurite
    features.get('section_lengths', m.neurites[0])
+
    # a flat list of lengths in a morphology, no separation among neurites
    features.get('section_lengths', m)
 
-   pop = load_morphology('path/to/morphology population')
+   pop = load_morphologies(morphologies_dir)
+
    # a flat list of lengths in a population, no separation among morphologies
    features.get('section_lengths', pop)
 
