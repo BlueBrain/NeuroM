@@ -66,7 +66,7 @@ extensions = [
 # code that will be executed for each test
 doctest_global_setup = """
 
-morphology_path = "../tests/data/swc/simple.swc"
+morphology_path = "../tests/data/swc/Neuron.swc"
 morphologies_dir = "../tests/data/valid_set/"
 
 """
