@@ -83,6 +83,7 @@ def extract_dataframe(morphs, config, n_workers=1, use_subtrees=False):
             - morphology: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole morphology.
         n_workers (int): number of workers for multiprocessing (on collection of morphs)
+        use_subtrees (bool): Enable of heterogeneous subtree processing.
 
     Returns:
         The extracted statistics
@@ -182,6 +183,7 @@ def extract_stats(morphs, config, use_subtrees=False):
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
             - morphology: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole morphology.
+        use_subtrees (bool): Enable of heterogeneous subtree processing.
 
     Returns:
         The extracted statistics
