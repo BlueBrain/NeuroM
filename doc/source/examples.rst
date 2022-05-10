@@ -48,7 +48,7 @@ Here we load a morphology and obtain some information from it:
     >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
 
-Morphology visualization with the :py:mod:`neurom.viewer` module
+Morphology visualization with the :py:mod:`neurom.view` module
 ****************************************************************
 
 Here we visualize a morphology:
@@ -57,12 +57,10 @@ Here we visualize a morphology:
 .. doctest:: [examples]
 
     >>> # Initialize m as above
-    >>> from neurom import viewer
-    >>> fig, ax = viewer.draw(m)
-    >>> fig.show()
-    >>>
-    >>> fig, ax = viewer.draw(m, mode='3d') # valid modes '2d', '3d', 'dendrogram'
-    >>> fig.show()
+    >>> from neurom.view import plot_morph, plot_morph3d, plot_dendrogram
+    >>> plot_morph(m)
+    >>> plot_morph3d(m)
+    >>> plot_dendrogram(m)
 
 Advanced iterator-based feature extraction example
 **************************************************
