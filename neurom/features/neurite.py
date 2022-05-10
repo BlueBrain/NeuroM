@@ -35,7 +35,7 @@ apply it to anything other than neurite then you must use the features mechanism
 
 >>> import neurom
 >>> from neurom import features
->>> m = neurom.load_morphology(morphology_path)
+>>> m = neurom.load_morphology("tests/data/swc/Neuron.swc")
 >>> max_radial_distances1 = features.get('max_radial_distance', m.neurites)
 >>> max_radial_distances2 = features.get('max_radial_distance', m.neurites[0])
 >>> max_radial_distances3 = features.get('max_radial_distance', m)

@@ -53,7 +53,7 @@ An example for ``neurite``:
     from neurom import load_morphology, features
     from neurom.features.neurite import max_radial_distance
 
-    m = load_morphology(morphology_path)
+    m = load_morphology("tests/data/swc/Neuron.swc")
 
     # valid input
     rd = max_radial_distance(m.neurites[0])
@@ -80,7 +80,7 @@ within the population.
 
    from neurom import load_morphology, load_morphologies, features
 
-   m = load_morphology(morphology_path)
+   m = load_morphology("tests/data/swc/Neuron.swc")
 
    # a single number
    features.get('number_of_segments', m.neurites[0])
@@ -88,7 +88,7 @@ within the population.
    # a single number that is a sum for all `m.neurites`.
    features.get('number_of_segments', m)
 
-   pop = load_morphologies(morphologies_dir)
+   pop = load_morphologies("tests/data/valid_set")
 
    # a list of numbers
    features.get('number_of_segments', pop)
@@ -99,7 +99,7 @@ if a list is returned then the feature results are concatenated.
 
    from neurom import load_morphology, load_morphologies, features
 
-   m = load_morphology(morphology_path)
+   m = load_morphology("tests/data/swc/Neuron.swc")
 
    # a list of lengths in a neurite
    features.get('section_lengths', m.neurites[0])
@@ -107,7 +107,7 @@ if a list is returned then the feature results are concatenated.
    # a flat list of lengths in a morphology, no separation among neurites
    features.get('section_lengths', m)
 
-   pop = load_morphologies(morphologies_dir)
+   pop = load_morphologies("tests/data/valid_set")
 
    # a flat list of lengths in a population, no separation among morphologies
    features.get('section_lengths', pop)

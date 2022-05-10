@@ -255,7 +255,7 @@ def iter_neurites(
 
         >>> from neurom.core.morphology import iter_neurites
         >>> from neurom import load_morphologies
-        >>> pop = load_morphologies(morphologies_dir)
+        >>> pop = load_morphologies("tests/data/valid_set")
         >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
 
         Get the number of points in each axon in a morphology population
@@ -263,7 +263,7 @@ def iter_neurites(
         >>> import neurom as nm
         >>> from neurom.core.morphology import iter_neurites
         >>> from neurom import load_morphologies
-        >>> pop = load_morphologies(morphologies_dir)
+        >>> pop = load_morphologies("tests/data/valid_set")
         >>> filter = lambda n : n.type == nm.AXON
         >>> mapping = lambda n : len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]

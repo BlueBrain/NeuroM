@@ -86,7 +86,7 @@ def tree_type_checker(*ref):
         >>> import neurom
         >>> from neurom.core.types import NeuriteType, tree_type_checker
         >>> from neurom.core.morphology import Section, iter_neurites
-        >>> m = neurom.load_morphology(morphology_path)
+        >>> m = neurom.load_morphology("tests/data/swc/Neuron.swc")
         >>>
         >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
         >>> it = iter_neurites(m, filt=tree_filter)
