@@ -83,6 +83,16 @@ def test_morph_stat_full_config():
         assert not df.empty
 
 
+def test_morph_stat_full_config__subtrees():
+    runner = CliRunner()
+    filename = DATA / 'h5/v1/Neuron.h5'
+    with tempfile.NamedTemporaryFile() as f:
+        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--use-subtrees', '--output', f.name])
+        assert result.exit_code == 0
+        df = pd.read_csv(f)
+        assert not df.empty
+
+
 def test_morph_stat_invalid_config():
     runner = CliRunner()
     with tempfile.NamedTemporaryFile('w') as config_f:
