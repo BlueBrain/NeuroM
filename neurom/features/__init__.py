@@ -32,7 +32,7 @@ Examples:
     Obtain some morphometrics
     >>> import neurom
     >>> from neurom import features
-    >>> m = neurom.load_morphology('path/to/morphology')
+    >>> m = neurom.load_morphology(morphology_path)
     >>> ap_seg_len = features.get('segment_lengths', m, neurite_type=neurom.APICAL_DENDRITE)
     >>> ax_sec_len = features.get('section_lengths', m, neurite_type=neurom.AXON)
 """

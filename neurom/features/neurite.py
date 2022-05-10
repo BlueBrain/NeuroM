@@ -35,10 +35,11 @@ apply it to anything other than neurite then you must use the features mechanism
 
 >>> import neurom
 >>> from neurom import features
->>> m = neurom.load_morphology('path/to/morphology')
->>> features.get('max_radial_distance', m.neurites[0])
->>> features.get('max_radial_distance', m)
->>> features.get('number_of_segments', m.neurites, neurite_type=neurom.AXON)
+>>> m = neurom.load_morphology(morphology_path)
+>>> max_radial_distances1 = features.get('max_radial_distance', m.neurites)
+>>> max_radial_distances2 = features.get('max_radial_distance', m.neurites[0])
+>>> max_radial_distances3 = features.get('max_radial_distance', m)
+>>> n_segments = features.get('number_of_segments', m, neurite_type=neurom.AXON)
 
 For more details see :ref:`features`.
 """

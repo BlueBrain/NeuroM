@@ -33,8 +33,8 @@ namespace can only accept a morphology population as its input no matter how cal
 
 >>> import neurom
 >>> from neurom import features
->>> pop = neurom.load_morphologies('path/to/morphs')
->>> features.get('sholl_frequency', pop)
+>>> pop = neurom.load_morphologies(morphologies_dir)
+>>> frequencies = features.get('sholl_frequency', pop)
 
 For more details see :ref:`features`.
 """
