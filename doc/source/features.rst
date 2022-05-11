@@ -59,10 +59,7 @@ An example for ``neurite``:
     rd = max_radial_distance(m.neurites[0])
 
     # invalid input
-    try:
-        rd = max_radial_distance(m)
-    except Exception as e:
-        pass
+    # rd = max_radial_distance(m)
 
     # valid input
     rd = features.get('max_radial_distance', m)

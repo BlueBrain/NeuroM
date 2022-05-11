@@ -56,7 +56,7 @@ Migration to v3 version
       fig, ax = matplotlib_utils.get_figure()
       matplotlib_impl.plot_dendrogram(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
-      matplotlib_utils.save_plot(fig=fig, output_path="output-directory-path")
+      # matplotlib_utils.save_plot(fig=fig, output_path="output-directory-path")
 
       # for other plots like `plot_morph` it is the same, you just need to call `plot_morph` instead
       # of `plot_dendrogram`.
