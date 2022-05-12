@@ -3,6 +3,7 @@ import warnings
 import pytest
 import neurom
 import numpy as np
+import pandas as pd
 import numpy.testing as npt
 from neurom import NeuriteType
 from neurom.features import get
@@ -14,6 +15,7 @@ from neurom.core.types import tree_type_checker as is_type
 
 import neurom.core.morphology
 import neurom.features.neurite
+import neurom.apps.morph_stats
 
 
 @pytest.fixture
@@ -238,6 +240,148 @@ def test_features_neurite_map_sections__heterogeneous(mixed_morph):
         apical, NeuriteType.apical_dendrite, neurom.core.morphology.Section.ibifurcation_point,
         [14, 15],
     )
+
+
+def test_mixed_morph_stats(mixed_morph):
+
+    def assert_stats_equal(actual_dict, expected_dict):
+        assert actual_dict.keys() == expected_dict.keys()
+        for (key, value) in actual_dict.items():
+            expected_value = expected_dict[key]
+            if value is None or expected_value is None:
+                assert expected_value is value
+            else:
+                npt.assert_almost_equal(value, expected_value, decimal=3, err_msg=f"\nKey: {key}")
+
+    cfg = {
+        'neurite': {
+            'max_radial_distance': ['mean'],
+            'number_of_sections': ['min'],
+            'number_of_bifurcations': ['max'],
+            'number_of_leaves': ['median'],
+            'total_length': ['min'],
+            'total_area': ['max'],
+            'total_volume': ['median'],
+            'section_lengths': ['mean'],
+            'section_term_lengths': ['mean'],
+            'section_bif_lengths': ['mean'],
+            'section_branch_orders': ['mean'],
+            'section_bif_branch_orders': ['mean'],
+            'section_term_branch_orders': ['mean'],
+            'section_path_distances': ['mean'],
+            'section_taper_rates': ['median'],
+            'local_bifurcation_angles': ['mean'],
+            'remote_bifurcation_angles': ['mean'],
+            'partition_asymmetry': ['mean'],
+            'partition_asymmetry_length': ['mean'],
+            'sibling_ratios': ['mean'],
+            'diameter_power_relations': ['median'],
+            'section_radial_distances': ['mean'],
+            'section_term_radial_distances': ['mean'],
+            'section_bif_radial_distances': ['mean'],
+            'terminal_path_lengths': ['mean'],
+            'section_volumes': ['min'],
+            'section_areas': ['mean'],
+            'section_tortuosity': ['mean'],
+            'section_strahler_orders': ['min']
+        },
+        'morphology': {
+            'soma_surface_area': ['mean'],
+            'soma_radius': ['max'],
+            'max_radial_distance': ['mean'],
+            'number_of_sections_per_neurite': ['median'],
+            'total_length_per_neurite': ['mean'],
+            'total_area_per_neurite': ['mean'],
+            'total_volume_per_neurite': ['mean'],
+            'number_of_neurites': ['median']
+        },
+        'neurite_type': ['AXON', 'BASAL_DENDRITE', 'APICAL_DENDRITE']
+    }
+
+    res = neurom.apps.morph_stats.extract_stats(mixed_morph, cfg, use_subtrees=False)
+
+    expected_axon_wout_subtrees = {
+        'max_number_of_bifurcations': 0,
+        'max_total_area': 0,
+        'mean_local_bifurcation_angles': None,
+        'mean_max_radial_distance': 0.0,
+        'mean_partition_asymmetry': None,
+        'mean_partition_asymmetry_length': None,
+        'mean_remote_bifurcation_angles': None,
+        'mean_section_areas': None,
+        'mean_section_bif_branch_orders': None,
+        'mean_section_bif_lengths': None,
+        'mean_section_bif_radial_distances': None,
+        'mean_section_branch_orders': None,
+        'mean_section_lengths': None,
+        'mean_section_path_distances': None,
+        'mean_section_radial_distances': None,
+        'mean_section_term_branch_orders': None,
+        'mean_section_term_lengths': None,
+        'mean_section_term_radial_distances': None,
+        'mean_section_tortuosity': None,
+        'mean_sibling_ratios': None,
+        'mean_terminal_path_lengths': None,
+        'median_diameter_power_relations': None,
+        'median_number_of_leaves': 0,
+        'median_section_taper_rates': None,
+        'median_total_volume': 0,
+        'min_number_of_sections': 0,
+        'min_section_strahler_orders': None,
+        'min_section_volumes': None,
+        'min_total_length': 0
+    }
+
+    assert_stats_equal(res["axon"], expected_axon_wout_subtrees)
+
+    res_df = neurom.apps.morph_stats.extract_dataframe(mixed_morph, cfg, use_subtrees=False)
+
+    # get axon column and tranform it to look like the expected values above
+    values = res_df.loc[pd.IndexSlice[:, "axon"]].iloc[0, :].to_dict()
+    assert_stats_equal(values, expected_axon_wout_subtrees)
+
+
+    res = neurom.apps.morph_stats.extract_stats(mixed_morph, cfg, use_subtrees=True)
+
+    expected_axon_with_subtrees = {
+        'max_number_of_bifurcations': 2,
+        'max_total_area': 3.4018507611950346,
+        'mean_local_bifurcation_angles': 2.356194490192345,
+        'mean_max_radial_distance': 4.472136,
+        'mean_partition_asymmetry': 0.25,
+        'mean_partition_asymmetry_length': 0.1846990320847273,
+        'mean_remote_bifurcation_angles': 2.356194490192345,
+        'mean_section_areas': 0.6803701522390069,
+        'mean_section_bif_branch_orders': 1.5,
+        'mean_section_bif_lengths': 1.2071068,
+        'mean_section_bif_radial_distances': 3.9240959,
+        'mean_section_branch_orders': 2.2,
+        'mean_section_lengths': 1.0828427,
+        'mean_section_path_distances': 2.614213538169861,
+        'mean_section_radial_distances': 4.207625,
+        'mean_section_term_branch_orders': 2.6666666666666665,
+        'mean_section_term_lengths': 1.0,
+        'mean_section_term_radial_distances': 4.396645,
+        'mean_section_tortuosity': 1.0,
+        'mean_sibling_ratios': 1.0,
+        'mean_terminal_path_lengths': 3.0808802048365274,
+        'median_diameter_power_relations': 2.0,
+        'median_number_of_leaves': 3,
+        'median_section_taper_rates': 8.6268466e-17,
+        'median_total_volume': 0.17009254152367845,
+        'min_number_of_sections': 5,
+        'min_section_strahler_orders': 1,
+        'min_section_volumes': 0.03141592778425469,
+        'min_total_length': 5.414213538169861
+    }
+
+    assert_stats_equal(res["axon"], expected_axon_with_subtrees)
+
+    res_df = neurom.apps.morph_stats.extract_dataframe(mixed_morph, cfg, use_subtrees=True)
+
+    # get axon column and tranform it to look like the expected values above
+    values = res_df.loc[pd.IndexSlice[:, "axon"]].iloc[0, :].to_dict()
+    assert_stats_equal(values, expected_axon_with_subtrees)
 
 
 @pytest.fixture

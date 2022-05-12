@@ -4,6 +4,7 @@ Changelog
 Version 4.0.0
 -------------
 
+- Mixed subtree processing can be used in morph_stats app via the use_subtrees flag.
 - ``neurom.view.[plot_tree|plot_tree3d|plot_soma|plot_soma3D]`` were hidden from the
   neurom.view module. They can still be imported from neurom.view.matplotlib_impl.
 - Deprecated modules and classes were removed.

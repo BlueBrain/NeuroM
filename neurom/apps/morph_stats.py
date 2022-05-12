@@ -59,14 +59,14 @@ EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
-def _run_extract_stats(morph, config):
+def _run_extract_stats(morph, config, use_subtrees=False):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
     if not isinstance(morph, Morphology):
         morph = nm.load_morphology(morph)
-    return morph.name, extract_stats(morph, config)
+    return morph.name, extract_stats(morph, config, use_subtrees=use_subtrees)
 
 
-def extract_dataframe(morphs, config, n_workers=1):
+def extract_dataframe(morphs, config, n_workers=1, use_subtrees=False):
     """Extract stats grouped by neurite type from morphs.
 
     Arguments:
@@ -83,6 +83,7 @@ def extract_dataframe(morphs, config, n_workers=1):
             - morphology: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole morphology.
         n_workers (int): number of workers for multiprocessing (on collection of morphs)
+        use_subtrees (bool): Enable of heterogeneous subtree processing.
 
     Returns:
         The extracted statistics
@@ -94,7 +95,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     if isinstance(morphs, Morphology):
         morphs = [morphs]
 
-    func = partial(_run_extract_stats, config=config)
+    func = partial(_run_extract_stats, config=config, use_subtrees=use_subtrees)
     if n_workers == 1:
         stats = list(map(func, morphs))
     else:
@@ -114,12 +115,12 @@ def extract_dataframe(morphs, config, n_workers=1):
 extract_dataframe.__doc__ += str(EXAMPLE_CONFIG)
 
 
-def _get_feature_stats(feature_name, morphs, modes, kwargs):
+def _get_feature_stats(feature_name, morphs, modes, use_subtrees=False, **kwargs):
     """Insert the stat data in the dict.
 
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
-    def stat_name_format(mode, feature_name, kwargs):
+    def stat_name_format(mode, feature_name, **kwargs):
         """Returns the key name for the data dictionary.
 
         The key is a combination of the mode, feature_name and an optional suffix of all the extra
@@ -135,14 +136,16 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
         return f"{mode}_{feature_name}"
 
     data = {}
-    value, func = _get_feature_value_and_func(feature_name, morphs, **kwargs)
+    value, func = _get_feature_value_and_func(
+        feature_name, morphs, use_subtrees=use_subtrees, **kwargs
+    )
     shape = func.shape
     if len(shape) > 2:
         raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
 
     for mode in modes:
 
-        stat_name = stat_name_format(mode, feature_name, kwargs)
+        stat_name = stat_name_format(mode, feature_name, **kwargs)
 
         stat = value
         if isinstance(value, Sized):
@@ -161,7 +164,7 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
     return data
 
 
-def extract_stats(morphs, config):
+def extract_stats(morphs, config, use_subtrees=False):
     """Extract stats from morphs.
 
     Arguments:
@@ -180,6 +183,7 @@ def extract_stats(morphs, config):
                   ['min', 'max', 'median', 'mean', 'std', 'raw', 'sum']
             - morphology: same as neurite entry, but it will not be run on each neurite_type,
               but only once on the whole morphology.
+        use_subtrees (bool): Enable of heterogeneous subtree processing.
 
     Returns:
         The extracted statistics
@@ -215,12 +219,18 @@ def extract_stats(morphs, config):
                     for neurite_type in types:
                         feature_kwargs["neurite_type"] = neurite_type
                         stats[neurite_type.name].update(
-                            _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                            _get_feature_stats(
+                                feature_name, morphs, modes,
+                                use_subtrees=use_subtrees, **feature_kwargs
+                            )
                         )
 
                 else:
                     stats[category].update(
-                        _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                        _get_feature_stats(
+                            feature_name, morphs, modes,
+                            use_subtrees=use_subtrees, **feature_kwargs
+                        )
                     )
 
     return dict(stats)
@@ -347,7 +357,15 @@ def _sanitize_config(config):
     return config
 
 
-def main(datapath, config, output_file, is_full_config, as_population, ignored_exceptions):
+def main(
+    datapath,
+    config,
+    output_file,
+    is_full_config,
+    as_population,
+    ignored_exceptions,
+    use_subtrees=False
+):
     """Main function that get statistics for morphologies.
 
     Args:
@@ -357,6 +375,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
         is_full_config (bool): should be statistics made over all possible features, modes, neurites
         as_population (bool): treat ``datapath`` as directory of morphologies population
         ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
+        use_subtrees (bool): Enable of heterogeneous subtree processing
     """
     config = full_config() if is_full_config else get_config(config, EXAMPLE_CONFIG)
 
@@ -374,9 +393,9 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
     )
 
     if as_population:
-        results = {datapath: extract_stats(morphs, config)}
+        results = {datapath: extract_stats(morphs, config, use_subtrees=use_subtrees)}
     else:
-        results = {m.name: extract_stats(m, config) for m in morphs}
+        results = {m.name: extract_stats(m, config, use_subtrees=use_subtrees) for m in morphs}
 
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))

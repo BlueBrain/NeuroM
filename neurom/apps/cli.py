@@ -95,9 +95,13 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
               help='If enabled the directory is treated as a population')
 @click.option('-I', '--ignored-exceptions', help='Exception to ignore',
               type=click.Choice(morph_stats.IGNORABLE_EXCEPTIONS.keys()))
-def stats(datapath, config, output, full_config, as_population, ignored_exceptions):
+@click.option('--use-subtrees', is_flag=True, show_default=True, default=False,
+              help="Enable mixed subtree processing.")
+def stats(datapath, config, output, full_config, as_population, ignored_exceptions, use_subtrees):
     """Cli for apps/morph_stats."""
-    morph_stats.main(datapath, config, output, full_config, as_population, ignored_exceptions)
+    morph_stats.main(
+        datapath, config, output, full_config, as_population, ignored_exceptions, use_subtrees
+    )
 
 
 @cli.command(short_help='Perform checks on morphologies, more details at'
