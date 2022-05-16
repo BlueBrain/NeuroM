@@ -12,7 +12,6 @@ jobs:
   trigger-binder-build:
     name: Launch the build of the docker image used by MyBinder
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: s-weigand/trigger-mybinder-build@v1
         with:
