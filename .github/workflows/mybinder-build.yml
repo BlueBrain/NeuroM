@@ -1,0 +1,22 @@
+name: Trigger MyBinder build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+    #tags:
+    #  - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  trigger-binder-build:
+    name: Launch the build of the docker image used by MyBinder
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: s-weigand/trigger-mybinder-build@v1
+        with:
+          target-repo: BlueBrain/NeuroM
+          service-name: gh
+          target-state: ${{github.ref_name}}
+          debug: true
