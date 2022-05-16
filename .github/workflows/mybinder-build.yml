@@ -16,6 +16,7 @@ jobs:
       - uses: s-weigand/trigger-mybinder-build@v1
         with:
           target-repo: BlueBrain/NeuroM
+          target-state: master
           service-name: gh
           target-state: ${{github.ref_name}}
           debug: true
