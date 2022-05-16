@@ -12,11 +12,10 @@ jobs:
   trigger-binder-build:
     name: Launch the build of the docker image used by MyBinder
     runs-on: ubuntu-latest
-    continue-on-error: false
     steps:
       - uses: s-weigand/trigger-mybinder-build@v1
         with:
           target-repo: BlueBrain/NeuroM
           service-name: gh
           target-state: master
-          debug: true
+          debug: false
