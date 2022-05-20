@@ -30,19 +30,18 @@
 
 import numpy as np
 
-
 try:
     import plotly.graph_objs as go
-    from plotly.offline import plot, iplot, init_notebook_mode
+    from plotly.offline import init_notebook_mode, iplot, plot
 except ImportError as e:
     raise ImportError(
         'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]'
     ) from e
 
-from neurom import COLS, iter_segments, iter_neurites
+from neurom import COLS, iter_neurites, iter_segments
 from neurom.core.morphology import Morphology
-from neurom.view.matplotlib_impl import TREE_COLOR
 from neurom.utils import flatten
+from neurom.view.matplotlib_impl import TREE_COLOR
 
 
 def plot_morph(morph, plane='xy', inline=False, **kwargs):

@@ -38,6 +38,7 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
+
 from neurom.core.morphology import Morphology
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError

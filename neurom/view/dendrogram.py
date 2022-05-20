@@ -29,9 +29,10 @@
 """Dendrogram helper functions and class."""
 
 import numpy as np
+
 from neurom import NeuriteType
-from neurom.core.morphology import Neurite, Morphology
 from neurom.core.dataformat import COLS
+from neurom.core.morphology import Morphology, Neurite
 from neurom.morphmath import interval_lengths
 
 

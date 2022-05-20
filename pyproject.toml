@@ -9,3 +9,7 @@ build-backend = "setuptools.build_meta"
 testpaths = [
     "tests",
 ]
+
+[isort]
+profile = "black"
+line_length = 100

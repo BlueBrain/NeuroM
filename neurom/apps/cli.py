@@ -33,8 +33,8 @@ from functools import partial
 import click
 import matplotlib.pyplot as plt
 
-from neurom.apps import morph_stats, morph_check
 from neurom import load_morphology
+from neurom.apps import morph_check, morph_stats
 from neurom.view import matplotlib_impl, matplotlib_utils
 
 

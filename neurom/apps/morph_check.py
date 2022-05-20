@@ -30,7 +30,9 @@
 
 import json
 from pathlib import Path
+
 import pkg_resources
+
 from neurom.apps import get_config
 from neurom.check.runner import CheckRunner
 

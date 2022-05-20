@@ -30,9 +30,9 @@
 import logging
 
 from morphio import MorphioError
+
 import neurom
 from neurom.exceptions import NeuroMError
-
 
 L = logging.getLogger(__name__)
 

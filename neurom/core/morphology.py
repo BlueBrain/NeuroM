@@ -28,16 +28,17 @@
 
 """Morphology classes and functions."""
 
-from collections import deque
 import warnings
+from collections import deque
 
 import morphio
 import numpy as np
+
 from neurom import morphmath
-from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
-from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.core.population import Population
+from neurom.core.soma import make_soma
+from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.utils import flatten
 
 

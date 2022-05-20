@@ -47,15 +47,17 @@ import logging
 from functools import partial
 
 import numpy as np
-from neurom import morphmath
-from neurom import utils
-from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section, iter_points
-from neurom.core.dataformat import COLS
-from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
-from neurom.morphmath import convex_hull
-from neurom.core.types import tree_type_checker as is_type
 
+from neurom import morphmath, utils
+from neurom.core.dataformat import COLS
+from neurom.core.morphology import Section, iter_points
+from neurom.core.types import NeuriteType
+from neurom.core.types import tree_type_checker as is_type
+from neurom.features import NameSpace
+from neurom.features import bifurcation as bf
+from neurom.features import feature
+from neurom.features import section as sf
+from neurom.morphmath import convex_hull
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 

@@ -37,7 +37,6 @@ from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 from scipy.linalg import norm
 from scipy.spatial import ConvexHull
 
-
 plt = None  # refer to _get_plt()
 
 

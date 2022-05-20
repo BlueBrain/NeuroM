@@ -43,25 +43,25 @@ The features mechanism does not allow you to apply these features to neurites.
 For more details see :ref:`features`.
 """
 
-import warnings
-
-from functools import partial
-from collections.abc import Iterable
 import math
+import warnings
+from collections.abc import Iterable
+from functools import partial
+
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import (
-    iter_neurites, iter_sections, iter_segments, iter_points, Morphology
-)
-from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
+from neurom.core.morphology import (Morphology, iter_neurites, iter_points,
+                                    iter_sections, iter_segments)
 from neurom.core.types import NeuriteType
+from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
-from neurom.features import feature, NameSpace, neurite as nf, section as sf
-from neurom.utils import str_to_plane, flatten
+from neurom.features import NameSpace, feature
+from neurom.features import neurite as nf
+from neurom.features import section as sf
 from neurom.morphmath import convex_hull
-
+from neurom.utils import flatten, str_to_plane
 
 feature = partial(feature, namespace=NameSpace.NEURON)
 

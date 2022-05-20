@@ -34,7 +34,7 @@ import numpy as np
 
 import neurom.morphmath
 from neurom.core.dataformat import COLS
-from neurom.geom.transform import translate, rotate
+from neurom.geom.transform import rotate, translate
 
 L = logging.getLogger(__name__)
 

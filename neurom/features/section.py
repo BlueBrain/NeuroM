@@ -32,8 +32,7 @@ import numpy as np
 
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
-from neurom.core.morphology import iter_segments
-from neurom.core.morphology import Section
+from neurom.core.morphology import Section, iter_segments
 from neurom.morphmath import interval_lengths
 
 

@@ -29,7 +29,9 @@
 """Type enumerations."""
 
 from enum import IntEnum, unique
+
 from morphio import SectionType
+
 from neurom.utils import OrderedEnum
 
 

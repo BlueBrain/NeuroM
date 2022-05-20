@@ -27,17 +27,16 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Mathematical and geometrical functions used to compute morphometrics."""
-import math
 import logging
+import math
 from itertools import combinations
 
 import numpy as np
 from scipy.spatial import ConvexHull
-from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import cdist
+from scipy.spatial.qhull import QhullError
 
 from neurom.core.dataformat import COLS
-
 
 L = logging.getLogger(__name__)
 
