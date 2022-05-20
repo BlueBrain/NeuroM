@@ -30,6 +30,7 @@
 import logging
 
 import yaml
+
 from neurom.exceptions import ConfigError
 
 L = logging.getLogger(__name__)

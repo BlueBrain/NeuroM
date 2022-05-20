@@ -39,19 +39,20 @@ from collections.abc import Sized
 from copy import deepcopy
 from functools import partial
 from pathlib import Path
-import pkg_resources
+
 import numpy as np
 import pandas as pd
+import pkg_resources
 from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
 from neurom.core.morphology import Morphology
 from neurom.exceptions import ConfigError
-from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
-    _get_feature_value_and_func
+from neurom.features import (_MORPHOLOGY_FEATURES, _NEURITE_FEATURES,
+                             _POPULATION_FEATURES, _get_feature_value_and_func)
 from neurom.io.utils import get_files_by_path
-from neurom.utils import flatten, NeuromJSON
+from neurom.utils import NeuromJSON, flatten
 
 L = logging.getLogger(__name__)
 

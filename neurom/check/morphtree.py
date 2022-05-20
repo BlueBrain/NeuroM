@@ -29,8 +29,9 @@
 """Python module of NeuroM to check morphology trees."""
 
 import numpy as np
-from neurom.core.dataformat import COLS
+
 from neurom import morphmath as mm
+from neurom.core.dataformat import COLS
 from neurom.morphmath import principal_direction_extent
 
 

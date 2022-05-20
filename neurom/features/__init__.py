@@ -40,11 +40,12 @@ Examples:
 import inspect
 import operator
 from enum import Enum
-from functools import reduce, partial
+from functools import partial, reduce
 
-from neurom.core import Population, Morphology, Neurite
+from neurom.core import Morphology, Neurite, Population
 from neurom.core.morphology import iter_neurites
-from neurom.core.types import NeuriteType, tree_type_checker as is_type
+from neurom.core.types import NeuriteType
+from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
 
 _NEURITE_FEATURES = {}
@@ -234,8 +235,7 @@ def feature(shape, namespace: NameSpace, name=None):
 
 
 # These imports are necessary in order to register the features
-from neurom.features import neurite, morphology, \
-    population  # noqa, pylint: disable=wrong-import-position
+from neurom.features import neurite, morphology, population  # noqa, isort:skip, pylint: disable=wrong-import-position
 
 
 def _features_catalogue():

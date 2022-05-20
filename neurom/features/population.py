@@ -41,13 +41,14 @@ For more details see :ref:`features`.
 
 
 from functools import partial
+
 import numpy as np
 
 from neurom.core.dataformat import COLS
-from neurom.core.types import NeuriteType
 from neurom.core.morphology import iter_sections
+from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import feature, NameSpace
+from neurom.features import NameSpace, feature
 from neurom.features import morphology as mf
 
 feature = partial(feature, namespace=NameSpace.POPULATION)

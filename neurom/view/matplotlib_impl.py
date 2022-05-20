@@ -29,20 +29,22 @@
 """Morphology draw functions using matplotlib."""
 
 from functools import wraps
+
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
 from neurom import NeuriteType, geom
+from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_neurites, iter_sections, iter_segments
 from neurom.core.soma import SomaCylinders
-from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
-from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
-
 from neurom.view import matplotlib_utils
+from neurom.view.dendrogram import (Dendrogram, get_size, layout_dendrogram,
+                                    move_positions)
 
 _LINEWIDTH = 1.2
 _ALPHA = 0.8
