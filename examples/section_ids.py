@@ -28,10 +28,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Get sections and segments by ID."""
+from pathlib import Path
 
 import neurom as nm
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def get_segment(neuron, section_id, segment_id):
@@ -46,7 +50,7 @@ def get_segment(neuron, section_id, segment_id):
 
 if __name__ == '__main__':
 
-    m = nm.load_morphology('tests/data/h5/v1/Neuron.h5')
+    m = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/Neuron.h5'))
 
     seg = get_segment(m, 3, 2)
     print('Segment:\n', seg)

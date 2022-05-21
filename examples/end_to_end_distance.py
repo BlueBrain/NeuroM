@@ -28,11 +28,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Calculate and plot end-to-end distance of neurites."""
+from pathlib import Path
 
 import neurom as nm
 from neurom import morphmath
 import numpy as np
 import matplotlib.pyplot as plt
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def path_end_to_end_distance(neurite):
@@ -54,7 +58,8 @@ def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type
     plt.title(neurite_type)
     plt.xlabel('Number of segments')
     plt.ylabel('End-to-end distance')
-    plt.show()
+    # uncomment to show
+    #plt.show()
 
 
 def calculate_and_plot_end_to_end_distance(neurite):
@@ -73,7 +78,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
 
 if __name__ == '__main__':
     #  load a neuron from an SWC file
-    filename = 'tests/data/swc/Neuron_3_random_walker_branches.swc'
+    filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron_3_random_walker_branches.swc')
     m = nm.load_morphology(filename)
 
     # print mean end-to-end distance per neurite type

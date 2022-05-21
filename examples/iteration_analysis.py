@@ -33,8 +33,8 @@ These examples highlight more advanced neurom
 morphometrics functionality using iterators.
 
 """
+from pathlib import Path
 
-from __future__ import print_function
 from neurom.core.dataformat import COLS
 import neurom as nm
 from neurom import geom
@@ -44,10 +44,11 @@ from neurom.core.types import tree_type_checker, NEURITES
 from neurom import morphmath as mm
 import numpy as np
 
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 if __name__ == '__main__':
 
-    filename = 'tests/data/swc/Neuron.swc'
+    filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
     #  load a neuron from an SWC file
     m = nm.load_morphology(filename)

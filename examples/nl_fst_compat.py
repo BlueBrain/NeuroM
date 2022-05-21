@@ -28,32 +28,34 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """Compatibility between NL and H5 files."""
 # pylint: disable=protected-access
+from pathlib import Path
 
 import numpy as np
 
 import neurom as nm
-from neurom.features import neurite as _nf
+from neurom.features import neurite as nf
+from neurom.features import morphology as mf
 
-m_h5 = nm.load_morphology('tests/data/h5/v1/bio_neuron-001.h5')
-m_asc = nm.load_morphology('tests/data/neurolucida/bio_neuron-001.asc')
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
-print('h5 number of sections: %s' % nm.get('number_of_sections', m_h5)[0])
-print('nl number of sections: %s\n' % nm.get('number_of_sections', m_asc)[0])
-print('h5 number of segments: %s' % nm.get('number_of_segments', m_h5)[0])
-print('nl number of segments: %s\n' % nm.get('number_of_segments', m_asc)[0])
-print('h5 total neurite length: %s' %
-      np.sum(nm.get('section_lengths', m_h5)))
-print('nl total neurite length: %s\n' %
-      np.sum(nm.get('section_lengths', m_asc)))
-print('h5 principal direction extents: %s' %
-      nm.get('principal_direction_extents', m_h5))
-print('nl principal direction extents: %s' %
-      nm.get('principal_direction_extents', m_asc))
+if __name__ == "__main__":
 
-print('\nNumber of neurites:')
-for nt in iter(nm.NeuriteType):
-    print(nt, _nf.n_neurites(m_h5, neurite_type=nt), _nf.n_neurites(m_asc, neurite_type=nt))
+	m_h5 = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/bio_neuron-001.h5'))
+	m_asc = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/neurolucida/bio_neuron-001.asc'))
 
-print('\nNumber of segments:')
-for nt in iter(nm.NeuriteType):
-    print(nt, _nf.n_segments(m_h5, neurite_type=nt), _nf.n_segments(m_asc, neurite_type=nt))
+	print('h5 number of sections:', nm.get('number_of_sections', m_h5))
+	print('nl number of sections:', nm.get('number_of_sections', m_asc))
+	print('h5 number of segments:', nm.get('number_of_segments', m_h5))
+	print('nl number of segments:', nm.get('number_of_segments', m_asc))
+	print('h5 total neurite length:', np.sum(nm.get('section_lengths', m_h5)))
+	print('nl total neurite length:', np.sum(nm.get('section_lengths', m_asc)))
+	print('h5 principal direction extents:', nm.get('principal_direction_extents', m_h5))
+	print('nl principal direction extents:', nm.get('principal_direction_extents', m_asc))
+
+	print('\nNumber of neurites:')
+	for nt in iter(nm.NeuriteType):
+	    print(nt, mf.number_of_neurites(m_h5, neurite_type=nt), mf.number_of_neurites(m_asc, neurite_type=nt))
+
+	print('\nNumber of segments:')
+	for nt in iter(nm.NeuriteType):
+	    print(nt, nf.number_of_segments(m_h5.neurites[0]), nf.number_of_segments(m_asc.neurites[0]))
