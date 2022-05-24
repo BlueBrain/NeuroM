@@ -46,7 +46,8 @@ import numpy as np
 
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
-if __name__ == '__main__':
+
+def main():
 
     filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
@@ -143,3 +144,7 @@ if __name__ == '__main__':
     # Morphology's bounding box
     # Note: does not account for soma radius
     print('Bounding box ((min x, y, z), (max x, y, z))', geom.bounding_box(m))
+
+
+if __name__ == '__main__':
+    main()

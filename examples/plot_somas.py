@@ -55,7 +55,7 @@ def plot_somas(somas):
     # plt.show()
 
 
-if __name__ == '__main__':
+def main():
     #  define set of files containing relevant morphs
     file_nms = [Path(DATA_PATH, file_nm) for file_nm in ['Soma_origin.swc',
                                                                 'Soma_translated_1.swc',
@@ -64,3 +64,6 @@ if __name__ == '__main__':
     # load from file and plot
     sms = [load_morphology(file_nm).soma for file_nm in file_nms]
     plot_somas(sms)
+
+if __name__ == '__main__':
+    main()

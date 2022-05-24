@@ -91,7 +91,8 @@ def mean_rad_of_gyration(neurites):
     return np.mean([radius_of_gyration(n) for n in neurites])
 
 
-if __name__ == '__main__':
+def main():
+
     #  load a neuron from an SWC file
     filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
     m = nm.load_morphology(filename)
@@ -108,3 +109,7 @@ if __name__ == '__main__':
     print('Mean radius of gyration for apical dendrites: ',
           mean_rad_of_gyration(n for n in m.neurites
                                if n.type == nm.APICAL_DENDRITE))
+
+
+if __name__ == '__main__':
+    main()

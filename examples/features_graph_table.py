@@ -99,9 +99,13 @@ def create_feature_plots(morphologies_dir, feature_list, output_dir):
             pl.close(f)
 
 
-if __name__ == '__main__':
+def main():
     create_feature_plots(
         morphologies_dir=Path(PACKAGE_DIR, "tests/data/valid_set"),
 	feature_list=["section_lengths"],
 	output_dir=".",
     )
+
+
+if __name__ == '__main__':
+    main()

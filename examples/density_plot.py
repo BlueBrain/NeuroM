@@ -108,10 +108,14 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
                         neurite_type=neurite_type, **kwargs)
 
 
-if __name__ == "__main__":
+def main():
 
     morphology_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
     neurons = load_morphologies(morphology_directory)
 
     plot_density(neurons)
     plot_neuron_on_density(neurons)
+
+
+if __name__ == "__main__":
+    main()

@@ -63,7 +63,7 @@ def pprint_stats(data):
     pprint(stats(data))
 
 
-if __name__ == '__main__':
+def main():
 
     filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
@@ -155,3 +155,7 @@ if __name__ == '__main__':
         rem_bifangles = nm.get('remote_bifurcation_angles', m, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(rem_bifangles)
+
+
+if __name__ == '__main__':
+    main()

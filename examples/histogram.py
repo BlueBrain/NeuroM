@@ -175,8 +175,12 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111,
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
 
-if __name__ == "__main__":
+def main():
 
     pop1 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
     pop2 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
     population_histogram([pop1, pop2], "section_lengths")
+
+
+if __name__ == "__main__":
+    main()

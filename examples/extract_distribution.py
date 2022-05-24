@@ -59,7 +59,7 @@ def find_optimal_distribution(population_directory, feature):
     return stats.optimal_distribution(feature_data)
 
 
-if __name__ == '__main__':
+def main():
 
     population_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
 
@@ -70,3 +70,7 @@ if __name__ == '__main__':
     print(json.dumps(
 	result, indent=2, separators=(',', ': '), cls=NeuromJSON
     ))
+
+
+if __name__ == '__main__':
+    main()

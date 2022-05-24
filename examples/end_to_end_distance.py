@@ -76,7 +76,7 @@ def calculate_and_plot_end_to_end_distance(neurite):
                                   end_to_end_distance, neurite.type)
 
 
-if __name__ == '__main__':
+def main():
     #  load a neuron from an SWC file
     filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron_3_random_walker_branches.swc')
     m = nm.load_morphology(filename)
@@ -97,3 +97,7 @@ if __name__ == '__main__':
         # print (number of segments, end-to-end distance, neurite type)
         print(sum(len(s.points) - 1 for s in nrte.root_node.ipreorder()),
               path_end_to_end_distance(nrte), nrte.type)
+
+
+if __name__ == '__main__':
+    main()

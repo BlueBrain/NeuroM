@@ -57,10 +57,13 @@ def test_multiple_distr(filepath):
     return st.optimal_distribution(soma_size, distr_to_check)
 
 
-if __name__ == '__main__':
-
+def main():
 
     morphology_path = Path(PACKAGE_DIR, "tests/data/swc/Neuron.swc")
 
     result = test_multiple_distr(morphology_path)
     print(f"Optimal distribution fit for soma radius is: {result.type} with parameters {result.params}")
+
+
+if __name__ == '__main__':
+    main()
