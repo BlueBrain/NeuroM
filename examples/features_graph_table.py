@@ -28,7 +28,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Example for comparison of the same feature of multiple cells."""
-import tempfile
 from pathlib import Path
 
 import pylab as pl
@@ -101,9 +100,8 @@ def create_feature_plots(morphologies_dir, feature_list, output_dir):
 
 
 if __name__ == '__main__':
-    with tempfile.TemporaryDirectory() as tmpdir:
-        create_feature_plots(
-	    morphologies_dir=Path(PACKAGE_DIR, "tests/data/valid_set"),
-	    feature_list=["section_lengths"],
-            output_dir=tmpdir,
-	)
+    create_feature_plots(
+        morphologies_dir=Path(PACKAGE_DIR, "tests/data/valid_set"),
+	feature_list=["section_lengths"],
+	output_dir=".",
+    )
