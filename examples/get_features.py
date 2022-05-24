@@ -33,11 +33,14 @@ These examples highlight most of the pre-packaged neurom.nm.get
 morphometrics functionality.
 
 """
+from pathlib import Path
 
-from __future__ import print_function
 from pprint import pprint
 import numpy as np
 import neurom as nm
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def stats(data):
@@ -60,9 +63,9 @@ def pprint_stats(data):
     pprint(stats(data))
 
 
-if __name__ == '__main__':
+def main():
 
-    filename = 'tests/data/swc/Neuron.swc'
+    filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
     #  load a neuron from an SWC file
     m = nm.load_morphology(filename)
@@ -152,3 +155,7 @@ if __name__ == '__main__':
         rem_bifangles = nm.get('remote_bifurcation_angles', m, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(rem_bifangles)
+
+
+if __name__ == '__main__':
+    main()

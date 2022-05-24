@@ -27,13 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Simple Histogram function for multiple morphologies."""
+from pathlib import Path
+
 from itertools import chain
 
 import numpy as np
+import neurom.features
 from neurom.view import matplotlib_utils
+from neurom import load_morphologies
 
 
-def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwargs):
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+
+
+def histogram(neurons, feature, new_fig=True, subplot=111, normed=False, **kwargs):
     """
     Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -80,11 +87,11 @@ def histogram(neurons, feature, new_fig=True, subplot=False, normed=False, **kwa
 
     kwargs['title'] = kwargs.get('title', feature + ' histogram')
 
-    feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
+    feature_values = [neurom.features.get(feature, neu) for neu in neurons]
 
     neu_labels = [neu.name for neu in neurons]
 
-    ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels, normed=normed)
+    ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels, density=normed)
 
     kwargs['no_legend'] = len(neu_labels) == 1
 
@@ -98,7 +105,7 @@ def population_feature_values(pops, feature):
 
     for pop in pops:
 
-        feature_values = [getattr(neu, 'get_' + feature)() for neu in pop.morphologies]
+        feature_values = [neurom.features.get(feature, neu) for neu in pop]
 
         # ugly hack to chain in case of list of lists
         if any([isinstance(p, (list, np.ndarray)) for p in feature_values]):
@@ -110,7 +117,7 @@ def population_feature_values(pops, feature):
     return pops_feature_values
 
 
-def population_histogram(pops, feature, new_fig=True, normed=False, subplot=False, **kwargs):
+def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111, **kwargs):
     """
     Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
@@ -160,8 +167,19 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=Fals
 
     pops_labels = [pop.name for pop in pops]
 
-    ax.hist(pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, normed=normed)
+    ax.hist(pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, density=normed)
 
     kwargs['no_legend'] = len(pops_labels) == 1
 
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
+
+
+def main():
+
+    pop1 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
+    pop2 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
+    population_histogram([pop1, pop2], "section_lengths")
+
+
+if __name__ == "__main__":
+    main()

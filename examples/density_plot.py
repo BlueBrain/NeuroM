@@ -27,20 +27,28 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Example for generating density plots."""
+from pathlib import Path
 
 import pylab as plt
+import matplotlib as mpl
 import numpy as np
 
 from neurom import get as get_feat
 from neurom.view import matplotlib_utils, matplotlib_impl
 from neurom.core.types import NeuriteType
 
+from neurom import load_morphologies
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+
 
 def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.basal_dendrite):
     """Extracts the 2d histogram of the center
        coordinates of segments in the selected plane.
     """
-    segment_midpoints = get_feat('segment_midpoints', population, neurite_type=neurite_type)
+    segment_midpoints = np.array(
+	get_feat('segment_midpoints', population, neurite_type=neurite_type)
+    )
     horiz = segment_midpoints[:, 'xyz'.index(plane[0])]
     vert = segment_midpoints[:, 'xyz'.index(plane[1])]
     return np.histogram2d(np.array(horiz), np.array(vert), bins=(bins, bins))
@@ -62,12 +70,13 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
     mask = H1 < threshold  # mask = H1==0
     H2 = np.ma.masked_array(H1, mask)
 
-    getattr(plt.cm, color_map).set_bad(color='white', alpha=None)
+    colormap = mpl.cm.get_cmap(color_map).copy()
+    colormap.set_bad(color='white', alpha=None)
 
     plots = ax.contourf((xedges1[:-1] + xedges1[1:]) / 2,
                         (yedges1[:-1] + yedges1[1:]) / 2,
                         np.transpose(H2), # / np.max(H2),
-                        cmap=getattr(plt.cm, color_map), levels=levels)
+                        cmap=colormap, levels=levels)
 
     if not no_colorbar:
         cbar = plt.colorbar(plots)
@@ -91,9 +100,22 @@ def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
     """
     _, ax = matplotlib_utils.get_figure(new_fig=new_fig)
 
-    matplotlib_impl.plot_tree(population.neurites[0], ax)
+    matplotlib_impl.plot_tree(list(population)[0].neurites[0], ax)
 
     return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
                         colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,
                         color_map=color_map, no_colorbar=no_colorbar, threshold=threshold,
                         neurite_type=neurite_type, **kwargs)
+
+
+def main():
+
+    morphology_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
+    neurons = load_morphologies(morphology_directory)
+
+    plot_density(neurons)
+    plot_neuron_on_density(neurons)
+
+
+if __name__ == "__main__":
+    main()
