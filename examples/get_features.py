@@ -33,11 +33,14 @@ These examples highlight most of the pre-packaged neurom.nm.get
 morphometrics functionality.
 
 """
+from pathlib import Path
 
-from __future__ import print_function
 from pprint import pprint
 import numpy as np
 import neurom as nm
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def stats(data):
@@ -60,17 +63,17 @@ def pprint_stats(data):
     pprint(stats(data))
 
 
-if __name__ == '__main__':
+def main():
 
-    filename = 'tests/data/swc/Neuron.swc'
+    filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
     #  load a neuron from an SWC file
     m = nm.load_morphology(filename)
 
     # Get some soma information
     # Soma radius and surface area
-    print("Soma radius", nm.get('soma_radii', m)[0])
-    print("Soma surface area", nm.get('soma_surface_areas', m)[0])
+    print("Soma radius", nm.get('soma_radius', m))
+    print("Soma surface area", nm.get('soma_surface_area', m))
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
@@ -81,23 +84,23 @@ if __name__ == '__main__':
     # to warm up...
 
     # number of neurites
-    print('Number of neurites (all):', nm.get('number_of_neurites', m)[0])
+    print('Number of neurites (all):', nm.get('number_of_neurites', m))
     print('Number of neurites (axons):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon))
     print('Number of neurites (apical dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite))
     print('Number of neurites (basal dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite))
 
     # number of sections
     print('Number of sections:',
-          nm.get('number_of_sections', m)[0])
+          nm.get('number_of_sections', m))
     print('Number of sections (axons):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon))
     print('Number of sections (apical dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite))
     print('Number of sections (basal dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite))
 
     # number of sections per neurite
     print('Number of sections per neurite:',
@@ -152,3 +155,7 @@ if __name__ == '__main__':
         rem_bifangles = nm.get('remote_bifurcation_angles', m, neurite_type=ttype)
         print('Local bifurcation angles (', ttype, '):', sep='')
         pprint_stats(rem_bifangles)
+
+
+if __name__ == '__main__':
+    main()

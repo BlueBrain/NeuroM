@@ -28,10 +28,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Get sections and segments by ID."""
+from pathlib import Path
 
 import neurom as nm
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def get_segment(neuron, section_id, segment_id):
@@ -44,11 +48,15 @@ def get_segment(neuron, section_id, segment_id):
     return sec.points[segment_id:segment_id + 2][:, COLS.XYZR]
 
 
-if __name__ == '__main__':
+def main():
 
-    m = nm.load_morphology('tests/data/h5/v1/Neuron.h5')
+    m = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/Neuron.h5'))
 
     seg = get_segment(m, 3, 2)
     print('Segment:\n', seg)
     print('Mid-point (x, y, z):\n', mm.linear_interpolate(seg[0], seg[1], 0.5))
     print('Mid-point R:\n', mm.interpolate_radius(seg[0][COLS.R], seg[1][COLS.R], 0.5))
+
+
+if __name__ == '__main__':
+    main()

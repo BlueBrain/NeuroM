@@ -28,11 +28,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Calculate radius of gyration of neurites."""
+from pathlib import Path
 
 import neurom as nm
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 import numpy as np
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def segment_centre_of_mass(seg):
@@ -53,8 +57,8 @@ def neurite_centre_of_mass(neurite):
     centre_of_mass = np.zeros(3)
     total_volume = 0
 
-    seg_vol = np.array(map(mm.segment_volume, nm.iter_segments(neurite)))
-    seg_centre_of_mass = np.array(map(segment_centre_of_mass, nm.iter_segments(neurite)))
+    seg_vol = np.array(list(map(mm.segment_volume, nm.iter_segments(neurite))))
+    seg_centre_of_mass = np.array(list(map(segment_centre_of_mass, nm.iter_segments(neurite))))
 
     # multiply array of scalars with array of arrays
     # http://stackoverflow.com/questions/5795700/multiply-numpy-array-of-scalars-by-array-of-vectors
@@ -87,9 +91,10 @@ def mean_rad_of_gyration(neurites):
     return np.mean([radius_of_gyration(n) for n in neurites])
 
 
-if __name__ == '__main__':
+def main():
+
     #  load a neuron from an SWC file
-    filename = 'tests/data/swc/Neuron.swc'
+    filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
     m = nm.load_morphology(filename)
 
     # for every neurite, print (number of segments, radius of gyration, neurite type)
@@ -104,3 +109,7 @@ if __name__ == '__main__':
     print('Mean radius of gyration for apical dendrites: ',
           mean_rad_of_gyration(n for n in m.neurites
                                if n.type == nm.APICAL_DENDRITE))
+
+
+if __name__ == '__main__':
+    main()
