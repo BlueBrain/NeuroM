@@ -147,7 +147,7 @@ def save_plot(
 
 def plot_style(
     fig,
-    ax,  # pylint: disable=too-many-arguments, too-many-locals
+    ax,
     # plot_title
     pretitle='',
     title='Figure',
@@ -180,7 +180,7 @@ def plot_style(
     aspect_ratio='equal',
     tight=False,
     **_,
-):
+):  # pylint: disable=too-many-arguments, too-many-locals
     """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:

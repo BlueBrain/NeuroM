@@ -240,11 +240,11 @@ def feature(shape, namespace: NameSpace, name=None):
 
 
 # These imports are necessary in order to register the features
-from neurom.features import (
-    neurite,
-    morphology,
-    population,
-)  # noqa, isort:skip, pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+from neurom.features import neurite  # noqa, isort: skio
+
+from neurom.features import morphology  # noqa, isort: skip
+from neurom.features import population  # noqa, isort: skip
 
 
 def _features_catalogue():
