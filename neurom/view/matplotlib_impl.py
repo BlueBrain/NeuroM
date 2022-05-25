@@ -43,8 +43,7 @@ from neurom.core.soma import SomaCylinders
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
 from neurom.view import matplotlib_utils
-from neurom.view.dendrogram import (Dendrogram, get_size, layout_dendrogram,
-                                    move_positions)
+from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
 
 _LINEWIDTH = 1.2
 _ALPHA = 0.8

@@ -49,8 +49,12 @@ import neurom as nm
 from neurom.apps import get_config
 from neurom.core.morphology import Morphology
 from neurom.exceptions import ConfigError
-from neurom.features import (_MORPHOLOGY_FEATURES, _NEURITE_FEATURES,
-                             _POPULATION_FEATURES, _get_feature_value_and_func)
+from neurom.features import (
+    _MORPHOLOGY_FEATURES,
+    _NEURITE_FEATURES,
+    _POPULATION_FEATURES,
+    _get_feature_value_and_func,
+)
 from neurom.io.utils import get_files_by_path
 from neurom.utils import NeuromJSON, flatten
 

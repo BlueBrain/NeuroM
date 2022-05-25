@@ -52,8 +52,13 @@ import numpy as np
 
 from neurom import morphmath
 from neurom.core.dataformat import COLS
-from neurom.core.morphology import (Morphology, iter_neurites, iter_points,
-                                    iter_sections, iter_segments)
+from neurom.core.morphology import (
+    Morphology,
+    iter_neurites,
+    iter_points,
+    iter_sections,
+    iter_segments,
+)
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError

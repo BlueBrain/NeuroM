@@ -32,6 +32,7 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib.patches import Polygon
+
 # needed so that projection='3d' works with fig.add_subplot
 from mpl_toolkits.mplot3d import Axes3D  # pylint: disable=unused-import
 from scipy.linalg import norm
