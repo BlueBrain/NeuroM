@@ -48,9 +48,7 @@ setup(
     ],
     packages=find_packages(exclude=('tests',)),
     license='BSD',
-    entry_points={
-        'console_scripts': ['neurom=neurom.apps.cli:cli']
-    },
+    entry_points={'console_scripts': ['neurom=neurom.apps.cli:cli']},
     name='neurom',
     extras_require={
         'plotly': ['plotly>=3.6.0', 'psutil>=5.5.1'],  # for plotly image saving

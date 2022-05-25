@@ -38,6 +38,7 @@ from neurom.utils import OrderedEnum
 @unique
 class NeuriteIter(OrderedEnum):
     """Neurite iteration orders."""
+
     FileOrder = 1  # Order in which neurites appear in the file
 
     # NRN simulator order: soma -> axon -> basal -> apical
@@ -49,6 +50,7 @@ class NeuriteIter(OrderedEnum):
 # for backward compatibility with 'v1' version
 class NeuriteType(IntEnum):
     """Type of neurite."""
+
     axon = SectionType.axon
     apical_dendrite = SectionType.apical_dendrite
     basal_dendrite = SectionType.basal_dendrite
@@ -64,9 +66,7 @@ class NeuriteType(IntEnum):
 
 
 #: Collection of all neurite types
-NEURITES = (NeuriteType.axon,
-            NeuriteType.apical_dendrite,
-            NeuriteType.basal_dendrite)
+NEURITES = (NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
 
 ROOT_ID = -1
 
@@ -102,10 +102,13 @@ def tree_type_checker(*ref):
     for t in ref:
         NeuriteType(t)
     if NeuriteType.all in ref:
+
         def check_tree_type(_):
             """Always returns true."""
             return True
+
     else:
+
         def check_tree_type(tree):
             """Check whether tree has the same type as ref.
 

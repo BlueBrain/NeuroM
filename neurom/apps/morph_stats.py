@@ -112,8 +112,10 @@ def extract_dataframe(morphs, config, n_workers=1, use_subtrees=False):
     columns = [('property', 'name')] + [
         (key1, key2) for key1, data in stats[0][1].items() for key2 in data
     ]
-    rows = [[name] + list(flatten(features.values() for features in data.values()))
-            for name, data in stats]
+    rows = [
+        [name] + list(flatten(features.values() for features in data.values()))
+        for name, data in stats
+    ]
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
@@ -125,6 +127,7 @@ def _get_feature_stats(feature_name, morphs, modes, use_subtrees=False, **kwargs
 
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
+
     def stat_name_format(mode, feature_name, **kwargs):
         """Returns the key name for the data dictionary.
 
@@ -225,16 +228,18 @@ def extract_stats(morphs, config, use_subtrees=False):
                         feature_kwargs["neurite_type"] = neurite_type
                         stats[neurite_type.name].update(
                             _get_feature_stats(
-                                feature_name, morphs, modes,
-                                use_subtrees=use_subtrees, **feature_kwargs
+                                feature_name,
+                                morphs,
+                                modes,
+                                use_subtrees=use_subtrees,
+                                **feature_kwargs,
                             )
                         )
 
                 else:
                     stats[category].update(
                         _get_feature_stats(
-                            feature_name, morphs, modes,
-                            use_subtrees=use_subtrees, **feature_kwargs
+                            feature_name, morphs, modes, use_subtrees=use_subtrees, **feature_kwargs
                         )
                     )
 
@@ -248,11 +253,7 @@ def _get_header(results):
     """Extracts the headers, using the first value in the dict as the template."""
     values = next(iter(results.values()))
 
-    return ['name'] + [
-        f'{k}:{metric}'
-        for k, v in values.items()
-        for metric in v.keys()
-    ]
+    return ['name'] + [f'{k}:{metric}' for k, v in values.items() for metric in v.keys()]
 
 
 def _generate_flattened_dict(headers, results):
@@ -274,7 +275,7 @@ _NEURITE_MAP = {
     'AXON': nm.AXON,
     'BASAL_DENDRITE': nm.BASAL_DENDRITE,
     'APICAL_DENDRITE': nm.APICAL_DENDRITE,
-    'ALL': nm.ANY_NEURITE
+    'ALL': nm.ANY_NEURITE,
 }
 
 
@@ -285,7 +286,7 @@ def full_config():
     categories = {
         "neurite": _NEURITE_FEATURES,
         "morphology": _MORPHOLOGY_FEATURES,
-        "population": _POPULATION_FEATURES
+        "population": _POPULATION_FEATURES,
     }
 
     config = {
@@ -327,6 +328,7 @@ def _standardize_layout(category_features):
                   - mode1
                   - mode2
     """
+
     def standardize_options(options):
         """Returns options as a dict with two keys: 'kwargs' and 'modes'."""
         # convert short format
@@ -369,7 +371,7 @@ def main(
     is_full_config,
     as_population,
     ignored_exceptions,
-    use_subtrees=False
+    use_subtrees=False,
 ):
     """Main function that get statistics for morphologies.
 
@@ -394,7 +396,7 @@ def main(
 
     morphs = nm.load_morphologies(
         get_files_by_path(datapath),
-        ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+        ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions),
     )
 
     if as_population:

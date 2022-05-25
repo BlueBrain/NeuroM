@@ -38,7 +38,7 @@ SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 m = nm.load_morphology(SWC_PATH / 'point_soma_single_neurite.swc')
 
 ROOT_NODE = m.neurites[0].morphio_root_node
-RADIUS = .5
+RADIUS = 0.5
 REF_LEN = 3
 
 

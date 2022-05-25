@@ -185,7 +185,8 @@ def section_path_distances(neurite, iterator_type=Section.ipreorder, section_typ
     return _map_sections(
         partial(sf.section_path_length, stop_node=neurite.root_node),
         neurite,
-        iterator_type=iterator_type, section_type=section_type
+        iterator_type=iterator_type,
+        section_type=section_type,
     )
 
 
@@ -283,7 +284,7 @@ def segment_radial_distances(neurite, origin=None, section_type=NeuriteType.all)
     return _map_segments(
         func=partial(sf.segment_midpoint_radial_distances, origin=origin),
         neurite=neurite,
-        section_type=section_type
+        section_type=section_type,
     )
 
 
@@ -339,7 +340,7 @@ def partition_asymmetry(
             partial(bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type),
             neurite,
             iterator_type=Section.ibifurcation_point,
-            section_type=section_type
+            section_type=section_type,
         )
 
     return _map_sections(
@@ -350,7 +351,7 @@ def partition_asymmetry(
         ),
         neurite,
         iterator_type=Section.ibifurcation_point,
-        section_type=section_type
+        section_type=section_type,
     )
 
 
@@ -426,7 +427,7 @@ def _radial_distances(neurite, origin, iterator_type, section_type):
         partial(sf.section_radial_distance, origin=origin),
         neurite=neurite,
         iterator_type=iterator_type,
-        section_type=section_type
+        section_type=section_type,
     )
 
 
@@ -452,7 +453,7 @@ def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
     term_radial_distances = section_term_radial_distances(
         neurite, origin=origin, section_type=section_type
     )
-    return max(term_radial_distances) if term_radial_distances else 0.
+    return max(term_radial_distances) if term_radial_distances else 0.0
 
 
 @feature(shape=(...,))
@@ -485,9 +486,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
         return section.points[:, COLS.XYZ].tolist()
 
     # note: duplicate points included but not affect the convex hull calculation
-    points = list(
-        utils.flatten(_map_sections(get_points, neurite, section_type=section_type))
-    )
+    points = list(utils.flatten(_map_sections(get_points, neurite, section_type=section_type)))
 
     hull = convex_hull(points)
 

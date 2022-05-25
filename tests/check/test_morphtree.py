@@ -40,7 +40,9 @@ SWC_PATH = DATA_PATH / 'swc'
 def _generate_back_track_tree(n, dev):
     points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
     ((CellBody)
      (0 0 0 0.4))
 
@@ -60,14 +62,21 @@ def _generate_back_track_tree(n, dev):
       (3 -5 0 0.2)
       (4 -6 0 0.2)
     ))
-    """.format(*points.tolist())), reader='asc')
+    """.format(
+                *points.tolist()
+            )
+        ),
+        reader='asc',
+    )
 
     return m
 
 
 def test_is_monotonic():
     # tree with decreasing radii
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 0.99)
@@ -77,11 +86,16 @@ def test_is_monotonic():
           |
           (0 0 0 0.5)
           (0 0 0 0.2)
-        ))"""), reader='asc')
+        ))"""
+        ),
+        reader='asc',
+    )
     assert mt.is_monotonic(m.neurites[0], 1e-6)
 
     # tree with equal radii
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 1.0)
@@ -91,11 +105,16 @@ def test_is_monotonic():
           |
           (0 0 0 1.0)
           (0 0 0 1.0)
-        ))"""), reader='asc')
+        ))"""
+        ),
+        reader='asc',
+    )
     assert mt.is_monotonic(m.neurites[0], 1e-6)
 
     # tree with increasing radii
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 1.0)
@@ -105,11 +124,16 @@ def test_is_monotonic():
           |
           (0 0 0 0.3)
           (0 0 0 0.1)
-        ))"""), reader='asc')
+        ))"""
+        ),
+        reader='asc',
+    )
     assert not mt.is_monotonic(m.neurites[0], 1e-6)
 
     # Tree with larger child initial point
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
         ((Dendrite)
         (0 0 0 1.0)
         (0 0 0 0.75)
@@ -119,7 +143,10 @@ def test_is_monotonic():
           (0 0 0 0.375)
           (0 0 0 0.125)
           (0 0 0 0.625)
-        ))"""), reader='asc')
+        ))"""
+        ),
+        reader='asc',
+    )
     assert not mt.is_monotonic(m.neurites[0], 1e-6)
 
 
@@ -131,7 +158,7 @@ def test_is_flat():
 
 def test_is_back_tracking():
     # case 1: a back-track falls directly on a previous node
-    t = _generate_back_track_tree(1, (0., 0., 0.))
+    t = _generate_back_track_tree(1, (0.0, 0.0, 0.0))
     assert mt.is_back_tracking(t.neurites[0])
 
     # case 2: a zigzag is close to another segment
@@ -143,7 +170,7 @@ def test_is_back_tracking():
     assert mt.is_back_tracking(t.neurites[0])
 
     # case 4: a zigzag far from civilization
-    t = _generate_back_track_tree(1, (10., -10., 10.))
+    t = _generate_back_track_tree(1, (10.0, -10.0, 10.0))
     assert not mt.is_back_tracking(t.neurites[0])
 
     # case 5: a zigzag on another section

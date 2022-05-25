@@ -45,6 +45,7 @@ def _get_plt():
     """Wrapper to avoid loading matplotlib.pyplot before someone has a chance to set the backend."""
     global plt  # pylint: disable=global-statement
     import matplotlib.pyplot  # pylint: disable=import-outside-toplevel
+
     plt = matplotlib.pyplot
 
 
@@ -111,8 +112,17 @@ def get_figure(new_fig=True, subplot=(1, 1, 1), params=None):
     return fig, ax
 
 
-def save_plot(fig, prefile='', postfile='', output_path='./', output_name='Figure',
-              output_format='png', dpi=300, transparent=False, **_):
+def save_plot(
+    fig,
+    prefile='',
+    postfile='',
+    output_path='./',
+    output_name='Figure',
+    output_format='png',
+    dpi=300,
+    transparent=False,
+    **_,
+):
     """Generates a figure file in the selected directory.
 
     Args:
@@ -128,43 +138,49 @@ def save_plot(fig, prefile='', postfile='', output_path='./', output_name='Figur
     output_path = Path(output_path)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    fig.savefig(Path(output_path, prefile + output_name + postfile + "." + output_format),
-                dpi=dpi, transparent=transparent)
+    fig.savefig(
+        Path(output_path, prefile + output_name + postfile + "." + output_format),
+        dpi=dpi,
+        transparent=transparent,
+    )
 
 
-def plot_style(fig, ax,  # pylint: disable=too-many-arguments, too-many-locals
-               # plot_title
-               pretitle='',
-               title='Figure',
-               posttitle='',
-               title_fontsize=14,
-               title_arg=None,
-               # plot_labels
-               label_fontsize=14,
-               xlabel=None,
-               xlabel_arg=None,
-               ylabel=None,
-               ylabel_arg=None,
-               zlabel=None,
-               zlabel_arg=None,
-               # plot_ticks
-               tick_fontsize=12,
-               xticks=None,
-               xticks_args=None,
-               yticks=None,
-               yticks_args=None,
-               zticks=None,
-               zticks_args=None,
-               # update_plot_limits
-               white_space=30,
-               # plot_legend
-               no_legend=True,
-               legend_arg=None,
-               # internal
-               no_axes=False,
-               aspect_ratio='equal',
-               tight=False,
-               **_):
+def plot_style(
+    fig,
+    ax,  # pylint: disable=too-many-arguments, too-many-locals
+    # plot_title
+    pretitle='',
+    title='Figure',
+    posttitle='',
+    title_fontsize=14,
+    title_arg=None,
+    # plot_labels
+    label_fontsize=14,
+    xlabel=None,
+    xlabel_arg=None,
+    ylabel=None,
+    ylabel_arg=None,
+    zlabel=None,
+    zlabel_arg=None,
+    # plot_ticks
+    tick_fontsize=12,
+    xticks=None,
+    xticks_args=None,
+    yticks=None,
+    yticks_args=None,
+    zticks=None,
+    zticks_args=None,
+    # update_plot_limits
+    white_space=30,
+    # plot_legend
+    no_legend=True,
+    legend_arg=None,
+    # internal
+    no_axes=False,
+    aspect_ratio='equal',
+    tight=False,
+    **_,
+):
     """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:
@@ -244,10 +260,16 @@ def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14,
     ax.set_title(current_title, fontsize=title_fontsize, **title_arg)
 
 
-def plot_labels(ax, label_fontsize=14,
-                xlabel=None, xlabel_arg=None,
-                ylabel=None, ylabel_arg=None,
-                zlabel=None, zlabel_arg=None):
+def plot_labels(
+    ax,
+    label_fontsize=14,
+    xlabel=None,
+    xlabel_arg=None,
+    ylabel=None,
+    ylabel_arg=None,
+    zlabel=None,
+    zlabel_arg=None,
+):
     """Sets the labels options of a matplotlib plot.
 
     Args:
@@ -275,10 +297,16 @@ def plot_labels(ax, label_fontsize=14,
         ax.set_zlabel(zlabel, fontsize=label_fontsize, **zlabel_arg)
 
 
-def plot_ticks(ax, tick_fontsize=12,
-               xticks=None, xticks_args=None,
-               yticks=None, yticks_args=None,
-               zticks=None, zticks_args=None):
+def plot_ticks(
+    ax,
+    tick_fontsize=12,
+    xticks=None,
+    xticks_args=None,
+    yticks=None,
+    yticks_args=None,
+    zticks=None,
+    zticks_args=None,
+):
     """Function that defines the labels options of a matplotlib plot.
 
     Args:
@@ -361,8 +389,9 @@ def _get_normals(v):
     return n1, n2
 
 
-def generate_cylindrical_points(start, end, start_radius, end_radius,
-                                linspace_count=_LINSPACE_COUNT):
+def generate_cylindrical_points(
+    start, end, start_radius, end_radius, linspace_count=_LINSPACE_COUNT
+):
     """Generate a 3d mesh of a cylinder with start and end points, and varying radius.
 
     Based on: http://stackoverflow.com/a/32383775
@@ -373,22 +402,20 @@ def generate_cylindrical_points(start, end, start_radius, end_radius,
     n1, n2 = _get_normals(v)
 
     # pylint: disable=unbalanced-tuple-unpacking
-    l, theta = np.meshgrid(np.linspace(0, length, linspace_count),
-                           np.linspace(0, 2 * np.pi, linspace_count))
+    l, theta = np.meshgrid(
+        np.linspace(0, length, linspace_count), np.linspace(0, 2 * np.pi, linspace_count)
+    )
 
     radii = np.linspace(start_radius, end_radius, linspace_count)
     rsin = np.multiply(radii, np.sin(theta))
     rcos = np.multiply(radii, np.cos(theta))
 
-    return np.array([start[i] +
-                     v[i] * l +
-                     n1[i] * rsin + n2[i] * rcos
-                     for i in range(3)])
+    return np.array([start[i] + v[i] * l + n1[i] * rsin + n2[i] * rcos for i in range(3)])
 
 
-def project_cylinder_onto_2d(ax, plane,
-                             start, end, start_radius, end_radius,
-                             color='black', alpha=1.):
+def project_cylinder_onto_2d(
+    ax, plane, start, end, start_radius, end_radius, color='black', alpha=1.0
+):
     """Take cylinder defined by start/end, and project it onto the plane.
 
     Args:
@@ -406,23 +433,31 @@ def project_cylinder_onto_2d(ax, plane,
     tight convex hull is found, and that is used for a filled polygon
     """
     points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
-    points = np.vstack([points[plane[0]].ravel(),
-                        points[plane[1]].ravel()])
+    points = np.vstack([points[plane[0]].ravel(), points[plane[1]].ravel()])
     points = points.T
     hull = ConvexHull(points)
     ax.add_patch(Polygon(points[hull.vertices], fill=True, color=color, alpha=alpha))
 
 
-def plot_cylinder(ax, start, end, start_radius, end_radius,
-                  color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+def plot_cylinder(
+    ax,
+    start,
+    end,
+    start_radius,
+    end_radius,
+    color='black',
+    alpha=1.0,
+    linspace_count=_LINSPACE_COUNT,
+):
     """Plot a 3d cylinder."""
     assert not np.all(start == end), 'Cylinder must have length'
-    x, y, z = generate_cylindrical_points(start, end, start_radius, end_radius,
-                                          linspace_count=linspace_count)
+    x, y, z = generate_cylindrical_points(
+        start, end, start_radius, end_radius, linspace_count=linspace_count
+    )
     ax.plot_surface(x, y, z, color=color, alpha=alpha)
 
 
-def plot_sphere(ax, center, radius, color='black', alpha=1., linspace_count=_LINSPACE_COUNT):
+def plot_sphere(ax, center, radius, color='black', alpha=1.0, linspace_count=_LINSPACE_COUNT):
     """Plots a 3d sphere, given the center and the radius."""
     u = np.linspace(0, 2 * np.pi, linspace_count)
     v = np.linspace(0, np.pi, linspace_count)

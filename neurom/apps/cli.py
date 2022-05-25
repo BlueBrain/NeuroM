@@ -39,8 +39,9 @@ from neurom.view import matplotlib_impl, matplotlib_utils
 
 
 @click.group()
-@click.option('-v', '--verbose', count=True, default=0,
-              help='-v for WARNING, -vv for INFO, -vvv for DEBUG')
+@click.option(
+    '-v', '--verbose', count=True, default=0, help='-v for WARNING, -vv for INFO, -vvv for DEBUG'
+)
 def cli(verbose):
     """The CLI entry point."""
     level = (logging.WARNING, logging.INFO, logging.DEBUG)[min(verbose, 2)]
@@ -52,9 +53,13 @@ def cli(verbose):
 @click.option('--3d', 'is_3d', is_flag=True)
 @click.option('--plane', type=click.Choice(['xy', 'yx', 'yz', 'zy', 'xz', 'zx']), default='xy')
 @click.option('--backend', type=click.Choice(['plotly', 'matplotlib']), default='matplotlib')
-@click.option('-r', '--realistic-diameters/--no-realistic-diameters', default=False,
-              help='Scale diameters according to the plot axis\n'
-                   'Warning: Only works with the matplotlib backend')
+@click.option(
+    '-r',
+    '--realistic-diameters/--no-realistic-diameters',
+    default=False,
+    help='Scale diameters according to the plot axis\n'
+    'Warning: Only works with the matplotlib backend',
+)
 def view(input_file, is_3d, plane, backend, realistic_diameters):
     """CLI interface to draw morphologies."""
     # pylint: disable=import-outside-toplevel
@@ -65,10 +70,15 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
             plot = partial(matplotlib_impl.plot_morph3d, ax=ax)
         else:
             _, ax = matplotlib_utils.get_figure()
-            plot = partial(matplotlib_impl.plot_morph, ax=ax,
-                           plane=plane, realistic_diameters=realistic_diameters)
+            plot = partial(
+                matplotlib_impl.plot_morph,
+                ax=ax,
+                plane=plane,
+                realistic_diameters=realistic_diameters,
+            )
     else:
         from neurom.view import plotly_impl
+
         if is_3d:
             plot = plotly_impl.plot_morph3d
         else:
@@ -79,24 +89,53 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
         plt.show()
 
 
-@cli.command(short_help='Morphology statistics extractor, more details at'
-                        'https://neurom.readthedocs.io/en/latest/morph_stats.html')
+@cli.command(
+    short_help='Morphology statistics extractor, more details at'
+    'https://neurom.readthedocs.io/en/latest/morph_stats.html'
+)
 @click.argument('datapath', required=False)
-@click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
-              default=morph_stats.EXAMPLE_CONFIG, show_default=True,
-              help='Configuration File')
-@click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
-              help='Path to output file, if it ends in .json, a json file is created,'
-                   'otherwise a csv file is created')
-@click.option('-f', '--full-config', is_flag=True, default=False,
-              help='If passed then --config is ignored. Compute statistics for all neurite'
-                   'types, all modes and all features')
-@click.option('--as-population', is_flag=True, default=False,
-              help='If enabled the directory is treated as a population')
-@click.option('-I', '--ignored-exceptions', help='Exception to ignore',
-              type=click.Choice(morph_stats.IGNORABLE_EXCEPTIONS.keys()))
-@click.option('--use-subtrees', is_flag=True, show_default=True, default=False,
-              help="Enable mixed subtree processing.")
+@click.option(
+    '-C',
+    '--config',
+    type=click.Path(exists=True, dir_okay=False),
+    default=morph_stats.EXAMPLE_CONFIG,
+    show_default=True,
+    help='Configuration File',
+)
+@click.option(
+    '-o',
+    '--output',
+    type=click.Path(exists=False, dir_okay=False),
+    help='Path to output file, if it ends in .json, a json file is created,'
+    'otherwise a csv file is created',
+)
+@click.option(
+    '-f',
+    '--full-config',
+    is_flag=True,
+    default=False,
+    help='If passed then --config is ignored. Compute statistics for all neurite'
+    'types, all modes and all features',
+)
+@click.option(
+    '--as-population',
+    is_flag=True,
+    default=False,
+    help='If enabled the directory is treated as a population',
+)
+@click.option(
+    '-I',
+    '--ignored-exceptions',
+    help='Exception to ignore',
+    type=click.Choice(morph_stats.IGNORABLE_EXCEPTIONS.keys()),
+)
+@click.option(
+    '--use-subtrees',
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Enable mixed subtree processing.",
+)
 def stats(datapath, config, output, full_config, as_population, ignored_exceptions, use_subtrees):
     """Cli for apps/morph_stats."""
     morph_stats.main(
@@ -104,14 +143,26 @@ def stats(datapath, config, output, full_config, as_population, ignored_exceptio
     )
 
 
-@cli.command(short_help='Perform checks on morphologies, more details at'
-                        'https://neurom.readthedocs.io/en/latest/morph_check.html')
+@cli.command(
+    short_help='Perform checks on morphologies, more details at'
+    'https://neurom.readthedocs.io/en/latest/morph_check.html'
+)
 @click.argument('datapath')
-@click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
-              default=morph_check.EXAMPLE_CONFIG, show_default=True,
-              help='Configuration File')
-@click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
-              help='Path to output json summary file', required=True)
+@click.option(
+    '-C',
+    '--config',
+    type=click.Path(exists=True, dir_okay=False),
+    default=morph_check.EXAMPLE_CONFIG,
+    show_default=True,
+    help='Configuration File',
+)
+@click.option(
+    '-o',
+    '--output',
+    type=click.Path(exists=False, dir_okay=False),
+    help='Path to output json summary file',
+    required=True,
+)
 def check(datapath, config, output):
     """Cli for apps/morph_check."""
     morph_check.main(datapath, config, output)

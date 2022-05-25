@@ -68,15 +68,15 @@ class Soma:
     @property
     def points(self):
         """Get the set of (x, y, z, r) points this soma."""
-        return np.concatenate((self._morphio_soma.points,
-                               self._morphio_soma.diameters[:, np.newaxis] / 2.),
-                              axis=1)
+        return np.concatenate(
+            (self._morphio_soma.points, self._morphio_soma.diameters[:, np.newaxis] / 2.0), axis=1
+        )
 
     @property
     def volume(self):
         """Gets soma volume assuming it is a sphere."""
         warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
-        return 4. / 3 * math.pi * self.radius ** 3
+        return 4.0 / 3 * math.pi * self.radius**3
 
     def overlaps(self, points, exclude_boundary=False):
         """Check that the given points are located inside the soma."""
@@ -101,8 +101,11 @@ class SomaSinglePoint(Soma):
 
     def __str__(self):
         """Return a string representation."""
-        return ('SomaSinglePoint(%s) <center: %s, radius: %s>' %
-                (repr(self.points), self.center, self.radius))
+        return 'SomaSinglePoint(%s) <center: %s, radius: %s>' % (
+            repr(self.points),
+            self.center,
+            self.radius,
+        )
 
 
 class SomaCylinders(Soma):
@@ -132,9 +135,10 @@ class SomaCylinders(Soma):
     def __init__(self, morphio_soma):
         """Initialize a SomaCyliners object."""
         super().__init__(morphio_soma)
-        self.area = sum(morphmath.segment_area((p0, p1))
-                        for p0, p1 in zip(self.points, self.points[1:]))
-        self.radius = math.sqrt(self.area / (4. * math.pi))
+        self.area = sum(
+            morphmath.segment_area((p0, p1)) for p0, p1 in zip(self.points, self.points[1:])
+        )
+        self.radius = math.sqrt(self.area / (4.0 * math.pi))
 
     @property
     def center(self):
@@ -144,13 +148,17 @@ class SomaCylinders(Soma):
     @property
     def volume(self):
         """Return the volume of soma."""
-        return sum(morphmath.segment_volume((p0, p1))
-                   for p0, p1 in zip(self.points, self.points[1:]))
+        return sum(
+            morphmath.segment_volume((p0, p1)) for p0, p1 in zip(self.points, self.points[1:])
+        )
 
     def __str__(self):
         """Return a string representation."""
-        return ('SomaCylinders(%s) <center: %s, virtual radius: %s>' %
-                (repr(self.points), self.center, self.radius))
+        return 'SomaCylinders(%s) <center: %s, virtual radius: %s>' % (
+            repr(self.points),
+            self.center,
+            self.radius,
+        )
 
     def overlaps(self, points, exclude_boundary=False):
         """Check that the given points are located inside the soma."""
@@ -207,23 +215,27 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
 
         r = self.points[0, COLS.R]
         # make sure the above invariant holds
-        assert (np.isclose(r, self.points[1, COLS.R]) and np.isclose(r, self.points[2, COLS.R])), \
-            'All radii must be the same'
+        assert np.isclose(r, self.points[1, COLS.R]) and np.isclose(
+            r, self.points[2, COLS.R]
+        ), 'All radii must be the same'
         if r < 1e-5:
             warnings.warn('Zero radius for {}'.format(self))
         h = morphmath.point_dist(self.points[1, COLS.XYZ], self.points[2, COLS.XYZ])
         self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
-        self.radius = math.sqrt(self.area / (4. * math.pi))
+        self.radius = math.sqrt(self.area / (4.0 * math.pi))
 
     @property
     def volume(self):
         """Return the volume of the soma."""
-        return 2 * math.pi * self.radius ** 3
+        return 2 * math.pi * self.radius**3
 
     def __str__(self):
         """Return a string representation."""
-        return ('SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' %
-                (repr(self.points), self.center, self.radius))
+        return 'SomaNeuromorphoThreePointCylinders(%s) <center: %s, radius: %s>' % (
+            repr(self.points),
+            self.center,
+            self.radius,
+        )
 
 
 class SomaSimpleContour(Soma):
@@ -240,8 +252,7 @@ class SomaSimpleContour(Soma):
     def __init__(self, morphio_soma):
         """Initialize a SomaSimpleContour object."""
         super().__init__(morphio_soma)
-        self.radius = morphmath.average_points_dist(
-            self.center, self.points[:, COLS.XYZ])
+        self.radius = morphmath.average_points_dist(self.center, self.points[:, COLS.XYZ])
 
     @property
     def center(self):
@@ -250,8 +261,11 @@ class SomaSimpleContour(Soma):
 
     def __str__(self):
         """Return a string representation."""
-        return ('SomaSimpleContour(%s) <center: %s, radius: %s>' %
-                (repr(self.points), self.center, self.radius))
+        return 'SomaSimpleContour(%s) <center: %s, radius: %s>' % (
+            repr(self.points),
+            self.center,
+            self.radius,
+        )
 
     def overlaps(self, points, exclude_boundary=False):
         """Check that the given points are located inside the soma.
@@ -280,26 +294,28 @@ class SomaSimpleContour(Soma):
         closest_indices = np.argmin(np.abs(angles), axis=1)
         neighbors = np.ones_like(closest_indices)
         neighbors[angles[np.arange(len(closest_indices)), closest_indices] < 0] = -1
-        signs = (neighbors == 1) * 2. - 1.
-        neighbors[
-            (closest_indices >= len(relative_soma_pts) - 1)
-            & (neighbors == 1)
-        ] = -len(relative_soma_pts) + 1
+        signs = (neighbors == 1) * 2.0 - 1.0
+        neighbors[(closest_indices >= len(relative_soma_pts) - 1) & (neighbors == 1)] = (
+            -len(relative_soma_pts) + 1
+        )
 
         # Compute the cross product and multiply by neighbors to get the same result as if all
         # vectors were clockwise
-        cross_z = np.cross(
-            (
-                ordered_relative_soma_pts[closest_indices + neighbors]
-                - ordered_relative_soma_pts[closest_indices]
-            ),
-            relative_pts - ordered_relative_soma_pts[closest_indices],
-        )[:, COLS.Z] * signs
+        cross_z = (
+            np.cross(
+                (
+                    ordered_relative_soma_pts[closest_indices + neighbors]
+                    - ordered_relative_soma_pts[closest_indices]
+                ),
+                relative_pts - ordered_relative_soma_pts[closest_indices],
+            )[:, COLS.Z]
+            * signs
+        )
 
         if exclude_boundary:
-            interior_side = (cross_z > 0)
+            interior_side = cross_z > 0
         else:
-            interior_side = (cross_z >= 0)
+            interior_side = cross_z >= 0
 
         return interior_side
 
