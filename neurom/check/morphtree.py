@@ -53,7 +53,7 @@ def is_monotonic(neurite, tol):
             if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
                 return False
         # Check that section boundary points satisfy monotonicity
-        if(node.parent is not None and
+        if (node.parent is not None and
            sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol):
             return False
 

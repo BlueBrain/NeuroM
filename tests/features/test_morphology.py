@@ -506,6 +506,16 @@ def test_sholl_analysis_custom():
     assert (list(morphology.sholl_crossings(morph_A, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 2, 2])
 
+    assert list(morphology.sholl_frequency(morph_A)) == [2, 2, 2, 2, 2, 2, 2, 2]
+
+    assert (
+        list(morphology.sholl_frequency(morph_A, distance_type='path')) == [2, 2, 2, 2, 2, 2, 2, 2]
+    )
+
+    assert list(
+        morphology.sholl_crossings(morph_A, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 2, 2, 2, 2, 2]
+
     morph_B = load_swc("""\
  1 1   0   0  0 1. -1
  2 3   0   0  0 1.  1
@@ -522,8 +532,16 @@ def test_sholl_analysis_custom():
 13 4 -51  -5  0 1.  9
 14 4 -51 -10  0 1.  9
                        """)
-    assert (list(morphology.sholl_crossings(morph_B, center=center, radii=radii)) ==
-            [2, 2, 2, 10, 10, 0, 0, 0])
+    assert (list(
+        morphology.sholl_crossings(morph_B, center=center, radii=radii)
+    ) == [2, 2, 2, 10, 10, 0, 0, 0])
+
+    assert (list(
+        morphology.sholl_crossings(morph_B, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 10, 10, 0, 0, 0])
+
+    assert list(morphology.sholl_frequency(morph_B)) == [2, 2, 2, 2, 10, 10]
+    assert list(morphology.sholl_frequency(morph_B, distance_type='path')) == [2, 2, 2, 2, 10, 10]
 
     morph_C = load_swc("""\
  1 1   0   0  0 1. -1
@@ -543,6 +561,15 @@ def test_sholl_analysis_custom():
                        """)
     assert (list(morphology.sholl_crossings(morph_C, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
+
+    assert (list(
+        morphology.sholl_crossings(morph_C, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 2, 2, 2, 10, 10])
+
+    assert list(morphology.sholl_frequency(morph_C)) == [2, 2, 2, 2, 2, 2, 2, 10, 10]
+    assert (list(
+        morphology.sholl_frequency(morph_C, distance_type='path')
+    ) == [2, 2, 2, 2, 2, 2, 2, 10, 10])
 
 
 def test_extent_along_axis():

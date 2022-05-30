@@ -50,10 +50,11 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import iter_neurites, iter_segments, Morphology
+from neurom.core.morphology import iter_neurites, iter_segments, Morphology, iter_sections
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
+from neurom.core.morphology import Section
 from neurom.exceptions import NeuroMError
 from neurom.features import feature, NameSpace, neurite as nf, section as sf
 from neurom.utils import str_to_plane
@@ -457,7 +458,9 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None):
+def sholl_crossings(
+    morph, neurite_type=NeuriteType.all, center=None, radii=None, distance_type="euclidean"
+):
     """Calculate crossings of neurites.
 
     Args:
@@ -466,6 +469,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
         center(Point): center point, if None then soma center is taken
         radii(iterable of floats): radii for which crossings will be counted,
             if None then soma radius is taken
+        distance_type(str): either `euclidean` or `path` as distance measure to use
 
     Returns:
         Array of same length as radii, with a count of the number of crossings
@@ -480,14 +484,25 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
     """
     def _count_crossings(neurite, radius):
         """Used to count_crossings of segments in neurite with radius."""
-        r2 = radius ** 2
         count = 0
-        for start, end in iter_segments(neurite):
-            start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
-                                      morphmath.point_dist2(center, end))
 
-            count += int(start_dist2 <= r2 <= end_dist2 or
-                         end_dist2 <= r2 <= start_dist2)
+        if distance_type == 'euclidean':
+            r2 = radius ** 2
+            for start, end in iter_segments(neurite):
+                start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
+                                          morphmath.point_dist2(center, end))
+
+                count += int(start_dist2 <= r2 <= end_dist2 or
+                             end_dist2 <= r2 <= start_dist2)
+
+        if distance_type == 'path':
+            for section in iter_sections(neurite):
+                base_length = sf.section_path_length(section) - section.length
+                path_dists = base_length + sf.segment_lengths(section, prepend_zero=True)
+
+                forward = np.logical_and(path_dists[:-1] <= radius, path_dists[1:] >= radius)
+                backward = np.logical_and(path_dists[:-1] >= radius, path_dists[1:] <= radius)
+                count += sum(np.logical_or(forward, backward))
 
         return count
 
@@ -505,7 +520,9 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
 
 
 @feature(shape=(...,))
-def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
+def sholl_frequency(
+    morph, neurite_type=NeuriteType.all, step_size=10, bins=None, distance_type='euclidean'
+):
     """Perform Sholl frequency calculations on a morph.
 
     Args:
@@ -514,6 +531,7 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
         intervals of step_size between min and max radii of ``morphologies``.
+        distance_type(str): either `euclidean` or `path` as distance measure to use
 
     Note:
         Given a morphology, the soma center is used for the concentric circles,
@@ -528,19 +546,34 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        min_soma_edge = morph.soma.radius
 
-        max_radius_per_neurite = [
-            np.max(np.linalg.norm(n.points[:, COLS.XYZ] - morph.soma.center, axis=1))
-            for n in morph.neurites if neurite_filter(n)
-        ]
+        if distance_type == "euclidean":
+            max_radius_per_neurite = [
+                np.max(np.linalg.norm(n.points[:, COLS.XYZ] - morph.soma.center, axis=1))
+                for n in morph.neurites
+                if neurite_filter(n)
+            ]
+            if not max_radius_per_neurite:
+                return []
+            min_distance = morph.soma.radius
+            max_distance = min_distance + max(max_radius_per_neurite)
 
-        if not max_radius_per_neurite:
-            return []
+        if distance_type == "path":
+            max_path_distance_per_neurite = [
+                max(sf.section_path_length(section) for section in iter_sections(n, Section.ileaf))
+                for n in morph.neurites
+                if neurite_filter(n)
+            ]
+            if not max_path_distance_per_neurite:
+                return []
+            min_distance = 0
+            max_distance = max(max_path_distance_per_neurite)
 
-        bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_neurite), step_size)
+        bins = np.arange(min_distance, max_distance, step_size)
 
-    return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
+    return sholl_crossings(
+        morph, neurite_type, morph.soma.center, bins, distance_type=distance_type
+    )
 
 
 def _extent_along_axis(morph, axis, neurite_type):
