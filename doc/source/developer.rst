@@ -60,7 +60,7 @@ individually:
 .. code-block:: bash
 
         $ tox -e py38-lint       # runs only pylint
-        $ tox -e py38-docs       # run only documentation check
+        $ tox -e py38-docs       # run only documentation check and build the doc
         $ tox -e py38-coverage   # run only coverage check
         $ tox -e py38            # run only the tests
 
