@@ -49,7 +49,7 @@ Here we load a morphology and obtain some information from it:
 
 
 Morphology visualization with the :py:mod:`neurom.view` module
-****************************************************************
+**************************************************************
 
 Here we visualize a morphology:
 
