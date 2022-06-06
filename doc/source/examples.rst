@@ -36,7 +36,7 @@ Examples
     installation.
 
 Analysis with :py:mod:`neurom`
-***********************************
+******************************
 
 Here we load a morphology and obtain some information from it:
 
