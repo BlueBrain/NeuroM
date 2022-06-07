@@ -85,14 +85,14 @@ def tree_type_checker(*ref):
     Ex:
         >>> import neurom
         >>> from neurom.core.types import NeuriteType, tree_type_checker
-        >>> from neurom.core.morphology import Section
-        >>> m = neurom.load_morphology('path')
+        >>> from neurom.core.morphology import Section, iter_neurites
+        >>> m = neurom.load_morphology("tests/data/swc/Neuron.swc")
         >>>
         >>> tree_filter = tree_type_checker(NeuriteType.axon, NeuriteType.basal_dendrite)
-        >>> m.i_neurites(Section.ipreorder, tree_filter=tree_filter)
+        >>> it = iter_neurites(m, filt=tree_filter)
         >>>
         >>> tree_filter = tree_type_checker((NeuriteType.axon, NeuriteType.basal_dendrite))
-        >>> m.i_neurites(Section.ipreorder, tree_filter=tree_filter)
+        >>> it = iter_neurites(m, filt=tree_filter)
     """
     ref = tuple(ref)
     if len(ref) == 1 and isinstance(ref[0], tuple):

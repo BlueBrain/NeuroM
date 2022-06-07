@@ -35,34 +35,32 @@ Examples
     started *with the virtualenv activated*. That gives access to the ``neurom``
     installation.
 
-Fast analysis with :py:mod:`neurom`
-***********************************
+Analysis with :py:mod:`neurom`
+******************************
 
 Here we load a morphology and obtain some information from it:
 
-.. code-block:: python
+.. doctest:: [examples]
 
     >>> import neurom as nm
-    >>> m = nm.load_morphology('some/data/path/morph_file.swc')
+    >>> m = nm.load_morphology("tests/data/swc/Neuron.swc")
     >>> ap_seg_len = nm.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
     >>> ax_sec_len = nm.get('section_lengths', m, neurite_type=nm.AXON)
 
 
-Morphology visualization with the :py:mod:`neurom.viewer` module
-****************************************************************
+Morphology visualization with the :py:mod:`neurom.view` module
+**************************************************************
 
 Here we visualize a morphology:
 
 
-.. code-block:: python
+.. doctest:: [examples]
 
     >>> # Initialize m as above
-    >>> from neurom import viewer
-    >>> fig, ax = viewer.draw(m)
-    >>> fig.show()
-    >>>
-    >>> fig, ax = viewer.draw(m, mode='3d') # valid modes '2d', '3d', 'dendrogram'
-    >>> fig.show()
+    >>> from neurom.view import plot_morph, plot_morph3d, plot_dendrogram
+    >>> plot_morph(m)
+    >>> plot_morph3d(m)
+    >>> plot_dendrogram(m)
 
 Advanced iterator-based feature extraction example
 **************************************************
@@ -89,7 +87,7 @@ Getting Log Information
 They are emitted in the ``neurom`` namespace, and can thus be filtered based
 on this.  An example of setting up a handler is:
 
-.. code-block:: python
+.. doctest::
 
     >>> import logging
     >>> # setup which namespace will be examined, and at what level

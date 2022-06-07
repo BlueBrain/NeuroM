@@ -36,7 +36,7 @@ NeuroM uses MorphIO for reading/writing of morphologies. The rule is be less rig
 If there is a problem with morphology then NeuroM rather print a warning about instead of raising
 an error. If you want validate morphologies as strictly as possible then
 
-.. code-block:: python
+.. testcode:: [validation]
 
    import morphio
    morphio.set_raise_warnings(True)
@@ -44,13 +44,13 @@ an error. If you want validate morphologies as strictly as possible then
 This will make MorphIO (hence NeuroM as well) raise warnings as errors. You might want to skip some
 warnings at all. For example, zero diameter is ok to have in your morpology. Then you can:
 
-.. code-block:: python
+.. testcode:: [validation]
 
    try:
        morphio.set_raise_warnings(True)
        # warnings you are not interested in
        morphio.set_ignored_warning(morphio.Warning.zero_diameter, True)
-       m = morphio.Morphology('path/to/morph')
+       m = morphio.Morphology('tests/data/swc/soma_zero_radius.swc')
    finally:
        morphio.set_ignored_warning(morphio.Warning.zero_diameter, False)
        morphio.set_raise_warnings(False)

@@ -59,9 +59,10 @@ individually:
 
 .. code-block:: bash
 
-        $ tox -e py36-lint       # runs only pylint
-        $ tox -e py36-docs       # run only documentation check
-        $ tox -e py36            # run only the tests
+        $ tox -e py38-lint       # runs only pylint
+        $ tox -e py38-docs       # run only documentation check and build the doc
+        $ tox -e py38-coverage   # run only coverage check
+        $ tox -e py38            # run only the tests
 
 You can also run tests manually via `pylint` but you need to make sure that you have installed
 all required dependencies in your virtual environment:

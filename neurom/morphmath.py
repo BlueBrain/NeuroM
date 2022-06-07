@@ -242,13 +242,6 @@ def angle_between_vectors(p1, p2):
 
     Normalizes the input vectors and computes the relative angle
     between them.
-
-        >>> angle_between((1, 0), (0, 1))
-        1.5707963267948966
-        >>> angle_between((1, 0), (1, 0))
-        0.0
-        >>> angle_between((1, 0), (-1, 0))
-        3.141592653589793
     """
     if np.equal(p1, p2).all():
         return 0.0

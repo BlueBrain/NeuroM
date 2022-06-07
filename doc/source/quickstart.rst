@@ -57,12 +57,12 @@ Extract morphometrics with :func:`neurom.features.get`
 Analyze morphologies via :func:`neurom.features.get`. This way you can get things like segment
 lengths, section lengths, etc.
 
-.. code::
+.. testcode::
 
     import neurom as nm
-    m = nm.load_morphology('some/data/path/morph_file0.swc')
+    m = nm.load_morphology('tests/data/swc/Neuron.swc')
     m_ap_seg_len = nm.features.get('segment_lengths', m, neurite_type=nm.APICAL_DENDRITE)
-    pop = nm.load_morphologies('some/data/path')
+    pop = nm.load_morphologies('tests/data/valid_set/')
     pop_ap_seg_len = nm.features.get('segment_lengths', pop, neurite_type=nm.APICAL_DENDRITE)
 
 For more details see :ref:`features`.
@@ -76,12 +76,11 @@ neurite or a list of neurites. It allows to optionally pass a function to be
 mapped onto each neurite, as well as a neurite filter function. In this example,
 we apply a simple user defined function to the apical dendrites in a population:
 
-.. code::
+.. testcode::
 
     import neurom as nm
 
     def user_func(neurite):
-        print('Analysing neurite', neurite)
         return len(neurite.points)
 
     stuff = [x for x in nm.iter_neurites(pop, user_func, lambda n : n.type == nm.APICAL_DENDRITE)]

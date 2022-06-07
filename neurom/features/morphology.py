@@ -35,10 +35,10 @@ The features mechanism does not allow you to apply these features to neurites.
 
 >>> import neurom
 >>> from neurom import features
->>> m = neurom.load_morphology('path/to/morphology')
->>> features.get('soma_surface_area', m)
->>> population = neurom.load_morphologies('path/to/morphs')
->>> features.get('sholl_crossings', population)
+>>> m = neurom.load_morphology("tests/data/swc/Neuron.swc")
+>>> result = features.get('soma_surface_area', m)
+>>> population = neurom.load_morphologies("tests/data/valid_set")
+>>> result = features.get('sholl_crossings', population)
 
 For more details see :ref:`features`.
 """
