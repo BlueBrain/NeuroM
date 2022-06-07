@@ -30,5 +30,6 @@
 
 from neurom.core.morphology import Morphology, Neurite, Section
 from neurom.core.population import Population
+
 # those imports here for backward compatibility
 from neurom.core.soma import Soma

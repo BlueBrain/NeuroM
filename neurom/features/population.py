@@ -97,7 +97,13 @@ def sholl_frequency(
 
         bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_section), step_size)
 
-    return np.array([
-        mf.sholl_crossings(m, neurite_type, m.soma.center, bins, use_subtrees=use_subtrees)
-        for m in morphs
-    ]).sum(axis=0).tolist()
+    return (
+        np.array(
+            [
+                mf.sholl_crossings(m, neurite_type, m.soma.center, bins, use_subtrees=use_subtrees)
+                for m in morphs
+            ]
+        )
+        .sum(axis=0)
+        .tolist()
+    )

@@ -10,6 +10,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 EXAMPLES_DIR = TESTS_DIR.parent / "examples"
 print(EXAMPLES_DIR)
 
+
 @pytest.mark.parametrize("filepath", EXAMPLES_DIR.glob("*.py"))
 def test_example(filepath):
 

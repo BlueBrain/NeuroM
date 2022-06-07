@@ -47,8 +47,9 @@ class CheckRunner:
     def __init__(self, config):
         """Initialize a CheckRunner object."""
         self._config = CheckRunner._sanitize_config(config)
-        self._check_modules = dict((k, import_module('neurom.check.%s' % k))
-                                   for k in config['checks'])
+        self._check_modules = dict(
+            (k, import_module('neurom.check.%s' % k)) for k in config['checks']
+        )
 
     def run(self, path):
         """Test a bunch of files and return a summary JSON report."""
@@ -83,8 +84,7 @@ class CheckRunner:
 
         try:
             if out.info:
-                L.debug('%s: %d failing ids detected: %s',
-                        out.title, len(out.info), out.info)
+                L.debug('%s: %d failing ids detected: %s', out.title, len(out.info), out.info)
         except TypeError:  # pragma: no cover
             pass
 
@@ -136,8 +136,7 @@ class CheckRunner:
         LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
 
         # pylint: disable=logging-not-lazy
-        L.log(LOG_LEVELS[ok],
-              '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
+        L.log(LOG_LEVELS[ok], '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
     @staticmethod
     def _sanitize_config(config):

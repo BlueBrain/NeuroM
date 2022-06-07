@@ -39,7 +39,15 @@ def test_get_config():
 
     test_yaml = Path(__file__).parent.parent.parent / 'neurom/apps/config/morph_stats.yaml'
 
-    expected = {'neurite': {'section_lengths': ['max', 'sum'], 'section_volumes': ['sum'], 'section_branch_orders': ['max']}, 'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'], 'morphology': {'soma_radius': ['mean']}}
+    expected = {
+        'neurite': {
+            'section_lengths': ['max', 'sum'],
+            'section_volumes': ['sum'],
+            'section_branch_orders': ['max'],
+        },
+        'neurite_type': ['AXON', 'APICAL_DENDRITE', 'BASAL_DENDRITE', 'ALL'],
+        'morphology': {'soma_radius': ['mean']},
+    }
 
     config = get_config(None, test_yaml)
     assert config == expected

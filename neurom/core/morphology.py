@@ -90,7 +90,7 @@ class Section:
 
     def ipreorder(self):
         """Depth-first pre-order iteration of tree nodes."""
-        children = deque((self, ))
+        children = deque((self,))
         while children:
             cur_node = children.pop()
             children.extend(reversed(cur_node.children))
@@ -98,7 +98,9 @@ class Section:
 
     def ipostorder(self):
         """Depth-first post-order iteration of tree nodes."""
-        children = [self, ]
+        children = [
+            self,
+        ]
         seen = set()
         while children:
             cur_node = children[-1]
@@ -116,9 +118,12 @@ class Section:
             stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
         """
         if stop_node is None:
+
             def stop_condition(section):
                 return section.is_root()
+
         else:
+
             def stop_condition(section):
                 return section.is_root() or section == stop_node
 
@@ -159,9 +164,10 @@ class Section:
     @property
     def points(self):
         """Returns the section list of points the NeuroM way (points + radius)."""
-        return np.concatenate((self._morphio_section.points,
-                               self._morphio_section.diameters[:, np.newaxis] / 2.),
-                              axis=1)
+        return np.concatenate(
+            (self._morphio_section.points, self._morphio_section.diameters[:, np.newaxis] / 2.0),
+            axis=1,
+        )
 
     @property
     def type(self):
@@ -194,18 +200,22 @@ class Section:
     def __repr__(self):
         """Text representation."""
         parent_id = None if self.parent is None else self.parent.id
-        return (f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
-                f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>')
+        return (
+            f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
+            f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>'
+        )
 
 
 # NRN simulator iteration order
 # See:
 # https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874
-NRN_ORDER = {NeuriteType.soma: 0,
-             NeuriteType.axon: 1,
-             NeuriteType.basal_dendrite: 2,
-             NeuriteType.apical_dendrite: 3,
-             NeuriteType.undefined: 4}
+NRN_ORDER = {
+    NeuriteType.soma: 0,
+    NeuriteType.axon: 1,
+    NeuriteType.basal_dendrite: 2,
+    NeuriteType.apical_dendrite: 3,
+    NeuriteType.undefined: 4,
+}
 
 
 def _homogeneous_subtrees(neurite):
@@ -228,9 +238,9 @@ def _homogeneous_subtrees(neurite):
         NeuriteType.axon,
     ]:
         warnings.warn(
-                f"{neurite} is not an axon-carrying dendrite. "
-                f"Subtree types found {homogeneous_types}",
-                stacklevel=2
+            f"{neurite} is not an axon-carrying dendrite. "
+            f"Subtree types found {homogeneous_types}",
+            stacklevel=2,
         )
     return homogeneous_neurites
 
@@ -277,8 +287,10 @@ def iter_neurites(
 
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
-            warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
-                          'within the whole population, not within each morphology separately.')
+            warnings.warn(
+                '`iter_neurites` with `neurite_order` over Population orders neurites'
+                'within the whole population, not within each morphology separately.'
+            )
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
@@ -299,11 +311,13 @@ def iter_neurites(
     return map(mapfun, neurite_iter)
 
 
-def iter_sections(neurites,
-                  iterator_type=Section.ipreorder,
-                  neurite_filter=None,
-                  neurite_order=NeuriteIter.FileOrder,
-                  section_filter=None):
+def iter_sections(
+    neurites,
+    iterator_type=Section.ipreorder,
+    neurite_filter=None,
+    neurite_order=NeuriteIter.FileOrder,
+    section_filter=None,
+):
     """Iterator to the sections in a neurite, morphology or morphology population.
 
     Arguments:
@@ -354,24 +368,21 @@ def iter_segments(
         morphology segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     """
-    sections = iter((obj,) if isinstance(obj, Section) else
-                    iter_sections(obj,
-                                  neurite_filter=neurite_filter,
-                                  neurite_order=neurite_order,
-                                  section_filter=section_filter))
-
-    return flatten(
-        zip(section.points[:-1], section.points[1:])
-        for section in sections
+    sections = iter(
+        (obj,)
+        if isinstance(obj, Section)
+        else iter_sections(
+            obj,
+            neurite_filter=neurite_filter,
+            neurite_order=neurite_order,
+            section_filter=section_filter,
+        )
     )
 
+    return flatten(zip(section.points[:-1], section.points[1:]) for section in sections)
 
-def iter_points(
-    obj,
-    neurite_filter=None,
-    neurite_order=NeuriteIter.FileOrder,
-    section_filter=None
-):
+
+def iter_points(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder, section_filter=None):
     """Return an iterator to the points in a population, morphology, neurites, or section.
 
     Args:
@@ -383,12 +394,13 @@ def iter_points(
         section_filter: optional section level filter
     """
     sections = (
-        iter((obj,)) if isinstance(obj, Section)
+        iter((obj,))
+        if isinstance(obj, Section)
         else iter_sections(
             obj,
             neurite_filter=neurite_filter,
             neurite_order=neurite_order,
-            section_filter=section_filter
+            section_filter=section_filter,
         )
     )
 
@@ -449,6 +461,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_length
+
         return total_length(self)
 
     @property
@@ -459,6 +472,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_area
+
         return total_area(self)
 
     @property
@@ -469,6 +483,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_volume
+
         return total_volume(self)
 
     def is_heterogeneous(self) -> bool:
@@ -540,8 +555,7 @@ class Morphology:
     @property
     def points(self):
         """Returns the list of points."""
-        return np.concatenate(
-            [section.points for section in iter_sections(self)])
+        return np.concatenate([section.points for section in iter_sections(self)])
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
@@ -564,5 +578,4 @@ class Morphology:
 
     def __repr__(self):
         """Return a string representation."""
-        return 'Morphology <soma: %s, n_neurites: %d>' % \
-            (self.soma, len(self.neurites))
+        return 'Morphology <soma: %s, n_neurites: %d>' % (self.soma, len(self.neurites))

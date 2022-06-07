@@ -55,6 +55,7 @@ _POPULATION_FEATURES = {}
 
 class NameSpace(Enum):
     """The level of morphology abstraction that feature applies to."""
+
     NEURITE = 'neurite'
     NEURON = 'morphology'
     POPULATION = 'population'
@@ -81,7 +82,7 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, use_subtrees, **k
                 use_subtrees=use_subtrees,
             )
         ),
-        0 if feature_.shape == () else []
+        0 if feature_.shape == () else [],
     )
 
 
@@ -118,9 +119,9 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
         # input is a neurite or a list of neurites
         if feature_name in _NEURITE_FEATURES:
 
-            assert 'neurite_type' not in kwargs, (
-                'Cant apply "neurite_type" arg to a neurite with a neurite feature'
-            )
+            assert (
+                'neurite_type' not in kwargs
+            ), 'Cant apply "neurite_type" arg to a neurite with a neurite feature'
 
             feature_ = _NEURITE_FEATURES[feature_name]
 
@@ -169,12 +170,14 @@ def _get_feature_value_and_func(feature_name, obj, use_subtrees=False, **kwargs)
                 [
                     _get_neurites_feature_value(feature_, n, neurite_filter, use_subtrees, **kwargs)
                     for n in obj
-                ]
+                ],
             )
 
     if res is None or feature_ is None:
-        raise NeuroMError(f'Cant apply "{feature_name}" feature. Please check that it exists, '
-                          'and can be applied to your input. See the features documentation page.')
+        raise NeuroMError(
+            f'Cant apply "{feature_name}" feature. Please check that it exists, '
+            'and can be applied to your input. See the features documentation page.'
+        )
 
     return res, feature_
 
@@ -210,9 +213,11 @@ def _register_feature(namespace: NameSpace, name, func, shape):
         shape(tuple): the expected shape of the feature values
     """
     setattr(func, 'shape', shape)
-    _map = {NameSpace.NEURITE: _NEURITE_FEATURES,
-            NameSpace.NEURON: _MORPHOLOGY_FEATURES,
-            NameSpace.POPULATION: _POPULATION_FEATURES}
+    _map = {
+        NameSpace.NEURITE: _NEURITE_FEATURES,
+        NameSpace.NEURON: _MORPHOLOGY_FEATURES,
+        NameSpace.POPULATION: _POPULATION_FEATURES,
+    }
     if name in _map[namespace]:
         raise NeuroMError(f'A feature is already registered under "{name}"')
     _map[namespace][name] = func
@@ -235,7 +240,11 @@ def feature(shape, namespace: NameSpace, name=None):
 
 
 # These imports are necessary in order to register the features
-from neurom.features import neurite, morphology, population  # noqa, isort:skip, pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+from neurom.features import neurite  # noqa, isort: skio
+
+from neurom.features import morphology  # noqa, isort: skip
+from neurom.features import population  # noqa, isort: skip
 
 
 def _features_catalogue():

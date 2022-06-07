@@ -38,15 +38,12 @@ def test_viewer_plotly(mock):
     runner = CliRunner()
     filename = str(DATA / 'swc' / 'simple.swc')
 
-    result = runner.invoke(cli, ['view', filename, '--3d',
-                                 '--backend', 'plotly'])
+    result = runner.invoke(cli, ['view', filename, '--3d', '--backend', 'plotly'])
     assert result.exit_code == 0
     mock.assert_called_once()
 
     mock.reset_mock()
-    result = runner.invoke(cli, ['view', filename,
-                                 '--backend', 'plotly',
-                                 '--plane', 'xy'])
+    result = runner.invoke(cli, ['view', filename, '--backend', 'plotly', '--plane', 'xy'])
     assert result.exit_code == 0
     mock.assert_called_once()
 
@@ -58,19 +55,26 @@ def test_morph_stat():
         result = runner.invoke(cli, ['stats', str(filename), '--output', f.name])
         assert result.exit_code == 0
         df = pd.read_csv(f)
-        assert set(df.columns) == {'name', 'axon:max_section_lengths', 'axon:sum_section_lengths',
-                                   'axon:sum_section_volumes', 'axon:max_section_branch_orders',
-                                   'apical_dendrite:max_section_lengths',
-                                   'apical_dendrite:sum_section_lengths',
-                                   'apical_dendrite:sum_section_volumes',
-                                   'apical_dendrite:max_section_branch_orders',
-                                   'basal_dendrite:max_section_lengths',
-                                   'basal_dendrite:sum_section_lengths',
-                                   'basal_dendrite:sum_section_volumes',
-                                   'basal_dendrite:max_section_branch_orders',
-                                   'all:max_section_lengths',
-                                   'all:sum_section_lengths', 'all:sum_section_volumes',
-                                   'all:max_section_branch_orders', 'morphology:mean_soma_radius'}
+        assert set(df.columns) == {
+            'name',
+            'axon:max_section_lengths',
+            'axon:sum_section_lengths',
+            'axon:sum_section_volumes',
+            'axon:max_section_branch_orders',
+            'apical_dendrite:max_section_lengths',
+            'apical_dendrite:sum_section_lengths',
+            'apical_dendrite:sum_section_volumes',
+            'apical_dendrite:max_section_branch_orders',
+            'basal_dendrite:max_section_lengths',
+            'basal_dendrite:sum_section_lengths',
+            'basal_dendrite:sum_section_volumes',
+            'basal_dendrite:max_section_branch_orders',
+            'all:max_section_lengths',
+            'all:sum_section_lengths',
+            'all:sum_section_volumes',
+            'all:max_section_branch_orders',
+            'morphology:mean_soma_radius',
+        }
 
 
 def test_morph_stat_full_config():
@@ -87,7 +91,9 @@ def test_morph_stat_full_config__subtrees():
     runner = CliRunner()
     filename = DATA / 'h5/v1/Neuron.h5'
     with tempfile.NamedTemporaryFile() as f:
-        result = runner.invoke(cli, ['stats', str(filename), '--full-config', '--use-subtrees', '--output', f.name])
+        result = runner.invoke(
+            cli, ['stats', str(filename), '--full-config', '--use-subtrees', '--output', f.name]
+        )
         assert result.exit_code == 0
         df = pd.read_csv(f)
         assert not df.empty
@@ -133,13 +139,18 @@ def test_morph_check():
         result = runner.invoke(cli, ['check', str(filename), '--output', f.name])
         assert result.exit_code == 0
         content = json.load(f)
-        assert content == {'files': {
-            str(filename.absolute()): {'Has basal dendrite': True,
-                                       'Has axon': True,
-                                       'Has apical dendrite': False,
-                                       'Has all nonzero segment lengths': True,
-                                       'Has all nonzero section lengths': True,
-                                       'Has all nonzero neurite radii': False,
-                                       'Has nonzero soma radius': True,
-                                       'ALL': False}},
-            'STATUS': 'FAIL'}
+        assert content == {
+            'files': {
+                str(filename.absolute()): {
+                    'Has basal dendrite': True,
+                    'Has axon': True,
+                    'Has apical dendrite': False,
+                    'Has all nonzero segment lengths': True,
+                    'Has all nonzero section lengths': True,
+                    'Has all nonzero neurite radii': False,
+                    'Has nonzero soma radius': True,
+                    'ALL': False,
+                }
+            },
+            'STATUS': 'FAIL',
+        }

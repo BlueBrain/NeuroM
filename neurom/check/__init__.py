@@ -33,6 +33,7 @@ from functools import wraps
 
 def check_wrapper(fun):
     """Decorate a checking function."""
+
     @wraps(fun)
     def _wrapper(*args, **kwargs):
         """Sets the title property of the result of running a checker."""
@@ -46,6 +47,7 @@ def check_wrapper(fun):
 
 class CheckResult:
     """Class representing a check result."""
+
     def __init__(self, status, info=None, title=None):
         """Initialize a CheckResult object."""
         self.status = bool(status)

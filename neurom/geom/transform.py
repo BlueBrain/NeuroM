@@ -46,6 +46,7 @@ _TRANSFDOC = """
 
 class Transform3D:
     """Class representing a generic 3D transformation."""
+
     __doc__ += _TRANSFDOC
 
     def __call__(self, points):
@@ -55,6 +56,7 @@ class Transform3D:
 
 class Translation(Transform3D):
     """Class representing a 3D translation."""
+
     __doc__ += _TRANSFDOC
 
     def __init__(self, translation):
@@ -72,6 +74,7 @@ class Translation(Transform3D):
 
 class Rotation(Transform3D):
     """Class representing a 3D rotation."""
+
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm):
@@ -89,6 +92,7 @@ class Rotation(Transform3D):
 
 class PivotRotation(Rotation):
     """Class representing a 3D rotation about a pivot point."""
+
     __doc__ += _TRANSFDOC
 
     def __init__(self, dcm, pivot=None):
@@ -148,7 +152,7 @@ def rotate(obj, axis, angle, origin=None):
 
 def _sin(x):
     """Sine with case for pi multiples."""
-    return 0. if np.isclose(np.mod(x, np.pi), 0.) else np.sin(x)
+    return 0.0 if np.isclose(np.mod(x, np.pi), 0.0) else np.sin(x)
 
 
 def _rodrigues_to_dcm(axis, angle):
@@ -174,8 +178,8 @@ def _rodrigues_to_dcm(axis, angle):
     uyz = uy * uz
 
     sn = _sin(angle)
-    cs = _sin(np.pi / 2. - angle)
-    cs1 = 1. - cs
+    cs = _sin(np.pi / 2.0 - angle)
+    cs1 = 1.0 - cs
 
     R = np.zeros([3, 3])
 

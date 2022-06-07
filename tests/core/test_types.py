@@ -1,4 +1,3 @@
-
 # Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -71,9 +70,8 @@ def test_tree_type_checker_broken():
     assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(
-        NeuriteType.axon,
-        NeuriteType.apical_dendrite,
-        NeuriteType.basal_dendrite)
+        NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite
+    )
     mock_tree.type = NeuriteType.soma
     assert not tree_filter(mock_tree)
 

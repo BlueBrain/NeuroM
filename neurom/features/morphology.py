@@ -52,8 +52,13 @@ import numpy as np
 
 from neurom import morphmath
 from neurom.core.dataformat import COLS
-from neurom.core.morphology import (Morphology, iter_neurites, iter_points,
-                                    iter_sections, iter_segments)
+from neurom.core.morphology import (
+    Morphology,
+    iter_neurites,
+    iter_points,
+    iter_sections,
+    iter_segments,
+)
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
@@ -103,7 +108,7 @@ def soma_surface_area(morph):
     Note:
         The surface area is calculated by assuming the soma is spherical.
     """
-    return 4.0 * math.pi * morph.soma.radius ** 2
+    return 4.0 * math.pi * morph.soma.radius**2
 
 
 @feature(shape=())
@@ -118,10 +123,9 @@ def max_radial_distance(morph, origin=None, neurite_type=NeuriteType.all, use_su
     origin = morph.soma.center if origin is None else origin
 
     term_radial_distances = _map_neurites(
-        partial(nf.max_radial_distance, origin=origin),
-        morph, neurite_type, use_subtrees
+        partial(nf.max_radial_distance, origin=origin), morph, neurite_type, use_subtrees
     )
-    return max(term_radial_distances) if term_radial_distances else 0.
+    return max(term_radial_distances) if term_radial_distances else 0.0
 
 
 @feature(shape=(...,))
@@ -133,12 +137,16 @@ def section_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, u
     """
     origin = morph.soma.center if origin is None else origin
 
-    return list(flatten(_map_neurites(
-        partial(nf.section_radial_distances, origin=origin),
-        morph=morph,
-        neurite_type=neurite_type,
-        use_subtrees=use_subtrees,
-    )))
+    return list(
+        flatten(
+            _map_neurites(
+                partial(nf.section_radial_distances, origin=origin),
+                morph=morph,
+                neurite_type=neurite_type,
+                use_subtrees=use_subtrees,
+            )
+        )
+    )
 
 
 @feature(shape=(...,))
@@ -148,12 +156,16 @@ def section_term_radial_distances(
     """Get the radial distances of the termination sections."""
     origin = morph.soma.center if origin is None else origin
 
-    return list(flatten(_map_neurites(
-        partial(nf.section_term_radial_distances, origin=origin),
-        morph=morph,
-        neurite_type=neurite_type,
-        use_subtrees=use_subtrees
-    )))
+    return list(
+        flatten(
+            _map_neurites(
+                partial(nf.section_term_radial_distances, origin=origin),
+                morph=morph,
+                neurite_type=neurite_type,
+                use_subtrees=use_subtrees,
+            )
+        )
+    )
 
 
 @feature(shape=(...,))
@@ -163,27 +175,33 @@ def section_bif_radial_distances(
     """Get the radial distances of the bifurcation sections."""
     origin = morph.soma.center if origin is None else origin
 
-    return list(flatten(_map_neurites(
-        partial(nf.section_bif_radial_distances, origin=origin),
-        morph=morph,
-        neurite_type=neurite_type,
-        use_subtrees=use_subtrees,
-    )))
+    return list(
+        flatten(
+            _map_neurites(
+                partial(nf.section_bif_radial_distances, origin=origin),
+                morph=morph,
+                neurite_type=neurite_type,
+                use_subtrees=use_subtrees,
+            )
+        )
+    )
 
 
 @feature(shape=(...,))
-def segment_radial_distances(
-    morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False
-):
+def segment_radial_distances(morph, origin=None, neurite_type=NeuriteType.all, use_subtrees=False):
     """Ger the radial distances of the segments."""
     origin = morph.soma.center if origin is None else origin
 
-    return list(flatten(_map_neurites(
-        partial(nf.segment_radial_distances, origin=origin),
-        morph=morph,
-        neurite_type=neurite_type,
-        use_subtrees=use_subtrees,
-    )))
+    return list(
+        flatten(
+            _map_neurites(
+                partial(nf.segment_radial_distances, origin=origin),
+                morph=morph,
+                neurite_type=neurite_type,
+                use_subtrees=use_subtrees,
+            )
+        )
+    )
 
 
 @feature(shape=(...,))
@@ -219,11 +237,13 @@ def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
 
     The range of the azimuth angle [-pi, pi] radians
     """
+
     def azimuth(root_node):
         """Azimuth of a neurite trunk."""
         return morphmath.azimuth_from_vector(
             morphmath.vector(root_node.points[0], morph.soma.center)
         )
+
     return _map_neurite_root_nodes(azimuth, morph, neurite_type, use_subtrees=False)
 
 
@@ -237,19 +257,23 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 
     The range of the elevation angle [-pi/2, pi/2] radians
     """
+
     def elevation(root_node):
         """Elevation of a section."""
         return morphmath.elevation_from_vector(
             morphmath.vector(root_node.points[0], morph.soma.center)
         )
+
     return _map_neurite_root_nodes(elevation, morph, neurite_type, use_subtrees=False)
 
 
 @feature(shape=(...,))
 def trunk_vectors(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     """Calculate the vectors between all the trunks of the morphology and the soma center."""
+
     def vector_from_soma_to_root(root_node):
         return morphmath.vector(root_node.points[0], morph.soma.center)
+
     return _map_neurite_root_nodes(
         vector_from_soma_to_root, morph, neurite_type, use_subtrees=use_subtrees
     )
@@ -299,7 +323,8 @@ def trunk_angles(
                     morphmath.angle_between_projections(i / np.linalg.norm(i), [0, 1])
                     for i in vectors[:, sort_coords]
                 ),
-                dtype=float)
+                dtype=float,
+            )
         )
         vectors = vectors[order]
 
@@ -312,10 +337,13 @@ def trunk_angles(
     n_vectors = len(vectors)
     cycling_vectors = np.vstack([vectors, vectors])
     angles = [
-        (num_i, [
-            morphmath.angle_between_vectors(i, j)
-            for j in cycling_vectors[num_i: num_i + n_vectors]
-        ])
+        (
+            num_i,
+            [
+                morphmath.angle_between_vectors(i, j)
+                for j in cycling_vectors[num_i : num_i + n_vectors]
+            ],
+        )
         for num_i, i in enumerate(vectors)
     ]
 
@@ -377,9 +405,9 @@ def trunk_angles_inter_types(
     for i, source in enumerate(source_vectors):
         for j, target in enumerate(target_vectors):
             angles[i, j, 0] = morphmath.angle_between_vectors(source, target)
-            angles[i, j, [1, 2]] = (
-                morphmath.spherical_from_vector(target) - morphmath.spherical_from_vector(source)
-            )
+            angles[i, j, [1, 2]] = morphmath.spherical_from_vector(
+                target
+            ) - morphmath.spherical_from_vector(source)
 
     # Ensure elevation differences are in [-pi, pi]
     angles[:, :, 1] = morphmath.angles_to_pi_interval(angles[:, :, 1])
@@ -389,8 +417,7 @@ def trunk_angles_inter_types(
 
     if closest_component is not None:
         angles = angles[
-            np.arange(len(angles)),
-            np.argmin(np.abs(angles[:, :, closest_component]), axis=1)
+            np.arange(len(angles)), np.argmin(np.abs(angles[:, :, closest_component]), axis=1)
         ][:, np.newaxis, :]
 
     return angles.tolist()
@@ -430,9 +457,9 @@ def trunk_angles_from_vector(
     angles = np.empty((len(vectors), 3), dtype=float)
     for i, i_vec in enumerate(vectors):
         angles[i, 0] = morphmath.angle_between_vectors(vector, i_vec)
-        angles[i, (1, 2)] = (
-            morphmath.spherical_from_vector(i_vec) - morphmath.spherical_from_vector(vector)
-        )
+        angles[i, (1, 2)] = morphmath.spherical_from_vector(
+            i_vec
+        ) - morphmath.spherical_from_vector(vector)
 
     # Ensure elevation difference are in [-pi, pi]
     angles[:, 1] = morphmath.angles_to_pi_interval(angles[:, 1])
@@ -506,7 +533,7 @@ def trunk_origin_radii(
         valid_pts = np.ones(len(path_lengths), dtype=bool)
 
         if min_length_filter is not None:
-            valid_pts = (valid_pts & (path_lengths >= min_length_filter))
+            valid_pts = valid_pts & (path_lengths >= min_length_filter)
             if not valid_pts.any():
                 warnings.warn(
                     "In 'trunk_origin_radii': the 'min_length_filter' value is greater than the "
@@ -516,8 +543,8 @@ def trunk_origin_radii(
                 return points[-1, COLS.R]
 
         if max_length_filter is not None:
-            valid_max = (path_lengths <= max_length_filter)
-            valid_pts = (valid_pts & valid_max)
+            valid_max = path_lengths <= max_length_filter
+            valid_pts = valid_pts & valid_max
             if not valid_pts.any():
                 warnings.warn(
                     "In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
@@ -580,23 +607,26 @@ def sholl_crossings(
                                                         center=morph.soma.center,
                                                         radii=np.arange(0, 1000, 100))
     """
+
     def count_crossings(section, radius):
         """Used to count_crossings of segments in neurite with radius."""
-        r2 = radius ** 2
+        r2 = radius**2
         count = 0
         for start, end in iter_segments(section):
-            start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
-                                      morphmath.point_dist2(center, end))
+            start_dist2, end_dist2 = (
+                morphmath.point_dist2(center, start),
+                morphmath.point_dist2(center, end),
+            )
 
-            count += int(start_dist2 <= r2 <= end_dist2 or
-                         end_dist2 <= r2 <= start_dist2)
+            count += int(start_dist2 <= r2 <= end_dist2 or end_dist2 <= r2 <= start_dist2)
 
         return count
 
     if center is None or radii is None:
-        assert isinstance(morph, Morphology) and morph.soma, \
-            '`sholl_crossings` input error. If `center` or `radii` is not set then `morph` is ' \
+        assert isinstance(morph, Morphology) and morph.soma, (
+            '`sholl_crossings` input error. If `center` or `radii` is not set then `morph` is '
             'expected to be an instance of Morphology and have a soma.'
+        )
         if center is None:
             center = morph.soma.center
         if radii is None:
@@ -716,14 +746,14 @@ def volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
     if morph_hull is None:
         return np.nan
 
-    total_volume = sum(total_volume_per_neurite(
-        morph, neurite_type=neurite_type, use_subtrees=use_subtrees)
+    total_volume = sum(
+        total_volume_per_neurite(morph, neurite_type=neurite_type, use_subtrees=use_subtrees)
     )
 
     return total_volume / morph_hull.volume
 
 
-def _unique_projected_points(morph, projection_plane,  neurite_type, use_subtrees=False):
+def _unique_projected_points(morph, projection_plane, neurite_type, use_subtrees=False):
 
     key = "".join(sorted(projection_plane.lower()))
 

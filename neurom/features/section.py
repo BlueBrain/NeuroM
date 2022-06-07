@@ -174,8 +174,7 @@ def section_radial_distance(section, origin):
 def section_meander_angles(section):
     """Inter-segment opening angles in a section."""
     p = section.points
-    return [mm.angle_3points(p[i - 1], p[i - 2], p[i])
-            for i in range(2, len(p))]
+    return [mm.angle_3points(p[i - 1], p[i - 2], p[i]) for i in range(2, len(p))]
 
 
 def strahler_order(section):

@@ -10,7 +10,17 @@ testpaths = [
     "tests",
 ]
 
-[isort]
+[tool.black]
+line-length = 100
+target-version = [
+    'py37',
+    'py38',
+    'py39',
+    'py310',
+]
+skip-string-normalization = true
+include = 'neurom\/.*\.py$|tests\/.*\.py$|doc\/source\/conf\.py$|setup\.py$'
+
+[tool.isort]
 profile = "black"
 line_length = 100
-force_single_line = true

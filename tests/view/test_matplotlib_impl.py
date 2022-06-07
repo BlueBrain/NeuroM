@@ -39,10 +39,10 @@ from numpy.testing import assert_allclose, assert_array_almost_equal
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 SWC_PATH = DATA_PATH / 'swc'
-tree_colors = {'black': np.array([[0., 0., 0., 1.] for _ in range(3)]),
-               None: [[1., 0., 0., 1.],
-                      [1., 0., 0., 1.],
-                      [0.501961, 0., 0.501961, 1.]]}
+tree_colors = {
+    'black': np.array([[0.0, 0.0, 0.0, 1.0] for _ in range(3)]),
+    None: [[1.0, 0.0, 0.0, 1.0], [1.0, 0.0, 0.0, 1.0], [0.501961, 0.0, 0.501961, 1.0]],
+}
 
 
 def test_tree_diameter_scale(get_fig_2d):
@@ -50,7 +50,9 @@ def test_tree_diameter_scale(get_fig_2d):
     fig, ax = get_fig_2d
     tree = m.neurites[0]
     for input_color, expected_colors in tree_colors.items():
-        matplotlib_impl.plot_tree(tree, ax, color=input_color, diameter_scale=None, alpha=1., linewidth=1.2)
+        matplotlib_impl.plot_tree(
+            tree, ax, color=input_color, diameter_scale=None, alpha=1.0, linewidth=1.2
+        )
         collection = ax.collections[0]
         assert collection.get_linewidth()[0] == 1.2
         assert_array_almost_equal(collection.get_colors(), expected_colors)
@@ -62,7 +64,9 @@ def test_tree_diameter_real(get_fig_2d):
     fig, ax = get_fig_2d
     tree = m.neurites[0]
     for input_color, expected_colors in tree_colors.items():
-        matplotlib_impl.plot_tree(tree, ax, color=input_color, alpha=1., linewidth=1.2, realistic_diameters=True)
+        matplotlib_impl.plot_tree(
+            tree, ax, color=input_color, alpha=1.0, linewidth=1.2, realistic_diameters=True
+        )
         collection = ax.collections[0]
         assert collection.get_linewidth()[0] == 1.0
         assert_array_almost_equal(collection.get_facecolors(), expected_colors)
@@ -80,7 +84,7 @@ def test_tree_bounds(get_fig_2d):
     m = load_morphology(SWC_PATH / 'simple-different-section-types.swc')
     fig, ax = get_fig_2d
     matplotlib_impl.plot_tree(m.neurites[0], ax=ax)
-    np.testing.assert_allclose(ax.dataLim.bounds, (-5., 0., 11., 5.))
+    np.testing.assert_allclose(ax.dataLim.bounds, (-5.0, 0.0, 11.0, 5.0))
 
 
 def test_morph(get_fig_2d):
@@ -88,9 +92,13 @@ def test_morph(get_fig_2d):
     fig, ax = get_fig_2d
     matplotlib_impl.plot_morph(m, ax=ax)
     assert ax.get_title() == m.name
-    assert_allclose(ax.dataLim.get_points(),
-                               [[-40.32853516, -57.600172],
-                                [64.74726272, 48.51626225], ])
+    assert_allclose(
+        ax.dataLim.get_points(),
+        [
+            [-40.32853516, -57.600172],
+            [64.74726272, 48.51626225],
+        ],
+    )
 
     with pytest.raises(AssertionError):
         matplotlib_impl.plot_tree(m, ax, plane='wrong')
@@ -102,9 +110,9 @@ def test_tree3d(get_fig_3d):
     tree = m.neurites[0]
     matplotlib_impl.plot_tree3d(tree, ax)
     xy_bounds = ax.xy_dataLim.bounds
-    np.testing.assert_allclose(xy_bounds, (-5., 0., 11., 5.))
+    np.testing.assert_allclose(xy_bounds, (-5.0, 0.0, 11.0, 5.0))
     zz_bounds = ax.zz_dataLim.bounds
-    np.testing.assert_allclose(zz_bounds, (0., 0., 1., 1.))
+    np.testing.assert_allclose(zz_bounds, (0.0, 0.0, 1.0, 1.0))
 
 
 def test_morph3d(get_fig_3d):
@@ -112,11 +120,14 @@ def test_morph3d(get_fig_3d):
     fig, ax = get_fig_3d
     matplotlib_impl.plot_morph3d(m, ax)
     assert ax.get_title() == m.name
-    assert_allclose(ax.xy_dataLim.get_points(),
-                               [[-40.32853516, -57.600172],
-                                [64.74726272, 48.51626225], ])
-    assert_allclose(ax.zz_dataLim.get_points().T[0],
-                               (-00.09999862, 54.20408797))
+    assert_allclose(
+        ax.xy_dataLim.get_points(),
+        [
+            [-40.32853516, -57.600172],
+            [64.74726272, 48.51626225],
+        ],
+    )
+    assert_allclose(ax.zz_dataLim.get_points().T[0], (-00.09999862, 54.20408797))
 
 
 def test_morph_no_neurites():
@@ -133,10 +144,10 @@ def test_dendrogram(get_fig_2d):
     m = load_morphology(SWC_PATH / 'Neuron.swc')
     fig, ax = get_fig_2d
     matplotlib_impl.plot_dendrogram(m, ax)
-    assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
+    assert_allclose(ax.get_xlim(), (-10.0, 180.0), rtol=0.25)
 
     matplotlib_impl.plot_dendrogram(m, ax, show_diameters=False)
-    assert_allclose(ax.get_xlim(), (-10., 180.), rtol=0.25)
+    assert_allclose(ax.get_xlim(), (-10.0, 180.0), rtol=0.25)
 
     matplotlib_impl.plot_dendrogram(m.neurites[0], ax, show_diameters=False)
 
@@ -146,31 +157,43 @@ def test_dendrogram(get_fig_2d):
 
 with warnings.catch_warnings(record=True):
     # upright, uniform radius, multiple cylinders
-    soma_3pt_normal = load_morphology(StringIO(u"""1 1 0 -10 0 10  -1
+    soma_3pt_normal = load_morphology(
+        StringIO(
+            u"""1 1 0 -10 0 10  -1
                                                2 1 0   0 0 10   1
-                                               3 1 0  10 0 10   2"""), reader='swc').soma
+                                               3 1 0  10 0 10   2"""
+        ),
+        reader='swc',
+    ).soma
 
     # increasing radius, multiple cylinders
-    soma_4pt_normal_cylinder = load_morphology(StringIO(u"""1 1   0   0   0 1 -1
+    soma_4pt_normal_cylinder = load_morphology(
+        StringIO(
+            u"""1 1   0   0   0 1 -1
                                                        2 1   0 -10   0 2  1
                                                        3 1   0 -10  10 4  2
-                                                       4 1 -10 -10 -10 4  3"""), reader='swc').soma
+                                                       4 1 -10 -10 -10 4  3"""
+        ),
+        reader='swc',
+    ).soma
 
-    soma_4pt_normal_contour = load_morphology(StringIO(u"""((CellBody)
+    soma_4pt_normal_contour = load_morphology(
+        StringIO(
+            u"""((CellBody)
                                                        (0     0   0 1)
                                                        (0   -10   0 2)
                                                        (0   -10  10 4)
-                                                       (-10 -10 -10 4))"""), reader='asc').soma
+                                                       (-10 -10 -10 4))"""
+        ),
+        reader='asc',
+    ).soma
 
 
 def test_soma(get_fig_2d):
     m = load_morphology(SWC_PATH / 'Neuron.swc')
     soma0 = m.soma
     fig, ax = get_fig_2d
-    for s in (soma0,
-              soma_3pt_normal,
-              soma_4pt_normal_cylinder,
-              soma_4pt_normal_contour):
+    for s in (soma0, soma_3pt_normal, soma_4pt_normal_cylinder, soma_4pt_normal_contour):
         matplotlib_impl.plot_soma(s, ax)
         matplotlib_utils.plt.close(fig)
 
@@ -181,9 +204,9 @@ def test_soma(get_fig_2d):
 def test_soma3d(get_fig_3d):
     _, ax = get_fig_3d
     matplotlib_impl.plot_soma3d(soma_3pt_normal, ax)
-    assert_allclose(ax.get_xlim(), (-11.,  11.), atol=2)
-    assert_allclose(ax.get_ylim(), (-11.,  11.), atol=2)
-    assert_allclose(ax.get_zlim(), (-10.,  10.), atol=2)
+    assert_allclose(ax.get_xlim(), (-11.0, 11.0), atol=2)
+    assert_allclose(ax.get_ylim(), (-11.0, 11.0), atol=2)
+    assert_allclose(ax.get_zlim(), (-10.0, 10.0), atol=2)
 
 
 def test_get_color():
@@ -202,11 +225,11 @@ def test_filter_neurite():
     fig, ax = matplotlib_utils.get_figure(params={'projection': '3d'})
     matplotlib_impl.plot_morph3d(m, ax, neurite_type=NeuriteType.basal_dendrite)
     matplotlib_utils.plot_style(fig=fig, ax=ax)
-    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30.0, 78], atol=5)
     matplotlib_utils.plt.close('all')
 
     fig, ax = matplotlib_utils.get_figure()
     matplotlib_impl.plot_morph(m, ax, neurite_type=NeuriteType.basal_dendrite)
     matplotlib_utils.plot_style(fig=fig, ax=ax)
-    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30., 78], atol=5)
+    assert_allclose(matplotlib_utils.plt.gca().get_ylim(), [-30.0, 78], atol=5)
     matplotlib_utils.plt.close('all')

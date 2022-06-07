@@ -35,6 +35,7 @@ _COL_COUNT = 4
 
 class COLS:
     """Column labels for internal data representation."""
+
     COL_COUNT = _COL_COUNT
     (X, Y, Z, R) = range(_COL_COUNT)
     XY = slice(0, 2)

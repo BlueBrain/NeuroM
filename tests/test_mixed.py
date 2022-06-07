@@ -67,7 +67,7 @@ def mixed_morph():
         section_ids: [14, 15, 16, 17, 18]
     """
     return neurom.load_morphology(
-    """
+        """
     1  1   0  0  0   0.5 -1
     2  3  -1  0  0   0.1  1
     3  3  -2  0  0   0.1  2
@@ -92,12 +92,14 @@ def mixed_morph():
     22 4   0 -3 -1   0.1 20
     23 4   1 -2  0   0.1 19
     """,
-    reader="swc")
+        reader="swc",
+    )
+
 
 @pytest.fixture
 def three_types_neurite_morph():
     return neurom.load_morphology(
-    """
+        """
     1    1   0  0  0   0.5 -1
     2    3   0  1  0   0.1  1
     3    3   1  2  0   0.1  2
@@ -110,7 +112,9 @@ def three_types_neurite_morph():
     10   2   3  3  1   0.1  9
     11   4   3  3 -1   0.1  9
     """,
-    reader="swc")
+        reader="swc",
+    )
+
 
 def test_heterogeneous_neurites(mixed_morph):
 
@@ -150,9 +154,9 @@ def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
 
     with pytest.warns(
         UserWarning,
-        match="Neurite <type: NeuriteType.basal_dendrite> is not an axon-carrying dendrite."
+        match="Neurite <type: NeuriteType.basal_dendrite> is not an axon-carrying dendrite.",
     ):
-        three_types_neurite, = three_types_neurite_morph.neurites
+        (three_types_neurite,) = three_types_neurite_morph.neurites
         neurom.core.morphology._homogeneous_subtrees(three_types_neurite)
 
 
@@ -165,7 +169,7 @@ def test_iter_neurites__heterogeneous(mixed_morph):
     assert subtrees[1].type == NeuriteType.basal_dendrite
     assert subtrees[2].type == NeuriteType.apical_dendrite
 
-    subtrees =  list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=True))
+    subtrees = list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=True))
 
     assert len(subtrees) == 4
     assert subtrees[0].type == NeuriteType.basal_dendrite
@@ -175,7 +179,6 @@ def test_iter_neurites__heterogeneous(mixed_morph):
 
 
 def test_core_iter_sections__heterogeneous(mixed_morph):
-
     def assert_sections(neurite, section_type, expected_section_ids):
 
         it = neurom.core.morphology.iter_sections(neurite, section_filter=is_type(section_type))
@@ -196,7 +199,6 @@ def test_core_iter_sections__heterogeneous(mixed_morph):
 
 
 def test_features_neurite_map_sections__heterogeneous(mixed_morph):
-
     def assert_sections(neurite, section_type, iterator_type, expected_section_ids):
         function = lambda section: section.id
         section_ids = neurom.features.neurite._map_sections(
@@ -208,42 +210,53 @@ def test_features_neurite_map_sections__heterogeneous(mixed_morph):
 
     # homogeneous tree, no difference between all and basal_dendrite types.
     assert_sections(
-        basal, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        basal,
+        NeuriteType.all,
+        neurom.core.morphology.Section.ibifurcation_point,
         [0, 1],
     )
     assert_sections(
-        basal, NeuriteType.basal_dendrite, neurom.core.morphology.Section.ibifurcation_point,
+        basal,
+        NeuriteType.basal_dendrite,
+        neurom.core.morphology.Section.ibifurcation_point,
         [0, 1],
     )
     # heterogeneous tree, forks cannot be heterogeneous if a type other than all is specified
     # Section with id 5 is the transition section, which has a basal and axon children sections
     assert_sections(
-        axon_on_basal, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        axon_on_basal,
+        NeuriteType.all,
+        neurom.core.morphology.Section.ibifurcation_point,
         [5, 6, 9, 11],
     )
     assert_sections(
-        axon_on_basal, NeuriteType.basal_dendrite,
+        axon_on_basal,
+        NeuriteType.basal_dendrite,
         neurom.core.morphology.Section.ibifurcation_point,
         [6],
     )
     assert_sections(
-        axon_on_basal, NeuriteType.axon,
+        axon_on_basal,
+        NeuriteType.axon,
         neurom.core.morphology.Section.ibifurcation_point,
         [9, 11],
     )
     # homogeneous tree, no difference between all and basal_dendrite types.
     assert_sections(
-        apical, NeuriteType.all, neurom.core.morphology.Section.ibifurcation_point,
+        apical,
+        NeuriteType.all,
+        neurom.core.morphology.Section.ibifurcation_point,
         [14, 15],
     )
     assert_sections(
-        apical, NeuriteType.apical_dendrite, neurom.core.morphology.Section.ibifurcation_point,
+        apical,
+        NeuriteType.apical_dendrite,
+        neurom.core.morphology.Section.ibifurcation_point,
         [14, 15],
     )
 
 
 def test_mixed_morph_stats(mixed_morph):
-
     def assert_stats_equal(actual_dict, expected_dict):
         assert actual_dict.keys() == expected_dict.keys()
         for (key, value) in actual_dict.items():
@@ -283,7 +296,7 @@ def test_mixed_morph_stats(mixed_morph):
             'section_volumes': ['min'],
             'section_areas': ['mean'],
             'section_tortuosity': ['mean'],
-            'section_strahler_orders': ['min']
+            'section_strahler_orders': ['min'],
         },
         'morphology': {
             'soma_surface_area': ['mean'],
@@ -293,9 +306,9 @@ def test_mixed_morph_stats(mixed_morph):
             'total_length_per_neurite': ['mean'],
             'total_area_per_neurite': ['mean'],
             'total_volume_per_neurite': ['mean'],
-            'number_of_neurites': ['median']
+            'number_of_neurites': ['median'],
         },
-        'neurite_type': ['AXON', 'BASAL_DENDRITE', 'APICAL_DENDRITE']
+        'neurite_type': ['AXON', 'BASAL_DENDRITE', 'APICAL_DENDRITE'],
     }
 
     res = neurom.apps.morph_stats.extract_stats(mixed_morph, cfg, use_subtrees=False)
@@ -329,7 +342,7 @@ def test_mixed_morph_stats(mixed_morph):
         'min_number_of_sections': 0,
         'min_section_strahler_orders': None,
         'min_section_volumes': None,
-        'min_total_length': 0
+        'min_total_length': 0,
     }
 
     assert_stats_equal(res["axon"], expected_axon_wout_subtrees)
@@ -339,7 +352,6 @@ def test_mixed_morph_stats(mixed_morph):
     # get axon column and tranform it to look like the expected values above
     values = res_df.loc[pd.IndexSlice[:, "axon"]].iloc[0, :].to_dict()
     assert_stats_equal(values, expected_axon_wout_subtrees)
-
 
     res = neurom.apps.morph_stats.extract_stats(mixed_morph, cfg, use_subtrees=True)
 
@@ -372,7 +384,7 @@ def test_mixed_morph_stats(mixed_morph):
         'min_number_of_sections': 5,
         'min_section_strahler_orders': 1,
         'min_section_volumes': 0.03141592778425469,
-        'min_total_length': 5.414213538169861
+        'min_total_length': 5.414213538169861,
     }
 
     assert_stats_equal(res["axon"], expected_axon_with_subtrees)
@@ -390,7 +402,6 @@ def population(mixed_morph):
 
 
 def _assert_feature_equal(values, expected_values, per_neurite=False):
-
     def innermost_value(iterable):
         while isinstance(iterable, collections.abc.Iterable):
             try:
@@ -433,7 +444,6 @@ def _assert_feature_equal(values, expected_values, per_neurite=False):
         check(values, expected_values)
 
 
-
 def _dispatch_features(features, mode=None):
     for feature_name, configurations in features.items():
 
@@ -474,23 +484,23 @@ def _population_features(mode):
                 "expected_wout_subtrees": [0, 2],
                 "expected_with_subtrees": [0, 2],
             },
-
         ],
     }
 
-    features_not_tested = list(
-        set(_POPULATION_FEATURES) - set(features.keys())
-    )
+    features_not_tested = list(set(_POPULATION_FEATURES) - set(features.keys()))
 
     assert not features_not_tested, (
-        "The following morphology tests need to be included in the tests:\n\n" +
-        "\n".join(sorted(features_not_tested)) + "\n"
+        "The following morphology tests need to be included in the tests:\n\n"
+        + "\n".join(sorted(features_not_tested))
+        + "\n"
     )
 
     return _dispatch_features(features, mode)
 
 
-@pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="wout-subtrees"))
+@pytest.mark.parametrize(
+    "feature_name, kwargs, expected", _population_features(mode="wout-subtrees")
+)
 def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -498,7 +508,9 @@ def test_population__population_features_wout_subtrees(feature_name, kwargs, exp
         _assert_feature_equal(values, expected)
 
 
-@pytest.mark.parametrize("feature_name, kwargs, expected", _population_features(mode="with-subtrees"))
+@pytest.mark.parametrize(
+    "feature_name, kwargs, expected", _population_features(mode="with-subtrees")
+)
 def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -523,8 +535,8 @@ def _morphology_features(mode):
         ],
         "soma_volume": [
             {
-                "expected_wout_subtrees": np.pi / 6.,
-                "expected_with_subtrees": np.pi / 6.,
+                "expected_wout_subtrees": np.pi / 6.0,
+                "expected_with_subtrees": np.pi / 6.0,
             }
         ],
         "number_of_sections_per_neurite": [
@@ -547,7 +559,7 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [5],
                 "expected_with_subtrees": [5],
-            }
+            },
         ],
         "max_radial_distance": [
             {
@@ -560,7 +572,7 @@ def _morphology_features(mode):
             },
             {
                 # with a global origin, AoD axon subtree [2, 4] is always furthest from soma
-                "kwargs": {"neurite_type": NeuriteType.all, "origin": np.array([0., 0., 0.])},
+                "kwargs": {"neurite_type": NeuriteType.all, "origin": np.array([0.0, 0.0, 0.0])},
                 "expected_wout_subtrees": 4.472136,
                 "expected_with_subtrees": 4.472136,
             },
@@ -570,10 +582,12 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 4.24264,
             },
             {
-                "kwargs": {"neurite_type": NeuriteType.basal_dendrite, "origin": np.array([0., 0., 0.])},
+                "kwargs": {
+                    "neurite_type": NeuriteType.basal_dendrite,
+                    "origin": np.array([0.0, 0.0, 0.0]),
+                },
                 "expected_wout_subtrees": 4.472136,
                 "expected_with_subtrees": 4.242641,
-
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -581,21 +595,21 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 4.472136,
             },
             {
-                "kwargs": {"neurite_type": NeuriteType.axon, "origin": np.array([0., 0., 0.])},
+                "kwargs": {"neurite_type": NeuriteType.axon, "origin": np.array([0.0, 0.0, 0.0])},
                 "expected_wout_subtrees": 0.0,
                 "expected_with_subtrees": 4.47213595499958,
-            }
+            },
         ],
         "total_length_per_neurite": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [5., 10.828427, 5.],
-                "expected_with_subtrees": [5., 5.414213, 5.414213, 5.],
+                "expected_wout_subtrees": [5.0, 10.828427, 5.0],
+                "expected_with_subtrees": [5.0, 5.414213, 5.414213, 5.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [5., 10.828427],
-                "expected_with_subtrees": [5., 5.414214],
+                "expected_wout_subtrees": [5.0, 10.828427],
+                "expected_with_subtrees": [5.0, 5.414214],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -604,11 +618,11 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [5.],
-                "expected_with_subtrees": [5.],
-            }
+                "expected_wout_subtrees": [5.0],
+                "expected_with_subtrees": [5.0],
+            },
         ],
-        "total_area_per_neurite" : [
+        "total_area_per_neurite": [
             {
                 # total length x 2piR
                 "kwargs": {"neurite_type": NeuriteType.all},
@@ -629,19 +643,19 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [3.141593],
                 "expected_with_subtrees": [3.141593],
-            }
+            },
         ],
         "total_volume_per_neurite": [
             # total_length * piR^2
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [0.15708 , 0.340185, 0.15708 ],
-                "expected_with_subtrees": [0.15708 , 0.170093, 0.170093, 0.15708],
+                "expected_wout_subtrees": [0.15708, 0.340185, 0.15708],
+                "expected_with_subtrees": [0.15708, 0.170093, 0.170093, 0.15708],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [0.15708 , 0.340185],
-                "expected_with_subtrees": [0.15708 , 0.170093],
+                "expected_wout_subtrees": [0.15708, 0.340185],
+                "expected_with_subtrees": [0.15708, 0.170093],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -652,7 +666,7 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.15708],
                 "expected_with_subtrees": [0.15708],
-            }
+            },
         ],
         "trunk_origin_azimuths": [  # Not applicable to distal subtrees
             {
@@ -701,27 +715,31 @@ def _morphology_features(mode):
         "trunk_vectors": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [[-1., 0., 0.], [0., 1., 0.], [0., -1., 0.]],
-                "expected_with_subtrees": [[-1., 0., 0.], [0., 1., 0.], [1., 2., 0.], [0., -1., 0.]],
+                "expected_wout_subtrees": [[-1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, -1.0, 0.0]],
+                "expected_with_subtrees": [
+                    [-1.0, 0.0, 0.0],
+                    [0.0, 1.0, 0.0],
+                    [1.0, 2.0, 0.0],
+                    [0.0, -1.0, 0.0],
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [[-1., 0., 0.], [0., 1., 0.]],
-                "expected_with_subtrees": [[-1., 0., 0.], [0., 1., 0.]],
+                "expected_wout_subtrees": [[-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
+                "expected_with_subtrees": [[-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [[1., 2., 0.]],
+                "expected_with_subtrees": [[1.0, 2.0, 0.0]],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [[0., -1., 0.]],
-                "expected_with_subtrees": [[0., -1., 0.]],
+                "expected_wout_subtrees": [[0.0, -1.0, 0.0]],
+                "expected_with_subtrees": [[0.0, -1.0, 0.0]],
             },
-
         ],
-        "trunk_angles": [ # Not applicable to distal subtrees
+        "trunk_angles": [  # Not applicable to distal subtrees
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
                 "expected_wout_subtrees": [1.570796, 3.141592, 1.570796],
@@ -739,36 +757,35 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [0.],
-                "expected_with_subtrees": [0.],
+                "expected_wout_subtrees": [0.0],
+                "expected_with_subtrees": [0.0],
             },
         ],
         "trunk_angles_from_vector": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
                 "expected_wout_subtrees": [
-                    [np.pi / 2., - np.pi / 2, np.pi],
-                    [0., 0., 0.],
-                    [np.pi, np.pi, 0.],
+                    [np.pi / 2.0, -np.pi / 2, np.pi],
+                    [0.0, 0.0, 0.0],
+                    [np.pi, np.pi, 0.0],
                 ],
                 "expected_with_subtrees": [
-                    [np.pi / 2., - np.pi / 2, np.pi],
-                    [0., 0., 0.],
-                    [0.463648, -0.463648,  0.],
-                    [np.pi, np.pi, 0.],
+                    [np.pi / 2.0, -np.pi / 2, np.pi],
+                    [0.0, 0.0, 0.0],
+                    [0.463648, -0.463648, 0.0],
+                    [np.pi, np.pi, 0.0],
                 ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [[np.pi / 2., - np.pi / 2, np.pi], [0., 0., 0.]],
-                "expected_with_subtrees": [[np.pi / 2., - np.pi / 2, np.pi], [0., 0., 0.]],
+                "expected_wout_subtrees": [[np.pi / 2.0, -np.pi / 2, np.pi], [0.0, 0.0, 0.0]],
+                "expected_with_subtrees": [[np.pi / 2.0, -np.pi / 2, np.pi], [0.0, 0.0, 0.0]],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [[0.463648, -0.463648,  0.]],
+                "expected_with_subtrees": [[0.463648, -0.463648, 0.0]],
             },
-
         ],
         "trunk_angles_inter_types": [
             {
@@ -778,8 +795,8 @@ def _morphology_features(mode):
                 },
                 "expected_wout_subtrees": [],
                 "expected_with_subtrees": [
-                    [[ 2.034444,  1.107149, -3.141593]],
-                    [[ 0.463648, -0.463648,  0.      ]],
+                    [[2.034444, 1.107149, -3.141593]],
+                    [[0.463648, -0.463648, 0.0]],
                 ],
             },
         ],
@@ -808,13 +825,13 @@ def _morphology_features(mode):
         "trunk_section_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [1., 1.414213, 1.],
-                "expected_with_subtrees": [1., 1.414213, 1.414213, 1.],
+                "expected_wout_subtrees": [1.0, 1.414213, 1.0],
+                "expected_with_subtrees": [1.0, 1.414213, 1.414213, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [1., 1.414213],
-                "expected_with_subtrees": [1., 1.414213],
+                "expected_wout_subtrees": [1.0, 1.414213],
+                "expected_with_subtrees": [1.0, 1.414213],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -823,8 +840,8 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1.],
-                "expected_with_subtrees": [1.],
+                "expected_wout_subtrees": [1.0],
+                "expected_with_subtrees": [1.0],
             },
         ],
         "number_of_neurites": [
@@ -914,7 +931,6 @@ def _morphology_features(mode):
                 "expected_wout_subtrees": [0, 1],
                 "expected_with_subtrees": [0, 1],
             },
-
         ],
         "total_width": [
             {
@@ -1004,7 +1020,7 @@ def _morphology_features(mode):
                 "expected_with_subtrees": 0.23561945,
             },
         ],
-        "aspect_ratio":[
+        "aspect_ratio": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
                 "expected_wout_subtrees": 0.630311,
@@ -1144,9 +1160,9 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": 5.,
-                "expected_with_subtrees": 5.,
-            }
+                "expected_wout_subtrees": 5.0,
+                "expected_with_subtrees": 5.0,
+            },
         ],
         "total_area": [
             {
@@ -1161,14 +1177,14 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
-                "expected_wout_subtrees": 0.,
+                "expected_wout_subtrees": 0.0,
                 "expected_with_subtrees": 3.401851,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": 3.141593,
                 "expected_with_subtrees": 3.141593,
-            }
+            },
         ],
         "total_volume": [
             {
@@ -1183,59 +1199,63 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
-                "expected_wout_subtrees": 0.,
+                "expected_wout_subtrees": 0.0,
                 "expected_with_subtrees": 0.170093,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": 0.15708,
                 "expected_with_subtrees": 0.15708,
-            }
+            },
         ],
         "section_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.] * 5 + [1.414214, 2., 1., 1.] + [1.414214, 1., 1., 1., 1.] + [1.] * 5,
-                "expected_with_subtrees":
-                    [1.] * 5 + [1.414214, 2., 1., 1.] + [1.414214, 1., 1., 1., 1.] + [1.] * 5,
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.] * 5 + [1.414214, 2., 1., 1.] + [1.414214, 1., 1., 1., 1],
-                "expected_with_subtrees":
-                    [1.] * 5 + [1.414214, 2., 1., 1.],
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1],
+                "expected_with_subtrees": [1.0] * 5 + [1.414214, 2.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [1.414214, 1., 1., 1., 1.],
-
+                "expected_with_subtrees": [1.414214, 1.0, 1.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1.] * 5,
-                "expected_with_subtrees": [1.] * 5,
-            }
+                "expected_wout_subtrees": [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5,
+            },
         ],
         "section_areas": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [0.628318] * 5 + [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319] + [0.628318] * 5,
-                "expected_with_subtrees":
-                    [0.628318] * 5 + [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319] + [0.628318] * 5,
+                "expected_wout_subtrees": [0.628318] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319]
+                + [0.628318] * 5,
+                "expected_with_subtrees": [0.628318] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319]
+                + [0.628318] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [0.628318] * 5 + [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
-                "expected_with_subtrees":
-                    [0.628318] * 5 + [0.888577, 1.256637, 0.628319, 0.628319],
+                "expected_wout_subtrees": [0.628318] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
+                "expected_with_subtrees": [0.628318] * 5 + [0.888577, 1.256637, 0.628319, 0.628319],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -1246,28 +1266,26 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.628318] * 5,
                 "expected_with_subtrees": [0.628318] * 5,
-            }
-
+            },
         ],
         "section_volumes": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [0.031416] * 5 + [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416] +
-                    [0.031416] * 5,
-                "expected_with_subtrees":
-                    [0.031416] * 5 + [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416] +
-                    [0.031416] * 5,
+                "expected_wout_subtrees": [0.031416] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416]
+                + [0.031416] * 5,
+                "expected_with_subtrees": [0.031416] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416]
+                + [0.031416] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [0.031416] * 5 + [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
-                "expected_with_subtrees":
-                    [0.031416] * 5 + [0.044429, 0.062832, 0.031416, 0.031416],
+                "expected_wout_subtrees": [0.031416] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
+                "expected_with_subtrees": [0.031416] * 5 + [0.044429, 0.062832, 0.031416, 0.031416],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -1278,7 +1296,7 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.031415] * 5,
                 "expected_with_subtrees": [0.031415] * 5,
-            }
+            },
         ],
         "section_tortuosity": [
             {
@@ -1300,69 +1318,59 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [1.0] * 5,
                 "expected_with_subtrees": [1.0] * 5,
-            }
+            },
         ],
         "section_radial_distances": [
             {
                 # radial distances change when the mixed subtrees are processed because
                 # the root of the subtree is considered
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [2., 3., 3.162278, 3.162278, 2.236068] +
-                    [2.236068, 4.123106, 4.24264 , 4.24264] +
-                    [3.605551, 4.472136, 4.24264 , 4.358899, 4.358899] +
-                    [2., 3., 3.162278, 3.162278, 2.236068],
-                "expected_with_subtrees":
-                    [2., 3., 3.162278, 3.162278, 2.236068] +
-                    [2.236068, 4.123106, 4.24264 , 4.24264] +
-                    [3.605551, 4.472136, 4.24264 , 4.358899, 4.358899] +
-                    [2., 3., 3.162278, 3.162278, 2.236068],
+                "expected_wout_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068]
+                + [2.236068, 4.123106, 4.24264, 4.24264]
+                + [3.605551, 4.472136, 4.24264, 4.358899, 4.358899]
+                + [2.0, 3.0, 3.162278, 3.162278, 2.236068],
+                "expected_with_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068]
+                + [2.236068, 4.123106, 4.24264, 4.24264]
+                + [3.605551, 4.472136, 4.24264, 4.358899, 4.358899]
+                + [2.0, 3.0, 3.162278, 3.162278, 2.236068],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [2., 3., 3.162278, 3.162278, 2.236068] +
-                    [2.236068, 4.123106, 4.24264 , 4.24264] +
-                    [3.605551, 4.472136, 4.24264 , 4.358899, 4.358899],
-                "expected_with_subtrees":
-                    [2., 3., 3.162278, 3.162278, 2.236068] +
-                    [2.236068, 4.123106, 4.24264 , 4.24264],
+                "expected_wout_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068]
+                + [2.236068, 4.123106, 4.24264, 4.24264]
+                + [3.605551, 4.472136, 4.24264, 4.358899, 4.358899],
+                "expected_with_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068]
+                + [2.236068, 4.123106, 4.24264, 4.24264],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [3.605551, 4.472136, 4.24264 , 4.358899, 4.358899],
+                "expected_with_subtrees": [3.605551, 4.472136, 4.24264, 4.358899, 4.358899],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [2., 3., 3.162278, 3.162278, 2.236068],
-                "expected_with_subtrees": [2., 3., 3.162278, 3.162278, 2.236068],
-            }
-
+                "expected_wout_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068],
+                "expected_with_subtrees": [2.0, 3.0, 3.162278, 3.162278, 2.236068],
+            },
         ],
         "section_term_radial_distances": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [3.162278, 3.162278, 2.236068] +
-                    [4.24264 , 4.24264] +
-                    [4.472136, 4.358899, 4.358899] +
-                    [3.162278, 3.162278, 2.236068],
-                "expected_with_subtrees":
-                    [3.162278, 3.162278, 2.236068] +
-                    [4.24264 , 4.24264] +
-                    [4.472136, 4.358899, 4.358899] +
-                    [3.162278, 3.162278, 2.236068],
+                "expected_wout_subtrees": [3.162278, 3.162278, 2.236068]
+                + [4.24264, 4.24264]
+                + [4.472136, 4.358899, 4.358899]
+                + [3.162278, 3.162278, 2.236068],
+                "expected_with_subtrees": [3.162278, 3.162278, 2.236068]
+                + [4.24264, 4.24264]
+                + [4.472136, 4.358899, 4.358899]
+                + [3.162278, 3.162278, 2.236068],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [3.162278, 3.162278, 2.236068] +
-                    [4.24264 , 4.24264] +
-                    [4.472136, 4.358899, 4.358899],
-                "expected_with_subtrees":
-                    [3.162278, 3.162278, 2.236068] +
-                    [4.24264 , 4.24264],
+                "expected_wout_subtrees": [3.162278, 3.162278, 2.236068]
+                + [4.24264, 4.24264]
+                + [4.472136, 4.358899, 4.358899],
+                "expected_with_subtrees": [3.162278, 3.162278, 2.236068] + [4.24264, 4.24264],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -1373,8 +1381,7 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [3.162278, 3.162278, 2.236068],
                 "expected_with_subtrees": [3.162278, 3.162278, 2.236068],
-            }
-
+            },
         ],
         "section_bif_radial_distances": [
             {
@@ -1382,16 +1389,22 @@ def _morphology_features(mode):
                 # the root of the subtree is considered instead of the tree root
                 # heterogeneous forks are not valid forking points
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [2., 3., 2.236068, 4.123106, 3.605551, 4.24264 , 2., 3.],
-                "expected_with_subtrees":
-                    [2., 3., 4.123106, 3.605551, 4.24264 , 2., 3.],
+                "expected_wout_subtrees": [
+                    2.0,
+                    3.0,
+                    2.236068,
+                    4.123106,
+                    3.605551,
+                    4.24264,
+                    2.0,
+                    3.0,
+                ],
+                "expected_with_subtrees": [2.0, 3.0, 4.123106, 3.605551, 4.24264, 2.0, 3.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [2., 3., 2.236068, 4.123106, 3.605551, 4.24264],
-                "expected_with_subtrees": [2., 3., 4.123106],
+                "expected_wout_subtrees": [2.0, 3.0, 2.236068, 4.123106, 3.605551, 4.24264],
+                "expected_with_subtrees": [2.0, 3.0, 4.123106],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -1400,66 +1413,61 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [2., 3.],
-                "expected_with_subtrees": [2., 3.],
-            }
+                "expected_wout_subtrees": [2.0, 3.0],
+                "expected_with_subtrees": [2.0, 3.0],
+            },
         ],
         "section_end_distances": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.] +
-                    [1.] * 5,
-                "expected_with_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.] +
-                    [1.] * 5,
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.],
-                "expected_with_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.],
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0],
+                "expected_with_subtrees": [1.0] * 5 + [1.414214, 2.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [1.414214, 1., 1., 1., 1.],
+                "expected_with_subtrees": [1.414214, 1.0, 1.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1.] * 5,
-                "expected_with_subtrees": [1.] * 5,
-            }
+                "expected_wout_subtrees": [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5,
+            },
         ],
         "section_term_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [1.] * 11,
-                "expected_with_subtrees": [1.] * 11,
+                "expected_wout_subtrees": [1.0] * 11,
+                "expected_with_subtrees": [1.0] * 11,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [1.] * 8,
-                "expected_with_subtrees": [1.] * 5,
+                "expected_wout_subtrees": [1.0] * 8,
+                "expected_with_subtrees": [1.0] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [1.] * 3,
+                "expected_with_subtrees": [1.0] * 3,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1.] * 3,
-                "expected_with_subtrees": [1.] * 3,
-            }
+                "expected_wout_subtrees": [1.0] * 3,
+                "expected_with_subtrees": [1.0] * 3,
+            },
         ],
         "section_taper_rates": [
             {
@@ -1481,39 +1489,35 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.0] * 5,
                 "expected_with_subtrees": [0.0] * 5,
-            }
+            },
         ],
         "section_bif_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1., 1., 1.414214, 2., 1.414214, 1., 1., 1.],
-                "expected_with_subtrees":
-                    [1., 1., 2., 1.414214, 1., 1., 1.],
+                "expected_wout_subtrees": [1.0, 1.0, 1.414214, 2.0, 1.414214, 1.0, 1.0, 1.0],
+                "expected_with_subtrees": [1.0, 1.0, 2.0, 1.414214, 1.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [1., 1., 1.414214, 2., 1.414214, 1.],
-                "expected_with_subtrees": [1., 1., 2.],
+                "expected_wout_subtrees": [1.0, 1.0, 1.414214, 2.0, 1.414214, 1.0],
+                "expected_with_subtrees": [1.0, 1.0, 2.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [1.414214, 1.],
+                "expected_with_subtrees": [1.414214, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1., 1.],
-                "expected_with_subtrees": [1., 1.],
+                "expected_wout_subtrees": [1.0, 1.0],
+                "expected_with_subtrees": [1.0, 1.0],
             },
         ],
         "section_branch_orders": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2, 2, 3, 3, 0, 1, 2, 2, 1],
-                "expected_with_subtrees":
-                    [0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2, 2, 3, 3, 0, 1, 2, 2, 1],
+                "expected_wout_subtrees": [0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2, 2, 3, 3, 0, 1, 2, 2, 1],
+                "expected_with_subtrees": [0, 1, 2, 2, 1, 0, 1, 2, 2, 1, 2, 2, 3, 3, 0, 1, 2, 2, 1],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
@@ -1578,10 +1582,8 @@ def _morphology_features(mode):
         "section_strahler_orders": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1, 1, 1],
-                "expected_with_subtrees":
-                    [2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1, 1, 1],
+                "expected_wout_subtrees": [2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1, 1, 1],
+                "expected_with_subtrees": [2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1, 1, 1],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
@@ -1602,109 +1604,92 @@ def _morphology_features(mode):
         "segment_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.] +
-                    [1.] * 5,
-                "expected_with_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.] +
-                    [1.] * 5,
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0]
+                + [1.0] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.] +
-                    [1.414214, 1., 1., 1., 1.],
-                "expected_with_subtrees":
-                    [1.] * 5 +
-                    [1.414214, 2., 1., 1.],
+                "expected_wout_subtrees": [1.0] * 5
+                + [1.414214, 2.0, 1.0, 1.0]
+                + [1.414214, 1.0, 1.0, 1.0, 1.0],
+                "expected_with_subtrees": [1.0] * 5 + [1.414214, 2.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [1.414214, 1., 1., 1., 1.],
+                "expected_with_subtrees": [1.414214, 1.0, 1.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [1.] * 5,
-                "expected_with_subtrees": [1.] * 5,
-            }
+                "expected_wout_subtrees": [1.0] * 5,
+                "expected_with_subtrees": [1.0] * 5,
+            },
         ],
         "segment_areas": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [0.628319] * 5 +
-                    [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319] +
-                    [0.628319] * 5,
-                "expected_with_subtrees":
-                    [0.628319] * 5 +
-                    [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319] +
-                    [0.628319] * 5,
+                "expected_wout_subtrees": [0.628319] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319]
+                + [0.628319] * 5,
+                "expected_with_subtrees": [0.628319] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319]
+                + [0.628319] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [0.628319] * 5 +
-                    [0.888577, 1.256637, 0.628319, 0.628319] +
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
-                "expected_with_subtrees":
-                    [0.628319] * 5 +
-                    [0.888577, 1.256637, 0.628319, 0.628319],
+                "expected_wout_subtrees": [0.628319] * 5
+                + [0.888577, 1.256637, 0.628319, 0.628319]
+                + [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
+                "expected_with_subtrees": [0.628319] * 5 + [0.888577, 1.256637, 0.628319, 0.628319],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees":
-                    [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
+                "expected_with_subtrees": [0.888577, 0.628319, 0.628319, 0.628319, 0.628319],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.628318] * 5,
                 "expected_with_subtrees": [0.628318] * 5,
-            }
+            },
         ],
         "segment_volumes": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [0.031415] * 5 +
-                    [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416] +
-                    [0.031416] * 5,
-                "expected_with_subtrees":
-                    [0.031415] * 5 +
-                    [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416] +
-                    [0.031416] * 5,
+                "expected_wout_subtrees": [0.031415] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416]
+                + [0.031416] * 5,
+                "expected_with_subtrees": [0.031415] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416]
+                + [0.031416] * 5,
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [0.031415] * 5 +
-                    [0.044429, 0.062832, 0.031416, 0.031416] +
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
-                "expected_with_subtrees":
-                    [0.031415] * 5 +
-                    [0.044429, 0.062832, 0.031416, 0.031416],
+                "expected_wout_subtrees": [0.031415] * 5
+                + [0.044429, 0.062832, 0.031416, 0.031416]
+                + [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
+                "expected_with_subtrees": [0.031415] * 5 + [0.044429, 0.062832, 0.031416, 0.031416],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees":
-                    [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
+                "expected_with_subtrees": [0.044429, 0.031416, 0.031416, 0.031416, 0.031416],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.031415] * 5,
                 "expected_with_subtrees": [0.031415] * 5,
-            }
+            },
         ],
         "segment_radii": [
             {
@@ -1726,7 +1711,7 @@ def _morphology_features(mode):
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [0.1] * 5,
                 "expected_with_subtrees": [0.1] * 5,
-            }
+            },
         ],
         "segment_taper_rates": [
             {
@@ -1755,26 +1740,22 @@ def _morphology_features(mode):
                 # radial distances change when the mixed subtrees are processed because
                 # the root of the subtree is considered
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553] +
-                    [1.581139, 3.162278, 4.153312, 4.153312] +
-                    [2.915476, 4.031129, 3.905125, 4.272002, 4.272002] +
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553],
-                "expected_with_subtrees":
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553] +
-                    [1.581139, 3.162278, 4.153312, 4.153312] +
-                    [2.915476, 4.031129, 3.905125, 4.272002, 4.272002] +
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553],
+                "expected_wout_subtrees": [1.5, 2.5, 3.041381, 3.041381, 2.061553]
+                + [1.581139, 3.162278, 4.153312, 4.153312]
+                + [2.915476, 4.031129, 3.905125, 4.272002, 4.272002]
+                + [1.5, 2.5, 3.041381, 3.041381, 2.061553],
+                "expected_with_subtrees": [1.5, 2.5, 3.041381, 3.041381, 2.061553]
+                + [1.581139, 3.162278, 4.153312, 4.153312]
+                + [2.915476, 4.031129, 3.905125, 4.272002, 4.272002]
+                + [1.5, 2.5, 3.041381, 3.041381, 2.061553],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553] +
-                    [1.581139, 3.162278, 4.153312, 4.153312] +
-                    [2.915476, 4.031129, 3.905125, 4.272002, 4.272002],
-                "expected_with_subtrees":
-                    [1.5, 2.5, 3.041381, 3.041381, 2.061553] +
-                    [1.581139, 3.162278, 4.153312, 4.153312],
+                "expected_wout_subtrees": [1.5, 2.5, 3.041381, 3.041381, 2.061553]
+                + [1.581139, 3.162278, 4.153312, 4.153312]
+                + [2.915476, 4.031129, 3.905125, 4.272002, 4.272002],
+                "expected_with_subtrees": [1.5, 2.5, 3.041381, 3.041381, 2.061553]
+                + [1.581139, 3.162278, 4.153312, 4.153312],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -1791,45 +1772,105 @@ def _morphology_features(mode):
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
                 "expected_wout_subtrees": [
-                    [-1.5, 0.0, 0.0], [-2.5, 0.0, 0.0], [-3.0, 0.0, 0.5], [-3.0, 0.0, -0.5],
-                    [-2.0, 0.5, 0.0], [0.5, 1.5, 0.0], [1.0, 3.0, 0.0], [1.0, 4.0, 0.5],
-                    [1.0, 4.0, -0.5], [1.5, 2.5, 0.0], [2.0, 3.5, 0.0], [2.5, 3.0, 0.0],
-                    [3.0, 3.0, 0.5], [3.0, 3.0, -0.5], [0.0, -1.5, 0.0], [0.0, -2.5, 0.0],
-                    [0.0, -3.0, 0.5], [0.0, -3.0, -0.5], [0.5, -2.0, 0.0]],
+                    [-1.5, 0.0, 0.0],
+                    [-2.5, 0.0, 0.0],
+                    [-3.0, 0.0, 0.5],
+                    [-3.0, 0.0, -0.5],
+                    [-2.0, 0.5, 0.0],
+                    [0.5, 1.5, 0.0],
+                    [1.0, 3.0, 0.0],
+                    [1.0, 4.0, 0.5],
+                    [1.0, 4.0, -0.5],
+                    [1.5, 2.5, 0.0],
+                    [2.0, 3.5, 0.0],
+                    [2.5, 3.0, 0.0],
+                    [3.0, 3.0, 0.5],
+                    [3.0, 3.0, -0.5],
+                    [0.0, -1.5, 0.0],
+                    [0.0, -2.5, 0.0],
+                    [0.0, -3.0, 0.5],
+                    [0.0, -3.0, -0.5],
+                    [0.5, -2.0, 0.0],
+                ],
                 "expected_with_subtrees": [
-                    [-1.5, 0.0, 0.0], [-2.5, 0.0, 0.0], [-3.0, 0.0, 0.5], [-3.0, 0.0, -0.5],
-                    [-2.0, 0.5, 0.0], [0.5, 1.5, 0.0], [1.0, 3.0, 0.0], [1.0, 4.0, 0.5],
-                    [1.0, 4.0, -0.5], [1.5, 2.5, 0.0], [2.0, 3.5, 0.0], [2.5, 3.0, 0.0],
-                    [3.0, 3.0, 0.5], [3.0, 3.0, -0.5], [0.0, -1.5, 0.0], [0.0, -2.5, 0.0],
-                    [0.0, -3.0, 0.5], [0.0, -3.0, -0.5], [0.5, -2.0, 0.0]],
+                    [-1.5, 0.0, 0.0],
+                    [-2.5, 0.0, 0.0],
+                    [-3.0, 0.0, 0.5],
+                    [-3.0, 0.0, -0.5],
+                    [-2.0, 0.5, 0.0],
+                    [0.5, 1.5, 0.0],
+                    [1.0, 3.0, 0.0],
+                    [1.0, 4.0, 0.5],
+                    [1.0, 4.0, -0.5],
+                    [1.5, 2.5, 0.0],
+                    [2.0, 3.5, 0.0],
+                    [2.5, 3.0, 0.0],
+                    [3.0, 3.0, 0.5],
+                    [3.0, 3.0, -0.5],
+                    [0.0, -1.5, 0.0],
+                    [0.0, -2.5, 0.0],
+                    [0.0, -3.0, 0.5],
+                    [0.0, -3.0, -0.5],
+                    [0.5, -2.0, 0.0],
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
                 "expected_wout_subtrees": [
-                    [-1.5, 0.0, 0.0], [-2.5, 0.0, 0.0], [-3.0, 0.0, 0.5], [-3.0, 0.0, -0.5],
-                    [-2.0, 0.5, 0.0], [0.5, 1.5, 0.0], [1.0, 3.0, 0.0], [1.0, 4.0, 0.5],
-                    [1.0, 4.0, -0.5], [1.5, 2.5, 0.0], [2.0, 3.5, 0.0], [2.5, 3.0, 0.0],
-                    [3.0, 3.0, 0.5], [3.0, 3.0, -0.5]],
+                    [-1.5, 0.0, 0.0],
+                    [-2.5, 0.0, 0.0],
+                    [-3.0, 0.0, 0.5],
+                    [-3.0, 0.0, -0.5],
+                    [-2.0, 0.5, 0.0],
+                    [0.5, 1.5, 0.0],
+                    [1.0, 3.0, 0.0],
+                    [1.0, 4.0, 0.5],
+                    [1.0, 4.0, -0.5],
+                    [1.5, 2.5, 0.0],
+                    [2.0, 3.5, 0.0],
+                    [2.5, 3.0, 0.0],
+                    [3.0, 3.0, 0.5],
+                    [3.0, 3.0, -0.5],
+                ],
                 "expected_with_subtrees": [
-                    [-1.5, 0.0, 0.0], [-2.5, 0.0, 0.0], [-3.0, 0.0, 0.5], [-3.0, 0.0, -0.5],
-                    [-2.0, 0.5, 0.0], [0.5, 1.5, 0.0], [1.0, 3.0, 0.0], [1.0, 4.0, 0.5],
-                    [1.0, 4.0, -0.5]],
+                    [-1.5, 0.0, 0.0],
+                    [-2.5, 0.0, 0.0],
+                    [-3.0, 0.0, 0.5],
+                    [-3.0, 0.0, -0.5],
+                    [-2.0, 0.5, 0.0],
+                    [0.5, 1.5, 0.0],
+                    [1.0, 3.0, 0.0],
+                    [1.0, 4.0, 0.5],
+                    [1.0, 4.0, -0.5],
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
                 "expected_with_subtrees": [
-                    [1.5, 2.5, 0.0], [2.0, 3.5, 0.0], [2.5, 3.0, 0.0],
-                    [3.0, 3.0, 0.5], [3.0, 3.0, -0.5]],
+                    [1.5, 2.5, 0.0],
+                    [2.0, 3.5, 0.0],
+                    [2.5, 3.0, 0.0],
+                    [3.0, 3.0, 0.5],
+                    [3.0, 3.0, -0.5],
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
                 "expected_wout_subtrees": [
-                    [0.0, -1.5, 0.0], [0.0, -2.5, 0.0], [0.0, -3.0, 0.5],
-                    [0.0, -3.0, -0.5], [0.5, -2.0, 0.0]],
+                    [0.0, -1.5, 0.0],
+                    [0.0, -2.5, 0.0],
+                    [0.0, -3.0, 0.5],
+                    [0.0, -3.0, -0.5],
+                    [0.5, -2.0, 0.0],
+                ],
                 "expected_with_subtrees": [
-                    [0.0, -1.5, 0.0], [0.0, -2.5, 0.0], [0.0, -3.0, 0.5],
-                    [0.0, -3.0, -0.5], [0.5, -2.0, 0.0]],
+                    [0.0, -1.5, 0.0],
+                    [0.0, -2.5, 0.0],
+                    [0.0, -3.0, 0.5],
+                    [0.0, -3.0, -0.5],
+                    [0.5, -2.0, 0.0],
+                ],
             },
         ],
         "segment_meander_angles": [
@@ -1923,16 +1964,36 @@ def _morphology_features(mode):
         "local_bifurcation_angles": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.570796, 3.141593, 0.785398, 3.141593,
-                     1.570796, 3.141593, 1.570796, 3.141593],
-                "expected_with_subtrees":
-                    [1.570796, 3.141593, 3.141593, 1.570796, 3.141593, 1.570796, 3.141593],
+                "expected_wout_subtrees": [
+                    1.570796,
+                    3.141593,
+                    0.785398,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
+                "expected_with_subtrees": [
+                    1.570796,
+                    3.141593,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.570796, 3.141593, 0.785398, 3.141593, 1.570796, 3.141593],
+                "expected_wout_subtrees": [
+                    1.570796,
+                    3.141593,
+                    0.785398,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
                 "expected_with_subtrees": [1.570796, 3.141593, 3.141593],
             },
             {
@@ -1949,16 +2010,36 @@ def _morphology_features(mode):
         "remote_bifurcation_angles": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.570796, 3.141593, 0.785398, 3.141593,
-                     1.570796, 3.141593, 1.570796, 3.141593],
-                "expected_with_subtrees":
-                    [1.570796, 3.141593, 3.141593, 1.570796, 3.141593, 1.570796, 3.141593],
+                "expected_wout_subtrees": [
+                    1.570796,
+                    3.141593,
+                    0.785398,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
+                "expected_with_subtrees": [
+                    1.570796,
+                    3.141593,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [1.570796, 3.141593, 0.785398, 3.141593, 1.570796, 3.141593],
+                "expected_wout_subtrees": [
+                    1.570796,
+                    3.141593,
+                    0.785398,
+                    3.141593,
+                    1.570796,
+                    3.141593,
+                ],
                 "expected_with_subtrees": [1.570796, 3.141593, 3.141593],
             },
             {
@@ -1997,17 +2078,36 @@ def _morphology_features(mode):
         "partition_pairs": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [[3.0, 1.0], [1.0, 1.0], [3.0, 5.0],
-                     [1.0, 1.0], [1.0, 3.0], [1.0, 1.0], [3.0, 1.0], [1.0, 1.0]],
-                "expected_with_subtrees":
-                    [[3.0, 1.0], [1.0, 1.0], [1.0, 1.0],
-                     [1.0, 3.0], [1.0, 1.0], [3.0, 1.0], [1.0, 1.0]],
+                "expected_wout_subtrees": [
+                    [3.0, 1.0],
+                    [1.0, 1.0],
+                    [3.0, 5.0],
+                    [1.0, 1.0],
+                    [1.0, 3.0],
+                    [1.0, 1.0],
+                    [3.0, 1.0],
+                    [1.0, 1.0],
+                ],
+                "expected_with_subtrees": [
+                    [3.0, 1.0],
+                    [1.0, 1.0],
+                    [1.0, 1.0],
+                    [1.0, 3.0],
+                    [1.0, 1.0],
+                    [3.0, 1.0],
+                    [1.0, 1.0],
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [[3.0, 1.0], [1.0, 1.0], [3.0, 5.0], [1.0, 1.0], [1.0, 3.0], [1.0, 1.0]],
+                "expected_wout_subtrees": [
+                    [3.0, 1.0],
+                    [1.0, 1.0],
+                    [3.0, 5.0],
+                    [1.0, 1.0],
+                    [1.0, 3.0],
+                    [1.0, 1.0],
+                ],
                 "expected_with_subtrees": [[3.0, 1.0], [1.0, 1.0], [1.0, 1.0]],
             },
             {
@@ -2046,23 +2146,23 @@ def _morphology_features(mode):
         "bifurcation_partitions": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [3., 1., 1.666667, 1., 3., 1., 3., 1.],
-                "expected_with_subtrees": [3., 1., 1., 3., 1., 3., 1.],
+                "expected_wout_subtrees": [3.0, 1.0, 1.666667, 1.0, 3.0, 1.0, 3.0, 1.0],
+                "expected_with_subtrees": [3.0, 1.0, 1.0, 3.0, 1.0, 3.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [3., 1., 1.666667, 1., 3., 1. ],
-                "expected_with_subtrees": [3., 1., 1.],
+                "expected_wout_subtrees": [3.0, 1.0, 1.666667, 1.0, 3.0, 1.0],
+                "expected_with_subtrees": [3.0, 1.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
                 "expected_wout_subtrees": [],
-                "expected_with_subtrees": [3., 1.],
+                "expected_with_subtrees": [3.0, 1.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [3., 1.],
-                "expected_with_subtrees": [3., 1.],
+                "expected_wout_subtrees": [3.0, 1.0],
+                "expected_with_subtrees": [3.0, 1.0],
             },
         ],
         "section_path_distances": [
@@ -2070,23 +2170,77 @@ def _morphology_features(mode):
                 # subtree path distances are calculated to the root of the subtree
                 "kwargs": {"neurite_type": NeuriteType.all},
                 "expected_wout_subtrees": [
-                    1.0, 2.0, 3.0, 3.0, 2.0, 1.414213, 3.414213, 4.414213,
-                    4.414213, 2.828427, 3.828427, 3.828427, 4.828427, 4.828427,
-                    1.0, 2.0, 3.0, 3.0, 2.0
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
+                    1.414213,
+                    3.414213,
+                    4.414213,
+                    4.414213,
+                    2.828427,
+                    3.828427,
+                    3.828427,
+                    4.828427,
+                    4.828427,
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
                 ],
                 "expected_with_subtrees": [
-                    1., 2., 3., 3., 2., 1.414214, 3.414214, 4.414214, 4.414214, 1.414214,
-                    2.414214, 2.414214, 3.414214, 3.414214, 1., 2., 3., 3., 2.
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
+                    1.414214,
+                    3.414214,
+                    4.414214,
+                    4.414214,
+                    1.414214,
+                    2.414214,
+                    2.414214,
+                    3.414214,
+                    3.414214,
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
                 ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
                 "expected_wout_subtrees": [
-                    1., 2., 3., 3., 2., 1.414214, 3.414214, 4.414214, 4.414214,
-                    2.828427, 3.828427, 3.828427, 4.828427, 4.828427
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
+                    1.414214,
+                    3.414214,
+                    4.414214,
+                    4.414214,
+                    2.828427,
+                    3.828427,
+                    3.828427,
+                    4.828427,
+                    4.828427,
                 ],
-                "expected_with_subtrees":
-                    [1., 2., 3., 3., 2., 1.414214, 3.414214, 4.414214, 4.414214],
+                "expected_with_subtrees": [
+                    1.0,
+                    2.0,
+                    3.0,
+                    3.0,
+                    2.0,
+                    1.414214,
+                    3.414214,
+                    4.414214,
+                    4.414214,
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -2097,16 +2251,46 @@ def _morphology_features(mode):
         "terminal_path_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [3., 3., 2., 4.414214, 4.414214, 3.828427, 4.828427, 4.828427, 3., 3., 2.],
-                "expected_with_subtrees":
-                    [3., 3., 2., 4.414214, 4.414214, 2.414214, 3.414214, 3.414214, 3., 3., 2.],
+                "expected_wout_subtrees": [
+                    3.0,
+                    3.0,
+                    2.0,
+                    4.414214,
+                    4.414214,
+                    3.828427,
+                    4.828427,
+                    4.828427,
+                    3.0,
+                    3.0,
+                    2.0,
+                ],
+                "expected_with_subtrees": [
+                    3.0,
+                    3.0,
+                    2.0,
+                    4.414214,
+                    4.414214,
+                    2.414214,
+                    3.414214,
+                    3.414214,
+                    3.0,
+                    3.0,
+                    2.0,
+                ],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees":
-                    [3., 3., 2., 4.414214, 4.414214, 3.828427, 4.828427, 4.828427],
-                "expected_with_subtrees": [3., 3., 2., 4.414214, 4.414214],
+                "expected_wout_subtrees": [
+                    3.0,
+                    3.0,
+                    2.0,
+                    4.414214,
+                    4.414214,
+                    3.828427,
+                    4.828427,
+                    4.828427,
+                ],
+                "expected_with_subtrees": [3.0, 3.0, 2.0, 4.414214, 4.414214],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -2115,20 +2299,20 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [3., 3., 2.],
-                "expected_with_subtrees": [3., 3., 2.],
+                "expected_wout_subtrees": [3.0, 3.0, 2.0],
+                "expected_with_subtrees": [3.0, 3.0, 2.0],
             },
         ],
         "principal_direction_extents": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees": [2., 3.596771, 2.],
-                "expected_with_subtrees": [2., 3.154926, 2.235207, 2.],
+                "expected_wout_subtrees": [2.0, 3.596771, 2.0],
+                "expected_with_subtrees": [2.0, 3.154926, 2.235207, 2.0],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.basal_dendrite},
-                "expected_wout_subtrees": [2., 3.596771],
-                "expected_with_subtrees": [2., 3.154926],
+                "expected_wout_subtrees": [2.0, 3.596771],
+                "expected_with_subtrees": [2.0, 3.154926],
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.axon},
@@ -2137,8 +2321,8 @@ def _morphology_features(mode):
             },
             {
                 "kwargs": {"neurite_type": NeuriteType.apical_dendrite},
-                "expected_wout_subtrees": [2.],
-                "expected_with_subtrees": [2.],
+                "expected_wout_subtrees": [2.0],
+                "expected_with_subtrees": [2.0],
             },
         ],
         "partition_asymmetry": [
@@ -2244,21 +2428,21 @@ def _morphology_features(mode):
         "segment_path_lengths": [
             {
                 "kwargs": {"neurite_type": NeuriteType.all},
-                "expected_wout_subtrees":
-                    [1.0, 2.0, 3.0, 3.0, 2.0] +
-                    [1.414213, 3.414213, 4.414213, 4.414213] +
-                    [2.828427, 3.828427, 3.828427, 4.828427, 4.828427] +
-                    [1.0, 2.0, 3.0, 3.0, 2.0],
-                "expected_with_subtrees":
-                    [1.0, 2.0, 3.0, 3.0, 2.0] +
-                    [1.414213, 3.414213, 4.414213, 4.414213] +
-                    [1.414214, 2.414214, 2.414214, 3.414214, 3.414214] +
-                    [1.0, 2.0, 3.0, 3.0, 2.0],
+                "expected_wout_subtrees": [1.0, 2.0, 3.0, 3.0, 2.0]
+                + [1.414213, 3.414213, 4.414213, 4.414213]
+                + [2.828427, 3.828427, 3.828427, 4.828427, 4.828427]
+                + [1.0, 2.0, 3.0, 3.0, 2.0],
+                "expected_with_subtrees": [1.0, 2.0, 3.0, 3.0, 2.0]
+                + [1.414213, 3.414213, 4.414213, 4.414213]
+                + [1.414214, 2.414214, 2.414214, 3.414214, 3.414214]
+                + [1.0, 2.0, 3.0, 3.0, 2.0],
             },
         ],
     }
 
-    features_not_tested = (set(_MORPHOLOGY_FEATURES) | set(_NEURITE_FEATURES)) - set(features.keys())
+    features_not_tested = (set(_MORPHOLOGY_FEATURES) | set(_NEURITE_FEATURES)) - set(
+        features.keys()
+    )
 
     assert not features_not_tested, (
         "The following morphology tests need to be included in the mixed morphology tests:\n"
@@ -2268,7 +2452,9 @@ def _morphology_features(mode):
     return _dispatch_features(features, mode)
 
 
-@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees"))
+@pytest.mark.parametrize(
+    "feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees")
+)
 def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -2276,10 +2462,10 @@ def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, exp
         _assert_feature_equal(values, expected)
 
 
-@pytest.mark.parametrize("feature_name, kwargs, expected", _morphology_features(mode="with-subtrees"))
-def test_morphology__morphology_features_with_subtrees(
-    feature_name, kwargs, expected, mixed_morph
-):
+@pytest.mark.parametrize(
+    "feature_name, kwargs, expected", _morphology_features(mode="with-subtrees")
+)
+def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, expected, mixed_morph):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
@@ -2296,7 +2482,7 @@ def _neurite_features():
                 "expected": [2.236068, 3.7416575, 2.236068],
             },
             {
-                "kwargs": {"section_type": NeuriteType.all, "origin": np.array([0., 0., 0.])},
+                "kwargs": {"section_type": NeuriteType.all, "origin": np.array([0.0, 0.0, 0.0])},
                 "expected": [3.162277, 4.472135, 3.162277],
             },
             {
@@ -2304,17 +2490,20 @@ def _neurite_features():
                 "expected": [2.236068, 3.3166249, 0.0],
             },
             {
-                "kwargs": {"section_type": NeuriteType.basal_dendrite, "origin": np.array([0., 0., 0.])},
-                "expected": [3.162277, 4.242640, 0.0]
+                "kwargs": {
+                    "section_type": NeuriteType.basal_dendrite,
+                    "origin": np.array([0.0, 0.0, 0.0]),
+                },
+                "expected": [3.162277, 4.242640, 0.0],
             },
             {
                 "kwargs": {"section_type": NeuriteType.axon},
-                "expected": [0.      , 3.741657, 0.      ],
+                "expected": [0.0, 3.741657, 0.0],
             },
             {
-                "kwargs": {"section_type": NeuriteType.axon, "origin": np.array([0., 0., 0.])},
+                "kwargs": {"section_type": NeuriteType.axon, "origin": np.array([0.0, 0.0, 0.0])},
                 "expected": [0.0, 4.472135, 0.0],
-            }
+            },
         ],
         "volume_density": [
             {
@@ -2339,7 +2528,17 @@ def _neurite_features():
                 "kwargs": {"section_type": NeuriteType.all},
                 "expected": [
                     [1.0, 2.0, 2.236068, 2.236068, 1.4142135],
-                    [1.4142135, 3.1622777, 3.3166249, 3.3166249, 2.828427, 3.6055512, 3.6055512, 3.7416575, 3.7416575],
+                    [
+                        1.4142135,
+                        3.1622777,
+                        3.3166249,
+                        3.3166249,
+                        2.828427,
+                        3.6055512,
+                        3.6055512,
+                        3.7416575,
+                        3.7416575,
+                    ],
                     [1.0, 2.0, 2.236068, 2.236068, 1.4142135],
                 ],
             },
@@ -2364,7 +2563,7 @@ def _neurite_features():
                 "expected": [
                     [],
                     [],
-                    [1., 2., 2.236068, 2.236068, 1.414214],
+                    [1.0, 2.0, 2.236068, 2.236068, 1.414214],
                 ],
             },
         ],
@@ -2372,15 +2571,15 @@ def _neurite_features():
             {
                 "kwargs": {"section_type": NeuriteType.all},
                 "expected": [
-                    [1., 2.],
+                    [1.0, 2.0],
                     [1.414214, 3.162278, 2.828427, 3.605551],
-                    [1., 2.],
+                    [1.0, 2.0],
                 ],
             },
             {
                 "kwargs": {"section_type": NeuriteType.basal_dendrite},
                 "expected": [
-                    [1., 2.],
+                    [1.0, 2.0],
                     [3.162278],
                     [],
                 ],
@@ -2398,7 +2597,7 @@ def _neurite_features():
                 "expected": [
                     [],
                     [],
-                    [1., 2.],
+                    [1.0, 2.0],
                 ],
             },
         ],
@@ -2440,15 +2639,25 @@ def _neurite_features():
             {
                 "kwargs": {"section_type": NeuriteType.all},
                 "expected": [
-                    [0.5     , 1.5     , 2.061553, 2.061553, 1.118034],
-                    [0.707107, 2.236068, 3.201562, 3.201562, 2.12132 , 3.201562, 3.201562, 3.640055, 3.640055],
-                    [0.5     , 1.5     , 2.061553, 2.061553, 1.118034],
+                    [0.5, 1.5, 2.061553, 2.061553, 1.118034],
+                    [
+                        0.707107,
+                        2.236068,
+                        3.201562,
+                        3.201562,
+                        2.12132,
+                        3.201562,
+                        3.201562,
+                        3.640055,
+                        3.640055,
+                    ],
+                    [0.5, 1.5, 2.061553, 2.061553, 1.118034],
                 ],
             },
             {
                 "kwargs": {"section_type": NeuriteType.basal_dendrite},
                 "expected": [
-                    [0.5     , 1.5     , 2.061553, 2.061553, 1.118034],
+                    [0.5, 1.5, 2.061553, 2.061553, 1.118034],
                     [0.707107, 2.236068, 3.201562, 3.201562],
                     [],
                 ],
@@ -2457,7 +2666,7 @@ def _neurite_features():
                 "kwargs": {"section_type": NeuriteType.axon},
                 "expected": [
                     [],
-                    [2.12132 , 3.201562, 3.201562, 3.640055, 3.640055],
+                    [2.12132, 3.201562, 3.201562, 3.640055, 3.640055],
                     [],
                 ],
             },
@@ -2466,21 +2675,22 @@ def _neurite_features():
                 "expected": [
                     [],
                     [],
-                    [0.5     , 1.5     , 2.061553, 2.061553, 1.118034],
+                    [0.5, 1.5, 2.061553, 2.061553, 1.118034],
                 ],
             },
-        ]
+        ],
     }
 
     # features that exist in both the neurite and morphology level, which indicates a different
     # implementation in each level
     features_not_tested = list(
-        (set(_NEURITE_FEATURES)  & set(_MORPHOLOGY_FEATURES)) - features.keys()
+        (set(_NEURITE_FEATURES) & set(_MORPHOLOGY_FEATURES)) - features.keys()
     )
 
     assert not features_not_tested, (
-        "The following morphology tests need to be included in the mixed neurite tests:\n\n" +
-        "\n".join(sorted(features_not_tested)) + "\n"
+        "The following morphology tests need to be included in the mixed neurite tests:\n\n"
+        + "\n".join(sorted(features_not_tested))
+        + "\n"
     )
 
     return _dispatch_features(features)

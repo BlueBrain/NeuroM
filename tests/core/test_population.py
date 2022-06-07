@@ -36,14 +36,15 @@ import pytest
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
 
-FILES = [DATA_PATH / 'swc/Neuron.swc',
-         DATA_PATH / 'swc/Single_basal.swc',
-         DATA_PATH / 'swc/Neuron_small_radius.swc']
+FILES = [
+    DATA_PATH / 'swc/Neuron.swc',
+    DATA_PATH / 'swc/Single_basal.swc',
+    DATA_PATH / 'swc/Neuron_small_radius.swc',
+]
 
 NEURONS = [load_morphology(f) for f in FILES]
 TOT_NEURITES = sum(len(N.neurites) for N in NEURONS)
-populations = [Population(NEURONS, name='foo'),
-               Population(FILES, name='foo', cache=True)]
+populations = [Population(NEURONS, name='foo'), Population(FILES, name='foo', cache=True)]
 
 
 @pytest.mark.parametrize('pop', populations)

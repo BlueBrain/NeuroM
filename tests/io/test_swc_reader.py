@@ -55,44 +55,36 @@ def test_read_single_neurite():
     n = load_morphology(SWC_PATH / 'point_soma_single_neurite.swc')
     assert len(n.neurites) == 1
     assert n.neurites[0].root_node.id == 0
-    assert_array_equal(n.soma.points,
-                       [[0, 0, 0, 3.0]])
+    assert_array_equal(n.soma.points, [[0, 0, 0, 3.0]])
     assert len(n.neurites) == 1
     assert len(n.sections) == 1
-    assert_array_equal(n.neurites[0].points,
-                       np.array([[0, 0, 2, 0.5],
-                                 [0, 0, 3, 0.5],
-                                 [0, 0, 4, 0.5],
-                                 [0, 0, 5, 0.5]]))
+    assert_array_equal(
+        n.neurites[0].points,
+        np.array([[0, 0, 2, 0.5], [0, 0, 3, 0.5], [0, 0, 4, 0.5], [0, 0, 5, 0.5]]),
+    )
 
 
 def test_read_split_soma():
     n = load_morphology(SWC_PATH / 'split_soma_two_neurites.swc')
 
-    assert_array_equal(n.soma.points,
-                       [[1, 0, 1, 4.0],
-                        [2, 0, 0, 4.0],
-                        [3, 0, 0, 4.0]])
+    assert_array_equal(n.soma.points, [[1, 0, 1, 4.0], [2, 0, 0, 4.0], [3, 0, 0, 4.0]])
 
     assert len(n.neurites) == 2
-    assert_array_equal(n.neurites[0].points,
-                       [[0, 0, 2, 0.5],
-                        [0, 0, 3, 0.5],
-                        [0, 0, 4, 0.5],
-                        [0, 0, 5, 0.5]])
+    assert_array_equal(
+        n.neurites[0].points, [[0, 0, 2, 0.5], [0, 0, 3, 0.5], [0, 0, 4, 0.5], [0, 0, 5, 0.5]]
+    )
 
-    assert_array_equal(n.neurites[1].points,
-                       [[0, 0, 6, 0.5],
-                        [0, 0, 7, 0.5],
-                        [0, 0, 8, 0.5],
-                        [0, 0, 9, 0.5]])
+    assert_array_equal(
+        n.neurites[1].points, [[0, 0, 6, 0.5], [0, 0, 7, 0.5], [0, 0, 8, 0.5], [0, 0, 9, 0.5]]
+    )
 
     assert len(n.sections) == 2
 
 
 def test_weird_indent():
 
-    n = load_morphology("""
+    n = load_morphology(
+        """
 
                  # this is the same as simple.swc
 
@@ -112,16 +104,18 @@ def test_weird_indent():
 
  8 2  6 -4 0         0.  7
  9 2 -5 -4 0 0.  7
-""", reader='swc')
+""",
+        reader='swc',
+    )
 
     simple = load_morphology(SWC_PATH / 'simple.swc')
-    assert_array_equal(simple.points,
-                       n.points)
+    assert_array_equal(simple.points, n.points)
 
 
 def test_cyclic():
     with pytest.raises(RawDataError):
-        load_morphology("""
+        load_morphology(
+            """
         1 1  0  0 0 1. -1
         2 3  0  0 0 1.  1
         3 3  0  5 0 1.  2
@@ -130,25 +124,22 @@ def test_cyclic():
         6 2  0  0 0 1.  6  # <-- cyclic point
         7 2  0 -4 0 1.  6
         8 2  6 -4 0 0.  7
-        9 2 -5 -4 0 0.  7""", reader='swc')
+        9 2 -5 -4 0 0.  7""",
+            reader='swc',
+        )
 
 
 def test_simple_reversed():
     n = load_morphology(SWC_PATH / 'simple_reversed.swc')
-    assert_array_equal(n.soma.points,
-                       [[0, 0, 0, 1]])
+    assert_array_equal(n.soma.points, [[0, 0, 0, 1]])
     assert len(n.neurites) == 2
     assert len(n.neurites[0].points) == 4
-    assert_array_equal(n.neurites[0].points,
-                       [[0, 0, 0, 1],
-                        [0, 5, 0, 1],
-                        [-5, 5, 0, 0],
-                        [6, 5, 0, 0]])
-    assert_array_equal(n.neurites[1].points,
-                       [[0, 0, 0, 1],
-                        [0, -4, 0, 1],
-                        [6, -4, 0, 0],
-                        [-5, -4, 0, 0]])
+    assert_array_equal(
+        n.neurites[0].points, [[0, 0, 0, 1], [0, 5, 0, 1], [-5, 5, 0, 0], [6, 5, 0, 0]]
+    )
+    assert_array_equal(
+        n.neurites[1].points, [[0, 0, 0, 1], [0, -4, 0, 1], [6, -4, 0, 0], [-5, -4, 0, 0]]
+    )
 
 
 def test_custom_type():

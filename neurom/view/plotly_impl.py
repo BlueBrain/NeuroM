@@ -74,9 +74,11 @@ def _make_trace(morph, plane):
 
         segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in segments]
 
-        coords = dict(x=list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
-                      y=list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
-                      z=list(flatten((p1[2], p2[2], None) for p1, p2 in segs)))
+        coords = dict(
+            x=list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
+            y=list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
+            z=list(flatten((p1[2], p2[2], None) for p1, p2 in segs)),
+        )
 
         color = TREE_COLOR.get(neurite.root_node.type, 'black')
         if plane.lower() == '3d':
@@ -84,11 +86,7 @@ def _make_trace(morph, plane):
         else:
             plot_fun = go.Scatter
             coords = dict(x=coords[plane[0]], y=coords[plane[1]])
-        yield plot_fun(
-            line=dict(color=color, width=2),
-            mode='lines',
-            **coords
-        )
+        yield plot_fun(line=dict(color=color, width=2), mode='lines', **coords)
 
 
 def _fill_soma_data(morph, data, plane):
@@ -108,7 +106,6 @@ def _fill_soma_data(morph, data, plane):
                 'y0': morph.soma.center[1] - morph.soma.radius,
                 'x1': morph.soma.center[0] + morph.soma.radius,
                 'y1': morph.soma.center[1] + morph.soma.radius,
-
                 'line': {
                     'color': 'rgba(50, 171, 96, 1)',
                 },
@@ -141,7 +138,7 @@ def get_figure(morph, plane, title):
         gridcolor='rgb(255, 255, 255)',
         zerolinecolor='rgb(255, 255, 255)',
         showbackground=True,
-        backgroundcolor='rgb(230, 230,230)'
+        backgroundcolor='rgb(230, 230,230)',
     )
 
     soma_2d = _fill_soma_data(morph, data, plane)
@@ -150,9 +147,18 @@ def get_figure(morph, plane, title):
         autosize=True,
         title=title,
         scene=dict(  # This is used for 3D plots
-            xaxis=axis, yaxis=axis, zaxis=axis,
-            camera=dict(up=dict(x=0, y=0, z=1), eye=dict(x=-1.7428, y=1.0707, z=0.7100,)),
-            aspectmode='data'
+            xaxis=axis,
+            yaxis=axis,
+            zaxis=axis,
+            camera=dict(
+                up=dict(x=0, y=0, z=1),
+                eye=dict(
+                    x=-1.7428,
+                    y=1.0707,
+                    z=0.7100,
+                ),
+            ),
+            aspectmode='data',
         ),
         yaxis=dict(scaleanchor="x"),  # This is used for 2D plots
         shapes=soma_2d,

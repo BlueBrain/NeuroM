@@ -44,6 +44,7 @@ class Population:
     It does not store the loaded morphology in memory unless the morphology has been already passed
     as loaded (instance of ``Morphology``).
     """
+
     def __init__(self, files, name='Population', ignored_exceptions=(), cache=False):
         """Construct a morphology population.
 
@@ -108,7 +109,8 @@ class Population:
         """Get morphology at index idx."""
         if idx > len(self):
             raise ValueError(
-                f'no {idx} index in "{self.name}" population, max possible index is {len(self)}')
+                f'no {idx} index in "{self.name}" population, max possible index is {len(self)}'
+            )
         return self._load_file(self._files[idx])
 
     def __str__(self):

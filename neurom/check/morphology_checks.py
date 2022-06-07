@@ -38,8 +38,7 @@ from neurom import NeuriteType
 from neurom.check import CheckResult
 from neurom.check.morphtree import get_flat_neurites
 from neurom.core.dataformat import COLS
-from neurom.core.morphology import (Section, iter_neurites, iter_sections,
-                                    iter_segments)
+from neurom.core.morphology import Section, iter_neurites, iter_sections, iter_segments
 from neurom.exceptions import NeuroMError
 from neurom.morphmath import section_length, segment_length
 from neurom.utils import flatten
@@ -139,8 +138,7 @@ def has_all_nonzero_section_lengths(morph, threshold=0.0):
     Returns:
         CheckResult with result including list of ids of bad sections
     """
-    bad_ids = [s.id for s in iter_sections(morph.neurites)
-               if section_length(s.points) <= threshold]
+    bad_ids = [s.id for s in iter_sections(morph.neurites) if section_length(s.points) <= threshold]
 
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
@@ -194,10 +192,15 @@ def has_no_jumps(morph, max_distance=30.0, axis='z'):
         CheckResult with result list of ids of bad sections
     """
     bad_ids = []
-    axis = {'x': COLS.X, 'y': COLS.Y, 'z': COLS.Z, }[axis.lower()]
+    axis = {
+        'x': COLS.X,
+        'y': COLS.Y,
+        'z': COLS.Z,
+    }[axis.lower()]
     for neurite in iter_neurites(morph):
-        section_segment = ((sec, seg) for sec in iter_sections(neurite)
-                           for seg in iter_segments(sec))
+        section_segment = (
+            (sec, seg) for sec in iter_sections(neurite) for seg in iter_segments(sec)
+        )
         for sec, (p0, p1) in islice(section_segment, 1, None):  # Skip neurite root segment
             if max_distance < abs(p0[axis] - p1[axis]):
                 bad_ids.append((sec.id, [p0, p1]))
@@ -256,9 +259,11 @@ def has_no_narrow_start(morph, frac=0.9):
     Returns:
         CheckResult with a list of all first segments of neurites with a narrow start
     """
-    bad_ids = [(neurite.root_node.id, neurite.root_node.points[np.newaxis, 1])
-               for neurite in morph.neurites
-               if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]]
+    bad_ids = [
+        (neurite.root_node.id, neurite.root_node.points[np.newaxis, 1])
+        for neurite in morph.neurites
+        if neurite.root_node.points[0][COLS.R] < frac * neurite.root_node.points[1][COLS.R]
+    ]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
@@ -284,33 +289,34 @@ def has_no_dangling_branch(morph):
     radius = np.linalg.norm(recentered_soma, axis=1)
     soma_max_radius = radius.max()
 
-    dendritic_points = np.array(list(flatten(n.points
-                                             for n in iter_neurites(morph)
-                                             if n.type != NeuriteType.axon)))
+    dendritic_points = np.array(
+        list(flatten(n.points for n in iter_neurites(morph) if n.type != NeuriteType.axon))
+    )
 
     def is_dangling(neurite):
         """Is the neurite dangling?"""
         starting_point = neurite.points[0][COLS.XYZ]
 
-        if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.:
+        if np.linalg.norm(starting_point - soma_center) - soma_max_radius <= 12.0:
             return False
 
         if neurite.type != NeuriteType.axon:
             return True
 
-        distance_to_dendrites = np.linalg.norm(dendritic_points[:, COLS.XYZ] - starting_point,
-                                               axis=1)
+        distance_to_dendrites = np.linalg.norm(
+            dendritic_points[:, COLS.XYZ] - starting_point, axis=1
+        )
         return np.all(distance_to_dendrites >= 2 * dendritic_points[:, COLS.R] + 2)
 
-    bad_ids = [(n.root_node.id, [n.root_node.points[0]])
-               for n in iter_neurites(morph) if is_dangling(n)]
+    bad_ids = [
+        (n.root_node.id, [n.root_node.points[0]]) for n in iter_neurites(morph) if is_dangling(n)
+    ]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def has_no_narrow_neurite_section(morph,
-                                  neurite_filter,
-                                  radius_threshold=0.05,
-                                  considered_section_min_length=50):
+def has_no_narrow_neurite_section(
+    morph, neurite_filter, radius_threshold=0.05, considered_section_min_length=50
+):
     """Check if the morphology has dendrites with narrow sections.
 
     Arguments:
@@ -324,22 +330,31 @@ def has_no_narrow_neurite_section(morph,
         CheckResult with result. `result.info` contains the narrow section ids and their
         first point
     """
-    considered_sections = (sec for sec in iter_sections(morph, neurite_filter=neurite_filter)
-                           if sec.length > considered_section_min_length)
+    considered_sections = (
+        sec
+        for sec in iter_sections(morph, neurite_filter=neurite_filter)
+        if sec.length > considered_section_min_length
+    )
 
     def narrow_section(section):
         """Select narrow sections."""
         return section.points[:, COLS.R].mean() < radius_threshold
 
-    bad_ids = [(section.id, section.points[np.newaxis, 1])
-               for section in considered_sections if narrow_section(section)]
+    bad_ids = [
+        (section.id, section.points[np.newaxis, 1])
+        for section in considered_sections
+        if narrow_section(section)
+    ]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
 def has_multifurcation(morph):
     """Check if a section has more than 3 children."""
-    bad_ids = [(section.id, section.points[np.newaxis, -1]) for section in iter_sections(morph)
-               if len(section.children) > 3]
+    bad_ids = [
+        (section.id, section.points[np.newaxis, -1])
+        for section in iter_sections(morph)
+        if len(section.children) > 3
+    ]
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 

@@ -49,41 +49,39 @@ def test_load_morphology_pathlib():
 def test_load_morphology_from_other_morphologies():
     filename = SWC_PATH / 'simple.swc'
 
-    expected_points = [[ 0.,  0.,  0.,  1.],
-                       [ 0.,  5.,  0.,  1.],
-                       [ 0.,  5.,  0.,  1.],
-                       [-5.,  5.,  0.,  0.],
-                       [ 0.,  5.,  0.,  1.],
-                       [ 6.,  5.,  0.,  0.],
-                       [ 0.,  0.,  0.,  1.],
-                       [ 0., -4.,  0.,  1.],
-                       [ 0., -4.,  0.,  1.],
-                       [ 6., -4.,  0.,  0.],
-                       [ 0., -4.,  0.,  1.],
-                       [-5., -4.,  0.,  0.]]
+    expected_points = [
+        [0.0, 0.0, 0.0, 1.0],
+        [0.0, 5.0, 0.0, 1.0],
+        [0.0, 5.0, 0.0, 1.0],
+        [-5.0, 5.0, 0.0, 0.0],
+        [0.0, 5.0, 0.0, 1.0],
+        [6.0, 5.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+        [0.0, -4.0, 0.0, 1.0],
+        [0.0, -4.0, 0.0, 1.0],
+        [6.0, -4.0, 0.0, 0.0],
+        [0.0, -4.0, 0.0, 1.0],
+        [-5.0, -4.0, 0.0, 0.0],
+    ]
 
-    assert_array_equal(nm.load_morphology(nm.load_morphology(filename)).points,
-                       expected_points)
+    assert_array_equal(nm.load_morphology(nm.load_morphology(filename)).points, expected_points)
 
-    assert_array_equal(nm.load_morphology(Morphology(filename)).points,
-                       expected_points)
+    assert_array_equal(nm.load_morphology(Morphology(filename)).points, expected_points)
 
-    assert_array_equal(nm.load_morphology(morphio.Morphology(filename)).points,
-                       expected_points)
+    assert_array_equal(nm.load_morphology(morphio.Morphology(filename)).points, expected_points)
 
 
 def test_for_morphio():
     Morphology(morphio.mut.Morphology())
 
     morphio_m = morphio.mut.Morphology()
-    morphio_m.soma.points = [[0,0,0], [1,1,1], [2,2,2]]
+    morphio_m.soma.points = [[0, 0, 0], [1, 1, 1], [2, 2, 2]]
     morphio_m.soma.diameters = [1, 1, 1]
 
     neurom_m = Morphology(morphio_m)
-    assert_array_equal(neurom_m.soma.points,
-                       [[0., 0., 0., 0.5],
-                        [1., 1., 1., 0.5],
-                        [2., 2., 2., 0.5]])
+    assert_array_equal(
+        neurom_m.soma.points, [[0.0, 0.0, 0.0, 0.5], [1.0, 1.0, 1.0, 0.5], [2.0, 2.0, 2.0, 0.5]]
+    )
 
 
 def _check_cloned_morphology(m, m2):
