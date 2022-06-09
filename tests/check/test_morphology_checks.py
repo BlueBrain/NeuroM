@@ -387,7 +387,7 @@ def test__bool__():
 
 def test_has_multifurcation():
     m = load_morphology(StringIO(u"""
-	((CellBody) (0 0 0 2))
+	((CellBody) (-1 0 0 2) (1 0 0 2))
 ( (Color Blue)
   (Axon)
   (0 5 0 2)
@@ -418,11 +418,7 @@ def test_has_multifurcation():
 
 def test_has_unifurcation():
     m = load_morphology(StringIO(u"""
-("CellBody"
- (Color Red)
- (CellBody)
- (0 0 0 2)
- )
+((CellBody) (-1 0 0 2) (1 0 0 2))
 
  ((Dendrite)
   (0 0 0 2)
