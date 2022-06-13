@@ -140,7 +140,7 @@ def test_load_morphologies__resolve_paths():
     # move there for this test
     os.chdir(tests_dir)
 
-    # get dir to morphs relative to tets dir
+    # get dir to morphs relative to test dir
     relative_morph_dir = SWC_PATH.relative_to(tests_dir)
 
     pop = utils.load_morphologies(
