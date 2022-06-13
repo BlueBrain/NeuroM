@@ -28,6 +28,7 @@
 
 """Test neurom.io.utils."""
 import warnings
+import os
 from io import StringIO
 from pathlib import Path
 
@@ -126,6 +127,35 @@ def test_load_morphologies():
     pop = utils.load_morphologies(SWC_PATH, ignored_exceptions=(MissingParentError, MorphioError))
     # is subset so that if new morpho are added to SWC_PATH, the test does not break
     assert {f.name for f in FILES}.issubset({m.name for m in pop})
+
+
+def test_load_morphologies__resolve_paths():
+
+    # store the dir of executing the tests
+    current_dir = os.getcwd()
+
+    # get the tests dir
+    tests_dir = Path(__file__).parent.parent
+
+    # move there for this test
+    os.chdir(tests_dir)
+
+    # get dir to morphs relative to tets dir
+    relative_morph_dir = SWC_PATH.relative_to(tests_dir)
+
+    pop = utils.load_morphologies(
+        str(relative_morph_dir), ignored_exceptions=(MissingParentError, MorphioError)
+    )
+
+    assert {f.name for f in FILES}.issubset({m.name for m in pop})
+
+    # move one up to break if the population is not using asbpaths
+    os.chdir("..")
+
+    assert {f.name for f in FILES}.issubset({m.name for m in pop})
+
+    # move back to our initial dir
+    os.chdir(current_dir)
 
 
 def test_ignore_exceptions():
