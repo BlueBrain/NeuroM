@@ -39,7 +39,7 @@ L = logging.getLogger(__name__)
 
 
 def _resolve_if_morphology_paths(files_or_objects):
-    """Resolve the files in the list"""
+    """Resolve the files in the list."""
     return [
         Path(f).expanduser().absolute() if isinstance(f, (Path, str)) else f
         for f in files_or_objects
