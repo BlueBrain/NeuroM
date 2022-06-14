@@ -99,7 +99,7 @@ def get_files_by_path(path):
 
     Return list of files with path
     """
-    path = Path(path).expanduser().resolve()
+    path = Path(path)
     if path.is_file():
         return [path]
     if path.is_dir():

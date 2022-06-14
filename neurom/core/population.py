@@ -28,6 +28,7 @@
 
 """Morphology Population Classes and Functions."""
 import logging
+from pathlib import Path
 
 from morphio import MorphioError
 
@@ -35,6 +36,14 @@ import neurom
 from neurom.exceptions import NeuroMError
 
 L = logging.getLogger(__name__)
+
+
+def _resolve_if_morphology_paths(files_or_objects):
+    """Resolve the files in the list"""
+    return [
+        Path(f).expanduser().absolute() if isinstance(f, (Path, str)) else f
+        for f in files_or_objects
+    ]
 
 
 class Population:
@@ -61,10 +70,11 @@ class Population:
         """
         self._ignored_exceptions = ignored_exceptions
         self.name = name
+
+        self._files = _resolve_if_morphology_paths(files)
+
         if cache:
-            self._files = [self._load_file(f) for f in files if f is not None]
-        else:
-            self._files = files
+            self._files = [self._load_file(f) for f in self._files if f is not None]
 
     @property
     def morphologies(self):

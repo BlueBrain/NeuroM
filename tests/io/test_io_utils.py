@@ -29,6 +29,7 @@
 """Test neurom.io.utils."""
 import warnings
 import os
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
 
@@ -70,6 +71,17 @@ NRN = utils.load_morphology(VALID_DATA_PATH / 'Neuron.swc')
 NO_SOMA_FILE = SWC_PATH / 'Single_apical_no_soma.swc'
 DISCONNECTED_POINTS_FILE = SWC_PATH / 'Neuron_disconnected_components.swc'
 MISSING_PARENTS_FILE = SWC_PATH / 'Neuron_missing_parents.swc'
+
+
+@contextmanager
+def cwd(path):
+    """Context manager to temporarily change the working directory."""
+    original_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(original_cwd)
 
 
 def _check_neurites_have_no_parent(m):
@@ -131,31 +143,14 @@ def test_load_morphologies():
 
 def test_load_morphologies__resolve_paths():
 
-    # store the dir of executing the tests
-    current_dir = os.getcwd()
+    with cwd(DATA_PATH):
 
-    # get the tests dir
-    tests_dir = Path(__file__).parent.parent
-
-    # move there for this test
-    os.chdir(tests_dir)
-
-    # get dir to morphs relative to test dir
-    relative_morph_dir = SWC_PATH.relative_to(tests_dir)
-
-    pop = utils.load_morphologies(
-        str(relative_morph_dir), ignored_exceptions=(MissingParentError, MorphioError)
-    )
-
-    assert {f.name for f in FILES}.issubset({m.name for m in pop})
+        pop = utils.load_morphologies("swc/", ignored_exceptions=(MissingParentError, MorphioError))
+        assert {f.name for f in FILES}.issubset({m.name for m in pop})
 
     # move one up to break if the population is not using asbpaths
-    os.chdir("..")
-
-    assert {f.name for f in FILES}.issubset({m.name for m in pop})
-
-    # move back to our initial dir
-    os.chdir(current_dir)
+    with cwd(DATA_PATH.parent):
+        assert {f.name for f in FILES}.issubset({m.name for m in pop})
 
 
 def test_ignore_exceptions():
