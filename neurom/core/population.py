@@ -40,10 +40,17 @@ L = logging.getLogger(__name__)
 
 def _resolve_if_morphology_paths(files_or_objects):
     """Resolve the files in the list."""
-    return [
-        Path(f).expanduser().absolute() if isinstance(f, (Path, str)) else f
-        for f in files_or_objects
-    ]
+
+    def resolve_path(path):
+        """Resolve only the parent of the file path.
+
+        Not resolving the filename allows to have symlinks to files with different filename, but
+        any symlink in the parent tree would be correctly resolved.
+        """
+        path = Path(path)
+        return path.parent.resolve() / path.name
+
+    return [resolve_path(f) if isinstance(f, (Path, str)) else f for f in files_or_objects]
 
 
 class Population:
