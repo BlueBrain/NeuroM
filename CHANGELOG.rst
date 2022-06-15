@@ -4,8 +4,7 @@ Changelog
 Version 4.0.0
 -------------
 
-- Make ``neurom.core.Population`` resolve paths. Symlinks are resolved up until the
-  parent directory. If the file is symlinked, then it will not be resolved.
+- Make ``neurom.core.Population`` resolve paths. Symlinks are not resolved.
 - Mixed subtree processing can be used in morph_stats app via the use_subtrees flag.
 - ``neurom.view.[plot_tree|plot_tree3d|plot_soma|plot_soma3D]`` were hidden from the
   neurom.view module. They can still be imported from neurom.view.matplotlib_impl.
