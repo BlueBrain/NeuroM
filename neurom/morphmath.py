@@ -34,7 +34,12 @@ from itertools import combinations
 import numpy as np
 from scipy.spatial import ConvexHull
 from scipy.spatial.distance import cdist
-from scipy.spatial.qhull import QhullError
+
+try:
+    # The QhulError was moved in scipy >= 1.8 so if the import fails the old location is imported
+    from scipy.spatial import QhullError
+except ImportError:
+    from scipy.spatial.qhull import QhullError
 
 from neurom.core.dataformat import COLS
 
