@@ -62,7 +62,10 @@ with warnings.catch_warnings(record=True):
 
 def _add_neurite_trunk(morph, elevation, azimuth, neurite_type=SectionType.basal_dendrite):
     """Add a neurite from the elevation and azimuth to a given morphology."""
-    mut = morph.to_morphio().as_mutable()
+    mut = morph.to_morphio()
+    if hasattr(mut, 'as_mutable'):
+        mut = mut.as_mutable()
+
     new_pts = np.array(morphmath.vector_from_spherical(elevation, azimuth), ndmin=2)
 
     point_lvl = PointLevel(new_pts, [1])
