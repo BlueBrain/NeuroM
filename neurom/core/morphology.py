@@ -531,10 +531,10 @@ class Morphology:
             filename (str|Path): a filename or morphio.{mut}.Morphology object
             name (str): an optional morphology name
         """
-        if isinstance(filename, (str, Path)):
-            self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
-        else:
-            self._morphio_morph = morphio.mut.Morphology(filename)
+        self._morphio_morph = morphio.mut.Morphology(filename)
+
+        if isinstance(filename, (str, Path, morphio.Morphology)):
+            self._morphio_morph = self._morphio_morph.as_immutable()
 
         self.name = name if name else 'Morphology'
         self.soma = make_soma(self._morphio_morph.soma)

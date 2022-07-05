@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import math
+import morphio
 from pathlib import Path
 
 import neurom.geom.transform as gtr
@@ -220,6 +221,29 @@ def test_transform_translate_morphology_h5():
     m = load_morphology(H5_NRN_PATH)
     tm = m.transform(gtr.Translation(t))
     _check_morphology_translate(m, tm, t)
+
+
+def test_transform__mut_immut():
+
+    t = np.array([100.0, 100.0, 100.0])
+
+    morph = morphio.Morphology(H5_NRN_PATH)
+
+    m1 = load_morphology(morph)
+    m2 = m1.transform(gtr.Translation(t))
+
+    assert isinstance(m2.to_morphio(), morphio.Morphology), type(m2.to_morphio())
+
+    _check_morphology_translate(m1, m2, t)
+
+    morph = morphio.mut.Morphology(H5_NRN_PATH)
+
+    m3 = load_morphology(morph)
+    m4 = m3.transform(gtr.Translation(t))
+
+    assert isinstance(m4.to_morphio(), morphio.mut.Morphology), type(m4.to_morphio())
+
+    _check_morphology_translate(m3, m4, t)
 
 
 def _apply_rot(points, rot_mat):
