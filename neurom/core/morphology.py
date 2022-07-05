@@ -30,6 +30,7 @@
 
 import warnings
 from collections import deque
+from pathlib import Path
 
 import morphio
 import numpy as np
@@ -530,7 +531,7 @@ class Morphology:
             filename (str|Path): a filename or morphio.{mut}.Morphology object
             name (str): an optional morphology name
         """
-        if isinstance(filename, str):
+        if isinstance(filename, (str, Path)):
             self._morphio_morph = morphio.mut.Morphology(filename).as_immutable()
         else:
             self._morphio_morph = morphio.mut.Morphology(filename)
@@ -563,17 +564,24 @@ class Morphology:
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
-        mut = self._morphio_morph
+        morph = self._morphio_morph
 
-        if hasattr(mut, 'as_mutable'):
-            mut = mut.as_mutable()
+        is_immutable = hasattr(morph, 'as_mutable')
 
-        mut.soma.points = trans(mut.soma.points)
+        # make copy or convert to mutable if immutable
+        if is_immutable:
+            morph = morph.as_mutable()
+        else:
+            morph = morphio.mut.Morphology(morph)
 
-        for section in mut.iter():
+        morph.soma.points = trans(morph.soma.points)
+
+        for section in morph.iter():
             section.points = trans(section.points)
 
-        return Morphology(mut.as_immutable())
+        if is_immutable:
+            return Morphology(morph.as_immutable())
+        return Morphology(morph)
 
     def __copy__(self):
         """Creates a deep copy of Morphology instance."""
