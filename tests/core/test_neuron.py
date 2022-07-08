@@ -131,3 +131,20 @@ def test_str():
     n = nm.load_morphology(SWC_PATH / 'simple.swc')
     assert 'Morphology' in str(n)
     assert 'Section' in str(n.neurites[0].root_node)
+
+
+def test_mut_nonmut_constructor():
+
+    path = SWC_PATH / 'simple.swc'
+
+    m = Morphology(path)
+    assert isinstance(m.to_morphio(), morphio.Morphology)
+
+    m = Morphology(str(path))
+    assert isinstance(m.to_morphio(), morphio.Morphology)
+
+    m = Morphology(morphio.Morphology(path))
+    assert isinstance(m.to_morphio(), morphio.Morphology)
+
+    m = Morphology(morphio.mut.Morphology(path))
+    assert isinstance(m.to_morphio(), morphio.mut.Morphology)
