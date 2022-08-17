@@ -145,7 +145,7 @@ class Section:
 
     def __hash__(self):
         """Hash of its id."""
-        return self.id
+        return hash((self.id, self.morphio_section))
 
     def __nonzero__(self):
         """If has children."""

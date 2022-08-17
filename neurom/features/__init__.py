@@ -38,16 +38,18 @@ Examples:
 """
 import operator
 from enum import Enum
-from functools import reduce
+from functools import reduce, wraps, lru_cache
 
 from neurom.core import Population, Morphology, Neurite
 from neurom.core.morphology import iter_neurites
 from neurom.core.types import NeuriteType, tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
+# from neurom.features import cache
+from neurom.features.cache import _MORPHOLOGY_FEATURES, _NEURITE_FEATURES, _POPULATION_FEATURES
 
-_NEURITE_FEATURES = {}
-_MORPHOLOGY_FEATURES = {}
-_POPULATION_FEATURES = {}
+# _NEURITE_FEATURES = {}
+# _MORPHOLOGY_FEATURES = {}
+# _POPULATION_FEATURES = {}
 
 
 class NameSpace(Enum):
@@ -132,7 +134,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     return res, feature_
 
 
-def get(feature_name, obj, **kwargs):
+def get(feature_name, obj, clear_cache=True, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite, Morphology or Population features. For Neurite features see
@@ -142,15 +144,19 @@ def get(feature_name, obj, **kwargs):
     Arguments:
         feature_name(string): feature to extract
         obj: a morphology, a morphology population or a neurite tree
+        clear_cache (bool): If True, the cache of this feature is cleared before computation.
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
         List|Number: feature value as a list or a single number.
     """
-    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
+    if clear_cache:
+        cache.clear_feature_cache([feature_name])
+    value = _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
+    return value
 
 
-def _register_feature(namespace: NameSpace, name, func, shape):
+def _register_feature(namespace: NameSpace, name, func, shape, cache=False):
     """Register a feature to be applied.
 
     Upon registration, an attribute 'shape' containing the expected
@@ -168,10 +174,13 @@ def _register_feature(namespace: NameSpace, name, func, shape):
             NameSpace.POPULATION: _POPULATION_FEATURES}
     if name in _map[namespace]:
         raise NeuroMError(f'A feature is already registered under "{name}"')
+    if cache:
+        func = lru_cache(maxsize=None)(func)
     _map[namespace][name] = func
+    return func
 
 
-def feature(shape, namespace: NameSpace, name=None):
+def feature(shape, namespace: NameSpace, name=None, cache=False):
     """Feature decorator to automatically register the feature in the appropriate namespace.
 
     Arguments:
@@ -181,8 +190,8 @@ def feature(shape, namespace: NameSpace, name=None):
     """
 
     def inner(func):
-        _register_feature(namespace, name or func.__name__, func, shape)
-        return func
+        new_func = _register_feature(namespace, name or func.__name__, func, shape, cache)
+        return new_func
 
     return inner
 
