@@ -74,7 +74,7 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
                   0 if feature_.shape == () else [])
 
 
-def _get_feature_value_and_func(feature_name, obj, **kwargs):
+def _get_feature_value_and_func(feature_name, obj, cache=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
@@ -100,7 +100,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
         if feature_name in _NEURITE_FEATURES:
             assert 'neurite_type' not in kwargs, 'Cant apply "neurite_type" arg to a neurite with' \
                                                  ' a neurite feature'
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             if isinstance(obj, Neurite):
                 res = feature_(obj, **kwargs)
             else:
@@ -108,21 +108,21 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     elif isinstance(obj, Morphology):
         # input is a morphology
         if feature_name in _MORPHOLOGY_FEATURES:
-            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            feature_ = _MORPHOLOGY_FEATURES[feature_name][cache]
             res = feature_(obj, **kwargs)
         elif feature_name in _NEURITE_FEATURES:
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
         if feature_name in _POPULATION_FEATURES:
-            feature_ = _POPULATION_FEATURES[feature_name]
+            feature_ = _POPULATION_FEATURES[feature_name][cache]
             res = feature_(obj, **kwargs)
         elif feature_name in _MORPHOLOGY_FEATURES:
-            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            feature_ = _MORPHOLOGY_FEATURES[feature_name][cache]
             res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
         elif feature_name in _NEURITE_FEATURES:
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             res = _flatten_feature(
                 feature_.shape,
                 [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
@@ -134,7 +134,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     return res, feature_
 
 
-def get(feature_name, obj, clear_cache=True, **kwargs):
+def get(feature_name, obj, cache=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite, Morphology or Population features. For Neurite features see
@@ -150,13 +150,10 @@ def get(feature_name, obj, clear_cache=True, **kwargs):
     Returns:
         List|Number: feature value as a list or a single number.
     """
-    if clear_cache:
-        cache.clear_feature_cache([feature_name])
-    value = _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
-    return value
+    return _get_feature_value_and_func(feature_name, obj, cache, **kwargs)[0]
 
 
-def _register_feature(namespace: NameSpace, name, func, shape, cache=False):
+def _register_feature(namespace: NameSpace, name, func, shape):
     """Register a feature to be applied.
 
     Upon registration, an attribute 'shape' containing the expected
@@ -174,13 +171,14 @@ def _register_feature(namespace: NameSpace, name, func, shape, cache=False):
             NameSpace.POPULATION: _POPULATION_FEATURES}
     if name in _map[namespace]:
         raise NeuroMError(f'A feature is already registered under "{name}"')
-    if cache:
-        func = lru_cache(maxsize=None)(func)
-    _map[namespace][name] = func
-    return func
+    cached_func = lru_cache(maxsize=None)(func)
+    _map[namespace][name] = {
+        False: func,
+        True: cached_func,
+    }
 
 
-def feature(shape, namespace: NameSpace, name=None, cache=False):
+def feature(shape, namespace: NameSpace, name=None):
     """Feature decorator to automatically register the feature in the appropriate namespace.
 
     Arguments:
@@ -190,8 +188,8 @@ def feature(shape, namespace: NameSpace, name=None, cache=False):
     """
 
     def inner(func):
-        new_func = _register_feature(namespace, name or func.__name__, func, shape, cache)
-        return new_func
+        _register_feature(namespace, name or func.__name__, func, shape)
+        return func
 
     return inner
 

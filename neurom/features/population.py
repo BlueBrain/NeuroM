@@ -52,7 +52,7 @@ from neurom.features.morphology import sholl_crossings
 feature = partial(feature, namespace=NameSpace.POPULATION)
 
 
-@feature(shape=(...,), cache=False)
+@feature(shape=(...,))
 def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a population of morphs.
 

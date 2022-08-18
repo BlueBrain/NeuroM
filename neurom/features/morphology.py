@@ -71,13 +71,13 @@ def _map_neurites(function, morph, neurite_type):
     )
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def soma_volume(morph):
     """Get the volume of a morphology's soma."""
     return morph.soma.volume
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def soma_surface_area(morph):
     """Get the surface area of a morphology's soma.
 
@@ -87,13 +87,13 @@ def soma_surface_area(morph):
     return 4.0 * math.pi * morph.soma.radius ** 2
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def soma_radius(morph):
     """Get the radius of a morphology's soma."""
     return morph.soma.radius
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def max_radial_distance(morph, neurite_type=NeuriteType.all):
     """Get the maximum radial distances of the termination sections."""
     term_radial_distances = _map_neurites(nf.max_radial_distance, morph, neurite_type)
@@ -101,31 +101,31 @@ def max_radial_distance(morph, neurite_type=NeuriteType.all):
     return max(term_radial_distances) if term_radial_distances else 0.0
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def number_of_sections_per_neurite(morph, neurite_type=NeuriteType.all):
     """List of numbers of sections per neurite."""
     return _map_neurites(nf.number_of_sections, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def total_length_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite lengths."""
     return _map_neurites(nf.total_length, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def total_area_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite areas."""
     return _map_neurites(nf.total_area, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def total_volume_per_neurite(morph, neurite_type=NeuriteType.all):
     """Neurite volumes."""
     return _map_neurites(nf.total_volume, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin azimuths of a morph.
 
@@ -143,7 +143,7 @@ def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
     return _map_neurites(azimuth, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
     """Get a list of all the trunk origin elevations of a morph.
 
@@ -162,7 +162,7 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
     return _map_neurites(elevation, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_vectors(morph, neurite_type=NeuriteType.all):
     """Calculate the vectors between all the trunks of the morphology and the soma center."""
     def vector_to_root_node(neurite):
@@ -171,7 +171,7 @@ def trunk_vectors(morph, neurite_type=NeuriteType.all):
     return _map_neurites(vector_to_root_node, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_angles(
     morph,
     neurite_type=NeuriteType.all,
@@ -243,7 +243,7 @@ def trunk_angles(
     return angles
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_angles_inter_types(
     morph,
     source_neurite_type=NeuriteType.apical_dendrite,
@@ -307,7 +307,7 @@ def trunk_angles_inter_types(
     return angles.tolist()
 
 
-@feature(shape=(...,), cache=False)
+@feature(shape=(...,))
 def trunk_angles_from_vector(
     morph,
     neurite_type=NeuriteType.all,
@@ -353,7 +353,7 @@ def trunk_angles_from_vector(
     return angles.tolist()
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_origin_radii(
     morph,
     neurite_type=NeuriteType.all,
@@ -437,7 +437,7 @@ def trunk_origin_radii(
     return _map_neurites(_mean_radius, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
     """List of lengths of trunk sections of neurites in a morph."""
     def trunk_section_length(neurite):
@@ -446,19 +446,19 @@ def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
     return _map_neurites(trunk_section_length, morph, neurite_type)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def number_of_neurites(morph, neurite_type=NeuriteType.all):
     """Number of neurites in a morph."""
     return len(_map_neurites(lambda n: n, morph, neurite_type))
 
 
-@feature(shape=(...,), cache=True)
+@feature(shape=(...,))
 def neurite_volume_density(morph, neurite_type=NeuriteType.all):
     """Get volume density per neurite."""
     return _map_neurites(nf.volume_density, morph, neurite_type)
 
 
-@feature(shape=(...,), cache=False)
+@feature(shape=(...,))
 def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None):
     """Calculate crossings of neurites.
 
@@ -506,7 +506,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
             for r in radii]
 
 
-@feature(shape=(...,), cache=False)
+@feature(shape=(...,))
 def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a morph.
 
@@ -564,25 +564,25 @@ def _extent_along_axis(morph, axis, neurite_type):
         return 0.0
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def total_width(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis x."""
     return _extent_along_axis(morph, axis=COLS.X, neurite_type=neurite_type)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def total_height(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis y."""
     return _extent_along_axis(morph, axis=COLS.Y, neurite_type=neurite_type)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def total_depth(morph, neurite_type=NeuriteType.all):
     """Extent of morphology along axis z."""
     return _extent_along_axis(morph, axis=COLS.Z, neurite_type=neurite_type)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def volume_density(morph, neurite_type=NeuriteType.all):
     """Get the volume density.
 
@@ -637,7 +637,7 @@ def _unique_projected_points(morph, projection_plane,  neurite_type):
     return np.unique(np.vstack(points), axis=0)[:, axes]
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     """Calculates the min/max ratio of the principal direction extents along the plane.
 
@@ -653,7 +653,7 @@ def aspect_ratio(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     return np.nan if len(projected_points) == 0 else morphmath.aspect_ratio(projected_points)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     """Calculates the circularity of the morphology points along the plane.
 
@@ -673,7 +673,7 @@ def circularity(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     return np.nan if len(projected_points) == 0 else morphmath.circularity(projected_points)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     """Calculates the shape factor of the morphology points along the plane.
 
@@ -693,7 +693,7 @@ def shape_factor(morph, neurite_type=NeuriteType.all, projection_plane="xy"):
     return np.nan if len(projected_points) == 0 else morphmath.shape_factor(projected_points)
 
 
-@feature(shape=(), cache=True)
+@feature(shape=())
 def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
     """Returns the length fraction of the segments that have their midpoints higher than the soma.
 
