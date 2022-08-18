@@ -144,7 +144,7 @@ def get(feature_name, obj, cache=False, **kwargs):
     Arguments:
         feature_name(string): feature to extract
         obj: a morphology, a morphology population or a neurite tree
-        clear_cache (bool): If True, the cache of this feature is cleared before computation.
+        cache (bool): If True, the cache of this feature is used for computation.
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
