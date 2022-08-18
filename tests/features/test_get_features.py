@@ -1050,6 +1050,35 @@ class TestCache:
         nm.features.cache._POPULATION_FEATURES = _POPULATION_FEATURES
         nm.features.cache._CACHED_FUNCTIONS = _CACHED_FUNCTIONS
 
+    def test_clear_feature_cache(self, reset_cache, NEURON):
+        func = nm.features.cache._NEURITE_FEATURES["total_length"][True]
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 0
+
+        features.get("total_length", NEURON.neurites[0], cache=True)
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 1
+
+        clear_feature_cache([])
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 1
+
+        clear_feature_cache(["UNKNOWN_FEATURE"])
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 1
+
+        clear_feature_cache(["total_length"])
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 0
+
+        features.get("total_length", NEURON.neurites[0], cache=True)
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 1
+
+        clear_feature_cache()
+        assert func.cache_info().hits == 0
+        assert func.cache_info().misses == 0
+
     def test_feature_cache(self, reset_cache, NEURON):
         func = nm.features.cache._NEURITE_FEATURES["total_length"][True]
         assert func.cache_info().hits == 0
