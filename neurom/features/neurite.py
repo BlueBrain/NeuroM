@@ -51,7 +51,6 @@ from neurom import morphmath
 from neurom.core.morphology import Section
 from neurom.core.dataformat import COLS
 from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
-from neurom.features.cache import cached_func
 from neurom.morphmath import convex_hull
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
@@ -59,7 +58,6 @@ feature = partial(feature, namespace=NameSpace.NEURITE)
 L = logging.getLogger(__name__)
 
 
-@cached_func()
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder):
     """Map `fun` to all the sections."""
     return list(map(fun, iterator_type(neurite.root_node)))

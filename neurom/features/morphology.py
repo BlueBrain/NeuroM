@@ -45,7 +45,6 @@ For more details see :ref:`features`.
 
 import warnings
 
-from functools import lru_cache
 from functools import partial
 import math
 import numpy as np

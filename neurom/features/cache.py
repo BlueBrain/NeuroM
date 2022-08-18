@@ -1,4 +1,4 @@
-""""""
+"""Cache mechanism for features."""
 from functools import lru_cache
 from itertools import chain
 
@@ -11,6 +11,7 @@ _CACHED_FUNCTIONS = {}
 
 
 def cached_func(maxsize=None):
+    """Decorator for functions than can use cache."""
     def inner(func):
         name = func.__name__
         func = lru_cache(maxsize=maxsize)(func)
@@ -25,7 +26,7 @@ def clear_feature_cache(features=None):
     Arguments:
         features (list[str]): (optional) The names of the features whose cache should be cleared.
 
-    Note: If the features arguments is None, the caches of all feature functions are cleared.
+    Note: If the features argument is None, the caches of all feature functions are cleared.
     """
     for feature_name, feature_funcs in chain(
         _POPULATION_FEATURES.items(),
