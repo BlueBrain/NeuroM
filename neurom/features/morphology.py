@@ -165,7 +165,6 @@ def trunk_vectors(morph, neurite_type=NeuriteType.all, from_origin=False):
     """Calculate the vectors between all the trunks of the morphology and the soma center.
 
     Args:
-
         morph: The morphology to process.
         neurite_type: Only the neurites of this type are considered.
         from_origin: If True, computes angle from [0, 0, 0] instead of soma.center
