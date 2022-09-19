@@ -506,6 +506,10 @@ def test_sholl_analysis_custom():
     assert (list(morphology.sholl_crossings(morph_A, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 2, 2])
 
+    assert list(
+        morphology.sholl_crossings(morph_A, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 2, 2, 2, 2, 2]
+
     morph_B = load_swc("""\
  1 1   0   0  0 1. -1
  2 3   0   0  0 1.  1
@@ -525,6 +529,10 @@ def test_sholl_analysis_custom():
     assert (list(morphology.sholl_crossings(morph_B, center=center, radii=radii)) ==
             [2, 2, 2, 10, 10, 0, 0, 0])
 
+    assert (list(
+        morphology.sholl_crossings(morph_B, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 10, 10, 0, 0, 0])
+
     morph_C = load_swc("""\
  1 1   0   0  0 1. -1
  2 3   0   0  0 1.  1
@@ -543,6 +551,10 @@ def test_sholl_analysis_custom():
                        """)
     assert (list(morphology.sholl_crossings(morph_C, center=center, radii=radii)) ==
             [2, 2, 2, 2, 2, 2, 10, 10])
+
+    assert (list(
+        morphology.sholl_crossings(morph_C, center=center, radii=radii, distance_type='path')
+    ) == [2, 2, 2, 2, 2, 2, 10, 10])
 
 
 def test_extent_along_axis():
