@@ -468,6 +468,7 @@ def sholl_crossings(
         center(Point): center point, if None then soma center is taken
         radii(iterable of floats): radii for which crossings will be counted,
             if None then soma radius is taken
+        distance_type(str): either `euclidean` or `path` as distance measure to use
 
     Returns:
         Array of same length as radii, with a count of the number of crossings
@@ -518,7 +519,9 @@ def sholl_crossings(
 
 
 @feature(shape=(...,))
-def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None):
+def sholl_frequency(
+    morph, neurite_type=NeuriteType.all, step_size=10, bins=None, distance_type='euclidean'
+):
     """Perform Sholl frequency calculations on a morph.
 
     Args:
@@ -527,6 +530,7 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         step_size(float): step size between Sholl radii
         bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
         intervals of step_size between min and max radii of ``morphologies``.
+        distance_type(str): either `euclidean` or `path` as distance measure to use
 
     Note:
         Given a morphology, the soma center is used for the concentric circles,
@@ -553,7 +557,9 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
 
         bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_neurite), step_size)
 
-    return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
+    return sholl_crossings(
+        morph, neurite_type, morph.soma.center, bins, distance_type=distance_type
+    )
 
 
 def _extent_along_axis(morph, axis, neurite_type):
