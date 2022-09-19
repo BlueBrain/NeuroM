@@ -50,7 +50,7 @@ import math
 import numpy as np
 
 from neurom import morphmath
-from neurom.core.morphology import iter_neurites, iter_segments, Morphology
+from neurom.core.morphology import iter_neurites, iter_segments, Morphology, iter_sections
 from neurom.core.types import tree_type_checker as is_type
 from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
@@ -457,7 +457,9 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
 
 
 @feature(shape=(...,))
-def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None):
+def sholl_crossings(
+    morph, neurite_type=NeuriteType.all, center=None, radii=None, distance_type="euclidean"
+):
     """Calculate crossings of neurites.
 
     Args:
@@ -480,14 +482,25 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
     """
     def _count_crossings(neurite, radius):
         """Used to count_crossings of segments in neurite with radius."""
-        r2 = radius ** 2
         count = 0
-        for start, end in iter_segments(neurite):
-            start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
-                                      morphmath.point_dist2(center, end))
 
-            count += int(start_dist2 <= r2 <= end_dist2 or
-                         end_dist2 <= r2 <= start_dist2)
+        if distance_type == 'euclidean':
+            r2 = radius ** 2
+            for start, end in iter_segments(neurite):
+                start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
+                                          morphmath.point_dist2(center, end))
+
+                count += int(start_dist2 <= r2 <= end_dist2 or
+                             end_dist2 <= r2 <= start_dist2)
+
+        if distance_type == 'path':
+            for section in iter_sections(neurite):
+                base_length = sf.section_path_length(section) - section.length
+                path_dists = base_length + sf.segment_lengths(section, prepend_zero=True)
+
+                forward = np.logical_and(path_dists[:-1] <= radius, path_dists[1:] >= radius)
+                backward = np.logical_and(path_dists[:-1] >= radius, path_dists[1:] <= radius)
+                count += sum(np.logical_or(forward, backward))
 
         return count
 
