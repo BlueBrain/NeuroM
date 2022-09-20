@@ -219,11 +219,6 @@ NRN_ORDER = {
 }
 
 
-def _get_heterogeneous_type(neurite):
-
-    it = neurite.root_node.ipreorder()
-
-
 def _homogeneous_subtrees(neurite):
     """Returns a list of the root nodes of the sub-neurites.
 
