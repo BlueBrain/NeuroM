@@ -53,9 +53,12 @@ class CompositeType(int):
     Each subtype corresponds to a homogeneous subtree in the morphology.
 
     Args:
-        value (int): The integer value 
+        value (int): The integer value.
+        types: (List[SectionType]): The list of subtypes for given type.
     """
+
     def __new__(cls, value, types):
+        """Create an int object and assign to it the `subtypes` attribute."""
         obj = super().__new__(cls, value)
         obj.subtypes = types
         return obj
@@ -84,6 +87,7 @@ class NeuriteType(IntEnum):
     )
 
     def __eq__(self, other):
+        """Logic for checking single and composite types."""
         is_self_composite = hasattr(self, "value") and isinstance(self.value, CompositeType)
         is_other_composite = hasattr(other, "value") and isinstance(other.value, CompositeType)
 
@@ -101,6 +105,10 @@ class NeuriteType(IntEnum):
         return self.value
 
     def __new__(cls, value):
+        """Create a new integer enum entry and replace its `_value_` entry with the value object.
+
+        This allows passing the CompositeType instance to self.value.
+        """
         obj = int.__new__(cls, value)
         if isinstance(value, CompositeType):
             obj._value_ = value
