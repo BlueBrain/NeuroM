@@ -172,11 +172,10 @@ def test_iter_neurites__heterogeneous(mixed_morph):
 
     subtrees = list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=True))
 
-    assert len(subtrees) == 4
+    assert len(subtrees) == 3
     assert subtrees[0].type == NeuriteType.basal_dendrite
-    assert subtrees[1].type == NeuriteType.basal_dendrite
-    assert subtrees[2].type == NeuriteType.axon
-    assert subtrees[3].type == NeuriteType.apical_dendrite
+    assert subtrees[1].type == NeuriteType.axon_carrying_dendrite
+    assert subtrees[2].type == NeuriteType.apical_dendrite
 
 
 def test_core_iter_sections__heterogeneous(mixed_morph):

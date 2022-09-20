@@ -219,6 +219,11 @@ NRN_ORDER = {
 }
 
 
+def _get_heterogeneous_type(neurite):
+
+    it = neurite.root_node.ipreorder()
+
+
 def _homogeneous_subtrees(neurite):
     """Returns a list of the root nodes of the sub-neurites.
 
@@ -296,10 +301,8 @@ def iter_neurites(
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     if use_subtrees:
-        neurites = flatten(
-            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
-            for neurite in neurites
-        )
+        for neurite in neurites:
+            neurite.enable_mixed_type()
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 
@@ -416,6 +419,40 @@ def graft_morphology(section):
     return Morphology(m)
 
 
+class _NeuriteTypeMode:
+    def __init__(self, neurite):
+        self._neurite = neurite
+        self._mode = self._root_node_type
+
+    def set(self, mode):
+        self._mode = {
+            "root_node": self._root_node_type,
+            "from_subtrees": self._subtrees_type,
+        }[mode]
+
+    def __call__(self):
+        return self._mode()
+
+    def _root_node_type(self):
+        return self._neurite.morphio_root_node.type
+
+    def _subtrees_type(self):
+        it = self._neurite.root_node.ipreorder()
+        subtree_types = [next(it).to_morphio().type]
+
+        for section in it:
+            if section.type != section.parent.type:
+                subtree_types.append(section.to_morphio().type)
+
+        if len(subtree_types) == 1:
+            return subtree_types[0]
+
+        if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
+            return NeuriteType.axon_carrying_dendrite
+        else:
+            raise TypeError()
+
+
 class Neurite:
     """Class representing a neurite tree."""
 
@@ -426,6 +463,7 @@ class Neurite:
             root_node (morphio.Section): root section
         """
         self._root_node = root_node
+        self._type_mode = _NeuriteTypeMode(self)
 
     @property
     def morphio_root_node(self):
@@ -440,7 +478,11 @@ class Neurite:
     @property
     def type(self):
         """The type of the root node."""
-        return self.root_node.type
+        return self._type_mode()
+
+    def enable_mixed_type(self):
+        if self.is_heterogeneous():
+            self._type_mode.set("from_subtrees")
 
     @property
     def points(self):

@@ -47,6 +47,20 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
+class CompositeType(int):
+    """A composite type is a list of section types.
+
+    Each subtype corresponds to a homogeneous subtree in the morphology.
+
+    Args:
+        value (int): The integer value 
+    """
+    def __new__(cls, value, types):
+        obj = super().__new__(cls, value)
+        obj.subtypes = types
+        return obj
+
+
 # for backward compatibility with 'v1' version
 class NeuriteType(IntEnum):
     """Type of neurite."""
@@ -63,6 +77,34 @@ class NeuriteType(IntEnum):
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
+
+    axon_carrying_dendrite = CompositeType(
+        value=1000,
+        types=(SectionType.basal_dendrite, SectionType.axon),
+    )
+
+    def __eq__(self, other):
+        is_self_composite = hasattr(self, "value") and isinstance(self.value, CompositeType)
+        is_other_composite = hasattr(other, "value") and isinstance(other.value, CompositeType)
+
+        if is_self_composite:
+            if is_other_composite:
+                return self.value.subtypes == other.value.subtypes
+            return other in self.value.subtypes
+
+        if is_other_composite:
+            return self in other.value.subtypes
+
+        return super().__eq__(other)
+
+    def __hash__(self):
+        return self.value
+
+    def __new__(cls, value):
+        obj = int.__new__(cls, value)
+        if isinstance(value, CompositeType):
+            obj._value_ = value
+        return obj
 
 
 #: Collection of all neurite types
@@ -116,6 +158,8 @@ def tree_type_checker(*ref):
                 True if ref in the same type as tree.type or ref is NeuriteType.all
             """
             return tree.type in ref
+
+        check_tree_type.type = ref
 
     return check_tree_type
 
