@@ -76,10 +76,8 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
 
     plot(load_morphology(input_file))
     if is_matplotlib:
-        try:
+        if not is_3d:
             plt.axis('equal')
-        except NotImplementedError:  # for python 3.7 it will not have equal scales
-            plt.axis('auto')
         plt.show()
 
 
