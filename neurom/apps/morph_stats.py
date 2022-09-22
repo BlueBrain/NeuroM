@@ -46,7 +46,7 @@ from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
-from neurom.core.morphology import Morphology
+from neurom.core.morphology import Morphology, Neurite
 from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
     _get_feature_value_and_func
@@ -213,7 +213,8 @@ def extract_stats(morphs, config):
                     )
 
                     for neurite_type in types:
-                        feature_kwargs["neurite_type"] = neurite_type
+                        if not isinstance(morphs, Neurite):
+                            feature_kwargs["neurite_type"] = neurite_type
                         stats[neurite_type.name].update(
                             _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
                         )
