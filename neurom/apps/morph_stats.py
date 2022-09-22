@@ -185,9 +185,10 @@ def extract_stats(morphs, config):
         The extracted statistics
 
     Note:
-        An example config can be found at:
+        An example config can be found in the `CLI -> neurom stats` page of the documentation.
 
     """
+    # pylint: disable=too-many-nested-blocks
     config = _sanitize_config(config)
 
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
