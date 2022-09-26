@@ -736,6 +736,7 @@ def test_sholl_frequency():
 
     # check that if there is no neurite of a specific type, an empty list is returned
     assert features.get('sholl_frequency', m, neurite_type=NeuriteType.axon) == []
+    assert features.get('sholl_frequency', m, neurite_type=NeuriteType.axon, distance_type='path') == []
 
 
 def test_bifurcation_partitions():
