@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 3.2.1
+-------------
+
+- Fix: extract_stats could not work on single neurite (#1060)
+- Fix view cli to use 'equal' axis when available (#1051)
+- Remove single point contour somas in h5 and asc tests (#1045)
+- Remove duplicated deps jinja, sphinx (#1043)
+
+
 Version 3.2.0
 -------------
 
