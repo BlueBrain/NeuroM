@@ -40,7 +40,9 @@ Examples:
 import inspect
 import operator
 from enum import Enum
-from functools import partial, reduce
+from functools import partial, reduce, wraps
+
+import numpy as np
 
 from neurom.core import Morphology, Neurite, Population
 from neurom.core.morphology import iter_neurites
@@ -226,6 +228,8 @@ def _register_feature(namespace: NameSpace, name, func, shape):
 def feature(shape, namespace: NameSpace, name=None):
     """Feature decorator to automatically register the feature in the appropriate namespace.
 
+    This decorator also ensures that the results of the features are casted to built-in types.
+
     Arguments:
         shape(tuple): the expected shape of the feature values
         namespace(string): a namespace, see :class:`NameSpace`
@@ -233,8 +237,26 @@ def feature(shape, namespace: NameSpace, name=None):
     """
 
     def inner(func):
-        _register_feature(namespace, name or func.__name__, func, shape)
-        return func
+        @wraps(func)
+        def scalar_wrapper(*args, **kwargs):
+            res = func(*args, **kwargs)
+            try:
+                return res.tolist()
+            except AttributeError:
+                return res
+
+        @wraps(func)
+        def matrix_wrapper(*args, **kwargs):
+            res = func(*args, **kwargs)
+            return np.array(res).tolist()
+
+        if shape == ():
+            decorated_func = scalar_wrapper
+        else:
+            decorated_func = matrix_wrapper
+
+        _register_feature(namespace, name or func.__name__, decorated_func, shape)
+        return decorated_func
 
     return inner
 

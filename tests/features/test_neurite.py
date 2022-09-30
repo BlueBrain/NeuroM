@@ -133,7 +133,7 @@ def test_section_end_distances():
 
 def test_section_partition_pairs():
     part_pairs = [neurite.partition_pairs(s) for s in SIMPLE.neurites]
-    assert part_pairs == [[(1.0, 1.0)], [(1.0, 1.0)]]
+    assert part_pairs == [[[1.0, 1.0]], [[1.0, 1.0]]]
 
 
 def test_section_bif_radial_distances():
