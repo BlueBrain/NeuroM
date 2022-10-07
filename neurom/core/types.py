@@ -28,7 +28,7 @@
 
 """Type enumerations."""
 
-from enum import IntEnum, unique
+from enum import IntEnum, unique, Enum
 
 from morphio import SectionType
 
@@ -47,25 +47,35 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-class CompositeType(int):
-    """A composite type is a list of section types.
+class Subtypes:
 
-    Each subtype corresponds to a homogeneous subtree in the morphology.
+    def __init__(self, *subtypes):
+        self.subtypes = subtypes
 
-    Args:
-        value (int): The integer value.
-        types: (List[SectionType]): The list of subtypes for given type.
-    """
+    def is_composite(self):
+        return len(self.subtypes) > 1
 
-    def __new__(cls, value, types):
-        """Create an int object and assign to it the `subtypes` attribute."""
-        obj = super().__new__(cls, value)
-        obj.subtypes = types
-        return obj
+    def __eq__(self, other):
+
+        if isinstance(self, Subtypes):
+            if isinstance(other, Subtypes):
+                if self.is_composite():
+                    if other.is_composite():
+                        return self.subtypes == other.subtypes
+                    return other.subtypes[0] in self.subtypes
+                if other.is_composite():
+                    return self.subtypes[0] in other.subtypes
+                return self.subtypes[0] == other.subtypes[0]
+            return other in self.subtypes
+
+        if isinstance(other, Subtypes):
+            return self in other.subtypes
+
+        return self == other
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(IntEnum):
+class NeuriteType(Subtypes, Enum):
     """Type of neurite."""
 
     axon = SectionType.axon
@@ -81,38 +91,10 @@ class NeuriteType(IntEnum):
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
 
-    axon_carrying_dendrite = CompositeType(
-        value=1000,
-        types=(SectionType.basal_dendrite, SectionType.axon),
-    )
-
-    def __eq__(self, other):
-        """Logic for checking single and composite types."""
-        is_self_composite = hasattr(self, "value") and isinstance(self.value, CompositeType)
-        is_other_composite = hasattr(other, "value") and isinstance(other.value, CompositeType)
-
-        if is_self_composite:
-            if is_other_composite:
-                return self.value.subtypes == other.value.subtypes
-            return other in self.value.subtypes
-
-        if is_other_composite:
-            return self in other.value.subtypes
-
-        return super().__eq__(other)
+    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
 
     def __hash__(self):
-        return self.value
-
-    def __new__(cls, value):
-        """Create a new integer enum entry and replace its `_value_` entry with the value object.
-
-        This allows passing the CompositeType instance to self.value.
-        """
-        obj = int.__new__(cls, value)
-        if isinstance(value, CompositeType):
-            obj._value_ = value
-        return obj
+        return hash(self.value)
 
 
 #: Collection of all neurite types
