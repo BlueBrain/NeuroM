@@ -57,21 +57,15 @@ class Subtypes:
 
     def __eq__(self, other):
 
-        if isinstance(self, Subtypes):
-            if isinstance(other, Subtypes):
-                if self.is_composite():
-                    if other.is_composite():
-                        return self.subtypes == other.subtypes
-                    return other.subtypes[0] in self.subtypes
-                if other.is_composite():
-                    return self.subtypes[0] in other.subtypes
-                return self.subtypes[0] == other.subtypes[0]
-            return other in self.subtypes
-
         if isinstance(other, Subtypes):
-            return self in other.subtypes
-
-        return self == other
+            if self.is_composite():
+                if other.is_composite():
+                    return self.subtypes == other.subtypes
+                return other.subtypes[0] in self.subtypes
+            if other.is_composite():
+                return self.subtypes[0] in other.subtypes
+            return self.subtypes[0] == other.subtypes[0]
+        return other in self.subtypes
 
 
 # for backward compatibility with 'v1' version
