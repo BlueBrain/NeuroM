@@ -73,8 +73,7 @@ def boxplot(neurons, feature, new_fig=True, subplot=111):
 
 
 def main():
-
-    morphology_directory =  Path(PACKAGE_DIR, "tests/data/valid_set")
+    morphology_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
     neurons = load_morphologies(morphology_directory)
     boxplot(neurons, "section_lengths")
 

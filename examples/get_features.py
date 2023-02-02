@@ -50,12 +50,14 @@ def stats(data):
         dicitonary with length, mean, sum, standard deviation,\
             min and max of data
     """
-    return {'len': len(data),
-            'mean': np.mean(data),
-            'sum': np.sum(data),
-            'std': np.std(data),
-            'min': np.min(data),
-            'max': np.max(data)}
+    return {
+        'len': len(data),
+        'mean': np.mean(data),
+        'sum': np.sum(data),
+        'std': np.std(data),
+        'min': np.min(data),
+        'max': np.max(data),
+    }
 
 
 def pprint_stats(data):
@@ -64,7 +66,6 @@ def pprint_stats(data):
 
 
 def main():
-
     filename = Path(PACKAGE_DIR, 'tests/data/swc/Neuron.swc')
 
     #  load a neuron from an SWC file
@@ -85,34 +86,48 @@ def main():
 
     # number of neurites
     print('Number of neurites (all):', nm.get('number_of_neurites', m))
-    print('Number of neurites (axons):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon))
-    print('Number of neurites (apical dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite))
-    print('Number of neurites (basal dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite))
+    print(
+        'Number of neurites (axons):',
+        nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon),
+    )
+    print(
+        'Number of neurites (apical dendrites):',
+        nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite),
+    )
+    print(
+        'Number of neurites (basal dendrites):',
+        nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite),
+    )
 
     # number of sections
-    print('Number of sections:',
-          nm.get('number_of_sections', m))
-    print('Number of sections (axons):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon))
-    print('Number of sections (apical dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite))
-    print('Number of sections (basal dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite))
+    print('Number of sections:', nm.get('number_of_sections', m))
+    print(
+        'Number of sections (axons):',
+        nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon),
+    )
+    print(
+        'Number of sections (apical dendrites):',
+        nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite),
+    )
+    print(
+        'Number of sections (basal dendrites):',
+        nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite),
+    )
 
     # number of sections per neurite
-    print('Number of sections per neurite:',
-          nm.get('number_of_sections_per_neurite', m))
-    print('Number of sections per neurite (axons):',
-          nm.get('number_of_sections_per_neurite', m, neurite_type=nm.NeuriteType.axon))
-    print('Number of sections per neurite (apical dendrites):',
-          nm.get('number_of_sections_per_neurite',
-                 m, neurite_type=nm.NeuriteType.apical_dendrite))
-    print('Number of sections per neurite (basal dendrites):',
-          nm.get('number_of_sections_per_neurite',
-                 m, neurite_type=nm.NeuriteType.apical_dendrite))
+    print('Number of sections per neurite:', nm.get('number_of_sections_per_neurite', m))
+    print(
+        'Number of sections per neurite (axons):',
+        nm.get('number_of_sections_per_neurite', m, neurite_type=nm.NeuriteType.axon),
+    )
+    print(
+        'Number of sections per neurite (apical dendrites):',
+        nm.get('number_of_sections_per_neurite', m, neurite_type=nm.NeuriteType.apical_dendrite),
+    )
+    print(
+        'Number of sections per neurite (basal dendrites):',
+        nm.get('number_of_sections_per_neurite', m, neurite_type=nm.NeuriteType.apical_dendrite),
+    )
 
     # OK, this is getting repetitive, so lets loop over valid neurite types.
     # The following methods return arrays of measurements. We will gather some

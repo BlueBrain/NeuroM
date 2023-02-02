@@ -99,17 +99,14 @@ def histogram(neurons, feature, new_fig=True, subplot=111, normed=False, **kwarg
 
 
 def population_feature_values(pops, feature):
-    """Extracts feature values per population
-    """
+    """Extracts feature values per population"""
     pops_feature_values = []
 
     for pop in pops:
-
         feature_values = [neurom.features.get(feature, neu) for neu in pop]
 
         # ugly hack to chain in case of list of lists
         if any([isinstance(p, (list, np.ndarray)) for p in feature_values]):
-
             feature_values = list(chain(*feature_values))
 
         pops_feature_values.append(feature_values)
@@ -167,7 +164,9 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111,
 
     pops_labels = [pop.name for pop in pops]
 
-    ax.hist(pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, density=normed)
+    ax.hist(
+        pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, density=normed
+    )
 
     kwargs['no_legend'] = len(pops_labels) == 1
 
@@ -175,7 +174,6 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111,
 
 
 def main():
-
     pop1 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
     pop2 = load_morphologies(Path(PACKAGE_DIR, "tests/data/valid_set"))
     population_histogram([pop1, pop2], "section_lengths")

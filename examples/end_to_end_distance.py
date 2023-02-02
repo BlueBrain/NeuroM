@@ -42,8 +42,7 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 def path_end_to_end_distance(neurite):
     """Calculate and return end-to-end-distance of a given neurite."""
     trunk = neurite.root_node.points[0]
-    return max(morphmath.point_dist(l.points[-1], trunk)
-               for l in neurite.root_node.ileaf())
+    return max(morphmath.point_dist(l.points[-1], trunk) for l in neurite.root_node.ileaf())
 
 
 def mean_end_to_end_dist(neurites):
@@ -59,7 +58,7 @@ def make_end_to_end_distance_plot(nb_segments, end_to_end_distance, neurite_type
     plt.xlabel('Number of segments')
     plt.ylabel('End-to-end distance')
     # uncomment to show
-    #plt.show()
+    # plt.show()
 
 
 def calculate_and_plot_end_to_end_distance(neurite):
@@ -67,13 +66,15 @@ def calculate_and_plot_end_to_end_distance(neurite):
     an increasingly larger part of a given neurite.
 
     Note that the plots are not very meaningful for bifurcating trees."""
+
     def _dist(seg):
         """Distance between segmenr end and trunk."""
         return morphmath.point_dist(seg[1], neurite.root_node.points[0])
 
     end_to_end_distance = [_dist(s) for s in nm.iter_segments(neurite)]
-    make_end_to_end_distance_plot(np.arange(len(end_to_end_distance)) + 1,
-                                  end_to_end_distance, neurite.type)
+    make_end_to_end_distance_plot(
+        np.arange(len(end_to_end_distance)) + 1, end_to_end_distance, neurite.type
+    )
 
 
 def main():
@@ -82,21 +83,29 @@ def main():
     m = nm.load_morphology(filename)
 
     # print mean end-to-end distance per neurite type
-    print('Mean end-to-end distance for axons: ',
-          mean_end_to_end_dist(n for n in m.neurites if n.type == nm.AXON))
-    print('Mean end-to-end distance for basal dendrites: ',
-          mean_end_to_end_dist(n for n in m.neurites if n.type == nm.BASAL_DENDRITE))
-    print('Mean end-to-end distance for apical dendrites: ',
-          mean_end_to_end_dist(n for n in m.neurites
-                               if n.type == nm.APICAL_DENDRITE))
+    print(
+        'Mean end-to-end distance for axons: ',
+        mean_end_to_end_dist(n for n in m.neurites if n.type == nm.AXON),
+    )
+    print(
+        'Mean end-to-end distance for basal dendrites: ',
+        mean_end_to_end_dist(n for n in m.neurites if n.type == nm.BASAL_DENDRITE),
+    )
+    print(
+        'Mean end-to-end distance for apical dendrites: ',
+        mean_end_to_end_dist(n for n in m.neurites if n.type == nm.APICAL_DENDRITE),
+    )
 
     print('End-to-end distance per neurite (nb segments, end-to-end distance, neurite type):')
     for nrte in m.neurites:
         # plot end-to-end distance for increasingly larger parts of neurite
         calculate_and_plot_end_to_end_distance(nrte)
         # print (number of segments, end-to-end distance, neurite type)
-        print(sum(len(s.points) - 1 for s in nrte.root_node.ipreorder()),
-              path_end_to_end_distance(nrte), nrte.type)
+        print(
+            sum(len(s.points) - 1 for s in nrte.root_node.ipreorder()),
+            path_end_to_end_distance(nrte),
+            nrte.type,
+        )
 
 
 if __name__ == '__main__':

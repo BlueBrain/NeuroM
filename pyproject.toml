@@ -83,7 +83,6 @@ target-version = [
     'py311',
 ]
 skip-string-normalization = true
-include = 'neurom\/.*\.py$|tests\/.*\.py$|doc\/source\/conf\.py$|setup\.py$'
 
 [tool.isort]
 profile = "black"

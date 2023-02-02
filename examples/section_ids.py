@@ -45,11 +45,10 @@ def get_segment(neuron, section_id, segment_id):
         array of two [x, y, z, r] points defining segment
     """
     sec = neuron.sections[section_id]
-    return sec.points[segment_id:segment_id + 2][:, COLS.XYZR]
+    return sec.points[segment_id : segment_id + 2][:, COLS.XYZR]
 
 
 def main():
-
     m = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/Neuron.h5'))
 
     seg = get_segment(m, 3, 2)
