@@ -152,7 +152,6 @@ def _get_feature_stats(feature_name, morphs, modes, use_subtrees=False, **kwargs
         raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
 
     for mode in modes:
-
         stat_name = stat_name_format(mode, feature_name, **kwargs)
 
         stat = value
@@ -207,14 +206,11 @@ def extract_stats(morphs, config, use_subtrees=False):
     stats = defaultdict(dict)
     for category in ("neurite", "morphology", "population"):
         for feature_name, opts in config[category].items():
-
             list_of_kwargs = opts["kwargs"]
             modes = opts["modes"]
 
             for feature_kwargs in list_of_kwargs:
-
                 if category == 'neurite':
-
                     # mutated below, need a copy
                     feature_kwargs = deepcopy(feature_kwargs)
 

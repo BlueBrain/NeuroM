@@ -148,7 +148,6 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     """
     stats = {}
     for func in functions:
-
         stats[func] = getattr(np, func)(data)
 
     return stats

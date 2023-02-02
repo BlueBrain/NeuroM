@@ -82,7 +82,6 @@ def test_interpolate_radius_extreme_cases():
 
 
 def test_path_fraction_point_two_points():
-
     points = [np.array([-1.0, -1.0, -1.0]), np.array([1.0, 1.0, 1.0])]
 
     res = mm.path_fraction_point(points, 0.0)
@@ -94,7 +93,6 @@ def test_path_fraction_point_two_points():
 
 
 def test_path_fraction_three_symmetric_points():
-
     points = [np.array((1.0, 0.0, 0.0)), np.array((0.0, 0.0, 0.0)), np.array((0.0, 0.0, 1.0))]
 
     res = mm.path_fraction_point(points, 0.0)
@@ -175,7 +173,6 @@ def test_vector_projection():
 
 
 def test_vector_projection_collinear():
-
     v1 = np.array([1.0, 2.0, 3.0])
     v2 = np.array([4.0, 8.0, 12.0])
 
@@ -184,7 +181,6 @@ def test_vector_projection_collinear():
 
 
 def test_vector_projection_perpendicular():
-
     v1 = np.array([2.0, 0.0, 0.0])
     v2 = np.array([0.0, 3.0, 0.0])
 
@@ -193,7 +189,6 @@ def test_vector_projection_perpendicular():
 
 
 def test_dist_point_line():
-
     # an easy one:
     res = mm.dist_point_line(
         np.array([0.0, 0.0, 0.0]), np.array([0.0, 1.0, 0.0]), np.array([1.0, 0.0, 0.0])
@@ -480,7 +475,6 @@ def test_segment_taper_rate():
 
 
 def test_pca():
-
     p = np.array(
         [[4.0, 2.0, 0.6], [4.2, 2.1, 0.59], [3.9, 2.0, 0.58], [4.3, 2.1, 0.62], [4.1, 2.2, 0.63]]
     )
@@ -545,7 +539,6 @@ def test_spherical_coordinates():
 
 
 def test_principal_direction_extent():
-
     # test with points on a circle with radius 0.5, and center at 0.0
     circle_points = np.array(
         [
@@ -609,13 +602,11 @@ def test_principal_direction_extent():
 
 
 def test_convex_hull_invalid():
-
     assert mm.convex_hull([]) is None
     assert mm.convex_hull([[1.0, 0.0, 0.0], [1.0, 0.0, 0.0]]) is None
 
 
 def _shape_datasets():
-
     return {
         "cross-3D": np.array(
             [
@@ -713,7 +704,6 @@ def _shape_datasets():
 
 
 def test_aspect_ratio():
-
     shapes = _shape_datasets()
 
     npt.assert_allclose(mm.aspect_ratio(shapes["cross-3D"]), 0.5, atol=1e-5)
@@ -725,7 +715,6 @@ def test_aspect_ratio():
 
 
 def test_circularity():
-
     shapes = _shape_datasets()
 
     npt.assert_allclose(mm.circularity(shapes["cross-3D"]), 0.051904, atol=1e-5)
