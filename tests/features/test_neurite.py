@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test features.neuritefunc."""
+"""Test ``neurom.features.neurite``."""
 
 from math import pi, sqrt
 from pathlib import Path
@@ -81,7 +81,6 @@ def test_neurite_volume_density():
 
 
 def test_neurite_volume_density_failed_convex_hull():
-
     flat_neuron = nm.load_morphology(
         """
     1  1   0  0  0  0.5 -1

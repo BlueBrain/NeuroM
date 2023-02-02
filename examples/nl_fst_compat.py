@@ -40,7 +40,6 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def main():
-
     m_h5 = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/bio_neuron-001.h5'))
     m_asc = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/neurolucida/bio_neuron-001.asc'))
 
@@ -55,7 +54,11 @@ def main():
 
     print('\nNumber of neurites:')
     for nt in iter(nm.NeuriteType):
-        print(nt, mf.number_of_neurites(m_h5, neurite_type=nt), mf.number_of_neurites(m_asc, neurite_type=nt))
+        print(
+            nt,
+            mf.number_of_neurites(m_h5, neurite_type=nt),
+            mf.number_of_neurites(m_asc, neurite_type=nt),
+        )
 
     print('\nNumber of segments:')
     for nt in iter(nm.NeuriteType):

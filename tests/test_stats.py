@@ -96,7 +96,6 @@ def test_optimal_distribution_uniform():
 
 
 def test_get_test():
-
     stat_test_enums = (st.StatTests.ks, st.StatTests.wilcoxon, st.StatTests.ttest)
     expected_stat_test_strings = ("ks_2samp", "wilcoxon", "ttest_ind")
 
@@ -159,7 +158,6 @@ def test_fit_results_dict_exponential_min_max():
 
 
 def test_scalar_stats():
-
     data = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
 
     result = st.scalar_stats(data)
@@ -191,7 +189,6 @@ distr2 = 2 * np.ones(100)
 
 
 def test_compare_two_ks():
-
     results1 = st.compare_two(distr1, distr1, test=st.StatTests.ks)
     assert_almost_equal(results1.dist, 0.0, decimal=5)
     assert_almost_equal(results1.pvalue, 1.0, decimal=5)
@@ -202,14 +199,12 @@ def test_compare_two_ks():
 
 
 def test_compare_two_wilcoxon():
-
     results2 = st.compare_two(distr1, distr2, test=st.StatTests.wilcoxon)
     assert_almost_equal(results2.dist, 0.0, decimal=5)
     assert_almost_equal(results2.pvalue, 0.0, decimal=5)
 
 
 def test_compare_two_ttest():
-
     results1 = st.compare_two(distr1, distr1, test=st.StatTests.ttest)
     assert np.isnan(results1.dist)
     assert np.isnan(results1.pvalue)
@@ -226,7 +221,6 @@ def test_compare_two_error():
 
 
 def test_total_score():
-
     testList1 = (([1.0, 1.0, 1], [1.0, 1.0, 1.0]), ([2.0, 3.0, 4.0, 5.0], [2.0, 3.0, 4.0, 5.0]))
 
     score = st.total_score(testList1)

@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test ``features.morphology``."""
+"""Test ``neurom.features.morphology``."""
 from math import pi, sqrt
 import tempfile
 import warnings
@@ -673,7 +673,6 @@ def test_total_depth():
 
 
 def test_volume_density():
-
     morph = load_swc(
         """
         1  1   0.5      0.5      0.5        0.5 -1
@@ -742,7 +741,6 @@ def test_volume_density():
 
 
 def test_unique_projected_points():
-
     morph = load_swc(
         """
         1  1   0.5 0.5 0.5   0.5 -1

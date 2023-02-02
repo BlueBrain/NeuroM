@@ -117,14 +117,12 @@ def three_types_neurite_morph():
 
 
 def test_heterogeneous_neurites(mixed_morph):
-
     assert not mixed_morph.neurites[0].is_heterogeneous()
     assert mixed_morph.neurites[1].is_heterogeneous()
     assert not mixed_morph.neurites[2].is_heterogeneous()
 
 
 def test_is_homogeneous_point(mixed_morph):
-
     heterogeneous_neurite = mixed_morph.neurites[1]
 
     sections = list(heterogeneous_neurite.iter_sections())
@@ -137,7 +135,6 @@ def test_is_homogeneous_point(mixed_morph):
 
 
 def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
-
     basal, axon_on_basal, apical = mixed_morph.neurites
 
     assert neurom.core.morphology._homogeneous_subtrees(basal) == [basal]
@@ -161,7 +158,6 @@ def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
 
 
 def test_iter_neurites__heterogeneous(mixed_morph):
-
     subtrees = list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=False))
 
     assert len(subtrees) == 3
@@ -180,7 +176,6 @@ def test_iter_neurites__heterogeneous(mixed_morph):
 
 def test_core_iter_sections__heterogeneous(mixed_morph):
     def assert_sections(neurite, section_type, expected_section_ids):
-
         it = neurom.core.morphology.iter_sections(neurite, section_filter=is_type(section_type))
         assert [s.id for s in it] == expected_section_ids
 
@@ -259,7 +254,7 @@ def test_features_neurite_map_sections__heterogeneous(mixed_morph):
 def test_mixed_morph_stats(mixed_morph):
     def assert_stats_equal(actual_dict, expected_dict):
         assert actual_dict.keys() == expected_dict.keys()
-        for (key, value) in actual_dict.items():
+        for key, value in actual_dict.items():
             expected_value = expected_dict[key]
             if value is None or expected_value is None:
                 assert expected_value is value
@@ -436,7 +431,6 @@ def _assert_feature_equal(values, expected_values, per_neurite=False):
                     assert_equal(values, expected_values)
 
     if per_neurite:
-
         assert len(values) == len(expected_values)
         for neurite_values, expected_neurite_values in zip(values, expected_values):
             check(neurite_values, expected_neurite_values)
@@ -446,7 +440,6 @@ def _assert_feature_equal(values, expected_values, per_neurite=False):
 
 def _dispatch_features(features, mode=None):
     for feature_name, configurations in features.items():
-
         for cfg in configurations:
             kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
 
@@ -461,7 +454,6 @@ def _dispatch_features(features, mode=None):
 
 
 def _population_features(mode):
-
     features = {
         "sholl_frequency": [
             {
@@ -519,7 +511,6 @@ def test_population__population_features_with_subtrees(feature_name, kwargs, exp
 
 
 def _morphology_features(mode):
-
     features = {
         "soma_radius": [
             {
@@ -2473,7 +2464,6 @@ def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, exp
 
 
 def _neurite_features():
-
     features = {
         "max_radial_distance": [
             # basal, AcD, apical

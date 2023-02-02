@@ -85,7 +85,6 @@ def cwd(path):
 
 
 def _check_neurites_have_no_parent(m):
-
     for n in m.neurites:
         assert n.root_node.parent is None
 
@@ -142,9 +141,7 @@ def test_load_morphologies():
 
 
 def test_load_morphologies__resolve_paths():
-
     with cwd(DATA_PATH):
-
         pop = utils.load_morphologies("swc/", ignored_exceptions=(MissingParentError, MorphioError))
         assert {f.name for f in FILES}.issubset({m.name for m in pop})
 
@@ -207,7 +204,6 @@ def test_load_neuromorpho_3pt_soma():
 
 
 def test_neurites_have_no_parent():
-
     _check_neurites_have_no_parent(NRN)
 
 
@@ -226,7 +222,6 @@ def test_morphology_sections_are_connected():
 
 
 def test_load_morphology_soma_only():
-
     m = utils.load_morphology(Path(DATA_PATH, 'swc', 'Soma_origin.swc'))
     assert len(m.neurites) == 0
     assert m.name == 'Soma_origin.swc'

@@ -134,7 +134,6 @@ def test_str():
 
 
 def test_mut_nonmut_constructor():
-
     path = SWC_PATH / 'simple.swc'
 
     m = Morphology(path)

@@ -39,7 +39,6 @@ from neurom.exceptions import NeuroMDeprecationWarning
 
 
 def test_warn_deprecated():
-
     with pytest.warns(NeuroMDeprecationWarning, match="foo"):
         nu.warn_deprecated(msg="foo")
 
@@ -100,7 +99,6 @@ def test_ordered_enum():
 
 
 def test_flatten():
-
     a = [[1, 2], [3, 4, 5], [6], [7, 8, 9, 10]]
 
     assert list(nu.flatten(a)) == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

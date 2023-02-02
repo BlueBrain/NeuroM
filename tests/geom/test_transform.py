@@ -83,14 +83,12 @@ def test_rotate_bad_type_raises():
 
 
 def test_translate_point():
-
     t = gtr.Translation([100, -100, 100])
     point = [1, 2, 3]
     assert t(point).tolist() == [101, -98, 103]
 
 
 def test_translate_points():
-
     t = gtr.Translation([100, -100, 100])
     points = np.array([[1, 2, 3], [11, 22, 33], [111, 222, 333]])
     assert np.all(t(points) == np.array([[101, -98, 103], [111, -78, 133], [211, 122, 433]]))
@@ -104,7 +102,6 @@ ROT_270 = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
 
 
 def test_rotate_point():
-
     rot = gtr.Rotation(ROT_90)
     assert rot([2, 0, 0]).tolist() == [0, 2, 0]
     assert rot([0, 2, 0]).tolist() == [-2, 0, 0]
@@ -122,7 +119,6 @@ def test_rotate_point():
 
 
 def test_rotate_points():
-
     rot = gtr.Rotation(ROT_90)
 
     points = np.array([[2, 0, 0], [0, 2, 0], [0, 0, 2], [3, 0, 3]])
@@ -137,7 +133,6 @@ def test_rotate_points():
 
 
 def test_pivot_rotate_point():
-
     point = [1, 2, 3]
 
     new_orig = np.array([10.0, 45.0, 50.0])
@@ -159,7 +154,6 @@ def test_pivot_rotate_point():
 
 
 def test_pivot_rotate_points():
-
     points = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
 
     new_orig = np.array([10.0, 45.0, 50.0])
@@ -181,7 +175,6 @@ def test_pivot_rotate_points():
 
 
 def _check_morphology_translate(m_a, m_b, t):
-
     # soma points
     assert np.allclose((m_b.soma.points[:, COLS.XYZ] - m_a.soma.points[:, COLS.XYZ]), t)
     _check_neurite_translate(m_a.neurites, m_b.neurites, t)
@@ -194,7 +187,6 @@ def _check_neurite_translate(nrts_a, nrts_b, t):
 
 
 def test_translate_morphology_swc():
-
     t = np.array([100.0, 100.0, 100.0])
     m = load_morphology(SWC_NRN_PATH)
     tm = gtr.translate(m, t)
@@ -224,7 +216,6 @@ def test_transform_translate_morphology_h5():
 
 
 def test_transform__mut_immut():
-
     t = np.array([100.0, 100.0, 100.0])
 
     morph = morphio.Morphology(H5_NRN_PATH)
@@ -251,7 +242,6 @@ def _apply_rot(points, rot_mat):
 
 
 def _check_morphology_rotate(m_a, m_b, rot_mat):
-
     # soma points
     assert np.allclose(
         _apply_rot(m_a.soma.points[:, COLS.XYZ], rot_mat), m_b.soma.points[:, COLS.XYZ]
@@ -295,7 +285,6 @@ def test_transform_rotate_morphology_h5():
 
 
 def test_rodrigues_to_dcm():
-
     RES = np.array(
         [
             [0.50017235, -0.80049871, 0.33019604],
@@ -324,7 +313,6 @@ def test_rodrigues_to_dcm():
 
     # check basic rotations with a range of angles
     for angle in np.linspace(0.0, 2.0 * np.pi, 10):
-
         Rx = gtr._rodrigues_to_dcm(np.array([1.0, 0.0, 0.0]), angle)
         Ry = gtr._rodrigues_to_dcm(np.array([0.0, 1.0, 0.0]), angle)
         Rz = gtr._rodrigues_to_dcm(np.array([0.0, 0.0, 1.0]), angle)
