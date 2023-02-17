@@ -13,11 +13,117 @@ from neurom.core import Population
 from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 import collections.abc
 
+from morphio import SectionType
+
 from neurom.core.types import tree_type_checker as is_type
 
 import neurom.core.morphology
 import neurom.features.neurite
 import neurom.apps.morph_stats
+from neurom.core.types import NeuriteSubtype
+from neurom.core.types import NeuriteType
+
+
+class TestNeuriteSubtype():
+    def test_repr(self):
+        assert repr(NeuriteSubtype(0)) == "0"
+        assert repr(NeuriteSubtype(32)) == "32"
+        assert repr(NeuriteSubtype(30201)) == "30201"
+        assert repr(NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+
+    def test_str(self):
+        assert str(NeuriteSubtype(0)) == "0"
+        assert str(NeuriteSubtype(32)) == "32"
+        assert str(NeuriteSubtype(30201)) == "30201"
+        assert str(NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+
+    def test_eq(self):
+        assert NeuriteSubtype(0) == NeuriteSubtype(0)
+        assert NeuriteSubtype(0) == 32
+        assert NeuriteSubtype(0) == NeuriteSubtype(32)
+        assert NeuriteSubtype(32) == 0
+        assert NeuriteSubtype(32) == NeuriteSubtype(0)
+        assert NeuriteSubtype(0) != 1
+        assert NeuriteSubtype(0) != NeuriteSubtype(1)
+        assert NeuriteSubtype(30201) == NeuriteSubtype(30201)
+        assert NeuriteSubtype(30201) == NeuriteSubtype(32)
+        assert NeuriteSubtype(30201) == 32
+        assert NeuriteSubtype(30201) == NeuriteSubtype(3, 2, 1)
+        assert NeuriteSubtype(30201) != NeuriteSubtype(321)
+        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(32)
+        assert NeuriteSubtype(3, 2, 1) == 32
+        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(4, 32, 6)
+        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(3, 2, 1)
+        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(3)
+        assert NeuriteSubtype(3) == NeuriteSubtype(3, 2, 1)
+        assert NeuriteSubtype(3, 2, 1) != NeuriteSubtype(1, 2, 3)
+
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteSubtype._ALL
+
+    def test_integer_behavior(self):
+        assert NeuriteSubtype(2) - 1 == 1
+        assert NeuriteSubtype(2) + 1 == 3
+        assert NeuriteSubtype(2) * 2 == 4
+        assert NeuriteSubtype(2) / 2 == 1
+
+
+class TestNeuriteType():
+    def test_repr(self):
+        assert repr(NeuriteType(0)) == "<NeuriteType.undefined: 0>"
+        assert repr(NeuriteType(32)) == "<NeuriteType.all: 32>"
+        assert repr(NeuriteType(20304)) == "<NeuriteType.axon-basal_dendrite-apical_dendrite: 20304>"
+        assert repr(NeuriteType([2, 3, 4])) == "<NeuriteType.axon-basal_dendrite-apical_dendrite: 20304>"
+
+    def test_str(self):
+        assert str(NeuriteType(0)) == "NeuriteType.undefined"
+        assert str(NeuriteType(32)) == "NeuriteType.all"
+        assert str(NeuriteType(20304)) == "NeuriteType.axon-basal_dendrite-apical_dendrite"
+        assert str(NeuriteType([2, 3, 4])) == "NeuriteType.axon-basal_dendrite-apical_dendrite"
+
+    def test_eq(self):
+        assert NeuriteType.axon == 32
+        assert NeuriteType.axon == NeuriteSubtype(32)
+        assert NeuriteType.axon == SectionType.all
+        assert NeuriteType.axon == SectionType.axon
+        assert NeuriteType.axon == 2
+        assert NeuriteType.axon == NeuriteSubtype(2)
+        assert NeuriteType.axon == NeuriteSubtype(SectionType.axon)
+        assert NeuriteType.axon == NeuriteSubtype(NeuriteType.axon)
+        assert NeuriteType.axon == NeuriteType.axon
+
+        assert NeuriteType(2) == 32
+        assert NeuriteType(2) == NeuriteSubtype(32)
+        assert NeuriteType(2) == SectionType.all
+        assert NeuriteType(2) == SectionType.axon
+        assert NeuriteType(2) == 2
+        assert NeuriteType(2) == NeuriteSubtype(2)
+        assert NeuriteType(2) == NeuriteSubtype(SectionType.axon)
+        assert NeuriteType(2) == NeuriteSubtype(NeuriteType.axon)
+        assert NeuriteType(2) == NeuriteType.axon
+
+        assert NeuriteType([2, 3, 4]) == 32
+        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(2, 3, 4)
+        assert NeuriteType([2, 3, 4]) == SectionType.all
+        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(20304)
+        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(SectionType.axon)
+        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(NeuriteType.axon, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite)
+        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
+        assert NeuriteType([2, 3, 4]) == NeuriteType.axon
+        assert NeuriteType([2, 3, 4]) == NeuriteType.basal_dendrite
+        assert NeuriteType([2, 3, 4]) == NeuriteType.apical_dendrite
+        assert NeuriteType([2, 3, 4]) == NeuriteType.all
+
+    def test_integer_behavior(self):
+        assert NeuriteType(2) - 1 == 1
+        assert NeuriteType(2) + 1 == 3
+        assert NeuriteType(2) * 2 == 4
+        assert NeuriteType(2) / 2 == 1
+        assert NeuriteType.axon - 1 == 1
+        assert NeuriteType.axon + 1 == 3
+        assert NeuriteType.axon * 2 == 4
+        assert NeuriteType.axon / 2 == 1
 
 
 DATA_DIR = Path(__file__).parent / "data/mixed"
@@ -523,6 +629,12 @@ def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, exp
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
+        expected = np.array([
+            1. , 2. , 3. , 3. , 2. , 1.414213,
+            3.414213, 4.414213, 4.414213, 2.828427, 3.828427, 3.828427,
+            4.828427, 4.828427, 1., 2., 3., 3.,
+            2.
+        ])
         _assert_feature_equal(values, expected)
 
 

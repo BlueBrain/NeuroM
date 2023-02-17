@@ -426,7 +426,10 @@ class _NeuriteTypeMode:
         }[mode]
 
     def __call__(self):
-        return self._mode()
+        mode = self._mode()
+        # if isinstance(mode, (list, tuple)):
+        #     mode = NeuriteType.from_list(mode)
+        return mode
 
     def _root_node_type(self):
         return self._neurite.morphio_root_node.type
@@ -439,13 +442,16 @@ class _NeuriteTypeMode:
             if section.type != section.parent.type:
                 subtree_types.append(section.to_morphio().type)
 
-        if len(subtree_types) == 1:
-            return subtree_types[0]
+        return NeuriteType(subtree_types)
+        # return NeuriteType.from_list(subtree_types)
 
-        if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
-            return NeuriteType.axon_carrying_dendrite
-        else:
-            raise TypeError()
+        # if len(subtree_types) == 1:
+        #     return subtree_types[0]
+
+        # if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
+        #     return NeuriteType.axon_carrying_dendrite
+        # else:
+        #     raise TypeError()
 
 
 class Neurite:

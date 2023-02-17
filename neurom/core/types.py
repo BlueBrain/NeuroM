@@ -29,6 +29,7 @@
 """Type enumerations."""
 
 from enum import IntEnum, unique, Enum
+from itertools import chain
 
 from morphio import SectionType
 
@@ -47,29 +48,78 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-class Subtypes:
+class NeuriteSubtype(int):
+    _ALL = 32
+    _BASE = 100
+    _COMPOSITE = 99
 
-    def __init__(self, *subtypes):
-        self.subtypes = subtypes
+    def __new__(cls, *value):
+        if len(value) == 1:
+            # Avoid recursion error
+            value = value[0]
+
+        if isinstance(value, (list, tuple)):
+            value = cls.from_list(value)
+        elif isinstance(value, Enum):
+            value = value.value
+        obj = super().__new__(cls, value)
+        obj._subtypes = NeuriteSubtype.to_list(obj)
+        obj._value_ = int(obj)
+        return obj
+
+    def __hash__(self):
+        return hash(self._value_)
 
     def is_composite(self):
-        return len(self.subtypes) > 1
+        return self._value_ >= self._BASE
 
     def __eq__(self, other):
-
-        if isinstance(other, Subtypes):
+        if not isinstance(other, NeuriteSubtype):
+            other = NeuriteSubtype(other)
+        if self._ALL in self._subtypes or self._ALL in other._subtypes:
+            is_eq = True
+        else:
             if self.is_composite():
                 if other.is_composite():
-                    return self.subtypes == other.subtypes
-                return other.subtypes[0] in self.subtypes
-            if other.is_composite():
-                return self.subtypes[0] in other.subtypes
-            return self.subtypes[0] == other.subtypes[0]
-        return other in self.subtypes
+                    is_eq = self._subtypes == other._subtypes
+                else:
+                    is_eq = other._value_ in self._subtypes
+            else:
+                if other.is_composite():
+                    is_eq = self._value_ in other._subtypes
+                else:
+                    is_eq = self._value_ == other._value_
+        return is_eq
+
+    def __ne__(self, other):
+        return not self == other
+
+    @classmethod
+    def from_list(cls, values):
+        """Create a NeuriteType from a list of sub types."""
+        value = 0
+        for num, i in enumerate(values[::-1]):
+            new_value = cls._BASE ** num * int(i)
+            value += new_value
+        obj = cls(value)
+        return obj
+
+    # @classmethod
+    def to_list(self):
+        """Transform a NeuriteType or a positive integer in a list of sub types."""
+        digits = []
+        tmp_value = int(self)
+        while tmp_value:
+            digits.append(int(tmp_value % self._BASE))
+            tmp_value //= self._BASE
+        if not digits:
+            digits = [0]
+        res = digits[::-1]
+        return res
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(Subtypes, Enum):
+class NeuriteType(NeuriteSubtype, Enum):
     """Type of neurite."""
 
     axon = SectionType.axon
@@ -77,18 +127,28 @@ class NeuriteType(Subtypes, Enum):
     basal_dendrite = SectionType.basal_dendrite
     undefined = SectionType.undefined
     soma = 31
-    all = 32
+    all = NeuriteSubtype._ALL
     custom5 = SectionType.custom5
     custom6 = SectionType.custom6
     custom7 = SectionType.custom7
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
-
     axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
 
-    def __hash__(self):
-        return hash(self.value)
+
+def _enum_accept_undefined(cls, value):
+    try:
+        obj = cls._member_map_[value]
+    except (ValueError, TypeError, KeyError) as exc:
+        value = NeuriteSubtype(value)
+        obj = super(NeuriteType, cls).__new__(cls, value)
+        obj._value_ = value
+        obj._subtypes = obj._value_._subtypes
+        obj._name_ = "-".join([cls._value2member_map_.get(i, NeuriteType.undefined).name for i in obj._subtypes])
+    return obj
+
+NeuriteType.__new__ = _enum_accept_undefined
 
 
 #: Collection of all neurite types
