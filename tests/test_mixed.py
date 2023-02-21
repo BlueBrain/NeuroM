@@ -43,6 +43,8 @@ class TestNeuriteSubtype():
         assert NeuriteSubtype(0) == NeuriteSubtype(32)
         assert NeuriteSubtype(32) == 0
         assert NeuriteSubtype(32) == NeuriteSubtype(0)
+        assert NeuriteSubtype(32) == NeuriteSubtype(32)
+        assert NeuriteSubtype(32) == 32
         assert NeuriteSubtype(0) != 1
         assert NeuriteSubtype(0) != NeuriteSubtype(1)
         assert NeuriteSubtype(30201) == NeuriteSubtype(30201)
@@ -57,9 +59,16 @@ class TestNeuriteSubtype():
         assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(3)
         assert NeuriteSubtype(3) == NeuriteSubtype(3, 2, 1)
         assert NeuriteSubtype(3, 2, 1) != NeuriteSubtype(1, 2, 3)
+        assert NeuriteSubtype(3, 2, 1) == 3
+        assert NeuriteSubtype(3, 2, 1) == [3, 2, 1]
+        assert NeuriteSubtype(3, 2, 1) != [4, 5, 6]
+        assert NeuriteSubtype(3, 2, 1) == [4, 32, 6]
 
         assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == 2
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
         assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
+        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)
         assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteSubtype._ALL
 
     def test_integer_behavior(self):
@@ -92,6 +101,10 @@ class TestNeuriteType():
         assert NeuriteType.axon == NeuriteSubtype(SectionType.axon)
         assert NeuriteType.axon == NeuriteSubtype(NeuriteType.axon)
         assert NeuriteType.axon == NeuriteType.axon
+        assert NeuriteType.axon != 3
+        assert NeuriteType.axon != NeuriteSubtype(3)
+        assert NeuriteType.axon != NeuriteSubtype(SectionType.basal_dendrite)
+        assert NeuriteType.axon != NeuriteSubtype(NeuriteType.basal_dendrite)
 
         assert NeuriteType(2) == 32
         assert NeuriteType(2) == NeuriteSubtype(32)
@@ -102,6 +115,10 @@ class TestNeuriteType():
         assert NeuriteType(2) == NeuriteSubtype(SectionType.axon)
         assert NeuriteType(2) == NeuriteSubtype(NeuriteType.axon)
         assert NeuriteType(2) == NeuriteType.axon
+        assert NeuriteType(2) != 3
+        assert NeuriteType(2) != NeuriteSubtype(3)
+        assert NeuriteType(2) != NeuriteSubtype(SectionType.basal_dendrite)
+        assert NeuriteType(2) != NeuriteSubtype(NeuriteType.basal_dendrite)
 
         assert NeuriteType([2, 3, 4]) == 32
         assert NeuriteType([2, 3, 4]) == NeuriteSubtype(2, 3, 4)
@@ -114,6 +131,8 @@ class TestNeuriteType():
         assert NeuriteType([2, 3, 4]) == NeuriteType.basal_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.apical_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.all
+        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(4, 3, 2)
+        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(40302)
 
     def test_integer_behavior(self):
         assert NeuriteType(2) - 1 == 1
