@@ -35,6 +35,9 @@ from morphio import SectionType
 
 from neurom.utils import OrderedEnum
 
+_SOMA_SUBTYPE = 31
+_ALL_SUBTYPE = 32
+
 
 @unique
 class NeuriteIter(OrderedEnum):
@@ -48,10 +51,8 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-class NeuriteSubtype(int):
-    _ALL = 32
+class SubtypeCollection(int):
     _BASE = 100
-    _COMPOSITE = 99
 
     def __new__(cls, *value):
         if len(value) == 1:
@@ -63,7 +64,7 @@ class NeuriteSubtype(int):
         elif isinstance(value, Enum):
             value = value.value
         obj = super().__new__(cls, value)
-        obj._subtypes = NeuriteSubtype.to_list(obj)
+        obj._subtypes = SubtypeCollection.to_list(obj)
         obj._value_ = int(obj)
         return obj
 
@@ -74,9 +75,9 @@ class NeuriteSubtype(int):
         return self._value_ >= self._BASE
 
     def __eq__(self, other):
-        if not isinstance(other, NeuriteSubtype):
-            other = NeuriteSubtype(other)
-        if self._ALL in self._subtypes or self._ALL in other._subtypes:
+        if not isinstance(other, SubtypeCollection):
+            other = SubtypeCollection(other)
+        if _ALL_SUBTYPE in self._subtypes or _ALL_SUBTYPE in other._subtypes:
             is_eq = True
         else:
             if self.is_composite():
@@ -119,15 +120,15 @@ class NeuriteSubtype(int):
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(NeuriteSubtype, Enum):
+class NeuriteType(SubtypeCollection, Enum):
     """Type of neurite."""
 
     axon = SectionType.axon
     apical_dendrite = SectionType.apical_dendrite
     basal_dendrite = SectionType.basal_dendrite
     undefined = SectionType.undefined
-    soma = 31
-    all = NeuriteSubtype._ALL
+    soma = _SOMA_SUBTYPE
+    all = _ALL_SUBTYPE
     custom5 = SectionType.custom5
     custom6 = SectionType.custom6
     custom7 = SectionType.custom7
@@ -141,7 +142,7 @@ def _enum_accept_undefined(cls, value):
     try:
         obj = cls._member_map_[value]
     except (ValueError, TypeError, KeyError) as exc:
-        value = NeuriteSubtype(value)
+        value = SubtypeCollection(value)
         obj = super(NeuriteType, cls).__new__(cls, value)
         obj._value_ = value
         obj._subtypes = obj._value_._subtypes

@@ -20,62 +20,63 @@ from neurom.core.types import tree_type_checker as is_type
 import neurom.core.morphology
 import neurom.features.neurite
 import neurom.apps.morph_stats
-from neurom.core.types import NeuriteSubtype
+from neurom.core.types import SubtypeCollection
 from neurom.core.types import NeuriteType
 
 
-class TestNeuriteSubtype():
+class TestSubtypeCollection():
     def test_repr(self):
-        assert repr(NeuriteSubtype(0)) == "0"
-        assert repr(NeuriteSubtype(32)) == "32"
-        assert repr(NeuriteSubtype(30201)) == "30201"
-        assert repr(NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+        assert repr(SubtypeCollection(0)) == "0"
+        assert repr(SubtypeCollection(32)) == "32"
+        assert repr(SubtypeCollection(30201)) == "30201"
+        assert repr(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
 
     def test_str(self):
-        assert str(NeuriteSubtype(0)) == "0"
-        assert str(NeuriteSubtype(32)) == "32"
-        assert str(NeuriteSubtype(30201)) == "30201"
-        assert str(NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+        assert str(SubtypeCollection(0)) == "0"
+        assert str(SubtypeCollection(32)) == "32"
+        assert str(SubtypeCollection(30201)) == "30201"
+        assert str(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
 
     def test_eq(self):
-        assert NeuriteSubtype(0) == NeuriteSubtype(0)
-        assert NeuriteSubtype(0) == 32
-        assert NeuriteSubtype(0) == NeuriteSubtype(32)
-        assert NeuriteSubtype(32) == 0
-        assert NeuriteSubtype(32) == NeuriteSubtype(0)
-        assert NeuriteSubtype(32) == NeuriteSubtype(32)
-        assert NeuriteSubtype(32) == 32
-        assert NeuriteSubtype(0) != 1
-        assert NeuriteSubtype(0) != NeuriteSubtype(1)
-        assert NeuriteSubtype(30201) == NeuriteSubtype(30201)
-        assert NeuriteSubtype(30201) == NeuriteSubtype(32)
-        assert NeuriteSubtype(30201) == 32
-        assert NeuriteSubtype(30201) == NeuriteSubtype(3, 2, 1)
-        assert NeuriteSubtype(30201) != NeuriteSubtype(321)
-        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(32)
-        assert NeuriteSubtype(3, 2, 1) == 32
-        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(4, 32, 6)
-        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(3, 2, 1)
-        assert NeuriteSubtype(3, 2, 1) == NeuriteSubtype(3)
-        assert NeuriteSubtype(3) == NeuriteSubtype(3, 2, 1)
-        assert NeuriteSubtype(3, 2, 1) != NeuriteSubtype(1, 2, 3)
-        assert NeuriteSubtype(3, 2, 1) == 3
-        assert NeuriteSubtype(3, 2, 1) == [3, 2, 1]
-        assert NeuriteSubtype(3, 2, 1) != [4, 5, 6]
-        assert NeuriteSubtype(3, 2, 1) == [4, 32, 6]
+        assert SubtypeCollection(0) == SubtypeCollection(0)
+        assert SubtypeCollection(0) == 32
+        assert SubtypeCollection(0) == SubtypeCollection(32)
+        assert SubtypeCollection(32) == 0
+        assert SubtypeCollection(32) == SubtypeCollection(0)
+        assert SubtypeCollection(32) == SubtypeCollection(32)
+        assert SubtypeCollection(32) == 32
+        assert SubtypeCollection(0) != 1
+        assert SubtypeCollection(0) != SubtypeCollection(1)
+        assert SubtypeCollection(30201) == SubtypeCollection(30201)
+        assert SubtypeCollection(30201) == SubtypeCollection(32)
+        assert SubtypeCollection(30201) == 32
+        assert SubtypeCollection(30201) == SubtypeCollection(3, 2, 1)
+        assert SubtypeCollection(30201) != SubtypeCollection(321)
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
+        assert SubtypeCollection(3, 2, 1) == 32
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(4, 32, 6)
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3, 2, 1)
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3)
+        assert SubtypeCollection(3) == SubtypeCollection(3, 2, 1)
+        assert SubtypeCollection(3, 2, 1) != SubtypeCollection(1, 2, 3)
+        assert SubtypeCollection(3, 2, 1) == 3
+        assert SubtypeCollection(3, 2, 1) == [3, 2, 1]
+        assert SubtypeCollection(3, 2, 1) != [4, 5, 6]
+        assert SubtypeCollection(3, 2, 1) == [4, 32, 6]
 
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == 2
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite)
-        assert NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteSubtype._ALL
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 2
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 204
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection._ALL
 
     def test_integer_behavior(self):
-        assert NeuriteSubtype(2) - 1 == 1
-        assert NeuriteSubtype(2) + 1 == 3
-        assert NeuriteSubtype(2) * 2 == 4
-        assert NeuriteSubtype(2) / 2 == 1
+        assert SubtypeCollection(2) - 1 == 1
+        assert SubtypeCollection(2) + 1 == 3
+        assert SubtypeCollection(2) * 2 == 4
+        assert SubtypeCollection(2) / 2 == 1
 
 
 class TestNeuriteType():
@@ -93,46 +94,48 @@ class TestNeuriteType():
 
     def test_eq(self):
         assert NeuriteType.axon == 32
-        assert NeuriteType.axon == NeuriteSubtype(32)
+        assert NeuriteType.axon == SubtypeCollection(32)
         assert NeuriteType.axon == SectionType.all
         assert NeuriteType.axon == SectionType.axon
         assert NeuriteType.axon == 2
-        assert NeuriteType.axon == NeuriteSubtype(2)
-        assert NeuriteType.axon == NeuriteSubtype(SectionType.axon)
-        assert NeuriteType.axon == NeuriteSubtype(NeuriteType.axon)
+        assert NeuriteType.axon == SubtypeCollection(2)
+        assert NeuriteType.axon == SubtypeCollection(SectionType.axon)
+        assert NeuriteType.axon == SubtypeCollection(NeuriteType.axon)
         assert NeuriteType.axon == NeuriteType.axon
         assert NeuriteType.axon != 3
-        assert NeuriteType.axon != NeuriteSubtype(3)
-        assert NeuriteType.axon != NeuriteSubtype(SectionType.basal_dendrite)
-        assert NeuriteType.axon != NeuriteSubtype(NeuriteType.basal_dendrite)
+        assert NeuriteType.axon != SubtypeCollection(3)
+        assert NeuriteType.axon != SubtypeCollection(SectionType.basal_dendrite)
+        assert NeuriteType.axon != SubtypeCollection(NeuriteType.basal_dendrite)
 
         assert NeuriteType(2) == 32
-        assert NeuriteType(2) == NeuriteSubtype(32)
+        assert NeuriteType(2) == SubtypeCollection(32)
         assert NeuriteType(2) == SectionType.all
         assert NeuriteType(2) == SectionType.axon
         assert NeuriteType(2) == 2
-        assert NeuriteType(2) == NeuriteSubtype(2)
-        assert NeuriteType(2) == NeuriteSubtype(SectionType.axon)
-        assert NeuriteType(2) == NeuriteSubtype(NeuriteType.axon)
+        assert NeuriteType(2) == SubtypeCollection(2)
+        assert NeuriteType(2) == SubtypeCollection(SectionType.axon)
+        assert NeuriteType(2) == SubtypeCollection(NeuriteType.axon)
         assert NeuriteType(2) == NeuriteType.axon
         assert NeuriteType(2) != 3
-        assert NeuriteType(2) != NeuriteSubtype(3)
-        assert NeuriteType(2) != NeuriteSubtype(SectionType.basal_dendrite)
-        assert NeuriteType(2) != NeuriteSubtype(NeuriteType.basal_dendrite)
+        assert NeuriteType(2) != SubtypeCollection(3)
+        assert NeuriteType(2) != SubtypeCollection(SectionType.basal_dendrite)
+        assert NeuriteType(2) != SubtypeCollection(NeuriteType.basal_dendrite)
 
         assert NeuriteType([2, 3, 4]) == 32
-        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(2, 3, 4)
+        assert NeuriteType([2, 3, 4]) == SubtypeCollection(2, 3, 4)
         assert NeuriteType([2, 3, 4]) == SectionType.all
-        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(20304)
-        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(SectionType.axon)
-        assert NeuriteType([2, 3, 4]) == NeuriteSubtype(NeuriteType.axon, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite)
-        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
+        assert NeuriteType([2, 3, 4]) == SubtypeCollection(20304)
+        assert NeuriteType([2, 3, 4]) == 20304
+        assert NeuriteType([2, 31, 4]) == 23104
+        assert NeuriteType([2, 3, 4]) == SubtypeCollection(SectionType.axon)
+        assert NeuriteType([2, 3, 4]) == SubtypeCollection(NeuriteType.axon, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite)
+        assert NeuriteType([2, 3, 4]) != SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
         assert NeuriteType([2, 3, 4]) == NeuriteType.axon
         assert NeuriteType([2, 3, 4]) == NeuriteType.basal_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.apical_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.all
-        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(4, 3, 2)
-        assert NeuriteType([2, 3, 4]) != NeuriteSubtype(40302)
+        assert NeuriteType([2, 3, 4]) != SubtypeCollection(4, 3, 2)
+        assert NeuriteType([2, 3, 4]) != SubtypeCollection(40302)
 
     def test_integer_behavior(self):
         assert NeuriteType(2) - 1 == 1
