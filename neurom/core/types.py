@@ -144,12 +144,12 @@ class NeuriteType(SubtypeCollection, Enum):
 def _enum_accept_undefined(cls, value):
     try:
         obj = cls._member_map_[value]
-    except (ValueError, TypeError, KeyError) as exc:
-        value = SubtypeCollection(value)
-        obj = super(NeuriteType, cls).__new__(cls, value)
-        obj._value_ = int(value)
-        obj._subtypes = value._subtypes
-        obj._name_ = "-".join([cls._value2member_map_.get(i, NeuriteType.undefined).name for i in obj._subtypes])
+    except (KeyError, TypeError) as exc:
+        try:
+            subtype_value = SubtypeCollection(value)
+            obj = cls._value2member_map_[subtype_value]
+        except KeyError as exc2:
+            raise ValueError(f"{value} is not a valid NeuriteType") from exc
     return obj
 
 NeuriteType.__new__ = _enum_accept_undefined
