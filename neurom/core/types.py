@@ -33,6 +33,7 @@ from itertools import chain
 
 from morphio import SectionType
 
+from neurom.exceptions import NeuroMError
 from neurom.utils import OrderedEnum
 
 _SOMA_SUBTYPE = 31
@@ -77,7 +78,7 @@ class SubtypeCollection(int):
     def __eq__(self, other):
         if not isinstance(other, SubtypeCollection):
             other = SubtypeCollection(other)
-        if _ALL_SUBTYPE in self._subtypes or _ALL_SUBTYPE in other._subtypes:
+        if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
             is_eq = True
         else:
             if self.is_composite():
@@ -116,6 +117,8 @@ class SubtypeCollection(int):
         if not digits:
             digits = [0]
         res = digits[::-1]
+        if _ALL_SUBTYPE in res and len(res) > 1:
+            raise NeuroMError(f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element (current elements: {res}).")
         return res
 
 
@@ -135,7 +138,7 @@ class NeuriteType(SubtypeCollection, Enum):
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
-    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+    axon_carrying_dendrite = SectionType.axon, SectionType.basal_dendrite
 
 
 def _enum_accept_undefined(cls, value):
@@ -144,8 +147,8 @@ def _enum_accept_undefined(cls, value):
     except (ValueError, TypeError, KeyError) as exc:
         value = SubtypeCollection(value)
         obj = super(NeuriteType, cls).__new__(cls, value)
-        obj._value_ = value
-        obj._subtypes = obj._value_._subtypes
+        obj._value_ = int(value)
+        obj._subtypes = value._subtypes
         obj._name_ = "-".join([cls._value2member_map_.get(i, NeuriteType.undefined).name for i in obj._subtypes])
     return obj
 

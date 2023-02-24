@@ -20,8 +20,11 @@ from neurom.core.types import tree_type_checker as is_type
 import neurom.core.morphology
 import neurom.features.neurite
 import neurom.apps.morph_stats
+from neurom.core.types import _ALL_SUBTYPE
+from neurom.core.types import _SOMA_SUBTYPE
 from neurom.core.types import SubtypeCollection
 from neurom.core.types import NeuriteType
+from neurom.exceptions import NeuroMError
 
 
 class TestSubtypeCollection():
@@ -38,23 +41,27 @@ class TestSubtypeCollection():
         assert str(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
 
     def test_eq(self):
+        assert SubtypeCollection(0) == 0
         assert SubtypeCollection(0) == SubtypeCollection(0)
         assert SubtypeCollection(0) == 32
         assert SubtypeCollection(0) == SubtypeCollection(32)
         assert SubtypeCollection(32) == 0
         assert SubtypeCollection(32) == SubtypeCollection(0)
-        assert SubtypeCollection(32) == SubtypeCollection(32)
         assert SubtypeCollection(32) == 32
+        assert SubtypeCollection(32) == SubtypeCollection(32)
         assert SubtypeCollection(0) != 1
         assert SubtypeCollection(0) != SubtypeCollection(1)
+        assert SubtypeCollection(30201) == 30201
         assert SubtypeCollection(30201) == SubtypeCollection(30201)
-        assert SubtypeCollection(30201) == SubtypeCollection(32)
         assert SubtypeCollection(30201) == 32
+        assert SubtypeCollection(30201) == SubtypeCollection(32)
         assert SubtypeCollection(30201) == SubtypeCollection(3, 2, 1)
+        assert SubtypeCollection(30201) != 321
         assert SubtypeCollection(30201) != SubtypeCollection(321)
-        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
         assert SubtypeCollection(3, 2, 1) == 32
-        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(4, 32, 6)
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
+        assert SubtypeCollection(3, 2, 1) == _ALL_SUBTYPE
+        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(_ALL_SUBTYPE)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3, 2, 1)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3)
         assert SubtypeCollection(3) == SubtypeCollection(3, 2, 1)
@@ -62,15 +69,38 @@ class TestSubtypeCollection():
         assert SubtypeCollection(3, 2, 1) == 3
         assert SubtypeCollection(3, 2, 1) == [3, 2, 1]
         assert SubtypeCollection(3, 2, 1) != [4, 5, 6]
-        assert SubtypeCollection(3, 2, 1) == [4, 32, 6]
 
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 2
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteType.axon
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 204
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection._ALL
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(32)
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == _ALL_SUBTYPE
+        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(_ALL_SUBTYPE)
+
+    def test_raise(self):
+        SubtypeCollection(32)
+
+        with pytest.raises(
+            NeuroMError,
+            match=(
+                r"A subtype containing the value 32 must contain only one element \(current "
+                r"elements: \[4, 32, 6\]\)\."
+            )
+        ):
+            SubtypeCollection(4, 32, 6)
+
+        with pytest.raises(
+            NeuroMError,
+            match=(
+                r"A subtype containing the value 32 must contain only one element \(current "
+                r"elements: \[4, 32, 6\]\)\."
+            )
+        ):
+            SubtypeCollection(43206)
 
     def test_integer_behavior(self):
         assert SubtypeCollection(2) - 1 == 1
@@ -123,19 +153,71 @@ class TestNeuriteType():
 
         assert NeuriteType([2, 3, 4]) == 32
         assert NeuriteType([2, 3, 4]) == SubtypeCollection(2, 3, 4)
+        assert NeuriteType([2, 3, 4]) == NeuriteType([2, 3, 4])
         assert NeuriteType([2, 3, 4]) == SectionType.all
         assert NeuriteType([2, 3, 4]) == SubtypeCollection(20304)
+        assert NeuriteType([2, 3, 4]) == NeuriteType(20304)
+        assert NeuriteType([2, 3, 4]) == NeuriteType([20304])
         assert NeuriteType([2, 3, 4]) == 20304
         assert NeuriteType([2, 31, 4]) == 23104
         assert NeuriteType([2, 3, 4]) == SubtypeCollection(SectionType.axon)
+        assert NeuriteType([2, 3, 4]) == NeuriteType(SectionType.axon)
         assert NeuriteType([2, 3, 4]) == SubtypeCollection(NeuriteType.axon, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite)
+        assert NeuriteType([2, 3, 4]) == NeuriteType([NeuriteType.axon, NeuriteType.basal_dendrite, NeuriteType.apical_dendrite])
         assert NeuriteType([2, 3, 4]) != SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
+        assert NeuriteType([2, 3, 4]) != NeuriteType([NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite])
         assert NeuriteType([2, 3, 4]) == NeuriteType.axon
         assert NeuriteType([2, 3, 4]) == NeuriteType.basal_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.apical_dendrite
         assert NeuriteType([2, 3, 4]) == NeuriteType.all
         assert NeuriteType([2, 3, 4]) != SubtypeCollection(4, 3, 2)
+        assert NeuriteType([2, 3, 4]) != NeuriteType([4, 3, 2])
         assert NeuriteType([2, 3, 4]) != SubtypeCollection(40302)
+        assert NeuriteType([2, 3, 4]) != NeuriteType(40302)
+        assert NeuriteType([2, 3, 4]) != NeuriteType([40302])
+
+        assert NeuriteType.axon_carrying_dendrite == 32
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(32)
+        assert NeuriteType.axon_carrying_dendrite == SectionType.all
+        assert NeuriteType.axon_carrying_dendrite == SectionType.axon
+        assert NeuriteType.axon_carrying_dendrite == 2
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(2)
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(SectionType.axon)
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(NeuriteType.axon)
+        assert NeuriteType.axon_carrying_dendrite == NeuriteType.axon
+        assert NeuriteType.axon_carrying_dendrite == 203
+        assert NeuriteType.axon_carrying_dendrite == (SectionType.axon, SectionType.basal_dendrite)
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(SectionType.axon, SectionType.basal_dendrite)
+        assert NeuriteType.axon_carrying_dendrite == 3
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(3)
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(SectionType.basal_dendrite)
+        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(NeuriteType.basal_dendrite)
+        assert NeuriteType.axon_carrying_dendrite == NeuriteType.basal_dendrite
+        assert NeuriteType.axon_carrying_dendrite != 4
+        assert NeuriteType.axon_carrying_dendrite != SubtypeCollection(4)
+        assert NeuriteType.axon_carrying_dendrite != SubtypeCollection(SectionType.apical_dendrite)
+        assert NeuriteType.axon_carrying_dendrite != SubtypeCollection(NeuriteType.apical_dendrite)
+
+    def test_raise(self):
+        NeuriteType(32)
+
+        with pytest.raises(
+            NeuroMError,
+            match=(
+                r"A subtype containing the value 32 must contain only one element \(current "
+                r"elements: \[4, 32, 6\]\)\."
+            )
+        ):
+            NeuriteType([4, 32, 6])
+
+        with pytest.raises(
+            NeuroMError,
+            match=(
+                r"A subtype containing the value 32 must contain only one element \(current "
+                r"elements: \[4, 32, 6\]\)\."
+            )
+        ):
+            NeuriteType(43206)
 
     def test_integer_behavior(self):
         assert NeuriteType(2) - 1 == 1
