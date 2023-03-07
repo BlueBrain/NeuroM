@@ -303,9 +303,9 @@ class SomaSimpleContour(Soma):
         )[:, COLS.Z] * signs
 
         if exclude_boundary:
-            interior_side = (cross_z > 0)
+            interior_side = cross_z > 0
         else:
-            interior_side = (cross_z >= 0)
+            interior_side = cross_z >= 0
 
         return interior_side
 
