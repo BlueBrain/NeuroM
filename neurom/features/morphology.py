@@ -411,7 +411,7 @@ def trunk_origin_radii(
         path_lengths = np.insert(np.cumsum(interval_lengths), 0, 0)
         valid_pts = np.ones(len(path_lengths), dtype=bool)
         if min_length_filter is not None:
-            valid_pts = (valid_pts & (path_lengths >= min_length_filter))
+            valid_pts = valid_pts & (path_lengths >= min_length_filter)
             if not valid_pts.any():
                 warnings.warn(
                     "In 'trunk_origin_radii': the 'min_length_filter' value is greater than the "
@@ -420,8 +420,8 @@ def trunk_origin_radii(
                 )
                 return points[-1, COLS.R]
         if max_length_filter is not None:
-            valid_max = (path_lengths <= max_length_filter)
-            valid_pts = (valid_pts & valid_max)
+            valid_max = path_lengths <= max_length_filter
+            valid_pts = valid_pts & valid_max
             if not valid_pts.any():
                 warnings.warn(
                     "In 'trunk_origin_radii': the 'min_length_filter' and 'max_length_filter' "
