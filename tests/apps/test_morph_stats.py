@@ -138,6 +138,22 @@ def test_extract_stats_single_morphology():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], decimal=4)
 
 
+def test_extract_stats_single_neurite():
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    neurite = m.neurites[0]
+    config = deepcopy(REF_CONFIG_NEW)
+    config.pop("neurite_type")
+    config.pop("morphology")
+    res = ms.extract_stats(neurite, config)
+
+    REF_OUT_NEURITE = deepcopy(REF_OUT)
+    REF_OUT_NEURITE.pop("morphology", None)
+    assert set(res.keys()) == set(REF_OUT_NEURITE.keys())
+    assert set(res["axon"].keys()) == set(REF_OUT_NEURITE["axon"].keys())
+    for kk in res["axon"].keys():
+        assert_almost_equal(res["axon"][kk], REF_OUT_NEURITE["axon"][kk], decimal=4)
+
+
 def test_extract_stats_new_format():
     m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     res = ms.extract_stats(m, REF_CONFIG_NEW)
