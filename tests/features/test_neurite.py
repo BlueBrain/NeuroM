@@ -81,7 +81,6 @@ def test_neurite_volume_density():
 
 
 def test_neurite_volume_density_failed_convex_hull():
-
     flat_neuron = nm.load_morphology(
         """
     1  1   0  0  0  0.5 -1

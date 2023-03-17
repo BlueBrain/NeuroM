@@ -617,7 +617,6 @@ def test_neurite_density():
 
 
 def test_morphology_volume_density():
-
     volume_density = features.get("volume_density", NEURON)
 
     # volume density should not be calculated as the sum of the neurite volume densities,
@@ -932,7 +931,6 @@ def test_section_strahler_orders():
 
 
 def test_section_bif_radial_distances():
-
     # the feature applied on morph calculates radial distance from soma
     trm_rads = features.get('section_bif_radial_distances', NRN, neurite_type=nm.AXON)
 
@@ -973,7 +971,6 @@ def test_section_bif_radial_distances():
 
 
 def test_section_term_radial_distances():
-
     trm_rads = features.get('section_term_radial_distances', NRN, neurite_type=nm.APICAL_DENDRITE)
 
     print(trm_rads)
@@ -1058,7 +1055,6 @@ def test_principal_direction_extents():
 
 
 def test_total_width():
-
     assert_allclose(features.get('total_width', NRN), 105.0758)
 
     assert_allclose(features.get('total_width', NRN, neurite_type=nm.AXON), 33.25306)
@@ -1067,7 +1063,6 @@ def test_total_width():
 
 
 def test_total_height():
-
     assert_allclose(features.get('total_height', NRN), 106.11643)
 
     assert_allclose(features.get('total_height', NRN, neurite_type=nm.AXON), 57.60017)
@@ -1076,7 +1071,6 @@ def test_total_height():
 
 
 def test_total_depth():
-
     assert_allclose(features.get('total_depth', NRN), 54.204086)
 
     assert_allclose(features.get('total_depth', NRN, neurite_type=nm.AXON), 49.70138)
@@ -1085,7 +1079,6 @@ def test_total_depth():
 
 
 def test_aspect_ratio():
-
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     npt.assert_almost_equal(
@@ -1108,7 +1101,6 @@ def test_aspect_ratio():
 
 
 def test_circularity():
-
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     npt.assert_almost_equal(
@@ -1131,7 +1123,6 @@ def test_circularity():
 
 
 def test_shape_factor():
-
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     npt.assert_almost_equal(
@@ -1168,7 +1159,6 @@ def test_shape_factor():
     ],
 )
 def test_length_fraction_from_soma(neurite_type, axis, expected_value):
-
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     npt.assert_almost_equal(
@@ -1179,7 +1169,6 @@ def test_length_fraction_from_soma(neurite_type, axis, expected_value):
 
 
 def test_length_fraction_from_soma__wrong_axis():
-
     morph = load_morphology(DATA_PATH / "neurolucida/bio_neuron-000.asc")
 
     with pytest.raises(NeuroMError):

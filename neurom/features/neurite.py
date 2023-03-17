@@ -265,7 +265,6 @@ def segment_path_lengths(neurite, section_type=NeuriteType.all):
 
     def segments_path_length(section):
         if section.id not in pathlength:
-
             pathlength[section.id] = (
                 0.0
                 if section.id == neurite.root_node.id
@@ -419,7 +418,6 @@ def diameter_power_relations(neurite, method='first', section_type=NeuriteType.a
 
 
 def _radial_distances(neurite, origin, iterator_type, section_type):
-
     if origin is None:
         origin = neurite.root_node.points[0]
 
