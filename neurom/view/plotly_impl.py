@@ -74,19 +74,19 @@ def _make_trace(morph, plane):
 
         segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in segments]
 
-        coords = dict(
-            x=list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
-            y=list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
-            z=list(flatten((p1[2], p2[2], None) for p1, p2 in segs)),
-        )
+        coords = {
+            "x": list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
+            "y": list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
+            "z": list(flatten((p1[2], p2[2], None) for p1, p2 in segs)),
+        }
 
         color = TREE_COLOR.get(neurite.root_node.type, 'black')
         if plane.lower() == '3d':
             plot_fun = go.Scatter3d
         else:
             plot_fun = go.Scatter
-            coords = dict(x=coords[plane[0]], y=coords[plane[1]])
-        yield plot_fun(line=dict(color=color, width=2), mode='lines', **coords)
+            coords = {"x": coords[plane[0]], "y": coords[plane[1]]}
+        yield plot_fun(line={"color": color, "width": 2}, mode='lines', **coords)
 
 
 def _fill_soma_data(morph, data, plane):
@@ -134,37 +134,37 @@ def _fill_soma_data(morph, data, plane):
 def get_figure(morph, plane, title):
     """Returns the plotly figure containing the morphology."""
     data = list(_make_trace(morph, plane))
-    axis = dict(
-        gridcolor='rgb(255, 255, 255)',
-        zerolinecolor='rgb(255, 255, 255)',
-        showbackground=True,
-        backgroundcolor='rgb(230, 230,230)',
-    )
+    axis = {
+        "gridcolor": 'rgb(255, 255, 255)',
+        "zerolinecolor": 'rgb(255, 255, 255)',
+        "showbackground": True,
+        "backgroundcolor": 'rgb(230, 230,230)',
+    }
 
     soma_2d = _fill_soma_data(morph, data, plane)
 
-    layout = dict(
-        autosize=True,
-        title=title,
-        scene=dict(  # This is used for 3D plots
-            xaxis=axis,
-            yaxis=axis,
-            zaxis=axis,
-            camera=dict(
-                up=dict(x=0, y=0, z=1),
-                eye=dict(
-                    x=-1.7428,
-                    y=1.0707,
-                    z=0.7100,
-                ),
-            ),
-            aspectmode='data',
-        ),
-        yaxis=dict(scaleanchor="x"),  # This is used for 2D plots
-        shapes=soma_2d,
-    )
+    layout = {
+        "autosize": True,
+        "title": title,
+        "scene": {  # This is used for 3D plots
+            "xaxis": axis,
+            "yaxis": axis,
+            "zaxis": axis,
+            "camera": {
+                "up": {"x": 0, "y": 0, "z": 1},
+                "eye": {
+                    "x": -1.7428,
+                    "y": 1.0707,
+                    "z": 0.7100,
+                },
+            },
+            "aspectmode": "data",
+        },
+        "yaxis": {"scaleanchor": "x"},  # This is used for 2D plots
+        "shapes": soma_2d,
+    }
 
-    res = dict(data=data, layout=layout)
+    res = {"data": data, "layout": layout}
     return res
 
 
