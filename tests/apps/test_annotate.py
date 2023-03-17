@@ -32,7 +32,6 @@ def test_generate_annotation():
 
 
 def test_annotate():
-
     correct_result = """
 
 (Circle1   ; MUK_ANNOTATION

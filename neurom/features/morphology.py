@@ -525,7 +525,6 @@ def trunk_origin_radii(
         return root_node.points[0][COLS.R]
 
     def trunk_mean_radius(root_node):
-
         points = root_node.points
 
         interval_lengths = morphmath.interval_lengths(points)
@@ -754,14 +753,12 @@ def volume_density(morph, neurite_type=NeuriteType.all, use_subtrees=False):
 
 
 def _unique_projected_points(morph, projection_plane, neurite_type, use_subtrees=False):
-
     key = "".join(sorted(projection_plane.lower()))
 
     try:
         axes = {"xy": COLS.XY, "xz": COLS.XZ, "yz": COLS.YZ}[key]
 
     except KeyError as e:
-
         raise NeuroMError(
             f"Invalid 'projection_plane' argument {projection_plane}. "
             f"Please select 'xy', 'xz', or 'yz'."

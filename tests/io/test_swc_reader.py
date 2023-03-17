@@ -82,7 +82,6 @@ def test_read_split_soma():
 
 
 def test_weird_indent():
-
     n = load_morphology(
         """
 

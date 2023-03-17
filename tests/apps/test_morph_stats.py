@@ -358,7 +358,6 @@ def test_extract_stats_scalar_feature():
 
 
 def test_extract_stats__kwarg_modes_multiple_features():
-
     m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     config = {
         'neurite': {
@@ -389,7 +388,6 @@ def test_extract_stats__kwarg_modes_multiple_features():
     assert set(res.keys()) == {"axon", "basal_dendrite", "apical_dendrite", "all", "morphology"}
 
     for key in ("axon", "basal_dendrite", "apical_dendrite", "all"):
-
         assert set(res[key].keys()) == {
             "sum_principal_direction_extents__direction:2",
             "min_principal_direction_extents__direction:2",
@@ -616,7 +614,6 @@ def test_get_header():
 
 
 def test_get_header__with_kwargs():
-
     fake_results = {
         "fake_name0": {
             'axon': {
@@ -700,7 +697,6 @@ def test_generate_flattened_dict():
 
 
 def test_generate_flattened_dict__with_kwargs():
-
     results = {
         'axon': {
             'sum_principal_direction_extents__direction:2': 0.0,
@@ -857,7 +853,6 @@ def test_standardize_layout():
 
 
 def test_sanitize_config():
-
     new_config = ms._sanitize_config({})  # empty
     assert 3 == len(new_config)  # neurite & morphology & population created
 

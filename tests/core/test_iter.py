@@ -68,7 +68,6 @@ def test_iter_neurites_nrn_order():
 
 
 def test_iter_neurites_filter():
-
     for ntyp in nm.NEURITE_TYPES:
         a = [n for n in POP.neurites if n.type == ntyp]
         b = [n for n in iter_neurites(POP, filt=lambda n: n.type == ntyp)]
@@ -76,7 +75,6 @@ def test_iter_neurites_filter():
 
 
 def test_iter_neurites_mapping():
-
     n = [n for n in iter_neurites(POP, mapfun=lambda n: len(n.points))]
     ref = [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500]
     assert n == ref
@@ -1052,7 +1050,6 @@ def test_iter_segments_morph():
 
 
 def test_iter_segments_pop():
-
     ref = list(iter_segments(POP))
     assert len(ref) == 3387
 

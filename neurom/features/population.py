@@ -77,7 +77,6 @@ def sholl_frequency(
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-
         section_iterator = (
             partial(iter_sections, section_filter=neurite_filter)
             if use_subtrees
