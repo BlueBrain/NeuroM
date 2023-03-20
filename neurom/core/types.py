@@ -121,6 +121,10 @@ class SubtypeCollection(int):
             raise NeuroMError(f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element (current elements: {res}).")
         return res
 
+    def __reduce_ex__(self, *args, **kwargs):
+        # This is just to ensure the type is recognized as picklable by the Enum class
+        return super().__reduce_ex__(*args, **kwargs)
+
 
 # for backward compatibility with 'v1' version
 class NeuriteType(SubtypeCollection, Enum):
@@ -138,7 +142,41 @@ class NeuriteType(SubtypeCollection, Enum):
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
+
+    # Composite types
     axon_carrying_dendrite = SectionType.axon, SectionType.basal_dendrite
+
+    @classmethod
+    def register(cls, name, value):
+        new_value = SubtypeCollection(value)
+        err = None
+        if name in cls._member_names_:
+            err = (name, cls._member_map_[name].value)
+        if new_value in cls._value2member_map_:
+            err = (cls._value2member_map_[new_value].name, value)
+        if err is not None:
+            raise ValueError(
+                f"The NeuriteType '{err[0]}' is already registered with the value "
+                f"'{err[1]}'"
+            )
+        obj = super(NeuriteType, cls).__new__(cls, new_value)
+        obj._name_ = name
+        cls._value2member_map_[new_value] = obj
+        cls._member_map_["name"] = obj
+        cls._member_names_.append(name)
+        return obj
+
+    @classmethod
+    def unregister(cls, name):
+        if name not in cls._member_names_:
+            raise ValueError(
+                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
+            )
+
+        value = cls._member_map_["name"].value
+        del cls._value2member_map_[value]
+        del cls._member_map_["name"]
+        cls._member_names_.remove(name)
 
 
 def _enum_accept_undefined(cls, value):

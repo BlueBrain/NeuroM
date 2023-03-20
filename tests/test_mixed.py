@@ -1,5 +1,7 @@
-import sys
+import copy
 import json
+import pickle
+import sys
 import warnings
 from pathlib import Path
 import pytest
@@ -219,6 +221,47 @@ class TestNeuriteType():
         assert NeuriteType.axon + 1 == 3
         assert NeuriteType.axon * 2 == 4
         assert NeuriteType.axon / 2 == 1
+
+    def test_pickle(self):
+        assert pickle.loads(pickle.dumps(NeuriteType(2))) == NeuriteType.axon
+        assert pickle.loads(pickle.dumps(NeuriteType.axon)) == NeuriteType.axon
+
+    @pytest.fixture
+    def reset_NeuriteType(self):
+        current_value2member_map_ = copy.deepcopy(NeuriteType._value2member_map_)
+        current_member_map_ = copy.deepcopy(NeuriteType._member_map_)
+        current_member_names_ = copy.deepcopy(NeuriteType._member_names_)
+        yield
+        NeuriteType._value2member_map_ = current_value2member_map_
+        NeuriteType._member_map_ = current_member_map_
+        NeuriteType._member_names_ = current_member_names_
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            pytest.param(99, id="Simple scalar value"),
+            pytest.param([NeuriteType.axon, NeuriteType.soma], id="Composite value"),
+        ]
+    )
+    def test_register_unregister(self, value, reset_NeuriteType):
+        obj = NeuriteType.register("new_type", value)
+        assert NeuriteType(value) == obj
+        assert NeuriteType(value).name == "new_type"
+        assert NeuriteType(value).value == SubtypeCollection(value)
+
+        with pytest.raises(ValueError):
+            # Try to register a new type with already existing value
+            NeuriteType.register("other_new_type", value)
+
+        with pytest.raises(ValueError):
+            # Try to register a new type with already existing name
+            NeuriteType.register("axon", 88)
+
+        NeuriteType.unregister("new_type")
+
+        with pytest.raises(ValueError):
+            # Try to get unregistered value
+            NeuriteType(value)
 
 
 DATA_DIR = Path(__file__).parent / "data/mixed"
