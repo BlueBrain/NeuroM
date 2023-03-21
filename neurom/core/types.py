@@ -28,8 +28,7 @@
 
 """Type enumerations."""
 
-from enum import IntEnum, unique, Enum
-from itertools import chain
+from enum import Enum, unique
 
 from morphio import SectionType
 
@@ -53,9 +52,12 @@ class NeuriteIter(OrderedEnum):
 
 
 class SubtypeCollection(int):
+    """The subtype use by the NeuriteType."""
+
     _BASE = 100
 
     def __new__(cls, *value):
+        """Create new objects."""
         if len(value) == 1:
             # Avoid recursion error
             value = value[0]
@@ -70,16 +72,19 @@ class SubtypeCollection(int):
         return obj
 
     def __hash__(self):
+        """Compute the hash of the object."""
         return hash(self._value_)
 
     def is_composite(self):
+        """Check that the object is composite."""
         return self._value_ >= self._BASE
 
     def __eq__(self, other):
+        """Equal operator."""
         if not isinstance(other, SubtypeCollection):
             try:
                 other = SubtypeCollection(other)
-            except:
+            except Exception:  # pylint: disable=broad-exception-caught
                 # If other can not be casted to SubtypeCollection it is not equal
                 return False
         # if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
@@ -98,6 +103,7 @@ class SubtypeCollection(int):
         return is_eq
 
     def __ne__(self, other):
+        """Not equal operator."""
         return not self == other
 
     @classmethod
@@ -105,7 +111,7 @@ class SubtypeCollection(int):
         """Create a NeuriteType from a list of sub types."""
         value = 0
         for num, i in enumerate(values[::-1]):
-            new_value = cls._BASE ** num * int(i)
+            new_value = cls._BASE**num * int(i)
             value += new_value
         obj = cls(value)
         return obj
@@ -122,17 +128,24 @@ class SubtypeCollection(int):
             digits = [0]
         res = digits[::-1]
         if _ALL_SUBTYPE in res and len(res) > 1:
-            raise NeuroMError(f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element (current elements: {res}).")
+            raise NeuroMError(
+                f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
+                f"(current elements: {res})."
+            )
         return res
 
     def __reduce_ex__(self, *args, **kwargs):
-        # This is just to ensure the type is recognized as picklable by the Enum class
+        """This is just to ensure the type is recognized as picklable by the Enum class."""
         return super().__reduce_ex__(*args, **kwargs)
 
 
 # for backward compatibility with 'v1' version
 class NeuriteType(SubtypeCollection, Enum):
     """Type of neurite."""
+
+    # pylint: disable=no-member
+    # pylint: disable=protected-access
+    # pylint: disable=attribute-defined-outside-init
 
     axon = SectionType.axon
     apical_dendrite = SectionType.apical_dendrite
@@ -152,6 +165,7 @@ class NeuriteType(SubtypeCollection, Enum):
 
     @classmethod
     def register(cls, name, value):
+        """Register a new value in the Enum class."""
         new_value = SubtypeCollection(value)
         err = None
         if name in cls._member_names_:
@@ -160,8 +174,7 @@ class NeuriteType(SubtypeCollection, Enum):
             err = (cls._value2member_map_[new_value].name, value)
         if err is not None:
             raise ValueError(
-                f"The NeuriteType '{err[0]}' is already registered with the value "
-                f"'{err[1]}'"
+                f"The NeuriteType '{err[0]}' is already registered with the value '{err[1]}'"
             )
         obj = super(NeuriteType, cls).__new__(cls, new_value)
         obj._name_ = name
@@ -172,6 +185,7 @@ class NeuriteType(SubtypeCollection, Enum):
 
     @classmethod
     def unregister(cls, name):
+        """Unregister a value in the Enum class."""
         if name not in cls._member_names_:
             raise ValueError(
                 f"The NeuriteType '{name}' is not registered so it can not be unregistered"
@@ -184,15 +198,17 @@ class NeuriteType(SubtypeCollection, Enum):
 
 
 def _enum_accept_undefined(cls, value):
+    # pylint: disable=protected-access
     try:
         obj = cls._member_map_[value]
-    except (KeyError, TypeError) as exc:
+    except (KeyError, TypeError):
         try:
             subtype_value = SubtypeCollection(value)
             obj = cls._value2member_map_[subtype_value]
         except (KeyError, ValueError) as exc2:
-            raise ValueError(f"{value} is not a valid NeuriteType") from exc
+            raise ValueError(f"{value} is not a valid NeuriteType") from exc2
     return obj
+
 
 NeuriteType.__new__ = _enum_accept_undefined
 

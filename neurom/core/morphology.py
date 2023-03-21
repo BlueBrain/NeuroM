@@ -236,7 +236,7 @@ def _homogeneous_subtrees(neurite):
 
     try:
         NeuriteType(homogeneous_types)
-    except ValueError as exc:
+    except ValueError:
         warnings.warn(
             f"{neurite} has not a registered NeuriteType. "
             f"Subtree types found {homogeneous_types}",
@@ -423,6 +423,7 @@ class _NeuriteTypeMode:
         self._mode = self._root_node_type
 
     def set(self, mode):
+        """Set the current mode."""
         self._mode = {
             "root_node": self._root_node_type,
             "from_subtrees": self._subtrees_type,
@@ -447,9 +448,8 @@ class _NeuriteTypeMode:
 
         if len(subtree_types) == 1:
             return subtree_types[0]
-        else:
-            subtree_types = list(reversed(subtree_types))
 
+        subtree_types = list(reversed(subtree_types))
         return NeuriteType(subtree_types)
         # # if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
         # if subtree_types == [NeuriteType.axon, NeuriteType.basal_dendrite]:
@@ -486,6 +486,7 @@ class Neurite:
         return self._type_mode()
 
     def enable_mixed_type(self):
+        """Set the type mode to mixed."""
         if self.is_heterogeneous():
             self._type_mode.set("from_subtrees")
 
