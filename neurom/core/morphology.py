@@ -234,12 +234,11 @@ def _homogeneous_subtrees(neurite):
 
     homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
 
-    if len(homogeneous_neurites) >= 2 and homogeneous_types != [
-        NeuriteType.basal_dendrite,
-        NeuriteType.axon,
-    ]:
+    try:
+        NeuriteType(homogeneous_types)
+    except ValueError as exc:
         warnings.warn(
-            f"{neurite} is not an axon-carrying dendrite. "
+            f"{neurite} has not a registered NeuriteType. "
             f"Subtree types found {homogeneous_types}",
             stacklevel=2,
         )
@@ -296,8 +295,12 @@ def iter_neurites(
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
     if use_subtrees:
-        for neurite in neurites:
-            neurite.enable_mixed_type()
+        neurites = flatten(
+            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
+            for neurite in neurites
+        )
+        # for neurite in neurites:
+        #     neurite.enable_mixed_type()
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 
@@ -432,7 +435,7 @@ class _NeuriteTypeMode:
         return mode
 
     def _root_node_type(self):
-        return self._neurite.morphio_root_node.type
+        return NeuriteType(self._neurite.morphio_root_node.type)
 
     def _subtrees_type(self):
         it = self._neurite.root_node.ipreorder()
@@ -442,13 +445,14 @@ class _NeuriteTypeMode:
             if section.type != section.parent.type:
                 subtree_types.append(section.to_morphio().type)
 
+        if len(subtree_types) == 1:
+            return subtree_types[0]
+        else:
+            subtree_types = list(reversed(subtree_types))
+
         return NeuriteType(subtree_types)
-        # return NeuriteType.from_list(subtree_types)
-
-        # if len(subtree_types) == 1:
-        #     return subtree_types[0]
-
-        # if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
+        # # if subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]:
+        # if subtree_types == [NeuriteType.axon, NeuriteType.basal_dendrite]:
         #     return NeuriteType.axon_carrying_dendrite
         # else:
         #     raise TypeError()

@@ -45,25 +45,25 @@ class TestSubtypeCollection():
     def test_eq(self):
         assert SubtypeCollection(0) == 0
         assert SubtypeCollection(0) == SubtypeCollection(0)
-        assert SubtypeCollection(0) == 32
-        assert SubtypeCollection(0) == SubtypeCollection(32)
-        assert SubtypeCollection(32) == 0
-        assert SubtypeCollection(32) == SubtypeCollection(0)
+        # assert SubtypeCollection(0) == 32
+        # assert SubtypeCollection(0) == SubtypeCollection(32)
+        # assert SubtypeCollection(32) == 0
+        # assert SubtypeCollection(32) == SubtypeCollection(0)
         assert SubtypeCollection(32) == 32
         assert SubtypeCollection(32) == SubtypeCollection(32)
         assert SubtypeCollection(0) != 1
         assert SubtypeCollection(0) != SubtypeCollection(1)
         assert SubtypeCollection(30201) == 30201
         assert SubtypeCollection(30201) == SubtypeCollection(30201)
-        assert SubtypeCollection(30201) == 32
-        assert SubtypeCollection(30201) == SubtypeCollection(32)
+        # assert SubtypeCollection(30201) == 32
+        # assert SubtypeCollection(30201) == SubtypeCollection(32)
         assert SubtypeCollection(30201) == SubtypeCollection(3, 2, 1)
         assert SubtypeCollection(30201) != 321
         assert SubtypeCollection(30201) != SubtypeCollection(321)
-        assert SubtypeCollection(3, 2, 1) == 32
-        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
-        assert SubtypeCollection(3, 2, 1) == _ALL_SUBTYPE
-        assert SubtypeCollection(3, 2, 1) == SubtypeCollection(_ALL_SUBTYPE)
+        # assert SubtypeCollection(3, 2, 1) == 32
+        # assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
+        # assert SubtypeCollection(3, 2, 1) == _ALL_SUBTYPE
+        # assert SubtypeCollection(3, 2, 1) == SubtypeCollection(_ALL_SUBTYPE)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3, 2, 1)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3)
         assert SubtypeCollection(3) == SubtypeCollection(3, 2, 1)
@@ -78,10 +78,12 @@ class TestSubtypeCollection():
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 204
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(32)
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == _ALL_SUBTYPE
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(_ALL_SUBTYPE)
+        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
+        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(32)
+        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == _ALL_SUBTYPE
+        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(_ALL_SUBTYPE)
+
+        assert SubtypeCollection(0) != "NOT A SUBTYPE"
 
     def test_raise(self):
         SubtypeCollection(32)
@@ -123,9 +125,9 @@ class TestNeuriteType():
         assert str(NeuriteType(203)) == "NeuriteType.axon_carrying_dendrite"
 
     def test_eq(self):
-        assert NeuriteType.axon == 32
-        assert NeuriteType.axon == SubtypeCollection(32)
-        assert NeuriteType.axon == SectionType.all
+        # assert NeuriteType.axon == 32
+        # assert NeuriteType.axon == SubtypeCollection(32)
+        # assert NeuriteType.axon == SectionType.all
         assert NeuriteType.axon == SectionType.axon
         assert NeuriteType.axon == 2
         assert NeuriteType.axon == SubtypeCollection(2)
@@ -137,9 +139,9 @@ class TestNeuriteType():
         assert NeuriteType.axon != SubtypeCollection(SectionType.basal_dendrite)
         assert NeuriteType.axon != SubtypeCollection(NeuriteType.basal_dendrite)
 
-        assert NeuriteType(2) == 32
-        assert NeuriteType(2) == SubtypeCollection(32)
-        assert NeuriteType(2) == SectionType.all
+        # assert NeuriteType(2) == 32
+        # assert NeuriteType(2) == SubtypeCollection(32)
+        # assert NeuriteType(2) == SectionType.all
         assert NeuriteType(2) == SectionType.axon
         assert NeuriteType(2) == 2
         assert NeuriteType(2) == SubtypeCollection(2)
@@ -151,10 +153,10 @@ class TestNeuriteType():
         assert NeuriteType(2) != SubtypeCollection(SectionType.basal_dendrite)
         assert NeuriteType(2) != SubtypeCollection(NeuriteType.basal_dendrite)
 
-        assert NeuriteType([2, 3]) == 32
+        # assert NeuriteType([2, 3]) == 32
         assert NeuriteType([2, 3]) == SubtypeCollection(2, 3)
         assert NeuriteType([2, 3]) == NeuriteType([2, 3])
-        assert NeuriteType([2, 3]) == SectionType.all
+        # assert NeuriteType([2, 3]) == SectionType.all
         assert NeuriteType([2, 3]) == SubtypeCollection(203)
         assert NeuriteType([2, 3]) == NeuriteType(203)
         assert NeuriteType([2, 3]) == NeuriteType([203])
@@ -168,14 +170,14 @@ class TestNeuriteType():
         assert NeuriteType([2, 3]) == NeuriteType.axon
         assert NeuriteType([2, 3]) == NeuriteType.basal_dendrite
         assert NeuriteType([2, 3]) != NeuriteType.apical_dendrite
-        assert NeuriteType([2, 3]) == NeuriteType.all
+        # assert NeuriteType([2, 3]) == NeuriteType.all
         assert NeuriteType([2, 3]) != SubtypeCollection(4, 3, 2)
         assert NeuriteType([2, 3]) != [4, 3, 2]
         assert NeuriteType([2, 3]) != SubtypeCollection(40302)
 
-        assert NeuriteType.axon_carrying_dendrite == 32
-        assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(32)
-        assert NeuriteType.axon_carrying_dendrite == SectionType.all
+        # assert NeuriteType.axon_carrying_dendrite == 32
+        # assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(32)
+        # assert NeuriteType.axon_carrying_dendrite == SectionType.all
         assert NeuriteType.axon_carrying_dendrite == SectionType.axon
         assert NeuriteType.axon_carrying_dendrite == 2
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(2)
@@ -400,7 +402,11 @@ def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
 
     with pytest.warns(
         UserWarning,
-        match="Neurite <type: NeuriteType.basal_dendrite> is not an axon-carrying dendrite.",
+        match=(
+            r"Neurite <type: NeuriteType\.basal_dendrite> has not a registered NeuriteType\. "
+            r"Subtree types found \[<NeuriteType\.basal_dendrite: 3>, <NeuriteType\.axon: 2>, "
+            r"<NeuriteType\.apical_dendrite: 4>\]"
+        ),
     ):
         (three_types_neurite,) = three_types_neurite_morph.neurites
         neurom.core.morphology._homogeneous_subtrees(three_types_neurite)
@@ -416,10 +422,11 @@ def test_iter_neurites__heterogeneous(mixed_morph):
 
     subtrees = list(neurom.core.morphology.iter_neurites(mixed_morph, use_subtrees=True))
 
-    assert len(subtrees) == 3
+    assert len(subtrees) == 4
     assert subtrees[0].type == NeuriteType.basal_dendrite
-    assert subtrees[1].type == NeuriteType.axon_carrying_dendrite
-    assert subtrees[2].type == NeuriteType.apical_dendrite
+    assert subtrees[1].type == NeuriteType.basal_dendrite
+    assert subtrees[2].type == NeuriteType.axon
+    assert subtrees[3].type == NeuriteType.apical_dendrite
 
 
 def test_core_iter_sections__heterogeneous(mixed_morph):
@@ -431,6 +438,8 @@ def test_core_iter_sections__heterogeneous(mixed_morph):
 
     assert_sections(basal, NeuriteType.all, [0, 1, 2, 3, 4])
     assert_sections(basal, NeuriteType.basal_dendrite, [0, 1, 2, 3, 4])
+    # import pdb
+    # pdb.set_trace()
     assert_sections(basal, NeuriteType.axon, [])
 
     assert_sections(axon_on_basal, NeuriteType.all, [5, 6, 7, 8, 9, 10, 11, 12, 13])
@@ -690,6 +699,10 @@ def _dispatch_features(features, mode=None):
     for feature_name, configurations in features.items():
         for cfg in configurations:
             kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
+            # if "neurite_type" in kwargs:
+            #     kwargs["neurite_type"] = NeuriteType(kwargs["neurite_type"])
+            # if "section_type" in kwargs:
+            #     kwargs["section_type"] = SectionType(kwargs["section_type"])
 
             if mode == "with-subtrees":
                 expected = cfg["expected_with_subtrees"]
@@ -753,27 +766,19 @@ def _morphology_features(mode):
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _morphology_features(mode="wout-subtrees")
 )
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        values = get(feature_name, mixed_morph, use_subtrees=False, **kwargs)
-        _assert_feature_equal(values, expected)
+    values = get(feature_name, mixed_morph, use_subtrees=False, **kwargs)
+    _assert_feature_equal(values, expected)
 
 
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _morphology_features(mode="with-subtrees")
 )
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, expected, mixed_morph):
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
-        expected = np.array([
-            1. , 2. , 3. , 3. , 2. , 1.414213,
-            3.414213, 4.414213, 4.414213, 2.828427, 3.828427, 3.828427,
-            4.828427, 4.828427, 1., 2., 3., 3.,
-            2.
-        ])
-        _assert_feature_equal(values, expected)
+    values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
+    _assert_feature_equal(values, expected)
 
 
 def _neurite_features():

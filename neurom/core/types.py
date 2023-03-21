@@ -77,20 +77,24 @@ class SubtypeCollection(int):
 
     def __eq__(self, other):
         if not isinstance(other, SubtypeCollection):
-            other = SubtypeCollection(other)
-        if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
-            is_eq = True
-        else:
-            if self.is_composite():
-                if other.is_composite():
-                    is_eq = self._subtypes == other._subtypes
-                else:
-                    is_eq = other._value_ in self._subtypes
+            try:
+                other = SubtypeCollection(other)
+            except:
+                # If other can not be casted to SubtypeCollection it is not equal
+                return False
+        # if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
+        #     # This could be used to simplify the internal code of NeuroM
+        #     return True
+        if self.is_composite():
+            if other.is_composite():
+                is_eq = self._subtypes == other._subtypes
             else:
-                if other.is_composite():
-                    is_eq = self._value_ in other._subtypes
-                else:
-                    is_eq = self._value_ == other._value_
+                is_eq = other._value_ in self._subtypes
+        else:
+            if other.is_composite():
+                is_eq = self._value_ in other._subtypes
+            else:
+                is_eq = self._value_ == other._value_
         return is_eq
 
     def __ne__(self, other):
@@ -186,7 +190,7 @@ def _enum_accept_undefined(cls, value):
         try:
             subtype_value = SubtypeCollection(value)
             obj = cls._value2member_map_[subtype_value]
-        except KeyError as exc2:
+        except (KeyError, ValueError) as exc2:
             raise ValueError(f"{value} is not a valid NeuriteType") from exc
     return obj
 
@@ -227,8 +231,7 @@ def tree_type_checker(*ref):
         # if `ref` is passed as a tuple of types
         ref = ref[0]
     # validate that all values are of NeuriteType
-    for t in ref:
-        NeuriteType(t)
+    ref = [NeuriteType(t) for t in ref]
     if NeuriteType.all in ref:
 
         def check_tree_type(_):
