@@ -161,7 +161,7 @@ class NeuriteType(SubtypeCollection, Enum):
     custom10 = SectionType.custom10
 
     # Composite types
-    axon_carrying_dendrite = SectionType.axon, SectionType.basal_dendrite
+    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
 
     @classmethod
     def register(cls, name, value):
