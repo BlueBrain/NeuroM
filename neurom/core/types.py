@@ -264,7 +264,7 @@ def tree_type_checker(*ref):
             """
             return tree.type in ref
 
-        check_tree_type.type = ref
+    check_tree_type.type = ref
 
     return check_tree_type
 

@@ -16,7 +16,7 @@ from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE
 import collections.abc
 
 from morphio import SectionType
-
+from neurom.core.morphology import Section
 from neurom.core.types import tree_type_checker as is_type
 
 import neurom.core.morphology
@@ -119,7 +119,7 @@ class TestNeuriteType:
     def test_repr(self):
         assert repr(NeuriteType(0)) == "<NeuriteType.undefined: 0>"
         assert repr(NeuriteType(32)) == "<NeuriteType.all: 32>"
-        assert repr(NeuriteType(302)) == "<NeuriteType.axon_carrying_dendrite: 203>"
+        assert repr(NeuriteType(302)) == "<NeuriteType.axon_carrying_dendrite: 302>"
 
     def test_str(self):
         assert str(NeuriteType(0)) == "NeuriteType.undefined"
@@ -197,7 +197,7 @@ class TestNeuriteType:
             SectionType.basal_dendrite, SectionType.axon
         )
         assert NeuriteType.axon_carrying_dendrite == NeuriteType(
-            [NeuriteType.axon, NeuriteType.basal_dendrite]
+            [NeuriteType.basal_dendrite, NeuriteType.axon]
         )
         assert NeuriteType.axon_carrying_dendrite == 3
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(3)
@@ -523,6 +523,47 @@ def test_features_neurite_map_sections__heterogeneous(mixed_morph):
     )
 
 
+def test_features_neurite_map_sections(mixed_morph):
+
+    acd = mixed_morph.neurites[1]
+
+    def count(iterator_type, section_type):
+        return sum(
+                neurom.features.neurite._map_sections(
+                    fun=lambda s: 1,
+                    neurite=acd,
+                    iterator_type=iterator_type,
+                    section_type=section_type,
+                )
+        )
+
+    mixed_morph.process_subtrees = True
+
+    res = count(Section.ipreorder, NeuriteType.all)
+    assert res == 9
+
+    res = count(Section.ipreorder, NeuriteType.axon)
+    assert res == 5
+
+    res = count(Section.ipreorder, NeuriteType.basal_dendrite)
+    assert res == 4
+
+    res = count(Section.ipreorder, NeuriteType.axon_carrying_dendrite)
+    assert res == 9
+
+    res = count(Section.ibifurcation_point, NeuriteType.all)
+    assert res == 4
+
+    res = count(Section.ibifurcation_point, NeuriteType.basal_dendrite)
+    assert res == 1
+
+    res = count(Section.ibifurcation_point, NeuriteType.axon)
+    assert res == 2
+
+    res = count(Section.ibifurcation_point, NeuriteType.axon_carrying_dendrite)
+    assert res == 3
+
+
 def _assert_stats_equal(actual_dict, expected_dict):
     assert actual_dict.keys() == expected_dict.keys()
     for key, value in actual_dict.items():
@@ -666,13 +707,12 @@ def test_mixed__extract_stats__heterogeneous(stats_cfg, mixed_morph):
 
     _assert_stats_equal(res["axon"], expected)
 
-    res_df = neurom.apps.morph_stats.extract_dataframe(mixed_morph, cfg)
+    res_df = neurom.apps.morph_stats.extract_dataframe(mixed_morph, stats_cfg)
 
     # get axon column and tranform it to look like the expected values above
     values = res_df.loc[pd.IndexSlice[:, "axon"]].iloc[0, :].to_dict()
     _assert_stats_equal(values, expected)
 
-'''
 
 @pytest.fixture
 def population(mixed_morph):
@@ -758,9 +798,12 @@ def _population_features(mode):
     "feature_name, kwargs, expected", _population_features(mode="wout-subtrees")
 )
 def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
+
+    population.process_subtrees = False
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        values = get(feature_name, population, use_subtrees=False, **kwargs)
+        values = get(feature_name, population, **kwargs)
         _assert_feature_equal(values, expected)
 
 
@@ -768,9 +811,10 @@ def test_population__population_features_wout_subtrees(feature_name, kwargs, exp
     "feature_name, kwargs, expected", _population_features(mode="with-subtrees")
 )
 def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
+    population.process_subtrees = True
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        values = get(feature_name, population, use_subtrees=True, **kwargs)
+        values = get(feature_name, population, **kwargs)
         _assert_feature_equal(values, expected)
 
 
@@ -794,7 +838,8 @@ def _morphology_features(mode):
 )
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, expected, mixed_morph):
-    values = get(feature_name, mixed_morph, use_subtrees=False, **kwargs)
+    mixed_morph.process_subtrees = False
+    values = get(feature_name, mixed_morph, **kwargs)
     _assert_feature_equal(values, expected)
 
 
@@ -803,7 +848,8 @@ def test_morphology__morphology_features_wout_subtrees(feature_name, kwargs, exp
 )
 @pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morphology__morphology_features_with_subtrees(feature_name, kwargs, expected, mixed_morph):
-    values = get(feature_name, mixed_morph, use_subtrees=True, **kwargs)
+    mixed_morph.process_subtrees = True
+    values = get(feature_name, mixed_morph, **kwargs)
     _assert_feature_equal(values, expected)
 
 
@@ -832,4 +878,3 @@ def test_morphology__neurite_features(feature_name, kwargs, expected, mixed_morp
         values = get(feature_name, mixed_morph.neurites, **kwargs)
         _assert_feature_equal(values, expected, per_neurite=True)
 
-'''

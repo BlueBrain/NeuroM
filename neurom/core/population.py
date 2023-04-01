@@ -52,7 +52,7 @@ class Population:
     as loaded (instance of ``Morphology``).
     """
 
-    def __init__(self, files, name='Population', ignored_exceptions=(), cache=False):
+    def __init__(self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False):
         """Construct a morphology population.
 
         Arguments:
@@ -77,6 +77,17 @@ class Population:
         if cache:
             self._files = [self._load_file(f) for f in self._files if f is not None]
 
+        self._process_subtrees = process_subtrees
+
+    @property
+    def process_subtrees(self):
+        return self._process_subtrees
+
+    @process_subtrees.setter
+    def process_subtrees(self, value):
+        # TODO: Handle cache
+        self._process_subtrees = value
+
     @property
     def morphologies(self):
         """Iterator to populations's morphologies."""
@@ -96,7 +107,7 @@ class Population:
         if isinstance(f, neurom.core.morphology.Morphology):
             return f
         try:
-            return neurom.load_morphology(f)
+            return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:
             if isinstance(e, self._ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s', e, f.name)

@@ -64,14 +64,14 @@ EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
-def _run_extract_stats(morph, config):
+def _run_extract_stats(morph, config, process_subtrees):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
     if not isinstance(morph, Morphology):
-        morph = nm.load_morphology(morph)
+        morph = nm.load_morphology(morph, process_subtrees=process_subtrees)
     return morph.name, extract_stats(morph, config)
 
 
-def extract_dataframe(morphs, config, n_workers=1):
+def extract_dataframe(morphs, config, n_workers=1, process_subtrees=False):
     """Extract stats grouped by neurite type from morphs.
 
     Arguments:
@@ -99,7 +99,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     if isinstance(morphs, Morphology):
         morphs = [morphs]
 
-    func = partial(_run_extract_stats, config=config)
+    func = partial(_run_extract_stats, config=config, process_subtrees=process_subtrees)
     if n_workers == 1:
         stats = list(map(func, morphs))
     else:
@@ -386,13 +386,13 @@ def main(
     morphs = nm.load_morphologies(
         get_files_by_path(datapath),
         ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions),
-        use_subtrees=use_subtrees,
+        process_subtrees=use_subtrees
     )
 
     if as_population:
-        results = {datapath: extract_stats(morphs, config)}
+        results = {datapath: extract_stats(morphs, config, process_subtrees=use_subtrees)}
     else:
-        results = {m.name: extract_stats(m, config) for m in morphs}
+        results = {m.name: extract_stats(m, config, process_subtrees=use_subtrees) for m in morphs}
 
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))

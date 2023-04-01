@@ -300,10 +300,14 @@ def iter_neurites(
     if mapfun is None:
         return neurite_iter
 
-    #if use_subtrees:
-    #    return (mapfun(neurite, section_type=neurite.type) for neurite in neurite_iter)
-
-    return map(mapfun, neurite_iter)
+    return (
+        (
+            mapfun(neurite, section_type=filt.type if (filt is not None or filt.type is NeuriteType.all) else None)
+            if neurite.process_subtrees
+            else mapfun(neurite)
+        )
+        for neurite in neurite_iter
+    )
 
 
 def iter_sections(
