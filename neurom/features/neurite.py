@@ -75,7 +75,7 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
     # forking sections cannot be heterogeneous
     if (
         iterator_type in {Section.ibifurcation_point, Section.iforking_point}
-        and section_type != NeuriteType.all
+        and neurite.process_subtrees
     ):
         filt = homogeneous_filter
     else:
