@@ -37,6 +37,7 @@ setup(
     author='Blue Brain Project, EPFL',
     url='https://github.com/BlueBrain/NeuroM',
     install_requires=[
+        'cached_property',
         'click>=7.0',
         'matplotlib>=3.2.1',
         'morphio>=3.1.1',

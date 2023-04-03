@@ -69,6 +69,34 @@ def test_cache():
         assert isinstance(n, Morphology)
 
 
+@pytest.mark.parametrize("cache", [True, False])
+def test_reset_cache(cache):
+    pop = Population(FILES, cache=cache, process_subtrees=True)
+
+    assert pop._process_subtrees is True
+    for n in pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is True
+
+    pop.process_subtrees = False
+    assert pop._process_subtrees is False
+    for n in pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is False
+
+    mixed_pop = Population(FILES + NEURONS, cache=cache, process_subtrees=True)
+    assert mixed_pop._process_subtrees is True
+    for n in mixed_pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is True
+
+    mixed_pop.process_subtrees = False
+    assert mixed_pop._process_subtrees is False
+    for n in mixed_pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is False
+
+
 def test_double_indexing():
     pop = populations[0]
     for i, n in enumerate(NEURONS):

@@ -74,10 +74,13 @@ class Population:
 
         self._files = _resolve_if_morphology_paths(files)
 
-        if cache:
-            self._files = [self._load_file(f) for f in self._files if f is not None]
-
         self._process_subtrees = process_subtrees
+
+        if cache:
+            self.reset_cache()
+
+    def reset_cache(self):
+        self._files = [self._load_file(f) for f in self._files if f is not None]
 
     @property
     def process_subtrees(self):
@@ -85,8 +88,8 @@ class Population:
 
     @process_subtrees.setter
     def process_subtrees(self, value):
-        # TODO: Handle cache
         self._process_subtrees = value
+        self.reset_cache()
 
     @property
     def morphologies(self):
@@ -105,7 +108,7 @@ class Population:
 
     def _load_file(self, f):
         if isinstance(f, neurom.core.morphology.Morphology):
-            return f
+            return neurom.core.morphology.Morphology(f.to_morphio(), process_subtrees=self.process_subtrees)
         try:
             return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:
