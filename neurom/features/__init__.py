@@ -149,10 +149,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
             feature_ = _NEURITE_FEATURES[feature_name]
             res = _flatten_feature(
                 feature_.shape,
-                [
-                    _get_neurites_feature_value(feature_, n, neurite_filter, **kwargs)
-                    for n in obj
-                ],
+                [_get_neurites_feature_value(feature_, n, neurite_filter, **kwargs) for n in obj],
             )
 
     if res is None or feature_ is None:

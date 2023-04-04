@@ -168,7 +168,9 @@ def load_morphology(morph, reader=None, process_subtrees=False):
     return Morphology(morph, Path(morph).name, process_subtrees=process_subtrees)
 
 
-def load_morphologies(morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False):
+def load_morphologies(
+    morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False
+):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.

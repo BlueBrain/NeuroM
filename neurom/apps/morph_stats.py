@@ -386,13 +386,13 @@ def main(
     morphs = nm.load_morphologies(
         get_files_by_path(datapath),
         ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions),
-        process_subtrees=use_subtrees
+        process_subtrees=use_subtrees,
     )
 
     if as_population:
-        results = {datapath: extract_stats(morphs, config, process_subtrees=use_subtrees)}
+        results = {datapath: extract_stats(morphs, config)}
     else:
-        results = {m.name: extract_stats(m, config, process_subtrees=use_subtrees) for m in morphs}
+        results = {m.name: extract_stats(m, config) for m in morphs}
 
     if not output_file:
         print(json.dumps(results, indent=2, separators=(',', ':'), cls=NeuromJSON))

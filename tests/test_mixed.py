@@ -439,7 +439,6 @@ def test_iter_neurites__homogeneous(mixed_morph):
 
 
 def test_core_iter_sections__heterogeneous(mixed_morph):
-
     mixed_morph.process_subtrees = True
 
     def assert_sections(neurite, section_type, expected_section_ids):
@@ -463,7 +462,6 @@ def test_core_iter_sections__heterogeneous(mixed_morph):
 
 
 def test_features_neurite_map_sections__heterogeneous(mixed_morph):
-
     mixed_morph.process_subtrees = True
 
     def assert_sections(neurite, section_type, iterator_type, expected_section_ids):
@@ -521,23 +519,28 @@ def test_features_neurite_map_sections__heterogeneous(mixed_morph):
         neurom.core.morphology.Section.ibifurcation_point,
         [14, 15],
     )
+    # with composite type the whole heterogeneous tree is kept
+    assert_sections(
+        axon_on_basal,
+        NeuriteType.axon_carrying_dendrite,
+        neurom.core.morphology.Section.ibifurcation_point,
+        [5, 6, 9, 11],
+    )
 
 
 def test_features_neurite_map_sections(mixed_morph):
-
+    mixed_morph.process_subtrees = False
     acd = mixed_morph.neurites[1]
 
     def count(iterator_type, section_type):
         return sum(
-                neurom.features.neurite._map_sections(
-                    fun=lambda s: 1,
-                    neurite=acd,
-                    iterator_type=iterator_type,
-                    section_type=section_type,
-                )
+            neurom.features.neurite._map_sections(
+                fun=lambda s: 1,
+                neurite=acd,
+                iterator_type=iterator_type,
+                section_type=section_type,
+            )
         )
-
-    mixed_morph.process_subtrees = True
 
     res = count(Section.ipreorder, NeuriteType.all)
     assert res == 9
@@ -561,7 +564,7 @@ def test_features_neurite_map_sections(mixed_morph):
     assert res == 2
 
     res = count(Section.ibifurcation_point, NeuriteType.axon_carrying_dendrite)
-    assert res == 3
+    assert res == 4
 
 
 def _assert_stats_equal(actual_dict, expected_dict):
@@ -623,7 +626,6 @@ def stats_cfg():
 
 
 def test_mixed__extract_stats__homogeneous(stats_cfg, mixed_morph):
-
     mixed_morph.process_subtrees = False
     res = neurom.apps.morph_stats.extract_stats(mixed_morph, stats_cfg)
 
@@ -669,7 +671,6 @@ def test_mixed__extract_stats__homogeneous(stats_cfg, mixed_morph):
 
 
 def test_mixed__extract_stats__heterogeneous(stats_cfg, mixed_morph):
-
     mixed_morph.process_subtrees = True
     res = neurom.apps.morph_stats.extract_stats(mixed_morph, stats_cfg)
 
@@ -687,14 +688,14 @@ def test_mixed__extract_stats__heterogeneous(stats_cfg, mixed_morph):
         'mean_section_bif_radial_distances': 3.9240959,
         'mean_section_branch_orders': 2.2,
         'mean_section_lengths': 1.0828427,
-        'mean_section_path_distances': 2.614213538169861,
+        'mean_section_path_distances': 4.028427076339722,
         'mean_section_radial_distances': 4.207625,
         'mean_section_term_branch_orders': 2.6666666666666665,
         'mean_section_term_lengths': 1.0,
         'mean_section_term_radial_distances': 4.396645,
         'mean_section_tortuosity': 1.0,
         'mean_sibling_ratios': 1.0,
-        'mean_terminal_path_lengths': 3.0808802048365274,
+        'mean_terminal_path_lengths': 4.495093743006389,
         'median_diameter_power_relations': 2.0,
         'median_number_of_leaves': 3,
         'median_section_taper_rates': 8.6268466e-17,
@@ -798,7 +799,6 @@ def _population_features(mode):
     "feature_name, kwargs, expected", _population_features(mode="wout-subtrees")
 )
 def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
-
     population.process_subtrees = False
 
     with warnings.catch_warnings():
@@ -812,6 +812,7 @@ def test_population__population_features_wout_subtrees(feature_name, kwargs, exp
 )
 def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
     population.process_subtrees = True
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         values = get(feature_name, population, **kwargs)
@@ -877,4 +878,3 @@ def test_morphology__neurite_features(feature_name, kwargs, expected, mixed_morp
         warnings.simplefilter("ignore")
         values = get(feature_name, mixed_morph.neurites, **kwargs)
         _assert_feature_equal(values, expected, per_neurite=True)
-

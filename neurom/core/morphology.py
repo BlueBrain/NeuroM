@@ -30,11 +30,11 @@
 
 import warnings
 from collections import deque
-from cached_property import cached_property
 from pathlib import Path
 
 import morphio
 import numpy as np
+from cached_property import cached_property
 
 from neurom import morphmath
 from neurom.core.dataformat import COLS
@@ -246,9 +246,7 @@ def _homogeneous_subtrees(neurite):
     return homogeneous_neurites
 
 
-def iter_neurites(
-    obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder
-):
+def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
     """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
@@ -302,7 +300,12 @@ def iter_neurites(
 
     return (
         (
-            mapfun(neurite, section_type=filt.type if (filt is not None or filt.type is NeuriteType.all) else None)
+            mapfun(
+                neurite,
+                section_type=filt.type
+                if (filt is not None or filt.type is NeuriteType.all)
+                else None,
+            )
             if neurite.process_subtrees
             else mapfun(neurite)
         )
@@ -422,12 +425,14 @@ class Neurite:
 
         Args:
             root_node (morphio.Section): root section
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
         self._root_node = root_node
         self._process_subtrees = process_subtrees
 
     @property
     def process_subtrees(self):
+        """Enable mixed tree processing if set to True."""
         return self._process_subtrees
 
     @process_subtrees.setter
@@ -552,6 +557,7 @@ class Morphology:
         Args:
             filename (str|Path): a filename or morphio.{mut}.Morphology object
             name (str): an optional morphology name
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
         self._morphio_morph = morphio.mut.Morphology(filename)
 

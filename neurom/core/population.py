@@ -52,7 +52,9 @@ class Population:
     as loaded (instance of ``Morphology``).
     """
 
-    def __init__(self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False):
+    def __init__(
+        self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False
+    ):
         """Construct a morphology population.
 
         Arguments:
@@ -80,10 +82,12 @@ class Population:
             self.reset_cache()
 
     def reset_cache(self):
+        """Reset the internal cache."""
         self._files = [self._load_file(f) for f in self._files if f is not None]
 
     @property
     def process_subtrees(self):
+        """Enable mixed tree processing if set to True."""
         return self._process_subtrees
 
     @process_subtrees.setter
@@ -108,7 +112,9 @@ class Population:
 
     def _load_file(self, f):
         if isinstance(f, neurom.core.morphology.Morphology):
-            return neurom.core.morphology.Morphology(f.to_morphio(), process_subtrees=self.process_subtrees)
+            return neurom.core.morphology.Morphology(
+                f.to_morphio(), name=f.name, process_subtrees=self.process_subtrees
+            )
         try:
             return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:

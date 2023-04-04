@@ -55,9 +55,7 @@ feature = partial(feature, namespace=NameSpace.POPULATION)
 
 
 @feature(shape=(...,))
-def sholl_frequency(
-    morphs, neurite_type=NeuriteType.all, step_size=10, bins=None, use_subtrees=False
-):
+def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a population of morphs.
 
     Args:
@@ -77,11 +75,7 @@ def sholl_frequency(
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        section_iterator = (
-            partial(iter_sections, section_filter=neurite_filter)
-            if use_subtrees
-            else partial(iter_sections, neurite_filter=neurite_filter)
-        )
+        section_iterator = partial(iter_sections, neurite_filter=neurite_filter)
 
         max_radius_per_section = [
             np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))
@@ -97,12 +91,7 @@ def sholl_frequency(
         bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_section), step_size)
 
     return (
-        np.array(
-            [
-                mf.sholl_crossings(m, neurite_type, m.soma.center, bins, use_subtrees=use_subtrees)
-                for m in morphs
-            ]
-        )
+        np.array([mf.sholl_crossings(m, neurite_type, m.soma.center, bins) for m in morphs])
         .sum(axis=0)
         .tolist()
     )

@@ -71,6 +71,11 @@ from neurom.utils import flatten, str_to_plane
 feature = partial(feature, namespace=NameSpace.NEURON)
 
 
+def _return_1(*args, **kwargs):
+    # pylint: disable=unused-argument
+    return 1
+
+
 def _map_neurites(function, morph, neurite_type):
     return list(
         iter_neurites(
@@ -573,7 +578,7 @@ def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
 @feature(shape=())
 def number_of_neurites(morph, neurite_type=NeuriteType.all):
     """Number of neurites in a morph."""
-    return len(_map_neurite_root_nodes(lambda n: n, morph, neurite_type))
+    return len(_map_neurite_root_nodes(_return_1, morph, neurite_type))
 
 
 @feature(shape=(...,))
