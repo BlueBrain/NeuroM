@@ -449,8 +449,6 @@ def test_core_iter_sections__heterogeneous(mixed_morph):
 
     assert_sections(basal, NeuriteType.all, [0, 1, 2, 3, 4])
     assert_sections(basal, NeuriteType.basal_dendrite, [0, 1, 2, 3, 4])
-    # import pdb
-    # pdb.set_trace()
     assert_sections(basal, NeuriteType.axon, [])
 
     assert_sections(axon_on_basal, NeuriteType.all, [5, 6, 7, 8, 9, 10, 11, 12, 13])

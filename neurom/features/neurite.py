@@ -65,11 +65,6 @@ feature = partial(feature, namespace=NameSpace.NEURITE)
 L = logging.getLogger(__name__)
 
 
-def _return_1(*args, **kwargs):
-    # pylint: disable=unused-argument
-    return 1
-
-
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
     check_type = is_type(section_type)
@@ -99,7 +94,7 @@ def number_of_segments(neurite, section_type=NeuriteType.all):
 def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
     return len(
-        _map_sections(_return_1, neurite, iterator_type=iterator_type, section_type=section_type)
+        _map_sections(lambda x: 1, neurite, iterator_type=iterator_type, section_type=section_type)
     )
 
 

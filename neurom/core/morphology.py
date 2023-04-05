@@ -573,6 +573,12 @@ class Morphology:
         """Returns the morphio morphology object."""
         return self._morphio_morph
 
+    def copy(self):
+        """Returns a copy of the morphio morphology object."""
+        return Morphology(
+            self.to_morphio(), name=self.name, process_subtrees=self.process_subtrees
+        )
+
     @property
     def neurites(self):
         """The list of neurites."""

@@ -112,9 +112,9 @@ class Population:
 
     def _load_file(self, f):
         if isinstance(f, neurom.core.morphology.Morphology):
-            return neurom.core.morphology.Morphology(
-                f.to_morphio(), name=f.name, process_subtrees=self.process_subtrees
-            )
+            new_morph = f.copy()
+            new_morph.process_subtrees = self.process_subtrees
+            return new_morph
         try:
             return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:
