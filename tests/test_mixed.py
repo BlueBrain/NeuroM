@@ -764,10 +764,6 @@ def _dispatch_features(features, mode=None):
     for feature_name, configurations in features.items():
         for cfg in configurations:
             kwargs = cfg["kwargs"] if "kwargs" in cfg else {}
-            # if "neurite_type" in kwargs:
-            #     kwargs["neurite_type"] = NeuriteType(kwargs["neurite_type"])
-            # if "section_type" in kwargs:
-            #     kwargs["section_type"] = SectionType(kwargs["section_type"])
 
             if mode == "with-subtrees":
                 expected = cfg["expected_with_subtrees"]

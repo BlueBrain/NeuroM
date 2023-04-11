@@ -464,9 +464,6 @@ class Neurite:
             if section.type != section.parent.type:
                 subtree_types.append(section.to_morphio().type)
 
-        if len(subtree_types) == 1:
-            return subtree_types[0]
-
         return NeuriteType(subtree_types)
 
     @property
@@ -574,10 +571,8 @@ class Morphology:
         return self._morphio_morph
 
     def copy(self):
-        """Returns a copy of the morphio morphology object."""
-        return Morphology(
-            self.to_morphio(), name=self.name, process_subtrees=self.process_subtrees
-        )
+        """Returns a shallow copy of the morphio morphology object."""
+        return Morphology(self.to_morphio(), name=self.name, process_subtrees=self.process_subtrees)
 
     @property
     def neurites(self):

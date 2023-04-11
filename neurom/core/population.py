@@ -79,9 +79,9 @@ class Population:
         self._process_subtrees = process_subtrees
 
         if cache:
-            self.reset_cache()
+            self._reset_cache()
 
-    def reset_cache(self):
+    def _reset_cache(self):
         """Reset the internal cache."""
         self._files = [self._load_file(f) for f in self._files if f is not None]
 
@@ -93,7 +93,7 @@ class Population:
     @process_subtrees.setter
     def process_subtrees(self, value):
         self._process_subtrees = value
-        self.reset_cache()
+        self._reset_cache()
 
     @property
     def morphologies(self):

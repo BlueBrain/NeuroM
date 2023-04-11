@@ -59,8 +59,7 @@ from neurom.core.morphology import (
     iter_sections,
     iter_segments,
 )
-from neurom.core.types import NeuriteType
-from neurom.core.types import SubtypeCollection
+from neurom.core.types import NeuriteType, SubtypeCollection
 from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
 from neurom.features import NameSpace, feature
@@ -86,7 +85,11 @@ def _map_neurite_root_nodes(function, morph, neurite_type):
     neurite_type = SubtypeCollection(neurite_type)
     neurites = list(iter_neurites(obj=morph, filt=is_type(neurite_type)))
     if neurite_type != NeuriteType.all:
-        neurites = [neurite for neurite in neurites if SubtypeCollection(neurite.type).root_type == neurite_type]
+        neurites = [
+            neurite
+            for neurite in neurites
+            if SubtypeCollection(neurite.type).root_type == neurite_type
+        ]
     return [function(trunk.root_node) for trunk in neurites]
 
 

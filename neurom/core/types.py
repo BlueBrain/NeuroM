@@ -135,6 +135,7 @@ class SubtypeCollection(int):
 
     @property
     def root_type(self):
+        """Get the root type of a composite type."""
         return self.to_list()[0]
 
     def __reduce_ex__(self, *args, **kwargs):
