@@ -453,7 +453,12 @@ class Neurite:
 
     @cached_property
     def type(self):
-        """The type of the root node."""
+        """The type of the Neurite (which can be composite)."""
+        return NeuriteType(self.subtree_types)
+
+    @cached_property
+    def subtree_types(self):
+        """The types of the subtrees."""
         if not self._process_subtrees:
             return NeuriteType(self.morphio_root_node.type)
 
@@ -462,9 +467,9 @@ class Neurite:
 
         for section in it:
             if section.type != section.parent.type:
-                subtree_types.append(section.to_morphio().type)
+                subtree_types.append(NeuriteType(section.to_morphio().type))
 
-        return NeuriteType(subtree_types)
+        return subtree_types
 
     @property
     def points(self):

@@ -389,6 +389,17 @@ def test_is_homogeneous_point(mixed_morph):
     assert sections[1].is_homogeneous_point()
 
 
+def test_subtypes(mixed_morph):
+    homogeneous_neurite = mixed_morph.neurites[0]
+    heterogeneous_neurite = mixed_morph.neurites[1]
+
+    assert homogeneous_neurite.subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]
+    assert homogeneous_neurite.type == NeuriteType.basal_dendrite
+
+    assert heterogeneous_neurite.subtree_types == [NeuriteType.basal_dendrite, NeuriteType.axon]
+    assert heterogeneous_neurite.type == NeuriteType.axon_carrying_dendrite
+
+
 def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
     basal, axon_on_basal, apical = mixed_morph.neurites
 
