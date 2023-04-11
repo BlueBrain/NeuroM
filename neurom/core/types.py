@@ -116,7 +116,6 @@ class SubtypeCollection(int):
         obj = cls(value)
         return obj
 
-    # @classmethod
     def to_list(self):
         """Transform a NeuriteType or a positive integer in a list of sub types."""
         digits = []
@@ -133,6 +132,10 @@ class SubtypeCollection(int):
                 f"(current elements: {res})."
             )
         return res
+
+    @property
+    def root_type(self):
+        return self.to_list()[0]
 
     def __reduce_ex__(self, *args, **kwargs):
         """This is just to ensure the type is recognized as picklable by the Enum class."""

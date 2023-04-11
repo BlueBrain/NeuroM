@@ -79,6 +79,7 @@ def test_neurite_feature_types(feature_name, NEURITE):
         for name in features._MORPHOLOGY_FEATURES
     ],
 )
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morphology_feature_types(feature_name, MORPHOLOGY):
     """Test morphology features."""
     res = features._MORPHOLOGY_FEATURES.get(feature_name)(MORPHOLOGY)

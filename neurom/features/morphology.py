@@ -60,6 +60,7 @@ from neurom.core.morphology import (
     iter_segments,
 )
 from neurom.core.types import NeuriteType
+from neurom.core.types import SubtypeCollection
 from neurom.core.types import tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
 from neurom.features import NameSpace, feature
@@ -82,10 +83,11 @@ def _map_neurites(function, morph, neurite_type):
 
 
 def _map_neurite_root_nodes(function, morph, neurite_type):
-    return [
-        function(neurite.root_node)
-        for neurite in iter_neurites(obj=morph, filt=is_type(neurite_type))
-    ]
+    neurite_type = SubtypeCollection(neurite_type)
+    neurites = list(iter_neurites(obj=morph, filt=is_type(neurite_type)))
+    if neurite_type != NeuriteType.all:
+        neurites = [neurite for neurite in neurites if SubtypeCollection(neurite.type).root_type == neurite_type]
+    return [function(trunk.root_node) for trunk in neurites]
 
 
 def _get_sections(morph, neurite_type):
@@ -573,7 +575,7 @@ def trunk_section_lengths(morph, neurite_type=NeuriteType.all):
 @feature(shape=())
 def number_of_neurites(morph, neurite_type=NeuriteType.all):
     """Number of neurites in a morph."""
-    return len(_map_neurite_root_nodes(lambda x: 1, morph, neurite_type))
+    return len(_map_neurites(lambda x, section_type: 1, morph, neurite_type))
 
 
 @feature(shape=(...,))

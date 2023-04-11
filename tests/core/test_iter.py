@@ -75,7 +75,7 @@ def test_iter_neurites_filter():
 
 
 def test_iter_neurites_mapping():
-    n = [n for n in iter_neurites(POP, mapfun=lambda n: len(n.points))]
+    n = [n for n in iter_neurites(POP, mapfun=lambda n, section_type: len(n.points))]
     ref = [211, 211, 211, 211, 211, 211, 211, 211, 211, 500, 500, 500]
     assert n == ref
 
@@ -84,7 +84,7 @@ def test_iter_neurites_filter_mapping():
     n = [
         n
         for n in iter_neurites(
-            POP, mapfun=lambda n: len(n.points), filt=lambda n: len(n.points) > 250
+            POP, mapfun=lambda n, section_type: len(n.points), filt=lambda n: len(n.points) > 250
         )
     ]
 

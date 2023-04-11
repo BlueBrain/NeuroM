@@ -374,7 +374,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [0.0]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -435,7 +435,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [1.5707964]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -536,13 +536,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          0.0,
-          1.0,
-          0.0
-        ]
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -627,7 +621,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [0.0]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -715,13 +709,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          0.0,
-          0.0,
-          0.0
-        ]
-      ]
+      "expected_with_subtrees": []
     }
   ],
   "trunk_angles_inter_types": [
@@ -731,22 +719,7 @@
         "target_neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          [
-            1.570796,
-            1.570796,
-            -3.141593
-          ]
-        ],
-        [
-          [
-            0.0,
-            0.0,
-            0.0
-          ]
-        ]
-      ]
+      "expected_with_subtrees": []
     }
   ],
   "trunk_origin_radii": [
@@ -783,9 +756,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        0.1
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -833,9 +804,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        1.414213
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {

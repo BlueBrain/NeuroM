@@ -796,25 +796,21 @@ def _population_features(mode):
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _population_features(mode="wout-subtrees")
 )
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_population__population_features_wout_subtrees(feature_name, kwargs, expected, population):
     population.process_subtrees = False
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        values = get(feature_name, population, **kwargs)
-        _assert_feature_equal(values, expected)
+    values = get(feature_name, population, **kwargs)
+    _assert_feature_equal(values, expected)
 
 
 @pytest.mark.parametrize(
     "feature_name, kwargs, expected", _population_features(mode="with-subtrees")
 )
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_population__population_features_with_subtrees(feature_name, kwargs, expected, population):
     population.process_subtrees = True
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        values = get(feature_name, population, **kwargs)
-        _assert_feature_equal(values, expected)
+    values = get(feature_name, population, **kwargs)
+    _assert_feature_equal(values, expected)
 
 
 def _morphology_features(mode):

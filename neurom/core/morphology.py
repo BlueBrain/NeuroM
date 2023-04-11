@@ -307,7 +307,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
                 else None,
             )
             if neurite.process_subtrees
-            else mapfun(neurite)
+            else mapfun(neurite, section_type=NeuriteType.all)
         )
         for neurite in neurite_iter
     )
