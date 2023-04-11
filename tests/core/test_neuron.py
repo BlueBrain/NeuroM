@@ -119,6 +119,15 @@ def test_deepcopy():
     _check_cloned_morphology(m, deepcopy(m))
 
 
+def test_eq():
+    m1 = nm.load_morphology(SWC_PATH / 'simple.swc').neurites[1]
+    m2 = nm.load_morphology(SWC_PATH / 'simple.swc').neurites[1]
+    assert m1 == m2
+
+    m1.process_subtrees = True
+    assert m1 != m2
+
+
 def test_graft_morphology():
     m = nm.load_morphology(SWC_PATH / 'simple.swc')
     basal_dendrite = m.neurites[0]

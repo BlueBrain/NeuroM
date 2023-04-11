@@ -80,7 +80,7 @@ we apply a simple user defined function to the apical dendrites in a population:
 
     import neurom as nm
 
-    def user_func(neurite):
+    def user_func(neurite, section_type):
         return len(neurite.points)
 
     stuff = [x for x in nm.iter_neurites(pop, user_func, lambda n : n.type == nm.APICAL_DENDRITE)]

@@ -265,7 +265,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         >>> from neurom.core.morphology import iter_neurites
         >>> from neurom import load_morphologies
         >>> pop = load_morphologies("tests/data/valid_set")
-        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
+        >>> n_points = [n for n in iter_neurites(pop, lambda x, section_type: len(x.points))]
 
         Get the number of points in each axon in a morphology population
 
@@ -274,7 +274,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         >>> from neurom import load_morphologies
         >>> pop = load_morphologies("tests/data/valid_set")
         >>> filter = lambda n : n.type == nm.AXON
-        >>> mapping = lambda n : len(n.points)
+        >>> mapping = lambda n, section_type: len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
     if isinstance(obj, Neurite):
@@ -539,11 +539,15 @@ class Neurite:
 
     def __eq__(self, other):
         """If root node ids and types are equal."""
-        return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
+        return (
+            self.type == other.type
+            and self.morphio_root_node.id == other.morphio_root_node.id
+            and self.process_subtrees == other.process_subtrees
+        )
 
     def __hash__(self):
         """Hash is made of tuple of type and root_node."""
-        return hash((self.type, self.root_node))
+        return hash((self.type, self.root_node, self.process_subtrees))
 
     def __repr__(self):
         """Return a string representation."""

@@ -72,4 +72,4 @@ def test_str():
 
 def test_neurite_hash():
     nrt = Neurite(ROOT_NODE)
-    assert hash(nrt) == hash((nrt.type, nrt.root_node))
+    assert hash(nrt) == hash((nrt.type, nrt.root_node, nrt.process_subtrees))
