@@ -207,6 +207,11 @@ features.get
 
     Neurites: 3, Sections: 5
 
+.. warning::
+    The ``features.get`` function can be used with either the ``neurite_type`` or the ``section_type`` parameter, depending on what type of object the feature is applied.
+    When the feature is applied to a ``Population`` or to a ``Morphology`` object, only the ``neurite_type`` parameter is accepted.
+    While when the feature is applied to a ``Neurite`` or to a list of ``Neurite`` objects, only the ``section_type`` parameter is accepted.
+
 Conventions & Incompatibilities
 -------------------------------
 

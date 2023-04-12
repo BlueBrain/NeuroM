@@ -115,7 +115,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
         if feature_name in _NEURITE_FEATURES:
             if 'neurite_type' in kwargs:
                 raise NeuroMError(
-                    'Cant apply "neurite_type" arg to a neurite with a neurite feature'
+                    'Can not apply "neurite_type" arg to a Neurite with a neurite feature'
                 )
 
             feature_ = _NEURITE_FEATURES[feature_name]
@@ -127,6 +127,8 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
 
     elif isinstance(obj, Morphology):
         # input is a morphology
+        if 'section_type' in kwargs:
+            raise NeuroMError('Can not apply "section_type" arg to a Morphology')
         if feature_name in _MORPHOLOGY_FEATURES:
             feature_ = _MORPHOLOGY_FEATURES[feature_name]
 
@@ -138,6 +140,8 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
 
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
+        if 'section_type' in kwargs:
+            raise NeuroMError('Can not apply "section_type" arg to a Population')
         if feature_name in _POPULATION_FEATURES:
             feature_ = _POPULATION_FEATURES[feature_name]
 

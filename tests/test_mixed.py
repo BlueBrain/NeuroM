@@ -425,31 +425,8 @@ def test_number_of_sections(mixed_morph, population):
         14,
         14,
     ]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.all,
-        section_type=NeuriteType.soma,
-    ) == [19, 19]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.axon,
-        section_type=NeuriteType.soma,
-    ) == [0, 0]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.apical_dendrite,
-        section_type=NeuriteType.soma,
-    ) == [5, 5]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.basal_dendrite,
-        section_type=NeuriteType.soma,
-    ) == [14, 14]
-    assert get('number_of_sections', population, section_type=NeuriteType.soma) == [19, 19]
+    with pytest.raises(NeuroMError, match='Can not apply "section_type" arg to a Population'):
+        get('number_of_sections', population, section_type=NeuriteType.soma)
 
     # # Morphology
     # # In this case only the neurite_type argument is considered but the section_type argument is ignored.
@@ -460,42 +437,8 @@ def test_number_of_sections(mixed_morph, population):
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.basal_dendrite) == 14
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.soma) == 0
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.undefined) == 0
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.all,
-            section_type=NeuriteType.soma,
-        )
-        == 19
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.axon,
-            section_type=NeuriteType.soma,
-        )
-        == 0
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.apical_dendrite,
-            section_type=NeuriteType.soma,
-        )
-        == 5
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.basal_dendrite,
-            section_type=NeuriteType.soma,
-        )
-        == 14
-    )
+    with pytest.raises(NeuroMError, match='Can not apply "section_type" arg to a Morphology'):
+        get('number_of_sections', mixed_morph, section_type=NeuriteType.soma)
 
     # # List of neurites
     # # In this case the process_subtrees flag is ignored. So only the section with the proper
@@ -518,7 +461,7 @@ def test_number_of_sections(mixed_morph, population):
         'number_of_sections', mixed_morph.neurites, section_type=NeuriteType.basal_dendrite
     ) == [5, 4, 0]
     with pytest.raises(
-        NeuroMError, match='Cant apply "neurite_type" arg to a neurite with a neurite feature'
+        NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites, neurite_type=NeuriteType.all)
 
@@ -535,7 +478,7 @@ def test_number_of_sections(mixed_morph, population):
         == 4
     )
     with pytest.raises(
-        NeuroMError, match='Cant apply "neurite_type" arg to a neurite with a neurite feature'
+        NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites[1], neurite_type=NeuriteType.all)
 
@@ -556,31 +499,8 @@ def test_number_of_sections(mixed_morph, population):
         9,
         9,
     ]  # This is weird: we skip bifurcation points but we still count 2 sections around heterogeneous bifurcation points
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.all,
-        section_type=NeuriteType.soma,
-    ) == [19, 19]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.axon,
-        section_type=NeuriteType.soma,
-    ) == [5, 5]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.apical_dendrite,
-        section_type=NeuriteType.soma,
-    ) == [5, 5]
-    assert get(
-        'number_of_sections',
-        population,
-        neurite_type=NeuriteType.basal_dendrite,
-        section_type=NeuriteType.soma,
-    ) == [9, 9]
-    assert get('number_of_sections', population, section_type=NeuriteType.soma) == [19, 19]
+    with pytest.raises(NeuroMError, match='Can not apply "section_type" arg to a Population'):
+        get('number_of_sections', population, section_type=NeuriteType.soma)
 
     # # Morphology
     # # In this case only the neurite_type argument is considered but the section_type argument is ignored.
@@ -591,42 +511,8 @@ def test_number_of_sections(mixed_morph, population):
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.basal_dendrite) == 9
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.soma) == 0
     assert get('number_of_sections', mixed_morph, neurite_type=NeuriteType.undefined) == 0
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.all,
-            section_type=NeuriteType.soma,
-        )
-        == 19
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.axon,
-            section_type=NeuriteType.soma,
-        )
-        == 5
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.apical_dendrite,
-            section_type=NeuriteType.soma,
-        )
-        == 5
-    )
-    assert (
-        get(
-            'number_of_sections',
-            mixed_morph,
-            neurite_type=NeuriteType.basal_dendrite,
-            section_type=NeuriteType.soma,
-        )
-        == 9
-    )
+    with pytest.raises(NeuroMError, match='Can not apply "section_type" arg to a Morphology'):
+        get('number_of_sections', mixed_morph, section_type=NeuriteType.soma)
 
     # # List of neurites
     # # In this case the process_subtrees flag is ignored. So only the section with the proper
@@ -649,7 +535,7 @@ def test_number_of_sections(mixed_morph, population):
         'number_of_sections', mixed_morph.neurites, section_type=NeuriteType.basal_dendrite
     ) == [5, 4, 0]
     with pytest.raises(
-        NeuroMError, match='Cant apply "neurite_type" arg to a neurite with a neurite feature'
+        NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites, neurite_type=NeuriteType.all)
 
@@ -666,7 +552,7 @@ def test_number_of_sections(mixed_morph, population):
         == 4
     )
     with pytest.raises(
-        NeuroMError, match='Cant apply "neurite_type" arg to a neurite with a neurite feature'
+        NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites[1], neurite_type=NeuriteType.all)
 
