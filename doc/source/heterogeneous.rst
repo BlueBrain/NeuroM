@@ -199,13 +199,13 @@ features.get
 
     m.process_subtrees = True
     n_neurites = features.get("number_of_neurites", m)
-    n_sections = features.get("number_of_sections", m, section_type=NeuriteType.axon)
+    n_sections = features.get("number_of_sections", m, neurite_type=NeuriteType.axon)
 
     print(f"Neurites: {n_neurites}, Sections: {n_sections}")
 
 .. testoutput:: [heterogeneous]
 
-    Neurites: 4, Sections: 5
+    Neurites: 3, Sections: 5
 
 Conventions & Incompatibilities
 -------------------------------
