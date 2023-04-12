@@ -108,6 +108,10 @@ class TestSubtypeCollection:
         ):
             SubtypeCollection(43206)
 
+    def test_pickle(self):
+        assert pickle.loads(pickle.dumps(SubtypeCollection(2))) == NeuriteType.axon
+        assert pickle.loads(pickle.dumps(SubtypeCollection(1, 2, 3))) == [1, 2, 3]
+
     def test_integer_behavior(self):
         assert SubtypeCollection(2) - 1 == 1
         assert SubtypeCollection(2) + 1 == 3
@@ -264,6 +268,10 @@ class TestNeuriteType:
             NeuriteType.register("axon", 88)
 
         NeuriteType.unregister("new_type")
+
+        with pytest.raises(ValueError):
+            # Try to unregister an unregistered value
+            NeuriteType.unregister("UNKNOWN VALUE")
 
         with pytest.raises(ValueError):
             # Try to get unregistered value
