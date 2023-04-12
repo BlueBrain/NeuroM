@@ -113,9 +113,10 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     if isinstance(obj, Neurite) or (is_obj_list and isinstance(obj[0], Neurite)):
         # input is a neurite or a list of neurites
         if feature_name in _NEURITE_FEATURES:
-            assert (
-                'neurite_type' not in kwargs
-            ), 'Cant apply "neurite_type" arg to a neurite with a neurite feature'
+            if 'neurite_type' in kwargs:
+                raise NeuroMError(
+                    'Cant apply "neurite_type" arg to a neurite with a neurite feature'
+                )
 
             feature_ = _NEURITE_FEATURES[feature_name]
 
