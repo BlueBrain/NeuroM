@@ -75,7 +75,9 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-        section_iterator = partial(iter_sections, neurite_filter=neurite_filter)
+        section_iterator = partial(
+            iter_sections, neurite_filter=neurite_filter, section_filter=neurite_filter
+        )
 
         max_radius_per_section = [
             np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))

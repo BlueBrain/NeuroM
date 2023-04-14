@@ -83,14 +83,14 @@ def _map_neurites(function, morph, neurite_type):
 
 def _map_neurite_root_nodes(function, morph, neurite_type):
     neurite_type = SubtypeCollection(neurite_type)
-    neurites = list(iter_neurites(obj=morph, filt=is_type(neurite_type)))
-    if neurite_type != NeuriteType.all:
-        neurites = [
-            neurite
-            for neurite in neurites
-            if SubtypeCollection(neurite.type).root_type == neurite_type
-        ]
-    return [function(trunk.root_node) for trunk in neurites]
+    if neurite_type == NeuriteType.all:
+        filt = None
+    else:
+
+        def filt(neurite):
+            return SubtypeCollection(neurite.type).root_type == neurite_type
+
+    return [function(trunk.root_node) for trunk in iter_neurites(obj=morph, filt=filt)]
 
 
 def _get_sections(morph, neurite_type):
@@ -611,7 +611,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
     """
 
     def count_crossings(section, radius):
-        """Used to count_crossings of segments in neurite with radius."""
+        """Used to count crossings of segments in neurite with radius."""
         r2 = radius**2
         count = 0
         for start, end in iter_segments(section):
@@ -620,7 +620,8 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
                 morphmath.point_dist2(center, end),
             )
 
-            count += int(start_dist2 <= r2 <= end_dist2 or end_dist2 <= r2 <= start_dist2)
+            if start_dist2 <= r2 <= end_dist2 or end_dist2 <= r2 <= start_dist2:
+                count += 1
 
         return count
 

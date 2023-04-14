@@ -302,9 +302,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
         (
             mapfun(
                 neurite,
-                section_type=filt.type
-                if (filt is not None or filt.type is NeuriteType.all)
-                else None,
+                section_type=filt.type if filt is not None else None,
             )
             if neurite.process_subtrees
             else mapfun(neurite, section_type=NeuriteType.all)

@@ -27,7 +27,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Type enumerations."""
-
 from enum import Enum, unique
 
 from morphio import SectionType
@@ -66,8 +65,13 @@ class SubtypeCollection(int):
             value = cls.from_list(value)
         elif isinstance(value, Enum):
             value = value.value
+
         obj = super().__new__(cls, value)
-        obj._subtypes = SubtypeCollection.to_list(obj)
+
+        if isinstance(value, SubtypeCollection):
+            obj._subtypes = list(value._subtypes)
+        else:
+            obj._subtypes = SubtypeCollection.to_list(obj)
         obj._value_ = int(obj)
         return obj
 

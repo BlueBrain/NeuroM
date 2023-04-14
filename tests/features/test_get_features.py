@@ -883,7 +883,8 @@ def test_sholl_frequency():
         [1, 2, 2, 6, 2, 2, 2, 2, 2],
     )
 
-    assert len(features.get('sholl_frequency', POP)) == 108
+    pop = Population([NEURON, NEURON])
+    assert len(features.get('sholl_frequency', pop)) == 10
 
     # check that the soma is taken into account for calculating max radius and num bins
     m = nm.load_morphology(

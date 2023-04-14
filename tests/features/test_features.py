@@ -10,43 +10,6 @@ import neurom as nm
 from neurom import features
 
 
-@pytest.fixture
-def DATA_PATH():
-    return Path(__file__).parent.parent / "data"
-
-
-@pytest.fixture
-def SWC_PATH(DATA_PATH):
-    return DATA_PATH / "swc"
-
-
-@pytest.fixture
-def MORPHOLOGY(SWC_PATH):
-    return nm.load_morphology(SWC_PATH / "test_morph.swc")
-
-
-@pytest.fixture
-def NEURITE(MORPHOLOGY):
-    return MORPHOLOGY.neurites[0]
-
-
-@pytest.fixture
-def SECTION(NEURITE):
-    return NEURITE.sections[0]
-
-
-@pytest.fixture
-def NRN_FILES(DATA_PATH):
-    return [
-        DATA_PATH / "h5/v1" / f for f in ("Neuron.h5", "Neuron_2_branch.h5", "bio_neuron-001.h5")
-    ]
-
-
-@pytest.fixture
-def POP(NRN_FILES):
-    return nm.load_morphologies(NRN_FILES)
-
-
 def _check_nested_type(data):
     """Check that the given data contains only built-in types.
 

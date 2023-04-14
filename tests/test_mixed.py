@@ -16,7 +16,7 @@ from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE
 import collections.abc
 
 from morphio import SectionType
-from neurom.core.morphology import Section
+from neurom.core.morphology import Section, iter_neurites, iter_sections
 from neurom.core.types import tree_type_checker as is_type
 
 import neurom.core.morphology
@@ -27,6 +27,7 @@ from neurom.core.types import _SOMA_SUBTYPE
 from neurom.core.types import SubtypeCollection
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
+from neurom.core.types import tree_type_checker as is_type
 
 
 class TestSubtypeCollection:
@@ -311,7 +312,7 @@ def mixed_morph():
     (-3, 0, -1)                                 (0, -1, 0)
                                                      |
                                                 S14  |
-                                                     |     S17
+                                                     |     S18
                             Apical Dendrite     (0, -2, 0)-----(1, -2, 0)
                                                      |
                                                 S15  |
@@ -388,6 +389,52 @@ def test_heterogeneous_neurites(mixed_morph):
     assert not mixed_morph.neurites[0].is_heterogeneous()
     assert mixed_morph.neurites[1].is_heterogeneous()
     assert not mixed_morph.neurites[2].is_heterogeneous()
+
+
+def test_iter_sections(mixed_morph):
+    mixed_morph.process_subtrees = False
+    assert [i.id for i in iter_sections(mixed_morph)] == list(range(19))
+    assert [
+        i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.all))
+    ] == list(range(19))
+    assert [
+        i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.axon))
+    ] == []
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.all),
+        )
+    ] == []
+
+    mixed_morph.process_subtrees = True
+    assert [i.id for i in iter_sections(mixed_morph)] == list(range(19))
+    assert [
+        i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.all))
+    ] == list(range(19))
+    assert [
+        i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.axon))
+    ] == list(
+        range(5, 14)
+    )  # Starts from the root point which is basal type
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.all),
+        )
+    ] == list(range(5, 14))
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.axon),
+        )
+    ] == list(range(9, 14))
 
 
 def test_is_homogeneous_point(mixed_morph):
@@ -622,6 +669,11 @@ def test_core_iter_sections__heterogeneous(mixed_morph):
     assert_sections(axon_on_basal, NeuriteType.all, [5, 6, 7, 8, 9, 10, 11, 12, 13])
     assert_sections(axon_on_basal, NeuriteType.basal_dendrite, [5, 6, 7, 8])
     assert_sections(axon_on_basal, NeuriteType.axon, [9, 10, 11, 12, 13])
+    assert_sections(
+        axon_on_basal,
+        (NeuriteType.axon, NeuriteType.basal_dendrite),
+        [5, 6, 7, 8, 9, 10, 11, 12, 13],
+    )
 
     assert_sections(apical, NeuriteType.all, [14, 15, 16, 17, 18])
     assert_sections(apical, NeuriteType.apical_dendrite, [14, 15, 16, 17, 18])
@@ -730,6 +782,9 @@ def test_features_neurite_map_sections(mixed_morph):
     assert res == 2
 
     res = count(Section.ibifurcation_point, NeuriteType.axon_carrying_dendrite)
+    assert res == 4
+
+    res = count(Section.ibifurcation_point, (NeuriteType.axon, NeuriteType.basal_dendrite))
     assert res == 4
 
 
@@ -1031,3 +1086,102 @@ def test_morphology__neurite_features(feature_name, kwargs, expected, mixed_morp
         warnings.simplefilter("ignore")
         values = get(feature_name, mixed_morph.neurites, **kwargs)
         _assert_feature_equal(values, expected, per_neurite=True)
+
+
+def test_sholl_crossings(mixed_morph):
+    mixed_morph.process_subtrees = True
+    center = mixed_morph.soma.center
+    radii = []
+    assert list(get("sholl_crossings", mixed_morph, center=center, radii=radii)) == []
+    assert list(get("sholl_crossings", mixed_morph, radii=radii)) == []
+    assert list(get("sholl_crossings", mixed_morph)) == [0]
+
+    radii = [1.0]
+    assert list(get("sholl_crossings", mixed_morph, center=center, radii=radii)) == [3]
+
+    radii = [1.0, 4.0]
+    assert list(get("sholl_crossings", mixed_morph, center=center, radii=radii)) == [3, 3]
+
+    radii = [1.0, 4.0, 5.0]
+    assert list(get("sholl_crossings", mixed_morph, center=center, radii=radii)) == [3, 3, 0]
+
+    radii = [1.0, 4.0, 5.0, 10]
+    assert list(
+        get(
+            "sholl_crossings", mixed_morph, neurite_type=NeuriteType.all, center=center, radii=radii
+        )
+    ) == [3, 3, 0, 0]
+    assert list(
+        get(
+            "sholl_crossings",
+            mixed_morph,
+            neurite_type=NeuriteType.basal_dendrite,
+            center=center,
+            radii=radii,
+        )
+    ) == [2, 1, 0, 0]
+    assert list(
+        get(
+            "sholl_crossings",
+            mixed_morph,
+            neurite_type=NeuriteType.apical_dendrite,
+            center=center,
+            radii=radii,
+        )
+    ) == [1, 0, 0, 0]
+    assert list(
+        get(
+            "sholl_crossings",
+            mixed_morph,
+            neurite_type=NeuriteType.axon,
+            center=center,
+            radii=radii,
+        )
+    ) == [0, 2, 0, 0]
+
+
+def test_sholl_frequency(mixed_morph):
+    mixed_morph.process_subtrees = True
+    assert list(get("sholl_frequency", mixed_morph)) == [0]
+    assert list(get("sholl_frequency", mixed_morph, step_size=3)) == [0, 2]
+    assert list(get("sholl_frequency", mixed_morph, bins=[1, 3, 5])) == [3, 8, 0]
+
+    assert list(get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.basal_dendrite)) == [0]
+    assert list(
+        get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.basal_dendrite, step_size=3)
+    ) == [0, 1]
+    assert list(
+        get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.basal_dendrite, bins=[1, 3, 5])
+    ) == [2, 4, 0]
+
+    assert list(get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.axon)) == [0]
+    assert list(
+        get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.axon, step_size=3)
+    ) == [0, 1]
+    assert list(
+        get("sholl_frequency", mixed_morph, neurite_type=NeuriteType.axon, bins=[1, 3, 5])
+    ) == [0, 1, 0]
+
+
+def test_sholl_frequency_pop(mixed_morph):
+    pop = Population([mixed_morph, mixed_morph])
+    pop.process_subtrees = True
+    assert list(get("sholl_frequency", pop)) == [0]
+    assert list(get("sholl_frequency", pop, step_size=3)) == [0, 4]
+    assert list(get("sholl_frequency", pop, bins=[1, 3, 5])) == [6, 16, 0]
+
+    assert list(get("sholl_frequency", pop, neurite_type=NeuriteType.basal_dendrite)) == [0]
+    assert list(
+        get("sholl_frequency", pop, neurite_type=NeuriteType.basal_dendrite, step_size=3)
+    ) == [0, 2]
+    assert list(
+        get("sholl_frequency", pop, neurite_type=NeuriteType.basal_dendrite, bins=[1, 3, 5])
+    ) == [4, 8, 0]
+
+    assert list(get("sholl_frequency", pop, neurite_type=NeuriteType.axon)) == [0]
+    assert list(get("sholl_frequency", pop, neurite_type=NeuriteType.axon, step_size=3)) == [0, 2]
+    assert list(get("sholl_frequency", pop, neurite_type=NeuriteType.axon, bins=[1, 3, 5])) == [
+        0,
+        2,
+        0,
+    ]
