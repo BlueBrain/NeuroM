@@ -392,7 +392,9 @@ def test_heterogeneous_neurites(mixed_morph):
 
 
 def test_iter_sections(mixed_morph):
+    # Test homogenous trees
     mixed_morph.process_subtrees = False
+    # # Iterate with ipreorder iterator
     assert [i.id for i in iter_sections(mixed_morph)] == list(range(19))
     assert [
         i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.all))
@@ -409,16 +411,50 @@ def test_iter_sections(mixed_morph):
         )
     ] == []
 
+    # # Iterate with ibifurcation_point iterator
+    assert [
+        i.id for i in iter_sections(mixed_morph, iterator_type=Section.ibifurcation_point)
+    ] == [0, 1, 5, 6, 9, 11, 14, 15]  # fmt: skip
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.all),
+        )
+    ] == [0, 1, 5, 6, 9, 11, 14, 15]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+        )
+    ] == []
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.all),
+        )
+    ] == []
+
+    # Test heterogenous trees
     mixed_morph.process_subtrees = True
+    # # Iterate with ipreorder iterator
     assert [i.id for i in iter_sections(mixed_morph)] == list(range(19))
     assert [
         i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.all))
     ] == list(range(19))
     assert [
-        i.id for i in iter_sections(mixed_morph, neurite_filter=is_type(NeuriteType.axon))
-    ] == list(
-        range(5, 14)
-    )  # Starts from the root point which is basal type
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            neurite_filter=is_type(NeuriteType.axon),
+        )
+    ] == [9, 10, 11, 12, 13]
     assert [
         i.id
         for i in iter_sections(
@@ -426,7 +462,7 @@ def test_iter_sections(mixed_morph):
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.all),
         )
-    ] == list(range(5, 14))
+    ] == [9, 10, 11, 12, 13]
     assert [
         i.id
         for i in iter_sections(
@@ -434,7 +470,67 @@ def test_iter_sections(mixed_morph):
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.axon),
         )
-    ] == list(range(9, 14))
+    ] == [9, 10, 11, 12, 13]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.basal_dendrite),
+        )
+    ] == []
+
+    # # Iterate with ibifurcation_point iterator
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+        )
+    ] == [0, 1, 5, 6, 9, 11, 14, 15]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.all),
+        )
+    ] == [0, 1, 5, 6, 9, 11, 14, 15]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+        )
+    ] == [9, 11]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.all),
+        )
+    ] == [9, 11]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.axon),
+        )
+    ] == [9, 11]
+    assert [
+        i.id
+        for i in iter_sections(
+            mixed_morph,
+            iterator_type=Section.ibifurcation_point,
+            neurite_filter=is_type(NeuriteType.axon),
+            section_filter=is_type(NeuriteType.basal_dendrite),
+        )
+    ] == []
 
 
 def test_is_homogeneous_point(mixed_morph):
@@ -634,7 +730,7 @@ def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
 def test_iter_neurites__heterogeneous(mixed_morph):
     mixed_morph.process_subtrees = True
 
-    neurites = list(neurom.core.morphology.iter_neurites(mixed_morph))
+    neurites = list(iter_neurites(mixed_morph))
 
     assert len(neurites) == 3
     assert neurites[0].type == NeuriteType.basal_dendrite
@@ -645,7 +741,7 @@ def test_iter_neurites__heterogeneous(mixed_morph):
 def test_iter_neurites__homogeneous(mixed_morph):
     mixed_morph.process_subtrees = False
 
-    neurites = list(neurom.core.morphology.iter_neurites(mixed_morph))
+    neurites = list(iter_neurites(mixed_morph))
 
     assert len(neurites) == 3
     assert neurites[0].type == NeuriteType.basal_dendrite

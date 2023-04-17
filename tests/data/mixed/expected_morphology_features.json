@@ -1245,8 +1245,8 @@
       "kwargs": {
         "neurite_type": 3
       },
-      "expected_wout_subtrees": 0.61591,
-      "expected_with_subtrees": 0.74729
+      "expected_wout_subtrees": 0.74729,
+      "expected_with_subtrees": 0.61591
     }
   ],
   "number_of_segments": [

@@ -147,6 +147,11 @@ class SubtypeCollection(int):
         return super().__reduce_ex__(*args, **kwargs)
 
 
+def is_composite_type(subtype):
+    """Check that the given type is composite."""
+    return SubtypeCollection(subtype).is_composite()
+
+
 # for backward compatibility with 'v1' version
 class NeuriteType(SubtypeCollection, Enum):
     """Type of neurite."""
@@ -251,7 +256,7 @@ def tree_type_checker(*ref):
         >>> it = iter_neurites(m, filt=tree_filter)
     """
     ref = tuple(ref)
-    if len(ref) == 1 and isinstance(ref[0], tuple):
+    if len(ref) == 1 and isinstance(ref[0], (list, tuple)):
         # if `ref` is passed as a tuple of types
         ref = ref[0]
     # validate that all values are of NeuriteType

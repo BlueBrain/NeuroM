@@ -51,8 +51,8 @@ import numpy as np
 
 from neurom import morphmath, utils
 from neurom.core.dataformat import COLS
-from neurom.core.morphology import Section, iter_points
-from neurom.core.types import NeuriteType, SubtypeCollection
+from neurom.core.morphology import Section, iter_neurite_sections, iter_points
+from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import NameSpace
 from neurom.features import bifurcation as bf
@@ -67,26 +67,7 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-    check_type = is_type(section_type)
-
-    def homogeneous_filter(section):
-        return check_type(section) and Section.is_homogeneous_point(section)
-
-    # forking sections cannot be heterogeneous
-    if (
-        section_type != NeuriteType.all
-        and not SubtypeCollection(section_type).is_composite()
-        and iterator_type
-        in {
-            Section.ibifurcation_point,
-            Section.iforking_point,
-        }
-    ):
-        filt = homogeneous_filter
-    else:
-        filt = check_type
-
-    return list(map(fun, filter(filt, iterator_type(neurite.root_node))))
+    return list(map(fun, iter_neurite_sections(neurite, iterator_type, section_type)))
 
 
 @feature(shape=())

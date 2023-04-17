@@ -40,7 +40,8 @@ from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.core.population import Population
 from neurom.core.soma import make_soma
-from neurom.core.types import NeuriteIter, NeuriteType
+from neurom.core.types import NeuriteIter, NeuriteType, is_composite_type
+from neurom.core.types import tree_type_checker as is_type
 from neurom.utils import flatten
 
 
@@ -311,6 +312,33 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
     )
 
 
+def iter_neurite_sections(neurite, iterator_type=Section.ipreorder, section_type=None):
+    """Iterate over the sections of a given neurite."""
+    if section_type is None:
+        section_type = NeuriteType.all
+    check_type = is_type(section_type)
+
+    # forking sections cannot be heterogeneous
+    if (
+        section_type != NeuriteType.all
+        and not is_composite_type(section_type)
+        and iterator_type
+        in {
+            Section.ibifurcation_point,
+            Section.iforking_point,
+        }
+    ):
+
+        def filt(section):
+            return check_type(section) and Section.is_homogeneous_point(section)
+
+    else:
+        filt = check_type
+
+    sections = list(filter(filt, iterator_type(neurite.root_node)))
+    return sections
+
+
 def iter_sections(
     neurites,
     iterator_type=Section.ipreorder,
@@ -345,9 +373,25 @@ def iter_sections(
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-    neurites = iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
-    sections = flatten(iterator_type(neurite.root_node) for neurite in neurites)
-    return sections if section_filter is None else filter(section_filter, sections)
+
+    def _iter_neurite_sections(neurite, section_type):
+        # Inject iterator_type
+        return iter_neurite_sections(
+            neurite, iterator_type=iterator_type, section_type=section_type
+        )
+
+    sections = flatten(
+        iter_neurites(
+            neurites,
+            mapfun=_iter_neurite_sections,
+            filt=neurite_filter,
+            neurite_order=neurite_order,
+        )
+    )
+    filtered_sections = list(
+        sections if section_filter is None else filter(section_filter, sections)
+    )
+    return filtered_sections
 
 
 def iter_segments(
