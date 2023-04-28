@@ -453,16 +453,9 @@ def test_iter_sections(mixed_morph):
         for i in iter_sections(
             mixed_morph,
             neurite_filter=is_type(NeuriteType.axon),
-        )
-    ] == [9, 10, 11, 12, 13]
-    assert [
-        i.id
-        for i in iter_sections(
-            mixed_morph,
-            neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.all),
         )
-    ] == [9, 10, 11, 12, 13]
+    ] == [5, 6, 7, 8, 9, 10, 11, 12, 13]
     assert [
         i.id
         for i in iter_sections(
@@ -478,7 +471,7 @@ def test_iter_sections(mixed_morph):
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.basal_dendrite),
         )
-    ] == []
+    ] == [5, 6, 7, 8]
 
     # # Iterate with ibifurcation_point iterator
     assert [
@@ -503,7 +496,7 @@ def test_iter_sections(mixed_morph):
             iterator_type=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
         )
-    ] == [9, 11]
+    ] == [5, 6, 9, 11]
     assert [
         i.id
         for i in iter_sections(
@@ -512,7 +505,7 @@ def test_iter_sections(mixed_morph):
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.all),
         )
-    ] == [9, 11]
+    ] == [5, 6, 9, 11]
     assert [
         i.id
         for i in iter_sections(
@@ -530,7 +523,7 @@ def test_iter_sections(mixed_morph):
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.basal_dendrite),
         )
-    ] == []
+    ] == [5, 6]
 
 
 def test_is_homogeneous_point(mixed_morph):
@@ -698,33 +691,6 @@ def test_number_of_sections(mixed_morph, population):
         NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites[1], neurite_type=NeuriteType.all)
-
-
-def test_homogeneous_subtrees(mixed_morph, three_types_neurite_morph):
-    basal, axon_on_basal, apical = mixed_morph.neurites
-
-    assert neurom.core.morphology._homogeneous_subtrees(basal) == [basal]
-
-    sections = list(axon_on_basal.iter_sections())
-
-    subtrees = neurom.core.morphology._homogeneous_subtrees(axon_on_basal)
-
-    assert subtrees[0].root_node.id == axon_on_basal.root_node.id
-    assert subtrees[0].root_node.type == NeuriteType.basal_dendrite
-
-    assert subtrees[1].root_node.id == sections[4].id
-    assert subtrees[1].root_node.type == NeuriteType.axon
-
-    with pytest.warns(
-        UserWarning,
-        match=(
-            r"Neurite <type: NeuriteType\.basal_dendrite> has not a registered NeuriteType\. "
-            r"Subtree types found \[<NeuriteType\.basal_dendrite: 3>, <NeuriteType\.axon: 2>, "
-            r"<NeuriteType\.apical_dendrite: 4>\]"
-        ),
-    ):
-        (three_types_neurite,) = three_types_neurite_morph.neurites
-        neurom.core.morphology._homogeneous_subtrees(three_types_neurite)
 
 
 def test_iter_neurites__heterogeneous(mixed_morph):

@@ -40,8 +40,7 @@ from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.core.population import Population
 from neurom.core.soma import make_soma
-from neurom.core.types import NeuriteIter, NeuriteType, is_composite_type
-from neurom.core.types import tree_type_checker as is_type
+from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.utils import flatten
 
 
@@ -221,32 +220,6 @@ NRN_ORDER = {
 }
 
 
-def _homogeneous_subtrees(neurite):
-    """Returns a list of the root nodes of the sub-neurites.
-
-    A sub-neurite can be either the entire tree or a homogeneous downstream
-    sub-tree.
-    """
-    it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).to_morphio())]
-
-    for section in it:
-        if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.to_morphio()))
-
-    homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
-
-    try:
-        NeuriteType(homogeneous_types)
-    except ValueError:
-        warnings.warn(
-            f"{neurite} has not a registered NeuriteType. "
-            f"Subtree types found {homogeneous_types}",
-            stacklevel=2,
-        )
-    return homogeneous_neurites
-
-
 def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
     """Iterator to a neurite, morphology or morphology population.
 
@@ -312,33 +285,6 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
     )
 
 
-def iter_neurite_sections(neurite, iterator_type=Section.ipreorder, section_type=None):
-    """Iterate over the sections of a given neurite."""
-    if section_type is None:
-        section_type = NeuriteType.all
-    check_type = is_type(section_type)
-
-    # forking sections cannot be heterogeneous
-    if (
-        section_type != NeuriteType.all
-        and not is_composite_type(section_type)
-        and iterator_type
-        in {
-            Section.ibifurcation_point,
-            Section.iforking_point,
-        }
-    ):
-
-        def filt(section):
-            return check_type(section) and Section.is_homogeneous_point(section)
-
-    else:
-        filt = check_type
-
-    sections = list(filter(filt, iterator_type(neurite.root_node)))
-    return sections
-
-
 def iter_sections(
     neurites,
     iterator_type=Section.ipreorder,
@@ -373,25 +319,9 @@ def iter_sections(
         >>> filter = lambda n : n.type == nm.AXON
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
-
-    def _iter_neurite_sections(neurite, section_type):
-        # Inject iterator_type
-        return iter_neurite_sections(
-            neurite, iterator_type=iterator_type, section_type=section_type
-        )
-
-    sections = flatten(
-        iter_neurites(
-            neurites,
-            mapfun=_iter_neurite_sections,
-            filt=neurite_filter,
-            neurite_order=neurite_order,
-        )
-    )
-    filtered_sections = list(
-        sections if section_filter is None else filter(section_filter, sections)
-    )
-    return filtered_sections
+    neurites = iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
+    sections = flatten(iterator_type(neurite.root_node) for neurite in neurites)
+    return sections if section_filter is None else filter(section_filter, sections)
 
 
 def iter_segments(

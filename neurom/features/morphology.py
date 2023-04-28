@@ -93,16 +93,22 @@ def _map_neurite_root_nodes(function, morph, neurite_type):
     return [function(trunk.root_node) for trunk in iter_neurites(obj=morph, filt=filt)]
 
 
+def _filter_mode(obj, neurite_type):
+    if obj.process_subtrees:
+        return {"section_filter": is_type(neurite_type)}
+    return {"neurite_filter": is_type(neurite_type)}
+
+
 def _get_sections(morph, neurite_type):
-    return list(iter_sections(morph, neurite_filter=is_type(neurite_type)))
+    return list(iter_sections(morph, **_filter_mode(morph, neurite_type)))
 
 
 def _get_segments(morph, neurite_type):
-    return list(iter_segments(morph, neurite_filter=is_type(neurite_type)))
+    return list(iter_segments(morph, **_filter_mode(morph, neurite_type)))
 
 
 def _get_points(morph, neurite_type):
-    return list(iter_points(morph, neurite_filter=is_type(neurite_type)))
+    return list(iter_points(morph, **_filter_mode(morph, neurite_type)))
 
 
 @feature(shape=())
