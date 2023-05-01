@@ -95,7 +95,7 @@ class TestSubtypeCollection:
             NeuroMError,
             match=(
                 r"A subtype containing the value 32 must contain only one element \(current "
-                r"elements: \[4, 32, 6\]\)\."
+                r"elements: \(4, 32, 6\)\)\."
             ),
         ):
             SubtypeCollection(4, 32, 6)
@@ -104,7 +104,7 @@ class TestSubtypeCollection:
             NeuroMError,
             match=(
                 r"A subtype containing the value 32 must contain only one element \(current "
-                r"elements: \[4, 32, 6\]\)\."
+                r"elements: \(4, 32, 6\)\)\."
             ),
         ):
             SubtypeCollection(43206)

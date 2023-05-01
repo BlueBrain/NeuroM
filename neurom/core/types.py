@@ -27,8 +27,11 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Type enumerations."""
+import collections.abc
+import math
 from enum import Enum, unique
 
+import numpy as np
 from morphio import SectionType
 
 from neurom.exceptions import NeuroMError
@@ -56,22 +59,37 @@ class SubtypeCollection(int):
     _BASE = 100
 
     def __new__(cls, *value):
-        """Create new objects."""
+        """Create an int representing a SubtypeCollection.
+
+        Args:
+            value (Union[int, Sequence[int], SubtypeCollection, NeuriteType, morphio.SectionType]):
+
+        """
         if len(value) == 1:
             # Avoid recursion error
             value = value[0]
 
-        if isinstance(value, (list, tuple)):
-            value = cls.from_list(value)
+        if isinstance(value, collections.abc.Sequence):
+            value = _ids_to_index([int(v) for v in value], cls._BASE)
         elif isinstance(value, Enum):
             value = value.value
+        elif isinstance(value, (SectionType, int)):
+            value = int(value)
+        else:
+            raise TypeError(
+                f"Invalid argument type {type(value)} for SubtypeCollections.\n"
+                "Supported types: int, Sequence[int], SubtypeCollection, NeuriteType, SectionType"
+            )
 
         obj = super().__new__(cls, value)
 
         if isinstance(value, SubtypeCollection):
-            obj._subtypes = list(value._subtypes)
+            obj._subtypes = value._subtypes
         else:
-            obj._subtypes = SubtypeCollection.to_list(obj)
+            obj._subtypes = tuple(
+                SectionType(int_type) for int_type in _index_to_ids(int(obj), cls._BASE)
+            )
+
         obj._value_ = int(obj)
         return obj
 
@@ -110,41 +128,36 @@ class SubtypeCollection(int):
         """Not equal operator."""
         return not self == other
 
-    @classmethod
-    def from_list(cls, values):
-        """Create a NeuriteType from a list of sub types."""
-        value = 0
-        for num, i in enumerate(values[::-1]):
-            new_value = cls._BASE**num * int(i)
-            value += new_value
-        obj = cls(value)
-        return obj
-
-    def to_list(self):
-        """Transform a NeuriteType or a positive integer in a list of sub types."""
-        digits = []
-        tmp_value = int(self)
-        while tmp_value:
-            digits.append(int(tmp_value % self._BASE))
-            tmp_value //= self._BASE
-        if not digits:
-            digits = [0]
-        res = digits[::-1]
-        if _ALL_SUBTYPE in res and len(res) > 1:
-            raise NeuroMError(
-                f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
-                f"(current elements: {res})."
-            )
-        return res
-
     @property
     def root_type(self):
         """Get the root type of a composite type."""
-        return self.to_list()[0]
+        return self._subtypes[0]
 
     def __reduce_ex__(self, *args, **kwargs):
         """This is just to ensure the type is recognized as picklable by the Enum class."""
         return super().__reduce_ex__(*args, **kwargs)
+
+
+def _ids_to_index(ids, base):
+    """Combine ids on a square grid with side 'base' into a single linear index."""
+    if len(ids) == 1:
+        return ids[0]
+    return int(np.ravel_multi_index(ids, (base,) * len(ids)))
+
+
+def _index_to_ids(index, base):
+    """Convert a linear index into ids on a square grid with side 'base'."""
+    # find number of integers in linear index
+    n_digits = math.ceil(len(str(index)) / (len(str(base)) - 1))
+
+    int_types = np.unravel_index(index, shape=(base,) * n_digits)
+
+    if _ALL_SUBTYPE in int_types and len(int_types) > 1:
+        raise NeuroMError(
+            f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
+            f"(current elements: {int_types})."
+        )
+    return int_types
 
 
 def is_composite_type(subtype):
