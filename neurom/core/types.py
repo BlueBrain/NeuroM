@@ -76,7 +76,7 @@ class SubtypeCollection(int):
 
         obj = super().__new__(cls, value)
 
-        obj._subtypes = tuple(
+        obj.subtypes = tuple(
             SectionType(int_type) for int_type in _index_to_ids(int(obj), cls._BASE)
         )
 
@@ -104,12 +104,12 @@ class SubtypeCollection(int):
         #     return True
         if self.is_composite():
             if other.is_composite():
-                is_eq = self._subtypes == other._subtypes
+                is_eq = self.subtypes == other.subtypes
             else:
-                is_eq = other._value_ in self._subtypes
+                is_eq = other._value_ in self.subtypes
         else:
             if other.is_composite():
-                is_eq = self._value_ in other._subtypes
+                is_eq = self._value_ in other.subtypes
             else:
                 is_eq = self._value_ == other._value_
         return is_eq
@@ -121,7 +121,7 @@ class SubtypeCollection(int):
     @property
     def root_type(self):
         """Get the root type of a composite type."""
-        return self._subtypes[0]
+        return self.subtypes[0]
 
     def __reduce_ex__(self, *args, **kwargs):
         """This is just to ensure the type is recognized as picklable by the Enum class."""
