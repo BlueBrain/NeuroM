@@ -80,7 +80,7 @@ class SubtypeCollection(int):
             SectionType(int_type) for int_type in cls._index_to_ids(int(obj), cls._BASE)
         )
 
-        obj._value_ = int(obj)
+        obj._value_ = value
         return obj
 
     @staticmethod
@@ -94,9 +94,9 @@ class SubtypeCollection(int):
     def _index_to_ids(index, base):
         """Convert a linear index into ids on a square grid with side 'base'."""
         # find number of integers in linear index
-        n_digits = math.ceil(len(str(index)) / (len(str(base)) - 1))
+        n_digits = math.ceil(len(str(index)) / max(1, len(str(base)) - 1))
 
-        int_types = np.unravel_index(index, shape=(base,) * n_digits)
+        int_types = np.trim_zeros(np.unravel_index(index, shape=(base,) * n_digits))
 
         if _ALL_SUBTYPE in int_types and len(int_types) > 1:
             raise NeuroMError(
@@ -215,15 +215,35 @@ class NeuriteType(SubtypeCollection, Enum):
 
 def _enum_accept_undefined(cls, value):
     # pylint: disable=protected-access
-    try:
-        obj = cls._member_map_[value]
-    except (KeyError, TypeError):
+
+    # Use NeuriteType name
+    if isinstance(value, NeuriteType):
+        value_str = value.name
+        if value_str in cls._member_map_:
+            return cls._member_map_[value_str]
+
+    # Name given as string
+    elif isinstance(value, str):
+        if value in cls._member_map_:
+            return cls._member_map_[value]
+
+    # SectionType or raw integer
+    elif isinstance(value, collections.abc.Hashable):
+        if value in cls._value2member_map_:
+            return cls._value2member_map_[value]
+
+    # Composite type or unhashable type (e.g. list)
+    else:
         try:
             subtype_value = SubtypeCollection(value)
-            obj = cls._value2member_map_[subtype_value]
-        except (KeyError, ValueError) as exc2:
-            raise ValueError(f"{value} is not a valid NeuriteType") from exc2
-    return obj
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        else:
+            if subtype_value in cls._value2member_map_:
+                return cls._value2member_map_[subtype_value]
+
+    # Invalid value
+    raise ValueError(f"{value} is not a valid registered NeuriteType")
 
 
 NeuriteType.__new__ = _enum_accept_undefined

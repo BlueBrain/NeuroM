@@ -217,10 +217,10 @@ class TestNeuriteType:
         assert NeuriteType.axon_carrying_dendrite != SubtypeCollection(NeuriteType.apical_dendrite)
 
     def test_raise(self):
-        with pytest.raises(ValueError, match=r"\[2, 3, 4\] is not a valid NeuriteType"):
+        with pytest.raises(ValueError, match=r"\[2, 3, 4\] is not a valid registered NeuriteType"):
             NeuriteType([2, 3, 4])
 
-        with pytest.raises(ValueError, match="20304 is not a valid NeuriteType"):
+        with pytest.raises(ValueError, match="20304 is not a valid registered NeuriteType"):
             NeuriteType(20304)
 
     def test_integer_behavior(self):
