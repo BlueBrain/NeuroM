@@ -71,24 +71,14 @@ class SubtypeCollection(int):
 
         if isinstance(value, collections.abc.Sequence):
             value = _ids_to_index([int(v) for v in value], cls._BASE)
-        elif isinstance(value, Enum):
-            value = value.value
-        elif isinstance(value, (SectionType, int)):
-            value = int(value)
         else:
-            raise TypeError(
-                f"Invalid argument type {type(value)} for SubtypeCollections.\n"
-                "Supported types: int, Sequence[int], SubtypeCollection, NeuriteType, SectionType"
-            )
+            value = int(value)
 
         obj = super().__new__(cls, value)
 
-        if isinstance(value, SubtypeCollection):
-            obj._subtypes = value._subtypes
-        else:
-            obj._subtypes = tuple(
-                SectionType(int_type) for int_type in _index_to_ids(int(obj), cls._BASE)
-            )
+        obj._subtypes = tuple(
+            SectionType(int_type) for int_type in _index_to_ids(int(obj), cls._BASE)
+        )
 
         obj._value_ = int(obj)
         return obj
