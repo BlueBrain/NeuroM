@@ -119,6 +119,32 @@ class TestSubtypeCollection:
         assert SubtypeCollection(2) * 2 == 4
         assert SubtypeCollection(2) / 2 == 1
 
+    @pytest.mark.parametrize("base", [2, 3, 11, 99, 100])
+    def test_base(self, monkeypatch, base):
+        monkeypatch.setattr(SubtypeCollection, "_BASE", base)
+
+        def int_to_base(value, base):
+            """Convert an integer into a list of numbers in the given base."""
+            digits = []
+            while value:
+                digits.append(int(value % base))
+                value = value // base
+            if not digits:
+                digits = [0]
+            return tuple([SectionType(i) for i in digits[::-1]])
+
+        assert SubtypeCollection(0).subtypes == (0,)
+        assert SubtypeCollection(1).subtypes == (1,)
+        assert SubtypeCollection(5).subtypes == int_to_base(5, base)
+        assert SubtypeCollection(7).subtypes == int_to_base(7, base)
+        assert SubtypeCollection(11).subtypes == int_to_base(11, base)
+        assert SubtypeCollection(23).subtypes == int_to_base(23, base)
+        assert SubtypeCollection(99).subtypes == int_to_base(99, base)
+        assert SubtypeCollection(100).subtypes == int_to_base(100, base)
+        assert SubtypeCollection(101).subtypes == int_to_base(101, base)
+        assert SubtypeCollection(10101).subtypes == int_to_base(10101, base)
+        assert SubtypeCollection(10001).subtypes == int_to_base(10001, base)
+
 
 class TestNeuriteType:
     def test_repr(self):
@@ -217,6 +243,16 @@ class TestNeuriteType:
         assert NeuriteType.axon_carrying_dendrite != SubtypeCollection(NeuriteType.apical_dendrite)
 
     def test_raise(self):
+        NeuriteType("all")
+        NeuriteType((3, 2))
+        with pytest.raises(ValueError, match="None is not a valid registered NeuriteType"):
+            NeuriteType(None)
+        with pytest.raises(
+            ValueError, match="{'WRONG TYPE': 999} is not a valid registered NeuriteType"
+        ):
+            NeuriteType({"WRONG TYPE": 999})
+        with pytest.raises(ValueError, match="UNKNOWN VALUE is not a valid registered NeuriteType"):
+            NeuriteType("UNKNOWN VALUE")
         with pytest.raises(ValueError, match=r"\[2, 3, 4\] is not a valid registered NeuriteType"):
             NeuriteType([2, 3, 4])
 

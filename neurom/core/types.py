@@ -94,9 +94,17 @@ class SubtypeCollection(int):
     def _index_to_ids(index, base):
         """Convert a linear index into ids on a square grid with side 'base'."""
         # find number of integers in linear index
-        n_digits = math.ceil(len(str(index)) / max(1, len(str(base)) - 1))
+        if index > 1:
+            ratio = math.log(index) / math.log(base)
+            n_digits = math.ceil(ratio)
+            if int(ratio) == n_digits:
+                n_digits += 1
+        elif index == 1:
+            n_digits = 1
+        else:
+            return [0]
 
-        int_types = np.trim_zeros(np.unravel_index(index, shape=(base,) * n_digits))
+        int_types = np.unravel_index(index, shape=(base,) * n_digits)
 
         if _ALL_SUBTYPE in int_types and len(int_types) > 1:
             raise NeuroMError(
@@ -228,9 +236,8 @@ def _enum_accept_undefined(cls, value):
             return cls._member_map_[value]
 
     # SectionType or raw integer
-    elif isinstance(value, collections.abc.Hashable):
-        if value in cls._value2member_map_:
-            return cls._value2member_map_[value]
+    elif isinstance(value, collections.abc.Hashable) and value in cls._value2member_map_:
+        return cls._value2member_map_[value]
 
     # Composite type or unhashable type (e.g. list)
     else:
