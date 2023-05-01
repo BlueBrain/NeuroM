@@ -70,18 +70,40 @@ class SubtypeCollection(int):
             value = value[0]
 
         if isinstance(value, collections.abc.Sequence):
-            value = _ids_to_index([int(v) for v in value], cls._BASE)
+            value = cls._ids_to_index([int(v) for v in value], cls._BASE)
         else:
             value = int(value)
 
         obj = super().__new__(cls, value)
 
         obj.subtypes = tuple(
-            SectionType(int_type) for int_type in _index_to_ids(int(obj), cls._BASE)
+            SectionType(int_type) for int_type in cls._index_to_ids(int(obj), cls._BASE)
         )
 
         obj._value_ = int(obj)
         return obj
+
+    @staticmethod
+    def _ids_to_index(ids, base):
+        """Combine ids on a square grid with side 'base' into a single linear index."""
+        if len(ids) == 1:
+            return ids[0]
+        return int(np.ravel_multi_index(ids, (base,) * len(ids)))
+
+    @staticmethod
+    def _index_to_ids(index, base):
+        """Convert a linear index into ids on a square grid with side 'base'."""
+        # find number of integers in linear index
+        n_digits = math.ceil(len(str(index)) / (len(str(base)) - 1))
+
+        int_types = np.unravel_index(index, shape=(base,) * n_digits)
+
+        if _ALL_SUBTYPE in int_types and len(int_types) > 1:
+            raise NeuroMError(
+                f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
+                f"(current elements: {int_types})."
+            )
+        return int_types
 
     def __hash__(self):
         """Compute the hash of the object."""
@@ -126,28 +148,6 @@ class SubtypeCollection(int):
     def __reduce_ex__(self, *args, **kwargs):
         """This is just to ensure the type is recognized as picklable by the Enum class."""
         return super().__reduce_ex__(*args, **kwargs)
-
-
-def _ids_to_index(ids, base):
-    """Combine ids on a square grid with side 'base' into a single linear index."""
-    if len(ids) == 1:
-        return ids[0]
-    return int(np.ravel_multi_index(ids, (base,) * len(ids)))
-
-
-def _index_to_ids(index, base):
-    """Convert a linear index into ids on a square grid with side 'base'."""
-    # find number of integers in linear index
-    n_digits = math.ceil(len(str(index)) / (len(str(base)) - 1))
-
-    int_types = np.unravel_index(index, shape=(base,) * n_digits)
-
-    if _ALL_SUBTYPE in int_types and len(int_types) > 1:
-        raise NeuroMError(
-            f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
-            f"(current elements: {int_types})."
-        )
-    return int_types
 
 
 def is_composite_type(subtype):
