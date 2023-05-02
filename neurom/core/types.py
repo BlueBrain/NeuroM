@@ -94,15 +94,12 @@ class SubtypeCollection(int):
     def _index_to_ids(index, base):
         """Convert a linear index into ids on a square grid with side 'base'."""
         # find number of integers in linear index
-        if index > 1:
-            ratio = math.log(index) / math.log(base)
-            n_digits = math.ceil(ratio)
-            if int(ratio) == n_digits:
-                n_digits += 1
-        elif index == 1:
-            n_digits = 1
-        else:
-            return [0]
+        if index < base:
+            return [index]
+        ratio = math.log(index) / math.log(base)
+        n_digits = math.ceil(ratio)
+        if int(ratio) == n_digits:
+            n_digits += 1
 
         int_types = np.unravel_index(index, shape=(base,) * n_digits)
 
@@ -242,7 +239,7 @@ def _enum_accept_undefined(cls, value):
     # Composite type or unhashable type (e.g. list)
     else:
         try:
-            subtype_value = SubtypeCollection(value)
+            subtype_value = SubtypeCollection(value)._value_
         except Exception:  # pylint: disable=broad-exception-caught
             pass
         else:

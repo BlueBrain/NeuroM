@@ -144,6 +144,8 @@ class TestSubtypeCollection:
         assert SubtypeCollection(101).subtypes == int_to_base(101, base)
         assert SubtypeCollection(10101).subtypes == int_to_base(10101, base)
         assert SubtypeCollection(10001).subtypes == int_to_base(10001, base)
+        # assert SubtypeCollection(0, 3).subtypes == int_to_base(3, base)
+        # TODO: Fix this last test. For now leading zeros are not supported but they should be.
 
 
 class TestNeuriteType:
