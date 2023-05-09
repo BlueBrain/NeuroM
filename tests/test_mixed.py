@@ -32,39 +32,42 @@ from neurom.core.types import tree_type_checker as is_type
 
 class TestSubtypeCollection:
     def test_repr(self):
-        assert repr(SubtypeCollection(0)) == "0"
-        assert repr(SubtypeCollection(32)) == "32"
-        assert repr(SubtypeCollection(30201)) == "30201"
-        assert repr(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+        assert repr(SubtypeCollection(0)) == "(<SectionType.undefined: 0>,)"
+        assert repr(SubtypeCollection(32)) == "(<SectionType.all: 32>,)"
+        assert (
+            repr(SubtypeCollection(3, 2, 1))
+            == "(<SectionType.basal_dendrite: 3>, <SectionType.axon: 2>, <SectionType.soma: 1>)"
+        )
+        assert (
+            repr(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite))
+            == "(<SectionType.axon: 2>, <SectionType.apical_dendrite: 4>)"
+        )
 
     def test_str(self):
-        assert str(SubtypeCollection(0)) == "0"
-        assert str(SubtypeCollection(32)) == "32"
-        assert str(SubtypeCollection(30201)) == "30201"
-        assert str(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == "204"
+        assert str(SubtypeCollection(0)) == "SectionType.undefined"
+        assert str(SubtypeCollection(32)) == "SectionType.all"
+        assert (
+            str(SubtypeCollection(3, 2, 1))
+            == "SectionType.basal_dendrite-SectionType.axon-SectionType.soma"
+        )
+        assert (
+            str(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite))
+            == "SectionType.axon-SectionType.apical_dendrite"
+        )
+
+    def test_flatten(self):
+        assert SubtypeCollection(NeuriteType.axon_carrying_dendrite) == (3, 2)
+        assert SubtypeCollection(
+            [[[3], [[NeuriteType.axon]], [[[SectionType(1), NeuriteType.axon_carrying_dendrite]]]]]
+        ) == (3, 2, 1, 3, 2)
 
     def test_eq(self):
         assert SubtypeCollection(0) == 0
         assert SubtypeCollection(0) == SubtypeCollection(0)
-        # assert SubtypeCollection(0) == 32
-        # assert SubtypeCollection(0) == SubtypeCollection(32)
-        # assert SubtypeCollection(32) == 0
-        # assert SubtypeCollection(32) == SubtypeCollection(0)
         assert SubtypeCollection(32) == 32
         assert SubtypeCollection(32) == SubtypeCollection(32)
         assert SubtypeCollection(0) != 1
         assert SubtypeCollection(0) != SubtypeCollection(1)
-        assert SubtypeCollection(30201) == 30201
-        assert SubtypeCollection(30201) == SubtypeCollection(30201)
-        # assert SubtypeCollection(30201) == 32
-        # assert SubtypeCollection(30201) == SubtypeCollection(32)
-        assert SubtypeCollection(30201) == SubtypeCollection(3, 2, 1)
-        assert SubtypeCollection(30201) != 321
-        assert SubtypeCollection(30201) != SubtypeCollection(321)
-        # assert SubtypeCollection(3, 2, 1) == 32
-        # assert SubtypeCollection(3, 2, 1) == SubtypeCollection(32)
-        # assert SubtypeCollection(3, 2, 1) == _ALL_SUBTYPE
-        # assert SubtypeCollection(3, 2, 1) == SubtypeCollection(_ALL_SUBTYPE)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3, 2, 1)
         assert SubtypeCollection(3, 2, 1) == SubtypeCollection(3)
         assert SubtypeCollection(3) == SubtypeCollection(3, 2, 1)
@@ -76,15 +79,10 @@ class TestSubtypeCollection:
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) != 0
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 2
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == NeuriteType.axon
-        assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 204
         assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == [2, 4]
         assert SubtypeCollection(
             NeuriteType.axon, NeuriteType.apical_dendrite
         ) == SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)
-        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == 32
-        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(32)
-        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == _ALL_SUBTYPE
-        # assert SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite) == SubtypeCollection(_ALL_SUBTYPE)
 
         assert SubtypeCollection(0) != "NOT A SUBTYPE"
 
@@ -95,74 +93,39 @@ class TestSubtypeCollection:
             NeuroMError,
             match=(
                 r"A subtype containing the value 32 must contain only one element \(current "
-                r"elements: \(4, 32, 6\)\)\."
+                r"elements: \(<SectionType\.apical_dendrite: 4>, <SectionType\.all: 32>, "
+                r"<SectionType\.custom6: 6>\)\)\."
             ),
         ):
             SubtypeCollection(4, 32, 6)
 
         with pytest.raises(
-            NeuroMError,
-            match=(
-                r"A subtype containing the value 32 must contain only one element \(current "
-                r"elements: \(4, 32, 6\)\)\."
-            ),
+            ValueError,
+            match="A SubtypeCollection object can not be empty",
         ):
-            SubtypeCollection(43206)
+            SubtypeCollection()
 
     def test_pickle(self):
         assert pickle.loads(pickle.dumps(SubtypeCollection(2))) == NeuriteType.axon
         assert pickle.loads(pickle.dumps(SubtypeCollection(1, 2, 3))) == [1, 2, 3]
 
-    def test_integer_behavior(self):
-        assert SubtypeCollection(2) - 1 == 1
-        assert SubtypeCollection(2) + 1 == 3
-        assert SubtypeCollection(2) * 2 == 4
-        assert SubtypeCollection(2) / 2 == 1
-
-    @pytest.mark.parametrize("base", [2, 3, 11, 99, 100])
-    def test_base(self, monkeypatch, base):
-        monkeypatch.setattr(SubtypeCollection, "_BASE", base)
-
-        def int_to_base(value, base):
-            """Convert an integer into a list of numbers in the given base."""
-            digits = []
-            while value:
-                digits.append(int(value % base))
-                value = value // base
-            if not digits:
-                digits = [0]
-            return tuple([SectionType(i) for i in digits[::-1]])
-
-        assert SubtypeCollection(0).subtypes == (0,)
-        assert SubtypeCollection(1).subtypes == (1,)
-        assert SubtypeCollection(5).subtypes == int_to_base(5, base)
-        assert SubtypeCollection(7).subtypes == int_to_base(7, base)
-        assert SubtypeCollection(11).subtypes == int_to_base(11, base)
-        assert SubtypeCollection(23).subtypes == int_to_base(23, base)
-        assert SubtypeCollection(99).subtypes == int_to_base(99, base)
-        assert SubtypeCollection(100).subtypes == int_to_base(100, base)
-        assert SubtypeCollection(101).subtypes == int_to_base(101, base)
-        assert SubtypeCollection(10101).subtypes == int_to_base(10101, base)
-        assert SubtypeCollection(10001).subtypes == int_to_base(10001, base)
-        # assert SubtypeCollection(0, 3).subtypes == int_to_base(3, base)
-        # TODO: Fix this last test. For now leading zeros are not supported but they should be.
-
 
 class TestNeuriteType:
     def test_repr(self):
-        assert repr(NeuriteType(0)) == "<NeuriteType.undefined: 0>"
-        assert repr(NeuriteType(32)) == "<NeuriteType.all: 32>"
-        assert repr(NeuriteType(302)) == "<NeuriteType.axon_carrying_dendrite: 302>"
+        assert repr(NeuriteType(0)) == "<NeuriteType.undefined: (<SectionType.undefined: 0>,)>"
+        assert repr(NeuriteType(32)) == "<NeuriteType.all: (<SectionType.all: 32>,)>"
+        print(repr(NeuriteType((3, 2))))
+        assert repr(NeuriteType((3, 2))) == (
+            "<NeuriteType.axon_carrying_dendrite: "
+            "(<SectionType.basal_dendrite: 3>, <SectionType.axon: 2>)>"
+        )
 
     def test_str(self):
         assert str(NeuriteType(0)) == "NeuriteType.undefined"
         assert str(NeuriteType(32)) == "NeuriteType.all"
-        assert str(NeuriteType(302)) == "NeuriteType.axon_carrying_dendrite"
+        assert str(NeuriteType((3, 2))) == "NeuriteType.axon_carrying_dendrite"
 
     def test_eq(self):
-        # assert NeuriteType.axon == 32
-        # assert NeuriteType.axon == SubtypeCollection(32)
-        # assert NeuriteType.axon == SectionType.all
         assert NeuriteType.axon == SectionType.axon
         assert NeuriteType.axon == 2
         assert NeuriteType.axon == SubtypeCollection(2)
@@ -174,9 +137,6 @@ class TestNeuriteType:
         assert NeuriteType.axon != SubtypeCollection(SectionType.basal_dendrite)
         assert NeuriteType.axon != SubtypeCollection(NeuriteType.basal_dendrite)
 
-        # assert NeuriteType(2) == 32
-        # assert NeuriteType(2) == SubtypeCollection(32)
-        # assert NeuriteType(2) == SectionType.all
         assert NeuriteType(2) == SectionType.axon
         assert NeuriteType(2) == 2
         assert NeuriteType(2) == SubtypeCollection(2)
@@ -188,20 +148,13 @@ class TestNeuriteType:
         assert NeuriteType(2) != SubtypeCollection(SectionType.basal_dendrite)
         assert NeuriteType(2) != SubtypeCollection(NeuriteType.basal_dendrite)
 
-        # assert NeuriteType([2, 3]) == 32
         assert NeuriteType([3, 2]) == SubtypeCollection(3, 2)
         assert NeuriteType([3, 2]) == NeuriteType([3, 2])
-        # assert NeuriteType([2, 3]) == SectionType.all
-        assert NeuriteType([3, 2]) == SubtypeCollection(302)
-        assert NeuriteType([3, 2]) == NeuriteType(302)
-        assert NeuriteType([3, 2]) == NeuriteType([302])
-        assert NeuriteType([3, 2]) == 302
         assert NeuriteType([3, 2]) == SubtypeCollection(SectionType.axon)
         assert NeuriteType([3, 2]) == NeuriteType(SectionType.axon)
         assert NeuriteType([3, 2]) == SubtypeCollection(
             NeuriteType.basal_dendrite, NeuriteType.axon
         )
-        assert NeuriteType([3, 2]) == NeuriteType([NeuriteType.basal_dendrite, NeuriteType.axon])
         assert NeuriteType([3, 2]) != SubtypeCollection(
             NeuriteType.axon, NeuriteType.apical_dendrite
         )
@@ -209,14 +162,10 @@ class TestNeuriteType:
         assert NeuriteType([3, 2]) == NeuriteType.axon
         assert NeuriteType([3, 2]) == NeuriteType.basal_dendrite
         assert NeuriteType([3, 2]) != NeuriteType.apical_dendrite
-        # assert NeuriteType([2, 3]) == NeuriteType.all
         assert NeuriteType([3, 2]) != SubtypeCollection(4, 3, 2)
         assert NeuriteType([3, 2]) != [4, 3, 2]
-        assert NeuriteType([3, 2]) != SubtypeCollection(40302)
+        assert NeuriteType([3, 2]) != SubtypeCollection(999)
 
-        # assert NeuriteType.axon_carrying_dendrite == 32
-        # assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(32)
-        # assert NeuriteType.axon_carrying_dendrite == SectionType.all
         assert NeuriteType.axon_carrying_dendrite == SectionType.axon
         assert NeuriteType.axon_carrying_dendrite == 2
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(2)
@@ -224,13 +173,12 @@ class TestNeuriteType:
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(NeuriteType.axon)
         assert NeuriteType.axon_carrying_dendrite == NeuriteType.axon
         assert NeuriteType.axon_carrying_dendrite == NeuriteType(2)
-        assert NeuriteType.axon_carrying_dendrite == 302
         assert NeuriteType.axon_carrying_dendrite == (SectionType.basal_dendrite, SectionType.axon)
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(
             SectionType.basal_dendrite, SectionType.axon
         )
         assert NeuriteType.axon_carrying_dendrite == NeuriteType(
-            [NeuriteType.basal_dendrite, NeuriteType.axon]
+            [SectionType.basal_dendrite, SectionType.axon]
         )
         assert NeuriteType.axon_carrying_dendrite == 3
         assert NeuriteType.axon_carrying_dendrite == SubtypeCollection(3)
@@ -261,16 +209,6 @@ class TestNeuriteType:
         with pytest.raises(ValueError, match="20304 is not a valid registered NeuriteType"):
             NeuriteType(20304)
 
-    def test_integer_behavior(self):
-        assert NeuriteType(2) - 1 == 1
-        assert NeuriteType(2) + 1 == 3
-        assert NeuriteType(2) * 2 == 4
-        assert NeuriteType(2) / 2 == 1
-        assert NeuriteType.axon - 1 == 1
-        assert NeuriteType.axon + 1 == 3
-        assert NeuriteType.axon * 2 == 4
-        assert NeuriteType.axon / 2 == 1
-
     def test_pickle(self):
         assert pickle.loads(pickle.dumps(NeuriteType(2))) == NeuriteType.axon
         assert pickle.loads(pickle.dumps(NeuriteType.axon)) == NeuriteType.axon
@@ -289,7 +227,7 @@ class TestNeuriteType:
         "value",
         [
             pytest.param(99, id="Simple scalar value"),
-            pytest.param([NeuriteType.axon, NeuriteType.soma], id="Composite value"),
+            pytest.param([SectionType.axon, SectionType.soma], id="Composite value"),
         ],
     )
     def test_register_unregister(self, value, reset_NeuriteType):
@@ -297,6 +235,8 @@ class TestNeuriteType:
         assert NeuriteType(value) == obj
         assert NeuriteType(value).name == "new_type"
         assert NeuriteType(value).value == SubtypeCollection(value)
+        assert getattr(NeuriteType, "new_type") == obj
+        assert NeuriteType["new_type"] == obj
 
         with pytest.raises(ValueError):
             # Try to register a new type with already existing value

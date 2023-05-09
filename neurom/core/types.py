@@ -53,70 +53,50 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-class SubtypeCollection(int):
+class SubtypeCollection(tuple):
     """The subtype use by the NeuriteType."""
 
-    _BASE = 100
+    @staticmethod
+    def _format_value(values):
+        formatted_values = []
+        for val in values:
+            if isinstance(val, Enum):
+                formatted_values.extend(SubtypeCollection._format_value(val._value_))
+            elif isinstance(val, SubtypeCollection):
+                formatted_values.extend(val)
+            elif isinstance(val, collections.abc.Sequence):
+                for i in val:
+                    formatted_values.extend(SubtypeCollection._format_value([i]))
+            else:
+                formatted_values.append(SectionType(val))
+        return formatted_values
 
     def __new__(cls, *value):
-        """Create an int representing a SubtypeCollection.
-
-        Args:
-            value (Union[int, Sequence[int], SubtypeCollection, NeuriteType, morphio.SectionType]):
-
-        """
-        if len(value) == 1:
-            # Avoid recursion error
-            value = value[0]
-
-        if isinstance(value, collections.abc.Sequence):
-            value = cls._ids_to_index([int(v) for v in value], cls._BASE)
-        else:
-            value = int(value)
-
-        obj = super().__new__(cls, value)
-
-        obj.subtypes = tuple(
-            SectionType(int_type) for int_type in cls._index_to_ids(int(obj), cls._BASE)
-        )
-
-        obj._value_ = value
-        return obj
-
-    @staticmethod
-    def _ids_to_index(ids, base):
-        """Combine ids on a square grid with side 'base' into a single linear index."""
-        if len(ids) == 1:
-            return ids[0]
-        return int(np.ravel_multi_index(ids, (base,) * len(ids)))
-
-    @staticmethod
-    def _index_to_ids(index, base):
-        """Convert a linear index into ids on a square grid with side 'base'."""
-        # find number of integers in linear index
-        if index < base:
-            return [index]
-        ratio = math.log(index) / math.log(base)
-        n_digits = math.ceil(ratio)
-        if int(ratio) == n_digits:
-            n_digits += 1
-
-        int_types = np.unravel_index(index, shape=(base,) * n_digits)
-
-        if _ALL_SUBTYPE in int_types and len(int_types) > 1:
+        if not value:
+            raise ValueError("A SubtypeCollection object can not be empty")
+        values = SubtypeCollection._format_value(value)
+        values = tuple(values)
+        if len(values) > 1 and _ALL_SUBTYPE in values:
             raise NeuroMError(
                 f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
-                f"(current elements: {int_types})."
+                f"(current elements: {values})."
             )
-        return int_types
+        obj = super().__new__(cls, tuple(values))
+        return obj
 
     def __hash__(self):
         """Compute the hash of the object."""
-        return hash(self._value_)
+        return hash(tuple(self))
+
+    # def __repr__(self):
+    #     return "-".join(repr(i) for i in self.subtypes)
+
+    def __str__(self):
+        return "-".join(str(i) for i in self)
 
     def is_composite(self):
         """Check that the object is composite."""
-        return self._value_ >= self._BASE
+        return len(self) > 1
 
     def __eq__(self, other):
         """Equal operator."""
@@ -129,16 +109,20 @@ class SubtypeCollection(int):
         # if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
         #     # This could be used to simplify the internal code of NeuroM
         #     return True
+
+        if len(other) == 0:
+            return False
+
         if self.is_composite():
             if other.is_composite():
-                is_eq = self.subtypes == other.subtypes
+                is_eq = tuple(self) == tuple(other)
             else:
-                is_eq = other._value_ in self.subtypes
+                is_eq = other[0] in self
         else:
             if other.is_composite():
-                is_eq = self._value_ in other.subtypes
+                is_eq = self[0] in other
             else:
-                is_eq = self._value_ == other._value_
+                is_eq = self[0] == other[0]
         return is_eq
 
     def __ne__(self, other):
@@ -148,7 +132,7 @@ class SubtypeCollection(int):
     @property
     def root_type(self):
         """Get the root type of a composite type."""
-        return self.subtypes[0]
+        return self[0]
 
     def __reduce_ex__(self, *args, **kwargs):
         """This is just to ensure the type is recognized as picklable by the Enum class."""
@@ -168,39 +152,38 @@ class NeuriteType(SubtypeCollection, Enum):
     # pylint: disable=protected-access
     # pylint: disable=attribute-defined-outside-init
 
-    axon = SectionType.axon
-    apical_dendrite = SectionType.apical_dendrite
-    basal_dendrite = SectionType.basal_dendrite
-    undefined = SectionType.undefined
-    soma = _SOMA_SUBTYPE
-    all = _ALL_SUBTYPE
-    custom5 = SectionType.custom5
-    custom6 = SectionType.custom6
-    custom7 = SectionType.custom7
-    custom8 = SectionType.custom8
-    custom9 = SectionType.custom9
-    custom10 = SectionType.custom10
-
-    # Composite types
-    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+    axon = (SectionType.axon,)
+    apical_dendrite = (SectionType.apical_dendrite,)
+    basal_dendrite = (SectionType.basal_dendrite,)
+    undefined = (SectionType.undefined,)
+    soma = (_SOMA_SUBTYPE,)
+    all = (_ALL_SUBTYPE,)
+    custom5 = (SectionType.custom5,)
+    custom6 = (SectionType.custom6,)
+    custom7 = (SectionType.custom7,)
+    custom8 = (SectionType.custom8,)
+    custom9 = (SectionType.custom9,)
+    custom10 = (SectionType.custom10,)
 
     @classmethod
     def register(cls, name, value):
         """Register a new value in the Enum class."""
         new_value = SubtypeCollection(value)
+        new_value_as_tuple = tuple(new_value)
         err = None
         if name in cls._member_names_:
             err = (name, cls._member_map_[name].value)
-        if new_value in cls._value2member_map_:
-            err = (cls._value2member_map_[new_value].name, value)
+        if new_value_as_tuple in cls._value2member_map_:
+            err = (cls._value2member_map_[new_value_as_tuple].name, value)
         if err is not None:
             raise ValueError(
                 f"The NeuriteType '{err[0]}' is already registered with the value '{err[1]}'"
             )
-        obj = super(NeuriteType, cls).__new__(cls, new_value)
+        obj = super().__new__(cls, new_value)
         obj._name_ = name
+        obj._value_ = new_value
         cls._value2member_map_[new_value] = obj
-        cls._member_map_["name"] = obj
+        cls._member_map_[name] = obj
         cls._member_names_.append(name)
         return obj
 
@@ -212,9 +195,9 @@ class NeuriteType(SubtypeCollection, Enum):
                 f"The NeuriteType '{name}' is not registered so it can not be unregistered"
             )
 
-        value = cls._member_map_["name"].value
+        value = cls._member_map_[name].value
         del cls._value2member_map_[value]
-        del cls._member_map_["name"]
+        del cls._member_map_[name]
         cls._member_names_.remove(name)
 
 
@@ -232,14 +215,10 @@ def _enum_accept_undefined(cls, value):
         if value in cls._member_map_:
             return cls._member_map_[value]
 
-    # SectionType or raw integer
-    elif isinstance(value, collections.abc.Hashable) and value in cls._value2member_map_:
-        return cls._value2member_map_[value]
-
     # Composite type or unhashable type (e.g. list)
     else:
         try:
-            subtype_value = SubtypeCollection(value)._value_
+            subtype_value = tuple(SubtypeCollection(value))
         except Exception:  # pylint: disable=broad-exception-caught
             pass
         else:
@@ -251,6 +230,9 @@ def _enum_accept_undefined(cls, value):
 
 
 NeuriteType.__new__ = _enum_accept_undefined
+
+# Register composite types
+NeuriteType.register("axon_carrying_dendrite", (SectionType.basal_dendrite, SectionType.axon))
 
 
 #: Collection of all neurite types
