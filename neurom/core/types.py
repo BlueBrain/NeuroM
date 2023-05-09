@@ -28,7 +28,6 @@
 
 """Type enumerations."""
 import collections.abc
-import math
 from enum import Enum, unique
 
 import numpy as np
@@ -58,6 +57,7 @@ class SubtypeCollection(tuple):
 
     @staticmethod
     def _format_value(values):
+        # pylint: disable=protected-access
         formatted_values = []
         for val in values:
             if isinstance(val, Enum):
@@ -72,6 +72,17 @@ class SubtypeCollection(tuple):
         return formatted_values
 
     def __new__(cls, *value):
+        """Create an tuple representing a SubtypeCollection.
+
+        Args:
+            value (Union[
+                int, SubtypeCollection, NeuriteType, morphio.SectionType,
+                Sequence[int],
+                Sequence[SubtypeCollection],
+                Sequence[NeuriteType],
+                Sequence[morphio.SectionType]
+                ]): The value(s) of the subtype.
+        """
         if not value:
             raise ValueError("A SubtypeCollection object can not be empty")
         values = SubtypeCollection._format_value(value)
@@ -92,7 +103,19 @@ class SubtypeCollection(tuple):
     #     return "-".join(repr(i) for i in self.subtypes)
 
     def __str__(self):
+        """Return the string representation of the object."""
         return "-".join(str(i) for i in self)
+
+    def __int__(self):
+        """Return the integer representation of the object.
+
+        Note:
+            The subtypes are converted to a base 100 in order to be able to represent all relevant
+            values.
+        """
+        if len(self) == 1:
+            return int(self[0])
+        return int(np.ravel_multi_index([int(i) for i in self], (100,) * len(self)))
 
     def is_composite(self):
         """Check that the object is composite."""
@@ -152,18 +175,18 @@ class NeuriteType(SubtypeCollection, Enum):
     # pylint: disable=protected-access
     # pylint: disable=attribute-defined-outside-init
 
-    axon = (SectionType.axon,)
-    apical_dendrite = (SectionType.apical_dendrite,)
-    basal_dendrite = (SectionType.basal_dendrite,)
-    undefined = (SectionType.undefined,)
-    soma = (_SOMA_SUBTYPE,)
-    all = (_ALL_SUBTYPE,)
-    custom5 = (SectionType.custom5,)
-    custom6 = (SectionType.custom6,)
-    custom7 = (SectionType.custom7,)
-    custom8 = (SectionType.custom8,)
-    custom9 = (SectionType.custom9,)
-    custom10 = (SectionType.custom10,)
+    axon = SectionType.axon
+    apical_dendrite = SectionType.apical_dendrite
+    basal_dendrite = SectionType.basal_dendrite
+    undefined = SectionType.undefined
+    soma = _SOMA_SUBTYPE
+    all = _ALL_SUBTYPE
+    custom5 = SectionType.custom5
+    custom6 = SectionType.custom6
+    custom7 = SectionType.custom7
+    custom8 = SectionType.custom8
+    custom9 = SectionType.custom9
+    custom10 = SectionType.custom10
 
     @classmethod
     def register(cls, name, value):

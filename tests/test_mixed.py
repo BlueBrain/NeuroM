@@ -55,6 +55,12 @@ class TestSubtypeCollection:
             == "SectionType.axon-SectionType.apical_dendrite"
         )
 
+    def test_int(self):
+        assert int(SubtypeCollection(0)) == 0
+        assert int(SubtypeCollection(32)) == 32
+        assert int(SubtypeCollection(3, 2, 1)) == 30201
+        assert int(SubtypeCollection(NeuriteType.axon, NeuriteType.apical_dendrite)) == 204
+
     def test_flatten(self):
         assert SubtypeCollection(NeuriteType.axon_carrying_dendrite) == (3, 2)
         assert SubtypeCollection(
