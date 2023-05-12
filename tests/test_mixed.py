@@ -120,7 +120,6 @@ class TestNeuriteType:
     def test_repr(self):
         assert repr(NeuriteType(0)) == "<NeuriteType.undefined: (<SectionType.undefined: 0>,)>"
         assert repr(NeuriteType(32)) == "<NeuriteType.all: (<SectionType.all: 32>,)>"
-        print(repr(NeuriteType((3, 2))))
         assert repr(NeuriteType((3, 2))) == (
             "<NeuriteType.axon_carrying_dendrite: "
             "(<SectionType.basal_dendrite: 3>, <SectionType.axon: 2>)>"

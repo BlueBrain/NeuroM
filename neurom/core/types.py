@@ -61,9 +61,9 @@ class SubtypeCollection:
         formatted_values = []
         for val in values:
             if isinstance(val, Enum):
-                formatted_values.extend(SubtypeCollection._format_value(val._value_))
+                formatted_values.extend(SubtypeCollection._format_value([val._value_]))
             elif isinstance(val, SubtypeCollection):
-                formatted_values.extend(val)
+                formatted_values.extend(val.subtypes)
             elif isinstance(val, collections.abc.Sequence):
                 for i in val:
                     formatted_values.extend(SubtypeCollection._format_value([i]))
@@ -93,6 +93,9 @@ class SubtypeCollection:
             )
         self.subtypes = values
 
+    def __new__(cls, *values):
+        return object.__new__(cls)
+
     def __hash__(self):
         """Compute the hash of the object."""
         return hash(self.subtypes)
@@ -100,9 +103,6 @@ class SubtypeCollection:
     def __len__(self):
         """Return number of subtypes."""
         return len(self.subtypes)
-
-    # def __repr__(self):
-    #     return "-".join(repr(i) for i in self.subtypes)
 
     def __repr__(self):
         return str(self.subtypes)
@@ -128,6 +128,8 @@ class SubtypeCollection:
 
     def __eq__(self, other):
         """Equal operator."""
+        self = getattr(self, "_value_", self)
+        other = getattr(other, "_value_", other)
         if not isinstance(other, SubtypeCollection):
             try:
                 other = SubtypeCollection(other)
@@ -180,20 +182,18 @@ class NeuriteType(SubtypeCollection, Enum):
     # pylint: disable=protected-access
     # pylint: disable=attribute-defined-outside-init
 
-    axon = SectionType.axon,
-    apical_dendrite = SectionType.apical_dendrite,
-    basal_dendrite = SectionType.basal_dendrite,
-    undefined = SectionType.undefined,
-    soma = SectionType.soma,
-    all = SectionType.all,
-    custom5 = SectionType.custom5,
-    custom6 = SectionType.custom6,
-    custom7 = SectionType.custom7,
-    custom8 = SectionType.custom8,
-    custom9 = SectionType.custom9,
-    custom10 = SectionType.custom10,
-
-    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+    axon = SectionType.axon
+    apical_dendrite = SectionType.apical_dendrite
+    basal_dendrite = SectionType.basal_dendrite
+    undefined = SectionType.undefined
+    soma = SectionType.soma
+    all = SectionType.all
+    custom5 = SectionType.custom5
+    custom6 = SectionType.custom6
+    custom7 = SectionType.custom7
+    custom8 = SectionType.custom8
+    custom9 = SectionType.custom9
+    custom10 = SectionType.custom10
 
     @classmethod
     def register(cls, name, value):
@@ -209,7 +209,7 @@ class NeuriteType(SubtypeCollection, Enum):
             raise ValueError(
                 f"The NeuriteType '{err[0]}' is already registered with the value '{err[1]}'"
             )
-        obj = super().__new__(cls, new_value)
+        obj = object.__new__(cls)
         obj._name_ = name
         obj._value_ = new_value
         cls._value2member_map_[new_value] = obj
@@ -260,6 +260,8 @@ def _enum_accept_undefined(cls, value):
 
 NeuriteType.__new__ = _enum_accept_undefined
 
+# Register composite types
+NeuriteType.register("axon_carrying_dendrite", (SectionType.basal_dendrite, SectionType.axon))
 
 #: Collection of all neurite types
 NEURITES = (NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
