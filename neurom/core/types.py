@@ -93,9 +93,6 @@ class SubtypeCollection:
             )
         self.subtypes = values
 
-    def __new__(cls, *values):
-        return object.__new__(cls)
-
     def __hash__(self):
         """Compute the hash of the object."""
         return hash(self.subtypes)
@@ -174,8 +171,33 @@ def is_composite_type(subtype):
     return SubtypeCollection(subtype).is_composite()
 
 
+class _RegisterAttrsAsCollections(type):
+
+    def __new__(meta, cls_name, bases, attrs):
+        # convert class attributes to subtype collections
+        for key, value in attrs.items():
+            if key.startswith("_"):
+                continue
+            attrs[key] = SubtypeCollection(value)
+        return super().__new__(meta, cls_name, bases, attrs)
+
+    def register(cls, name, value):
+        obj = SubtypeCollection(value)
+        breakpoint()
+        if (
+            name in cls.__dict__ or
+            obj.subtypes in cls.__dict__.values()
+        ):
+            # TODO: Fix this
+            raise
+        cls.__dict__[name] = obj
+
+    def unregister(cls, name):
+        del cls.__dict__[name]
+
+
 # for backward compatibility with 'v1' version
-class NeuriteType(SubtypeCollection, Enum):
+class NeuriteType(SubtypeCollection, metaclass=_RegisterAttrsAsCollections):
     """Type of neurite."""
 
     # pylint: disable=no-member
@@ -195,6 +217,9 @@ class NeuriteType(SubtypeCollection, Enum):
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
 
+    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+
+    '''
     @classmethod
     def register(cls, name, value):
         """Register a new value in the Enum class."""
@@ -230,6 +255,7 @@ class NeuriteType(SubtypeCollection, Enum):
         del cls._member_map_[name]
         cls._member_names_.remove(name)
 
+    '''
 
 def _enum_accept_undefined(cls, value):
     # pylint: disable=protected-access
@@ -257,11 +283,6 @@ def _enum_accept_undefined(cls, value):
     # Invalid value
     raise ValueError(f"{value} is not a valid registered NeuriteType")
 
-
-NeuriteType.__new__ = _enum_accept_undefined
-
-# Register composite types
-NeuriteType.register("axon_carrying_dendrite", (SectionType.basal_dendrite, SectionType.axon))
 
 #: Collection of all neurite types
 NEURITES = (NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
