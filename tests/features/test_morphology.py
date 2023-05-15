@@ -45,9 +45,9 @@ from numpy.testing import assert_array_equal
 
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
-from neurom.core import Morphology
+from neurom.core import Morphology, Population
 from neurom.exceptions import NeuroMError
-from neurom.features import morphology, section
+from neurom.features import morphology, population, section
 
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
@@ -745,3 +745,7 @@ def test_missing_soma():
         morphology.sholl_frequency(NRN_missing_soma)
     with pytest.raises(NeuroMError):
         morphology.length_fraction_above_soma(NRN_missing_soma)
+
+    POP_missing_soma = Population([NRN_missing_soma])
+    with pytest.raises(NeuroMError):
+        population.sholl_frequency(POP_missing_soma)

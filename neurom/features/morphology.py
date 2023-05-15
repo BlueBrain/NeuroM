@@ -65,8 +65,14 @@ feature = partial(feature, namespace=NameSpace.NEURON)
 
 def _assert_soma_center(morph, feature_name):
     if morph.soma.center is None:
+        morph_name = getattr(morph, "name", "")
+        if not morph_name:
+            morph_name = " "
+        else:
+            morph_name = f" '{morph_name}' "
         raise NeuroMError(
-            f"The given morphology has no soma so the feature '{feature_name}' can not be computed."
+            f"The given morphology{morph_name}has no soma so the feature '{feature_name}' can "
+            "not be computed."
         )
 
 
