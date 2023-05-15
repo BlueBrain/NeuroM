@@ -80,7 +80,7 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
     def _sholl_crossings(morph):
-        _assert_soma_center(morph, "sholl_frequency")
+        _assert_soma_center(morph)
         return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
 
     return np.array([_sholl_crossings(m) for m in morphs]).sum(axis=0)
