@@ -33,6 +33,7 @@ import warnings
 from io import StringIO
 from pathlib import Path
 
+import morphio
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
@@ -725,3 +726,22 @@ def test_unique_projected_points():
         morphology._unique_projected_points(morph, "airplane", NeuriteType.all)
 
     assert len(morphology._unique_projected_points(morph, "yz", NeuriteType.apical_dendrite)) == 0
+
+
+def test_missing_soma():
+    NRN_missing_soma = load_morphology(SWC_PATH / 'Single_apical_no_soma.swc')
+
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_elevations(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_azimuths(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_elevations(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_vectors(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.sholl_crossings(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.sholl_frequency(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.length_fraction_above_soma(NRN_missing_soma)

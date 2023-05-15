@@ -63,6 +63,13 @@ from neurom.morphmath import convex_hull
 feature = partial(feature, namespace=NameSpace.NEURON)
 
 
+def _assert_soma_center(morph, feature_name):
+    if morph.soma.center is None:
+        raise NeuroMError(
+            f"The given morphology has no soma so the feature '{feature_name}' can not be computed."
+        )
+
+
 def _map_neurites(function, morph, neurite_type):
     return list(
         iter_neurites(morph, mapfun=function, filt=is_type(neurite_type))
@@ -132,6 +139,8 @@ def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
 
     The range of the azimuth angle [-pi, pi] radians
     """
+    _assert_soma_center(morph, "trunk_origin_azimuths")
+
     def azimuth(neurite):
         """Azimuth of a neurite trunk."""
         return morphmath.azimuth_from_vector(
@@ -151,6 +160,8 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 
     The range of the elevation angle [-pi/2, pi/2] radians
     """
+    _assert_soma_center(morph, "trunk_origin_elevations")
+
     def elevation(neurite):
         """Elevation of a section."""
         return morphmath.elevation_from_vector(
@@ -163,6 +174,8 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 @feature(shape=(...,))
 def trunk_vectors(morph, neurite_type=NeuriteType.all):
     """Calculate the vectors between all the trunks of the morphology and the soma center."""
+    _assert_soma_center(morph, "trunk_vectors")
+
     def vector_to_root_node(neurite):
         return morphmath.vector(neurite.root_node.points[0], morph.soma.center)
 
@@ -496,6 +509,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
             '`sholl_crossings` input error. If `center` or `radii` is not set then `morph` is ' \
             'expected to be an instance of Morphology and have a soma.'
         if center is None:
+            _assert_soma_center(morph, "sholl_crossings")
             center = morph.soma.center
         if radii is None:
             radii = [morph.soma.radius]
@@ -525,6 +539,7 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         If a `neurite_type` is specified and there are no trees corresponding to it, an empty
         list will be returned.
     """
+    _assert_soma_center(morph, "sholl_frequency")
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
@@ -701,6 +716,7 @@ def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
     Returns:
         The fraction of neurite length that lies on the right of the soma along the given axis.
     """
+    _assert_soma_center(morph, "length_fraction_above_soma")
     axis = up.upper()
 
     if axis not in {"X", "Y", "Z"}:
