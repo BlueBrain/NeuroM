@@ -69,6 +69,7 @@ class SubtypeCollection:
                     formatted_values.extend(SubtypeCollection._format_value([i]))
             else:
                 formatted_values.append(val)
+
         return tuple(SectionType(s) for s in formatted_values)
 
     def __init__(self, *value):
@@ -171,33 +172,19 @@ def is_composite_type(subtype):
     return SubtypeCollection(subtype).is_composite()
 
 
-class _RegisterAttrsAsCollections(type):
+def _attrs_as_subtypes(cls):
 
-    def __new__(meta, cls_name, bases, attrs):
-        # convert class attributes to subtype collections
-        for key, value in attrs.items():
-            if key.startswith("_"):
-                continue
-            attrs[key] = SubtypeCollection(value)
-        return super().__new__(meta, cls_name, bases, attrs)
+    for key, value in vars(cls).items():
+        if key.startswith("_") or callable(value) or isinstance(value, classmethod):
+            continue
+        setattr(cls, key, cls(value))
 
-    def register(cls, name, value):
-        obj = SubtypeCollection(value)
-        breakpoint()
-        if (
-            name in cls.__dict__ or
-            obj.subtypes in cls.__dict__.values()
-        ):
-            # TODO: Fix this
-            raise
-        cls.__dict__[name] = obj
-
-    def unregister(cls, name):
-        del cls.__dict__[name]
+    return cls
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(SubtypeCollection, metaclass=_RegisterAttrsAsCollections):
+@_attrs_as_subtypes
+class NeuriteType(SubtypeCollection):
     """Type of neurite."""
 
     # pylint: disable=no-member
@@ -219,43 +206,21 @@ class NeuriteType(SubtypeCollection, metaclass=_RegisterAttrsAsCollections):
 
     axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
 
-    '''
     @classmethod
     def register(cls, name, value):
-        """Register a new value in the Enum class."""
-        new_value = SubtypeCollection(value)
-        new_value_as_tuple = new_value.subtypes
-        err = None
-        if name in cls._member_names_:
-            err = (name, cls._member_map_[name].value)
-        if new_value_as_tuple in cls._value2member_map_:
-            err = (cls._value2member_map_[new_value_as_tuple].name, value)
-        if err is not None:
-            raise ValueError(
-                f"The NeuriteType '{err[0]}' is already registered with the value '{err[1]}'"
-            )
-        obj = object.__new__(cls)
-        obj._name_ = name
-        obj._value_ = new_value
-        cls._value2member_map_[new_value] = obj
-        cls._member_map_[name] = obj
-        cls._member_names_.append(name)
-        return obj
+        obj = SubtypeCollection(value)
+        if (
+            name in cls.__dict__ or
+            obj.subtypes in cls.__dict__.values()
+        ):
+            # TODO: Fix this
+            raise
+        cls.__dict__[name] = obj
 
     @classmethod
     def unregister(cls, name):
-        """Unregister a value in the Enum class."""
-        if name not in cls._member_names_:
-            raise ValueError(
-                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
-            )
+        del cls.__dict__[name]
 
-        value = cls._member_map_[name].value
-        del cls._value2member_map_[value]
-        del cls._member_map_[name]
-        cls._member_names_.remove(name)
-
-    '''
 
 def _enum_accept_undefined(cls, value):
     # pylint: disable=protected-access
