@@ -33,6 +33,7 @@ import warnings
 from io import StringIO
 from pathlib import Path
 
+import morphio
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
@@ -44,9 +45,9 @@ from numpy.testing import assert_array_equal
 
 from neurom import morphmath
 from neurom import NeuriteType, load_morphology, AXON, BASAL_DENDRITE
-from neurom.core import Morphology
+from neurom.core import Morphology, Population
 from neurom.exceptions import NeuroMError
-from neurom.features import morphology, section
+from neurom.features import morphology, population, section
 
 
 DATA_PATH = Path(__file__).parent.parent / 'data'
@@ -725,3 +726,26 @@ def test_unique_projected_points():
         morphology._unique_projected_points(morph, "airplane", NeuriteType.all)
 
     assert len(morphology._unique_projected_points(morph, "yz", NeuriteType.apical_dendrite)) == 0
+
+
+def test_missing_soma():
+    NRN_missing_soma = load_morphology(SWC_PATH / 'Single_apical_no_soma.swc')
+
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_elevations(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_azimuths(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_origin_elevations(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.trunk_vectors(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.sholl_crossings(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.sholl_frequency(NRN_missing_soma)
+    with pytest.raises(NeuroMError):
+        morphology.length_fraction_above_soma(NRN_missing_soma)
+
+    POP_missing_soma = Population([NRN_missing_soma])
+    with pytest.raises(NeuroMError):
+        population.sholl_frequency(POP_missing_soma)

@@ -47,6 +47,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import feature, NameSpace
+from neurom.features.morphology import _assert_soma_center
 from neurom.features.morphology import sholl_crossings
 
 feature = partial(feature, namespace=NameSpace.POPULATION)
@@ -78,7 +79,8 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
                         for n in m.neurites if neurite_filter(n))
         bins = np.arange(min_soma_edge, min_soma_edge + max_radii, step_size)
 
-    return np.array([
-        sholl_crossings(m, neurite_type, m.soma.center, bins)
-        for m in morphs
-    ]).sum(axis=0)
+    def _sholl_crossings(morph):
+        _assert_soma_center(morph)
+        return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
+
+    return np.array([_sholl_crossings(m) for m in morphs]).sum(axis=0)
