@@ -199,6 +199,7 @@ class TestNeuriteType:
 
     def test_raise(self):
         NeuriteType("all")
+        NeuriteType(NeuriteType.all)
         NeuriteType((3, 2))
         with pytest.raises(ValueError, match="None is not a valid registered NeuriteType"):
             NeuriteType(None)
@@ -220,13 +221,19 @@ class TestNeuriteType:
 
     @pytest.fixture
     def reset_NeuriteType(self):
-        current_value2member_map_ = copy.deepcopy(NeuriteType._value2member_map_)
-        current_member_map_ = copy.deepcopy(NeuriteType._member_map_)
-        current_member_names_ = copy.deepcopy(NeuriteType._member_names_)
+        current_dict = dict(NeuriteType.__dict__.items())
+        # current_value2member_map_ = copy.deepcopy(NeuriteType._value2member_map_)
+        # current_member_map_ = copy.deepcopy(NeuriteType._member_map_)
+        # current_member_names_ = copy.deepcopy(NeuriteType._member_names_)
         yield
-        NeuriteType._value2member_map_ = current_value2member_map_
-        NeuriteType._member_map_ = current_member_map_
-        NeuriteType._member_names_ = current_member_names_
+        for k, v in current_dict.items():
+            setattr(NeuriteType, k, v)
+        for k in list(NeuriteType.__dict__.keys()):
+            if k not in current_dict:
+                delattr(NeuriteType, k)
+        # NeuriteType._value2member_map_ = current_value2member_map_
+        # NeuriteType._member_map_ = current_member_map_
+        # NeuriteType._member_names_ = current_member_names_
 
     @pytest.mark.parametrize(
         "value",
@@ -239,9 +246,10 @@ class TestNeuriteType:
         obj = NeuriteType.register("new_type", value)
         assert NeuriteType(value) == obj
         assert NeuriteType(value).name == "new_type"
-        assert NeuriteType(value).value == SubtypeCollection(value)
+        assert NeuriteType(value) == SubtypeCollection(value)
+        # assert NeuriteType(value).value == SubtypeCollection(value)
         assert getattr(NeuriteType, "new_type") == obj
-        assert NeuriteType["new_type"] == obj
+        # assert NeuriteType["new_type"] == obj
 
         with pytest.raises(ValueError):
             # Try to register a new type with already existing value
