@@ -9,6 +9,7 @@ import neurom
 import numpy as np
 import pandas as pd
 import numpy.testing as npt
+from enum import Enum
 from neurom import NeuriteType
 from neurom.features import get
 from neurom.core import Population
@@ -67,6 +68,21 @@ class TestSubtypeCollection:
             [[[3], [[NeuriteType.axon]], [[[SectionType(1), NeuriteType.axon_carrying_dendrite]]]]]
         ) == (3, 2, 1, 3, 2)
 
+    def test_ctor(self):
+        assert SubtypeCollection(1).subtypes == (SectionType.soma,)
+        assert SubtypeCollection(1, 2).subtypes == (SectionType.soma, SectionType.axon)
+        assert SubtypeCollection([1, 2]).subtypes == (SectionType.soma, SectionType.axon)
+        assert SubtypeCollection(SubtypeCollection([1, 2])).subtypes == (
+            SectionType.soma,
+            SectionType.axon,
+        )
+
+        class TestEnum(Enum):
+            a = 1
+            b = 2
+
+        assert SubtypeCollection(TestEnum.a, TestEnum.b).subtypes == (1, 2)
+
     def test_eq(self):
         assert SubtypeCollection(0) == 0
         assert SubtypeCollection(0) == SubtypeCollection(0)
@@ -120,7 +136,6 @@ class TestNeuriteType:
     def test_repr(self):
         assert repr(NeuriteType(0)) == "<NeuriteType.undefined: (<SectionType.undefined: 0>,)>"
         assert repr(NeuriteType(32)) == "<NeuriteType.all: (<SectionType.all: 32>,)>"
-        print(repr(NeuriteType((3, 2))))
         assert repr(NeuriteType((3, 2))) == (
             "<NeuriteType.axon_carrying_dendrite: "
             "(<SectionType.basal_dendrite: 3>, <SectionType.axon: 2>)>"
@@ -200,6 +215,7 @@ class TestNeuriteType:
 
     def test_raise(self):
         NeuriteType("all")
+        NeuriteType(NeuriteType.all)
         NeuriteType((3, 2))
         with pytest.raises(ValueError, match="None is not a valid registered NeuriteType"):
             NeuriteType(None)
@@ -215,19 +231,30 @@ class TestNeuriteType:
         with pytest.raises(ValueError, match="20304 is not a valid registered NeuriteType"):
             NeuriteType(20304)
 
+        with pytest.raises(
+            ValueError, match="The NeuriteType class constructor accepts only 1 argument."
+        ):
+            NeuriteType(1, 2, 3)
+
     def test_pickle(self):
         assert pickle.loads(pickle.dumps(NeuriteType(2))) == NeuriteType.axon
         assert pickle.loads(pickle.dumps(NeuriteType.axon)) == NeuriteType.axon
 
     @pytest.fixture
     def reset_NeuriteType(self):
-        current_value2member_map_ = copy.deepcopy(NeuriteType._value2member_map_)
-        current_member_map_ = copy.deepcopy(NeuriteType._member_map_)
-        current_member_names_ = copy.deepcopy(NeuriteType._member_names_)
+        current_dict = dict(NeuriteType.__dict__.items())
+        # current_value2member_map_ = copy.deepcopy(NeuriteType._value2member_map_)
+        # current_member_map_ = copy.deepcopy(NeuriteType._member_map_)
+        # current_member_names_ = copy.deepcopy(NeuriteType._member_names_)
         yield
-        NeuriteType._value2member_map_ = current_value2member_map_
-        NeuriteType._member_map_ = current_member_map_
-        NeuriteType._member_names_ = current_member_names_
+        for k, v in current_dict.items():
+            setattr(NeuriteType, k, v)
+        for k in list(NeuriteType.__dict__.keys()):
+            if k not in current_dict:
+                delattr(NeuriteType, k)
+        # NeuriteType._value2member_map_ = current_value2member_map_
+        # NeuriteType._member_map_ = current_member_map_
+        # NeuriteType._member_names_ = current_member_names_
 
     @pytest.mark.parametrize(
         "value",
@@ -240,9 +267,10 @@ class TestNeuriteType:
         obj = NeuriteType.register("new_type", value)
         assert NeuriteType(value) == obj
         assert NeuriteType(value).name == "new_type"
-        assert NeuriteType(value).value == SubtypeCollection(value)
+        assert NeuriteType(value) == SubtypeCollection(value)
+        # assert NeuriteType(value).value == SubtypeCollection(value)
         assert getattr(NeuriteType, "new_type") == obj
-        assert NeuriteType["new_type"] == obj
+        # assert NeuriteType["new_type"] == obj
 
         with pytest.raises(ValueError):
             # Try to register a new type with already existing value
@@ -257,6 +285,10 @@ class TestNeuriteType:
         with pytest.raises(ValueError):
             # Try to unregister an unregistered value
             NeuriteType.unregister("UNKNOWN VALUE")
+
+        with pytest.raises(ValueError):
+            # Try to unregister an existing attribute that is not a registered value
+            NeuriteType.unregister("name")
 
         with pytest.raises(ValueError):
             # Try to get unregistered value
