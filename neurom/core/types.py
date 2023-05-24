@@ -205,7 +205,7 @@ def _empty_init(self, *args, **kwargs):  # pylint: disable=unused-argument
     """Replace default __init__ to do nothing more than the __new__ method."""
 
 
-class MutableEnumMeta(type):
+class MutableEnumType(type):
     """Metaclass to behave like a simple Enum class with mutable members."""
 
     # pylint: disable=attribute-defined-outside-init
@@ -261,7 +261,7 @@ class MutableEnumMeta(type):
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(SubtypeCollection, metaclass=MutableEnumMeta):
+class NeuriteType(SubtypeCollection, metaclass=MutableEnumType):
     """Type of neurite."""
 
     axon = SectionType.axon
