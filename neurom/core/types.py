@@ -164,74 +164,44 @@ def is_composite_type(subtype):
     return SubtypeCollection(subtype).is_composite()
 
 
-def __enum_accept_undefined__(cls, *args):
-    """Replace default __new__ to accept both keys and values."""
-    # pylint: disable=protected-access
-    if not args:
-        # Used by Pickle
-        return object.__new__(cls)
-
-    if len(args) > 1:
-        raise ValueError(f"The {cls.__name__} class constructor accepts only 1 argument.")
-
-    value = args[0]
-
-    # Use NeuriteType name
-    if isinstance(value, cls):
-        value_str = value.name
-        if hasattr(cls, value_str):
-            return getattr(cls, value_str)
-
-    # Name given as string
-    elif isinstance(value, str):
-        if hasattr(cls, value):
-            return getattr(cls, value)
-
-    # Composite type or unhashable type (e.g. list)
-    else:
-        try:
-            subtype_value = SubtypeCollection(value).subtypes
-        except Exception:  # pylint: disable=broad-exception-caught
-            pass
-        else:
-            if subtype_value in cls._reverse_mapping:
-                return getattr(cls, cls._reverse_mapping[subtype_value])
-
-    # Invalid value
-    raise ValueError(f"{value} is not a valid registered NeuriteType")
-
-
-def _empty_init(self, *args, **kwargs):  # pylint: disable=unused-argument
-    """Replace default __init__ to do nothing more than the __new__ method."""
-
-
 class MutableEnumType(type):
-    """Metaclass to behave like a simple Enum class with mutable members."""
+    """Metaclass that behaves like a simple EnumType class with mutable members."""
 
     # pylint: disable=attribute-defined-outside-init
 
     def __new__(mcs, cls_name, bases, classdict, **kwargs):
-        """The constroctor of the class to update its members."""
+        """The constructor of the class to update its members."""
         # Build the new class
         cls = super().__new__(mcs, cls_name, bases, classdict, **kwargs)
+
+        # Get the subtype
+        cls._member_type = cls.__mro__[-2]
+
+        if isinstance(cls._member_type, MutableEnumType) and cls.__name__ != "MutableEnum":
+            raise TypeError(
+                f"The class {cls.__name__} must have a subtype given as the last parent."
+            )
 
         # Format the attributes
         cls._reverse_mapping = {}
         for key, value in vars(cls).items():
             if key.startswith("_") or callable(value) or isinstance(value, (classmethod, property)):
                 continue
-            obj = cls(value)
+            obj = cls._member_type(value)
+            if not hasattr(obj, "subtypes"):
+                raise TypeError(
+                    f"The subtype of the {cls.__name__} class must have a 'subtypes' attribute."
+                )
+            obj.__class__ = cls
             obj._name_ = key
             setattr(cls, key, obj)
             cls._reverse_mapping[obj.subtypes] = key
 
-        # Set specific __new__ method to be able to get instances either by name or value
-        cls.__new__ = __enum_accept_undefined__
-
-        # Set specific __init__ method to be able to call `cls(value)` but only relying on __new__
-        cls.__init__ = _empty_init
-
         return cls
+
+    def __call__(cls, *args):
+        """Retrieve a registered value instead of building new one."""
+        return cls.__new__(cls, *args)
 
     def __iter__(cls):
         """Iterate over registered values of the class."""
@@ -241,7 +211,7 @@ class MutableEnumType(type):
     def register(cls, name, value):
         """Register a new key/value pair as attribute in the class."""
         # pylint: disable=protected-access
-        obj = SubtypeCollection(value)
+        obj = cls._member_type(value)
         if hasattr(cls, name) or obj.subtypes in cls._reverse_mapping:
             raise ValueError(f"The NeuriteType '{name}' is already registered.")
         obj.__class__ = cls
@@ -260,8 +230,64 @@ class MutableEnumType(type):
         delattr(cls, name)
 
 
+class MutableEnum(metaclass=MutableEnumType):
+    """Class that behaves like a simple Enum class with mutable members."""
+
+    # pylint: disable=no-member
+
+    def __new__(cls, *args):
+        """Custom constructor to accept both keys and values."""
+        # pylint: disable=protected-access
+        if not args:
+            # Used by Pickle
+            return object.__new__(cls)
+
+        if len(args) > 1:
+            raise ValueError(f"The {cls.__name__} class constructor accepts only 1 argument.")
+
+        value = args[0]
+
+        # Use NeuriteType name
+        if isinstance(value, cls):
+            value_str = value.name
+            if hasattr(cls, value_str):
+                return getattr(cls, value_str)
+
+        # Name given as string
+        elif isinstance(value, str):
+            if hasattr(cls, value):
+                return getattr(cls, value)
+
+        # Composite type or unhashable type (e.g. list)
+        else:
+            try:
+                # subtype_value = SubtypeCollection(value).subtypes
+                subtype_value = cls._member_type(value).subtypes
+            except Exception:  # pylint: disable=broad-exception-caught
+                pass
+            else:
+                if subtype_value in cls._reverse_mapping:
+                    return getattr(cls, cls._reverse_mapping[subtype_value])
+
+        # Invalid value
+        raise ValueError(f"{value} is not a valid registered {cls.__name__}")
+
+    @property
+    def name(self):
+        """Get the associated name of the class member."""
+        return self._name_
+
+    def __repr__(self):
+        """Printable representation of the class member."""
+        return f"<{self.__class__.__name__}.{self._name_}: {repr(self.subtypes)}>"
+
+    def __str__(self):
+        """String representation of the class member."""
+        return f"{self.__class__.__name__}.{self._name_}"
+
+
 # for backward compatibility with 'v1' version
-class NeuriteType(SubtypeCollection, metaclass=MutableEnumType):
+class NeuriteType(MutableEnum, SubtypeCollection):
     """Type of neurite."""
 
     axon = SectionType.axon
@@ -278,19 +304,6 @@ class NeuriteType(SubtypeCollection, metaclass=MutableEnumType):
     custom10 = SectionType.custom10
 
     axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
-
-    @property
-    def name(self):
-        """Get the associated name of the NeuriteType member."""
-        return self._name_
-
-    def __repr__(self):
-        """Printable representation of the NeuriteType member."""
-        return f"<NeuriteType.{self._name_}: {repr(self.subtypes)}>"
-
-    def __str__(self):
-        """String representation of the NeuriteType member."""
-        return f"NeuriteType.{self._name_}"
 
 
 #: Collection of all neurite types

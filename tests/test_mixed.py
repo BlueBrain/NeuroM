@@ -26,6 +26,7 @@ import neurom.apps.morph_stats
 from neurom.core.types import _ALL_SUBTYPE
 from neurom.core.types import _SOMA_SUBTYPE
 from neurom.core.types import SubtypeCollection
+from neurom.core.types import MutableEnum
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
 from neurom.core.types import tree_type_checker as is_type
@@ -132,7 +133,33 @@ class TestSubtypeCollection:
         assert pickle.loads(pickle.dumps(SubtypeCollection(1, 2, 3))) == [1, 2, 3]
 
 
+def test_MutableEnum():
+    with pytest.raises(
+        TypeError, match=r"The class Foo must have a subtype given as the last parent"
+    ):
+
+        class Foo(MutableEnum):
+            a = 1
+            b = 2
+
+    with pytest.raises(
+        TypeError, match=r"The subtype of the Foo class must have a 'subtypes' attribute"
+    ):
+
+        class Foo(MutableEnum, int):
+            a = 1
+            b = 2
+
+
 class TestNeuriteType:
+    def test_ctor(self):
+        assert NeuriteType.axon.name == "axon"
+        assert NeuriteType.axon.subtypes == (SectionType(2),)
+        assert NeuriteType("axon").name == "axon"
+        assert NeuriteType("axon").subtypes == (SectionType(2),)
+        assert NeuriteType(2).name == "axon"
+        assert NeuriteType(2).subtypes == (SectionType(2),)
+
     def test_repr(self):
         assert repr(NeuriteType(0)) == "<NeuriteType.undefined: (<SectionType.undefined: 0>,)>"
         assert repr(NeuriteType(32)) == "<NeuriteType.all: (<SectionType.all: 32>,)>"
