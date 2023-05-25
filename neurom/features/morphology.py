@@ -558,7 +558,7 @@ def sholl_frequency(
             min_distance = morph.soma.radius
             max_distance = min_distance + max(max_radius_per_neurite)
 
-        if distance_type == "path":
+        elif distance_type == "path":
             max_path_distance_per_neurite = [
                 max(sf.section_path_length(section) for section in iter_sections(n, Section.ileaf))
                 for n in morph.neurites
