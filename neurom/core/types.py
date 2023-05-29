@@ -28,12 +28,10 @@
 
 """Type enumerations."""
 import collections.abc
-from enum import Enum, unique
+from enum import Enum, EnumMeta, unique
 
-import numpy as np
 from morphio import SectionType
 
-from neurom.exceptions import NeuroMError
 from neurom.utils import OrderedEnum
 
 _SOMA_SUBTYPE = 31
@@ -52,242 +50,67 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
-class SubtypeCollection:
-    """The subtype use by the NeuriteType."""
-
-    @staticmethod
-    def _format_value(values):
-        # pylint: disable=protected-access
-        formatted_values = []
-        for val in values:
-            if isinstance(val, Enum):
-                formatted_values.extend(SubtypeCollection._format_value([val._value_]))
-            elif isinstance(val, SubtypeCollection):
-                formatted_values.extend(val.subtypes)
-            elif isinstance(val, collections.abc.Sequence) and not isinstance(val, str):
-                for i in val:
-                    formatted_values.extend(SubtypeCollection._format_value([i]))
-            else:
-                formatted_values.append(val)
-
-        return tuple(SectionType(s) for s in formatted_values)
-
-    def __init__(self, *value):
-        """Create an tuple representing a SubtypeCollection.
-
-        Args:
-            value (Union[
-                int, SubtypeCollection, NeuriteType, morphio.SectionType,
-                Sequence[int],
-                Sequence[SubtypeCollection],
-                Sequence[NeuriteType],
-                Sequence[morphio.SectionType]
-                ]): The value(s) of the subtype.
-        """
-        if not value:
-            raise ValueError("A SubtypeCollection object can not be empty")
-        values = self._format_value(value)
-        if len(values) > 1 and _ALL_SUBTYPE in values:
-            raise NeuroMError(
-                f"A subtype containing the value {_ALL_SUBTYPE} must contain only one element "
-                f"(current elements: {values})."
-            )
-        self.subtypes = values
-
-    def __hash__(self):
-        """Compute the hash of the object."""
-        return hash(self.subtypes)
-
-    def __len__(self):
-        """Return number of subtypes."""
-        return len(self.subtypes)
-
-    def __repr__(self):
-        """Printable representation of the object."""
-        return str(self.subtypes)
-
-    def __str__(self):
-        """String representation of the object."""
-        return "-".join(str(i) for i in self.subtypes)
-
-    def __int__(self):
-        """Return the integer representation of the object.
-
-        Note:
-            The subtypes are converted to a base 100 in order to be able to represent all relevant
-            values.
-        """
-        if len(self) == 1:
-            return int(self.subtypes[0])
-        return int(np.ravel_multi_index([int(i) for i in self.subtypes], (100,) * len(self)))
-
-    def is_composite(self):
-        """Check that the object is composite."""
-        return len(self.subtypes) > 1
-
-    def __eq__(self, other):
-        """Equal operator."""
-        if not isinstance(other, SubtypeCollection):
-            try:
-                other = SubtypeCollection(other)
-            except Exception:  # pylint: disable=broad-exception-caught
-                # If other can not be casted to SubtypeCollection it is not equal
-                return False
-        # if _ALL_SUBTYPE == self._value_ or _ALL_SUBTYPE == other._value_:
-        #     # This could be used to simplify the internal code of NeuroM
-        #     return True
-
-        if self.is_composite():
-            if other.is_composite():
-                is_eq = self.subtypes == other.subtypes
-            else:
-                is_eq = other.root_type in self.subtypes
-        else:
-            if other.is_composite():
-                is_eq = self.root_type in other.subtypes
-            else:
-                is_eq = self.root_type == other.root_type
-        return is_eq
-
-    def __ne__(self, other):
-        """Not equal operator."""
-        return not self == other
-
-    @property
-    def root_type(self):
-        """Get the root type of a composite type."""
-        return self.subtypes[0]
-
-
 def is_composite_type(subtype):
     """Check that the given type is composite."""
-    return SubtypeCollection(subtype).is_composite()
+    return NeuriteType(subtype).is_composite()
 
 
-class MutableEnumType(type):
-    """Metaclass that behaves like a simple EnumType class with mutable members."""
-
-    # pylint: disable=attribute-defined-outside-init
-
-    def __new__(mcs, cls_name, bases, classdict, **kwargs):
-        """The constructor of the class to update its members."""
-        # Build the new class
-        cls = super().__new__(mcs, cls_name, bases, classdict, **kwargs)
-
-        # Get the subtype
-        cls._member_type = cls.__mro__[-2]
-
-        if isinstance(cls._member_type, MutableEnumType) and cls.__name__ != "MutableEnum":
-            raise TypeError(
-                f"The class {cls.__name__} must have a subtype given as the last parent."
-            )
-
-        # Format the attributes
-        cls._reverse_mapping = {}
-        for key, value in vars(cls).items():
-            if key.startswith("_") or callable(value) or isinstance(value, (classmethod, property)):
-                continue
-            obj = cls._member_type(value)
-            if not hasattr(obj, "subtypes"):
-                raise TypeError(
-                    f"The subtype of the {cls.__name__} class must have a 'subtypes' attribute."
-                )
-            obj.__class__ = cls
-            obj._name_ = key
-            setattr(cls, key, obj)
-            cls._reverse_mapping[obj.subtypes] = key
-
-        return cls
-
-    def __call__(cls, *args):
-        """Retrieve a registered value instead of building new one."""
-        return cls.__new__(cls, *args)
-
-    def __iter__(cls):
-        """Iterate over registered values of the class."""
-        # pylint: disable=protected-access
-        return (getattr(cls, i) for i in cls._reverse_mapping.values())
-
-    def register(cls, name, value):
-        """Register a new key/value pair as attribute in the class."""
-        # pylint: disable=protected-access
-        obj = cls._member_type(value)
-        if hasattr(cls, name) or obj.subtypes in cls._reverse_mapping:
-            raise ValueError(f"The NeuriteType '{name}' is already registered.")
-        obj.__class__ = cls
-        obj._name_ = name
-        setattr(cls, name, obj)
-        cls._reverse_mapping[obj.subtypes] = name
-        return obj
-
-    def unregister(cls, name):
-        """Unregister an attribute from the class."""
-        if not hasattr(cls, name) or not isinstance(getattr(cls, name), cls):
-            raise ValueError(
-                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
-            )
-        del cls._reverse_mapping[getattr(cls, name).subtypes]
-        delattr(cls, name)
+def _is_sequence(obj):
+    return isinstance(obj, collections.abc.Sequence) and not isinstance(obj, str)
 
 
-class MutableEnum(metaclass=MutableEnumType):
-    """Class that behaves like a simple Enum class with mutable members."""
+def _int_or_tuple(values):
+    if isinstance(values, Enum):
+        return _int_or_tuple(values.value)
 
-    # pylint: disable=no-member
+    if isinstance(values, (int, SectionType)):
+        return int(values)
 
-    def __new__(cls, *args):
-        """Custom constructor to accept both keys and values."""
-        # pylint: disable=protected-access
-        if not args:
-            # Used by Pickle
-            return object.__new__(cls)
+    if _is_sequence(values):
+        if len(values) == 1:
+            return _int_or_tuple(values[0])
+        return tuple(_int_or_tuple(v) for v in values)
 
-        if len(args) > 1:
-            raise ValueError(f"The {cls.__name__} class constructor accepts only 1 argument.")
+    raise ValueError(f"Could not cast {values} to int or tuple of ints.")
 
-        value = args[0]
 
-        # Use NeuriteType name
-        if isinstance(value, cls):
-            value_str = value.name
-            if hasattr(cls, value_str):
-                return getattr(cls, value_str)
+# pylint: disable=redefined-builtin
+class _ArgsIntsOrTuples(EnumMeta):
+    def __call__(cls, value, names=None, *, module=None, qualname=None, type=None, start=1):
+        try:
+            value = _int_or_tuple(value)
+        except ValueError:
+            pass
+        return super().__call__(
+            value, names=names, module=module, qualname=qualname, type=type, start=start
+        )
 
-        # Name given as string
-        elif isinstance(value, str):
-            if hasattr(cls, value):
-                return getattr(cls, value)
 
-        # Composite type or unhashable type (e.g. list)
-        else:
-            try:
-                # subtype_value = SubtypeCollection(value).subtypes
-                subtype_value = cls._member_type(value).subtypes
-            except Exception:  # pylint: disable=broad-exception-caught
-                pass
-            else:
-                if subtype_value in cls._reverse_mapping:
-                    return getattr(cls, cls._reverse_mapping[subtype_value])
+def _create_neurite_type(cls, value, name=None):
+    """Construct and return a cls type."""
+    obj = object.__new__(cls)
 
-        # Invalid value
-        raise ValueError(f"{value} is not a valid registered {cls.__name__}")
+    # this is an optimization to avoid checks during runtime
+    if _is_sequence(value):
+        subtypes = value
+        root_type = value[0]
+    else:
+        subtypes = (value,)
+        root_type = value
 
-    @property
-    def name(self):
-        """Get the associated name of the class member."""
-        return self._name_
+    setattr(obj, "_value_", value)
 
-    def __repr__(self):
-        """Printable representation of the class member."""
-        return f"<{self.__class__.__name__}.{self._name_}: {repr(self.subtypes)}>"
+    if name:
+        setattr(obj, "_name_", name)
 
-    def __str__(self):
-        """String representation of the class member."""
-        return f"{self.__class__.__name__}.{self._name_}"
+    obj.subtypes = subtypes
+    obj.root_type = root_type
+
+    return obj
 
 
 # for backward compatibility with 'v1' version
-class NeuriteType(MutableEnum, SubtypeCollection):
+class NeuriteType(Enum, metaclass=_ArgsIntsOrTuples):
     """Type of neurite."""
 
     axon = SectionType.axon
@@ -304,6 +127,76 @@ class NeuriteType(MutableEnum, SubtypeCollection):
     custom10 = SectionType.custom10
 
     axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+
+    def __new__(cls, *values):
+        """Construct a NeuriteType from class definitions."""
+        return _create_neurite_type(cls, value=_int_or_tuple(values))
+
+    def __hash__(self):
+        """Return the has of the type."""
+        return hash(self._value_)
+
+    def is_composite(self):
+        """Return True if the type consists of more than 1 subtypes."""
+        return len(self.subtypes) > 1
+
+    def __eq__(self, other):
+        """Equal operator."""
+        if not isinstance(other, NeuriteType):
+            try:
+                other = NeuriteType(other)
+            except ValueError:
+                return False
+
+        if self.is_composite():
+            if other.is_composite():
+                is_eq = self.subtypes == other.subtypes
+            else:
+                is_eq = other.root_type in self.subtypes
+        else:
+            if other.is_composite():
+                is_eq = self.root_type in other.subtypes
+            else:
+                is_eq = self.root_type == other.root_type
+        return is_eq
+
+    @classmethod
+    def register(cls, name, value):
+        """Register a new value in the Enum class."""
+        value = _int_or_tuple(value)
+
+        if hasattr(cls, name):
+            existing = getattr(cls, name)
+            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
+
+        try:
+            existing = cls(value)
+        except ValueError:
+            existing = None
+
+        if existing:
+            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
+
+        obj = _create_neurite_type(cls, value, name=name)
+
+        cls._value2member_map_[value] = obj
+        cls._member_map_[name] = obj
+        cls._member_names_.append(name)
+
+        return obj
+
+    @classmethod
+    def unregister(cls, name):
+        """Unregister a value in the Enum class."""
+        if name not in cls._member_names_:
+            raise ValueError(
+                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
+            )
+
+        value = cls._member_map_[name].value
+        del cls._value2member_map_[value]
+        del cls._member_map_[name]
+        cls._member_names_.remove(name)
 
 
 #: Collection of all neurite types
