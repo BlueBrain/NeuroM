@@ -71,7 +71,7 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
 
     if (
         section_type != NeuriteType.all
-        and not is_composite_type(section_type)
+        and not any(is_composite_type(i) for i in check_type.type)
         and iterator_type in {Section.ibifurcation_point, Section.iforking_point}
     ):
 

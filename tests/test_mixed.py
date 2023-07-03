@@ -7,30 +7,29 @@ import warnings
 from copy import deepcopy
 from pathlib import Path
 import pytest
-import neurom
 import numpy as np
 import pandas as pd
 import numpy.testing as npt
 from enum import Enum
-from neurom import NeuriteType
-from neurom.features import get
-from neurom.core import Population
-from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
 import collections.abc
 
 from morphio import SectionType
-from neurom.core.morphology import Section, iter_neurites, iter_sections
-from neurom.core.types import tree_type_checker as is_type
 
+import neurom
+import neurom.apps.morph_stats
 import neurom.core.morphology
 import neurom.features.neurite
-import neurom.apps.morph_stats
+from neurom import NeuriteType
+from neurom.core import Population
 from neurom.core import types
+from neurom.core.morphology import Section, iter_neurites, iter_sections
 from neurom.core.types import _ALL_SUBTYPE
 from neurom.core.types import _SOMA_SUBTYPE
 from neurom.core.types import NeuriteType
-from neurom.exceptions import NeuroMError
 from neurom.core.types import tree_type_checker as is_type
+from neurom.exceptions import NeuroMError
+from neurom.features import _POPULATION_FEATURES, _MORPHOLOGY_FEATURES, _NEURITE_FEATURES
+from neurom.features import get
 
 
 @pytest.mark.parametrize(
@@ -605,6 +604,31 @@ def test_number_of_sections(mixed_morph, population):
         NeuroMError, match='Can not apply "neurite_type" arg to a Neurite with a neurite feature'
     ):
         assert get('number_of_sections', mixed_morph.neurites[1], neurite_type=NeuriteType.all)
+
+
+def test_multine_neurite_types(mixed_morph):
+    for process_subtrees in [False, True]:
+        mixed_morph.process_subtrees = process_subtrees
+        res = get(
+            "number_of_sections",
+            mixed_morph,
+            neurite_type=[NeuriteType.apical_dendrite, NeuriteType.basal_dendrite],
+        )
+        res1 = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.apical_dendrite)
+        res2 = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.basal_dendrite)
+
+        assert res == res1 + res2, (res, res1, res2)
+
+        res = get(
+            "number_of_sections",
+            mixed_morph,
+            neurite_type=[NeuriteType.apical_dendrite, NeuriteType.axon_carrying_dendrite],
+        )
+        res1 = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.apical_dendrite)
+        res2 = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.basal_dendrite)
+        res3 = get("number_of_sections", mixed_morph, neurite_type=NeuriteType.axon)
+
+        assert res == res1 + res2 + res3, (res, res1, res2, res3)
 
 
 def test_iter_neurites__heterogeneous(mixed_morph):
