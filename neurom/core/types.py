@@ -59,6 +59,15 @@ class NeuriteType(IntEnum):
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
+    custom11 = SectionType.custom11
+    custom12 = SectionType.custom12
+    custom13 = SectionType.custom13
+    custom14 = SectionType.custom14
+    custom15 = SectionType.custom15
+    custom16 = SectionType.custom16
+    custom17 = SectionType.custom17
+    custom18 = SectionType.custom18
+    custom19 = SectionType.custom19
 
 
 #: Collection of all neurite types
