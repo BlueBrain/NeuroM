@@ -36,7 +36,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 from morphio import PointLevel, SectionType
-from numpy import testing as npt
 from numpy.testing import assert_allclose
 from numpy.testing import assert_almost_equal
 from numpy.testing import assert_array_almost_equal
@@ -491,25 +490,79 @@ def test_trunk_elevation_zero_norm_vector_raises():
         morphology.trunk_origin_elevations(SWC_NRN)
 
 
-def test_sholl_crossings_simple():
-    center = SIMPLE.soma.center
+def test_sholl_crossings_simple(SIMPLE_MORPHOLOGY):
+    center = SIMPLE_MORPHOLOGY.soma.center
     radii = []
-    assert list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii)) == []
-    assert list(morphology.sholl_crossings(SIMPLE, radii=radii)) == []
-    assert list(morphology.sholl_crossings(SIMPLE)) == [2]
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY, center=center, radii=radii)) == []
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY, radii=radii)) == []
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY)) == [2]
 
     radii = [1.0]
-    assert [2] == list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii))
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY, center=center, radii=radii)) == [2]
 
     radii = [1.0, 5.1]
-    assert [2, 4] == list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii))
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY, center=center, radii=radii)) == [2, 4]
 
     radii = [1.0, 4.0, 5.0]
-    assert [2, 4, 5] == list(morphology.sholl_crossings(SIMPLE, center=center, radii=radii))
+    assert list(morphology.sholl_crossings(SIMPLE_MORPHOLOGY, center=center, radii=radii)) == [
+        2,
+        4,
+        5,
+    ]
 
-    assert [1, 1, 2] == list(
-        morphology.sholl_crossings(SIMPLE.sections[:2], center=center, radii=radii)
-    )
+    assert list(
+        morphology.sholl_crossings(SIMPLE_MORPHOLOGY.sections[:2], center=center, radii=radii)
+    ) == [1, 1, 2]
+
+    radii = [1.0, 4.0, 5.0, 10]
+    assert list(
+        morphology.sholl_crossings(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.all, center=center, radii=radii
+        )
+    ) == [2, 4, 5, 0]
+    assert list(
+        morphology.sholl_crossings(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.basal_dendrite, center=center, radii=radii
+        )
+    ) == [1, 1, 3, 0]
+    assert list(
+        morphology.sholl_crossings(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.apical_dendrite, center=center, radii=radii
+        )
+    ) == [0, 0, 0, 0]
+    assert list(
+        morphology.sholl_crossings(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.axon, center=center, radii=radii
+        )
+    ) == [1, 3, 2, 0]
+
+
+def test_sholl_frequency_simple(SIMPLE_MORPHOLOGY):
+    assert list(morphology.sholl_frequency(SIMPLE_MORPHOLOGY)) == [2]
+    assert list(morphology.sholl_frequency(SIMPLE_MORPHOLOGY, step_size=3)) == [2, 4, 3]
+    assert list(morphology.sholl_frequency(SIMPLE_MORPHOLOGY, bins=[1, 3, 5])) == [2, 2, 5]
+
+    assert list(
+        morphology.sholl_frequency(SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.basal_dendrite)
+    ) == [1]
+    assert list(
+        morphology.sholl_frequency(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.basal_dendrite, step_size=3
+        )
+    ) == [1, 1, 2]
+    assert list(
+        morphology.sholl_frequency(
+            SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.basal_dendrite, bins=[1, 3, 5]
+        )
+    ) == [1, 1, 3]
+
+    assert list(morphology.sholl_frequency(SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.axon)) == [1]
+    assert list(
+        morphology.sholl_frequency(SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.axon, step_size=3)
+    ) == [1, 3, 1]
+    assert list(
+        morphology.sholl_frequency(SIMPLE_MORPHOLOGY, neurite_type=NeuriteType.axon, bins=[1, 3, 5])
+    ) == [1, 1, 2]
 
 
 def load_swc(string):
@@ -764,12 +817,12 @@ def test_unique_projected_points():
     )
 
     for plane, enalp in zip(("xy", "xz", "yz"), ("yx", "zx", "zy")):
-        npt.assert_allclose(
+        assert_allclose(
             morphology._unique_projected_points(morph, plane, NeuriteType.all),
             morphology._unique_projected_points(morph, enalp, NeuriteType.all),
         )
 
-    npt.assert_allclose(
+    assert_allclose(
         morphology._unique_projected_points(morph, "xy", NeuriteType.all),
         [
             [0.0, 0.0],
@@ -790,7 +843,7 @@ def test_unique_projected_points():
             [1.0, 1.0],
         ],
     )
-    npt.assert_allclose(
+    assert_allclose(
         morphology._unique_projected_points(morph, "xz", NeuriteType.all),
         [
             [0.0, 0.0],
@@ -811,7 +864,7 @@ def test_unique_projected_points():
             [1.0, 1.0],
         ],
     )
-    npt.assert_allclose(
+    assert_allclose(
         morphology._unique_projected_points(morph, "yz", NeuriteType.all),
         [
             [0.0, 0.0],

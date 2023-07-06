@@ -78,7 +78,7 @@ def test_tree_type_checker_broken():
 
 def test_tree_type_checker_error():
     with pytest.raises(ValueError, match='is not a valid NeuriteType'):
-        tree_type_checker('all')
+        tree_type_checker('NOT A VALID NeuriteType')
 
 
 def test_type_filters():

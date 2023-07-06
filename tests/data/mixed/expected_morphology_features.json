@@ -29,8 +29,7 @@
       ],
       "expected_with_subtrees": [
         5,
-        4,
-        5,
+        9,
         5
       ]
     },
@@ -65,6 +64,19 @@
       ],
       "expected_with_subtrees": [
         5
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        5,
+        9
+      ],
+      "expected_with_subtrees": [
+        5,
+        9
       ]
     }
   ],
@@ -125,6 +137,18 @@
       },
       "expected_wout_subtrees": 0.0,
       "expected_with_subtrees": 4.47213595499958
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2],
+        "origin": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.472136
     }
   ],
   "total_length_per_neurite": [
@@ -139,8 +163,7 @@
       ],
       "expected_with_subtrees": [
         5.0,
-        5.414213,
-        5.414213,
+        10.828427,
         5.0
       ]
     },
@@ -176,6 +199,19 @@
       "expected_with_subtrees": [
         5.0
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        5.0,
+        10.828427
+      ],
+      "expected_with_subtrees": [
+        5.0,
+        10.828427
+      ]
     }
   ],
   "total_area_per_neurite": [
@@ -190,8 +226,7 @@
       ],
       "expected_with_subtrees": [
         3.141593,
-        3.401851,
-        3.401851,
+        6.803702,
         3.141593
       ]
     },
@@ -227,6 +262,19 @@
       "expected_with_subtrees": [
         3.141593
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.141593,
+        6.803702
+      ],
+      "expected_with_subtrees": [
+        3.141593,
+        6.803702
+      ]
     }
   ],
   "total_volume_per_neurite": [
@@ -241,8 +289,7 @@
       ],
       "expected_with_subtrees": [
         0.15708,
-        0.170093,
-        0.170093,
+        0.340185,
         0.15708
       ]
     },
@@ -277,6 +324,19 @@
       ],
       "expected_with_subtrees": [
         0.15708
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        0.15708,
+        0.340185
+      ],
+      "expected_with_subtrees": [
+        0.15708,
+        0.340185
       ]
     }
   ],
@@ -324,6 +384,19 @@
         0.0
       ],
       "expected_with_subtrees": [
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.1415927,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        3.1415927,
         0.0
       ]
     }
@@ -374,6 +447,19 @@
       "expected_with_subtrees": [
         -1.570796
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        1.5707964
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        1.5707964
+      ]
     }
   ],
   "trunk_vectors": [
@@ -407,11 +493,6 @@
         [
           0.0,
           1.0,
-          0.0
-        ],
-        [
-          1.0,
-          2.0,
           0.0
         ],
         [
@@ -455,13 +536,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          1.0,
-          2.0,
-          0.0
-        ]
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -478,6 +553,35 @@
         [
           0.0,
           -1.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
           0.0
         ]
       ]
@@ -565,11 +669,6 @@
           0.0
         ],
         [
-          0.463648,
-          -0.463648,
-          0.0
-        ],
-        [
           3.141592653589793,
           3.141592653589793,
           0.0
@@ -610,13 +709,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          0.463648,
-          -0.463648,
-          0.0
-        ]
-      ]
+      "expected_with_subtrees": []
     }
   ],
   "trunk_angles_inter_types": [
@@ -626,22 +719,7 @@
         "target_neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        [
-          [
-            2.034444,
-            1.107149,
-            -3.141593
-          ]
-        ],
-        [
-          [
-            0.463648,
-            -0.463648,
-            0.0
-          ]
-        ]
-      ]
+      "expected_with_subtrees": []
     }
   ],
   "trunk_origin_radii": [
@@ -657,7 +735,6 @@
       "expected_with_subtrees": [
         0.1,
         0.1,
-        0.1,
         0.1
       ]
     },
@@ -679,9 +756,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        0.1
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -708,7 +783,6 @@
       "expected_with_subtrees": [
         1.0,
         1.414213,
-        1.414213,
         1.0
       ]
     },
@@ -730,9 +804,7 @@
         "neurite_type": 2
       },
       "expected_wout_subtrees": [],
-      "expected_with_subtrees": [
-        1.414213
-      ]
+      "expected_with_subtrees": []
     },
     {
       "kwargs": {
@@ -752,7 +824,7 @@
         "neurite_type": 32
       },
       "expected_wout_subtrees": 3,
-      "expected_with_subtrees": 4
+      "expected_with_subtrees": 3
     },
     {
       "kwargs": {
@@ -788,8 +860,7 @@
       ],
       "expected_with_subtrees": [
         0.235619,
-        0.255139,
-        0.170093,
+        0.063785,
         0.235619
       ]
     },
@@ -1174,8 +1245,8 @@
       "kwargs": {
         "neurite_type": 3
       },
-      "expected_wout_subtrees": 0.61591,
-      "expected_with_subtrees": 0.74729
+      "expected_wout_subtrees": 0.74729,
+      "expected_with_subtrees": 0.61591
     }
   ],
   "number_of_segments": [
@@ -1992,6 +2063,7 @@
       "expected_with_subtrees": [
         2.0,
         3.0,
+        2.236068,
         4.123106,
         3.605551,
         4.24264,
@@ -2038,6 +2110,27 @@
       "expected_with_subtrees": [
         2.0,
         3.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264
       ]
     }
   ],
@@ -2366,6 +2459,7 @@
       "expected_with_subtrees": [
         1.0,
         1.0,
+        1.414214,
         2.0,
         1.414214,
         1.0,
@@ -2411,6 +2505,27 @@
       ],
       "expected_with_subtrees": [
         1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
         1.0
       ]
     }
@@ -2546,6 +2661,7 @@
       "expected_with_subtrees": [
         0,
         1,
+        0,
         1,
         1,
         2,
@@ -2895,6 +3011,43 @@
       ],
       "expected_with_subtrees": [
         1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
         1.0,
         1.0,
         1.0,
@@ -3942,6 +4095,13 @@
       },
       "expected_wout_subtrees": 5,
       "expected_with_subtrees": 5
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 14,
+      "expected_with_subtrees": 14
     }
   ],
   "number_of_bifurcations": [
@@ -3950,7 +4110,7 @@
         "neurite_type": 32
       },
       "expected_wout_subtrees": 8,
-      "expected_with_subtrees": 7
+      "expected_with_subtrees": 8
     },
     {
       "kwargs": {
@@ -3972,6 +4132,13 @@
       },
       "expected_wout_subtrees": 2,
       "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 6
     }
   ],
   "number_of_forking_points": [
@@ -3980,7 +4147,7 @@
         "neurite_type": 32
       },
       "expected_wout_subtrees": 8,
-      "expected_with_subtrees": 7
+      "expected_with_subtrees": 8
     },
     {
       "kwargs": {
@@ -4002,6 +4169,13 @@
       },
       "expected_wout_subtrees": 2,
       "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 6
     }
   ],
   "local_bifurcation_angles": [
@@ -4022,6 +4196,7 @@
       "expected_with_subtrees": [
         1.570796,
         3.141593,
+        0.785398,
         3.141593,
         1.570796,
         3.141593,
@@ -4089,6 +4264,7 @@
       "expected_with_subtrees": [
         1.570796,
         3.141593,
+        0.785398,
         3.141593,
         1.570796,
         3.141593,
@@ -4136,6 +4312,27 @@
         1.570796,
         3.141593
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ]
     }
   ],
   "sibling_ratios": [
@@ -4154,6 +4351,7 @@
         1.0
       ],
       "expected_with_subtrees": [
+        1.0,
         1.0,
         1.0,
         1.0,
@@ -4254,6 +4452,10 @@
           1.0
         ],
         [
+          3.0,
+          5.0
+        ],
+        [
           1.0,
           1.0
         ],
@@ -4360,6 +4562,63 @@
           1.0
         ]
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
     }
   ],
   "diameter_power_relations": [
@@ -4378,6 +4637,7 @@
         2.0
       ],
       "expected_with_subtrees": [
+        2.0,
         2.0,
         2.0,
         2.0,
@@ -4447,6 +4707,7 @@
       "expected_with_subtrees": [
         3.0,
         1.0,
+        1.666667,
         1.0,
         3.0,
         1.0,
@@ -4494,6 +4755,27 @@
         3.0,
         1.0
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0
+      ]
     }
   ],
   "section_path_distances": [
@@ -4528,15 +4810,15 @@
         3.0,
         3.0,
         2.0,
-        1.414214,
-        3.414214,
-        4.414214,
-        4.414214,
-        1.414214,
-        2.414214,
-        2.414214,
-        3.414214,
-        3.414214,
+        1.414213,
+        3.414213,
+        4.414213,
+        4.414213,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
         1.0,
         2.0,
         3.0,
@@ -4582,11 +4864,11 @@
       },
       "expected_wout_subtrees": [],
       "expected_with_subtrees": [
-        1.414214,
-        2.414214,
-        2.414214,
-        3.414214,
-        3.414214
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427
       ]
     }
   ],
@@ -4614,9 +4896,9 @@
         2.0,
         4.414214,
         4.414214,
-        2.414214,
-        3.414214,
-        3.414214,
+        3.828427,
+        4.828427,
+        4.828427,
         3.0,
         3.0,
         2.0
@@ -4650,9 +4932,9 @@
       },
       "expected_wout_subtrees": [],
       "expected_with_subtrees": [
-        2.414214,
-        3.414214,
-        3.414214
+        3.828427,
+        4.828427,
+        4.828427
       ]
     },
     {
@@ -4683,8 +4965,7 @@
       ],
       "expected_with_subtrees": [
         2.0,
-        3.154926,
-        2.235207,
+        3.596771,
         2.0
       ]
     },
@@ -4742,6 +5023,7 @@
       "expected_with_subtrees": [
         0.5,
         0.0,
+        0.25,
         0.0,
         0.5,
         0.0,
@@ -4814,8 +5096,9 @@
       "expected_with_subtrees": [
         0.4,
         0.0,
+        0.130601,
         0.0,
-        0.369398,
+        0.184699,
         0.0,
         0.4,
         0.0
@@ -4884,8 +5167,9 @@
       "expected_with_subtrees": [
         0.4,
         0.0,
+        0.130601,
         0.0,
-        0.369398,
+        0.184699,
         0.0,
         0.4,
         0.0
@@ -4969,11 +5253,11 @@
         3.414213,
         4.414213,
         4.414213,
-        1.414214,
-        2.414214,
-        2.414214,
-        3.414214,
-        3.414214,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
         1.0,
         2.0,
         3.0,

@@ -120,7 +120,7 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_morphology(morph, reader=None):
+def load_morphology(morph, reader=None, process_subtrees=False):
     """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
@@ -157,18 +157,20 @@ def load_morphology(morph, reader=None):
                                                    )'''), reader='asc')
     """
     if isinstance(morph, Morphology):
-        return Morphology(morph.to_morphio())
+        return Morphology(morph.to_morphio(), process_subtrees=process_subtrees)
 
     if isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
-        return Morphology(morph)
+        return Morphology(morph, process_subtrees=process_subtrees)
 
     if reader:
-        return Morphology(_get_file(morph, reader))
+        return Morphology(_get_file(morph, reader), process_subtrees=process_subtrees)
 
-    return Morphology(morph, Path(morph).name)
+    return Morphology(morph, Path(morph).name, process_subtrees=process_subtrees)
 
 
-def load_morphologies(morphs, name=None, ignored_exceptions=(), cache=False):
+def load_morphologies(
+    morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False
+):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
@@ -191,4 +193,4 @@ def load_morphologies(morphs, name=None, ignored_exceptions=(), cache=False):
     else:
         files = morphs
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions, cache)
+    return Population(files, name, ignored_exceptions, cache, process_subtrees=process_subtrees)

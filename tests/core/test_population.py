@@ -58,7 +58,8 @@ def test_names(pop):
 def test_indexing():
     pop = populations[0]
     for i, n in enumerate(NEURONS):
-        assert n is pop[i]
+        assert n.name == pop[i].name
+        assert (n.points == pop[i].points).all()
     with pytest.raises(ValueError, match='no 10 index'):
         pop[10]
 
@@ -69,22 +70,53 @@ def test_cache():
         assert isinstance(n, Morphology)
 
 
+@pytest.mark.parametrize("cache", [True, False])
+def test_reset_cache(cache):
+    pop = Population(FILES, cache=cache, process_subtrees=True)
+
+    assert pop._process_subtrees is True
+    for n in pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is True
+
+    pop.process_subtrees = False
+    assert pop._process_subtrees is False
+    for n in pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is False
+
+    mixed_pop = Population(FILES + NEURONS, cache=cache, process_subtrees=True)
+    assert mixed_pop._process_subtrees is True
+    for n in mixed_pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is True
+
+    mixed_pop.process_subtrees = False
+    assert mixed_pop._process_subtrees is False
+    for n in mixed_pop:
+        assert isinstance(n, Morphology)
+        assert n.process_subtrees is False
+
+
 def test_double_indexing():
     pop = populations[0]
     for i, n in enumerate(NEURONS):
-        assert n is pop[i]
+        assert n.name == pop[i].name
+        assert (n.points == pop[i].points).all()
     # second time to assure that generator is available again
     for i, n in enumerate(NEURONS):
-        assert n is pop[i]
+        assert n.name == pop[i].name
+        assert (n.points == pop[i].points).all()
 
 
 def test_iterating():
     pop = populations[0]
     for a, b in zip(NEURONS, pop):
-        assert a is b
+        assert a.name == b.name
+        assert (a.points == b.points).all()
 
     for a, b in zip(NEURONS, pop.somata):
-        assert a.soma is b
+        assert (a.soma.points == b.points).all()
 
 
 @pytest.mark.parametrize('pop', populations)
@@ -95,7 +127,8 @@ def test_len(pop):
 def test_getitem():
     pop = populations[0]
     for i in range(len(NEURONS)):
-        assert pop[i] is NEURONS[i]
+        assert pop[i].name == NEURONS[i].name
+        assert (pop[i].points == NEURONS[i].points).all()
 
 
 @pytest.mark.parametrize('pop', populations)

@@ -52,7 +52,7 @@ import numpy as np
 from neurom import morphmath, utils
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import Section, iter_points
-from neurom.core.types import NeuriteType
+from neurom.core.types import NeuriteType, is_composite_type
 from neurom.core.types import tree_type_checker as is_type
 from neurom.features import NameSpace
 from neurom.features import bifurcation as bf
@@ -69,15 +69,15 @@ def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=Ne
     """Map `fun` to all the sections."""
     check_type = is_type(section_type)
 
-    def homogeneous_filter(section):
-        return check_type(section) and Section.is_homogeneous_point(section)
-
-    # forking sections cannot be heterogeneous
     if (
-        iterator_type in {Section.ibifurcation_point, Section.iforking_point}
-        and section_type != NeuriteType.all
+        section_type != NeuriteType.all
+        and not any(is_composite_type(i) for i in check_type.type)
+        and iterator_type in {Section.ibifurcation_point, Section.iforking_point}
     ):
-        filt = homogeneous_filter
+
+        def filt(section):
+            return check_type(section) and Section.is_homogeneous_point(section)
+
     else:
         filt = check_type
 
@@ -94,7 +94,7 @@ def number_of_segments(neurite, section_type=NeuriteType.all):
 def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
     return len(
-        _map_sections(lambda s: s, neurite, iterator_type=iterator_type, section_type=section_type)
+        _map_sections(lambda x: 1, neurite, iterator_type=iterator_type, section_type=section_type)
     )
 
 

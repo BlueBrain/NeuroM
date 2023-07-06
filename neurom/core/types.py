@@ -27,12 +27,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Type enumerations."""
-
-from enum import IntEnum, unique
+import collections.abc
+from enum import Enum, EnumMeta, unique
 
 from morphio import SectionType
 
 from neurom.utils import OrderedEnum
+
+_SOMA_SUBTYPE = 31
+_ALL_SUBTYPE = 32
 
 
 @unique
@@ -47,22 +50,153 @@ class NeuriteIter(OrderedEnum):
     NRN = 2
 
 
+def is_composite_type(subtype):
+    """Check that the given type is composite."""
+    return NeuriteType(subtype).is_composite()
+
+
+def _is_sequence(obj):
+    return isinstance(obj, collections.abc.Sequence) and not isinstance(obj, str)
+
+
+def _int_or_tuple(values):
+    if isinstance(values, Enum):
+        return _int_or_tuple(values.value)
+
+    if isinstance(values, (int, SectionType)):
+        return int(values)
+
+    if _is_sequence(values):
+        if len(values) == 1:
+            return _int_or_tuple(values[0])
+        return tuple(_int_or_tuple(v) for v in values)
+
+    raise ValueError(f"Could not cast {values} to int or tuple of ints.")
+
+
+# pylint: disable=redefined-builtin
+class _ArgsIntsOrTuples(EnumMeta):
+    def __call__(cls, value, names=None, *, module=None, qualname=None, type=None, start=1):
+        try:
+            value = _int_or_tuple(value)
+        except ValueError:
+            pass
+        return super().__call__(
+            value, names=names, module=module, qualname=qualname, type=type, start=start
+        )
+
+
+def _create_neurite_type(cls, value, name=None):
+    """Construct and return a cls type."""
+    obj = object.__new__(cls)
+
+    # this is an optimization to avoid checks during runtime
+    if _is_sequence(value):
+        subtypes = value
+        root_type = value[0]
+    else:
+        subtypes = (value,)
+        root_type = value
+
+    setattr(obj, "_value_", value)
+
+    if name:
+        setattr(obj, "_name_", name)
+
+    obj.subtypes = subtypes
+    obj.root_type = root_type
+
+    return obj
+
+
 # for backward compatibility with 'v1' version
-class NeuriteType(IntEnum):
+class NeuriteType(Enum, metaclass=_ArgsIntsOrTuples):
     """Type of neurite."""
 
     axon = SectionType.axon
     apical_dendrite = SectionType.apical_dendrite
     basal_dendrite = SectionType.basal_dendrite
     undefined = SectionType.undefined
-    soma = 31
-    all = 32
+    soma = SectionType.soma
+    all = SectionType.all
     custom5 = SectionType.custom5
     custom6 = SectionType.custom6
     custom7 = SectionType.custom7
     custom8 = SectionType.custom8
     custom9 = SectionType.custom9
     custom10 = SectionType.custom10
+
+    axon_carrying_dendrite = SectionType.basal_dendrite, SectionType.axon
+
+    def __new__(cls, *values):
+        """Construct a NeuriteType from class definitions."""
+        return _create_neurite_type(cls, value=_int_or_tuple(values))
+
+    def __hash__(self):
+        """Return the has of the type."""
+        return hash(self._value_)
+
+    def is_composite(self):
+        """Return True if the type consists of more than 1 subtypes."""
+        return len(self.subtypes) > 1
+
+    def __eq__(self, other):
+        """Equal operator."""
+        if not isinstance(other, NeuriteType):
+            try:
+                other = NeuriteType(other)
+            except ValueError:
+                return False
+
+        if self.is_composite():
+            if other.is_composite():
+                is_eq = self.subtypes == other.subtypes
+            else:
+                is_eq = other.root_type in self.subtypes
+        else:
+            if other.is_composite():
+                is_eq = self.root_type in other.subtypes
+            else:
+                is_eq = self.root_type == other.root_type
+        return is_eq
+
+    @classmethod
+    def register(cls, name, value):
+        """Register a new value in the Enum class."""
+        value = _int_or_tuple(value)
+
+        if hasattr(cls, name):
+            existing = getattr(cls, name)
+            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
+
+        try:
+            existing = cls(value)
+        except ValueError:
+            existing = None
+
+        if existing:
+            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
+
+        obj = _create_neurite_type(cls, value, name=name)
+
+        cls._value2member_map_[value] = obj
+        cls._member_map_[name] = obj
+        cls._member_names_.append(name)
+
+        return obj
+
+    @classmethod
+    def unregister(cls, name):
+        """Unregister a value in the Enum class."""
+        if name not in cls._member_names_:
+            raise ValueError(
+                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
+            )
+
+        value = cls._member_map_[name].value
+        del cls._value2member_map_[value]
+        del cls._member_map_[name]
+        cls._member_names_.remove(name)
 
 
 #: Collection of all neurite types
@@ -95,12 +229,11 @@ def tree_type_checker(*ref):
         >>> it = iter_neurites(m, filt=tree_filter)
     """
     ref = tuple(ref)
-    if len(ref) == 1 and isinstance(ref[0], tuple):
+    if len(ref) == 1 and isinstance(ref[0], (list, tuple)):
         # if `ref` is passed as a tuple of types
         ref = ref[0]
     # validate that all values are of NeuriteType
-    for t in ref:
-        NeuriteType(t)
+    ref = [NeuriteType(t) for t in ref]
     if NeuriteType.all in ref:
 
         def check_tree_type(_):
@@ -116,6 +249,8 @@ def tree_type_checker(*ref):
                 True if ref in the same type as tree.type or ref is NeuriteType.all
             """
             return tree.type in ref
+
+    check_tree_type.type = ref
 
     return check_tree_type
 

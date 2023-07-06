@@ -783,33 +783,31 @@ def test_section_radial_distances_origin():
 
 def test_number_of_sections_per_neurite():
     for use_subtrees in (True, False):
-        nsecs = features.get('number_of_sections_per_neurite', NEURON, use_subtrees=use_subtrees)
+        neuron = load_morphology(NEURON_PATH, process_subtrees=use_subtrees)
+        nsecs = features.get('number_of_sections_per_neurite', neuron)
         assert len(nsecs) == 4
         assert np.all(nsecs == [21, 21, 21, 21])
 
         nsecs = features.get(
             'number_of_sections_per_neurite',
-            NEURON,
+            neuron,
             neurite_type=NeuriteType.axon,
-            use_subtrees=use_subtrees,
         )
         assert len(nsecs) == 1
         assert nsecs == [21]
 
         nsecs = features.get(
             'number_of_sections_per_neurite',
-            NEURON,
+            neuron,
             neurite_type=NeuriteType.basal_dendrite,
-            use_subtrees=use_subtrees,
         )
         assert len(nsecs) == 2
         assert np.all(nsecs == [21, 21])
 
         nsecs = features.get(
             'number_of_sections_per_neurite',
-            NEURON,
+            neuron,
             neurite_type=NeuriteType.apical_dendrite,
-            use_subtrees=use_subtrees,
         )
         assert len(nsecs) == 1
         assert np.all(nsecs == [21])
@@ -885,7 +883,8 @@ def test_sholl_frequency():
         [1, 2, 2, 6, 2, 2, 2, 2, 2],
     )
 
-    assert len(features.get('sholl_frequency', POP)) == 108
+    pop = Population([NEURON, NEURON])
+    assert len(features.get('sholl_frequency', pop)) == 10
 
     # check that the soma is taken into account for calculating max radius and num bins
     m = nm.load_morphology(

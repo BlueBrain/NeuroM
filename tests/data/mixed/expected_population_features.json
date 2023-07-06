@@ -52,6 +52,20 @@
         0,
         2
       ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2],
+        "step_size": 3
+      },
+      "expected_wout_subtrees": [
+        0,
+        4
+      ],
+      "expected_with_subtrees": [
+        0,
+        4
+      ]
     }
   ]
 }

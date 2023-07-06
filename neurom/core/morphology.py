@@ -34,6 +34,7 @@ from pathlib import Path
 
 import morphio
 import numpy as np
+from cached_property import cached_property
 
 from neurom import morphmath
 from neurom.core.dataformat import COLS
@@ -219,36 +220,7 @@ NRN_ORDER = {
 }
 
 
-def _homogeneous_subtrees(neurite):
-    """Returns a list of the root nodes of the sub-neurites.
-
-    A sub-neurite can be either the entire tree or a homogeneous downstream
-    sub-tree.
-    """
-    it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).to_morphio())]
-
-    for section in it:
-        if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.to_morphio()))
-
-    homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
-
-    if len(homogeneous_neurites) >= 2 and homogeneous_types != [
-        NeuriteType.basal_dendrite,
-        NeuriteType.axon,
-    ]:
-        warnings.warn(
-            f"{neurite} is not an axon-carrying dendrite. "
-            f"Subtree types found {homogeneous_types}",
-            stacklevel=2,
-        )
-    return homogeneous_neurites
-
-
-def iter_neurites(
-    obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder, use_subtrees=False
-):
+def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
     """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
@@ -267,7 +239,7 @@ def iter_neurites(
         >>> from neurom.core.morphology import iter_neurites
         >>> from neurom import load_morphologies
         >>> pop = load_morphologies("tests/data/valid_set")
-        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
+        >>> n_points = [n for n in iter_neurites(pop, lambda x, section_type: len(x.points))]
 
         Get the number of points in each axon in a morphology population
 
@@ -276,7 +248,7 @@ def iter_neurites(
         >>> from neurom import load_morphologies
         >>> pop = load_morphologies("tests/data/valid_set")
         >>> filter = lambda n : n.type == nm.AXON
-        >>> mapping = lambda n : len(n.points)
+        >>> mapping = lambda n, section_type: len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
     if isinstance(obj, Neurite):
@@ -295,21 +267,22 @@ def iter_neurites(
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
 
-    if use_subtrees:
-        neurites = flatten(
-            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
-            for neurite in neurites
-        )
-
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 
     if mapfun is None:
         return neurite_iter
 
-    if use_subtrees:
-        return (mapfun(neurite, section_type=neurite.type) for neurite in neurite_iter)
-
-    return map(mapfun, neurite_iter)
+    return (
+        (
+            mapfun(
+                neurite,
+                section_type=filt.type if filt is not None else None,
+            )
+            if neurite.process_subtrees
+            else mapfun(neurite, section_type=NeuriteType.all)
+        )
+        for neurite in neurite_iter
+    )
 
 
 def iter_sections(
@@ -419,13 +392,26 @@ def graft_morphology(section):
 class Neurite:
     """Class representing a neurite tree."""
 
-    def __init__(self, root_node):
+    def __init__(self, root_node, process_subtrees=False):
         """Constructor.
 
         Args:
             root_node (morphio.Section): root section
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
         self._root_node = root_node
+        self._process_subtrees = process_subtrees
+
+    @property
+    def process_subtrees(self):
+        """Enable mixed tree processing if set to True."""
+        return self._process_subtrees
+
+    @process_subtrees.setter
+    def process_subtrees(self, value):
+        self._process_subtrees = value
+        if "type" in vars(self):
+            del vars(self)["type"]
 
     @property
     def morphio_root_node(self):
@@ -437,10 +423,25 @@ class Neurite:
         """The first section of the neurite."""
         return Section(self.morphio_root_node)
 
-    @property
+    @cached_property
     def type(self):
-        """The type of the root node."""
-        return self.root_node.type
+        """The type of the Neurite (which can be composite)."""
+        return NeuriteType(self.subtree_types)
+
+    @cached_property
+    def subtree_types(self):
+        """The types of the subtrees."""
+        if not self._process_subtrees:
+            return NeuriteType(self.morphio_root_node.type)
+
+        it = self.root_node.ipreorder()
+        subtree_types = [next(it).to_morphio().type]
+
+        for section in it:
+            if section.type != section.parent.type:
+                subtree_types.append(NeuriteType(section.to_morphio().type))
+
+        return subtree_types
 
     @property
     def points(self):
@@ -510,11 +511,15 @@ class Neurite:
 
     def __eq__(self, other):
         """If root node ids and types are equal."""
-        return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
+        return (
+            self.type == other.type
+            and self.morphio_root_node.id == other.morphio_root_node.id
+            and self.process_subtrees == other.process_subtrees
+        )
 
     def __hash__(self):
         """Hash is made of tuple of type and root_node."""
-        return hash((self.type, self.root_node))
+        return hash((self.type, self.root_node, self.process_subtrees))
 
     def __repr__(self):
         """Return a string representation."""
@@ -524,12 +529,13 @@ class Neurite:
 class Morphology:
     """Class representing a simple morphology."""
 
-    def __init__(self, filename, name=None):
+    def __init__(self, filename, name=None, process_subtrees=False):
         """Morphology constructor.
 
         Args:
             filename (str|Path): a filename or morphio.{mut}.Morphology object
             name (str): an optional morphology name
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
         self._morphio_morph = morphio.mut.Morphology(filename)
 
@@ -539,14 +545,23 @@ class Morphology:
         self.name = name if name else 'Morphology'
         self.soma = make_soma(self._morphio_morph.soma)
 
+        self.process_subtrees = process_subtrees
+
     def to_morphio(self):
         """Returns the morphio morphology object."""
         return self._morphio_morph
 
+    def copy(self):
+        """Returns a shallow copy of the morphio morphology object."""
+        return Morphology(self.to_morphio(), name=self.name, process_subtrees=self.process_subtrees)
+
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self._morphio_morph.root_sections]
+        return [
+            Neurite(root_section, process_subtrees=self.process_subtrees)
+            for root_section in self._morphio_morph.root_sections
+        ]
 
     def section(self, section_id):
         """Returns the section with the given id."""
