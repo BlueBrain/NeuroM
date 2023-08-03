@@ -34,6 +34,7 @@ from pathlib import Path
 import neurom as nm
 import pandas as pd
 from neurom.apps import morph_stats as ms
+from neurom.core.population import Population
 from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES
 
@@ -335,6 +336,30 @@ def test_extract_dataframe():
     # drop raw features as they require too much test data to mock
     actual = actual.drop(columns='raw_section_branch_orders', level=1)
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
+    assert REF_CONFIG_NEW == initial_config
+
+    # Test with a List[Population] argument
+    pop1 = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'], name="Pop1")
+    pop2 = Population(pop1)
+    pop2.name = "Pop2"
+    actual = ms.extract_dataframe([pop1, pop2], REF_CONFIG_NEW)
+    actual = actual.drop(columns='raw_section_branch_orders', level=1)
+    aggregated_expected = pd.concat(
+        [
+            expected[[col for col in expected.columns if col[1].startswith("mean_")]].mean().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("max_")]].max().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("min_")]].min().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("sum_")]].sum().to_frame().T,
+        ],
+        axis=1,
+    )
+    aggregated_expected.loc[1] = aggregated_expected.loc[0]
+    aggregated_expected[("property", "name")] = ["Pop1", "Pop2"]
+    assert (actual.columns.sort_values() == aggregated_expected.columns.sort_values()).all()
+
+    actual = actual[actual.columns.sort_values()]
+    aggregated_expected = aggregated_expected[aggregated_expected.columns.sort_values()]
+    assert_frame_equal(actual, aggregated_expected, check_dtype=False)
     assert REF_CONFIG_NEW == initial_config
 
     # Test with a config without the 'morphology' key
