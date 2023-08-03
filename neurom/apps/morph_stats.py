@@ -47,6 +47,7 @@ from morphio import SomaError
 import neurom as nm
 from neurom.apps import get_config
 from neurom.core.morphology import Morphology, Neurite
+from neurom.core.population import Population
 from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
     _get_feature_value_and_func
@@ -61,8 +62,8 @@ IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 def _run_extract_stats(morph, config):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
-    if not isinstance(morph, Morphology):
-        morph = nm.load_morphology(morph)
+    if not isinstance(morph, (Morphology, Population)):
+        morph = nm.load_morphologies(morph)
     return morph.name, extract_stats(morph, config)
 
 
@@ -70,7 +71,8 @@ def extract_dataframe(morphs, config, n_workers=1):
     """Extract stats grouped by neurite type from morphs.
 
     Arguments:
-        morphs: a morphology, population, neurite tree or list of morphology paths
+        morphs: a morphology, population, neurite tree, list of populations or list of morphology
+            paths
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
