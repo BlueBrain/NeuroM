@@ -93,7 +93,7 @@ def extract_dataframe(morphs, config, n_workers=1):
         An example config can be found at:
 
     """
-    if isinstance(morphs, Morphology):
+    if isinstance(morphs, (Morphology, Population)):
         morphs = [morphs]
 
     func = partial(_run_extract_stats, config=config)
