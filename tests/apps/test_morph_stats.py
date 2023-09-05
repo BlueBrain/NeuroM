@@ -439,17 +439,15 @@ def test_extract_dataframe_with_kwargs():
     assert_frame_equal(actual, expected, check_dtype=False)
 
 
-
-
 def test_extract_dataframe_multiproc():
     morphs = [Path(SWC_PATH, name)
             for name in ['Neuron.swc', 'simple.swc']]
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
+
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=2)
         # drop raw features as they require too much test data to mock
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
-    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
-
     assert_frame_equal(actual, expected, check_dtype=False)
 
     with warnings.catch_warnings(record=True) as w:
@@ -458,6 +456,26 @@ def test_extract_dataframe_multiproc():
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
         assert len(w) == 1, "Warning not emitted"
     assert_frame_equal(actual, expected, check_dtype=False)
+
+    with warnings.catch_warnings(record=True) as w:
+        pop = Population(morphs)
+        actual = ms.extract_dataframe(pop, REF_CONFIG, n_workers=2)
+        actual = actual.drop(columns='raw_section_branch_orders', level=1)
+    assert_frame_equal(actual, expected, check_dtype=False)
+
+    with warnings.catch_warnings(record=True) as w:
+        pop1 = Population(morphs, name="Pop1")
+        pop2 = Population(morphs, name="Pop2")
+        actual = ms.extract_dataframe([pop1, pop2], REF_CONFIG, n_workers=2)
+
+    assert actual[("property", "name")].tolist() == ["Pop1", "Pop2"]
+
+    with pytest.raises(
+        ValueError,
+        match="Can only process morphologies given as file paths when n_workers > 1",
+    ):
+        pop = Population(morphs, cache=True)
+        actual = ms.extract_dataframe(pop, REF_CONFIG, n_workers=2)
 
 
 def test_get_header():

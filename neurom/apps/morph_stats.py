@@ -95,11 +95,15 @@ def extract_dataframe(morphs, config, n_workers=1):
     """
     if isinstance(morphs, Morphology):
         morphs = [morphs]
+    elif isinstance(morphs, Population):
+        morphs = morphs._files  # pylint: disable=protected-access
 
     func = partial(_run_extract_stats, config=config)
     if n_workers == 1:
         stats = list(map(func, morphs))
     else:
+        if any(isinstance(i, Morphology) for i in morphs):
+            raise ValueError("Can only process morphologies given as file paths when n_workers > 1")
         if n_workers > os.cpu_count():
             warnings.warn(f'n_workers ({n_workers}) > os.cpu_count() ({os.cpu_count()}))')
         with multiprocessing.Pool(n_workers) as pool:
