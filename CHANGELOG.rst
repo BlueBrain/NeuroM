@@ -1,6 +1,20 @@
 Changelog
 =========
 
+Version 3.2.3
+-------------
+
+- Fix neurom.app.morph_stats.extract_dataframe for Population objects with several workers (#1080)
+- Update readthedocs config (#1077)
+- Can pass List[Population] args to neurom.app.morph_stats.extract_dataframe (#1076)
+- Fix compatibility with MorphIO>=3.3.6 (#1075)
+- Check that soma is not empty when features need it (#1073)
+
+Version 3.2.2
+-------------
+
+- Fix QhullError warning (#1063)
+
 Version 3.2.1
 -------------
 
