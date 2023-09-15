@@ -146,7 +146,7 @@ def plot_tree(tree, ax=None, plane='xy',
             return Rectangle(x - linewidth / 2. * np.array([-np.sin(angle), np.cos(angle)]),
                              np.linalg.norm(diff),
                              linewidth,
-                             np.rad2deg(angle))
+                             angle=np.rad2deg(angle))
 
         segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
                                (seg[1][plane0], seg[1][plane1]),
