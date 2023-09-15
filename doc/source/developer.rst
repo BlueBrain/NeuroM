@@ -59,9 +59,9 @@ individually:
 
 .. code-block:: bash
 
-        $ tox -e py36-lint       # runs only pylint
-        $ tox -e py36-docs       # run only documentation check
-        $ tox -e py36            # run only the tests
+        $ tox -e py38-lint       # runs only pylint
+        $ tox -e py38-docs       # run only documentation check
+        $ tox -e py38            # run only the tests
 
 You can also run tests manually via `pylint` but you need to make sure that you have installed
 all required dependencies in your virtual environment:
@@ -81,4 +81,4 @@ Then, run the tests manually. For example,
 Python compatibility
 --------------------
 
-We test the code against Python 3.6 and 3.7.
+We test the code against Python 3.8, 3.9, 3.10, and 3.11.
