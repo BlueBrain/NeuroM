@@ -27,7 +27,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mock import Mock
+from unittest.mock import Mock
+
 from neurom.core.types import NEURITES, NeuriteType, axon_filter, dendrite_filter, tree_type_checker
 import pytest
 
