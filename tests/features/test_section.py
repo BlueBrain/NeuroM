@@ -37,7 +37,6 @@ from unittest.mock import Mock
 import pytest
 import numpy as np
 from numpy import testing as npt
-from mock import Mock
 
 from neurom import load_morphology, iter_sections
 from neurom import morphmath

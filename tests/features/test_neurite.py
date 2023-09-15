@@ -30,11 +30,11 @@
 
 from math import pi, sqrt
 from pathlib import Path
+from unittest.mock import patch
 
 import neurom as nm
 import numpy as np
 import scipy
-from mock import patch
 from neurom.features import neurite, morphology
 from neurom.geom import convex_hull
 

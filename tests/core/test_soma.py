@@ -29,12 +29,12 @@
 import math
 import warnings
 from io import StringIO
+from unittest.mock import Mock
 
 import numpy as np
 from morphio import MorphioError, SomaError, set_raise_warnings
 from neurom import load_morphology
 from neurom.core import soma
-from mock import Mock
 
 import pytest
 from numpy.testing import assert_array_equal, assert_almost_equal

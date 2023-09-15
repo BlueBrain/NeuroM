@@ -68,7 +68,7 @@ all required dependencies in your virtual environment:
 
 .. code-block:: bash
 
-    (your virtual env name)$ pip install neurom[plotly] pytest mock
+    (your virtual env name)$ pip install neurom[plotly] pytest
 
 Then, run the tests manually. For example,
 
