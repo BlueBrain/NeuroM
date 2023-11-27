@@ -5,7 +5,6 @@
   "description": "NeuroM is a Python-based toolkit for the analysis and processing of morphologies.",
   "creators": [
     {
-      "affiliation": "Blue Brain Project, EPFL",
       "name": "Coste, Benoit",
       "orcid": "0000-0003-4408-0412"
     },
@@ -20,7 +19,6 @@
       "orcid": "0000-0002-9539-5070"
     },
     {
-      "affiliation": "Blue Brain Project, EPFL",
       "name": "Palacios, Juan"
     },
     {
