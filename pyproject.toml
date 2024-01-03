@@ -6,7 +6,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "neurom"
+name = "NeuroM"
 description = "NeuroM: a light-weight neuron morphology analysis package"
 readme = "README.rst"
 requires-python = ">=3.8"
