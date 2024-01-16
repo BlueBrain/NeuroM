@@ -69,8 +69,8 @@ if __name__ == '__main__':
 
     # Get some soma information
     # Soma radius and surface area
-    print("Soma radius", nm.get('soma_radii', m)[0])
-    print("Soma surface area", nm.get('soma_surface_areas', m)[0])
+    print("Soma radius", nm.get('soma_radius', m))
+    print("Soma surface area", nm.get('soma_surface_area', m))
 
     # Get information about neurites
     # Most neurite data can be queried for a particular type of neurite.
@@ -81,23 +81,23 @@ if __name__ == '__main__':
     # to warm up...
 
     # number of neurites
-    print('Number of neurites (all):', nm.get('number_of_neurites', m)[0])
+    print('Number of neurites (all):', nm.get('number_of_neurites', m))
     print('Number of neurites (axons):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.axon))
     print('Number of neurites (apical dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.apical_dendrite))
     print('Number of neurites (basal dendrites):',
-          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_neurites', m, neurite_type=nm.NeuriteType.basal_dendrite))
 
     # number of sections
     print('Number of sections:',
-          nm.get('number_of_sections', m)[0])
+          nm.get('number_of_sections', m))
     print('Number of sections (axons):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.axon))
     print('Number of sections (apical dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.apical_dendrite))
     print('Number of sections (basal dendrites):',
-          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite)[0])
+          nm.get('number_of_sections', m, neurite_type=nm.NeuriteType.basal_dendrite))
 
     # number of sections per neurite
     print('Number of sections per neurite:',
