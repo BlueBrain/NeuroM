@@ -52,7 +52,7 @@ def test_bounding_box():
     obj = PointObj()
     obj.points = pts
 
-    assert np.alltrue(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
+    assert np.all(geom.bounding_box(obj) == [[-100, -2, -3], [42, 55, 33]])
 
 
 def test_bounding_box_morphology():
@@ -78,7 +78,7 @@ def test_convex_hull_points():
     # This leverages scipy ConvexHull and we don't want
     # to re-test scipy, so simply check that the points are the same.
     hull = geom.convex_hull(NRN)
-    assert np.alltrue(hull.points == NRN.points[:, :3])
+    assert np.all(hull.points == NRN.points[:, :3])
 
 
 def test_convex_hull_volume():
