@@ -1,0 +1,44 @@
+# define some common functions
+.define-functions:
+  # define the start of a collapsible section in the job log
+  - section_start() { echo -e "\e[0Ksection_start:`date +%s`:$1\r\e[0K$2"; }
+  # define the end of a collapsible section in the job log
+  - section_end() { echo -e "\e[0Ksection_end:`date +%s`:$1\r\e[0K"; }
+  # print a variable
+  - print_var() { echo -e "${TXT_CYAN}${1}=${!1}${TXT_CLEAR}"; }
+  # set a variable and echo its assignment
+  - set_and_print() { eval $1=$2; print_var $1; }
+
+# create the main virtualenv and install the needed packages
+.setup-venv:
+  - section_start section_venv[collapsed=true] "Setting up the virtual env"
+  - cd "${PYTHON_PROJECT_DIR}"
+  - CI_VENV="$(pwd)/venv"
+  - rm -rf "$CI_VENV"
+  - python -mvenv "$CI_VENV"
+  - source "$CI_VENV/bin/activate"
+  - python -mpip install --upgrade pip setuptools wheel tox
+  - if [[ -n $PIP_PACKAGES ]]; then python -mpip install --upgrade $PIP_PACKAGES; fi
+  - section_end section_venv
+
+.tox-template:
+  stage: test
+  tags:
+    - docker-runner
+  interruptible: true
+  before_script:
+    - if [[ -z $TOXENV ]]; then echo 'Please set the $TOXENV variable'; exit 1; fi
+    - !reference [.define-functions]
+    - !reference [.setup-venv]
+  script:
+    - section_start section_tox "Running Tox"
+    - python -mtox $TOX_OPTIONS
+    - section_end section_tox
+
+py39:
+  image: python:3.9
+  extends: .tox-template
+  variables:
+    # Directory containing setup.py and tox.ini
+    PYTHON_PROJECT_DIR: .
+    TOXENV: py39

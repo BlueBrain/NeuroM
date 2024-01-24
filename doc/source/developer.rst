@@ -60,8 +60,7 @@ individually:
 .. code-block:: bash
 
         $ tox -e py38-lint       # runs only pylint
-        $ tox -e py38-docs       # run only documentation check and build the doc
-        $ tox -e py38-coverage   # run only coverage check
+        $ tox -e py38-docs       # run only documentation check
         $ tox -e py38            # run only the tests
 
 You can also run tests manually via `pylint` but you need to make sure that you have installed
@@ -69,7 +68,7 @@ all required dependencies in your virtual environment:
 
 .. code-block:: bash
 
-    (your virtual env name)$ pip install neurom[plotly] pytest mock
+    (your virtual env name)$ pip install neurom[plotly] pytest
 
 Then, run the tests manually. For example,
 
@@ -82,4 +81,4 @@ Then, run the tests manually. For example,
 Python compatibility
 --------------------
 
-We test the code against Python 3.6 and 3.7.
+We test the code against Python 3.8, 3.9, 3.10, and 3.11.

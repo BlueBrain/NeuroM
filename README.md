@@ -77,11 +77,8 @@ When you use the NeuroM software, we ask you to cite the following (**this inclu
 
 
 ## Funding & Acknowledgements
+This work has been partially funded by the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 720270, 785907 (Human Brain Project SGA1/SGA2) and by the EBRAINS research infrastructure, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3).
 
-This project/research received funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). 
-This research was supported by the EBRAINS research infrastructure, funded from the European
-Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant
-Agreement No. 945539 (Human Brain Project SGA3).
 The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology.
 
 For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.

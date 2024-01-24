@@ -71,6 +71,14 @@ from neurom.utils import flatten, str_to_plane
 feature = partial(feature, namespace=NameSpace.NEURON)
 
 
+def _assert_soma_center(morph):
+    if morph.soma.center is None:
+        raise NeuroMError(
+            f"The morphology named '{morph.name}' has no soma so the feature can not be computed."
+        )
+    return morph
+
+
 def _map_neurites(function, morph, neurite_type):
     return list(
         iter_neurites(
@@ -244,6 +252,7 @@ def trunk_origin_azimuths(morph, neurite_type=NeuriteType.all):
 
     The range of the azimuth angle [-pi, pi] radians
     """
+    _assert_soma_center(morph)
 
     def azimuth(root_node):
         """Azimuth of a neurite trunk."""
@@ -264,6 +273,7 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 
     The range of the elevation angle [-pi/2, pi/2] radians
     """
+    _assert_soma_center(morph)
 
     def elevation(root_node):
         """Elevation of a section."""
@@ -277,6 +287,7 @@ def trunk_origin_elevations(morph, neurite_type=NeuriteType.all):
 @feature(shape=(...,))
 def trunk_vectors(morph, neurite_type=NeuriteType.all):
     """Calculate the vectors between all the trunks of the morphology and the soma center."""
+    _assert_soma_center(morph)
 
     def vector_from_soma_to_root(root_node):
         return morphmath.vector(root_node.points[0], morph.soma.center)
@@ -624,6 +635,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
             'expected to be an instance of Morphology and have a soma.'
         )
         if center is None:
+            _assert_soma_center(morph)
             center = morph.soma.center
         if radii is None:
             radii = [morph.soma.radius]
@@ -663,6 +675,8 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         If a `neurite_type` is specified and there are no trees corresponding to it, an empty
         list will be returned.
     """
+    _assert_soma_center(morph)
+
     if bins is None:
         min_soma_edge = morph.soma.radius
 
@@ -826,6 +840,7 @@ def length_fraction_above_soma(morph, neurite_type=NeuriteType.all, up="Y"):
     Returns:
         The fraction of neurite length that lies on the right of the soma along the given axis.
     """
+    _assert_soma_center(morph)
     axis = up.upper()
 
     if axis not in {"X", "Y", "Z"}:

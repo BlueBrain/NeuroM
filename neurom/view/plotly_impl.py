@@ -85,8 +85,16 @@ def _make_trace(morph, plane):
             plot_fun = go.Scatter3d
         else:
             plot_fun = go.Scatter
-            coords = {"x": coords[plane[0]], "y": coords[plane[1]]}
-        yield plot_fun(line={"color": color, "width": 2}, mode='lines', **coords)
+            coords = {'x': coords[plane[0]],
+                      'y': coords[plane[1]],
+                      }
+        yield plot_fun(
+            line={'color': color,
+                  'width': 2,
+                  },
+            mode='lines',
+            **coords
+        )
 
 
 def _fill_soma_data(morph, data, plane):

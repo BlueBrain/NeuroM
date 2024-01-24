@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import neurom
 from neurom import load_morphology
 from neurom.view import plotly_impl
 
-import mock
 from numpy.testing import assert_allclose
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc'
@@ -21,7 +21,7 @@ def _reload_module(module):
 
 
 def test_plotly_extra_not_installed():
-    with mock.patch.dict(sys.modules, {'plotly': None}):
+    with patch.dict(sys.modules, {'plotly': None}):
         try:
             _reload_module(neurom.view.plotly_impl)
             assert False, "ImportError not triggered"

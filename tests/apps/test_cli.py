@@ -5,7 +5,7 @@ import tempfile
 import pandas as pd
 import yaml
 from click.testing import CliRunner
-from mock import patch
+from unittest.mock import patch
 
 from neurom.apps.cli import cli
 from neurom.exceptions import ConfigError

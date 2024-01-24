@@ -159,7 +159,7 @@ def plot_tree(
                 x - linewidth / 2.0 * np.array([-np.sin(angle), np.cos(angle)]),
                 np.linalg.norm(diff),
                 linewidth,
-                np.rad2deg(angle),
+                angle=np.rad2deg(angle),
             )
 
         segs = [

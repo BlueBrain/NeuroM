@@ -34,6 +34,7 @@ from pathlib import Path
 import neurom as nm
 import pandas as pd
 from neurom.apps import morph_stats as ms
+from neurom.core.population import Population
 from neurom.exceptions import ConfigError
 from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES
 
@@ -309,6 +310,22 @@ def test_extract_stats_single_morphology():
             assert_almost_equal(res[k][kk], REF_OUT[k][kk], decimal=4)
 
 
+def test_extract_stats_single_neurite():
+    m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
+    neurite = m.neurites[0]
+    config = deepcopy(REF_CONFIG_NEW)
+    config.pop("neurite_type")
+    config.pop("morphology")
+    res = ms.extract_stats(neurite, config)
+
+    REF_OUT_NEURITE = deepcopy(REF_OUT)
+    REF_OUT_NEURITE.pop("morphology", None)
+    assert set(res.keys()) == set(REF_OUT_NEURITE.keys())
+    assert set(res["axon"].keys()) == set(REF_OUT_NEURITE["axon"].keys())
+    for kk in res["axon"].keys():
+        assert_almost_equal(res["axon"][kk], REF_OUT_NEURITE["axon"][kk], decimal=4)
+
+
 def test_extract_stats_new_format():
     m = nm.load_morphology(SWC_PATH / 'Neuron.swc')
     res = ms.extract_stats(m, REF_CONFIG_NEW)
@@ -493,6 +510,30 @@ def test_extract_dataframe():
     assert_frame_equal(actual, expected.iloc[[0]], check_dtype=False)
     assert REF_CONFIG_NEW == initial_config
 
+    # Test with a List[Population] argument
+    pop1 = nm.load_morphologies([SWC_PATH / 'Neuron.swc', SWC_PATH / 'simple.swc'], name="Pop1")
+    pop2 = Population(pop1)
+    pop2.name = "Pop2"
+    actual = ms.extract_dataframe([pop1, pop2], REF_CONFIG_NEW)
+    actual = actual.drop(columns='raw_section_branch_orders', level=1)
+    aggregated_expected = pd.concat(
+        [
+            expected[[col for col in expected.columns if col[1].startswith("mean_")]].mean().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("max_")]].max().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("min_")]].min().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("sum_")]].sum().to_frame().T,
+        ],
+        axis=1,
+    )
+    aggregated_expected.loc[1] = aggregated_expected.loc[0]
+    aggregated_expected[("property", "name")] = ["Pop1", "Pop2"]
+    assert (actual.columns.sort_values() == aggregated_expected.columns.sort_values()).all()
+
+    actual = actual[actual.columns.sort_values()]
+    aggregated_expected = aggregated_expected[aggregated_expected.columns.sort_values()]
+    assert_frame_equal(actual, aggregated_expected, check_dtype=False)
+    assert REF_CONFIG_NEW == initial_config
+
     # Test with a config without the 'morphology' key
     morphs = nm.load_morphologies([Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']])
     config = {
@@ -583,13 +624,14 @@ def test_extract_dataframe_with_kwargs():
 
 
 def test_extract_dataframe_multiproc():
-    morphs = [Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']]
+    morphs = [Path(SWC_PATH, name)
+            for name in ['Neuron.swc', 'simple.swc']]
+    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
+
     with warnings.catch_warnings(record=True) as w:
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=2)
         # drop raw features as they require too much test data to mock
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
-    expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
-
     assert_frame_equal(actual, expected, check_dtype=False)
 
     with warnings.catch_warnings(record=True) as w:
@@ -598,6 +640,26 @@ def test_extract_dataframe_multiproc():
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
         assert len(w) == 1, "Warning not emitted"
     assert_frame_equal(actual, expected, check_dtype=False)
+
+    with warnings.catch_warnings(record=True) as w:
+        pop = Population(morphs)
+        actual = ms.extract_dataframe(pop, REF_CONFIG, n_workers=2)
+        actual = actual.drop(columns='raw_section_branch_orders', level=1)
+    assert_frame_equal(actual, expected, check_dtype=False)
+
+    with warnings.catch_warnings(record=True) as w:
+        pop1 = Population(morphs, name="Pop1")
+        pop2 = Population(morphs, name="Pop2")
+        actual = ms.extract_dataframe([pop1, pop2], REF_CONFIG, n_workers=2)
+
+    assert actual[("property", "name")].tolist() == ["Pop1", "Pop2"]
+
+    with pytest.raises(
+        ValueError,
+        match="Can only process morphologies given as file paths when n_workers > 1",
+    ):
+        pop = Population(morphs, cache=True)
+        actual = ms.extract_dataframe(pop, REF_CONFIG, n_workers=2)
 
 
 def test_get_header():

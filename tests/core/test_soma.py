@@ -29,12 +29,12 @@
 import math
 import warnings
 from io import StringIO
+from unittest.mock import Mock
 
 import numpy as np
 from morphio import MorphioError, SomaError, set_raise_warnings
 from neurom import load_morphology
 from neurom.core import soma
-from mock import Mock
 
 import pytest
 from numpy.testing import assert_array_equal, assert_almost_equal
@@ -119,12 +119,11 @@ def test_Soma_ThreePointCylinder_invalid_radius():
 def test_Soma_ThreePointCylinder_invalid():
     try:
         set_raise_warnings(True)
-        with pytest.raises(
-            MorphioError, match='Warning: the soma does not conform the three point soma spec'
-        ):
-            load_morphology(
-                StringIO(
-                    u"""
+        with pytest.raises(MorphioError,
+                           match=('Warning: the soma does not conform the three point soma spec|' # morphio < 3.3.7
+                                  'The non-constant columns is not offset by' # morphio >= 3.3.7
+                                  )):
+            load_morphology(StringIO(u"""
                             1 1 0   0 0 1e-4 -1
                             2 1 0 -44 0 1e-4  1
                             3 1 0 +44 0 1e-4  1"""

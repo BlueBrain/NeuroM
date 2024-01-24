@@ -1,0 +1,30 @@
+{
+  "title" : "NeuroM",
+  "license": "BSD-3.0",
+  "upload_type": "software",
+  "description": "NeuroM is a Python-based toolkit for the analysis and processing of morphologies.",
+  "creators": [
+    {
+      "name": "Coste, Benoit",
+      "orcid": "0000-0003-4408-0412"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Gevaert, Michael",
+      "orcid": "0000-0002-7547-3297"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Kanari, Lida",
+      "orcid": "0000-0002-9539-5070"
+    },
+    {
+      "name": "Palacios, Juan"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Zisis, Eleftherios",
+      "orcid": "0000-0003-4303-1678"
+    }
+  ]
+}

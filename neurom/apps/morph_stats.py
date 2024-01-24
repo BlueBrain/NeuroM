@@ -47,7 +47,8 @@ from morphio import SomaError
 
 import neurom as nm
 from neurom.apps import get_config
-from neurom.core.morphology import Morphology
+from neurom.core.morphology import Morphology, Neurite
+from neurom.core.population import Population
 from neurom.exceptions import ConfigError
 from neurom.features import (
     _MORPHOLOGY_FEATURES,
@@ -66,8 +67,8 @@ IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 def _run_extract_stats(morph, config, process_subtrees):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
-    if not isinstance(morph, Morphology):
-        morph = nm.load_morphology(morph, process_subtrees=process_subtrees)
+    if not isinstance(morph, (Morphology, Population)):
+        morph = nm.load_morphologies(morph, process_subtrees=process_subtrees)
     return morph.name, extract_stats(morph, config)
 
 
@@ -75,7 +76,8 @@ def extract_dataframe(morphs, config, n_workers=1, process_subtrees=False):
     """Extract stats grouped by neurite type from morphs.
 
     Arguments:
-        morphs: a morphology, population, neurite tree or list of morphology paths
+        morphs: a morphology, population, neurite tree, list of populations or list of morphology
+            paths
         config (dict): configuration dict. The keys are:
             - neurite_type: a list of neurite types for which features are extracted
               If not provided, all neurite_type will be used
@@ -98,11 +100,15 @@ def extract_dataframe(morphs, config, n_workers=1, process_subtrees=False):
     """
     if isinstance(morphs, Morphology):
         morphs = [morphs]
+    elif isinstance(morphs, Population):
+        morphs = morphs._files  # pylint: disable=protected-access
 
     func = partial(_run_extract_stats, config=config, process_subtrees=process_subtrees)
     if n_workers == 1:
         stats = list(map(func, morphs))
     else:
+        if any(isinstance(i, Morphology) for i in morphs):
+            raise ValueError("Can only process morphologies given as file paths when n_workers > 1")
         if n_workers > os.cpu_count():
             warnings.warn(f'n_workers ({n_workers}) > os.cpu_count() ({os.cpu_count()}))')
         with multiprocessing.Pool(n_workers) as pool:
@@ -192,9 +198,10 @@ def extract_stats(morphs, config):
         The extracted statistics
 
     Note:
-        An example config can be found at:
+        An example config can be found in the `CLI -> neurom stats` page of the documentation.
 
     """
+    # pylint: disable=too-many-nested-blocks
     config = _sanitize_config(config)
 
     neurite_types = [_NEURITE_MAP[t] for t in config.get('neurite_type', _NEURITE_MAP.keys())]
@@ -217,7 +224,8 @@ def extract_stats(morphs, config):
                     )
 
                     for neurite_type in types:
-                        feature_kwargs["neurite_type"] = neurite_type
+                        if not isinstance(morphs, Neurite):
+                            feature_kwargs["neurite_type"] = neurite_type
                         stats[neurite_type.name].update(
                             _get_feature_stats(
                                 feature_name,
