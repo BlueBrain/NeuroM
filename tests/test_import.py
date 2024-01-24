@@ -29,6 +29,5 @@
 def test_import_neurom():
     try:
         import neurom
-        return True
     except Exception:
-        return False
+        print("neurom failed to be imported")
