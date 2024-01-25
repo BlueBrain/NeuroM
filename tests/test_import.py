@@ -27,7 +27,4 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 def test_import_neurom():
-    try:
-        import neurom
-    except Exception:
-        print("neurom failed to be imported")
+    import neurom
