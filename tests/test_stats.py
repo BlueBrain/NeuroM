@@ -31,8 +31,6 @@
 Since the stats module consists of simple wrappers to scipy.stats functions,
 these tests are only sanity checks.
 """
-import warnings
-
 import numpy as np
 from neurom import stats as st
 
@@ -202,7 +200,8 @@ def test_compare_two_wilcoxon():
     assert_almost_equal(results2.dist, 0.0, decimal=5)
     assert_almost_equal(results2.pvalue, 0.0, decimal=5)
 
-@pytest.mark.filterwarnings("ignore")  # Ignore precision warnigns
+
+@pytest.mark.filterwarnings("ignore")  # Ignore precision warnings
 def test_compare_two_ttest():
 
     results1 = st.compare_two(distr1, distr1, test=st.StatTests.ttest)

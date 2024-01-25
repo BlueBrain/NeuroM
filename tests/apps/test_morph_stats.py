@@ -199,7 +199,7 @@ def test_extract_stats_scalar_feature():
         }
     }
     with warnings.catch_warnings():
-        # silence warning about approximating soma volume by a sphere
+        # silence warning about approximating soma volume with a sphere
         warnings.simplefilter("ignore", category=UserWarning)
         res = ms.extract_stats(m, config)
 
