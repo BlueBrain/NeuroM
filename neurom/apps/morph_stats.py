@@ -38,14 +38,13 @@ from collections import defaultdict
 from collections.abc import Sized
 from copy import deepcopy
 from functools import partial
-from pathlib import Path
-import pkg_resources
+
 import numpy as np
 import pandas as pd
 from morphio import SomaError
 
 import neurom as nm
-from neurom.apps import get_config
+from neurom.apps import get_config, EXAMPLE_STATS_CONFIG
 from neurom.core.morphology import Morphology, Neurite
 from neurom.core.population import Population
 from neurom.exceptions import ConfigError
@@ -56,7 +55,6 @@ from neurom.utils import flatten, NeuromJSON
 
 L = logging.getLogger(__name__)
 
-EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_stats.yaml')
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
@@ -117,7 +115,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
-extract_dataframe.__doc__ += str(EXAMPLE_CONFIG)
+extract_dataframe.__doc__ += str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_feature_stats(feature_name, morphs, modes, kwargs):
@@ -234,7 +232,7 @@ def extract_stats(morphs, config):
     return dict(stats)
 
 
-extract_stats.__doc__ += str(EXAMPLE_CONFIG)
+extract_stats.__doc__ += str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_header(results):
@@ -366,7 +364,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
         as_population (bool): treat ``datapath`` as directory of morphologies population
         ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
     """
-    config = full_config() if is_full_config else get_config(config, EXAMPLE_CONFIG)
+    config = full_config() if is_full_config else get_config(config, EXAMPLE_STATS_CONFIG)
 
     if 'neurite' in config and 'neurite_type' not in config:
         error = ConfigError('"neurite_type" missing from config, but "neurite" set')

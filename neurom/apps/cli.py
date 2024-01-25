@@ -33,7 +33,7 @@ from functools import partial
 import click
 import matplotlib.pyplot as plt
 
-from neurom.apps import morph_stats, morph_check
+from neurom.apps import morph_stats, morph_check, EXAMPLE_CHECK_CONFIG, EXAMPLE_STATS_CONFIG
 from neurom import load_morphology
 from neurom.view import matplotlib_impl, matplotlib_utils
 
@@ -85,7 +85,7 @@ def view(input_file, is_3d, plane, backend, realistic_diameters):
                         'https://neurom.readthedocs.io/en/latest/morph_stats.html')
 @click.argument('datapath', required=False)
 @click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
-              default=morph_stats.EXAMPLE_CONFIG, show_default=True,
+              default=EXAMPLE_STATS_CONFIG, show_default=True,
               help='Configuration File')
 @click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
               help='Path to output file, if it ends in .json, a json file is created,'
@@ -106,7 +106,7 @@ def stats(datapath, config, output, full_config, as_population, ignored_exceptio
                         'https://neurom.readthedocs.io/en/latest/morph_check.html')
 @click.argument('datapath')
 @click.option('-C', '--config', type=click.Path(exists=True, dir_okay=False),
-              default=morph_check.EXAMPLE_CONFIG, show_default=True,
+              default=EXAMPLE_CHECK_CONFIG, show_default=True,
               help='Configuration File')
 @click.option('-o', '--output', type=click.Path(exists=False, dir_okay=False),
               help='Path to output json summary file', required=True)
