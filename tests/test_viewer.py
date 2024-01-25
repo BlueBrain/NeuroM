@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import warnings
 import tempfile
 from pathlib import Path
 
@@ -35,7 +36,14 @@ import matplotlib
 if 'DISPLAY' not in os.environ:  # noqa
     matplotlib.use('Agg')  # noqa
 
-from neurom import NeuriteType, load_morphology, viewer
+from neurom.exceptions import NeuroMDeprecationWarning
+
+with warnings.catch_warnings():
+    # no need to warn about the deprecated module in this test
+    warnings.simplefilter("ignore", category=NeuroMDeprecationWarning)
+    from neurom import viewer
+
+from neurom import NeuriteType, load_morphology
 from neurom.view import matplotlib_utils
 
 import pytest

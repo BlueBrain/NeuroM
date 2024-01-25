@@ -186,7 +186,9 @@ def test_stats_new_format_set_arg():
 
 
 def test_extract_stats_scalar_feature():
+
     m = nm.load_morphology(DATA_PATH / 'neurolucida' / 'bio_neuron-000.asc')
+
     config = {
         'neurite_type': ['ALL'],
         'neurite': {
@@ -196,7 +198,11 @@ def test_extract_stats_scalar_feature():
             'soma_volume': ['sum'],
         }
     }
-    res = ms.extract_stats(m, config)
+    with warnings.catch_warnings():
+        # silence warning about approximating soma volume by a sphere
+        warnings.simplefilter("ignore", category=UserWarning)
+        res = ms.extract_stats(m, config)
+
     assert res == {'all': {'max_number_of_forking_points': 277},
                    'morphology': {'sum_soma_volume': 1424.4383771584492}}
 
