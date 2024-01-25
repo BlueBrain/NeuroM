@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import tempfile
+import pytest
 
 import pandas as pd
 import yaml
@@ -73,6 +74,7 @@ def test_morph_stat():
                                    'all:max_section_branch_orders', 'morphology:mean_soma_radius'}
 
 
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morph_stat_full_config():
     runner = CliRunner()
     filename = DATA / 'h5/v1/Neuron.h5'

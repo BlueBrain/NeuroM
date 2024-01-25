@@ -27,10 +27,20 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Helper code for neurom applications."""
+import sys
 import logging
-
+from pathlib import Path
 import yaml
+
 from neurom.exceptions import ConfigError
+
+if sys.version_info >= (3, 9):  # pragma: no cover
+    import importlib.resources as importlib_resources
+else:
+    import importlib_resources  # pragma: no cover
+
+EXAMPLE_CHECK_CONFIG = Path(importlib_resources.files("neurom.apps"), "config", "morph_check.yaml")
+EXAMPLE_STATS_CONFIG = Path(importlib_resources.files("neurom.apps"), "config", "morph_stats.yaml")
 
 L = logging.getLogger(__name__)
 
