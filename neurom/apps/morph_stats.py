@@ -115,7 +115,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
-extract_dataframe.__doc__ += str(EXAMPLE_STATS_CONFIG)
+extract_dataframe.__doc__ = extract_dataframe.__doc__.strip() + "\n\t" + str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_feature_stats(feature_name, morphs, modes, kwargs):
@@ -232,7 +232,7 @@ def extract_stats(morphs, config):
     return dict(stats)
 
 
-extract_stats.__doc__ += str(EXAMPLE_STATS_CONFIG)
+extract_stats.__doc__ = extract_stats.__doc__.strip() + "\n\t" + str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_header(results):
