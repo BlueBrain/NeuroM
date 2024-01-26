@@ -28,7 +28,6 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Example for comparison of the same feature of multiple cells."""
-import argparse
 from pathlib import Path
 
 import pylab as pl
@@ -36,25 +35,7 @@ import neurom as nm
 from neurom.io.utils import get_morph_files
 
 
-def parse_args():
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description='Feature Comparison Between Different Cells')
-
-    parser.add_argument('-d',
-                        '--datapath',
-                        help='Data directory')
-
-    parser.add_argument('-o',
-                        '--odir',
-                        default='.',
-                        help='Output path')
-
-    parser.add_argument('-f',
-                        '--features',
-                        nargs='+',
-                        help='List features separated by spaces')
-
-    return parser.parse_args()
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def stylize(ax, name, feature):
@@ -88,7 +69,7 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
 
     feature_values = nm.get(feature, neuron)
     # generate histogram
-    ax.hist(feature_values, bins=bins, cumulative=cumulative, normed=normed)
+    ax.hist(feature_values, bins=bins, cumulative=cumulative, density=normed)
 
 
 def plot_feature(feature, cell):
@@ -106,14 +87,25 @@ def plot_feature(feature, cell):
     return fig
 
 
-if __name__ == '__main__':
-    args = parse_args()
+def create_feature_plots(morphologies_dir, feature_list, output_dir):
 
-    for morph_file in get_morph_files(args.datapath):
+    for morph_file in get_morph_files(morphologies_dir):
         m = nm.load_morphology(morph_file)
 
-        for _feature in args.features:
-            f = plot_feature(_feature, m)
-            figname = "{0}_{1}.eps".format(_feature, m.name)
-            f.savefig(Path(args.odir, figname))
+        for feature_name in feature_list:
+            f = plot_feature(feature_name, m)
+            figname = f"{feature_name}_{m.name}.eps"
+            f.savefig(Path(output_dir, figname))
             pl.close(f)
+
+
+def main():
+    create_feature_plots(
+        morphologies_dir=Path(PACKAGE_DIR, "tests/data/valid_set"),
+	feature_list=["section_lengths"],
+	output_dir=".",
+    )
+
+
+if __name__ == '__main__':
+    main()
