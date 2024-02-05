@@ -1,7 +1,8 @@
 {
   "title" : "NeuroM",
-  "license": "BSD-3.0",
+  "license": "BSD-3-Clause",
   "upload_type": "software",
+  "access_right": "open",
   "description": "NeuroM is a Python-based toolkit for the analysis and processing of morphologies.",
   "creators": [
     {
