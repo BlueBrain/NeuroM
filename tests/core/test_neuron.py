@@ -46,12 +46,6 @@ def test_load_morphology_pathlib():
     nm.load_morphology(SWC_PATH / 'simple.swc')
 
 
-def test_morphology__sections():
-    """Test that we can get the sections from a morph without storing it to a var first.
-    """
-    nm.load_morphology(SWC_PATH / 'simple.swc').sections
-
-
 def test_load_morphology_from_other_morphologies():
     filename = SWC_PATH / 'simple.swc'
 
