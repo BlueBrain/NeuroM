@@ -1,5 +1,5 @@
 <!--
- Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
+ Copyright (c) 2015-2024 Blue Brain Project/EPFL
  All rights reserved.
 
  This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
@@ -83,4 +83,4 @@ The development of this software was supported by funding to the Blue Brain Proj
 
 For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.
 
-Copyright (c) 2015-2022 Blue Brain Project/EPFL
+Copyright (c) 2015-2024 Blue Brain Project/EPFL
