@@ -42,9 +42,9 @@
 
 import sys
 import os
-from pkg_resources import get_distribution
+import importlib.metadata
 
-VERSION = get_distribution('neurom').version
+VERSION = importlib.metadata.version('neurom')
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -77,7 +77,7 @@ author = u'BBP Algorithm Development Section'
 # built documents.
 #
 # The short X.Y version.
-version = get_distribution('neurom').version
+version = importlib.metadata.version('neurom')
 # The full version, including alpha/beta/rc tags.
 release = version
 
