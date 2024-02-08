@@ -29,9 +29,10 @@ jobs:
         tox
     - name: Upload to codecov
       if: ${{matrix.python-version == '3.8'}}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
       with:
         fail_ci_if_error: false
         files: ./coverage.xml
         flags: pytest
         name: "neurom-py38"
+        token: ${{ secrets.CODECOV_TOKEN }}
