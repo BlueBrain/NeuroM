@@ -59,7 +59,7 @@ Tracker = "https://github.com/BlueBrain/NeuroM/issues"
 neurom = 'neurom.apps.cli:cli'
 
 [tool.setuptools.packages.find]
-where = ["neurom"]
+where = ["."]
 namespaces = false
 
 [tool.setuptools.package-data]
