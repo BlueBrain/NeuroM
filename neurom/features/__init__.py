@@ -38,16 +38,18 @@ Examples:
 """
 import operator
 from enum import Enum
-from functools import reduce
+from functools import reduce, wraps, lru_cache
 
 from neurom.core import Population, Morphology, Neurite
 from neurom.core.morphology import iter_neurites
 from neurom.core.types import NeuriteType, tree_type_checker as is_type
 from neurom.exceptions import NeuroMError
+# from neurom.features import cache
+from neurom.features.cache import _MORPHOLOGY_FEATURES, _NEURITE_FEATURES, _POPULATION_FEATURES
 
-_NEURITE_FEATURES = {}
-_MORPHOLOGY_FEATURES = {}
-_POPULATION_FEATURES = {}
+# _NEURITE_FEATURES = {}
+# _MORPHOLOGY_FEATURES = {}
+# _POPULATION_FEATURES = {}
 
 
 class NameSpace(Enum):
@@ -72,7 +74,7 @@ def _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs):
                   0 if feature_.shape == () else [])
 
 
-def _get_feature_value_and_func(feature_name, obj, **kwargs):
+def _get_feature_value_and_func(feature_name, obj, cache=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Arguments:
@@ -98,7 +100,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
         if feature_name in _NEURITE_FEATURES:
             assert 'neurite_type' not in kwargs, 'Cant apply "neurite_type" arg to a neurite with' \
                                                  ' a neurite feature'
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             if isinstance(obj, Neurite):
                 res = feature_(obj, **kwargs)
             else:
@@ -106,21 +108,21 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     elif isinstance(obj, Morphology):
         # input is a morphology
         if feature_name in _MORPHOLOGY_FEATURES:
-            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            feature_ = _MORPHOLOGY_FEATURES[feature_name][cache]
             res = feature_(obj, **kwargs)
         elif feature_name in _NEURITE_FEATURES:
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             res = _get_neurites_feature_value(feature_, obj, neurite_filter, kwargs)
     elif isinstance(obj, Population) or (is_obj_list and isinstance(obj[0], Morphology)):
         # input is a morphology population or a list of morphs
         if feature_name in _POPULATION_FEATURES:
-            feature_ = _POPULATION_FEATURES[feature_name]
+            feature_ = _POPULATION_FEATURES[feature_name][cache]
             res = feature_(obj, **kwargs)
         elif feature_name in _MORPHOLOGY_FEATURES:
-            feature_ = _MORPHOLOGY_FEATURES[feature_name]
+            feature_ = _MORPHOLOGY_FEATURES[feature_name][cache]
             res = _flatten_feature(feature_.shape, [feature_(n, **kwargs) for n in obj])
         elif feature_name in _NEURITE_FEATURES:
-            feature_ = _NEURITE_FEATURES[feature_name]
+            feature_ = _NEURITE_FEATURES[feature_name][cache]
             res = _flatten_feature(
                 feature_.shape,
                 [_get_neurites_feature_value(feature_, n, neurite_filter, kwargs) for n in obj])
@@ -132,7 +134,7 @@ def _get_feature_value_and_func(feature_name, obj, **kwargs):
     return res, feature_
 
 
-def get(feature_name, obj, **kwargs):
+def get(feature_name, obj, cache=False, **kwargs):
     """Obtain a feature from a set of morphology objects.
 
     Features can be either Neurite, Morphology or Population features. For Neurite features see
@@ -142,12 +144,13 @@ def get(feature_name, obj, **kwargs):
     Arguments:
         feature_name(string): feature to extract
         obj: a morphology, a morphology population or a neurite tree
+        cache (bool): If True, the cache of this feature is used for computation.
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
         List|Number: feature value as a list or a single number.
     """
-    return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
+    return _get_feature_value_and_func(feature_name, obj, cache, **kwargs)[0]
 
 
 def _register_feature(namespace: NameSpace, name, func, shape):
@@ -168,7 +171,11 @@ def _register_feature(namespace: NameSpace, name, func, shape):
             NameSpace.POPULATION: _POPULATION_FEATURES}
     if name in _map[namespace]:
         raise NeuroMError(f'A feature is already registered under "{name}"')
-    _map[namespace][name] = func
+    cached_func = lru_cache(maxsize=None)(func)
+    _map[namespace][name] = {
+        False: func,
+        True: cached_func,
+    }
 
 
 def feature(shape, namespace: NameSpace, name=None):

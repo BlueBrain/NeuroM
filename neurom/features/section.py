@@ -33,6 +33,7 @@ import numpy as np
 from neurom import morphmath as mm
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_segments
+from neurom.features.cache import cached_func
 from neurom.morphmath import interval_lengths
 
 
@@ -41,26 +42,31 @@ def section_points(section):
     return section.points[:, COLS.XYZ]
 
 
+@cached_func()
 def section_path_length(section):
     """Path length from section to root."""
     return sum(s.length for s in section.iupstream())
 
 
+@cached_func()
 def section_length(section):
     """Length of a section."""
     return section.length
 
 
+@cached_func()
 def section_volume(section):
     """Volume of a section."""
     return section.volume
 
 
+@cached_func()
 def section_area(section):
     """Surface area of a section."""
     return section.area
 
 
+@cached_func()
 def section_tortuosity(section):
     """Tortuosity of a section.
 
@@ -75,6 +81,7 @@ def section_tortuosity(section):
     return 1 if len(pts) < 2 else mm.section_length(pts) / mm.point_dist(pts[-1], pts[0])
 
 
+@cached_func()
 def section_end_distance(section):
     """End to end distance of a section.
 
@@ -87,6 +94,7 @@ def section_end_distance(section):
     return 0 if len(pts) < 2 else mm.point_dist(pts[-1], pts[0])
 
 
+@cached_func()
 def branch_order(section):
     """Branching order of a tree section.
 
@@ -98,6 +106,7 @@ def branch_order(section):
     return sum(1 for _ in section.iupstream()) - 1
 
 
+@cached_func()
 def taper_rate(section):
     """Taper rate from fit along a section."""
     pts = section.points
@@ -105,38 +114,45 @@ def taper_rate(section):
     return np.polynomial.polynomial.polyfit(path_distances, 2.0 * pts[:, COLS.R], 1)[1]
 
 
+@cached_func()
 def number_of_segments(section):
     """Returns the number of segments within a section."""
     return len(section.points) - 1
 
 
+@cached_func()
 def segment_lengths(section, prepend_zero=False):
     """Returns the list of segment lengths within the section."""
     return interval_lengths(section.points, prepend_zero=prepend_zero)
 
 
+@cached_func()
 def segment_areas(section):
     """Returns the list of segment areas within the section."""
     return [mm.segment_area(seg) for seg in iter_segments(section)]
 
 
+@cached_func()
 def segment_volumes(section):
     """Returns the list of segment volumes within the section."""
     return [mm.segment_volume(seg) for seg in iter_segments(section)]
 
 
+@cached_func()
 def segment_mean_radii(section):
     """Returns the list of segment mean radii within the section."""
     pts = section.points[:, COLS.R]
     return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
 
 
+@cached_func()
 def segment_midpoints(section):
     """Returns the list of segment midpoints within the section."""
     pts = section.points[:, COLS.XYZ]
     return np.divide(np.add(pts[:-1], pts[1:]), 2.0).tolist()
 
 
+@cached_func()
 def segment_taper_rates(section):
     """Returns the list of segment taper rates within the section."""
     pts = section.points[:, COLS.XYZR]
@@ -159,6 +175,7 @@ def section_radial_distance(section, origin):
     return mm.point_dist(section.points[-1], origin)
 
 
+@cached_func()
 def section_meander_angles(section):
     """Inter-segment opening angles in a section."""
     p = section.points
@@ -166,6 +183,7 @@ def section_meander_angles(section):
             for i in range(2, len(p))]
 
 
+@cached_func()
 def strahler_order(section):
     """Branching order of a tree section.
 
@@ -199,11 +217,13 @@ def strahler_order(section):
     return 1
 
 
+@cached_func()
 def locate_segment_position(section, fraction):
     """Segment ID / offset corresponding to a given fraction of section length."""
     return mm.path_fraction_id_offset(section.points, fraction)
 
 
+@cached_func()
 def section_mean_radius(section):
     """Compute the mean radius of a section weighted by segment lengths."""
     radii = section.points[:, COLS.R]
@@ -213,6 +233,7 @@ def section_mean_radius(section):
     return np.sum(mean_radii * lengths) / np.sum(lengths)
 
 
+@cached_func()
 def downstream_pathlength(section):
     """Compute the total downstream length starting from a section."""
     return sum(sec.length for sec in section.ipreorder())

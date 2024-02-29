@@ -56,6 +56,7 @@ from neurom.core.dataformat import COLS
 from neurom.core.types import NeuriteType
 from neurom.exceptions import NeuroMError
 from neurom.features import feature, NameSpace, neurite as nf, section as sf
+from neurom.features.cache import cached_func
 from neurom.utils import str_to_plane
 from neurom.morphmath import convex_hull
 
@@ -558,6 +559,7 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
     return sholl_crossings(morph, neurite_type, morph.soma.center, bins)
 
 
+@cached_func()
 def _extent_along_axis(morph, axis, neurite_type):
     """Returns the total extent of the morpholog neurites.
 
@@ -624,6 +626,7 @@ def volume_density(morph, neurite_type=NeuriteType.all):
     return total_volume / morph_hull.volume
 
 
+@cached_func()
 def _unique_projected_points(morph, projection_plane,  neurite_type):
 
     key = "".join(sorted(projection_plane.lower()))
