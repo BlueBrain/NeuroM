@@ -60,6 +60,10 @@ neurom = 'neurom.apps.cli:cli'
 
 [tool.setuptools.packages.find]
 include = ["neurom"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"*" = ["morph_check.yaml", "morph_stats.yaml"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
