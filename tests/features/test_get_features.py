@@ -484,7 +484,9 @@ def test_segment_meander_angles():
 
 
 def test_segment_meander_angles_single_section():
-    m = nm.load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    m = nm.load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                       ((Dendrite)
                                        (0 0 0 2)
                                        (1 0 0 2)

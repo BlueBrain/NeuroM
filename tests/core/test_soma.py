@@ -119,11 +119,16 @@ def test_Soma_ThreePointCylinder_invalid_radius():
 def test_Soma_ThreePointCylinder_invalid():
     try:
         set_raise_warnings(True)
-        with pytest.raises(MorphioError,
-                           match=('Warning: the soma does not conform the three point soma spec|' # morphio < 3.3.7
-                                  'The non-constant columns is not offset by' # morphio >= 3.3.7
-                                  )):
-            load_morphology(StringIO(u"""
+        with pytest.raises(
+            MorphioError,
+            match=(
+                'Warning: the soma does not conform the three point soma spec|'  # morphio < 3.3.7
+                'The non-constant columns is not offset by'  # morphio >= 3.3.7
+            ),
+        ):
+            load_morphology(
+                StringIO(
+                    u"""
                             1 1 0   0 0 1e-4 -1
                             2 1 0 -44 0 1e-4  1
                             3 1 0 +44 0 1e-4  1"""

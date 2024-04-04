@@ -38,15 +38,13 @@ from collections import defaultdict
 from collections.abc import Sized
 from copy import deepcopy
 from functools import partial
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import pkg_resources
 from morphio import SomaError
 
 import neurom as nm
-from neurom.apps import get_config
+from neurom.apps import EXAMPLE_STATS_CONFIG, get_config
 from neurom.core.morphology import Morphology, Neurite
 from neurom.core.population import Population
 from neurom.exceptions import ConfigError
@@ -61,7 +59,6 @@ from neurom.utils import NeuromJSON, flatten
 
 L = logging.getLogger(__name__)
 
-EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_stats.yaml')
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
@@ -124,7 +121,7 @@ def extract_dataframe(morphs, config, n_workers=1, process_subtrees=False):
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
-extract_dataframe.__doc__ += str(EXAMPLE_CONFIG)
+extract_dataframe.__doc__ = extract_dataframe.__doc__.strip() + "\n\t" + str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_feature_stats(feature_name, morphs, modes, **kwargs):
@@ -243,7 +240,7 @@ def extract_stats(morphs, config):
     return dict(stats)
 
 
-extract_stats.__doc__ += str(EXAMPLE_CONFIG)
+extract_stats.__doc__ = extract_stats.__doc__.strip() + "\n\t" + str(EXAMPLE_STATS_CONFIG)
 
 
 def _get_header(results):
@@ -381,7 +378,7 @@ def main(
         ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
         use_subtrees (bool): Enable of heterogeneous subtree processing
     """
-    config = full_config() if is_full_config else get_config(config, EXAMPLE_CONFIG)
+    config = full_config() if is_full_config else get_config(config, EXAMPLE_STATS_CONFIG)
 
     if 'neurite' in config and 'neurite_type' not in config:
         error = ConfigError('"neurite_type" missing from config, but "neurite" set')

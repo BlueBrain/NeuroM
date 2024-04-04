@@ -40,7 +40,9 @@ SWC_PATH = DATA_PATH / 'swc'
 def _generate_back_track_tree(n, dev):
     points = np.array(dev) + np.array([1, 3 if n == 0 else -3, 0])
 
-    m = load_morphology(StringIO(u"""
+    m = load_morphology(
+        StringIO(
+            u"""
     ((CellBody) (-1 0 0 2) (1 0 0 2))
 
     ((Dendrite)

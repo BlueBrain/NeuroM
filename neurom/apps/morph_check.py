@@ -29,14 +29,9 @@
 """Check on morphologies."""
 
 import json
-from pathlib import Path
 
-import pkg_resources
-
-from neurom.apps import get_config
+from neurom.apps import EXAMPLE_CHECK_CONFIG, get_config
 from neurom.check.runner import CheckRunner
-
-EXAMPLE_CONFIG = Path(pkg_resources.resource_filename('neurom.apps', 'config'), 'morph_check.yaml')
 
 
 def main(datapath, config, output):
@@ -47,7 +42,7 @@ def main(datapath, config, output):
         config (str|Path): path to a statistics config file
         output (str|Path): path to output the resulted checks file
     """
-    config = get_config(config, EXAMPLE_CONFIG)
+    config = get_config(config, EXAMPLE_CHECK_CONFIG)
     checker = CheckRunner(config)
     summary = checker.run(datapath)
     with open(output, 'w') as json_output:

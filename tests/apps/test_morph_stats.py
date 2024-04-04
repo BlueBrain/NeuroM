@@ -357,7 +357,9 @@ def test_stats_new_format_set_arg():
 
 
 def test_extract_stats_scalar_feature():
+
     m = nm.load_morphology(DATA_PATH / 'neurolucida' / 'bio_neuron-000.asc')
+
     config = {
         'neurite_type': ['ALL'],
         'neurite': {
@@ -367,7 +369,10 @@ def test_extract_stats_scalar_feature():
             'soma_volume': ['sum'],
         },
     }
-    res = ms.extract_stats(m, config)
+    with warnings.catch_warnings():
+        # silence warning about approximating soma volume with a sphere
+        warnings.simplefilter("ignore", category=UserWarning)
+        res = ms.extract_stats(m, config)
     assert res == {
         'all': {'max_number_of_forking_points': 277},
         'morphology': {'sum_soma_volume': 1424.4383771584492},
@@ -518,10 +523,22 @@ def test_extract_dataframe():
     actual = actual.drop(columns='raw_section_branch_orders', level=1)
     aggregated_expected = pd.concat(
         [
-            expected[[col for col in expected.columns if col[1].startswith("mean_")]].mean().to_frame().T,
-            expected[[col for col in expected.columns if col[1].startswith("max_")]].max().to_frame().T,
-            expected[[col for col in expected.columns if col[1].startswith("min_")]].min().to_frame().T,
-            expected[[col for col in expected.columns if col[1].startswith("sum_")]].sum().to_frame().T,
+            expected[[col for col in expected.columns if col[1].startswith("mean_")]]
+            .mean()
+            .to_frame()
+            .T,
+            expected[[col for col in expected.columns if col[1].startswith("max_")]]
+            .max()
+            .to_frame()
+            .T,
+            expected[[col for col in expected.columns if col[1].startswith("min_")]]
+            .min()
+            .to_frame()
+            .T,
+            expected[[col for col in expected.columns if col[1].startswith("sum_")]]
+            .sum()
+            .to_frame()
+            .T,
         ],
         axis=1,
     )
@@ -624,8 +641,7 @@ def test_extract_dataframe_with_kwargs():
 
 
 def test_extract_dataframe_multiproc():
-    morphs = [Path(SWC_PATH, name)
-            for name in ['Neuron.swc', 'simple.swc']]
+    morphs = [Path(SWC_PATH, name) for name in ['Neuron.swc', 'simple.swc']]
     expected = pd.read_csv(Path(DATA_PATH, 'extracted-stats.csv'), index_col=0, header=[0, 1])
 
     with warnings.catch_warnings(record=True) as w:

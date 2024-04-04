@@ -236,7 +236,7 @@ def plot_style(
         ax.set_aspect(aspect_ratio)
 
     if tight:
-        fig.set_tight_layout(True)
+        fig.set_layout_engine("tight")
 
 
 def plot_title(ax, pretitle='', title='Figure', posttitle='', title_fontsize=14, title_arg=None):

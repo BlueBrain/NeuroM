@@ -95,7 +95,9 @@ def test_section_path_length():
 
 
 def test_section_area():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
                                      (1 0 0 2))"""
@@ -107,7 +109,9 @@ def test_section_area():
 
 
 def test_segment_areas():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 4)
                                      (1 0 0 4)
@@ -120,7 +124,9 @@ def test_segment_areas():
 
 
 def test_segment_volumes():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 4)
                                      (1 0 0 4)
@@ -133,7 +139,9 @@ def test_segment_volumes():
 
 
 def test_segment_mean_radii():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
                                      (1 0 0 4)
@@ -146,7 +154,9 @@ def test_segment_mean_radii():
 
 
 def test_segment_midpoints():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
                                      (1 0 0 4)
@@ -159,15 +169,22 @@ def test_segment_midpoints():
 
 
 def test_section_tortuosity():
-    sec_a = load_morphology(StringIO(u"""
+    sec_a = load_morphology(
+        StringIO(
+            u"""
 	((CellBody) (-1 0 0 2) (1 0 0 2))
 	((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (2 0 0 2)
-    (3 0 0 2))"""), reader='asc').sections[SECTION_ID]
+    (3 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
-    sec_b = load_morphology(StringIO(u"""
+    sec_b = load_morphology(
+        StringIO(
+            u"""
     ((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
@@ -188,7 +205,9 @@ def test_section_tortuosity():
 
 
 def test_setion_tortuosity_single_point():
-    sec = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                    ((Dendrite)
                                     (1 2 3 2))"""
         ),
@@ -198,7 +217,9 @@ def test_setion_tortuosity_single_point():
 
 
 def test_section_tortuosity_looping_section():
-    sec = load_morphology(StringIO(u"""
+    sec = load_morphology(
+        StringIO(
+            u"""
     ((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
@@ -214,7 +235,9 @@ def test_section_tortuosity_looping_section():
 
 
 def test_section_meander_angles():
-    s0 = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    s0 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
@@ -226,7 +249,9 @@ def test_section_meander_angles():
     ).sections[SECTION_ID]
     assert section.section_meander_angles(s0) == [math.pi, math.pi, math.pi]
 
-    s1 = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    s1 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
@@ -238,7 +263,9 @@ def test_section_meander_angles():
     ).sections[SECTION_ID]
     assert section.section_meander_angles(s1) == [math.pi / 2, math.pi / 2, math.pi / 2]
 
-    s2 = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    s2 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (0 0 1 2)
@@ -251,7 +278,9 @@ def test_section_meander_angles():
 
 
 def test_section_meander_angles_single_segment():
-    s = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    s = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 1 1 2))"""
@@ -269,7 +298,9 @@ def test_strahler_order():
 
 
 def test_locate_segment_position():
-    s = load_morphology(StringIO(u"""((CellBody) (-1 0 0 2) (1 0 0 2))
+    s = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
@@ -290,7 +321,9 @@ def test_locate_segment_position():
 
 
 def test_mean_radius():
-    n = load_morphology(StringIO(u"""
+    n = load_morphology(
+        StringIO(
+            u"""
     ((CellBody) (-1 0 0 2) (1 0 0 2))
 
     ((Dendrite)

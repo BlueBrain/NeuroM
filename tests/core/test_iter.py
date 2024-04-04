@@ -1064,7 +1064,9 @@ def test_iter_segments_pop():
 
 
 def test_iter_segments_section():
-    sec = load_morphology(StringIO(u"""
+    sec = load_morphology(
+        StringIO(
+            u"""
 	                      ((CellBody) (-1 0 0 2) (1 0 0 2))
 
 	                      ((Dendrite)

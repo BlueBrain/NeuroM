@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import tempfile
+import pytest
 
 import pandas as pd
 import yaml
@@ -77,6 +78,7 @@ def test_morph_stat():
         }
 
 
+@pytest.mark.filterwarnings('ignore::UserWarning')
 def test_morph_stat_full_config():
     runner = CliRunner()
     filename = DATA / 'h5/v1/Neuron.h5'
