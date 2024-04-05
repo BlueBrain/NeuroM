@@ -150,48 +150,6 @@ def reset_NeuriteType():
     NeuriteType._member_names_ = current_member_names_
 
 
-@pytest.mark.parametrize(
-    "value",
-    [
-        pytest.param(99, id="Simple scalar value"),
-        pytest.param([SectionType.axon, SectionType.soma], id="Composite value"),
-    ],
-)
-def test_neurite_type__register_unregister(value, reset_NeuriteType):
-    obj = NeuriteType.register("new_type", value)
-
-    assert NeuriteType(value) == obj
-    assert NeuriteType(value).name == "new_type"
-    assert NeuriteType(value) == NeuriteType(value)
-    # assert NeuriteType(value).value == NeuriteType(value)
-    assert getattr(NeuriteType, "new_type") == obj
-    # assert NeuriteType["new_type"] == obj
-
-    with pytest.raises(ValueError, match="NeuriteType 'other_new_type' is already registered"):
-        # Try to register a new type with already existing value
-        NeuriteType.register("other_new_type", value)
-
-    expected = "NeuriteType 'axon' is already registered as <NeuriteType.axon: 2>"
-    with pytest.raises(ValueError, match=expected):
-        # Try to register a new type with already existing name
-        NeuriteType.register("axon", 88)
-
-    NeuriteType.unregister("new_type")
-
-    expected = "The NeuriteType 'UNKNOWN VALUE' is not registered so it can not be unregistered"
-    with pytest.raises(ValueError, match=expected):
-        # Try to unregister an unregistered value
-        NeuriteType.unregister("UNKNOWN VALUE")
-
-    with pytest.raises(ValueError):
-        # Try to unregister an existing attribute that is not a registered value
-        NeuriteType.unregister("name")
-
-    with pytest.raises(ValueError, match="is not a valid NeuriteType"):
-        # Try to get unregistered value
-        NeuriteType(value)
-
-
 DATA_DIR = Path(__file__).parent / "data/mixed"
 
 

@@ -169,44 +169,6 @@ class NeuriteType(Enum, metaclass=_ArgsIntsOrTuples):
                 is_eq = self.root_type == other.root_type
         return is_eq
 
-    @classmethod
-    def register(cls, name, value):
-        """Register a new value in the Enum class."""
-        value = _int_or_tuple(value)
-
-        if hasattr(cls, name):
-            existing = getattr(cls, name)
-            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
-
-        try:
-            existing = cls(value)
-        except ValueError:
-            existing = None
-
-        if existing:
-            raise ValueError(f"NeuriteType '{name}' is already registered as {repr(existing)}")
-
-        obj = _create_neurite_type(cls, value, name=name)
-
-        cls._value2member_map_[value] = obj
-        cls._member_map_[name] = obj
-        cls._member_names_.append(name)
-
-        return obj
-
-    @classmethod
-    def unregister(cls, name):
-        """Unregister a value in the Enum class."""
-        if name not in cls._member_names_:
-            raise ValueError(
-                f"The NeuriteType '{name}' is not registered so it can not be unregistered"
-            )
-
-        value = cls._member_map_[name].value
-        del cls._value2member_map_[value]
-        del cls._member_map_[name]
-        cls._member_names_.remove(name)
-
 
 #: Collection of all neurite types
 NEURITES = (NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite)
