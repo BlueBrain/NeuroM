@@ -64,7 +64,7 @@ Heterogeneous neurites can be identified using the ``Neurite::is_heterogeneous``
 which would return ``[False, True, False]``, meaning the 2nd neurite extending from the soma contains multiple neurite types.
 
 
-Sub-neurite views of heterogeneous neurites
+sub-neurite views of heterogeneous neurites
 --------------------------------------------
 
 Default mode
@@ -84,14 +84,15 @@ For example:
 
     NeuriteType.basal_dendrite NeuriteType.basal_dendrite NeuriteType.apical_dendrite
 
-I.E. the axon-carrying dendrite would be treated as a basal dendrite.
+In other words, the axon-carrying dendrite would be treated as a basal dendrite.
+
 For feature extraction and checks, the axon-carrying dendrite is treated as a basal dendrite.
 Features, for which an axon neurite type is passed, do not have access to the axonal part of the neurite.
 For instance, the number of basal and axon neurites will be two and zero respectively.
-A features such as ``total_volume`` would include the entire axon-carrying dendrite, without separating between basal and axon types.
+A feature such as ``total_volume`` would include the entire axon-carrying dendrite, without separating between basal and axon types.
 
-Sub-neurite mode
-~~~~~~~~~~~~~~~~
+subtree mode
+~~~~~~~~~~~~
 
 The ``Population``, ``Morphology`` and ``Neurite`` objects have a boolean attribute named ``process_subtrees`` which is set to ``False`` by default.
 The value of this attribute can be set to ``True`` in order to take into account heterogeneous sub-neurites.
@@ -210,7 +211,7 @@ features.get
 .. warning::
     The ``features.get`` function can be used with either the ``neurite_type`` or the ``section_type`` parameter, depending on what type of object the feature is applied.
     When the feature is applied to a ``Population`` or to a ``Morphology`` object, only the ``neurite_type`` parameter is accepted.
-    While when the feature is applied to a ``Neurite`` or to a list of ``Neurite`` objects, only the ``section_type`` parameter is accepted.
+    While the feature is applied to a ``Neurite`` or to a list of ``Neurite`` objects, only the ``section_type`` parameter is accepted.
 
 Conventions & Incompatibilities
 -------------------------------
