@@ -70,7 +70,7 @@ However, it is still accessible via the ``to_morphio()`` method:
 
     morphio._morphio Morphology
 
-which means that the default morphio Morphology is immutable. It is however, possible to use a mutable morpio Morphology if needed:
+which means that the default morphio Morphology is immutable. It is however possible to use a mutable morpio Morphology if needed:
 
 .. testcode:: [v4-migration]
 
