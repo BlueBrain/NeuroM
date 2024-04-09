@@ -108,6 +108,12 @@ To mutate a readonly morphology requires a detour through morphio's mutable obje
 
    4 5
 
+Note that ``mutated_morph`` above will store the mutable morphio object. To prevent that:
+
+.. testcode:: [v4-migration]
+
+   mutated_morph = Morphology(mut.as_immutable())
+
 .. _migration-v3.0.0:
 
 Migration to v3 version
