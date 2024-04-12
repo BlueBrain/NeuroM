@@ -84,7 +84,7 @@ def is_flat(neurite, tol, method='tolerance'):
     return any(ext < float(tol))
 
 
-def is_back_tracking(neurite):
+def back_tracking_segments(neurite):
     """Check if a neurite process backtracks to a previous node.
 
     Back-tracking takes place
@@ -95,10 +95,11 @@ def is_back_tracking(neurite):
         neurite(Neurite): neurite to operate on
 
     Returns:
-        True Under the following scenaria:
-            1. A segment endpoint falls back and overlaps with a previous segment's point
-            2. The geometry of a segment overlaps with a previous one in the section
+        A generator of tuples containing the section ID and the two segment indices in this section
+        for which a back tracking is detected (so the first point of these segments can be
+        retrieved with ``morph.section(section_id).points[segment_id]``.
     """
+    # pylint: disable=too-many-locals
     def pair(segs):
         """Pairs the input list into triplets."""
         return zip(segs, segs[1:])
@@ -179,9 +180,27 @@ def is_back_tracking(neurite):
         for i, seg1 in enumerate(segment_pairs[1:]):
             # check if the end point of the segment lies within the previous
             # ones in the current section
-            for seg2 in segment_pairs[0: i + 1]:
+            for j, seg2 in enumerate(segment_pairs[0: i + 1]):
                 if is_inside_cylinder(seg1, seg2):
-                    return True
+                    yield (sec.id, i, j)
+
+
+def is_back_tracking(neurite):
+    """Check if a neurite process backtracks to a previous node.
+
+    See back_tracking_segments() for more details.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+
+    Returns:
+        True Under the following scenaria:
+            1. A segment endpoint falls back and overlaps with a previous segment's point
+            2. The geometry of a segment overlaps with a previous one in the section
+    """
+    for _i in back_tracking_segments(neurite):
+        # If one segment is found then the neurite is back tracking
+        return True
     return False
 
 
