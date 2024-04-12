@@ -483,4 +483,8 @@ def test_has_no_back_tracking():
 """, "asc")
     result = morphology_checks.has_no_back_tracking(m)
     assert result.status is False
-    assert result.info == [(2, 1, 0), (2, 1, 1)]
+    info = result.info
+    assert_array_equal(info[0][0], [2, 1, 0])
+    assert_array_equal(info[0][1], [[1, -3, 0]])
+    assert_array_equal(info[1][0], [2, 1, 1])
+    assert_array_equal(info[1][1], [[1, -3, 0]])
