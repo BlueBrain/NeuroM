@@ -35,7 +35,7 @@ from itertools import islice
 import numpy as np
 from neurom import NeuriteType
 from neurom.check import CheckResult
-from neurom.check.morphtree import get_flat_neurites
+from neurom.check.morphtree import get_flat_neurites, back_tracking_segments
 from neurom.core.morphology import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.exceptions import NeuroMError
@@ -354,4 +354,10 @@ def has_unifurcation(neuron):
 def has_no_single_children(morph):
     """Check if the morphology has sections with only one child section."""
     bad_ids = [section.id for section in iter_sections(morph) if len(section.children) == 1]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_no_back_tracking(morph):
+    """Check if the morphology has sections with back-tracks."""
+    bad_ids = [i for neurite in iter_neurites(morph) for i in back_tracking_segments(neurite)]
     return CheckResult(len(bad_ids) == 0, bad_ids)
