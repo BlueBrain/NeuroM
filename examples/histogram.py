@@ -76,16 +76,16 @@ def histogram(neurons, feature, new_fig=True, subplot=111, normed=False, **kwarg
             figure file.
     """
 
-    bins = kwargs.get('bins', 25)
-    cumulative = kwargs.get('cumulative', False)
+    bins = kwargs.get("bins", 25)
+    cumulative = kwargs.get("cumulative", False)
 
     fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
-    kwargs['xlabel'] = kwargs.get('xlabel', feature)
+    kwargs["xlabel"] = kwargs.get("xlabel", feature)
 
-    kwargs['ylabel'] = kwargs.get('ylabel', feature + ' fraction')
+    kwargs["ylabel"] = kwargs.get("ylabel", feature + " fraction")
 
-    kwargs['title'] = kwargs.get('title', feature + ' histogram')
+    kwargs["title"] = kwargs.get("title", feature + " histogram")
 
     feature_values = [neurom.features.get(feature, neu) for neu in neurons]
 
@@ -93,7 +93,7 @@ def histogram(neurons, feature, new_fig=True, subplot=111, normed=False, **kwarg
 
     ax.hist(feature_values, bins=bins, cumulative=cumulative, label=neu_labels, density=normed)
 
-    kwargs['no_legend'] = len(neu_labels) == 1
+    kwargs["no_legend"] = len(neu_labels) == 1
 
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -149,16 +149,16 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111,
             figure file.
     """
 
-    bins = kwargs.get('bins', 25)
-    cumulative = kwargs.get('cumulative', False)
+    bins = kwargs.get("bins", 25)
+    cumulative = kwargs.get("cumulative", False)
 
     fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
-    kwargs['xlabel'] = kwargs.get('xlabel', feature)
+    kwargs["xlabel"] = kwargs.get("xlabel", feature)
 
-    kwargs['ylabel'] = kwargs.get('ylabel', feature + ' fraction')
+    kwargs["ylabel"] = kwargs.get("ylabel", feature + " fraction")
 
-    kwargs['title'] = kwargs.get('title', feature + ' histogram')
+    kwargs["title"] = kwargs.get("title", feature + " histogram")
 
     pops_feature_values = population_feature_values(pops, feature)
 
@@ -168,7 +168,7 @@ def population_histogram(pops, feature, new_fig=True, normed=False, subplot=111,
         pops_feature_values, bins=bins, cumulative=cumulative, label=pops_labels, density=normed
     )
 
-    kwargs['no_legend'] = len(pops_labels) == 1
+    kwargs["no_legend"] = len(pops_labels) == 1
 
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 

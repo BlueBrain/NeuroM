@@ -66,8 +66,8 @@ def main():
         find_optimal_distribution(population_directory, "section_lengths")
     )
 
-    print(json.dumps(result, indent=2, separators=(',', ': '), cls=NeuromJSON))
+    print(json.dumps(result, indent=2, separators=(",", ": "), cls=NeuromJSON))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

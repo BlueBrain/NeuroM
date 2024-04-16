@@ -48,10 +48,10 @@ def test_multiple_distr(filepath):
     population = nm.load_morphologies(filepath)
 
     # Create a list of basic distributions
-    distr_to_check = ('norm', 'expon', 'uniform')
+    distr_to_check = ("norm", "expon", "uniform")
 
     # Get the soma radii of a population of morphs
-    soma_size = nm.get('soma_radius', population)
+    soma_size = nm.get("soma_radius", population)
 
     # Find the best fit distribution
     return st.optimal_distribution(soma_size, distr_to_check)
@@ -66,5 +66,5 @@ def main():
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

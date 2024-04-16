@@ -36,7 +36,7 @@ from neurom.view import matplotlib_utils
 import matplotlib.pyplot as plt
 import numpy as np
 
-DATA_PATH = Path(__file__).resolve().parent.parent / 'tests/data/swc'
+DATA_PATH = Path(__file__).resolve().parent.parent / "tests/data/swc"
 
 
 def random_color():
@@ -47,7 +47,7 @@ def random_color():
 def plot_somas(somas):
     """Plot set of somas on same figure as spheres, each with different color."""
     _, ax = matplotlib_utils.get_figure(
-        new_fig=True, subplot=111, params={'projection': '3d', 'aspect': 'auto'}
+        new_fig=True, subplot=111, params={"projection": "3d", "aspect": "auto"}
     )
     for s in somas:
         matplotlib_utils.plot_sphere(ax, s.center, s.radius, color=random_color(), alpha=1)
@@ -60,7 +60,7 @@ def main():
     #  define set of files containing relevant morphs
     file_nms = [
         Path(DATA_PATH, file_nm)
-        for file_nm in ['Soma_origin.swc', 'Soma_translated_1.swc', 'Soma_translated_2.swc']
+        for file_nm in ["Soma_origin.swc", "Soma_translated_1.swc", "Soma_translated_2.swc"]
     ]
 
     # load from file and plot
@@ -68,5 +68,5 @@ def main():
     plot_somas(sms)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

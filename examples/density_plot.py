@@ -42,15 +42,15 @@ from neurom import load_morphologies
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
-def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.basal_dendrite):
+def extract_density(population, plane="xy", bins=100, neurite_type=NeuriteType.basal_dendrite):
     """Extracts the 2d histogram of the center
     coordinates of segments in the selected plane.
     """
     segment_midpoints = np.array(
-        get_feat('segment_midpoints', population, neurite_type=neurite_type)
+        get_feat("segment_midpoints", population, neurite_type=neurite_type)
     )
-    horiz = segment_midpoints[:, 'xyz'.index(plane[0])]
-    vert = segment_midpoints[:, 'xyz'.index(plane[1])]
+    horiz = segment_midpoints[:, "xyz".index(plane[0])]
+    vert = segment_midpoints[:, "xyz".index(plane[1])]
     return np.histogram2d(np.array(horiz), np.array(vert), bins=(bins, bins))
 
 
@@ -60,10 +60,10 @@ def plot_density(
     new_fig=True,
     subplot=111,
     levels=None,
-    plane='xy',
-    colorlabel='Nodes per unit area',
+    plane="xy",
+    colorlabel="Nodes per unit area",
     labelfontsize=16,
-    color_map='Reds',
+    color_map="Reds",
     no_colorbar=False,
     threshold=0.01,
     neurite_type=NeuriteType.basal_dendrite,
@@ -82,7 +82,7 @@ def plot_density(
     H2 = np.ma.masked_array(H1, mask)
 
     colormap = mpl.cm.get_cmap(color_map).copy()
-    colormap.set_bad(color='white', alpha=None)
+    colormap.set_bad(color="white", alpha=None)
 
     plots = ax.contourf(
         (xedges1[:-1] + xedges1[1:]) / 2,
@@ -96,9 +96,9 @@ def plot_density(
         cbar = plt.colorbar(plots)
         cbar.ax.set_ylabel(colorlabel, fontsize=labelfontsize)
 
-    kwargs['title'] = kwargs.get('title', '')
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs["title"] = kwargs.get("title", "")
+    kwargs["xlabel"] = kwargs.get("xlabel", plane[0])
+    kwargs["ylabel"] = kwargs.get("ylabel", plane[1])
 
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
@@ -109,10 +109,10 @@ def plot_neuron_on_density(
     new_fig=True,
     subplot=111,
     levels=None,
-    plane='xy',
-    colorlabel='Nodes per unit area',
+    plane="xy",
+    colorlabel="Nodes per unit area",
     labelfontsize=16,
-    color_map='Reds',
+    color_map="Reds",
     no_colorbar=False,
     threshold=0.01,
     neurite_type=NeuriteType.basal_dendrite,

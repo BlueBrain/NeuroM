@@ -41,7 +41,7 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 def stylize(ax, name, feature):
     """Stylization modifications to the plots"""
     ax.set_ylabel(feature)
-    ax.set_title(name, fontsize='small')
+    ax.set_title(name, fontsize="small")
 
 
 def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
@@ -104,5 +104,5 @@ def main():
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
