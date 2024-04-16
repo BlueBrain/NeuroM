@@ -153,11 +153,7 @@ def max_radial_distance(morph, origin=None, neurite_type=NeuriteType.all):
 
 @feature(shape=(...,))
 def section_radial_distances(morph, origin=None, neurite_type=NeuriteType.all):
-    """Section radial distances.
-
-    The iterator_type can be used to select only terminal sections (ileaf)
-    or only bifurcations (ibifurcation_point).
-    """
+    """Section radial distances."""
     origin = morph.soma.center if origin is None else origin
 
     return list(

@@ -284,13 +284,13 @@ def test_iter_sections(mixed_morph):
 
     # # Iterate with ibifurcation_point iterator
     assert [
-        i.id for i in iter_sections(mixed_morph, iterator_type=Section.ibifurcation_point)
+        i.id for i in iter_sections(mixed_morph, section_iterator=Section.ibifurcation_point)
     ] == [0, 1, 5, 6, 9, 11, 14, 15]  # fmt: skip
     assert [
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.all),
         )
     ] == [0, 1, 5, 6, 9, 11, 14, 15]
@@ -298,7 +298,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
         )
     ] == []
@@ -306,7 +306,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.all),
         )
@@ -349,14 +349,14 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
         )
     ] == [0, 1, 5, 6, 9, 11, 14, 15]
     assert [
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.all),
         )
     ] == [0, 1, 5, 6, 9, 11, 14, 15]
@@ -364,7 +364,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
         )
     ] == [5, 6, 9, 11]
@@ -372,7 +372,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.all),
         )
@@ -381,7 +381,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.axon),
         )
@@ -390,7 +390,7 @@ def test_iter_sections(mixed_morph):
         i.id
         for i in iter_sections(
             mixed_morph,
-            iterator_type=Section.ibifurcation_point,
+            section_iterator=Section.ibifurcation_point,
             neurite_filter=is_type(NeuriteType.axon),
             section_filter=is_type(NeuriteType.basal_dendrite),
         )

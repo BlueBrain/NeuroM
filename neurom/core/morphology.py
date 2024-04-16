@@ -291,7 +291,7 @@ def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrd
 
 def iter_sections(
     neurites,
-    iterator_type=Section.ipreorder,
+    section_iterator=Section.ipreorder,
     neurite_filter=None,
     neurite_order=NeuriteIter.FileOrder,
     section_filter=None,
@@ -300,7 +300,7 @@ def iter_sections(
 
     Arguments:
         neurites: morphology, population, neurite, or iterable containing neurite objects
-        iterator_type: section iteration order within a given neurite. Must be one of:
+        section_iterator: section iteration order within a given neurite. Must be one of:
             Section.ipreorder: Depth-first pre-order iteration of tree nodes
             Section.ipostorder: Depth-first post-order iteration of tree nodes
             Section.iupstream: Iterate from a tree node to the root nodes
@@ -324,7 +324,7 @@ def iter_sections(
         >>> n_points = [len(s.points) for s in iter_sections(pop,  neurite_filter=filter)]
     """
     neurites = iter_neurites(neurites, filt=neurite_filter, neurite_order=neurite_order)
-    sections = flatten(iterator_type(neurite.root_node) for neurite in neurites)
+    sections = flatten(section_iterator(neurite.root_node) for neurite in neurites)
     return sections if section_filter is None else filter(section_filter, sections)
 
 
@@ -361,7 +361,7 @@ def iter_segments(
         if isinstance(obj, Section)
         else iter_sections(
             obj,
-            iterator_type=section_order,
+            section_iterator=section_order,
             neurite_filter=neurite_filter,
             neurite_order=neurite_order,
             section_filter=section_filter,
@@ -507,11 +507,11 @@ class Neurite:
         """Returns true if the neurite consists of more that one section types."""
         return self.morphio_root_node.is_heterogeneous()
 
-    def iter_sections(self, iterator_type=Section.ipreorder, section_filter=None):
+    def iter_sections(self, section_iterator=Section.ipreorder, section_filter=None):
         """Iteration over section nodes.
 
         Arguments:
-            iterator_type: section iteration order within a given neurite. Must be one of:
+            section_iterator: section iteration order within a given neurite. Must be one of:
                 Section.ipreorder: Depth-first pre-order iteration of tree nodes
                 Section.ipostorder: Depth-first post-order iteration of tree nodes
                 Section.iupstream: Iterate from a tree node to the root nodes
@@ -519,14 +519,14 @@ class Neurite:
                 Section.ileaf: Iterator to all leaves of a tree
             section_filter: optional section level filter.
         """
-        return iter_sections(self, iterator_type=iterator_type, section_filter=section_filter)
+        return iter_sections(self, section_iterator=section_iterator, section_filter=section_filter)
 
     def iter_segments(self, section_filter=None, section_order=Section.ipreorder):
         """Iterator to the segments of the sections."""
         return flatten(
             iter_segments(sec)
             for sec in self.iter_sections(
-                section_filter=section_filter, iterator_type=section_order
+                section_filter=section_filter, section_iterator=section_order
             )
         )
 
