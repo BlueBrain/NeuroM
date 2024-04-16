@@ -197,3 +197,10 @@ def test_get_nonmonotonic_neurites():
 def test_get_back_tracking_neurites():
     m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
     assert len(mt.get_back_tracking_neurites(m)) == 4
+
+
+def test_get_duplicated_point_neurites():
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert len(mt.get_duplicated_point_neurites(m)) == 0
+    assert len(mt.get_duplicated_point_neurites(m, tolerance=0.09)) == 1
+    assert len(mt.get_duplicated_point_neurites(m, tolerance=999)) == 4

@@ -29,6 +29,8 @@
 """Python module of NeuroM to check morphology trees."""
 
 import numpy as np
+from scipy.spatial import KDTree
+
 from neurom.core.dataformat import COLS
 from neurom import morphmath as mm
 from neurom.morphmath import principal_direction_extent
@@ -204,6 +206,60 @@ def is_back_tracking(neurite):
     return False
 
 
+def duplicated_points(neurite, tolerance=None):
+    """Return duplicated points of a neurite.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tolerance(float): the tolerance used to find duplicated points
+
+    Returns:
+        A generator of tuples containing the IDs of the two intersecting sections and the
+        duplicated point.
+    """
+    section_pts = np.vstack(
+        [
+            np.insert(neurite.root_node.points[0], 0, neurite.root_node.id),
+            np.vstack(
+                [
+                    np.concatenate(
+                        [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:]],
+                        axis=1,
+                    )
+                    for sec in neurite.iter_sections()
+                ],
+            ),
+        ],
+    )
+    tree = KDTree(section_pts[:, [1, 2, 3]])
+    if tolerance is None:
+        tolerance = 0
+    for pt_id1, pt_id2 in tree.query_pairs(tolerance):
+        yield (
+            int(section_pts[pt_id1, 0]),
+            int(section_pts[pt_id2, 0]),
+            section_pts[pt_id1, [1, 2, 3]],
+        )
+
+
+def has_duplicated_points(neurite, tolerance=None):
+    """Check if a neurite has at least one duplicated point.
+
+    See duplicated_points() for more details.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tolerance(float): the tolerance used to find duplicated points
+
+    Returns:
+        True if two points of the neurite are duplicated.
+    """
+    for _i in duplicated_points(neurite, tolerance=tolerance):
+        # If one duplicated point is found then the neurite is duplicating
+        return True
+    return False
+
+
 def get_flat_neurites(morph, tol=0.1, method='ratio'):
     """Check if a morphology has neurites that are flat within a tolerance.
 
@@ -246,3 +302,15 @@ def get_back_tracking_neurites(morph):
         List of morphologies with backtracks
     """
     return [n for n in morph.neurites if is_back_tracking(n)]
+
+
+def get_duplicated_point_neurites(morph, tolerance=0):
+    """Get neurites that have duplicated points.
+
+    Args:
+        morph(Morphology): neurite to operate on
+
+    Returns:
+        List of morphologies with backtracks
+    """
+    return [n for n in morph.neurites if has_duplicated_points(n, tolerance=tolerance)]
