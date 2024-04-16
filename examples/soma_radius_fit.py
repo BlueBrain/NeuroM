@@ -42,28 +42,29 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 def test_multiple_distr(filepath):
     """Runs the distribution fit for multiple distributions and returns
-       the optimal distribution along with the corresponding parameters.
+    the optimal distribution along with the corresponding parameters.
     """
     #  load a neuron from an SWC file
     population = nm.load_morphologies(filepath)
 
     # Create a list of basic distributions
-    distr_to_check = ('norm', 'expon', 'uniform')
+    distr_to_check = ("norm", "expon", "uniform")
 
     # Get the soma radii of a population of morphs
-    soma_size = nm.get('soma_radius', population)
+    soma_size = nm.get("soma_radius", population)
 
     # Find the best fit distribution
     return st.optimal_distribution(soma_size, distr_to_check)
 
 
 def main():
-
     morphology_path = Path(PACKAGE_DIR, "tests/data/swc/Neuron.swc")
 
     result = test_multiple_distr(morphology_path)
-    print(f"Optimal distribution fit for soma radius is: {result.type} with parameters {result.params}")
+    print(
+        f"Optimal distribution fit for soma radius is: {result.type} with parameters {result.params}"
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

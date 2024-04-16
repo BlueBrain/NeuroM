@@ -85,18 +85,8 @@ def _make_trace(morph, plane):
             plot_fun = go.Scatter3d
         else:
             plot_fun = go.Scatter
-            coords = {
-                'x': coords[plane[0]],
-                'y': coords[plane[1]],
-            }
-        yield plot_fun(
-            line={
-                'color': color,
-                'width': 2,
-            },
-            mode='lines',
-            **coords,
-        )
+            coords = {"x": coords[plane[0]], "y": coords[plane[1]]}
+        yield plot_fun(line={"color": color, "width": 2}, mode='lines', **coords)
 
 
 def _fill_soma_data(morph, data, plane):
@@ -145,10 +135,10 @@ def get_figure(morph, plane, title):
     """Returns the plotly figure containing the morphology."""
     data = list(_make_trace(morph, plane))
     axis = {
-        "gridcolor": 'rgb(255, 255, 255)',
-        "zerolinecolor": 'rgb(255, 255, 255)',
+        "gridcolor": "rgb(255, 255, 255)",
+        "zerolinecolor": "rgb(255, 255, 255)",
         "showbackground": True,
-        "backgroundcolor": 'rgb(230, 230,230)',
+        "backgroundcolor": "rgb(230, 230,230)",
     }
 
     soma_2d = _fill_soma_data(morph, data, plane)
