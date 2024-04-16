@@ -31,6 +31,7 @@
 """Extract a distribution for the selected feature of the population of morphologies among
    the exponential, normal and uniform distribution, according to the minimum ks distance.
    """
+from pathlib import Path
 
 from itertools import chain
 import argparse
@@ -38,31 +39,19 @@ import json
 
 import neurom as nm
 from neurom import stats
+from neurom.utils import NeuromJSON
 
 
-def parse_args():
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description='Morphology fit distribution extractor',
-        epilog='Note: Outputs json of the optimal distribution \
-                and corresponding parameters.')
-
-    parser.add_argument('datapath',
-                        help='Path to morphology data directory')
-
-    parser.add_argument('feature',
-                        help='Feature to be extracted with neurom.get')
-
-    return parser.parse_args()
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
-def extract_data(data_path, feature):
+def find_optimal_distribution(population_directory, feature):
     """Loads a list of morphologies, extracts feature
        and transforms the fitted distribution in the correct format.
        Returns the optimal distribution, corresponding parameters,
        minimun and maximum values.
     """
-    population = nm.load_morphologies(data_path)
+    population = nm.load_morphologies(population_directory)
 
     feature_data = [nm.get(feature, n) for n in population]
     feature_data = list(chain(*feature_data))
@@ -70,13 +59,18 @@ def extract_data(data_path, feature):
     return stats.optimal_distribution(feature_data)
 
 
+def main():
+
+    population_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
+
+    result = stats.fit_results_to_dict(
+	find_optimal_distribution(population_directory, "section_lengths")
+    )
+
+    print(json.dumps(
+	result, indent=2, separators=(',', ': '), cls=NeuromJSON
+    ))
+
+
 if __name__ == '__main__':
-    args = parse_args()
-
-    d_path = args.datapath
-
-    feat = args.feature
-
-    _result = stats.fit_results_to_dict(extract_data(d_path, feat))
-
-    print(json.dumps(_result, indent=2, separators=(',', ': ')))
+    main()

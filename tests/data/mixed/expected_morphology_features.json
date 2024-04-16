@@ -1,0 +1,5269 @@
+{
+  "soma_radius": [
+    {
+      "expected_wout_subtrees": 0.5,
+      "expected_with_subtrees": 0.5
+    }
+  ],
+  "soma_surface_area": [
+    {
+      "expected_wout_subtrees": 3.141592653589793,
+      "expected_with_subtrees": 3.141592653589793
+    }
+  ],
+  "soma_volume": [
+    {
+      "expected_wout_subtrees": 0.5235987755982988,
+      "expected_with_subtrees": 0.5235987755982988
+    }
+  ],
+  "number_of_sections_per_neurite": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        5,
+        9,
+        5
+      ],
+      "expected_with_subtrees": [
+        5,
+        9,
+        5
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        5,
+        9
+      ],
+      "expected_with_subtrees": [
+        5,
+        4
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        5
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        5
+      ],
+      "expected_with_subtrees": [
+        5
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        5,
+        9
+      ],
+      "expected_with_subtrees": [
+        5,
+        9
+      ]
+    }
+  ],
+  "max_radial_distance": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.472136
+    },
+    {
+      "kwargs": {
+        "neurite_type": 32,
+        "origin": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.472136
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.24264
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3,
+        "origin": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.242641
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 4.472136
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2,
+        "origin": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 4.47213595499958
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2],
+        "origin": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "expected_wout_subtrees": 4.472136,
+      "expected_with_subtrees": 4.472136
+    }
+  ],
+  "total_length_per_neurite": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        5.0,
+        10.828427,
+        5.0
+      ],
+      "expected_with_subtrees": [
+        5.0,
+        10.828427,
+        5.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        5.0,
+        10.828427
+      ],
+      "expected_with_subtrees": [
+        5.0,
+        5.414214
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        5.414214
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        5.0
+      ],
+      "expected_with_subtrees": [
+        5.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        5.0,
+        10.828427
+      ],
+      "expected_with_subtrees": [
+        5.0,
+        10.828427
+      ]
+    }
+  ],
+  "total_area_per_neurite": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        3.141593,
+        6.803702,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        3.141593,
+        6.803702,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        3.141593,
+        6.803702
+      ],
+      "expected_with_subtrees": [
+        3.141593,
+        3.401851
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        3.401851
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.141593,
+        6.803702
+      ],
+      "expected_with_subtrees": [
+        3.141593,
+        6.803702
+      ]
+    }
+  ],
+  "total_volume_per_neurite": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.15708,
+        0.340185,
+        0.15708
+      ],
+      "expected_with_subtrees": [
+        0.15708,
+        0.340185,
+        0.15708
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.15708,
+        0.340185
+      ],
+      "expected_with_subtrees": [
+        0.15708,
+        0.170093
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.170093
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.15708
+      ],
+      "expected_with_subtrees": [
+        0.15708
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        0.15708,
+        0.340185
+      ],
+      "expected_with_subtrees": [
+        0.15708,
+        0.340185
+      ]
+    }
+  ],
+  "trunk_origin_azimuths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        3.1415927,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        3.1415927,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        3.1415927,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        3.1415927,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.1415927,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        3.1415927,
+        0.0
+      ]
+    }
+  ],
+  "trunk_origin_elevations": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        1.5707964,
+        -1.5707964
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        1.5707964,
+        -1.5707964
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        1.5707964
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        1.5707964
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        -1.570796
+      ],
+      "expected_with_subtrees": [
+        -1.570796
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        1.5707964
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        1.5707964
+      ]
+    }
+  ],
+  "trunk_vectors": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        [
+          0.0,
+          -1.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          0.0,
+          -1.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ]
+    }
+  ],
+  "trunk_angles": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141592,
+        1.570796
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141592,
+        1.570796
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.5707964,
+        1.570796
+      ],
+      "expected_with_subtrees": [
+        1.5707964,
+        1.570796
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0
+      ]
+    }
+  ],
+  "trunk_angles_from_vector": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        [
+          1.5707963267948966,
+          -1.5707963267948966,
+          3.141592653589793
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          3.141592653589793,
+          3.141592653589793,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          1.5707963267948966,
+          -1.5707963267948966,
+          3.141592653589793
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          3.141592653589793,
+          3.141592653589793,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        [
+          1.5707963267948966,
+          -1.5707963267948966,
+          3.141592653589793
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          1.5707963267948966,
+          -1.5707963267948966,
+          3.141592653589793
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    }
+  ],
+  "trunk_angles_inter_types": [
+    {
+      "kwargs": {
+        "source_neurite_type": 3,
+        "target_neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    }
+  ],
+  "trunk_origin_radii": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.1,
+        0.1,
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1,
+        0.1,
+        0.1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.1,
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1,
+        0.1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1
+      ]
+    }
+  ],
+  "trunk_section_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.414213,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.414213,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.414213
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.414213
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0
+      ]
+    }
+  ],
+  "number_of_neurites": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 3,
+      "expected_with_subtrees": 3
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 2,
+      "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 1
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 1,
+      "expected_with_subtrees": 1
+    }
+  ],
+  "neurite_volume_density": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.235619,
+        0.063785,
+        0.235619
+      ],
+      "expected_with_subtrees": [
+        0.235619,
+        0.063785,
+        0.235619
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.235619,
+        0.063785
+      ],
+      "expected_with_subtrees": [
+        0.235619,
+        0.255139
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.170093
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.235619
+      ],
+      "expected_with_subtrees": [
+        0.235619
+      ]
+    }
+  ],
+  "sholl_crossings": [
+    {
+      "kwargs": {
+        "neurite_type": 32,
+        "radii": [
+          1.5,
+          3.5
+        ]
+      },
+      "expected_wout_subtrees": [
+        3,
+        2
+      ],
+      "expected_with_subtrees": [
+        3,
+        2
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3,
+        "radii": [
+          1.5,
+          3.5
+        ]
+      },
+      "expected_wout_subtrees": [
+        2,
+        2
+      ],
+      "expected_with_subtrees": [
+        2,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2,
+        "radii": [
+          1.5,
+          3.5
+        ]
+      },
+      "expected_wout_subtrees": [
+        0,
+        0
+      ],
+      "expected_with_subtrees": [
+        0,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4,
+        "radii": [
+          1.5,
+          3.5
+        ]
+      },
+      "expected_wout_subtrees": [
+        1,
+        0
+      ],
+      "expected_with_subtrees": [
+        1,
+        0
+      ]
+    }
+  ],
+  "sholl_frequency": [
+    {
+      "kwargs": {
+        "neurite_type": 32,
+        "step_size": 3
+      },
+      "expected_wout_subtrees": [
+        0,
+        2
+      ],
+      "expected_with_subtrees": [
+        0,
+        2
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3,
+        "step_size": 3
+      },
+      "expected_wout_subtrees": [
+        0,
+        2
+      ],
+      "expected_with_subtrees": [
+        0,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2,
+        "step_size": 3
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4,
+        "step_size": 2
+      },
+      "expected_wout_subtrees": [
+        0,
+        1
+      ],
+      "expected_with_subtrees": [
+        0,
+        1
+      ]
+    }
+  ],
+  "total_width": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 6.0,
+      "expected_with_subtrees": 6.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 6.0,
+      "expected_with_subtrees": 4.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 2.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 1.0,
+      "expected_with_subtrees": 1.0
+    }
+  ],
+  "total_height": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 7.0,
+      "expected_with_subtrees": 7.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 4.0,
+      "expected_with_subtrees": 4.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 2.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 2.0,
+      "expected_with_subtrees": 2.0
+    }
+  ],
+  "total_depth": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 2.0,
+      "expected_with_subtrees": 2.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 2.0,
+      "expected_with_subtrees": 2.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 2.0
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 2.0,
+      "expected_with_subtrees": 2.0
+    }
+  ],
+  "volume_density": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.01570426,
+      "expected_with_subtrees": 0.01570426
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.02983588,
+      "expected_with_subtrees": 0.04907583
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": NaN,
+      "expected_with_subtrees": 0.17009254
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 0.23561945,
+      "expected_with_subtrees": 0.23561945
+    }
+  ],
+  "aspect_ratio": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.630311,
+      "expected_with_subtrees": 0.630311
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.305701,
+      "expected_with_subtrees": 0.284467
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": NaN,
+      "expected_with_subtrees": 0.666667
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 0.5,
+      "expected_with_subtrees": 0.5
+    }
+  ],
+  "circularity": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.739583,
+      "expected_with_subtrees": 0.739583
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.525588,
+      "expected_with_subtrees": 0.483687
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": NaN,
+      "expected_with_subtrees": 0.544013
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 0.539012,
+      "expected_with_subtrees": 0.539012
+    }
+  ],
+  "shape_factor": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.40566,
+      "expected_with_subtrees": 0.40566
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.21111,
+      "expected_with_subtrees": 0.1875
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": NaN,
+      "expected_with_subtrees": 0.3
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 0.25,
+      "expected_with_subtrees": 0.25
+    }
+  ],
+  "length_fraction_above_soma": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.567898,
+      "expected_with_subtrees": 0.567898
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.74729,
+      "expected_with_subtrees": 0.61591
+    }
+  ],
+  "number_of_segments": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 19,
+      "expected_with_subtrees": 19
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 14,
+      "expected_with_subtrees": 9
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 5
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 5,
+      "expected_with_subtrees": 5
+    }
+  ],
+  "number_of_leaves": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 11,
+      "expected_with_subtrees": 11
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 8,
+      "expected_with_subtrees": 5
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 3
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 3,
+      "expected_with_subtrees": 3
+    }
+  ],
+  "total_length": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 20.828427,
+      "expected_with_subtrees": 20.828427
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 15.828427,
+      "expected_with_subtrees": 10.414214
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 5.414214
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 5.0,
+      "expected_with_subtrees": 5.0
+    }
+  ],
+  "total_area": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 13.086887,
+      "expected_with_subtrees": 13.086887
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 9.945294,
+      "expected_with_subtrees": 6.543443
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 3.401851
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 3.141593,
+      "expected_with_subtrees": 3.141593
+    }
+  ],
+  "total_volume": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 0.654344,
+      "expected_with_subtrees": 0.654344
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 0.497265,
+      "expected_with_subtrees": 0.327172
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0.0,
+      "expected_with_subtrees": 0.170093
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 0.15708,
+      "expected_with_subtrees": 0.15708
+    }
+  ],
+  "section_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "section_areas": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ],
+      "expected_with_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ],
+      "expected_with_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ],
+      "expected_with_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ]
+    }
+  ],
+  "section_volumes": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ],
+      "expected_with_subtrees": [
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ],
+      "expected_with_subtrees": [
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415
+      ],
+      "expected_with_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415
+      ]
+    }
+  ],
+  "section_tortuosity": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "section_radial_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068,
+        2.236068,
+        4.123106,
+        4.24264,
+        4.24264,
+        3.605551,
+        4.472136,
+        4.24264,
+        4.358899,
+        4.358899,
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068,
+        2.236068,
+        4.123106,
+        4.24264,
+        4.24264,
+        3.605551,
+        4.472136,
+        4.24264,
+        4.358899,
+        4.358899,
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068,
+        2.236068,
+        4.123106,
+        4.24264,
+        4.24264,
+        3.605551,
+        4.472136,
+        4.24264,
+        4.358899,
+        4.358899
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068,
+        2.236068,
+        4.123106,
+        4.24264,
+        4.24264
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        3.605551,
+        4.472136,
+        4.24264,
+        4.358899,
+        4.358899
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        3.162278,
+        3.162278,
+        2.236068
+      ]
+    }
+  ],
+  "section_term_radial_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068,
+        4.24264,
+        4.24264,
+        4.472136,
+        4.358899,
+        4.358899,
+        3.162278,
+        3.162278,
+        2.236068
+      ],
+      "expected_with_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068,
+        4.24264,
+        4.24264,
+        4.472136,
+        4.358899,
+        4.358899,
+        3.162278,
+        3.162278,
+        2.236068
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068,
+        4.24264,
+        4.24264,
+        4.472136,
+        4.358899,
+        4.358899
+      ],
+      "expected_with_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068,
+        4.24264,
+        4.24264
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        4.472136,
+        4.358899,
+        4.358899
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068
+      ],
+      "expected_with_subtrees": [
+        3.162278,
+        3.162278,
+        2.236068
+      ]
+    }
+  ],
+  "section_bif_radial_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264,
+        2.0,
+        3.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264,
+        2.0,
+        3.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        4.123106
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        3.605551,
+        4.24264
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.0,
+        2.236068,
+        4.123106,
+        3.605551,
+        4.24264
+      ]
+    }
+  ],
+  "section_end_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "section_term_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "section_taper_rates": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "section_bif_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.414214,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.414214,
+        1.0
+      ]
+    }
+  ],
+  "section_branch_orders": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1,
+        0,
+        1,
+        2,
+        2,
+        1,
+        2,
+        2,
+        3,
+        3,
+        0,
+        1,
+        2,
+        2,
+        1
+      ],
+      "expected_with_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1,
+        0,
+        1,
+        2,
+        2,
+        1,
+        2,
+        2,
+        3,
+        3,
+        0,
+        1,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1,
+        0,
+        1,
+        2,
+        2,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "expected_with_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1,
+        0,
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1,
+        2,
+        2,
+        3,
+        3
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1
+      ],
+      "expected_with_subtrees": [
+        0,
+        1,
+        2,
+        2,
+        1
+      ]
+    }
+  ],
+  "section_bif_branch_orders": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        2,
+        0,
+        1
+      ],
+      "expected_with_subtrees": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        2,
+        0,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        2
+      ],
+      "expected_with_subtrees": [
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1,
+        2
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0,
+        1
+      ],
+      "expected_with_subtrees": [
+        0,
+        1
+      ]
+    }
+  ],
+  "section_term_branch_orders": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        2,
+        2,
+        1
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        2,
+        2,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2,
+        3,
+        3
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1
+      ]
+    }
+  ],
+  "section_strahler_orders": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        2,
+        1,
+        1,
+        2,
+        1,
+        2,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        2,
+        1,
+        1,
+        2,
+        1,
+        2,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        2,
+        1,
+        1,
+        2,
+        1,
+        2,
+        1,
+        1
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1,
+        3,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2,
+        1,
+        2,
+        1,
+        1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "expected_with_subtrees": [
+        2,
+        2,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "segment_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.414214,
+        2.0,
+        1.0,
+        1.0,
+        1.414214,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "segment_areas": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ],
+      "expected_with_subtrees": [
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319,
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ],
+      "expected_with_subtrees": [
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.888577,
+        1.256637,
+        0.628319,
+        0.628319
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.888577,
+        0.628319,
+        0.628319,
+        0.628319,
+        0.628319
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ],
+      "expected_with_subtrees": [
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318,
+        0.628318
+      ]
+    }
+  ],
+  "segment_volumes": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ],
+      "expected_with_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416,
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ],
+      "expected_with_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.044429,
+        0.062832,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.044429,
+        0.031416,
+        0.031416,
+        0.031416,
+        0.031416
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415
+      ],
+      "expected_with_subtrees": [
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415,
+        0.031415
+      ]
+    }
+  ],
+  "segment_radii": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "expected_with_subtrees": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ]
+    }
+  ],
+  "segment_taper_rates": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "segment_radial_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553,
+        1.581139,
+        3.162278,
+        4.153312,
+        4.153312,
+        2.915476,
+        4.031129,
+        3.905125,
+        4.272002,
+        4.272002,
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553
+      ],
+      "expected_with_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553,
+        1.581139,
+        3.162278,
+        4.153312,
+        4.153312,
+        2.915476,
+        4.031129,
+        3.905125,
+        4.272002,
+        4.272002,
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553,
+        1.581139,
+        3.162278,
+        4.153312,
+        4.153312,
+        2.915476,
+        4.031129,
+        3.905125,
+        4.272002,
+        4.272002
+      ],
+      "expected_with_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553,
+        1.581139,
+        3.162278,
+        4.153312,
+        4.153312
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2.915476,
+        4.031129,
+        3.905125,
+        4.272002,
+        4.272002
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553
+      ],
+      "expected_with_subtrees": [
+        1.5,
+        2.5,
+        3.041381,
+        3.041381,
+        2.061553
+      ]
+    }
+  ],
+  "segment_midpoints": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.5,
+          0.0,
+          0.0
+        ],
+        [
+          -2.5,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0,
+          0.0,
+          0.5
+        ],
+        [
+          -3.0,
+          0.0,
+          -0.5
+        ],
+        [
+          -2.0,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          1.5,
+          0.0
+        ],
+        [
+          1.0,
+          3.0,
+          0.0
+        ],
+        [
+          1.0,
+          4.0,
+          0.5
+        ],
+        [
+          1.0,
+          4.0,
+          -0.5
+        ],
+        [
+          1.5,
+          2.5,
+          0.0
+        ],
+        [
+          2.0,
+          3.5,
+          0.0
+        ],
+        [
+          2.5,
+          3.0,
+          0.0
+        ],
+        [
+          3.0,
+          3.0,
+          0.5
+        ],
+        [
+          3.0,
+          3.0,
+          -0.5
+        ],
+        [
+          0.0,
+          -1.5,
+          0.0
+        ],
+        [
+          0.0,
+          -2.5,
+          0.0
+        ],
+        [
+          0.0,
+          -3.0,
+          0.5
+        ],
+        [
+          0.0,
+          -3.0,
+          -0.5
+        ],
+        [
+          0.5,
+          -2.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.5,
+          0.0,
+          0.0
+        ],
+        [
+          -2.5,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0,
+          0.0,
+          0.5
+        ],
+        [
+          -3.0,
+          0.0,
+          -0.5
+        ],
+        [
+          -2.0,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          1.5,
+          0.0
+        ],
+        [
+          1.0,
+          3.0,
+          0.0
+        ],
+        [
+          1.0,
+          4.0,
+          0.5
+        ],
+        [
+          1.0,
+          4.0,
+          -0.5
+        ],
+        [
+          1.5,
+          2.5,
+          0.0
+        ],
+        [
+          2.0,
+          3.5,
+          0.0
+        ],
+        [
+          2.5,
+          3.0,
+          0.0
+        ],
+        [
+          3.0,
+          3.0,
+          0.5
+        ],
+        [
+          3.0,
+          3.0,
+          -0.5
+        ],
+        [
+          0.0,
+          -1.5,
+          0.0
+        ],
+        [
+          0.0,
+          -2.5,
+          0.0
+        ],
+        [
+          0.0,
+          -3.0,
+          0.5
+        ],
+        [
+          0.0,
+          -3.0,
+          -0.5
+        ],
+        [
+          0.5,
+          -2.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        [
+          -1.5,
+          0.0,
+          0.0
+        ],
+        [
+          -2.5,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0,
+          0.0,
+          0.5
+        ],
+        [
+          -3.0,
+          0.0,
+          -0.5
+        ],
+        [
+          -2.0,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          1.5,
+          0.0
+        ],
+        [
+          1.0,
+          3.0,
+          0.0
+        ],
+        [
+          1.0,
+          4.0,
+          0.5
+        ],
+        [
+          1.0,
+          4.0,
+          -0.5
+        ],
+        [
+          1.5,
+          2.5,
+          0.0
+        ],
+        [
+          2.0,
+          3.5,
+          0.0
+        ],
+        [
+          2.5,
+          3.0,
+          0.0
+        ],
+        [
+          3.0,
+          3.0,
+          0.5
+        ],
+        [
+          3.0,
+          3.0,
+          -0.5
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          -1.5,
+          0.0,
+          0.0
+        ],
+        [
+          -2.5,
+          0.0,
+          0.0
+        ],
+        [
+          -3.0,
+          0.0,
+          0.5
+        ],
+        [
+          -3.0,
+          0.0,
+          -0.5
+        ],
+        [
+          -2.0,
+          0.5,
+          0.0
+        ],
+        [
+          0.5,
+          1.5,
+          0.0
+        ],
+        [
+          1.0,
+          3.0,
+          0.0
+        ],
+        [
+          1.0,
+          4.0,
+          0.5
+        ],
+        [
+          1.0,
+          4.0,
+          -0.5
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        [
+          1.5,
+          2.5,
+          0.0
+        ],
+        [
+          2.0,
+          3.5,
+          0.0
+        ],
+        [
+          2.5,
+          3.0,
+          0.0
+        ],
+        [
+          3.0,
+          3.0,
+          0.5
+        ],
+        [
+          3.0,
+          3.0,
+          -0.5
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        [
+          0.0,
+          -1.5,
+          0.0
+        ],
+        [
+          0.0,
+          -2.5,
+          0.0
+        ],
+        [
+          0.0,
+          -3.0,
+          0.5
+        ],
+        [
+          0.0,
+          -3.0,
+          -0.5
+        ],
+        [
+          0.5,
+          -2.0,
+          0.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          0.0,
+          -1.5,
+          0.0
+        ],
+        [
+          0.0,
+          -2.5,
+          0.0
+        ],
+        [
+          0.0,
+          -3.0,
+          0.5
+        ],
+        [
+          0.0,
+          -3.0,
+          -0.5
+        ],
+        [
+          0.5,
+          -2.0,
+          0.0
+        ]
+      ]
+    }
+  ],
+  "segment_meander_angles": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": []
+    }
+  ],
+  "number_of_sections": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 19,
+      "expected_with_subtrees": 19
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 14,
+      "expected_with_subtrees": 9
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 5
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 5,
+      "expected_with_subtrees": 5
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 14,
+      "expected_with_subtrees": 14
+    }
+  ],
+  "number_of_bifurcations": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 8,
+      "expected_with_subtrees": 8
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 3
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 2,
+      "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 6
+    }
+  ],
+  "number_of_forking_points": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": 8,
+      "expected_with_subtrees": 8
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 3
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": 0,
+      "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": 2,
+      "expected_with_subtrees": 2
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": 6,
+      "expected_with_subtrees": 6
+    }
+  ],
+  "local_bifurcation_angles": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593,
+        1.570796,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593
+      ]
+    }
+  ],
+  "remote_bifurcation_angles": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593,
+        1.570796,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ],
+      "expected_with_subtrees": [
+        1.570796,
+        3.141593,
+        0.785398,
+        3.141593,
+        1.570796,
+        3.141593
+      ]
+    }
+  ],
+  "sibling_ratios": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "partition_pairs": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "expected_with_subtrees": [
+        [
+          3.0,
+          1.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          3.0,
+          5.0
+        ],
+        [
+          1.0,
+          1.0
+        ],
+        [
+          1.0,
+          3.0
+        ],
+        [
+          1.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "diameter_power_relations": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        2.0
+      ]
+    }
+  ],
+  "bifurcation_partitions": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0,
+        3.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0,
+        3.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        3.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        1.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": [3, 2]
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        1.0,
+        1.666667,
+        1.0,
+        3.0,
+        1.0
+      ]
+    }
+  ],
+  "section_path_distances": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414213,
+        3.414213,
+        4.414213,
+        4.414213,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414213,
+        3.414213,
+        4.414213,
+        4.414213,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414214,
+        3.414214,
+        4.414214,
+        4.414214,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414214,
+        3.414214,
+        4.414214,
+        4.414214
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427
+      ]
+    }
+  ],
+  "terminal_path_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        3.0,
+        2.0,
+        4.414214,
+        4.414214,
+        3.828427,
+        4.828427,
+        4.828427,
+        3.0,
+        3.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        3.0,
+        2.0,
+        4.414214,
+        4.414214,
+        3.828427,
+        4.828427,
+        4.828427,
+        3.0,
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        3.0,
+        2.0,
+        4.414214,
+        4.414214,
+        3.828427,
+        4.828427,
+        4.828427
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        3.0,
+        2.0,
+        4.414214,
+        4.414214
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        3.828427,
+        4.828427,
+        4.828427
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        3.0,
+        3.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        3.0,
+        3.0,
+        2.0
+      ]
+    }
+  ],
+  "principal_direction_extents": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.596771,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.596771,
+        2.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        2.0,
+        3.596771
+      ],
+      "expected_with_subtrees": [
+        2.0,
+        3.154926
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        2.235207
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        2.0
+      ],
+      "expected_with_subtrees": [
+        2.0
+      ]
+    }
+  ],
+  "partition_asymmetry": [
+    {
+      "kwargs": {
+        "neurite_type": 32,
+        "variant": "branch-order",
+        "method": "petilla"
+      },
+      "expected_wout_subtrees": [
+        0.5,
+        0.0,
+        0.25,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.5,
+        0.0,
+        0.25,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3,
+        "variant": "branch-order",
+        "method": "petilla"
+      },
+      "expected_wout_subtrees": [
+        0.5,
+        0.0,
+        0.25,
+        0.0,
+        0.5,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.5,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2,
+        "variant": "branch-order",
+        "method": "petilla"
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.5,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4,
+        "variant": "branch-order",
+        "method": "petilla"
+      },
+      "expected_wout_subtrees": [
+        0.5,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.5,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 32,
+        "variant": "length"
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0,
+        0.4,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0,
+        0.4,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3,
+        "variant": "length"
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2,
+        "variant": "length"
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.369398,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4,
+        "variant": "length"
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0
+      ]
+    }
+  ],
+  "partition_asymmetry_length": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0,
+        0.4,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0,
+        0.4,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 3
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0,
+        0.130601,
+        0.0,
+        0.184699,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 2
+      },
+      "expected_wout_subtrees": [],
+      "expected_with_subtrees": [
+        0.369398,
+        0.0
+      ]
+    },
+    {
+      "kwargs": {
+        "neurite_type": 4
+      },
+      "expected_wout_subtrees": [
+        0.4,
+        0.0
+      ],
+      "expected_with_subtrees": [
+        0.4,
+        0.0
+      ]
+    }
+  ],
+  "segment_path_lengths": [
+    {
+      "kwargs": {
+        "neurite_type": 32
+      },
+      "expected_wout_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414213,
+        3.414213,
+        4.414213,
+        4.414213,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0
+      ],
+      "expected_with_subtrees": [
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0,
+        1.414213,
+        3.414213,
+        4.414213,
+        4.414213,
+        2.828427,
+        3.828427,
+        3.828427,
+        4.828427,
+        4.828427,
+        1.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0
+      ]
+    }
+  ]
+}

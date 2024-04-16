@@ -1,40 +1,12 @@
-<!--
- Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
- All rights reserved.
+![NeuroM Logo](https://raw.githubusercontent.com/BlueBrain/NeuroM/master/doc/source/logo/NeuroM.jpg)
 
- This file is part of NeuroM <https://github.com/BlueBrain/NeuroM>
 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
-
-     1. Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the following disclaimer.
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
-     3. Neither the name of the copyright holder nor the names of
-        its contributors may be used to endorse or promote products
-        derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- -->
-![NeuroM Logo](doc/source/logo/NeuroM.jpg)
 
 # NeuroM
 
 NeuroM is a Python toolkit for the analysis and processing of neuron morphologies.
 
-
-[![Build Status](https://travis-ci.org/BlueBrain/NeuroM.svg?branch=master)](https://travis-ci.org/BlueBrain/NeuroM)
+[![Run all tox python3](https://github.com/BlueBrain/NeuroM/actions/workflows/run-tox.yml/badge.svg)](https://github.com/BlueBrain/NeuroM/actions/workflows/run-tox.yml)
 [![license](https://img.shields.io/pypi/l/neurom.svg)](https://github.com/BlueBrain/NeuroM/blob/master/LICENSE.txt)
 [![codecov.io](https://codecov.io/github/BlueBrain/NeuroM/coverage.svg?branch=master)](https://codecov.io/github/BlueBrain/NeuroM?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/neurom/badge/?version=latest)](http://neurom.readthedocs.io/en/latest/?badge=latest)
@@ -77,13 +49,10 @@ When you use the NeuroM software, we ask you to cite the following (**this inclu
 
 
 ## Funding & Acknowledgements
+This work has been partially funded by the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 720270, 785907 (Human Brain Project SGA1/SGA2) and by the EBRAINS research infrastructure, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3).
 
-This project/research received funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA). 
-This research was supported by the EBRAINS research infrastructure, funded from the European
-Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant
-Agreement No. 945539 (Human Brain Project SGA3).
 The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology.
 
 For license and authors, see `LICENSE.txt` and `AUTHORS.md` respectively.
 
-Copyright (c) 2015-2021 Blue Brain Project/EPFL
+Copyright (c) 2015-2022 Blue Brain Project/EPFL

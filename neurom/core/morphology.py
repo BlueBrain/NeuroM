@@ -28,17 +28,20 @@
 
 """Morphology classes and functions."""
 
-from collections import deque
 import warnings
+from collections import deque
+from pathlib import Path
 
 import morphio
 import numpy as np
+from cached_property import cached_property
+
 from neurom import morphmath
-from neurom.core.soma import make_soma
 from neurom.core.dataformat import COLS
-from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.core.population import Population
-from neurom.utils import flatten, warn_deprecated
+from neurom.core.soma import make_soma
+from neurom.core.types import NeuriteIter, NeuriteType
+from neurom.utils import flatten
 
 
 class Section:
@@ -46,34 +49,26 @@ class Section:
 
     def __init__(self, morphio_section):
         """The section constructor."""
-        self.morphio_section = morphio_section
+        self._morphio_section = morphio_section
+
+    def to_morphio(self):
+        """Returns the morphio section."""
+        return self._morphio_section
 
     @property
     def id(self):
         """Returns the section ID."""
-        return self.morphio_section.id
+        return self._morphio_section.id
 
     @property
     def parent(self):
         """Returns the parent section if non root section else None."""
-        if self.morphio_section.is_root:
-            return None
-        return Section(self.morphio_section.parent)
+        return None if self.is_root() else Section(self._morphio_section.parent)
 
     @property
     def children(self):
         """Returns a list of child section."""
-        return [Section(child) for child in self.morphio_section.children]
-
-    def append_section(self, section):
-        """Appends a section to the current section object.
-
-        Args:
-            section (morphio.Section|morphio.mut.Section|Section|morphio.PointLevel): a section
-        """
-        if isinstance(section, Section):
-            return self.morphio_section.append_section(section.morphio_section)
-        return self.morphio_section.append_section(section)
+        return [Section(child) for child in self._morphio_section.children]
 
     def is_homogeneous_point(self):
         """A section is homogeneous if it has the same type with its children."""
@@ -93,11 +88,11 @@ class Section:
 
     def is_root(self):
         """Is tree the root node?"""
-        return self.parent is None
+        return self._morphio_section.is_root
 
     def ipreorder(self):
         """Depth-first pre-order iteration of tree nodes."""
-        children = deque((self, ))
+        children = deque((self,))
         while children:
             cur_node = children.pop()
             children.extend(reversed(cur_node.children))
@@ -105,7 +100,9 @@ class Section:
 
     def ipostorder(self):
         """Depth-first post-order iteration of tree nodes."""
-        children = [self, ]
+        children = [
+            self,
+        ]
         seen = set()
         while children:
             cur_node = children[-1]
@@ -123,11 +120,14 @@ class Section:
             stop_node: Node to stop the upstream traversal. If None, it stops when parent is None.
         """
         if stop_node is None:
+
             def stop_condition(section):
-                return section.parent is None
+                return section.is_root()
+
         else:
+
             def stop_condition(section):
-                return section == stop_node
+                return section.is_root() or section == stop_node
 
         current_section = self
         while not stop_condition(current_section):
@@ -157,35 +157,24 @@ class Section:
 
     def __eq__(self, other):
         """Equal when its morphio section is equal."""
-        return self.morphio_section == other.morphio_section
+        return self.to_morphio().has_same_shape(other.to_morphio())
 
     def __hash__(self):
         """Hash of its id."""
         return self.id
 
-    def __nonzero__(self):
-        """If has children."""
-        return self.morphio_section is not None
-
-    __bool__ = __nonzero__
-
     @property
     def points(self):
         """Returns the section list of points the NeuroM way (points + radius)."""
-        return np.concatenate((self.morphio_section.points,
-                               self.morphio_section.diameters[:, np.newaxis] / 2.),
-                              axis=1)
-
-    @points.setter
-    def points(self, value):
-        """Set the points."""
-        self.morphio_section.points = np.copy(value[:, COLS.XYZ])
-        self.morphio_section.diameters = np.copy(value[:, COLS.R]) * 2
+        return np.concatenate(
+            (self._morphio_section.points, self._morphio_section.diameters[:, np.newaxis] / 2.0),
+            axis=1,
+        )
 
     @property
     def type(self):
         """Returns the section type."""
-        return NeuriteType(int(self.morphio_section.type))
+        return NeuriteType(int(self._morphio_section.type))
 
     @property
     def length(self):
@@ -213,50 +202,25 @@ class Section:
     def __repr__(self):
         """Text representation."""
         parent_id = None if self.parent is None else self.parent.id
-        return (f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
-                f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>')
+        return (
+            f'Section(id={self.id}, type={self.type}, n_points={len(self.points)})'
+            f'<parent: Section(id={parent_id}), nchildren: {len(self.children)}>'
+        )
 
 
 # NRN simulator iteration order
 # See:
 # https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874
-NRN_ORDER = {NeuriteType.soma: 0,
-             NeuriteType.axon: 1,
-             NeuriteType.basal_dendrite: 2,
-             NeuriteType.apical_dendrite: 3,
-             NeuriteType.undefined: 4}
+NRN_ORDER = {
+    NeuriteType.soma: 0,
+    NeuriteType.axon: 1,
+    NeuriteType.basal_dendrite: 2,
+    NeuriteType.apical_dendrite: 3,
+    NeuriteType.undefined: 4,
+}
 
 
-def _homogeneous_subtrees(neurite):
-    """Returns a list of the root nodes of the sub-neurites.
-
-    A sub-neurite can be either the entire tree or a homogeneous downstream
-    sub-tree.
-    """
-    it = neurite.root_node.ipreorder()
-    homogeneous_neurites = [Neurite(next(it).morphio_section)]
-
-    for section in it:
-        if section.type != section.parent.type:
-            homogeneous_neurites.append(Neurite(section.morphio_section))
-
-    homogeneous_types = [neurite.type for neurite in homogeneous_neurites]
-
-    if len(homogeneous_neurites) >= 2 and homogeneous_types != [
-        NeuriteType.axon,
-        NeuriteType.basal_dendrite,
-    ]:
-        warnings.warn(
-                f"{neurite} is not an axon-carrying dendrite. "
-                f"Subtree types found {homogeneous_types}",
-                stacklevel=2
-        )
-    return homogeneous_neurites
-
-
-def iter_neurites(
-    obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder, use_subtrees=False
-):
+def iter_neurites(obj, mapfun=None, filt=None, neurite_order=NeuriteIter.FileOrder):
     """Iterator to a neurite, morphology or morphology population.
 
     Applies optional neurite filter and mapping functions.
@@ -274,15 +238,17 @@ def iter_neurites(
 
         >>> from neurom.core.morphology import iter_neurites
         >>> from neurom import load_morphologies
-        >>> pop = load_morphologies('path/to/morphologies')
-        >>> n_points = [n for n in iter_neurites(pop, lambda x : len(x.points))]
+        >>> pop = load_morphologies("tests/data/valid_set")
+        >>> n_points = [n for n in iter_neurites(pop, lambda x, section_type: len(x.points))]
 
         Get the number of points in each axon in a morphology population
 
         >>> import neurom as nm
         >>> from neurom.core.morphology import iter_neurites
+        >>> from neurom import load_morphologies
+        >>> pop = load_morphologies("tests/data/valid_set")
         >>> filter = lambda n : n.type == nm.AXON
-        >>> mapping = lambda n : len(n.points)
+        >>> mapping = lambda n, section_type: len(n.points)
         >>> n_points = [n for n in iter_neurites(pop, mapping, filter)]
     """
     if isinstance(obj, Neurite):
@@ -294,33 +260,38 @@ def iter_neurites(
 
     if neurite_order == NeuriteIter.NRN:
         if isinstance(obj, Population):
-            warnings.warn('`iter_neurites` with `neurite_order` over Population orders neurites'
-                          'within the whole population, not within each morphology separately.')
+            warnings.warn(
+                '`iter_neurites` with `neurite_order` over Population orders neurites'
+                'within the whole population, not within each morphology separately.'
+            )
         last_position = max(NRN_ORDER.values()) + 1
         neurites = sorted(neurites, key=lambda neurite: NRN_ORDER.get(neurite.type, last_position))
-
-    if use_subtrees:
-        neurites = flatten(
-            _homogeneous_subtrees(neurite) if neurite.is_heterogeneous() else [neurite]
-            for neurite in neurites
-        )
 
     neurite_iter = iter(neurites) if filt is None else filter(filt, neurites)
 
     if mapfun is None:
         return neurite_iter
 
-    if use_subtrees:
-        return (mapfun(neurite, section_type=neurite.type) for neurite in neurite_iter)
+    return (
+        (
+            mapfun(
+                neurite,
+                section_type=filt.type if filt is not None else None,
+            )
+            if neurite.process_subtrees
+            else mapfun(neurite, section_type=NeuriteType.all)
+        )
+        for neurite in neurite_iter
+    )
 
-    return map(mapfun, neurite_iter)
 
-
-def iter_sections(neurites,
-                  iterator_type=Section.ipreorder,
-                  neurite_filter=None,
-                  neurite_order=NeuriteIter.FileOrder,
-                  section_filter=None):
+def iter_sections(
+    neurites,
+    iterator_type=Section.ipreorder,
+    neurite_filter=None,
+    neurite_order=NeuriteIter.FileOrder,
+    section_filter=None,
+):
     """Iterator to the sections in a neurite, morphology or morphology population.
 
     Arguments:
@@ -371,24 +342,21 @@ def iter_segments(
         morphology segments. It may have a performance overhead WRT custom-made
         segment analysis functions that leverage numpy and section-wise iteration.
     """
-    sections = iter((obj,) if isinstance(obj, Section) else
-                    iter_sections(obj,
-                                  neurite_filter=neurite_filter,
-                                  neurite_order=neurite_order,
-                                  section_filter=section_filter))
-
-    return flatten(
-        zip(section.points[:-1], section.points[1:])
-        for section in sections
+    sections = iter(
+        (obj,)
+        if isinstance(obj, Section)
+        else iter_sections(
+            obj,
+            neurite_filter=neurite_filter,
+            neurite_order=neurite_order,
+            section_filter=section_filter,
+        )
     )
 
+    return flatten(zip(section.points[:-1], section.points[1:]) for section in sections)
 
-def iter_points(
-    obj,
-    neurite_filter=None,
-    neurite_order=NeuriteIter.FileOrder,
-    section_filter=None
-):
+
+def iter_points(obj, neurite_filter=None, neurite_order=NeuriteIter.FileOrder, section_filter=None):
     """Return an iterator to the points in a population, morphology, neurites, or section.
 
     Args:
@@ -400,12 +368,13 @@ def iter_points(
         section_filter: optional section level filter
     """
     sections = (
-        iter((obj,)) if isinstance(obj, Section)
+        iter((obj,))
+        if isinstance(obj, Section)
         else iter_sections(
             obj,
             neurite_filter=neurite_filter,
             neurite_order=neurite_order,
-            section_filter=section_filter
+            section_filter=section_filter,
         )
     )
 
@@ -416,37 +385,63 @@ def graft_morphology(section):
     """Returns a morphology starting at section."""
     assert isinstance(section, Section)
     m = morphio.mut.Morphology()
-    m.append_root_section(section.morphio_section)
+    m.append_root_section(section.to_morphio())
     return Morphology(m)
-
-
-def graft_neuron(section):
-    """Deprecated in favor of ``graft_morphology``."""
-    warn_deprecated('`neurom.core.neuron.graft_neuron` is deprecated in favor of '
-                    '`neurom.core.morphology.graft_morphology`')  # pragma: no cover
-    return graft_morphology(section)  # pragma: no cover
 
 
 class Neurite:
     """Class representing a neurite tree."""
 
-    def __init__(self, root_node):
+    def __init__(self, root_node, process_subtrees=False):
         """Constructor.
 
         Args:
             root_node (morphio.Section): root section
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
-        self.morphio_root_node = root_node
+        self._root_node = root_node
+        self._process_subtrees = process_subtrees
+
+    @property
+    def process_subtrees(self):
+        """Enable mixed tree processing if set to True."""
+        return self._process_subtrees
+
+    @process_subtrees.setter
+    def process_subtrees(self, value):
+        self._process_subtrees = value
+        if "type" in vars(self):
+            del vars(self)["type"]
+
+    @property
+    def morphio_root_node(self):
+        """Returns the morphio root section."""
+        return self._root_node
 
     @property
     def root_node(self):
         """The first section of the neurite."""
         return Section(self.morphio_root_node)
 
-    @property
+    @cached_property
     def type(self):
-        """The type of the root node."""
-        return self.root_node.type
+        """The type of the Neurite (which can be composite)."""
+        return NeuriteType(self.subtree_types)
+
+    @cached_property
+    def subtree_types(self):
+        """The types of the subtrees."""
+        if not self._process_subtrees:
+            return NeuriteType(self.morphio_root_node.type)
+
+        it = self.root_node.ipreorder()
+        subtree_types = [next(it).to_morphio().type]
+
+        for section in it:
+            if section.type != section.parent.type:
+                subtree_types.append(NeuriteType(section.to_morphio().type))
+
+        return subtree_types
 
     @property
     def points(self):
@@ -468,6 +463,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_length
+
         return total_length(self)
 
     @property
@@ -478,6 +474,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_area
+
         return total_area(self)
 
     @property
@@ -488,6 +485,7 @@ class Neurite:
         """
         # pylint: disable=import-outside-toplevel
         from neurom.features.neurite import total_volume
+
         return total_volume(self)
 
     def is_heterogeneous(self) -> bool:
@@ -511,49 +509,63 @@ class Neurite:
         """
         return iter_sections(self, iterator_type=order, neurite_order=neurite_order)
 
-    def __nonzero__(self):
-        """If has root node."""
-        return bool(self.morphio_root_node)
-
     def __eq__(self, other):
         """If root node ids and types are equal."""
-        return self.type == other.type and self.morphio_root_node.id == other.morphio_root_node.id
+        return (
+            self.type == other.type
+            and self.morphio_root_node.id == other.morphio_root_node.id
+            and self.process_subtrees == other.process_subtrees
+        )
 
     def __hash__(self):
         """Hash is made of tuple of type and root_node."""
-        return hash((self.type, self.root_node))
-
-    __bool__ = __nonzero__
+        return hash((self.type, self.root_node, self.process_subtrees))
 
     def __repr__(self):
         """Return a string representation."""
         return 'Neurite <type: %s>' % self.type
 
 
-class Morphology(morphio.mut.Morphology):
+class Morphology:
     """Class representing a simple morphology."""
 
-    def __init__(self, filename, name=None):
+    def __init__(self, filename, name=None, process_subtrees=False):
         """Morphology constructor.
 
         Args:
-            filename (str|Path): a filename
-            name (str): a option morphology name
+            filename (str|Path): a filename or morphio.{mut}.Morphology object
+            name (str): an optional morphology name
+            process_subtrees (bool): enable mixed tree processing if set to True
         """
-        super().__init__(filename)
-        self.name = name if name else 'Morphology'
-        self.morphio_soma = super().soma
-        self.neurom_soma = make_soma(self.morphio_soma)
+        self._morphio_morph = morphio.mut.Morphology(filename)
 
-    @property
-    def soma(self):
-        """Corresponding soma."""
-        return self.neurom_soma
+        if isinstance(filename, (str, Path, morphio.Morphology)):
+            self._morphio_morph = self._morphio_morph.as_immutable()
+
+        self.name = name if name else 'Morphology'
+        self.soma = make_soma(self._morphio_morph.soma)
+
+        self.process_subtrees = process_subtrees
+
+    def to_morphio(self):
+        """Returns the morphio morphology object."""
+        return self._morphio_morph
+
+    def copy(self):
+        """Returns a shallow copy of the morphio morphology object."""
+        return Morphology(self.to_morphio(), name=self.name, process_subtrees=self.process_subtrees)
 
     @property
     def neurites(self):
         """The list of neurites."""
-        return [Neurite(root_section) for root_section in self.root_sections]
+        return [
+            Neurite(root_section, process_subtrees=self.process_subtrees)
+            for root_section in self._morphio_morph.root_sections
+        ]
+
+    def section(self, section_id):
+        """Returns the section with the given id."""
+        return Section(self._morphio_morph.section(section_id))
 
     @property
     def sections(self):
@@ -563,37 +575,38 @@ class Morphology(morphio.mut.Morphology):
     @property
     def points(self):
         """Returns the list of points."""
-        return np.concatenate(
-            [section.points for section in iter_sections(self)])
+        return np.concatenate([section.points for section in iter_sections(self)])
 
     def transform(self, trans):
         """Return a copy of this morphology with a 3D transformation applied."""
-        obj = Morphology(self)
-        obj.morphio_soma.points = trans(obj.morphio_soma.points)
+        morph = self._morphio_morph
 
-        for section in obj.sections:
-            section.morphio_section.points = trans(section.morphio_section.points)
-        return obj
+        is_immutable = hasattr(morph, 'as_mutable')
+
+        # make copy or convert to mutable if immutable
+        if is_immutable:
+            morph = morph.as_mutable()
+        else:
+            morph = morphio.mut.Morphology(morph)
+
+        morph.soma.points = trans(morph.soma.points)
+
+        for section in morph.iter():
+            section.points = trans(section.points)
+
+        if is_immutable:
+            return Morphology(morph.as_immutable())
+        return Morphology(morph)
 
     def __copy__(self):
         """Creates a deep copy of Morphology instance."""
-        return Morphology(self, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __deepcopy__(self, memodict={}):
         """Creates a deep copy of Morphology instance."""
         # pylint: disable=dangerous-default-value
-        return Morphology(self, self.name)
+        return Morphology(self.to_morphio(), self.name)
 
     def __repr__(self):
         """Return a string representation."""
-        return 'Morphology <soma: %s, n_neurites: %d>' % \
-            (self.soma, len(self.neurites))
-
-
-class Neuron(Morphology):
-    """Deprecated ``Neuron`` class. Use ``Morphology`` instead."""
-    def __init__(self, filename, name=None):
-        """Dont use me."""
-        super().__init__(filename, name)  # pragma: no cover
-        warn_deprecated('`neurom.core.neuron.Neuron` is deprecated in favor of '
-                        '`neurom.core.morphology.Morphology`')  # pragma: no cover
+        return 'Morphology <soma: %s, n_neurites: %d>' % (self.soma, len(self.neurites))

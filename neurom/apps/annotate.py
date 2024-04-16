@@ -46,14 +46,21 @@ def generate_annotation(result, settings):
     if result.status:
         return ''
 
-    header = ('\n\n'
-              f'({settings["label"]}   ; MUK_ANNOTATION\n'
-              f'    (Color {settings["color"]})   ; MUK_ANNOTATION\n'
-              f'    (Name "{settings["name"]}")   ; MUK_ANNOTATION')
+    header = (
+        '\n\n'
+        f'({settings["label"]}   ; MUK_ANNOTATION\n'
+        f'    (Color {settings["color"]})   ; MUK_ANNOTATION\n'
+        f'    (Name "{settings["name"]}")   ; MUK_ANNOTATION'
+    )
     points = [p for _, _points in result.info for p in _points]
-    annotations = '\n'.join((f'    '
-                             f'({p[COLS.X]:10.2f} {p[COLS.Y]:10.2f} {p[COLS.Z]:10.2f} 0.50)'
-                             f'   ; MUK_ANNOTATION' for p in points))
+    annotations = '\n'.join(
+        (
+            f'    '
+            f'({p[COLS.X]:10.2f} {p[COLS.Y]:10.2f} {p[COLS.Z]:10.2f} 0.50)'
+            f'   ; MUK_ANNOTATION'
+            for p in points
+        )
+    )
     footer = ')   ; MUK_ANNOTATION\n'
 
     return f'{header}\n{annotations}\n{footer}'
@@ -61,6 +68,7 @@ def generate_annotation(result, settings):
 
 def annotate(results, settings):
     """Concatenate the annotations of all checkers."""
-    annotations = (generate_annotation(result, setting)
-                   for result, setting in zip(results, settings))
+    annotations = (
+        generate_annotation(result, setting) for result, setting in zip(results, settings)
+    )
     return '\n'.join(annot for annot in annotations if annot)

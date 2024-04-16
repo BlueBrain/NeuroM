@@ -33,30 +33,30 @@ namespace can only accept a morphology population as its input no matter how cal
 
 >>> import neurom
 >>> from neurom import features
->>> pop = neurom.load_morphologies('path/to/morphs')
->>> features.get('sholl_frequency', pop)
+>>> pop = neurom.load_morphologies("tests/data/valid_set")
+>>> frequencies = features.get('sholl_frequency', pop)
 
 For more details see :ref:`features`.
 """
 
 
 from functools import partial
+
 import numpy as np
 
 from neurom.core.dataformat import COLS
-from neurom.core.types import NeuriteType
 from neurom.core.morphology import iter_sections
+from neurom.core.types import NeuriteType
 from neurom.core.types import tree_type_checker as is_type
-from neurom.features import feature, NameSpace
+from neurom.features import NameSpace, feature
 from neurom.features import morphology as mf
+from neurom.features.morphology import _assert_soma_center
 
 feature = partial(feature, namespace=NameSpace.POPULATION)
 
 
 @feature(shape=(...,))
-def sholl_frequency(
-    morphs, neurite_type=NeuriteType.all, step_size=10, bins=None, use_subtrees=False
-):
+def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=None):
     """Perform Sholl frequency calculations on a population of morphs.
 
     Args:
@@ -76,16 +76,13 @@ def sholl_frequency(
     neurite_filter = is_type(neurite_type)
 
     if bins is None:
-
-        section_iterator = (
-            partial(iter_sections, section_filter=neurite_filter)
-            if use_subtrees
-            else partial(iter_sections, neurite_filter=neurite_filter)
+        section_iterator = partial(
+            iter_sections, neurite_filter=neurite_filter, section_filter=neurite_filter
         )
 
         max_radius_per_section = [
             np.max(np.linalg.norm(section.points[:, COLS.XYZ] - morph.soma.center, axis=1))
-            for morph in morphs
+            for morph in map(_assert_soma_center, morphs)
             for section in section_iterator(morph)
         ]
 
@@ -96,7 +93,8 @@ def sholl_frequency(
 
         bins = np.arange(min_soma_edge, min_soma_edge + max(max_radius_per_section), step_size)
 
-    return np.array([
-        mf.sholl_crossings(m, neurite_type, m.soma.center, bins, use_subtrees=use_subtrees)
-        for m in morphs
-    ]).sum(axis=0).tolist()
+    def _sholl_crossings(morph):
+        _assert_soma_center(morph)
+        return mf.sholl_crossings(morph, neurite_type, morph.soma.center, bins)
+
+    return np.array([_sholl_crossings(m) for m in morphs]).sum(axis=0).tolist()

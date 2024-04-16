@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import neurom
 from neurom import load_morphology
 from neurom.view import plotly_impl
 
-import mock
 from numpy.testing import assert_allclose
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc'
@@ -16,26 +16,29 @@ m = load_morphology(MORPH_FILENAME)
 def _reload_module(module):
     """Force module reload."""
     import importlib
+
     importlib.reload(module)
 
 
 def test_plotly_extra_not_installed():
-    with mock.patch.dict(sys.modules, {'plotly': None}):
+    with patch.dict(sys.modules, {'plotly': None}):
         try:
             _reload_module(neurom.view.plotly_impl)
             assert False, "ImportError not triggered"
         except ImportError as e:
-            assert (str(e) ==
-                            'neurom[plotly] is not installed. '
-                            'Please install it by doing: pip install neurom[plotly]')
+            assert (
+                str(e) == 'neurom[plotly] is not installed. '
+                'Please install it by doing: pip install neurom[plotly]'
+            )
 
 
 def test_plotly_draw_morph3d():
     plotly_impl.plot_morph3d(m, auto_open=False)
     plotly_impl.plot_morph3d(m.neurites[0], auto_open=False)
 
-    fig = plotly_impl.plot_morph3d(load_morphology(SWC_PATH / 'simple-different-soma.swc'),
-                                   auto_open=False)
+    fig = plotly_impl.plot_morph3d(
+        load_morphology(SWC_PATH / 'simple-different-soma.swc'), auto_open=False
+    )
     x, y, z = [fig['data'][2][key] for key in str('xyz')]
     assert_allclose(x[0, 0], 2)
     assert_allclose(x[33, 33], -1.8971143170299758)

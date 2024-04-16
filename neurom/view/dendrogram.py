@@ -29,9 +29,10 @@
 """Dendrogram helper functions and class."""
 
 import numpy as np
+
 from neurom import NeuriteType
-from neurom.core.morphology import Neurite, Morphology
 from neurom.core.dataformat import COLS
+from neurom.core.morphology import Morphology, Neurite
 from neurom.morphmath import interval_lengths
 
 
@@ -49,7 +50,8 @@ class Dendrogram:
             self.height = 1
             self.width = 1
             self.coords = self.get_coords(
-                np.array([0, self.height]), np.array([.5 * self.width, .5 * self.width]))
+                np.array([0, self.height]), np.array([0.5 * self.width, 0.5 * self.width])
+            )
             self.children = [Dendrogram(neurite.root_node) for neurite in neurom_section.neurites]
         else:
             if isinstance(neurom_section, Neurite):
@@ -105,6 +107,7 @@ def layout_dendrogram(dendrogram, origin):
          calculation we start to lay out. Each child gets its X coordinate as:
          parent's X + previous sibling children widths + half of this child's width.
         """
+
         HORIZONTAL_PADDING = 2
 
         def __init__(self, dendrogram):
@@ -120,10 +123,10 @@ def layout_dendrogram(dendrogram, origin):
             positions = {self.dendrogram: origin}
             if self.children:
                 end_point = origin + [0, self.dendrogram.height]
-                left_bottom_offset = [-.5 * self.total_width, 0]
+                left_bottom_offset = [-0.5 * self.total_width, 0]
                 children_origin = end_point + left_bottom_offset
                 for child in self.children:
-                    child_origin = children_origin + [.5 * child.total_width, 0]
+                    child_origin = children_origin + [0.5 * child.total_width, 0]
                     positions.update(child.position_at(child_origin))
                     children_origin += [child.total_width + self.HORIZONTAL_PADDING, 0]
             return positions

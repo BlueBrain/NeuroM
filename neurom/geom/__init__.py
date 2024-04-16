@@ -34,7 +34,7 @@ import numpy as np
 
 import neurom.morphmath
 from neurom.core.dataformat import COLS
-from neurom.geom.transform import translate, rotate
+from neurom.geom.transform import rotate, translate
 
 L = logging.getLogger(__name__)
 
@@ -45,8 +45,9 @@ def bounding_box(obj):
     Returns:
         2D numpy array of [[min_x, min_y, min_z], [max_x, max_y, max_z]]
     """
-    return np.array([np.min(obj.points[:, COLS.XYZ], axis=0),
-                     np.max(obj.points[:, COLS.XYZ], axis=0)])
+    return np.array(
+        [np.min(obj.points[:, COLS.XYZ], axis=0), np.max(obj.points[:, COLS.XYZ], axis=0)]
+    )
 
 
 def convex_hull(obj):

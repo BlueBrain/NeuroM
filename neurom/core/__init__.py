@@ -28,7 +28,8 @@
 
 """Core functionality and data types of NeuroM."""
 
+from neurom.core.morphology import Morphology, Neurite, Section
+from neurom.core.population import Population
+
 # those imports here for backward compatibility
 from neurom.core.soma import Soma
-from neurom.core.morphology import Section, Neurite, Morphology, Neuron
-from neurom.core.population import Population

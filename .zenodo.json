@@ -1,0 +1,57 @@
+{
+  "title" : "NeuroM",
+  "license": "BSD-3-Clause",
+  "upload_type": "software",
+  "access_right": "open",
+  "description": "NeuroM is a Python-based toolkit for the analysis and processing of morphologies.",
+  "creators": [
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Arnaudon, Alexis",
+      "orcid": "0000-0001-9486-1458"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Berchet, Adrien",
+      "orcid": "0000-0001-6354-9947"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Courcol, Jean-Denis",
+      "orcid": "0000-0002-9351-1461"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Coste, Benoit",
+      "orcid": "0000-0003-4408-0412"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Gevaert, Michael",
+      "orcid": "0000-0002-7547-3297"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Kanari, Lida",
+      "orcid": "0000-0002-9539-5070"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Sanin, Aleksei"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Palacios, Juan"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Vanherpe, Liesbeth",
+      "orcid": "0000-0002-1226-0526"
+    },
+    {
+      "affiliation": "Blue Brain Project, EPFL",
+      "name": "Zisis, Eleftherios",
+      "orcid": "0000-0003-4303-1678"
+    }
+  ]
+}

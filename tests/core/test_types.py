@@ -1,4 +1,3 @@
-
 # Copyright (c) 2016, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -27,7 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mock import Mock
+from unittest.mock import Mock
+
 from neurom.core.types import NEURITES, NeuriteType, axon_filter, dendrite_filter, tree_type_checker
 import pytest
 
@@ -71,16 +71,15 @@ def test_tree_type_checker_broken():
     assert tree_filter(mock_tree)
 
     tree_filter = tree_type_checker(
-        NeuriteType.axon,
-        NeuriteType.apical_dendrite,
-        NeuriteType.basal_dendrite)
+        NeuriteType.axon, NeuriteType.apical_dendrite, NeuriteType.basal_dendrite
+    )
     mock_tree.type = NeuriteType.soma
     assert not tree_filter(mock_tree)
 
 
 def test_tree_type_checker_error():
     with pytest.raises(ValueError, match='is not a valid NeuriteType'):
-        tree_type_checker('all')
+        tree_type_checker('NOT A VALID NeuriteType')
 
 
 def test_type_filters():

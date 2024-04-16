@@ -1,4 +1,4 @@
-## look at http://docutils.sourceforge.net/sandbox/py-rest-doc/utils/pylintrc
+# look at http://docutils.sourceforge.net/sandbox/py-rest-doc/utils/pylintrc
 # for some of the options that are available
 
 [MESSAGES CONTROL]
@@ -23,7 +23,7 @@ max-locals=15
 # Maximum number of return / yield for function / method body
 max-returns=6
 # Maximum number of branch for function / method body
-max-branchs=12
+max-branches=12
 # Maximum number of statements in function / method body
 max-statements=50
 # Maximum number of parents for a class (see R0901).
@@ -56,4 +56,4 @@ ignore-docstrings=yes
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis. It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=numpy,numpy.*,scipy.stats,scipy.spatial
+ignored-modules=numpy,numpy.*,scipy,scipy.spatial,scipy.stats,scipy.spatial.qhull

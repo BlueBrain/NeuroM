@@ -35,10 +35,11 @@ apply it to anything other than neurite then you must use the features mechanism
 
 >>> import neurom
 >>> from neurom import features
->>> m = neurom.load_morphology('path/to/morphology')
->>> features.get('max_radial_distance', m.neurites[0])
->>> features.get('max_radial_distance', m)
->>> features.get('number_of_segments', m.neurites, neurite_type=neurom.AXON)
+>>> m = neurom.load_morphology("tests/data/swc/Neuron.swc")
+>>> max_radial_distances1 = features.get('max_radial_distance', m.neurites)
+>>> max_radial_distances2 = features.get('max_radial_distance', m.neurites[0])
+>>> max_radial_distances3 = features.get('max_radial_distance', m)
+>>> n_segments = features.get('number_of_segments', m, neurite_type=neurom.AXON)
 
 For more details see :ref:`features`.
 """
@@ -47,15 +48,17 @@ import logging
 from functools import partial
 
 import numpy as np
-from neurom import morphmath
-from neurom import utils
-from neurom.core.types import NeuriteType
-from neurom.core.morphology import Section, iter_points
-from neurom.core.dataformat import COLS
-from neurom.features import NameSpace, feature, bifurcation as bf, section as sf
-from neurom.morphmath import convex_hull
-from neurom.core.types import tree_type_checker as is_type
 
+from neurom import morphmath, utils
+from neurom.core.dataformat import COLS
+from neurom.core.morphology import Section, iter_points
+from neurom.core.types import NeuriteType, is_composite_type
+from neurom.core.types import tree_type_checker as is_type
+from neurom.features import NameSpace
+from neurom.features import bifurcation as bf
+from neurom.features import feature
+from neurom.features import section as sf
+from neurom.morphmath import convex_hull
 
 feature = partial(feature, namespace=NameSpace.NEURITE)
 
@@ -64,16 +67,21 @@ L = logging.getLogger(__name__)
 
 def _map_sections(fun, neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Map `fun` to all the sections."""
-    return list(map(fun, filter(is_type(section_type), iterator_type(neurite.root_node))))
+    check_type = is_type(section_type)
 
+    if (
+        section_type != NeuriteType.all
+        and not any(is_composite_type(i) for i in check_type.type)
+        and iterator_type in {Section.ibifurcation_point, Section.iforking_point}
+    ):
 
-@feature(shape=())
-def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
-    """Get the maximum radial distances of the termination sections."""
-    term_radial_distances = section_term_radial_distances(
-        neurite, origin=origin, section_type=section_type
-    )
-    return max(term_radial_distances) if term_radial_distances else 0.
+        def filt(section):
+            return check_type(section) and Section.is_homogeneous_point(section)
+
+    else:
+        filt = check_type
+
+    return list(map(fun, filter(filt, iterator_type(neurite.root_node))))
 
 
 @feature(shape=())
@@ -86,7 +94,7 @@ def number_of_segments(neurite, section_type=NeuriteType.all):
 def number_of_sections(neurite, iterator_type=Section.ipreorder, section_type=NeuriteType.all):
     """Number of sections. For a morphology it will be a sum of all neurites sections numbers."""
     return len(
-        _map_sections(lambda s: s, neurite, iterator_type=iterator_type, section_type=section_type)
+        _map_sections(lambda x: 1, neurite, iterator_type=iterator_type, section_type=section_type)
     )
 
 
@@ -177,7 +185,8 @@ def section_path_distances(neurite, iterator_type=Section.ipreorder, section_typ
     return _map_sections(
         partial(sf.section_path_length, stop_node=neurite.root_node),
         neurite,
-        iterator_type=iterator_type, section_type=section_type
+        iterator_type=iterator_type,
+        section_type=section_type,
     )
 
 
@@ -256,7 +265,6 @@ def segment_path_lengths(neurite, section_type=NeuriteType.all):
 
     def segments_path_length(section):
         if section.id not in pathlength:
-
             pathlength[section.id] = (
                 0.0
                 if section.id == neurite.root_node.id
@@ -275,7 +283,7 @@ def segment_radial_distances(neurite, origin=None, section_type=NeuriteType.all)
     return _map_segments(
         func=partial(sf.segment_midpoint_radial_distances, origin=origin),
         neurite=neurite,
-        section_type=section_type
+        section_type=section_type,
     )
 
 
@@ -331,7 +339,7 @@ def partition_asymmetry(
             partial(bf.partition_asymmetry, uylings=method == 'uylings', iterator_type=it_type),
             neurite,
             iterator_type=Section.ibifurcation_point,
-            section_type=section_type
+            section_type=section_type,
         )
 
     return _map_sections(
@@ -342,7 +350,7 @@ def partition_asymmetry(
         ),
         neurite,
         iterator_type=Section.ibifurcation_point,
-        section_type=section_type
+        section_type=section_type,
     )
 
 
@@ -409,34 +417,47 @@ def diameter_power_relations(neurite, method='first', section_type=NeuriteType.a
     )
 
 
+def _radial_distances(neurite, origin, iterator_type, section_type):
+    if origin is None:
+        origin = neurite.root_node.points[0]
+
+    return _map_sections(
+        partial(sf.section_radial_distance, origin=origin),
+        neurite=neurite,
+        iterator_type=iterator_type,
+        section_type=section_type,
+    )
+
+
 @feature(shape=(...,))
-def section_radial_distances(
-    neurite, origin=None, iterator_type=Section.ipreorder, section_type=NeuriteType.all
-):
+def section_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Section radial distances.
 
     The iterator_type can be used to select only terminal sections (ileaf)
     or only bifurcations (ibifurcation_point).
     """
-    pos = neurite.root_node.points[0] if origin is None else origin
-    return _map_sections(partial(sf.section_radial_distance, origin=pos),
-                         neurite,
-                         iterator_type,
-                         section_type=section_type)
+    return _radial_distances(neurite, origin, Section.ipreorder, section_type)
 
 
 @feature(shape=(...,))
 def section_term_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the termination sections."""
-    return section_radial_distances(neurite, origin, Section.ileaf, section_type=section_type)
+    return _radial_distances(neurite, origin, Section.ileaf, section_type)
+
+
+@feature(shape=())
+def max_radial_distance(neurite, origin=None, section_type=NeuriteType.all):
+    """Get the maximum radial distances of the termination sections."""
+    term_radial_distances = section_term_radial_distances(
+        neurite, origin=origin, section_type=section_type
+    )
+    return max(term_radial_distances) if term_radial_distances else 0.0
 
 
 @feature(shape=(...,))
 def section_bif_radial_distances(neurite, origin=None, section_type=NeuriteType.all):
     """Get the radial distances of the bf sections."""
-    return section_radial_distances(
-        neurite, origin, Section.ibifurcation_point, section_type=section_type
-    )
+    return _radial_distances(neurite, origin, Section.ibifurcation_point, section_type)
 
 
 @feature(shape=(...,))
@@ -463,9 +484,7 @@ def volume_density(neurite, section_type=NeuriteType.all):
         return section.points[:, COLS.XYZ].tolist()
 
     # note: duplicate points included but not affect the convex hull calculation
-    points = list(
-        utils.flatten(_map_sections(get_points, neurite, section_type=section_type))
-    )
+    points = list(utils.flatten(_map_sections(get_points, neurite, section_type=section_type)))
 
     hull = convex_hull(points)
 

@@ -38,10 +38,10 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
+
 from neurom.core.morphology import Morphology
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
-from neurom.utils import warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -120,7 +120,7 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_morphology(morph, reader=None):
+def load_morphology(morph, reader=None, process_subtrees=False):
     """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
@@ -156,26 +156,21 @@ def load_morphology(morph, reader=None):
                                                    )
                                                    )'''), reader='asc')
     """
-    if isinstance(morph, (Morphology, morphio.Morphology, morphio.mut.Morphology)):
-        return Morphology(morph)
+    if isinstance(morph, Morphology):
+        return Morphology(morph.to_morphio(), process_subtrees=process_subtrees)
+
+    if isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
+        return Morphology(morph, process_subtrees=process_subtrees)
 
     if reader:
-        return Morphology(_get_file(morph, reader))
+        return Morphology(_get_file(morph, reader), process_subtrees=process_subtrees)
 
-    return Morphology(morph, Path(morph).name)
-
-
-def load_neuron(morph, reader=None):
-    """Deprecated in favor of ``load_morphology``."""
-    warn_deprecated('`neurom.io.utils.load_neuron` is deprecated in favor of '
-                    '`neurom.io.utils.load_morphology`')  # pragma: no cover
-    return load_morphology(morph, reader)  # pragma: no cover
+    return Morphology(morph, Path(morph).name, process_subtrees=process_subtrees)
 
 
-def load_morphologies(morphs,
-                      name=None,
-                      ignored_exceptions=(),
-                      cache=False):
+def load_morphologies(
+    morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False
+):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
@@ -198,11 +193,4 @@ def load_morphologies(morphs,
     else:
         files = morphs
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions, cache)
-
-
-def load_neurons(morphs, name=None, ignored_exceptions=(), cache=False):
-    """Deprecated in favor of ``load_morphologies``."""
-    warn_deprecated('`neurom.io.utils.load_neurons` is deprecated in favor of '
-                    '`neurom.io.utils.load_morphologies`')  # pragma: no cover
-    return load_morphologies(morphs, name, ignored_exceptions, cache)  # pragma: no cover
+    return Population(files, name, ignored_exceptions, cache, process_subtrees=process_subtrees)

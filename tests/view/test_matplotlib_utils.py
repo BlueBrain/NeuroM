@@ -29,9 +29,20 @@ from pathlib import Path
 import tempfile
 
 import numpy as np
-from neurom.view.matplotlib_utils import (plt, figure_naming, get_figure, save_plot, plot_style,
-                                          plot_title, plot_labels, plot_legend, update_plot_limits, plot_ticks,
-                                          plot_sphere, plot_cylinder)
+from neurom.view.matplotlib_utils import (
+    plt,
+    figure_naming,
+    get_figure,
+    save_plot,
+    plot_style,
+    plot_title,
+    plot_labels,
+    plot_legend,
+    update_plot_limits,
+    plot_ticks,
+    plot_sphere,
+    plot_cylinder,
+)
 import pytest
 
 
@@ -42,7 +53,9 @@ def test_figure_naming():
     assert prefile == ""
     assert postfile == "_3"
 
-    pretitle, posttitle, prefile, postfile = figure_naming(pretitle='', posttitle="Test", prefile="test", postfile="")
+    pretitle, posttitle, prefile, postfile = figure_naming(
+        pretitle='', posttitle="Test", prefile="test", postfile=""
+    )
     assert pretitle == ""
     assert posttitle == " -- Test"
     assert prefile == "test_"
@@ -203,13 +216,13 @@ def test_plot_style(get_fig_2d):
 def test_plot_cylinder():
     fig0, ax0 = get_figure(params={'projection': '3d'})
     start, end = np.array([0, 0, 0]), np.array([1, 0, 0])
-    plot_cylinder(ax0, start=start, end=end,
-                  start_radius=0, end_radius=10.,
-                  color='black', alpha=1.)
+    plot_cylinder(
+        ax0, start=start, end=end, start_radius=0, end_radius=10.0, color='black', alpha=1.0
+    )
     assert ax0.has_data()
 
 
 def test_plot_sphere():
     fig0, ax0 = get_figure(params={'projection': '3d'})
-    plot_sphere(ax0, [0, 0, 0], 10., color='black', alpha=1.)
+    plot_sphere(ax0, [0, 0, 0], 10.0, color='black', alpha=1.0)
     assert ax0.has_data()

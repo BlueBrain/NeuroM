@@ -27,17 +27,21 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Mathematical and geometrical functions used to compute morphometrics."""
-import math
 import logging
+import math
 from itertools import combinations
 
 import numpy as np
 from scipy.spatial import ConvexHull
-from scipy.spatial.qhull import QhullError
 from scipy.spatial.distance import cdist
 
-from neurom.core.dataformat import COLS
+try:
+    # The QhulError was moved in scipy >= 1.8 so if the import fails the old location is imported
+    from scipy.spatial import QhullError
+except ImportError:  # pragma: no cover
+    from scipy.spatial.qhull import QhullError
 
+from neurom.core.dataformat import COLS
 
 L = logging.getLogger(__name__)
 
@@ -57,9 +61,13 @@ def vector(p1, p2):
 
 def linear_interpolate(p1, p2, fraction):
     """Returns the point p satisfying: p1 + fraction * (p2 - p1)."""
-    return np.array((p1[0] + fraction * (p2[0] - p1[0]),
-                     p1[1] + fraction * (p2[1] - p1[1]),
-                     p1[2] + fraction * (p2[2] - p1[2])))
+    return np.array(
+        (
+            p1[0] + fraction * (p2[0] - p1[0]),
+            p1[1] + fraction * (p2[1] - p1[1]),
+            p1[2] + fraction * (p2[2] - p1[2]),
+        )
+    )
 
 
 def interpolate_radius(r1, r2, fraction):
@@ -82,10 +90,12 @@ def interpolate_radius(r1, r2, fraction):
 
     Note: The fraction is assumed from point P1, not from point P2.
     """
+
     def f(a, b, c):
         """Returns the length of the interpolated radius calculated using similar triangles."""
         return a + c * (b - a)
-    return f(r2, r1, 1. - fraction) if r1 > r2 else f(r1, r2, fraction)
+
+    return f(r2, r1, 1.0 - fraction) if r1 > r2 else f(r1, r2, fraction)
 
 
 def interval_lengths(points, prepend_zero=False):
@@ -117,7 +127,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
     Returns:
         (segment ID, segment offset) pair.
     """
-    if not 0. <= fraction <= 1.0:
+    if not 0.0 <= fraction <= 1.0:
         raise ValueError("Invalid fraction: %.3f" % fraction)
     lengths = interval_lengths(points)
     cum_lengths = np.cumsum(lengths)
@@ -234,8 +244,7 @@ def angle_3points(p0, p1, p2):
     """
     vec1 = vector(p1, p0)
     vec2 = vector(p2, p0)
-    return math.atan2(np.linalg.norm(np.cross(vec1, vec2)),
-                      np.dot(vec1, vec2))
+    return math.atan2(np.linalg.norm(np.cross(vec1, vec2)), np.dot(vec1, vec2))
 
 
 def angle_between_vectors(p1, p2):
@@ -243,13 +252,6 @@ def angle_between_vectors(p1, p2):
 
     Normalizes the input vectors and computes the relative angle
     between them.
-
-        >>> angle_between((1, 0), (0, 1))
-        1.5707963267948966
-        >>> angle_between((1, 0), (1, 0))
-        0.0
-        >>> angle_between((1, 0), (-1, 0))
-        3.141592653589793
     """
     if np.equal(p1, p2).all():
         return 0.0
@@ -355,7 +357,7 @@ def segment_radius(seg):
 
     Returns: arithmetic mean of the radii of the points in seg
     """
-    return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.
+    return (seg[0][COLS.R] + seg[1][COLS.R]) / 2.0
 
 
 def segment_x_coordinate(seg):
@@ -363,7 +365,7 @@ def segment_x_coordinate(seg):
 
     Returns: arithmetic mean of the x coordinates of the points in seg
     """
-    return (seg[0][COLS.X] + seg[1][COLS.X]) / 2.
+    return (seg[0][COLS.X] + seg[1][COLS.X]) / 2.0
 
 
 def segment_y_coordinate(seg):
@@ -371,7 +373,7 @@ def segment_y_coordinate(seg):
 
     Returns: arithmetic mean of the y coordinates of the points in seg
     """
-    return (seg[0][COLS.Y] + seg[1][COLS.Y]) / 2.
+    return (seg[0][COLS.Y] + seg[1][COLS.Y]) / 2.0
 
 
 def segment_z_coordinate(seg):
@@ -379,7 +381,7 @@ def segment_z_coordinate(seg):
 
     Returns: arithmetic mean of the z coordinates of the points in seg
     """
-    return (seg[0][COLS.Z] + seg[1][COLS.Z]) / 2.
+    return (seg[0][COLS.Z] + seg[1][COLS.Z]) / 2.0
 
 
 def segment_radial_dist(seg, pos):
@@ -459,7 +461,7 @@ def pca(points):
 
 def sphere_area(r):
     """Compute the area of a sphere with radius r."""
-    return 4. * math.pi * r ** 2
+    return 4.0 * math.pi * r**2
 
 
 # Useful alias for path_distance
@@ -508,17 +510,13 @@ def convex_hull(points):
         scipy.spatial.ConvexHull object if successful, otherwise None
     """
     if len(points) == 0:
-        L.exception(
-            "Failure to compute convex hull because there are no points"
-        )
+        L.exception("Failure to compute convex hull because there are no points")
         return None
 
     try:
         return ConvexHull(points)
     except QhullError:
-        L.exception(
-            "Failure to compute convex hull because of geometrical degeneracy."
-        )
+        L.exception("Failure to compute convex hull because of geometrical degeneracy.")
         return None
 
 

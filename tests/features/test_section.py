@@ -48,9 +48,13 @@ SWC_PATH = DATA_PATH / 'swc/'
 NRN = load_morphology(H5_PATH / 'Neuron.h5')
 SECTION_ID = 0
 
+
 def test_section_points():
-    sec = Mock(points=np.array([[0., 1., 2., 1.], [3., 4., 5., 1.], [6., 7., 8., 1.]]))
-    npt.assert_almost_equal(section.section_points(sec), [[0., 1., 2.], [3., 4., 5.], [6., 7., 8.]])
+    sec = Mock(points=np.array([[0.0, 1.0, 2.0, 1.0], [3.0, 4.0, 5.0, 1.0], [6.0, 7.0, 8.0, 1.0]]))
+    npt.assert_almost_equal(
+        section.section_points(sec), [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]]
+    )
+
 
 def test_section_length():
     sec = Mock(length=3.2)
@@ -58,31 +62,32 @@ def test_section_length():
 
 
 def test_number_of_segments():
-    sec = Mock(points=np.array([[0., 1., 2., 1.], [3., 4., 5., 1.], [6., 7., 8., 1.]]))
+    sec = Mock(points=np.array([[0.0, 1.0, 2.0, 1.0], [3.0, 4.0, 5.0, 1.0], [6.0, 7.0, 8.0, 1.0]]))
     npt.assert_almost_equal(section.number_of_segments(sec), 2)
 
 
 def test_section_taper_rate():
     # Note: taper rate is calculated on the diameters
-    sec = Mock(points=np.array([[0., 0., 0., 2.], [1., 0., 0., 1.], [2., 0., 0., 0.]]))
-    npt.assert_almost_equal(section.taper_rate(sec), -2.)
+    sec = Mock(points=np.array([[0.0, 0.0, 0.0, 2.0], [1.0, 0.0, 0.0, 1.0], [2.0, 0.0, 0.0, 0.0]]))
+    npt.assert_almost_equal(section.taper_rate(sec), -2.0)
 
 
 def test_segment_taper_rates():
     # Note: taper rate is calculated on the diameters
-    sec = Mock(points=np.array([[0., 0., 0., 2.], [1., 0., 0., 1.], [2., 0., 0., 0.]]))
-    npt.assert_almost_equal(section.segment_taper_rates(sec), [-2., -2.])
+    sec = Mock(points=np.array([[0.0, 0.0, 0.0, 2.0], [1.0, 0.0, 0.0, 1.0], [2.0, 0.0, 0.0, 0.0]]))
+    npt.assert_almost_equal(section.segment_taper_rates(sec), [-2.0, -2.0])
+
 
 def test_section_path_length():
     m = load_morphology(
-    """
+        """
     1  1    0  0  0    0.5 -1
     2  3    1  0  0    0.1  1
     3  3    2  0  0    0.1  2
     4  3    3  0  0    0.1  3
     5  3    2  1  0    0.1  3
     """,
-    reader="swc",
+        reader="swc",
     )
 
     sec = m.sections[1]
@@ -90,131 +95,198 @@ def test_section_path_length():
 
 
 def test_section_area():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
-                                     (1 0 0 2))"""), reader='asc').sections[SECTION_ID]
+                                     (1 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     area = section.section_area(sec)
     assert math.pi * 1 * 2 * 1 == area
 
 
 def test_segment_areas():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 4)
                                      (1 0 0 4)
-                                     (2 0 0 4))"""), reader='asc').sections[SECTION_ID]
+                                     (2 0 0 4))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
-    npt.assert_allclose(section.segment_areas(sec), [2. * np.pi * 2. * 1.] * 2)
+    npt.assert_allclose(section.segment_areas(sec), [2.0 * np.pi * 2.0 * 1.0] * 2)
 
 
 def test_segment_volumes():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 4)
                                      (1 0 0 4)
-                                     (2 0 0 4))"""), reader='asc').sections[SECTION_ID]
+                                     (2 0 0 4))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
-    npt.assert_allclose(section.segment_areas(sec), [np.pi * 4. * 1.] * 2)
+    npt.assert_allclose(section.segment_areas(sec), [np.pi * 4.0 * 1.0] * 2)
 
 
 def test_segment_mean_radii():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
                                      (1 0 0 4)
-                                     (2 0 0 6))"""), reader='asc').sections[SECTION_ID]
+                                     (2 0 0 6))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
     npt.assert_allclose(section.segment_mean_radii(sec), [1.5, 2.5])
 
 
 def test_segment_midpoints():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                     ((Dendrite)
                                      (0 0 0 2)
                                      (1 0 0 4)
-                                     (2 0 0 6))"""), reader='asc').sections[SECTION_ID]
+                                     (2 0 0 6))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
-    npt.assert_allclose(section.segment_midpoints(sec), [[0.5, 0., 0.], [1.5, 0., 0.]])
+    npt.assert_allclose(section.segment_midpoints(sec), [[0.5, 0.0, 0.0], [1.5, 0.0, 0.0]])
 
 
 def test_section_tortuosity():
-    sec_a = load_morphology(StringIO(u"""
-	((CellBody) (0 0 0 2))
+    sec_a = load_morphology(
+        StringIO(
+            u"""
+	((CellBody) (-1 0 0 2) (1 0 0 2))
 	((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (2 0 0 2)
-    (3 0 0 2))"""), reader='asc').sections[SECTION_ID]
+    (3 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
-    sec_b = load_morphology(StringIO(u"""
-    ((CellBody) (0 0 0 2))
+    sec_b = load_morphology(
+        StringIO(
+            u"""
+    ((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (1 2 0 2)
-    (0 2 0 2))"""), reader='asc').sections[SECTION_ID]
+    (0 2 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
     assert section.section_tortuosity(sec_a) == 1.0
     assert section.section_tortuosity(sec_b) == 4.0 / 2.0
 
     for s in iter_sections(NRN):
-        assert (section.section_tortuosity(s) ==
-                morphmath.section_length(s.points) / morphmath.point_dist(s.points[0], s.points[-1]))
+        assert section.section_tortuosity(s) == morphmath.section_length(
+            s.points
+        ) / morphmath.point_dist(s.points[0], s.points[-1])
+
 
 def test_setion_tortuosity_single_point():
-    sec = load_morphology(StringIO(u"""((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
                                    ((Dendrite)
-                                    (1 2 3 2))"""), reader='asc').sections[SECTION_ID]
+                                    (1 2 3 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     assert section.section_tortuosity(sec) == 1.0
 
 
 def test_section_tortuosity_looping_section():
-    sec = load_morphology(StringIO(u"""
-    ((CellBody) (0 0 0 2))
+    sec = load_morphology(
+        StringIO(
+            u"""
+    ((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (1 2 0 2)
     (0 2 0 2)
-    (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
+    (0 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     with warnings.catch_warnings(record=True):
         assert section.section_tortuosity(sec) == np.inf
 
 
 def test_section_meander_angles():
-    s0 = load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    s0 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (2 0 0 2)
     (3 0 0 2)
-    (4 0 0 2))"""), reader='asc').sections[SECTION_ID]
+    (4 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     assert section.section_meander_angles(s0) == [math.pi, math.pi, math.pi]
 
-    s1 = load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    s1 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (1 0 0 2)
     (1 1 0 2)
     (2 1 0 2)
-    (2 2 0 2))"""), reader='asc').sections[SECTION_ID]
+    (2 2 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     assert section.section_meander_angles(s1) == [math.pi / 2, math.pi / 2, math.pi / 2]
 
-    s2 = load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    s2 = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
     (0 0 1 2)
     (0 0 2 2)
-    (0 0 0 2))"""), reader='asc').sections[SECTION_ID]
-    assert section.section_meander_angles(s2) == [math.pi, 0.]
+    (0 0 0 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
+    assert section.section_meander_angles(s2) == [math.pi, 0.0]
 
 
 def test_section_meander_angles_single_segment():
-    s = load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    s = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 2)
-    (1 1 1 2))"""), reader='asc').sections[SECTION_ID]
+    (1 1 1 2))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
     assert len(section.section_meander_angles(s)) == 0
 
 
@@ -226,11 +298,16 @@ def test_strahler_order():
 
 
 def test_locate_segment_position():
-    s = load_morphology(StringIO(u"""((CellBody) (0 0 0 0))
+    s = load_morphology(
+        StringIO(
+            u"""((CellBody) (-1 0 0 2) (1 0 0 2))
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
-    (6 4 4 400))"""), reader='asc').sections[SECTION_ID]
+    (6 4 4 400))"""
+        ),
+        reader='asc',
+    ).sections[SECTION_ID]
 
     assert section.locate_segment_position(s, 0.0) == (0, 0.0)
     assert section.locate_segment_position(s, 0.25) == (0, 2.5)
@@ -244,13 +321,17 @@ def test_locate_segment_position():
 
 
 def test_mean_radius():
-    n = load_morphology(StringIO(u"""
-    ((CellBody)
-     (0 0 0 1))
+    n = load_morphology(
+        StringIO(
+            u"""
+    ((CellBody) (-1 0 0 2) (1 0 0 2))
 
     ((Dendrite)
     (0 0 0 0)
     (3 0 4 200)
-    (6 4 4 400))"""), reader='asc')
+    (6 4 4 400))"""
+        ),
+        reader='asc',
+    )
 
-    assert section.section_mean_radius(n.neurites[0]) == 100.
+    assert section.section_mean_radius(n.neurites[0]) == 100.0

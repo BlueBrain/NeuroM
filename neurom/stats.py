@@ -31,7 +31,7 @@
 Nothing fancy. Just commonly used functions using scipy functionality.
 """
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from enum import Enum, unique
 
 import numpy as np
@@ -43,6 +43,7 @@ FitResults = namedtuple('FitResults', ['params', 'errs', 'type'])
 @unique
 class StatTests(Enum):
     """Enum representing valid statistical tests of scipy."""
+
     ks = 1
     wilcoxon = 2
     ttest = 3
@@ -76,9 +77,11 @@ def fit_results_to_dict(fit_results, min_bound=None, max_bound=None):
         Supported fit types: 'norm', 'expon', 'uniform'
     """
     type_map = {'norm': 'normal', 'expon': 'exponential', 'uniform': 'uniform'}
-    param_map = {'uniform': lambda p: [('min', p[0]), ('max', p[0] + p[1])],
-                 'norm': lambda p: [('mu', p[0]), ('sigma', p[1])],
-                 'expon': lambda p: [('lambda', 1.0 / p[1])]}
+    param_map = {
+        'uniform': lambda p: [('min', p[0]), ('max', p[0] + p[1])],
+        'norm': lambda p: [('mu', p[0]), ('sigma', p[1])],
+        'expon': lambda p: [('lambda', 1.0 / p[1])],
+    }
 
     d = OrderedDict({'type': type_map[fit_results.type]})
     d.update(param_map[fit_results.type](fit_results.params))
@@ -145,7 +148,6 @@ def scalar_stats(data, functions=('min', 'max', 'mean', 'std')):
     """
     stats = {}
     for func in functions:
-
         stats[func] = getattr(np, func)(data)
 
     return stats

@@ -53,18 +53,23 @@ def _load_morphology(name):
     return name, load_morphology(path)
 
 
-
-NEURONS = dict([_load_morphology(n) for n in ['Neuron.h5',
-                                          'Neuron_2_branch.h5',
-                                          'Neuron.swc',
-                                          'Neuron_small_radius.swc',
-                                          'Neuron_zero_length_sections.swc',
-                                          'Neuron_zero_length_segments.swc',
-                                          'Neuron_zero_radius.swc',
-                                          'Single_apical.swc',
-                                          'Single_axon.swc',
-                                          'Single_basal.swc',
-                                          ]])
+NEURONS = dict(
+    [
+        _load_morphology(n)
+        for n in [
+            'Neuron.h5',
+            'Neuron_2_branch.h5',
+            'Neuron.swc',
+            'Neuron_small_radius.swc',
+            'Neuron_zero_length_sections.swc',
+            'Neuron_zero_length_segments.swc',
+            'Neuron_zero_radius.swc',
+            'Single_apical.swc',
+            'Single_axon.swc',
+            'Single_basal.swc',
+        ]
+    ]
+)
 
 
 def _pick(files):
@@ -72,11 +77,12 @@ def _pick(files):
 
 
 def test_has_axon_good_data():
-    files = ['Neuron.swc',
-             'Neuron_small_radius.swc',
-             'Single_axon.swc',
-             'Neuron.h5',
-             ]
+    files = [
+        'Neuron.swc',
+        'Neuron_small_radius.swc',
+        'Single_axon.swc',
+        'Neuron.h5',
+    ]
     for m in _pick(files):
         assert morphology_checks.has_axon(m)
 
@@ -88,10 +94,7 @@ def test_has_axon_bad_data():
 
 
 def test_has_apical_dendrite_good_data():
-    files = ['Neuron.swc',
-             'Neuron_small_radius.swc',
-             'Single_apical.swc',
-             'Neuron.h5']
+    files = ['Neuron.swc', 'Neuron_small_radius.swc', 'Single_apical.swc', 'Neuron.h5']
 
     for m in _pick(files):
         assert morphology_checks.has_apical_dendrite(m)
@@ -104,11 +107,13 @@ def test_has_apical_dendrite_bad_data():
 
 
 def test_has_basal_dendrite_good_data():
-    files = ['Neuron.swc',
-             'Neuron_small_radius.swc',
-             'Single_basal.swc',
-             'Neuron_2_branch.h5',
-             'Neuron.h5']
+    files = [
+        'Neuron.swc',
+        'Neuron_small_radius.swc',
+        'Single_basal.swc',
+        'Neuron_2_branch.h5',
+        'Neuron.h5',
+    ]
 
     for m in _pick(files):
         assert morphology_checks.has_basal_dendrite(m)
@@ -134,12 +139,13 @@ def test_has_no_flat_neurites():
 
 
 def test_nonzero_neurite_radii_good_data():
-    files = ['Neuron.swc',
-             'Single_apical.swc',
-             'Single_basal.swc',
-             'Single_axon.swc',
-             'Neuron_2_branch.h5',
-             ]
+    files = [
+        'Neuron.swc',
+        'Single_apical.swc',
+        'Single_basal.swc',
+        'Single_axon.swc',
+        'Neuron_2_branch.h5',
+    ]
 
     for m in _pick(files):
         ids = morphology_checks.has_all_nonzero_neurite_radii(m)
@@ -170,18 +176,18 @@ def test_nonzero_segment_lengths_good_data():
 
 
 def test_nonzero_segment_lengths_bad_data():
-    files = ['Neuron_zero_length_segments.swc',
-             'Single_apical.swc',
-             'Single_basal.swc',
-             'Single_axon.swc',
-             ]
+    files = [
+        'Neuron_zero_length_segments.swc',
+        'Single_apical.swc',
+        'Single_basal.swc',
+        'Single_axon.swc',
+    ]
 
     bad_ids = [[0, 21, 42, 63], [0], [0], [0], [0]]
 
     for i, m in enumerate(_pick(files)):
         ids = morphology_checks.has_all_nonzero_segment_lengths(m)
-        assert (ids.info ==
-                        [(id, 0) for id in bad_ids[i]])
+        assert ids.info == [(id, 0) for id in bad_ids[i]]
 
 
 def test_nonzero_segment_lengths_threshold():
@@ -194,16 +200,16 @@ def test_nonzero_segment_lengths_threshold():
     ids = morphology_checks.has_all_nonzero_segment_lengths(m, threshold=0.25)
 
     bad_ids = [(0, 0), (21, 0), (36, 9), (42, 0), (52, 7), (60, 2), (63, 0), (70, 4), (76, 6)]
-    assert (ids.info ==
-                    [(id, val) for id, val in bad_ids])
+    assert ids.info == [(id, val) for id, val in bad_ids]
 
 
 def test_nonzero_section_lengths_good_data():
-    files = ['Neuron.swc',
-             'Single_apical.swc',
-             'Single_basal.swc',
-             'Single_axon.swc',
-             ]
+    files = [
+        'Neuron.swc',
+        'Single_apical.swc',
+        'Single_basal.swc',
+        'Single_axon.swc',
+    ]
 
     for i, m in enumerate(_pick(files)):
         ids = morphology_checks.has_all_nonzero_section_lengths(m)
@@ -226,7 +232,7 @@ def test_nonzero_section_lengths_threshold():
     assert ids.status
     assert len(ids.info) == 0
 
-    ids = morphology_checks.has_all_nonzero_section_lengths(m, threshold=15.)
+    ids = morphology_checks.has_all_nonzero_section_lengths(m, threshold=15.0)
     assert not ids.status
     assert len(ids.info) == 84
 
@@ -281,7 +287,6 @@ def test_has_no_narrow_start():
 
 
 def test_has_nonzero_soma_radius_threshold():
-
     class Dummy:
         pass
 
@@ -308,7 +313,8 @@ def test_has_no_jumps():
 
 
 def test_has_no_narrow_dendritic_section():
-    swc_content = StringIO(u"""
+    swc_content = StringIO(
+        u"""
 # index, type, x, y, z, radius, parent
     1 1  0  0 0 10. -1
     2 2  0  0 0 10.  1
@@ -319,21 +325,22 @@ def test_has_no_narrow_dendritic_section():
     7 3  0 -4 0 5.  6
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
-""")
+"""
+    )
     m = load_morphology(swc_content, reader='swc')
-    res = morphology_checks.has_no_narrow_neurite_section(m,
-                                                dendrite_filter,
-                                                radius_threshold=5,
-                                                considered_section_min_length=0)
+    res = morphology_checks.has_no_narrow_neurite_section(
+        m, dendrite_filter, radius_threshold=5, considered_section_min_length=0
+    )
 
     assert res.status
 
-    res = morphology_checks.has_no_narrow_neurite_section(m, dendrite_filter,
-                                                radius_threshold=7,
-                                                considered_section_min_length=0)
+    res = morphology_checks.has_no_narrow_neurite_section(
+        m, dendrite_filter, radius_threshold=7, considered_section_min_length=0
+    )
     assert not res.status
 
-    swc_content = StringIO(u"""
+    swc_content = StringIO(
+        u"""
 # index, type, x, y, z, radius, parent
     1 1  0  0 0 10. -1
     2 2  0  0 0 5  1 # narrow soma
@@ -344,12 +351,15 @@ def test_has_no_narrow_dendritic_section():
     7 3  0 -4 0 10.  6
     8 3  6 -4 0 10.  7
     9 3 -5 -4 0 10.  7
-""")
+"""
+    )
     m = load_morphology(swc_content, reader='swc')
-    res = morphology_checks.has_no_narrow_neurite_section(m, dendrite_filter,
-                                                radius_threshold=5,
-                                                considered_section_min_length=0)
-    assert res.status, 'Narrow soma or axons should not raise bad status when checking for narrow dendrites'
+    res = morphology_checks.has_no_narrow_neurite_section(
+        m, dendrite_filter, radius_threshold=5, considered_section_min_length=0
+    )
+    assert (
+        res.status
+    ), 'Narrow soma or axons should not raise bad status when checking for narrow dendrites'
 
 
 def test_has_no_dangling_branch():
@@ -357,15 +367,13 @@ def test_has_no_dangling_branch():
     res = morphology_checks.has_no_dangling_branch(m)
     assert not res.status
     assert len(res.info) == 1
-    assert_array_equal(res.info[0][1][0][COLS.XYZ],
-                       [0., 49.,  0.])
+    assert_array_equal(res.info[0][1][0][COLS.XYZ], [0.0, 49.0, 0.0])
 
     _, m = _load_morphology('dangling_dendrite.swc')
     res = morphology_checks.has_no_dangling_branch(m)
     assert not res.status
     assert len(res.info) == 1
-    assert_array_equal(res.info[0][1][0][COLS.XYZ],
-                       [0., 49.,  0.])
+    assert_array_equal(res.info[0][1][0][COLS.XYZ], [0.0, 49.0, 0.0])
 
     _, m = _load_morphology('axon-sprout-from-dendrite.asc')
     res = morphology_checks.has_no_dangling_branch(m)
@@ -384,10 +392,11 @@ def test__bool__():
     assert c.__bool__() == c.__nonzero__()
 
 
-
 def test_has_multifurcation():
-    m = load_morphology(StringIO(u"""
-	((CellBody) (0 0 0 2))
+    m = load_morphology(
+        StringIO(
+            u"""
+	((CellBody) (-1 0 0 2) (1 0 0 2))
 ( (Color Blue)
   (Axon)
   (0 5 0 2)
@@ -407,7 +416,10 @@ def test_has_multifurcation():
     (4 13 0 2)
   )
 )
-"""), reader='asc')
+"""
+        ),
+        reader='asc',
+    )
 
     check_ = morphology_checks.has_multifurcation(m)
     assert not check_.status
@@ -417,12 +429,10 @@ def test_has_multifurcation():
 
 
 def test_has_unifurcation():
-    m = load_morphology(StringIO(u"""
-("CellBody"
- (Color Red)
- (CellBody)
- (0 0 0 2)
- )
+    m = load_morphology(
+        StringIO(
+            u"""
+((CellBody) (-1 0 0 2) (1 0 0 2))
 
  ((Dendrite)
   (0 0 0 2)
@@ -436,7 +446,10 @@ def test_has_unifurcation():
    (6 5 0 3)
    )
   )
-"""), reader='asc')
+"""
+        ),
+        reader='asc',
+    )
 
     check_ = morphology_checks.has_unifurcation(m)
     assert not check_.status
@@ -446,7 +459,8 @@ def test_has_unifurcation():
 
 
 def test_single_children():
-    m = load_morphology("""
+    m = load_morphology(
+        """
 ( (Color Blue)
   (Axon)
   (0 5 0 2)
@@ -458,7 +472,9 @@ def test_single_children():
     (6 13 0 2)
   )
 )
-""", "asc")
+""",
+        "asc",
+    )
     result = morphology_checks.has_no_single_children(m)
     assert result.status is False
     assert result.info == [0]

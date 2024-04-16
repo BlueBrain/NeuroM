@@ -29,8 +29,9 @@
 """Python module of NeuroM to check morphology trees."""
 
 import numpy as np
-from neurom.core.dataformat import COLS
+
 from neurom import morphmath as mm
+from neurom.core.dataformat import COLS
 from neurom.morphmath import principal_direction_extent
 
 
@@ -53,8 +54,7 @@ def is_monotonic(neurite, tol):
             if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
                 return False
         # Check that section boundary points satisfy monotonicity
-        if(node.parent is not None and
-           sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol):
+        if node.parent is not None and sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol:
             return False
 
     return True
@@ -99,6 +99,7 @@ def is_back_tracking(neurite):
             1. A segment endpoint falls back and overlaps with a previous segment's point
             2. The geometry of a segment overlaps with a previous one in the section
     """
+
     def pair(segs):
         """Pairs the input list into triplets."""
         return zip(segs, segs[1:])
@@ -179,7 +180,7 @@ def is_back_tracking(neurite):
         for i, seg1 in enumerate(segment_pairs[1:]):
             # check if the end point of the segment lies within the previous
             # ones in the current section
-            for seg2 in segment_pairs[0: i + 1]:
+            for seg2 in segment_pairs[0 : i + 1]:
                 if is_inside_cylinder(seg1, seg2):
                     return True
     return False

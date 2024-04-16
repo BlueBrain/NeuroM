@@ -36,7 +36,7 @@ Heterogeneous Morphologies
 Definition
 ----------
 
-A heterogeneous morphology consists of zero or more homogeneous and at least one heterogeneous neurite trees extending from the soma.
+A heterogeneous morphology consists of zero or more homogeneous and at least one heterogeneous neurite tree extending from the soma.
 A heterogeneous neurite tree consists of multiple sub-neurites with different types (ie: basal and axon).
 
 A typical example of a heterogeneous neurite is the axon-carrying dendrite, in which the axon sprouts from the basal dendrite.
@@ -47,19 +47,24 @@ Identification
 
 Heterogeneous neurites can be identified using the ``Neurite::is_heterogeneous`` method:
 
-.. code:: python
+.. testcode:: [heterogeneous]
 
     from neurom import load_morphology
     from neurom.core.morphology import iter_neurites
 
     m = load_morphology('tests/data/swc/heterogeneous_morphology.swc')
 
-    print([neurite.is_heterogeneous() for neurite in m])
+    print([neurite.is_heterogeneous() for neurite in m.neurites])
+
+.. testoutput:: [heterogeneous]
+    :hide:
+
+    [False, True, False]
 
 which would return ``[False, True, False]``, meaning the 2nd neurite extending from the soma contains multiple neurite types.
 
 
-Sub-neurite views of heterogeneous neurites
+sub-neurite views of heterogeneous neurites
 --------------------------------------------
 
 Default mode
@@ -69,56 +74,48 @@ NeuroM does not take into account heterogeneous sub-neurites by default.
 A heterogeneous neurite is treated as a homogeneous one, the type of which is determined by the first section of the tree.
 For example:
 
-.. code-block:: python
-
-    from neurom import load_morphology
-    from neurom.core.morphology import iter_neurites
-
-    m = load_morphology('tests/data/swc/heterogeneous_morphology.swc')
+.. testcode:: [heterogeneous]
 
     basal, axon_carrying_dendrite, apical = list(iter_neurites(m))
 
     print(basal.type, axon_carrying_dendrite.type, apical.type)
 
-Prints::
+.. testoutput:: [heterogeneous]
 
     NeuriteType.basal_dendrite NeuriteType.basal_dendrite NeuriteType.apical_dendrite
 
-I.E. the axon-carrying dendrite would be treated as a basal dendrite.
+In other words, the axon-carrying dendrite would be treated as a basal dendrite.
+
 For feature extraction and checks, the axon-carrying dendrite is treated as a basal dendrite.
 Features, for which an axon neurite type is passed, do not have access to the axonal part of the neurite.
 For instance, the number of basal and axon neurites will be two and zero respectively.
-A features such as ``total_volume`` would include the entire axon-carrying dendrite, without separating between basal and axon types.
+A feature such as ``total_volume`` would include the entire axon-carrying dendrite, without separating between basal and axon types.
 
-Sub-neurite mode
-~~~~~~~~~~~~~~~~
+subtree mode
+~~~~~~~~~~~~
 
-NeuroM provides an immutable approach (without modifying the morphology) to access the homogeneous sub-neurites of a neurite.
-Using ``iter_neurites`` with the flag ``use_subtrees`` returns a neurite view for each homogeneous sub-neurite.
+The ``Population``, ``Morphology`` and ``Neurite`` objects have a boolean attribute named ``process_subtrees`` which is set to ``False`` by default.
+The value of this attribute can be set to ``True`` in order to take into account heterogeneous sub-neurites.
 
-.. code-block:: python
+.. testcode:: [heterogeneous]
 
-    basal1, basal2, axon, apical = list(iter_neurites(m, use_subtrees=True))
+    m.process_subtrees = True
 
-    print(basal1.type, basal2.type, axon.type, apical.type)
+    basal, axon_carrying_basal, apical = list(iter_neurites(m))
 
-In the example above, two views of the axon-carrying dendrite have been created: the basal and axon dendrite views.
+    print(basal.type, axon_carrying_basal.type, apical.type)
+
+.. testoutput:: [heterogeneous]
+
+    NeuriteType.basal_dendrite NeuriteType.axon_carrying_dendrite NeuriteType.apical_dendrite
+
+In the example above, two views of the axon-carrying dendrite have been created: the basal dendrite view and the axon view.
 
 .. image:: images/heterogeneous_neurite.png
 
-Given that the morphology is not modified, the sub-neurites specify as their ``root_node`` the section of the homogeneous sub-neurite.
-They are just references to where the sub-neurites start.
-
-.. note::
-    Creating neurite instances for the homogeneous sub-neurites breaks the assumption of root nodes not having a parent.
-
-
-.. warning::
-    Be careful while using sub-neurites.
-    Because they just point to the start sections of the sub-neurite, they may include other sub-neurites as well.
-    In the figure example above, the basal sub-neurite includes the entire tree, including the axon sub-neurite.
-    An additional filtering of the sections is needed to leave out the axonal part.
-    However, for the axon sub-neurite this filtering is not needed because it is downstream homogeneous.
+Given that the topology of the morphology is not modified, the sub-neurites specify as their ``root_node`` the same section of the homogeneous neurite.
+So, in this case, both the basal and axon views start at the same section but then the filters used in iterators are different.
+This also means that the sub-trees have no 'trunk', as a trunk is defined as a section connected to the soma.
 
 
 Extract features from heterogeneous morphologies
@@ -127,64 +124,68 @@ Extract features from heterogeneous morphologies
 Neurite
 ~~~~~~~
 
-Neurite features have been extended to include a ``section_type`` argument, which can be used to apply a feature on a heterogeneous neurite.
+Neurite objects have been extended to include a ``process_subtrees`` flag, which can be used to apply a feature on a heterogeneous neurite.
 
-.. code-block:: python
+.. testcode:: [heterogeneous]
 
     from neurom import NeuriteType
-    from neurom import load_morphology
     from neurom.features.neurite import number_of_sections
-
-    m = load_morphology('tests/data/swc/heterogeneous_morphology.swc')
 
     axon_carrying_dendrite = m.neurites[1]
 
+    axon_carrying_dendrite.process_subtrees = True
     total_sections = number_of_sections(axon_carrying_dendrite)
     basal_sections = number_of_sections(axon_carrying_dendrite, section_type=NeuriteType.basal_dendrite)
     axon_sections = number_of_sections(axon_carrying_dendrite, section_type=NeuriteType.axon)
 
     print(total_sections, basal_sections, axon_sections)
 
-Not specifying a ``section_type`` is equivalent to passing ``NeuriteType.all`` and it will use all sections as done historically.
+.. testoutput:: [heterogeneous]
+
+    9 4 5
+
+Not specifying a ``section_type`` is equivalent to passing ``NeuriteType.all`` and it will use all sections as done historically, even if ``process_subtrees`` is set to ``True``.
 
 Morphology
 ~~~~~~~~~~
 
-Morphology features have been extended to include the ``use_subtrees`` flag, which allows to use the sub-neurites.
+Morphology objects have been extended to include the ``process_subtrees`` flag, which allows to use the sub-neurites.
 
-.. code-block:: python
+.. testcode:: [heterogeneous]
 
-    from neurom import NeuriteType
-    from neurom import load_morphology
     from neurom.features.morphology import number_of_neurites
 
-    m = load_morphology('tests/data/swc/heterogeneous_morphology.swc')
-
+    m.process_subtrees = False
     total_neurites_wout_subneurites = number_of_neurites(m)
-    total_neurites_with_subneurites = number_of_neurites(m, use_subtrees=True)
+    m.process_subtrees = True
+    total_neurites_with_subneurites = number_of_neurites(m)
 
     print("A:", total_neurites_wout_subneurites, total_neurites_with_subneurites)
 
+    m.process_subtrees = False
     number_of_axon_neurites_wout = number_of_neurites(m, neurite_type=NeuriteType.axon)
-    number_of_axon_neurites_with = number_of_neurites(m, neurite_type=NeuriteType.axon, use_subtrees=True)
+    m.process_subtrees = True
+    number_of_axon_neurites_with = number_of_neurites(m, neurite_type=NeuriteType.axon)
 
     print("B:", number_of_axon_neurites_wout, number_of_axon_neurites_with)
 
+    m.process_subtrees = False
     number_of_basal_neurites_wout = number_of_neurites(m, neurite_type=NeuriteType.basal_dendrite)
-    number_of_basal_neurites_with = number_of_neurites(m, neurite_type=NeuriteType.basal_dendrite, use_subtrees=True)
+    m.process_subtrees = True
+    number_of_basal_neurites_with = number_of_neurites(m, neurite_type=NeuriteType.basal_dendrite)
 
     print("C:", number_of_basal_neurites_wout, number_of_basal_neurites_with)
 
-Prints::
+.. testoutput:: [heterogeneous]
 
-    A: 3 4
+    A: 3 3
     B: 0 1
     C: 2 2
 
-In the example above, the total number of neurites increases from 3 to 4 when the subtrees are enabled (see ``A`` in the print out.)
-This is because the axonal and basal parts of the axon-carrying dendrite are counted separately in the second case.
+In the example above, the total number of neurites is the same when the subtrees are enabled (see ``A`` in the print out.)
+This is because the axonal and basal parts of the axon-carrying dendrite are counted as one neurite.
 
-Specifying a ``neurite_type``, allows to count sub-neurites.
+Specifying a ``neurite_type``, allows to consider sub-neurites.
 Therefore, the number of axons without subtrees is 0, whereas it is 1 when subtrees are enabled (see ``B`` in the print out.)
 However, for basal dendrites the number does not change (2) because the axon-carrying dendrite is perceived as basal dendrite in the default case (see ``C``.)
 
@@ -193,15 +194,24 @@ features.get
 
 ``features.get`` can be used with respect to what has been mentioned above for neurite and morphology features.
 
-.. code-block:: python
+.. testcode:: [heterogeneous]
 
     from neurom import features
-    from neurom import load_morphology
 
-    m = load_morphology('tests/data/swc/heterogeneous_morphology.swc')
+    m.process_subtrees = True
+    n_neurites = features.get("number_of_neurites", m)
+    n_sections = features.get("number_of_sections", m, neurite_type=NeuriteType.axon)
 
-    features.get("number_of_neurites", m, use_subtrees=True)
-    features.get("number_of_sections", m, section_type=NeuriteType.axon)
+    print(f"Neurites: {n_neurites}, Sections: {n_sections}")
+
+.. testoutput:: [heterogeneous]
+
+    Neurites: 3, Sections: 5
+
+.. warning::
+    The ``features.get`` function can be used with either the ``neurite_type`` or the ``section_type`` parameter, depending on what type of object the feature is applied.
+    When the feature is applied to a ``Population`` or to a ``Morphology`` object, only the ``neurite_type`` parameter is accepted.
+    While the feature is applied to a ``Neurite`` or to a list of ``Neurite`` objects, only the ``section_type`` parameter is accepted.
 
 Conventions & Incompatibilities
 -------------------------------
@@ -223,4 +233,4 @@ The following features are not compatible with subtrees:
 
 Because they require the neurites to be rooted at the soma.
 This is not true for sub-neurites.
-Therefore, passing a ``use_subtrees`` flag will result in an error.
+Therefore, passing a Neurite object with a ``process_subtrees`` flag set to ``True`` will result in an empty list.

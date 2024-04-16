@@ -29,6 +29,91 @@
 Migration guides
 =======================
 
+.. _migration-v4.0.0:
+
+Migration to v4 version
+-----------------------
+
+Deprecated modules
+~~~~~~~~~~~~~~~~~~
+
+The following modules have been deprecated:
+
+- ``neurom/core/neuron.py`` (use ``neurom/core/morphology.py``)
+- ``neurom/features/bifurcationfunc.py`` (use ``neurom/features/bifurcation.py``)
+- ``neurom/features/sectionfunc.py`` (use ``neurom/features/section.py``)
+- ``neurom/check/neuron_checks.py`` (use ``neurom/check/morphology_checks.py``)
+- ``neurom/viewer.py`` (use ``from neurom.view import plot_[morph|morph3d|dendrogram]``)
+
+Breaking changes in Morphology class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Morphology class has changed in two major ways:
+
+* Does not derive from morphio.mut.Morphology
+* By default an immutable morphio Morphology is instantiated
+
+The morphio Morphology is stored as a protected attribute in neurom Morphology object turning
+the latter into a wrapper around morphio Morphology.
+
+However, it is still accessible via the ``to_morphio()`` method:
+
+.. testcode:: [v4-migration]
+   
+    from neurom import load_morphology
+    neurom_morphology = load_morphology('tests/data/swc/Neuron.swc')
+    ref_morph = neurom_morphology.to_morphio()
+
+    print(type(ref_morph).__module__, type(ref_morph).__name__)
+
+.. testoutput:: [v4-migration]
+
+    morphio._morphio Morphology
+
+which means that the default morphio Morphology is immutable. It is however possible to use a mutable morpio Morphology if needed:
+
+.. testcode:: [v4-migration]
+
+   import morphio.mut
+
+   morphio_morphology = morphio.mut.Morphology('tests/data/swc/Neuron.swc')
+   neurom_morphology = load_morphology(morphio_morphology)
+   ref_morph = neurom_morphology.to_morphio()
+
+   print(type(ref_morph).__module__, type(ref_morph).__name__)   
+
+.. testoutput:: [v4-migration]
+
+   morphio._morphio.mut Morphology
+
+
+To mutate a readonly morphology requires a detour through morphio's mutable object as follows:
+
+.. testcode:: [v4-migration]
+
+   from neurom.core import Morphology
+   from morphio import PointLevel, SectionType
+
+   morph = load_morphology('tests/data/swc/Neuron.swc')
+   mut = morph.to_morphio().as_mutable()
+
+   point_lvl = PointLevel([[0, 0, 0],[1, 1, 1]], [1, 1])
+   mut.append_root_section(point_lvl, SectionType.basal_dendrite)
+
+   mutated_morph = Morphology(mut)
+
+   print(len(morph.neurites), len(mutated_morph.neurites))
+
+.. testoutput:: [v4-migration]
+
+   4 5
+
+Note that ``mutated_morph`` above will store the mutable morphio object. To prevent that:
+
+.. testcode:: [v4-migration]
+
+   mutated_morph = Morphology(mut.as_immutable())
+
 .. _migration-v3.0.0:
 
 Migration to v3 version
@@ -36,12 +121,12 @@ Migration to v3 version
 
 - ``neurom.view.viewer`` is deprecated. To get the same results as before, use the replacement:
 
-   .. code-block:: python
+   .. testcode::
 
       import neurom as nm
       # instead of: from neurom import viewer
       from neurom.view import matplotlib_impl, matplotlib_utils
-      m = nm.load_morphology('some/data/path/morph_file.asc')
+      m = nm.load_morphology('tests/data/swc/Neuron.swc')
 
       # instead of: viewer.draw(m)
       matplotlib_impl.plot_morph(m)
@@ -56,12 +141,13 @@ Migration to v3 version
       fig, ax = matplotlib_utils.get_figure()
       matplotlib_impl.plot_dendrogram(m, ax)
       matplotlib_utils.plot_style(fig=fig, ax=ax)
-      matplotlib_utils.save_plot(fig=fig, output_path=output_path)
+      # matplotlib_utils.save_plot(fig=fig, output_path="output-directory-path")
+
       # for other plots like `plot_morph` it is the same, you just need to call `plot_morph` instead
       # of `plot_dendrogram`.
 
       # instead of `plotly.draw`
-      from neurom import plotly_impl
+      from neurom.view import plotly_impl
       plotly_impl.plot_morph(m)  # for 2d
       plotly_impl.plot_morph3d(m)  # for 3d
 

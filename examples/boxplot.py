@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (c) 2015, Ecole Polytechnique Federale de Lausanne, Blue Brain Project
 # All rights reserved.
 #
@@ -28,11 +27,17 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Box Plot function for multiple morphs."""
+from pathlib import Path
 
+from neurom import load_morphologies
 from neurom.view import matplotlib_utils
+from neurom.features import get
 
 
-def boxplot(neurons, feature, new_fig=True, subplot=False):
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+
+
+def boxplot(neurons, feature, new_fig=True, subplot=111):
     """Plot a histogram of the selected feature for the population of morphologies.
     Plots x-axis versus y-axis on a scatter|histogram|binned values plot.
 
@@ -53,12 +58,26 @@ def boxplot(neurons, feature, new_fig=True, subplot=False):
         Default is False, which returns a matplotlib figure object. If True,
         returns a matplotlib axis object, for use as a subplot.
     """
-    feature_values = [getattr(neu, 'get_' + feature)() for neu in neurons]
+    feature_values = [get(feature, neuron) for neuron in neurons]
 
     _, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
     ax.boxplot(feature_values)
 
-    x_labels = ['neuron_id' for _ in neurons]
+    x_labels = [neuron.name for neuron in neurons]
 
     ax.set_xticklabels(x_labels)
+
+    # uncomment below to show image
+    # pylab.show()
+
+
+def main():
+
+    morphology_directory =  Path(PACKAGE_DIR, "tests/data/valid_set")
+    neurons = load_morphologies(morphology_directory)
+    boxplot(neurons, "section_lengths")
+
+
+if __name__ == "__main__":
+    main()

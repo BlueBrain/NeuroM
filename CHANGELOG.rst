@@ -1,6 +1,45 @@
 Changelog
 =========
 
+Version 4.0.0
+-------------
+
+- NeuriteType extended to allow mixed type declarations as tuple of ints. (#1071)
+- All features return built-in types (#1064)
+- Morphology class also allows mutable morphio objects to be passed explicitly. (#1049)
+- Morphology class uses morphio immutable class by composition, istead of inheritance. (#979)
+- Morphology level radial distance features use the somata as reference point. (#1030)
+- Make ``neurom.core.Population`` resolve paths. Symlinks are not resolved. (#1047)
+- Mixed subtree processing can be used in morph_stats app via the use_subtrees flag. (#1034)
+- ``neurom.view.[plot_tree|plot_tree3d|plot_soma|plot_soma3D]`` were hidden from the
+  neurom.view module. They can still be imported from neurom.view.matplotlib_impl. (#1032)
+- Mixed subtree processing. (#981)
+- Deprecated modules and classes were removed. (#1026)
+
+
+Version 3.2.3
+-------------
+
+- Fix neurom.app.morph_stats.extract_dataframe for Population objects with several workers (#1080)
+- Update readthedocs config (#1077)
+- Can pass List[Population] args to neurom.app.morph_stats.extract_dataframe (#1076)
+- Fix compatibility with MorphIO>=3.3.6 (#1075)
+- Check that soma is not empty when features need it (#1073)
+
+Version 3.2.2
+-------------
+
+- Fix QhullError warning (#1063)
+
+Version 3.2.1
+-------------
+
+- Fix: extract_stats could not work on single neurite (#1060)
+- Fix view cli to use 'equal' axis when available (#1051)
+- Remove single point contour somas in h5 and asc tests (#1045)
+- Remove duplicated deps jinja, sphinx (#1043)
+
+
 Version 3.2.0
 -------------
 
