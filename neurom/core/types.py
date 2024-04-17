@@ -84,7 +84,7 @@ class _ArgsIntsOrTuples(EnumMeta):
         kwargs = {}
         if names is not None:
             # Keep default value of EnumMeta for Python>=3.12.3
-            kwargs["names"] = names
+            kwargs["names"] = names  # pragma: no cover
         return super().__call__(
             value, module=module, qualname=qualname, type=type, start=start, **kwargs
         )
