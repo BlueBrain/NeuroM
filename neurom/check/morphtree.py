@@ -29,6 +29,8 @@
 """Python module of NeuroM to check morphology trees."""
 
 import numpy as np
+from scipy.spatial import KDTree
+
 from neurom.core.dataformat import COLS
 from neurom import morphmath as mm
 from neurom.morphmath import principal_direction_extent
@@ -204,6 +206,64 @@ def is_back_tracking(neurite):
     return False
 
 
+def overlapping_points(neurite, tolerance=None):
+    """Return overlapping points of a neurite.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tolerance(float): the tolerance used to find overlapping points
+
+    Returns:
+        A generator of tuples containing the IDs of the two intersecting sections and the
+        overlapping point.
+    """
+    # Create an array containing all the points of the neurite with 1st and last points of each
+    # section deduplicated. This array has 4 columns: the section ID of the point and the
+    # XYZ coordinates.
+    # Note: The section ID is cast to float in this operation and cast back to int later.
+    section_pts = np.vstack(
+        [
+            np.insert(neurite.root_node.points[0, :3], 0, neurite.root_node.id),
+            np.vstack(
+                [
+                    np.concatenate(
+                        [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:, :3]],
+                        axis=1,
+                    )
+                    for sec in neurite.iter_sections()
+                ],
+            ),
+        ],
+    )
+    tree = KDTree(section_pts[:, 1:4])
+    if tolerance is None:
+        tolerance = 0
+    for pt_id1, pt_id2 in tree.query_pairs(tolerance):
+        yield (
+            int(section_pts[pt_id1, 0]),  # Cast the first section ID back to int
+            int(section_pts[pt_id2, 0]),  # Cast the second section ID back to int
+            section_pts[pt_id1, 1:4],  # The overlapping point of the first section
+        )
+
+
+def has_overlapping_points(neurite, tolerance=None):
+    """Check if a neurite has at least one overlapping point.
+
+    See overlapping_points() for more details.
+
+    Args:
+        neurite(Neurite): neurite to operate on
+        tolerance(float): the tolerance used to find overlapping points
+
+    Returns:
+        True if two points of the neurite are overlapping.
+    """
+    for _i in overlapping_points(neurite, tolerance=tolerance):
+        # If one overlapping point is found then the neurite is overlapping
+        return True
+    return False
+
+
 def get_flat_neurites(morph, tol=0.1, method='ratio'):
     """Check if a morphology has neurites that are flat within a tolerance.
 
@@ -246,3 +306,15 @@ def get_back_tracking_neurites(morph):
         List of morphologies with backtracks
     """
     return [n for n in morph.neurites if is_back_tracking(n)]
+
+
+def get_overlapping_point_neurites(morph, tolerance=0):
+    """Get neurites that have overlapping points.
+
+    Args:
+        morph(Morphology): neurite to operate on
+
+    Returns:
+        List of morphologies with backtracks
+    """
+    return [n for n in morph.neurites if has_overlapping_points(n, tolerance=tolerance)]
