@@ -368,7 +368,12 @@ def has_no_back_tracking(morph):
 
 
 def has_no_overlapping_point(morph, tolerance=None):
-    """Check if the morphology has overlapping points."""
+    """Check if the morphology has overlapping points.
+
+    Returns:
+        CheckResult with result. `result.info` contains a tuple with the two overlapping section ids
+        and a list containing only the first overlapping points.
+    """
     bad_ids = [
         (i[:2], np.atleast_2d(i[2]))
         for neurite in iter_neurites(morph)

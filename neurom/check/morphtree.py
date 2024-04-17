@@ -217,13 +217,17 @@ def overlapping_points(neurite, tolerance=None):
         A generator of tuples containing the IDs of the two intersecting sections and the
         overlapping point.
     """
+    # Create an array containing all the points of the neurite with 1st and last points of each
+    # section deduplicated. This array has 4 columns: the section ID of the point and the
+    # XYZ coordinates.
+    # Note: The section ID is cast to float in this operation and cast back to int later.
     section_pts = np.vstack(
         [
-            np.insert(neurite.root_node.points[0], 0, neurite.root_node.id),
+            np.insert(neurite.root_node.points[0, :3], 0, neurite.root_node.id),
             np.vstack(
                 [
                     np.concatenate(
-                        [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:]],
+                        [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:, :3]],
                         axis=1,
                     )
                     for sec in neurite.iter_sections()
@@ -231,14 +235,14 @@ def overlapping_points(neurite, tolerance=None):
             ),
         ],
     )
-    tree = KDTree(section_pts[:, [1, 2, 3]])
+    tree = KDTree(section_pts[:, 1:4])
     if tolerance is None:
         tolerance = 0
     for pt_id1, pt_id2 in tree.query_pairs(tolerance):
         yield (
-            int(section_pts[pt_id1, 0]),
-            int(section_pts[pt_id2, 0]),
-            section_pts[pt_id1, [1, 2, 3]],
+            int(section_pts[pt_id1, 0]),  # Cast the first section ID back to int
+            int(section_pts[pt_id2, 0]),  # Cast the second section ID back to int
+            section_pts[pt_id1, 1:4],  # The overlapping point of the first section
         )
 
 
