@@ -490,7 +490,7 @@ def test_has_no_back_tracking():
     assert_array_equal(info[1][1], [[1, -3, 0]])
 
 
-def test_has_no_duplicated_point():
+def test_has_no_overlapping_point():
     m = load_morphology("""
     ((CellBody) (-1 0 0 2) (1 0 0 2))
 
@@ -511,7 +511,7 @@ def test_has_no_duplicated_point():
       (4 -6 0 0.2)
     ))
 """, "asc")
-    result = morphology_checks.has_no_duplicated_point(m)
+    result = morphology_checks.has_no_overlapping_point(m)
     assert result.status is False
     info = result.info
     assert_array_equal(info[0][0], [0, 2])

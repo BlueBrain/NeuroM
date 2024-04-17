@@ -35,7 +35,7 @@ from itertools import islice
 import numpy as np
 from neurom import NeuriteType
 from neurom.check import CheckResult
-from neurom.check.morphtree import get_flat_neurites, back_tracking_segments, duplicated_points
+from neurom.check.morphtree import get_flat_neurites, back_tracking_segments, overlapping_points
 from neurom.core.morphology import Section, iter_neurites, iter_sections, iter_segments
 from neurom.core.dataformat import COLS
 from neurom.exceptions import NeuroMError
@@ -367,11 +367,11 @@ def has_no_back_tracking(morph):
     return CheckResult(len(bad_ids) == 0, bad_ids)
 
 
-def has_no_duplicated_point(morph, tolerance=None):
-    """Check if the morphology has duplicated points."""
+def has_no_overlapping_point(morph, tolerance=None):
+    """Check if the morphology has overlapping points."""
     bad_ids = [
         (i[:2], np.atleast_2d(i[2]))
         for neurite in iter_neurites(morph)
-        for i in duplicated_points(neurite, tolerance=tolerance)
+        for i in overlapping_points(neurite, tolerance=tolerance)
     ]
     return CheckResult(len(bad_ids) == 0, bad_ids)

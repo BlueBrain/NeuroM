@@ -206,16 +206,16 @@ def is_back_tracking(neurite):
     return False
 
 
-def duplicated_points(neurite, tolerance=None):
-    """Return duplicated points of a neurite.
+def overlapping_points(neurite, tolerance=None):
+    """Return overlapping points of a neurite.
 
     Args:
         neurite(Neurite): neurite to operate on
-        tolerance(float): the tolerance used to find duplicated points
+        tolerance(float): the tolerance used to find overlapping points
 
     Returns:
         A generator of tuples containing the IDs of the two intersecting sections and the
-        duplicated point.
+        overlapping point.
     """
     section_pts = np.vstack(
         [
@@ -242,20 +242,20 @@ def duplicated_points(neurite, tolerance=None):
         )
 
 
-def has_duplicated_points(neurite, tolerance=None):
-    """Check if a neurite has at least one duplicated point.
+def has_overlapping_points(neurite, tolerance=None):
+    """Check if a neurite has at least one overlapping point.
 
-    See duplicated_points() for more details.
+    See overlapping_points() for more details.
 
     Args:
         neurite(Neurite): neurite to operate on
-        tolerance(float): the tolerance used to find duplicated points
+        tolerance(float): the tolerance used to find overlapping points
 
     Returns:
-        True if two points of the neurite are duplicated.
+        True if two points of the neurite are overlapping.
     """
-    for _i in duplicated_points(neurite, tolerance=tolerance):
-        # If one duplicated point is found then the neurite is duplicating
+    for _i in overlapping_points(neurite, tolerance=tolerance):
+        # If one overlapping point is found then the neurite is overlapping
         return True
     return False
 
@@ -304,8 +304,8 @@ def get_back_tracking_neurites(morph):
     return [n for n in morph.neurites if is_back_tracking(n)]
 
 
-def get_duplicated_point_neurites(morph, tolerance=0):
-    """Get neurites that have duplicated points.
+def get_overlapping_point_neurites(morph, tolerance=0):
+    """Get neurites that have overlapping points.
 
     Args:
         morph(Morphology): neurite to operate on
@@ -313,4 +313,4 @@ def get_duplicated_point_neurites(morph, tolerance=0):
     Returns:
         List of morphologies with backtracks
     """
-    return [n for n in morph.neurites if has_duplicated_points(n, tolerance=tolerance)]
+    return [n for n in morph.neurites if has_overlapping_points(n, tolerance=tolerance)]
