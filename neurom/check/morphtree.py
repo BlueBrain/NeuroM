@@ -47,7 +47,7 @@ def is_monotonic(neurite, tol):
     Returns:
         True if neurite monotonic
     """
-    for node in neurite.iter_sections():
+    for node in neurite.sections:
         # check that points in section satisfy monotonicity
         sec = node.points
         for point_id in range(len(sec) - 1):
@@ -171,7 +171,7 @@ def is_back_tracking(neurite):
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    section_itr = (sec for sec in neurite.iter_sections() if sec.points.shape[0] > 2)
+    section_itr = (sec for sec in neurite.sections if sec.points.shape[0] > 2)
     for sec in section_itr:
         # group each section's points intro triplets
         segment_pairs = list(filter(is_not_zero_seg, pair(sec.points)))

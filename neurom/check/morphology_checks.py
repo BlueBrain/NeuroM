@@ -240,7 +240,7 @@ def has_no_fat_ends(morph, multiple_of_mean=2.0, final_point_count=5):
         `final_point_count`
     """
     bad_ids = []
-    for leaf in iter_sections(morph.neurites, section_iterator=Section.ileaf):
+    for leaf in iter_sections(morph.neurites, iterator_type=Section.ileaf):
         mean_radius = np.mean(leaf.points[1:][-final_point_count:, COLS.R])
 
         if mean_radius * multiple_of_mean <= leaf.points[-1, COLS.R]:

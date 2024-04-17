@@ -100,7 +100,7 @@ def main():
     print(
         [
             (
-                sum(len(s.points) - 1 for s in nrte.iter_sections()),
+                sum(len(s.points) - 1 for s in nrte.sections),
                 radius_of_gyration(nrte),
                 nrte.type,
             )

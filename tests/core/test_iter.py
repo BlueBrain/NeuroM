@@ -101,22 +101,18 @@ def test_iter_population():
 
 
 def test_iter_sections_default():
-    ref = [s.id for n in POP.neurites for s in n.iter_sections()]
+    ref = [s.id for n in POP.neurites for s in n.sections]
     assert ref == [n.id for n in iter_sections(POP)]
 
 
 def test_iter_sections_default_pop():
-    ref = [s.id for n in POP.neurites for s in n.iter_sections()]
+    ref = [s.id for n in POP.neurites for s in n.sections]
     assert ref == [n.id for n in iter_sections(POP)]
 
 
 def test_iter_sections_filter():
     for ntyp in nm.NEURITE_TYPES:
-        a = [
-            s.id
-            for n in filter(lambda nn: nn.type == ntyp, POP.neurites)
-            for s in n.iter_sections()
-        ]
+        a = [s.id for n in filter(lambda nn: nn.type == ntyp, POP.neurites) for s in n.sections]
         b = [n.id for n in iter_sections(POP, neurite_filter=lambda n: n.type == ntyp)]
         assert a == b
 
@@ -136,7 +132,7 @@ def test_iter_sections_inrnorder():
 
 
 def test_iter_sections_ipreorder():
-    assert [s.id for n in POP.neurites for s in n.iter_sections(Section.ipreorder)] == [
+    assert [s.id for n in POP.neurites for s in iter_sections(n, Section.ipreorder)] == [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
         25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
@@ -150,7 +146,7 @@ def test_iter_sections_ipreorder():
 
 
 def test_iter_sections_ipostorder():
-    assert [s.id for n in POP.neurites for s in n.iter_sections(Section.ipostorder)] == [
+    assert [s.id for n in POP.neurites for s in iter_sections(n, Section.ipostorder)] == [
         1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, 22, 24, 26, 28,
         30, 32, 34, 36, 38, 40, 41, 39, 37, 35, 33, 31, 29, 27, 25, 23, 21, 43, 45, 47, 49, 51, 53,
         55, 57, 59, 61, 62, 60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 64, 66, 68, 70, 72, 74, 76, 78,
@@ -164,7 +160,7 @@ def test_iter_sections_ipostorder():
 
 
 def test_iter_sections_ibifurcation():
-    assert [s.id for n in POP.neurites for s in n.iter_sections(Section.ibifurcation_point)] == [
+    assert [s.id for n in POP.neurites for s in iter_sections(n, Section.ibifurcation_point)] == [
         0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 42, 44, 46, 48,
         50, 52, 54, 56, 58, 60, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 0, 2, 4, 6, 8, 10, 12, 14,
         16, 18, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 42, 44,
@@ -173,7 +169,7 @@ def test_iter_sections_ibifurcation():
 
 
 def test_iter_sections_iforking():
-    assert [s.id for n in POP.neurites for s in n.iter_sections(Section.iforking_point)] == [
+    assert [s.id for n in POP.neurites for s in iter_sections(n, Section.iforking_point)] == [
         0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 42, 44, 46, 48,
         50, 52, 54, 56, 58, 60, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 0, 2, 4, 6, 8, 10, 12, 14,
         16, 18, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 42, 44,
@@ -182,7 +178,7 @@ def test_iter_sections_iforking():
 
 
 def test_iter_sections_ileaf():
-    assert [s.id for n in POP.neurites for s in n.iter_sections(Section.ileaf)] == [
+    assert [s.id for n in POP.neurites for s in iter_sections(n, Section.ileaf)] == [
         1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 41, 43, 45,
         47, 49, 51, 53, 55, 57, 59, 61, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 83, 1, 3, 5, 7,
         9, 11, 13, 15, 17, 19, 20, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 20, 22, 24, 26, 28, 30, 32,
@@ -246,7 +242,7 @@ def test_iter_segments_morph():
         [],
     )
 
-    ref = list(iter_segments(SIMPLE, section_order=Section.ipostorder))
+    ref = list(iter_segments(SIMPLE, section_iterator=Section.ipostorder))
     assert_array_equal(
         ref,
         [
@@ -316,7 +312,7 @@ def test_iter_segments_section():
         ref,
         [[[1, 2, 3, 4], [5, 6, 7, 8]], [[5, 6, 7, 8], [8, 7, 6, 5]], [[8, 7, 6, 5], [4, 3, 2, 1]]],
     )
-    assert_array_equal(ref, list(sec.iter_segments()))
+    assert_array_equal(ref, sec.segments)
 
 
 def test_iter_segments_neurite():
@@ -340,4 +336,4 @@ def test_iter_segments_neurite():
         ref,
         [[[1, 2, 3, 4], [5, 6, 7, 8]], [[5, 6, 7, 8], [8, 7, 6, 5]], [[8, 7, 6, 5], [4, 3, 2, 1]]],
     )
-    assert_array_equal(list(neurite.iter_segments()), ref)
+    assert_array_equal(neurite.segments, ref)

@@ -133,7 +133,7 @@ def main():
     # Number of bifurcation points.
     print(
         "Number of bifurcation points:",
-        sum(1 for _ in nm.iter_sections(m, section_iterator=Section.ibifurcation_point)),
+        sum(1 for _ in nm.iter_sections(m, iterator_type=Section.ibifurcation_point)),
     )
 
     # Number of bifurcation points for apical dendrites
@@ -143,7 +143,7 @@ def main():
             1
             for _ in nm.iter_sections(
                 m,
-                section_iterator=Section.ibifurcation_point,
+                iterator_type=Section.ibifurcation_point,
                 neurite_filter=tree_type_checker(nm.APICAL_DENDRITE),
             )
         ),
