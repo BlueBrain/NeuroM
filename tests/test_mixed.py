@@ -400,7 +400,7 @@ def test_iter_sections(mixed_morph):
 def test_is_homogeneous_point(mixed_morph):
     heterogeneous_neurite = mixed_morph.neurites[1]
 
-    sections = list(heterogeneous_neurite.iter_sections())
+    sections = heterogeneous_neurite.sections
 
     # first section has one axon and one basal children
     assert not sections[0].is_homogeneous_point()

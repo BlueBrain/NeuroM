@@ -45,6 +45,27 @@ The following modules have been deprecated:
 - ``neurom/check/neuron_checks.py`` (use ``neurom/check/morphology_checks.py``)
 - ``neurom/viewer.py`` (use ``from neurom.view import plot_[morph|morph3d|dendrogram]``)
 
+New and deprecated methods in core classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``neurom.core.morphology.Neurite.iter_sections()`` has been deprecated. It is now possible to
+access lower scale elements of any core class using properties:
+
+- ``neurom.core.morphology.Section.segments``
+- ``neurom.core.morphology.Section.points``
+- ``neurom.core.morphology.Neurite.sections``
+- ``neurom.core.morphology.Neurite.segments``
+- ``neurom.core.morphology.Neurite.points``
+- ``neurom.core.morphology.Morphology.neurites``
+- ``neurom.core.morphology.Morphology.sections``
+- ``neurom.core.morphology.Morphology.segments``
+- ``neurom.core.morphology.Morphology.points``
+
+Note that these properties return all elements in a list. It is possible to use
+``neurom.core.morphology.iter_neurites()``, ``neurom.core.morphology.iter_sections()``,
+``neurom.core.morphology.iter_segments()`` and ``neurom.core.morphology.iter_points()`` to get a
+generator or to filter the elements.
+
 Breaking changes in Morphology class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
