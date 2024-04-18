@@ -4,6 +4,7 @@ Changelog
 Version 4.0.0
 -------------
 
+- Replace ``iter_*`` methods by properties in core objects and improve ``iter_segments``. (#1054)
 - NeuriteType extended to allow mixed type declarations as tuple of ints. (#1071)
 - All features return built-in types (#1064)
 - Morphology class also allows mutable morphio objects to be passed explicitly. (#1049)
