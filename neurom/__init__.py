@@ -55,6 +55,10 @@ Examples:
     >>> mapping = lambda n : len(n.points)
     >>> n_points = [n for n in nm.iter_neurites(pop, mapping, filter)]
 """
+from importlib.metadata import version
+
+__version__ = version(__package__)
+
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import graft_morphology, iter_neurites, iter_sections, iter_segments
 from neurom.core.types import NEURITES as NEURITE_TYPES
