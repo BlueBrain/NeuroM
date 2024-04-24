@@ -51,15 +51,20 @@ class Soma:
             morphio_soma (morphio.Soma): instance of soma of MorphIO class
         """
         self._morphio_soma = morphio_soma
-        # this radius is used only for `volume` method, please avoid using it for anything else.
-        self.radius = 0
+
+    def to_morphio(self):
+        """Return morphio instance."""
+        return self._morphio_soma
 
     @property
     def center(self):
         """Obtain the center from the first stored point."""
-        if len(self._morphio_soma.points) > 0:
-            return self._morphio_soma.points[0]
-        return None
+        return soma_center(self)
+
+    @property
+    def radius(self):
+        # this radius is used only for `volume` method, please avoid using it for anything else.
+        return soma_radius(self)
 
     def iter(self):
         """Iterator to soma contents."""
@@ -73,10 +78,14 @@ class Soma:
         )
 
     @property
+    def area(self):
+        """Calculate soma area."""
+        return soma_area(self)
+
+    @property
     def volume(self):
-        """Gets soma volume assuming it is a sphere."""
-        warnings.warn('Approximating soma volume by a sphere. {}'.format(self))
-        return 4.0 / 3 * math.pi * self.radius**3
+        """Calculate soma volume."""
+        return soma_volume(self)
 
     def overlaps(self, points, exclude_boundary=False):
         """Check that the given points are located inside the soma."""
@@ -93,11 +102,6 @@ class SomaSinglePoint(Soma):
 
     Represented by a single point.
     """
-
-    def __init__(self, morphio_soma):
-        """Initialize a SomaSinglePoint object."""
-        super().__init__(morphio_soma)
-        self.radius = self.points[0][COLS.R]
 
     def __str__(self):
         """Return a string representation."""
@@ -131,26 +135,6 @@ class SomaCylinders(Soma):
     in a line, then the overlap between cylinders isn't taken into account for
     the area calculation
     """
-
-    def __init__(self, morphio_soma):
-        """Initialize a SomaCyliners object."""
-        super().__init__(morphio_soma)
-        self.area = sum(
-            morphmath.segment_area((p0, p1)) for p0, p1 in zip(self.points, self.points[1:])
-        )
-        self.radius = math.sqrt(self.area / (4.0 * math.pi))
-
-    @property
-    def center(self):
-        """Obtain the center from the first stored point."""
-        return self.points[0][COLS.XYZ]
-
-    @property
-    def volume(self):
-        """Return the volume of soma."""
-        return sum(
-            morphmath.segment_volume((p0, p1)) for p0, p1 in zip(self.points, self.points[1:])
-        )
 
     def __str__(self):
         """Return a string representation."""
@@ -203,31 +187,21 @@ class SomaNeuromorphoThreePointCylinders(SomaCylinders):
         and +rs, respectively (Figure 2). The surface area of this soma cylinder equals
         the surface area of a sphere of radius rs.
     """
-
     def __init__(self, morphio_soma):
-        """Initialize a SomaNeuromorphoThreePointCylinders object."""
         super().__init__(morphio_soma)
-
         # X    Y     Z   R    P
         # xs ys      zs rs   -1
         # xs (ys-rs) zs rs    1
         # xs (ys+rs) zs rs    1
 
-        r = self.points[0, COLS.R]
-        # make sure the above invariant holds
-        assert np.isclose(r, self.points[1, COLS.R]) and np.isclose(
-            r, self.points[2, COLS.R]
-        ), 'All radii must be the same'
-        if r < 1e-5:
-            warnings.warn('Zero radius for {}'.format(self))
-        h = morphmath.point_dist(self.points[1, COLS.XYZ], self.points[2, COLS.XYZ])
-        self.area = 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
-        self.radius = math.sqrt(self.area / (4.0 * math.pi))
+        r1, r2, r3 = 0.5 * morphio_soma.diameters
 
-    @property
-    def volume(self):
-        """Return the volume of the soma."""
-        return 2 * math.pi * self.radius**3
+        # make sure the above invariant holds
+        assert np.isclose(r1, r2) and np.isclose(r1, r3), 'All radii must be the same'
+
+        if r1 < 1e-5:
+            warnings.warn('Zero radius for {}'.format(self))
+
 
     def __str__(self):
         """Return a string representation."""
@@ -248,17 +222,6 @@ class SomaSimpleContour(Soma):
     Note: This doesn't currently check to see if the contour is in a plane. Also
     the radii of the points are not taken into account.
     """
-
-    def __init__(self, morphio_soma):
-        """Initialize a SomaSimpleContour object."""
-        super().__init__(morphio_soma)
-        self.radius = morphmath.average_points_dist(self.center, self.points[:, COLS.XYZ])
-
-    @property
-    def center(self):
-        """Obtain the center from the average of all points."""
-        return np.mean(self.points[:, COLS.XYZ], axis=0)
-
     def __str__(self):
         """Return a string representation."""
         return 'SomaSimpleContour(%s) <center: %s, radius: %s>' % (
@@ -318,6 +281,167 @@ class SomaSimpleContour(Soma):
             interior_side = cross_z >= 0
 
         return interior_side
+
+
+def soma_center(soma):
+    """Calculate soma center."""
+
+    if hasattr(soma, "to_morphio"):
+        morphio_soma = soma.to_morphio()
+    else:
+        morphio_soma = soma
+
+    def _first_point(morphio_soma):
+        """Return the first point."""
+        return morphio_soma.points[0]
+
+    def _first_point_or_none(morphio_soma):
+        points = morphio_soma.points
+        return points[0] if len(points) > 0 else None
+
+    def _centroid(soma):
+        """Return the centroid of the soma points."""
+        return np.mean(soma.points, axis=0)
+
+    soma_algo = {
+        SomaType.SOMA_UNDEFINED: _first_point_or_none,
+        SomaType.SOMA_SINGLE_POINT: _first_point,
+        SomaType.SOMA_CYLINDERS: _first_point,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: _first_point,
+        SomaType.SOMA_SIMPLE_CONTOUR: _centroid,
+    }[morphio_soma.type]
+
+    return soma_algo(morphio_soma)
+
+
+def soma_radius(soma):
+    """Calculate soma radius."""
+
+    if hasattr(soma, "to_morphio"):
+        morphio_soma = soma.to_morphio()
+    else:
+        morphio_soma = soma
+
+    def _soma_single_point_radius(morphio_soma):
+        """Return first radius."""
+        return 0.5 * morphio_soma.diameters[0]
+
+    def _soma_cylinders_radius(morphio_soma):
+        """Calculate radius calculated from the cylinder area."""
+        points = np.concatenate(
+            (
+                morphio_soma.points,
+                0.5 * morphio_soma.diameters[:, np.newaxis]
+            ),
+            axis=1,
+        )
+        area = sum(
+            morphmath.segment_area((p0, p1))
+            for p0, p1 in zip(points, points[1:])
+        )
+        return  math.sqrt(area / (4.0 * math.pi))
+
+    def _soma_three_point_cylinders_radius(morphio_soma):
+        """Calculate three-point-cylinder radius."""
+        return math.sqrt(soma_area(morphio_soma) / (4.0 * math.pi))
+
+    def _soma_simple_contour_radius(morphio_soma):
+        """Calculate average contour distance from center of soma."""
+        return morphmath.average_points_dist(soma_center(morphio_soma), morphio_soma.points)
+
+    soma_algo = {
+        SomaType.SOMA_UNDEFINED: lambda _: 0,
+        SomaType.SOMA_SINGLE_POINT: _soma_single_point_radius,
+        SomaType.SOMA_CYLINDERS: _soma_cylinders_radius,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: _soma_three_point_cylinders_radius,
+        SomaType.SOMA_SIMPLE_CONTOUR: _soma_simple_contour_radius,
+    }[morphio_soma.type]
+
+    return soma_algo(morphio_soma)
+
+def soma_area(soma):
+
+    if hasattr(soma, "to_morphio"):
+        morphio_soma = soma.to_morphio()
+    else:
+        morphio_soma = soma
+
+    def _soma_single_point_area(morphio_soma):
+        return 4. * math.pi * soma_radius(morphio_soma)**2
+
+    def _soma_undefined_area(morphio_soma):
+        warnings.warn('Approximating soma area by a sphere. {}'.format(soma))
+        return _soma_single_point_radius(morphio_soma)
+
+    def _soma_cylinders_area(morphio_soma):
+        points = np.concatenate(
+            (
+                morphio_soma.points,
+                0.5 * morphio_soma.diameters[:, np.newaxis],
+            ),
+            axis=1,
+        )
+        return sum(
+            morphmath.segment_area((p0, p1)) for p0, p1 in zip(points, points[1:])
+        )
+
+    def _soma_three_point_cylinders_area(morphio_soma):
+        r = 0.5 * morphio_soma.diameters[0]
+        h = morphmath.point_dist(morphio_soma.points[1], morphio_soma.points[2])
+        return 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
+
+    soma_algo = {
+        SomaType.SOMA_UNDEFINED: _soma_undefined_area,
+        SomaType.SOMA_SINGLE_POINT: _soma_single_point_area,
+        SomaType.SOMA_CYLINDERS: _soma_cylinders_area,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: _soma_three_point_cylinders_area,
+        SomaType.SOMA_SIMPLE_CONTOUR: _soma_single_point_area,
+    }[morphio_soma.type]
+
+    return soma_algo(morphio_soma)
+
+
+def soma_volume(soma):
+    """Calculate soma volume."""
+
+    if hasattr(soma, "to_morphio"):
+        morphio_soma = soma.to_morphio()
+    else:
+        morphio_soma = soma
+
+    def _soma_single_point_volume(morphio_soma):
+        return 4.0 / 3 * math.pi * soma_radius(morphio_soma)**3
+
+    def _soma_undefined_volume(morphio_soma):
+        warnings.warn('Approximating soma volume by a sphere. {}'.format(soma))
+        return _soma_single_point_volume(morphio_soma)
+
+    def _soma_cylinders_volume(soma):
+        points = np.concatenate(
+            (
+                morphio_soma.points,
+                0.5 * morphio_soma.diameters[:, np.newaxis],
+            ),
+            axis=1,
+        )
+        return sum(
+            morphmath.segment_volume((p0, p1)) for p0, p1 in zip(points, points[1:])
+        )
+
+    def _soma_three_point_cylinders_volume(morphio_soma):
+        return 2. * math.pi * soma_radius(morphio_soma)**3
+
+
+    soma_algo = {
+        SomaType.SOMA_UNDEFINED: _soma_undefined_volume,
+        SomaType.SOMA_SINGLE_POINT: _soma_single_point_volume,
+        SomaType.SOMA_CYLINDERS: _soma_cylinders_volume,
+        SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: _soma_three_point_cylinders_volume,
+        SomaType.SOMA_SIMPLE_CONTOUR: _soma_undefined_volume,
+    }[morphio_soma.type]
+
+    return soma_algo(morphio_soma)
+
 
 
 def make_soma(morphio_soma):
