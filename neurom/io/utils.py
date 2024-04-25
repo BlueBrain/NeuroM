@@ -120,7 +120,7 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_morphology(morph, reader=None, mutable=None, process_subtrees=False):
+def load_morphology(morph, reader=None, *, mutable=None, process_subtrees=False):
     """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
@@ -137,6 +137,7 @@ def load_morphology(morph, reader=None, mutable=None, process_subtrees=False):
                              morphology is loaded, then it will be immutable by default.
         reader (str): Optional, must be provided if morphology is a stream to
                       specify the file format (asc, swc, h5)
+        process_subtrees (bool): enable mixed tree processing if set to True
 
     Returns:
         A Morphology object
@@ -181,7 +182,7 @@ def load_morphology(morph, reader=None, mutable=None, process_subtrees=False):
 
 
 def load_morphologies(
-    morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False
+    morphs, name=None, ignored_exceptions=(), cache=False, mutable=None, process_subtrees=False
 ):
     """Create a population object.
 
@@ -195,6 +196,9 @@ def load_morphologies(
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
             loading morphologies
         cache (bool): whether to cache the loaded morphologies in memory
+        mutable (bool): Can force mutability/immutability by setting it to True or False, while
+            None uses the default behavior.
+        process_subtrees (bool): enable mixed tree processing if set to True
 
     Returns:
         Population: population object
@@ -205,4 +209,4 @@ def load_morphologies(
     else:
         files = morphs
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions, cache, process_subtrees=process_subtrees)
+    return Population(files, name, ignored_exceptions, cache, mutable=mutable, process_subtrees=process_subtrees)

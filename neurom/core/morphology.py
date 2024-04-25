@@ -538,7 +538,7 @@ class Neurite:
 class Morphology:
     """Class representing a simple morphology."""
 
-    def __init__(self, morphio_morph, name=None, process_subtrees=False):
+    def __init__(self, morphio_morph, name=None, *, process_subtrees=False):
         """Morphology constructor.
 
         Args:
