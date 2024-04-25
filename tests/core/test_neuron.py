@@ -65,9 +65,6 @@ def test_load_morphology_from_other_morphologies():
     ]
 
     assert_array_equal(nm.load_morphology(nm.load_morphology(filename)).points, expected_points)
-
-    assert_array_equal(nm.load_morphology(Morphology(filename)).points, expected_points)
-
     assert_array_equal(nm.load_morphology(morphio.Morphology(filename)).points, expected_points)
 
 
@@ -140,19 +137,3 @@ def test_str():
     n = nm.load_morphology(SWC_PATH / 'simple.swc')
     assert 'Morphology' in str(n)
     assert 'Section' in str(n.neurites[0].root_node)
-
-
-def test_mut_nonmut_constructor():
-    path = SWC_PATH / 'simple.swc'
-
-    m = Morphology(path)
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(str(path))
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(morphio.Morphology(path))
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(morphio.mut.Morphology(path))
-    assert isinstance(m.to_morphio(), morphio.mut.Morphology)

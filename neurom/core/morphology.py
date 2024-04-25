@@ -538,18 +538,15 @@ class Neurite:
 class Morphology:
     """Class representing a simple morphology."""
 
-    def __init__(self, filename, name=None, process_subtrees=False):
+    def __init__(self, morphio_morph, name=None, process_subtrees=False):
         """Morphology constructor.
 
         Args:
-            filename (str|Path): a filename or morphio.{mut}.Morphology object
+            morphio_morph (morphio.Morphology|morphio.mut.Morphology): a morphio object
             name (str): an optional morphology name
             process_subtrees (bool): enable mixed tree processing if set to True
         """
-        self._morphio_morph = morphio.mut.Morphology(filename)
-
-        if isinstance(filename, (str, Path, morphio.Morphology)):
-            self._morphio_morph = self._morphio_morph.as_immutable()
+        self._morphio_morph = morphio_morph
 
         self.name = name if name else 'Morphology'
         self.soma = make_soma(self._morphio_morph.soma)

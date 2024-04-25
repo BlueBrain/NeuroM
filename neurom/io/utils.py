@@ -120,7 +120,7 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_morphology(morph, reader=None, process_subtrees=False):
+def load_morphology(morph, reader=None, mutable=None, process_subtrees=False):
     """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
@@ -157,15 +157,24 @@ def load_morphology(morph, reader=None, process_subtrees=False):
                                                    )'''), reader='asc')
     """
     if isinstance(morph, Morphology):
-        return Morphology(morph.to_morphio(), process_subtrees=process_subtrees)
+        name = morph.name
+        morphio_morph = morph.to_morphio()
+    elif isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
+        name = "Morphology"
+        morphio_morph = morph
+    else:
+        filepath = _get_file(morph, reader) if reader else morph
+        name = os.path.basename(filepath)
+        morphio_morph = morphio.Morphology(filepath)
 
-    if isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
-        return Morphology(morph, process_subtrees=process_subtrees)
+    # None does not modify existing mutability
+    if mutable is not None:
+        if mutable and isinstance(morphio_morph, morphio.Morphology):
+            morphio_morph = morphio_morph.as_mutable()
+        elif not mutable and isinstance(morphio_morph, morphio.mut.Morphology):
+            morphio_morph = morphio_morph.as_immutable()
 
-    if reader:
-        return Morphology(_get_file(morph, reader), process_subtrees=process_subtrees)
-
-    return Morphology(morph, Path(morph).name, process_subtrees=process_subtrees)
+    return Morphology(morphio_morph, name=name, process_subtrees=process_subtrees)
 
 
 def load_morphologies(
