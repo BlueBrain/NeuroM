@@ -34,6 +34,7 @@ from io import StringIO
 from pathlib import Path
 
 import numpy as np
+import morphio
 from morphio import (
     MissingParentError,
     RawDataError,
@@ -181,6 +182,64 @@ def test_load_morphology():
                       9 2 -5 -4 0 0.  7
                      """
     utils.load_morphology(StringIO(morphology_str), reader='swc')
+
+
+def test_load_morphology__conversions():
+
+    morphology_str = u""" 1 1  0  0 0 1. -1
+                      2 3  0  0 0 1.  1
+                      3 3  0  5 0 1.  2
+                      4 3 -5  5 0 0.  3
+                      5 3  6  5 0 0.  3
+                      6 2  0  0 0 1.  1
+                      7 2  0 -4 0 1.  6
+                      8 2  6 -4 0 0.  7
+                      9 2 -5 -4 0 0.  7
+                     """
+    filepath = FILENAMES[0]
+    morphio_mut = morphio.mut.Morphology(filepath)
+    morphio_immut = morphio_mut.as_immutable()
+
+    # default readonly
+    morph = utils.load_morphology(filepath)
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    # should be same with mutable=False
+    morph = utils.load_morphology(filepath, mutable=False)
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(filepath, mutable=True)
+    assert isinstance(morph.to_morphio(), morphio.mut.Morphology)
+
+    # default mutable=None maintains mutability
+    morph = utils.load_morphology(morphio_mut)
+    assert isinstance(morph.to_morphio(), morphio.mut.Morphology)
+
+    morph = utils.load_morphology(morphio_mut, mutable=False)
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(morphio_mut, mutable=True)
+    assert isinstance(morph.to_morphio(), morphio.mut.Morphology)
+
+    # default mutable=None maintains mutability
+    morph = utils.load_morphology(morphio_immut)
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(morphio_immut, mutable=False)
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(morphio_immut, mutable=True)
+    assert isinstance(morph.to_morphio(), morphio.mut.Morphology)
+
+    # default mutable=None is readaonly
+    morph = utils.load_morphology(morphology_str, reader="swc")
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(morphology_str, mutable=False, reader="swc")
+    assert isinstance(morph.to_morphio(), morphio.Morphology)
+
+    morph = utils.load_morphology(morphology_str, mutable=True, reader="swc")
+    assert isinstance(morph.to_morphio(), morphio.mut.Morphology)
 
 
 def test_morphology_name():

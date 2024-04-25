@@ -4,6 +4,7 @@ Changelog
 Version 4.0.0
 -------------
 
+- Morphology class accepts only morphio objects, not files anymore. (#1120)
 - Replace ``iter_*`` methods by properties in core objects and improve ``iter_segments``. (#1054)
 - NeuriteType extended to allow mixed type declarations as tuple of ints. (#1071)
 - All features return built-in types (#1064)

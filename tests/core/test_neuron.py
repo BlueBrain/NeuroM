@@ -29,11 +29,13 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
+import pytest
 import neurom as nm
 import numpy as np
 import morphio
 from neurom.core.morphology import Morphology, graft_morphology, iter_segments
 from numpy.testing import assert_array_equal
+from neurom.exceptions import NeuroMError
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 
@@ -65,9 +67,6 @@ def test_load_morphology_from_other_morphologies():
     ]
 
     assert_array_equal(nm.load_morphology(nm.load_morphology(filename)).points, expected_points)
-
-    assert_array_equal(nm.load_morphology(Morphology(filename)).points, expected_points)
-
     assert_array_equal(nm.load_morphology(morphio.Morphology(filename)).points, expected_points)
 
 
@@ -142,17 +141,6 @@ def test_str():
     assert 'Section' in str(n.neurites[0].root_node)
 
 
-def test_mut_nonmut_constructor():
-    path = SWC_PATH / 'simple.swc'
-
-    m = Morphology(path)
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(str(path))
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(morphio.Morphology(path))
-    assert isinstance(m.to_morphio(), morphio.Morphology)
-
-    m = Morphology(morphio.mut.Morphology(path))
-    assert isinstance(m.to_morphio(), morphio.mut.Morphology)
+def test_morphology_raises_wrong_argument():
+    with pytest.raises(NeuroMError, match="Expected morphio Morphology object but got: my-path"):
+        Morphology("my-path")
