@@ -53,7 +53,7 @@ class Population:
     """
 
     def __init__(
-        self, files, name='Population', ignored_exceptions=(), cache=False, mutable=None, process_subtrees=False
+        self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False
     ):
         """Construct a morphology population.
 
@@ -67,8 +67,6 @@ class Population:
                 will be loaded everytime it is accessed within the population. Which is good when
                 population is big. If true then all morphs will be loaded upon the construction
                 and kept in memory.
-            mutable (bool): Can force mutability/immutability by setting it to True or False, while
-                None uses the default behavior.
             process_subtrees (bool): enable mixed tree processing if set to True
 
         Notes:
@@ -79,7 +77,6 @@ class Population:
 
         self._files = _resolve_if_morphology_paths(files)
 
-        self._mutable = mutable
         self._process_subtrees = process_subtrees
 
         if cache:
@@ -88,16 +85,6 @@ class Population:
     def _reset_cache(self):
         """Reset the internal cache."""
         self._files = [self._load_file(f) for f in self._files if f is not None]
-
-    @property
-    def mutable(self):
-        """The mutability status of the morphologies."""
-        return self._mutable
-
-    @mutable.setter
-    def mutable(self, value):
-        self._mutable = value
-        self._reset_cache()
 
     @property
     def process_subtrees(self):
@@ -130,7 +117,7 @@ class Population:
             new_morph.process_subtrees = self.process_subtrees
             return new_morph
         try:
-            return neurom.load_morphology(f, mutable=self.mutable, process_subtrees=self.process_subtrees)
+            return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:
             if isinstance(e, self._ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s', e, f.name)

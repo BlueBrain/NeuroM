@@ -182,7 +182,7 @@ def load_morphology(morph, reader=None, *, mutable=None, process_subtrees=False)
 
 
 def load_morphologies(
-    morphs, name=None, ignored_exceptions=(), cache=False, mutable=None, process_subtrees=False
+    morphs, name=None, ignored_exceptions=(), cache=False, process_subtrees=False
 ):
     """Create a population object.
 
@@ -196,8 +196,6 @@ def load_morphologies(
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
             loading morphologies
         cache (bool): whether to cache the loaded morphologies in memory
-        mutable (bool): Can force mutability/immutability by setting it to True or False, while
-            None uses the default behavior.
         process_subtrees (bool): enable mixed tree processing if set to True
 
     Returns:
@@ -209,4 +207,4 @@ def load_morphologies(
     else:
         files = morphs
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions, cache, mutable=mutable, process_subtrees=process_subtrees)
+    return Population(files, name, ignored_exceptions, cache, process_subtrees=process_subtrees)
