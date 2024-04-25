@@ -50,6 +50,7 @@ from functools import partial
 
 import numpy as np
 
+import neurom.core.soma
 from neurom import morphmath
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import (
@@ -121,7 +122,7 @@ def _get_points(morph, neurite_type):
 @feature(shape=())
 def soma_volume(morph):
     """Get the volume of a morphology's soma."""
-    return morph.soma.volume
+    return neurom.core.soma.soma_volume(morph.soma)
 
 
 @feature(shape=())
@@ -131,13 +132,13 @@ def soma_surface_area(morph):
     Note:
         The surface area is calculated by assuming the soma is spherical.
     """
-    return 4.0 * math.pi * morph.soma.radius**2
+    return neurom.core.soma.soma_area(morph.soma)
 
 
 @feature(shape=())
 def soma_radius(morph):
     """Get the radius of a morphology's soma."""
-    return morph.soma.radius
+    return neurom.core.soma.soma_radius(morph.soma)
 
 
 @feature(shape=())
