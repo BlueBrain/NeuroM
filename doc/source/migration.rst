@@ -72,15 +72,19 @@ Breaking changes in Morphology class
 The Morphology class has changed in two major ways:
 
 * Does not derive from morphio.mut.Morphology
-* By default an immutable morphio Morphology is instantiated
+* It accepts a morphio object as an argument
 
 The morphio Morphology is stored as a protected attribute in neurom Morphology object turning
 the latter into a wrapper around morphio Morphology.
 
+.. warning::
+   Morphology class will raise a NeuroMerror if a filepath is passed as an argument. Please
+   use `neurom.load_morphology()` to load from file or a stream.
+
 However, it is still accessible via the ``to_morphio()`` method:
 
 .. testcode:: [v4-migration]
-   
+
     from neurom import load_morphology
     neurom_morphology = load_morphology('tests/data/swc/Neuron.swc')
     ref_morph = neurom_morphology.to_morphio()
@@ -101,7 +105,7 @@ which means that the default morphio Morphology is immutable. It is however poss
    neurom_morphology = load_morphology(morphio_morphology)
    ref_morph = neurom_morphology.to_morphio()
 
-   print(type(ref_morph).__module__, type(ref_morph).__name__)   
+   print(type(ref_morph).__module__, type(ref_morph).__name__)
 
 .. testoutput:: [v4-migration]
 
