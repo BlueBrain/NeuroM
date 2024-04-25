@@ -29,11 +29,13 @@
 from copy import copy, deepcopy
 from pathlib import Path
 
+import pytest
 import neurom as nm
 import numpy as np
 import morphio
 from neurom.core.morphology import Morphology, graft_morphology, iter_segments
 from numpy.testing import assert_array_equal
+from neurom.exceptions import NeuroMError
 
 SWC_PATH = Path(__file__).parent.parent / 'data/swc/'
 
@@ -137,3 +139,8 @@ def test_str():
     n = nm.load_morphology(SWC_PATH / 'simple.swc')
     assert 'Morphology' in str(n)
     assert 'Section' in str(n.neurites[0].root_node)
+
+
+def test_morphology_raises_wrong_argument():
+    with pytest.raises(NeuroMError, match="Expected morphio Morphology object but got: my-path"):
+        Morphology("my-path")

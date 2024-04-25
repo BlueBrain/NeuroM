@@ -42,6 +42,7 @@ from neurom.core.population import Population
 from neurom.core.soma import make_soma
 from neurom.core.types import NeuriteIter, NeuriteType
 from neurom.utils import flatten
+from neurom.exceptions import NeuroMError
 
 
 class Section:
@@ -546,6 +547,12 @@ class Morphology:
             name (str): an optional morphology name
             process_subtrees (bool): enable mixed tree processing if set to True
         """
+        if not isinstance(morphio_morph, (morphio.Morphology, morphio.mut.Morphology)):
+            raise NeuroMError(
+                f"Expected morphio Morphology object but got: {morphio_morph}.\n"
+                f"Use neurom.load_morphology() to load from file."
+            )
+
         self._morphio_morph = morphio_morph
 
         self.name = name if name else 'Morphology'
