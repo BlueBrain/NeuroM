@@ -30,7 +30,6 @@
 
 import warnings
 from collections import deque
-from pathlib import Path
 
 import morphio
 import numpy as np
@@ -41,8 +40,8 @@ from neurom.core.dataformat import COLS
 from neurom.core.population import Population
 from neurom.core.soma import make_soma
 from neurom.core.types import NeuriteIter, NeuriteType
-from neurom.utils import flatten
 from neurom.exceptions import NeuroMError
+from neurom.utils import flatten
 
 
 class Section:
