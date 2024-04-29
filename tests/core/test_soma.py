@@ -32,6 +32,7 @@ from io import StringIO
 from unittest.mock import Mock
 
 import numpy as np
+import morphio
 from morphio import MorphioError, SomaError, set_raise_warnings
 from neurom import load_morphology
 from neurom.core import soma
@@ -67,6 +68,7 @@ def test_Soma_SinglePoint():
     assert isinstance(sm, soma.SomaSinglePoint)
     assert list(sm.center) == [11, 22, 33]
     assert sm.radius == 44
+    assert_almost_equal(sm.area, 24328.49350939936, decimal=5)
 
 
 def test_Soma_contour():
@@ -258,6 +260,7 @@ def test_Soma_Cylinders():
     assert 'SomaNeuromorphoThreePointCylinders' in str(s)
     assert list(s.center) == [0.0, 0.0, 0.0]
     assert_almost_equal(s.area, 794.76706126368811, decimal=5)
+    assert_almost_equal(s.volume, 3160.274957542371, decimal=5)
 
     s = load_morphology(
         StringIO(
@@ -355,3 +358,42 @@ def test_soma_overlaps():
     np.testing.assert_array_equal(
         sm.overlaps(points, exclude_boundary=True), [True, False, False, True, True, False]
     )
+
+
+def test_morphio_soma():
+    sm = load_morphology(
+        StringIO(
+            u"""
+                ((CellBody)
+                    (1 0 0 1)
+                    (1 1 0 1)
+                    (-1 1 0 1)
+                    (-1 0 0 1)) """
+        ),
+        reader='asc',
+    ).soma
+
+    morphio_soma = soma._morphio_soma(sm)
+    assert isinstance(morphio_soma, morphio.Soma)
+
+    morphio_soma = soma._morphio_soma(sm.to_morphio())
+    assert isinstance(morphio_soma, morphio.Soma)
+
+    with pytest.raises(TypeError, match="Unknown soma type"):
+        soma._morphio_soma(10)
+
+
+def test_soma_undefined_area():
+    sm = load_morphology(
+        StringIO(
+            u"""
+                ((CellBody)
+                    (1 0 0 1)
+                    (1 1 0 1)
+                    (-1 1 0 1)
+                    (-1 0 0 1)) """
+        ),
+        reader='asc',
+    ).soma
+    res = soma._soma_undefined_area(sm)
+    assert_almost_equal(res, 15.70796372920407, decimal=5)

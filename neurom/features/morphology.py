@@ -43,7 +43,6 @@ The features mechanism does not allow you to apply these features to neurites.
 For more details see :ref:`features`.
 """
 
-import math
 import warnings
 from collections.abc import Iterable
 from functools import partial
