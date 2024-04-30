@@ -121,7 +121,7 @@ def _get_points(morph, neurite_type):
 @feature(shape=())
 def soma_volume(morph):
     """Get the volume of a morphology's soma."""
-    return neurom.core.soma.soma_volume(morph.soma)
+    return neurom.core.soma.get_volume(morph.soma)
 
 
 @feature(shape=())
@@ -131,13 +131,13 @@ def soma_surface_area(morph):
     Note:
         The surface area is calculated by assuming the soma is spherical.
     """
-    return neurom.core.soma.soma_area(morph.soma)
+    return neurom.core.soma.get_area(morph.soma)
 
 
 @feature(shape=())
 def soma_radius(morph):
     """Get the radius of a morphology's soma."""
-    return neurom.core.soma.soma_radius(morph.soma)
+    return neurom.core.soma.get_radius(morph.soma)
 
 
 @feature(shape=())

@@ -60,13 +60,13 @@ class Soma:
     @property
     def center(self):
         """Obtain the center from the first stored point."""
-        return soma_center(self)
+        return get_center(self)
 
     @property
     def radius(self):
         """Return radius of soma."""
         # this radius is used only for `volume` method, please avoid using it for anything else.
-        return soma_radius(self)
+        return get_radius(self)
 
     def iter(self):
         """Iterator to soma contents."""
@@ -82,16 +82,16 @@ class Soma:
     @property
     def area(self):
         """Calculate soma area."""
-        return soma_area(self)
+        return get_area(self)
 
     @property
     def volume(self):
         """Calculate soma volume."""
-        return soma_volume(self)
+        return get_volume(self)
 
     def overlaps(self, points, exclude_boundary=False):
         """Check that the given points are located inside the soma."""
-        return soma_overlaps(self, points, exclude_boundary=exclude_boundary)
+        return check_overlaps(self, points, exclude_boundary=exclude_boundary)
 
 
 class SomaSinglePoint(Soma):
@@ -222,7 +222,7 @@ def _dispatch_soma_functions(soma, dispatch_mapping, **kwargs):
     return soma_algo(morphio_soma, **kwargs)
 
 
-def soma_center(soma):
+def get_center(soma):
     """Calculate soma center."""
     dispatch_mapping = {
         SomaType.SOMA_UNDEFINED: _first_point_or_none,
@@ -250,7 +250,7 @@ def _centroid(morphio_soma):
     return np.mean(morphio_soma.points, axis=0)
 
 
-def soma_radius(soma):
+def get_radius(soma):
     """Calculate soma radius."""
     dispatch_mapping = {
         SomaType.SOMA_UNDEFINED: lambda _: 0,
@@ -279,15 +279,15 @@ def _soma_cylinders_radius(morphio_soma):
 
 def _soma_three_point_cylinders_radius(morphio_soma):
     """Calculate three-point-cylinder radius."""
-    return math.sqrt(soma_area(morphio_soma) / (4.0 * math.pi))
+    return math.sqrt(get_area(morphio_soma) / (4.0 * math.pi))
 
 
 def _soma_simple_contour_radius(morphio_soma):
     """Calculate average contour distance from center of soma."""
-    return morphmath.average_points_dist(soma_center(morphio_soma), morphio_soma.points)
+    return morphmath.average_points_dist(get_center(morphio_soma), morphio_soma.points)
 
 
-def soma_area(soma):
+def get_area(soma):
     """Calculate soma area."""
     dispatch_mapping = {
         SomaType.SOMA_UNDEFINED: _soma_undefined_area,
@@ -301,7 +301,7 @@ def soma_area(soma):
 
 def _soma_single_point_area(morphio_soma):
     """Calculate soma area as a sphere."""
-    return 4.0 * math.pi * soma_radius(morphio_soma) ** 2
+    return 4.0 * math.pi * get_radius(morphio_soma) ** 2
 
 
 def _soma_undefined_area(morphio_soma):
@@ -329,7 +329,7 @@ def _soma_three_point_cylinders_area(morphio_soma):
     return 2.0 * math.pi * r * h  # ignores the 'end-caps' of the cylinder
 
 
-def soma_volume(soma):
+def get_volume(soma):
     """Calculate soma volume."""
     dispatch_mapping = {
         SomaType.SOMA_UNDEFINED: _soma_undefined_volume,
@@ -343,7 +343,7 @@ def soma_volume(soma):
 
 def _soma_single_point_volume(morphio_soma):
     """Calculate soma volume as a sphere."""
-    return 4.0 / 3 * math.pi * soma_radius(morphio_soma) ** 3
+    return 4.0 / 3 * math.pi * get_radius(morphio_soma) ** 3
 
 
 def _soma_undefined_volume(morphio_soma):
@@ -366,10 +366,10 @@ def _soma_cylinders_volume(morphio_soma):
 
 def _soma_three_point_cylinders_volume(morphio_soma):
     """Calculate soma volume as a cylinder of three points and same radius."""
-    return 2.0 * math.pi * soma_radius(morphio_soma) ** 3
+    return 2.0 * math.pi * get_radius(morphio_soma) ** 3
 
 
-def soma_overlaps(soma, points, exclude_boundary=False):
+def check_overlaps(soma, points, exclude_boundary=False):
     """Check if soma overlaps with points."""
     dispatch_mapping = {
         SomaType.SOMA_UNDEFINED: _soma_undefined_overlaps,
@@ -390,8 +390,8 @@ def _soma_undefined_overlaps(morphio_soma, points, exclude_boundary):
     """Check if points overlap with soma approximated as a sphere."""
     points = np.atleast_2d(np.asarray(points, dtype=np.float64))
 
-    center = soma_center(morphio_soma)
-    radius = soma_radius(morphio_soma)
+    center = get_center(morphio_soma)
+    radius = get_radius(morphio_soma)
 
     if exclude_boundary:
         return np.linalg.norm(points - center, axis=1) < radius
@@ -442,7 +442,7 @@ def _soma_simple_contour_overlaps(morphio_soma, points, exclude_boundary):
         ),
         axis=1,
     )
-    center = soma_center(morphio_soma)
+    center = get_center(morphio_soma)
 
     points = np.atleast_2d(np.asarray(points, dtype=np.float64))
 
