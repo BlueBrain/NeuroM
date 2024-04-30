@@ -70,7 +70,7 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
     mask = H1 < threshold  # mask = H1==0
     H2 = np.ma.masked_array(H1, mask)
 
-    colormap = mpl.cm.get_cmap(color_map).copy()
+    colormap = plt.get_cmap(color_map).copy()
     colormap.set_bad(color='white', alpha=None)
 
     plots = ax.contourf((xedges1[:-1] + xedges1[1:]) / 2,
