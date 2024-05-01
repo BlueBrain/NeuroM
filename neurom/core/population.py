@@ -53,7 +53,13 @@ class Population:
     """
 
     def __init__(
-        self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False
+        self,
+        files,
+        name='Population',
+        ignored_exceptions=(),
+        *,
+        cache=False,
+        process_subtrees=False,
     ):
         """Construct a morphology population.
 

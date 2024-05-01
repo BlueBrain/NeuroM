@@ -408,7 +408,7 @@ def graft_morphology(section):
 class Neurite:
     """Class representing a neurite tree."""
 
-    def __init__(self, root_node, process_subtrees=False):
+    def __init__(self, root_node, *, process_subtrees=False):
         """Constructor.
 
         Args:
