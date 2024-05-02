@@ -48,8 +48,9 @@ from neurom.apps import get_config, EXAMPLE_STATS_CONFIG
 from neurom.core.morphology import Morphology, Neurite
 from neurom.core.population import Population
 from neurom.exceptions import ConfigError
-from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
-    _get_feature_value_and_func
+from neurom.features import (
+    _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, get_feature_value_and_func
+)
 from neurom.io.utils import get_files_by_path
 from neurom.utils import flatten, NeuromJSON
 
@@ -139,7 +140,7 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
         return f"{mode}_{feature_name}"
 
     data = {}
-    value, func = _get_feature_value_and_func(feature_name, morphs, **kwargs)
+    value, func = get_feature_value_and_func(feature_name, morphs, **kwargs)
     shape = func.shape
     if len(shape) > 2:
         raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
