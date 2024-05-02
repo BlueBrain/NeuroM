@@ -53,7 +53,13 @@ class Population:
     """
 
     def __init__(
-        self, files, name='Population', ignored_exceptions=(), cache=False, process_subtrees=False
+        self,
+        files,
+        name='Population',
+        ignored_exceptions=(),
+        *,
+        cache=False,
+        process_subtrees=False,
     ):
         """Construct a morphology population.
 
@@ -67,6 +73,7 @@ class Population:
                 will be loaded everytime it is accessed within the population. Which is good when
                 population is big. If true then all morphs will be loaded upon the construction
                 and kept in memory.
+            process_subtrees (bool): enable mixed tree processing if set to True
 
         Notes:
             symlinks in paths are not resolved.
