@@ -10,7 +10,7 @@ Version 4.0.0
 - All features return built-in types (#1064)
 - Morphology class also allows mutable morphio objects to be passed explicitly. (#1049)
 - Morphology class uses morphio immutable class by composition, istead of inheritance. (#979)
-- Morphology level radial distance features use the somata as reference point. (#1030)
+- Morphology level radial distance features use the soma as reference point. (#1030)
 - Make ``neurom.core.Population`` resolve paths. Symlinks are not resolved. (#1047)
 - Mixed subtree processing can be used in morph_stats app via the use_subtrees flag. (#1034)
 - ``neurom.view.[plot_tree|plot_tree3d|plot_soma|plot_soma3D]`` were hidden from the

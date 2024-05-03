@@ -45,6 +45,13 @@ The following modules have been deprecated:
 - ``neurom/check/neuron_checks.py`` (use ``neurom/check/morphology_checks.py``)
 - ``neurom/viewer.py`` (use ``from neurom.view import plot_[morph|morph3d|dendrogram]``)
 
+Breaking changes in features
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Morphology-level radial distance calculation uses the soma as a default reference point instead
+  of the root of each neurite. To achieve the old behavior the neurites of the morphology need to
+  be passed to the feature function instead of the morphology.
+
 New and deprecated methods in core classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
