@@ -44,14 +44,14 @@ CONFIG = {
             'has_all_nonzero_segment_lengths',
             'has_all_nonzero_section_lengths',
             'has_all_nonzero_neurite_radii',
-            'has_nonzero_soma_radius'
+            'has_nonzero_soma_radius',
         ]
     },
     'options': {
         'has_nonzero_soma_radius': 0.0,
         "has_all_nonzero_neurite_radii": 0.007,
         "has_all_nonzero_segment_lengths": 0.01,
-        "has_all_nonzero_section_lengths": [0.01]
+        "has_all_nonzero_section_lengths": [0.01],
     },
 }
 CONFIG_COLOR = copy(CONFIG)
@@ -63,102 +63,108 @@ def _run_test(path, ref, config=CONFIG, should_pass=False):
     and compare the results to 'ref'"""
     results = CheckRunner(config).run(path)
     assert dict(results['files'][str(path)]) == ref
-    assert (results['STATUS'] ==
-                    ("PASS" if should_pass else "FAIL"))
+    assert results['STATUS'] == ("PASS" if should_pass else "FAIL")
 
-ref = dict([
-    ("Has basal dendrite", True),
-    ("Has axon", True),
-    ("Has apical dendrite", True),
-    ("Has all nonzero segment lengths", True),
-    ("Has all nonzero section lengths", True),
-    ("Has all nonzero neurite radii", True),
-    ("Has nonzero soma radius", True),
-    ("ALL", True)
-])
+
+ref = dict(
+    [
+        ("Has basal dendrite", True),
+        ("Has axon", True),
+        ("Has apical dendrite", True),
+        ("Has all nonzero segment lengths", True),
+        ("Has all nonzero section lengths", True),
+        ("Has all nonzero neurite radii", True),
+        ("Has nonzero soma radius", True),
+        ("ALL", True),
+    ]
+)
+
 
 def test_ok_morphology():
-    _run_test(SWC_PATH / 'Neuron.swc',
-              ref,
-              should_pass=True)
+    _run_test(SWC_PATH / 'Neuron.swc', ref, should_pass=True)
+
 
 def test_ok_morphology_color():
-    _run_test(SWC_PATH / 'Neuron.swc',
-              ref,
-              CONFIG_COLOR,
-              should_pass=True)
+    _run_test(SWC_PATH / 'Neuron.swc', ref, CONFIG_COLOR, should_pass=True)
 
 
 def test_zero_length_sections_morphology():
-    expected = dict([
-                  ("Has basal dendrite", True),
-                  ("Has axon", True),
-                  ("Has apical dendrite", True),
-                  ("Has all nonzero segment lengths", False),
-                  ("Has all nonzero section lengths", False),
-                  ("Has all nonzero neurite radii", True),
-                  ("Has nonzero soma radius", True),
-                  ("ALL", False)
-    ])
-    _run_test(SWC_PATH / 'Neuron_zero_length_sections.swc',
-              expected)
+    expected = dict(
+        [
+            ("Has basal dendrite", True),
+            ("Has axon", True),
+            ("Has apical dendrite", True),
+            ("Has all nonzero segment lengths", False),
+            ("Has all nonzero section lengths", False),
+            ("Has all nonzero neurite radii", True),
+            ("Has nonzero soma radius", True),
+            ("ALL", False),
+        ]
+    )
+    _run_test(SWC_PATH / 'Neuron_zero_length_sections.swc', expected)
 
 
 def test_single_apical_morphology():
-    expected = dict([
-                  ("Has basal dendrite", False),
-                  ("Has axon", False),
-                  ("Has apical dendrite", True),
-                  ("Has all nonzero segment lengths", False),
-                  ("Has all nonzero section lengths", True),
-                  ("Has all nonzero neurite radii", True),
-                  ("Has nonzero soma radius", True),
-                  ("ALL", False)
-              ])
-    _run_test(SWC_PATH / 'Single_apical.swc',
-              expected)
+    expected = dict(
+        [
+            ("Has basal dendrite", False),
+            ("Has axon", False),
+            ("Has apical dendrite", True),
+            ("Has all nonzero segment lengths", False),
+            ("Has all nonzero section lengths", True),
+            ("Has all nonzero neurite radii", True),
+            ("Has nonzero soma radius", True),
+            ("ALL", False),
+        ]
+    )
+    _run_test(SWC_PATH / 'Single_apical.swc', expected)
 
 
 def test_single_basal_morphology():
     expected = dict(
-                  ([
-                      ("Has basal dendrite", True),
-                      ("Has axon", False),
-                      ("Has apical dendrite", False),
-                      ("Has all nonzero segment lengths", False),
-                      ("Has all nonzero section lengths", True),
-                      ("Has all nonzero neurite radii", True),
-                      ("Has nonzero soma radius", True),
-                      ("ALL", False)
-                  ]))
-    _run_test(SWC_PATH / 'Single_basal.swc',
-              expected)
+        (
+            [
+                ("Has basal dendrite", True),
+                ("Has axon", False),
+                ("Has apical dendrite", False),
+                ("Has all nonzero segment lengths", False),
+                ("Has all nonzero section lengths", True),
+                ("Has all nonzero neurite radii", True),
+                ("Has nonzero soma radius", True),
+                ("ALL", False),
+            ]
+        )
+    )
+    _run_test(SWC_PATH / 'Single_basal.swc', expected)
 
 
 def test_single_axon_morphology():
-    expected = dict([
-                  ("Has basal dendrite", False),
-                  ("Has axon", True),
-                  ("Has apical dendrite", False),
-                  ("Has all nonzero segment lengths", False),
-                  ("Has all nonzero section lengths", True),
-                  ("Has all nonzero neurite radii", True),
-                  ("Has nonzero soma radius", True),
-                  ("ALL", False)
-              ])
-    _run_test(SWC_PATH / 'Single_axon.swc',
-              expected)
+    expected = dict(
+        [
+            ("Has basal dendrite", False),
+            ("Has axon", True),
+            ("Has apical dendrite", False),
+            ("Has all nonzero segment lengths", False),
+            ("Has all nonzero section lengths", True),
+            ("Has all nonzero neurite radii", True),
+            ("Has nonzero soma radius", True),
+            ("ALL", False),
+        ]
+    )
+    _run_test(SWC_PATH / 'Single_axon.swc', expected)
 
 
 def test_single_apical_no_soma():
-    expected = {'ALL': False,
-                'Has all nonzero neurite radii': True,
-                'Has all nonzero section lengths': True,
-                'Has all nonzero segment lengths': False,
-                'Has apical dendrite': True,
-                'Has axon': False,
-                'Has basal dendrite': False,
-                'Has nonzero soma radius': False}
+    expected = {
+        'ALL': False,
+        'Has all nonzero neurite radii': True,
+        'Has all nonzero section lengths': True,
+        'Has all nonzero segment lengths': False,
+        'Has apical dendrite': True,
+        'Has axon': False,
+        'Has basal dendrite': False,
+        'Has nonzero soma radius': False,
+    }
     _run_test(SWC_PATH / 'Single_apical_no_soma.swc', expected)
 
 
@@ -182,13 +188,13 @@ def test__sanitize_config():
 
     # creates minimal config
     new_config = CheckRunner._sanitize_config({'checks': {}})
-    assert new_config == {'checks':
-                        {
-                         'morphology_checks': [],
-                         },
-                        'options': {},
-                        'color': False,
-                        }
+    assert new_config == {
+        'checks': {
+            'morphology_checks': [],
+        },
+        'options': {},
+        'color': False,
+    }
 
     # makes no changes to already filled out config
     new_config = CheckRunner._sanitize_config(CONFIG)

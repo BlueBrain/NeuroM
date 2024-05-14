@@ -40,24 +40,27 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def main():
+    m_h5 = nm.load_morphology(Path(PACKAGE_DIR, "tests/data/h5/v1/bio_neuron-001.h5"))
+    m_asc = nm.load_morphology(Path(PACKAGE_DIR, "tests/data/neurolucida/bio_neuron-001.asc"))
 
-    m_h5 = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/h5/v1/bio_neuron-001.h5'))
-    m_asc = nm.load_morphology(Path(PACKAGE_DIR, 'tests/data/neurolucida/bio_neuron-001.asc'))
+    print("h5 number of sections:", nm.get("number_of_sections", m_h5))
+    print("nl number of sections:", nm.get("number_of_sections", m_asc))
+    print("h5 number of segments:", nm.get("number_of_segments", m_h5))
+    print("nl number of segments:", nm.get("number_of_segments", m_asc))
+    print("h5 total neurite length:", np.sum(nm.get("section_lengths", m_h5)))
+    print("nl total neurite length:", np.sum(nm.get("section_lengths", m_asc)))
+    print("h5 principal direction extents:", nm.get("principal_direction_extents", m_h5))
+    print("nl principal direction extents:", nm.get("principal_direction_extents", m_asc))
 
-    print('h5 number of sections:', nm.get('number_of_sections', m_h5))
-    print('nl number of sections:', nm.get('number_of_sections', m_asc))
-    print('h5 number of segments:', nm.get('number_of_segments', m_h5))
-    print('nl number of segments:', nm.get('number_of_segments', m_asc))
-    print('h5 total neurite length:', np.sum(nm.get('section_lengths', m_h5)))
-    print('nl total neurite length:', np.sum(nm.get('section_lengths', m_asc)))
-    print('h5 principal direction extents:', nm.get('principal_direction_extents', m_h5))
-    print('nl principal direction extents:', nm.get('principal_direction_extents', m_asc))
-
-    print('\nNumber of neurites:')
+    print("\nNumber of neurites:")
     for nt in iter(nm.NeuriteType):
-        print(nt, mf.number_of_neurites(m_h5, neurite_type=nt), mf.number_of_neurites(m_asc, neurite_type=nt))
+        print(
+            nt,
+            mf.number_of_neurites(m_h5, neurite_type=nt),
+            mf.number_of_neurites(m_asc, neurite_type=nt),
+        )
 
-    print('\nNumber of segments:')
+    print("\nNumber of segments:")
     for nt in iter(nm.NeuriteType):
         print(nt, nf.number_of_segments(m_h5.neurites[0]), nf.number_of_segments(m_asc.neurites[0]))
 

@@ -42,30 +42,41 @@ from neurom import load_morphologies
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
-def extract_density(population, plane='xy', bins=100, neurite_type=NeuriteType.basal_dendrite):
+def extract_density(population, plane="xy", bins=100, neurite_type=NeuriteType.basal_dendrite):
     """Extracts the 2d histogram of the center
-       coordinates of segments in the selected plane.
+    coordinates of segments in the selected plane.
     """
     segment_midpoints = np.array(
-	get_feat('segment_midpoints', population, neurite_type=neurite_type)
+        get_feat("segment_midpoints", population, neurite_type=neurite_type)
     )
-    horiz = segment_midpoints[:, 'xyz'.index(plane[0])]
-    vert = segment_midpoints[:, 'xyz'.index(plane[1])]
+    horiz = segment_midpoints[:, "xyz".index(plane[0])]
+    vert = segment_midpoints[:, "xyz".index(plane[1])]
     return np.histogram2d(np.array(horiz), np.array(vert), bins=(bins, bins))
 
 
-def plot_density(population,  # pylint: disable=too-many-arguments, too-many-locals
-                 bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
-                 colorlabel='Nodes per unit area', labelfontsize=16,
-                 color_map='Reds', no_colorbar=False, threshold=0.01,
-                 neurite_type=NeuriteType.basal_dendrite, **kwargs):
+def plot_density(
+    population,  # pylint: disable=too-many-arguments, too-many-locals
+    bins=100,
+    new_fig=True,
+    subplot=111,
+    levels=None,
+    plane="xy",
+    colorlabel="Nodes per unit area",
+    labelfontsize=16,
+    color_map="Reds",
+    no_colorbar=False,
+    threshold=0.01,
+    neurite_type=NeuriteType.basal_dendrite,
+    **kwargs,
+):
     """Plots the 2d histogram of the center
-       coordinates of segments in the selected plane.
+    coordinates of segments in the selected plane.
     """
     fig, ax = matplotlib_utils.get_figure(new_fig=new_fig, subplot=subplot)
 
-    H1, xedges1, yedges1 = extract_density(population, plane=plane, bins=bins,
-                                           neurite_type=neurite_type)
+    H1, xedges1, yedges1 = extract_density(
+        population, plane=plane, bins=bins, neurite_type=neurite_type
+    )
 
     mask = H1 < threshold  # mask = H1==0
     H2 = np.ma.masked_array(H1, mask)
@@ -73,44 +84,67 @@ def plot_density(population,  # pylint: disable=too-many-arguments, too-many-loc
     colormap = plt.get_cmap(color_map).copy()
     colormap.set_bad(color='white', alpha=None)
 
-    plots = ax.contourf((xedges1[:-1] + xedges1[1:]) / 2,
-                        (yedges1[:-1] + yedges1[1:]) / 2,
-                        np.transpose(H2), # / np.max(H2),
-                        cmap=colormap, levels=levels)
+    plots = ax.contourf(
+        (xedges1[:-1] + xedges1[1:]) / 2,
+        (yedges1[:-1] + yedges1[1:]) / 2,
+        np.transpose(H2),  # / np.max(H2),
+        cmap=colormap,
+        levels=levels,
+    )
 
     if not no_colorbar:
         cbar = plt.colorbar(plots)
         cbar.ax.set_ylabel(colorlabel, fontsize=labelfontsize)
 
-    kwargs['title'] = kwargs.get('title', '')
-    kwargs['xlabel'] = kwargs.get('xlabel', plane[0])
-    kwargs['ylabel'] = kwargs.get('ylabel', plane[1])
+    kwargs["title"] = kwargs.get("title", "")
+    kwargs["xlabel"] = kwargs.get("xlabel", plane[0])
+    kwargs["ylabel"] = kwargs.get("ylabel", plane[1])
 
     return matplotlib_utils.plot_style(fig=fig, ax=ax, **kwargs)
 
 
-def plot_neuron_on_density(population, # pylint: disable=too-many-arguments
-                           bins=100, new_fig=True, subplot=111, levels=None, plane='xy',
-                           colorlabel='Nodes per unit area', labelfontsize=16,
-                           color_map='Reds', no_colorbar=False, threshold=0.01,
-                           neurite_type=NeuriteType.basal_dendrite, **kwargs):
+def plot_neuron_on_density(
+    population,  # pylint: disable=too-many-arguments
+    bins=100,
+    new_fig=True,
+    subplot=111,
+    levels=None,
+    plane="xy",
+    colorlabel="Nodes per unit area",
+    labelfontsize=16,
+    color_map="Reds",
+    no_colorbar=False,
+    threshold=0.01,
+    neurite_type=NeuriteType.basal_dendrite,
+    **kwargs,
+):
     """Plots the 2d histogram of the center
-       coordinates of segments in the selected plane
-       and superimposes the view of the first neurite of the collection.
+    coordinates of segments in the selected plane
+    and superimposes the view of the first neurite of the collection.
     """
     _, ax = matplotlib_utils.get_figure(new_fig=new_fig)
 
     ref_neuron = population[0]
     matplotlib_impl.plot_tree(ref_neuron.neurites[0], ax)
 
-    return plot_density(population, plane=plane, bins=bins, new_fig=False, subplot=subplot,
-                        colorlabel=colorlabel, labelfontsize=labelfontsize, levels=levels,
-                        color_map=color_map, no_colorbar=no_colorbar, threshold=threshold,
-                        neurite_type=neurite_type, **kwargs)
+    return plot_density(
+        population,
+        plane=plane,
+        bins=bins,
+        new_fig=False,
+        subplot=subplot,
+        colorlabel=colorlabel,
+        labelfontsize=labelfontsize,
+        levels=levels,
+        color_map=color_map,
+        no_colorbar=no_colorbar,
+        threshold=threshold,
+        neurite_type=neurite_type,
+        **kwargs,
+    )
 
 
 def main():
-
     morphology_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
     neurons = load_morphologies(morphology_directory)
 

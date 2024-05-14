@@ -27,7 +27,4 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """View tools to visualize morphologies."""
-from neurom.view.matplotlib_impl import (plot_morph, plot_morph3d,
-                                         plot_tree, plot_tree3d,
-                                         plot_soma, plot_soma3d,
-                                         plot_dendrogram)
+from neurom.view.matplotlib_impl import plot_dendrogram, plot_morph, plot_morph3d

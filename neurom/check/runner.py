@@ -34,9 +34,8 @@ from importlib import import_module
 
 from neurom import load_morphology
 from neurom.check import check_wrapper
-from neurom.exceptions import ConfigError
+from neurom.exceptions import ConfigError, NeuroMError
 from neurom.io import utils
-from neurom.utils import warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -47,8 +46,9 @@ class CheckRunner:
     def __init__(self, config):
         """Initialize a CheckRunner object."""
         self._config = CheckRunner._sanitize_config(config)
-        self._check_modules = dict((k, import_module('neurom.check.%s' % k))
-                                   for k in config['checks'])
+        self._check_modules = dict(
+            (k, import_module('neurom.check.%s' % k)) for k in config['checks']
+        )
 
     def run(self, path):
         """Test a bunch of files and return a summary JSON report."""
@@ -83,8 +83,7 @@ class CheckRunner:
 
         try:
             if out.info:
-                L.debug('%s: %d failing ids detected: %s',
-                        out.title, len(out.info), out.info)
+                L.debug('%s: %d failing ids detected: %s', out.title, len(out.info), out.info)
         except TypeError:  # pragma: no cover
             pass
 
@@ -136,8 +135,7 @@ class CheckRunner:
         LOG_LEVELS = {False: logging.ERROR, True: logging.INFO}
 
         # pylint: disable=logging-not-lazy
-        L.log(LOG_LEVELS[ok],
-              '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
+        L.log(LOG_LEVELS[ok], '%35s %s' + CEND, msg, CGREEN + 'PASS' if ok else CRED + 'FAIL')
 
     @staticmethod
     def _sanitize_config(config):
@@ -146,10 +144,10 @@ class CheckRunner:
             checks = config['checks']
             if 'morphology_checks' not in checks:
                 checks['morphology_checks'] = []
-            if 'neuron_checks' in checks:
-                warn_deprecated('"neuron_checks" is deprecated, use "morphology_checks" instead '
-                                'for the config of `neurom.check`')  # pragma: no cover
-                checks['morphology_checks'] = config['neuron_checks']  # pragma: no cover
+            if 'neuron_checks' in checks:  # pragma: no cover
+                raise NeuroMError(
+                    "'neuron_checks' is not supported. Please rename it into 'morphology_checks'"
+                )
         else:
             raise ConfigError('Need to have "checks" in the config')
 

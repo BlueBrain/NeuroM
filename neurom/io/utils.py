@@ -38,10 +38,10 @@ from io import StringIO, open
 from pathlib import Path
 
 import morphio
+
 from neurom.core.morphology import Morphology
 from neurom.core.population import Population
 from neurom.exceptions import NeuroMError
-from neurom.utils import warn_deprecated
 
 L = logging.getLogger(__name__)
 
@@ -120,7 +120,7 @@ def _get_file(stream, extension):
     return temp_file
 
 
-def load_morphology(morph, reader=None):
+def load_morphology(morph, reader=None, *, mutable=None, process_subtrees=False):
     """Build section trees from a morphology or a h5, swc or asc file.
 
     Args:
@@ -134,6 +134,10 @@ def load_morphology(morph, reader=None):
               must be passed with the corresponding file format (asc, swc and h5)
         reader (str): Optional, must be provided if morphology is a stream to
                       specify the file format (asc, swc, h5)
+        mutable (bool|None): Whether to enforce mutability. If None and a morphio/neurom object is
+                             passed, the initial mutability will be maintained. If None and the
+                             morphology is loaded, then it will be immutable by default.
+        process_subtrees (bool): enable mixed tree processing if set to True
 
     Returns:
         A Morphology object
@@ -156,26 +160,30 @@ def load_morphology(morph, reader=None):
                                                    )
                                                    )'''), reader='asc')
     """
-    if isinstance(morph, (Morphology, morphio.Morphology, morphio.mut.Morphology)):
-        return Morphology(morph)
+    if isinstance(morph, Morphology):
+        name = morph.name
+        morphio_morph = morph.to_morphio()
+    elif isinstance(morph, (morphio.Morphology, morphio.mut.Morphology)):
+        name = "Morphology"
+        morphio_morph = morph
+    else:
+        filepath = _get_file(morph, reader) if reader else morph
+        name = os.path.basename(filepath)
+        morphio_morph = morphio.Morphology(filepath)
 
-    if reader:
-        return Morphology(_get_file(morph, reader))
+    # None does not modify existing mutability
+    if mutable is not None:
+        if mutable and isinstance(morphio_morph, morphio.Morphology):
+            morphio_morph = morphio_morph.as_mutable()
+        elif not mutable and isinstance(morphio_morph, morphio.mut.Morphology):
+            morphio_morph = morphio_morph.as_immutable()
 
-    return Morphology(morph, Path(morph).name)
-
-
-def load_neuron(morph, reader=None):
-    """Deprecated in favor of ``load_morphology``."""
-    warn_deprecated('`neurom.io.utils.load_neuron` is deprecated in favor of '
-                    '`neurom.io.utils.load_morphology`')  # pragma: no cover
-    return load_morphology(morph, reader)  # pragma: no cover
+    return Morphology(morphio_morph, name=name, process_subtrees=process_subtrees)
 
 
-def load_morphologies(morphs,
-                      name=None,
-                      ignored_exceptions=(),
-                      cache=False):
+def load_morphologies(
+    morphs, name=None, ignored_exceptions=(), *, cache=False, process_subtrees=False
+):
     """Create a population object.
 
     From all morphologies in a directory of from morphologies in a list of file names.
@@ -188,6 +196,7 @@ def load_morphologies(morphs,
         ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when
             loading morphologies
         cache (bool): whether to cache the loaded morphologies in memory
+        process_subtrees (bool): enable mixed tree processing if set to True
 
     Returns:
         Population: population object
@@ -198,11 +207,6 @@ def load_morphologies(morphs,
     else:
         files = morphs
         name = name or 'Population'
-    return Population(files, name, ignored_exceptions, cache)
-
-
-def load_neurons(morphs, name=None, ignored_exceptions=(), cache=False):
-    """Deprecated in favor of ``load_morphologies``."""
-    warn_deprecated('`neurom.io.utils.load_neurons` is deprecated in favor of '
-                    '`neurom.io.utils.load_morphologies`')  # pragma: no cover
-    return load_morphologies(morphs, name, ignored_exceptions, cache)  # pragma: no cover
+    return Population(
+        files, name, ignored_exceptions, cache=cache, process_subtrees=process_subtrees
+    )

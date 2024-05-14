@@ -46,8 +46,10 @@ def warn_deprecated(msg):
 
 def deprecated(fun_name=None, msg=""):
     """Issue a deprecation warning for a function."""
+
     def _deprecated(fun):
         """Issue a deprecation warning for a function."""
+
         @wraps(fun)
         def _wrapper(*args, **kwargs):
             """Issue deprecation warning and forward arguments to fun."""
@@ -136,3 +138,13 @@ def str_to_plane(plane):
 def flatten(list_of_lists):
     """Flatten one level of nesting."""
     return chain.from_iterable(list_of_lists)
+
+
+def filtered_iterator(predicate, iterator_type):
+    """Returns an iterator function that is filtered by the predicate."""
+
+    @wraps(iterator_type)
+    def composed(*args, **kwargs):
+        return filter(predicate, iterator_type(*args, **kwargs))
+
+    return composed

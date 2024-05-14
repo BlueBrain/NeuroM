@@ -29,7 +29,8 @@
 """Check on morphologies."""
 
 import json
-from neurom.apps import get_config, EXAMPLE_CHECK_CONFIG
+
+from neurom.apps import EXAMPLE_CHECK_CONFIG, get_config
 from neurom.check.runner import CheckRunner
 
 

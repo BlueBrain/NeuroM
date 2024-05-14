@@ -44,28 +44,32 @@ import pandas as pd
 from morphio import SomaError
 
 import neurom as nm
-from neurom.apps import get_config, EXAMPLE_STATS_CONFIG
+from neurom.apps import EXAMPLE_STATS_CONFIG, get_config
 from neurom.core.morphology import Morphology, Neurite
 from neurom.core.population import Population
 from neurom.exceptions import ConfigError
-from neurom.features import _NEURITE_FEATURES, _MORPHOLOGY_FEATURES, _POPULATION_FEATURES, \
-    _get_feature_value_and_func
+from neurom.features import (
+    _MORPHOLOGY_FEATURES,
+    _NEURITE_FEATURES,
+    _POPULATION_FEATURES,
+    _get_feature_value_and_func,
+)
 from neurom.io.utils import get_files_by_path
-from neurom.utils import flatten, NeuromJSON
+from neurom.utils import NeuromJSON, flatten
 
 L = logging.getLogger(__name__)
 
 IGNORABLE_EXCEPTIONS = {'SomaError': SomaError}
 
 
-def _run_extract_stats(morph, config):
+def _run_extract_stats(morph, config, process_subtrees):
     """The function to be called by multiprocessing.Pool.imap_unordered."""
     if not isinstance(morph, (Morphology, Population)):
-        morph = nm.load_morphologies(morph)
+        morph = nm.load_morphologies(morph, process_subtrees=process_subtrees)
     return morph.name, extract_stats(morph, config)
 
 
-def extract_dataframe(morphs, config, n_workers=1):
+def extract_dataframe(morphs, config, n_workers=1, process_subtrees=False):
     """Extract stats grouped by neurite type from morphs.
 
     Arguments:
@@ -96,7 +100,7 @@ def extract_dataframe(morphs, config, n_workers=1):
     elif isinstance(morphs, Population):
         morphs = morphs._files  # pylint: disable=protected-access
 
-    func = partial(_run_extract_stats, config=config)
+    func = partial(_run_extract_stats, config=config, process_subtrees=process_subtrees)
     if n_workers == 1:
         stats = list(map(func, morphs))
     else:
@@ -110,20 +114,23 @@ def extract_dataframe(morphs, config, n_workers=1):
     columns = [('property', 'name')] + [
         (key1, key2) for key1, data in stats[0][1].items() for key2 in data
     ]
-    rows = [[name] + list(flatten(features.values() for features in data.values()))
-            for name, data in stats]
+    rows = [
+        [name] + list(flatten(features.values() for features in data.values()))
+        for name, data in stats
+    ]
     return pd.DataFrame(columns=pd.MultiIndex.from_tuples(columns), data=rows)
 
 
 extract_dataframe.__doc__ = extract_dataframe.__doc__.strip() + "\n\t" + str(EXAMPLE_STATS_CONFIG)
 
 
-def _get_feature_stats(feature_name, morphs, modes, kwargs):
+def _get_feature_stats(feature_name, morphs, modes, **kwargs):
     """Insert the stat data in the dict.
 
     If the feature is 2-dimensional, the feature is flattened on its last axis
     """
-    def stat_name_format(mode, feature_name, kwargs):
+
+    def stat_name_format(mode, feature_name, **kwargs):
         """Returns the key name for the data dictionary.
 
         The key is a combination of the mode, feature_name and an optional suffix of all the extra
@@ -145,8 +152,7 @@ def _get_feature_stats(feature_name, morphs, modes, kwargs):
         raise ValueError(f'Len of "{feature_name}" feature shape must be <= 2')  # pragma: no cover
 
     for mode in modes:
-
-        stat_name = stat_name_format(mode, feature_name, kwargs)
+        stat_name = stat_name_format(mode, feature_name, **kwargs)
 
         stat = value
         if isinstance(value, Sized):
@@ -200,14 +206,11 @@ def extract_stats(morphs, config):
     stats = defaultdict(dict)
     for category in ("neurite", "morphology", "population"):
         for feature_name, opts in config[category].items():
-
             list_of_kwargs = opts["kwargs"]
             modes = opts["modes"]
 
             for feature_kwargs in list_of_kwargs:
-
                 if category == 'neurite':
-
                     # mutated below, need a copy
                     feature_kwargs = deepcopy(feature_kwargs)
 
@@ -221,12 +224,17 @@ def extract_stats(morphs, config):
                         if not isinstance(morphs, Neurite):
                             feature_kwargs["neurite_type"] = neurite_type
                         stats[neurite_type.name].update(
-                            _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                            _get_feature_stats(
+                                feature_name,
+                                morphs,
+                                modes,
+                                **feature_kwargs,
+                            )
                         )
 
                 else:
                     stats[category].update(
-                        _get_feature_stats(feature_name, morphs, modes, feature_kwargs)
+                        _get_feature_stats(feature_name, morphs, modes, **feature_kwargs)
                     )
 
     return dict(stats)
@@ -239,11 +247,7 @@ def _get_header(results):
     """Extracts the headers, using the first value in the dict as the template."""
     values = next(iter(results.values()))
 
-    return ['name'] + [
-        f'{k}:{metric}'
-        for k, v in values.items()
-        for metric in v.keys()
-    ]
+    return ['name'] + [f'{k}:{metric}' for k, v in values.items() for metric in v.keys()]
 
 
 def _generate_flattened_dict(headers, results):
@@ -265,7 +269,7 @@ _NEURITE_MAP = {
     'AXON': nm.AXON,
     'BASAL_DENDRITE': nm.BASAL_DENDRITE,
     'APICAL_DENDRITE': nm.APICAL_DENDRITE,
-    'ALL': nm.ANY_NEURITE
+    'ALL': nm.ANY_NEURITE,
 }
 
 
@@ -276,7 +280,7 @@ def full_config():
     categories = {
         "neurite": _NEURITE_FEATURES,
         "morphology": _MORPHOLOGY_FEATURES,
-        "population": _POPULATION_FEATURES
+        "population": _POPULATION_FEATURES,
     }
 
     config = {
@@ -318,6 +322,7 @@ def _standardize_layout(category_features):
                   - mode1
                   - mode2
     """
+
     def standardize_options(options):
         """Returns options as a dict with two keys: 'kwargs' and 'modes'."""
         # convert short format
@@ -353,7 +358,15 @@ def _sanitize_config(config):
     return config
 
 
-def main(datapath, config, output_file, is_full_config, as_population, ignored_exceptions):
+def main(
+    datapath,
+    config,
+    output_file,
+    is_full_config,
+    as_population,
+    ignored_exceptions,
+    use_subtrees=False,
+):
     """Main function that get statistics for morphologies.
 
     Args:
@@ -363,6 +376,7 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
         is_full_config (bool): should be statistics made over all possible features, modes, neurites
         as_population (bool): treat ``datapath`` as directory of morphologies population
         ignored_exceptions (list|tuple|None): exceptions to ignore when loading a morphology
+        use_subtrees (bool): Enable of heterogeneous subtree processing
     """
     config = full_config() if is_full_config else get_config(config, EXAMPLE_STATS_CONFIG)
 
@@ -376,7 +390,8 @@ def main(datapath, config, output_file, is_full_config, as_population, ignored_e
 
     morphs = nm.load_morphologies(
         get_files_by_path(datapath),
-        ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions)
+        ignored_exceptions=tuple(IGNORABLE_EXCEPTIONS[k] for k in ignored_exceptions),
+        process_subtrees=use_subtrees,
     )
 
     if as_population:

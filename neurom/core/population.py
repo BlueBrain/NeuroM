@@ -28,13 +28,20 @@
 
 """Morphology Population Classes and Functions."""
 import logging
+import os
+from pathlib import Path
 
 from morphio import MorphioError
+
 import neurom
 from neurom.exceptions import NeuroMError
 
-
 L = logging.getLogger(__name__)
+
+
+def _resolve_if_morphology_paths(files_or_objects):
+    """Resolve the files in the list."""
+    return [Path(os.path.abspath(f)) if isinstance(f, (Path, str)) else f for f in files_or_objects]
 
 
 class Population:
@@ -44,7 +51,16 @@ class Population:
     It does not store the loaded morphology in memory unless the morphology has been already passed
     as loaded (instance of ``Morphology``).
     """
-    def __init__(self, files, name='Population', ignored_exceptions=(), cache=False):
+
+    def __init__(
+        self,
+        files,
+        name='Population',
+        ignored_exceptions=(),
+        *,
+        cache=False,
+        process_subtrees=False,
+    ):
         """Construct a morphology population.
 
         Arguments:
@@ -57,13 +73,34 @@ class Population:
                 will be loaded everytime it is accessed within the population. Which is good when
                 population is big. If true then all morphs will be loaded upon the construction
                 and kept in memory.
+            process_subtrees (bool): enable mixed tree processing if set to True
+
+        Notes:
+            symlinks in paths are not resolved.
         """
         self._ignored_exceptions = ignored_exceptions
         self.name = name
+
+        self._files = _resolve_if_morphology_paths(files)
+
+        self._process_subtrees = process_subtrees
+
         if cache:
-            self._files = [self._load_file(f) for f in files if f is not None]
-        else:
-            self._files = files
+            self._reset_cache()
+
+    def _reset_cache(self):
+        """Reset the internal cache."""
+        self._files = [self._load_file(f) for f in self._files if f is not None]
+
+    @property
+    def process_subtrees(self):
+        """Enable mixed tree processing if set to True."""
+        return self._process_subtrees
+
+    @process_subtrees.setter
+    def process_subtrees(self, value):
+        self._process_subtrees = value
+        self._reset_cache()
 
     @property
     def morphologies(self):
@@ -82,9 +119,11 @@ class Population:
 
     def _load_file(self, f):
         if isinstance(f, neurom.core.morphology.Morphology):
-            return f
+            new_morph = f.copy()
+            new_morph.process_subtrees = self.process_subtrees
+            return new_morph
         try:
-            return neurom.load_morphology(f)
+            return neurom.load_morphology(f, process_subtrees=self.process_subtrees)
         except (NeuroMError, MorphioError) as e:
             if isinstance(e, self._ignored_exceptions):
                 L.info('Ignoring exception "%s" for file %s', e, f.name)
@@ -108,7 +147,8 @@ class Population:
         """Get morphology at index idx."""
         if idx > len(self):
             raise ValueError(
-                f'no {idx} index in "{self.name}" population, max possible index is {len(self)}')
+                f'no {idx} index in "{self.name}" population, max possible index is {len(self)}'
+            )
         return self._load_file(self._files[idx])
 
     def __str__(self):

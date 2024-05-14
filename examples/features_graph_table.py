@@ -39,10 +39,9 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 
 def stylize(ax, name, feature):
-    """Stylization modifications to the plots
-    """
+    """Stylization modifications to the plots"""
     ax.set_ylabel(feature)
-    ax.set_title(name, fontsize='small')
+    ax.set_title(name, fontsize="small")
 
 
 def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
@@ -73,8 +72,7 @@ def histogram(neuron, feature, ax, bins=15, normed=True, cumulative=False):
 
 
 def plot_feature(feature, cell):
-    """Plot a feature
-    """
+    """Plot a feature"""
     fig = pl.figure()
     ax = fig.add_subplot(111)
 
@@ -88,7 +86,6 @@ def plot_feature(feature, cell):
 
 
 def create_feature_plots(morphologies_dir, feature_list, output_dir):
-
     for morph_file in get_morph_files(morphologies_dir):
         m = nm.load_morphology(morph_file)
 
@@ -102,10 +99,10 @@ def create_feature_plots(morphologies_dir, feature_list, output_dir):
 def main():
     create_feature_plots(
         morphologies_dir=Path(PACKAGE_DIR, "tests/data/valid_set"),
-	feature_list=["section_lengths"],
-	output_dir=".",
+        feature_list=["section_lengths"],
+        output_dir=".",
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -47,9 +47,9 @@ PACKAGE_DIR = Path(__file__).resolve().parent.parent
 
 def find_optimal_distribution(population_directory, feature):
     """Loads a list of morphologies, extracts feature
-       and transforms the fitted distribution in the correct format.
-       Returns the optimal distribution, corresponding parameters,
-       minimun and maximum values.
+    and transforms the fitted distribution in the correct format.
+    Returns the optimal distribution, corresponding parameters,
+    minimun and maximum values.
     """
     population = nm.load_morphologies(population_directory)
 
@@ -60,17 +60,14 @@ def find_optimal_distribution(population_directory, feature):
 
 
 def main():
-
     population_directory = Path(PACKAGE_DIR, "tests/data/valid_set")
 
     result = stats.fit_results_to_dict(
-	find_optimal_distribution(population_directory, "section_lengths")
+        find_optimal_distribution(population_directory, "section_lengths")
     )
 
-    print(json.dumps(
-	result, indent=2, separators=(',', ': '), cls=NeuromJSON
-    ))
+    print(json.dumps(result, indent=2, separators=(",", ": "), cls=NeuromJSON))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

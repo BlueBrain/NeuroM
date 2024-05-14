@@ -9,8 +9,9 @@ SWC_PATH = Path(__file__).parent.parent / 'data/swc'
 
 def test_generate_annotation():
     checker_ok = CheckResult(True)
-    checker_not_ok = CheckResult(False, [('section 1', [[1, 2, 3], [4, 5, 6]]),
-                                         ('section 2', [[7, 8, 9], [10, 11, 12]])])
+    checker_not_ok = CheckResult(
+        False, [('section 1', [[1, 2, 3], [4, 5, 6]]), ('section 2', [[7, 8, 9], [10, 11, 12]])]
+    )
 
     settings = {'color': 'blue', 'label': 'circle', 'name': 'dangling'}
     assert generate_annotation(checker_ok, settings) == ""
@@ -31,7 +32,6 @@ def test_generate_annotation():
 
 
 def test_annotate():
-
     correct_result = """
 
 (Circle1   ; MUK_ANNOTATION
@@ -41,9 +41,7 @@ def test_annotate():
 )   ; MUK_ANNOTATION
 """
 
-    checkers = {has_no_narrow_start: {"name": "narrow start",
-                                      "label": "Circle1",
-                                      "color": "Blue"}}
+    checkers = {has_no_narrow_start: {"name": "narrow start", "label": "Circle1", "color": "Blue"}}
 
     m = load_morphology(SWC_PATH / 'narrow_start.swc')
     results = [checker(m) for checker in checkers.keys()]

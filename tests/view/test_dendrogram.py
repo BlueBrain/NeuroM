@@ -20,18 +20,16 @@ def test_create_dendrogram_morphology():
     assert soma_len == dendrogram.height
     assert soma_len == dendrogram.width
     assert_array_almost_equal(
-        [[-.5, 0], [-.5, soma_len], [.5, soma_len], [.5, 0]],
-        dendrogram.coords)
+        [[-0.5, 0], [-0.5, soma_len], [0.5, soma_len], [0.5, 0]], dendrogram.coords
+    )
     assert len(m.neurites) == len(dendrogram.children)
 
 
 def test_dendrogram_get_coords():
     segment_lengts = np.array([0, 1, 1])
-    segment_radii = np.array([.5, 1, .25])
+    segment_radii = np.array([0.5, 1, 0.25])
     coords = dm.Dendrogram.get_coords(segment_lengts, segment_radii)
-    assert_array_almost_equal(
-        [[-.5, 0], [-1, 1], [-.25, 2], [.25, 2], [1, 1], [.5, 0]],
-        coords)
+    assert_array_almost_equal([[-0.5, 0], [-1, 1], [-0.25, 2], [0.25, 2], [1, 1], [0.5, 0]], coords)
 
 
 def test_create_dendrogram_neurite():
@@ -71,15 +69,13 @@ def test_layout_dendrogram():
     def assert_layout(dendrogram):
         for i, child in enumerate(dendrogram.children):
             # child is higher than parent in Y coordinate
-            assert (
-                positions[child][1] >=
-                positions[dendrogram][1] + dendrogram.height)
+            assert positions[child][1] >= positions[dendrogram][1] + dendrogram.height
             if i < len(dendrogram.children) - 1:
                 next_child = dendrogram.children[i + 1]
                 # X space between child is enough for their widths
-                assert (
-                    positions[next_child][0] - positions[child][0] >
-                    .5 * (next_child.width + child.width))
+                assert positions[next_child][0] - positions[child][0] > 0.5 * (
+                    next_child.width + child.width
+                )
             assert_layout(child)
 
     m = load_morphology(NEURON_PATH)

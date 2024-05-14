@@ -32,6 +32,7 @@ from io import StringIO
 from unittest.mock import Mock
 
 import numpy as np
+import morphio
 from morphio import MorphioError, SomaError, set_raise_warnings
 from neurom import load_morphology
 from neurom.core import soma
@@ -48,10 +49,15 @@ def test_no_soma_builder():
 
 
 def test_no_soma():
-    sm = load_morphology(StringIO(u"""
+    sm = load_morphology(
+        StringIO(
+            u"""
         ((Dendrite)
         (0 0 0 1.0)
-        (0 0 0 2.0))"""), reader='asc').soma
+        (0 0 0 2.0))"""
+        ),
+        reader='asc',
+    ).soma
     assert sm.center is None
     assert sm.points.shape == (0, 4)
 
@@ -62,14 +68,20 @@ def test_Soma_SinglePoint():
     assert isinstance(sm, soma.SomaSinglePoint)
     assert list(sm.center) == [11, 22, 33]
     assert sm.radius == 44
+    assert_almost_equal(sm.area, 24328.49350939936, decimal=5)
 
 
 def test_Soma_contour():
     with warnings.catch_warnings(record=True):
-        sm = load_morphology(StringIO(u"""((CellBody)
+        sm = load_morphology(
+            StringIO(
+                u"""((CellBody)
                                       (0 0 0 44)
                                       (0 -44 0 44)
-                                      (0 +44 0 44))"""), reader='asc').soma
+                                      (0 +44 0 44))"""
+            ),
+            reader='asc',
+        ).soma
 
     assert 'SomaSimpleContour' in str(sm)
     assert isinstance(sm, soma.SomaSimpleContour)
@@ -78,9 +90,14 @@ def test_Soma_contour():
 
 
 def test_Soma_ThreePointCylinder():
-    sm = load_morphology(StringIO(u"""1 1 0   0 0 44 -1
+    sm = load_morphology(
+        StringIO(
+            u"""1 1 0   0 0 44 -1
                                   2 1 0 -44 0 44  1
-                                  3 1 0 +44 0 44  1"""), reader='swc').soma
+                                  3 1 0 +44 0 44  1"""
+        ),
+        reader='swc',
+    ).soma
     assert 'SomaNeuromorphoThreePointCylinders' in str(sm)
     assert isinstance(sm, soma.SomaNeuromorphoThreePointCylinders)
     assert list(sm.center) == [0, 0, 0]
@@ -89,24 +106,37 @@ def test_Soma_ThreePointCylinder():
 
 def test_Soma_ThreePointCylinder_invalid_radius():
     with warnings.catch_warnings(record=True) as w_list:
-        load_morphology(StringIO(u"""
+        load_morphology(
+            StringIO(
+                u"""
                         1 1 0   0 0 1e-8 -1
                         2 1 0 -1e-8 0 1e-8  1
-                        3 1 0 +1e-8 0 1e-8  1"""), reader='swc').soma
+                        3 1 0 +1e-8 0 1e-8  1"""
+            ),
+            reader='swc',
+        ).soma
         assert 'Zero radius for SomaNeuromorphoThreePointCylinders' in str(w_list[0])
 
 
 def test_Soma_ThreePointCylinder_invalid():
     try:
         set_raise_warnings(True)
-        with pytest.raises(MorphioError,
-                           match=('Warning: the soma does not conform the three point soma spec|' # morphio < 3.3.7
-                                  'The non-constant columns is not offset by' # morphio >= 3.3.7
-                                  )):
-            load_morphology(StringIO(u"""
+        with pytest.raises(
+            MorphioError,
+            match=(
+                'Warning: the soma does not conform the three point soma spec|'  # morphio < 3.3.7
+                'The non-constant columns is not offset by'  # morphio >= 3.3.7
+            ),
+        ):
+            load_morphology(
+                StringIO(
+                    u"""
                             1 1 0   0 0 1e-4 -1
                             2 1 0 -44 0 1e-4  1
-                            3 1 0 +44 0 1e-4  1"""), reader='swc')
+                            3 1 0 +44 0 1e-4  1"""
+                ),
+                reader='swc',
+            )
     finally:
         set_raise_warnings(False)
 
@@ -115,31 +145,37 @@ def check_SomaC(stream):
     sm = load_morphology(StringIO(stream), reader='asc').soma
     assert 'SomaSimpleContour' in str(sm)
     assert isinstance(sm, soma.SomaSimpleContour)
-    np.testing.assert_almost_equal(sm.center, [0., 0., 0.])
+    np.testing.assert_almost_equal(sm.center, [0.0, 0.0, 0.0])
     assert_almost_equal(sm.radius, 1.0)
 
 
 def test_SomaC():
     with warnings.catch_warnings(record=True):
-        check_SomaC(u"""((CellBody)
+        check_SomaC(
+            u"""((CellBody)
                         (1 0 0 44)
                         (0 1 0 44)
                         (-1 0 0 44)
-                        (0 -1 0 44)) """)
+                        (0 -1 0 44)) """
+        )
 
-        sin_pi_by_4 = math.cos(math.pi/4.)
-        cos_pi_by_4 = math.sin(math.pi/4.)
+        sin_pi_by_4 = math.cos(math.pi / 4.0)
+        cos_pi_by_4 = math.sin(math.pi / 4.0)
 
-        check_SomaC(u"""((CellBody)
+        check_SomaC(
+            u"""((CellBody)
                          (1 0 0 44)
                          ({sin} {cos} 0 44)
                          (0 1 0 44)
                          (-1 0 0 44)
                          (-{sin} -{cos} 0 44)
-                         (0 -1 0 44))""".format(sin=sin_pi_by_4,
-                                                cos=cos_pi_by_4))
+                         (0 -1 0 44))""".format(
+                sin=sin_pi_by_4, cos=cos_pi_by_4
+            )
+        )
 
-        check_SomaC(u"""((CellBody)
+        check_SomaC(
+            u"""((CellBody)
         (1 0 0 44)
         ({sin} {cos} 0 44)
         (0 1 0 44)
@@ -147,24 +183,41 @@ def test_SomaC():
         (-1 0 0 44)
         (-{sin} -{cos} 0 44)
         (0 -1 0 44)
-        ({sin} -{cos} 0 44))""".format(sin=sin_pi_by_4,
-                                       cos=cos_pi_by_4))
+        ({sin} -{cos} 0 44))""".format(
+                sin=sin_pi_by_4, cos=cos_pi_by_4
+            )
+        )
 
 
 def test_soma_points_2():
-    load_morphology(StringIO(u"""
+    load_morphology(
+        StringIO(
+            u"""
                     1 1 0 0 -10 40 -1
-                    2 1 0 0   0 40  1"""), reader='swc').soma
-    load_morphology(StringIO(u"""((CellBody)
+                    2 1 0 0   0 40  1"""
+        ),
+        reader='swc',
+    ).soma
+    load_morphology(
+        StringIO(
+            u"""((CellBody)
                              (0 0 0 44)
-                             (0 +44 0 44))"""), reader='asc').soma
+                             (0 +44 0 44))"""
+        ),
+        reader='asc',
+    ).soma
 
 
 def test_Soma_Cylinders():
-    s = load_morphology(StringIO(u"""
+    s = load_morphology(
+        StringIO(
+            u"""
                 1 1 0 0 -10 40 -1
                 2 1 0 0   0 40  1
-                3 1 0 0  10 40  2"""), reader='swc').soma
+                3 1 0 0  10 40  2"""
+        ),
+        reader='swc',
+    ).soma
 
     # if r = 2*h (ie: as in this case 10 - -10 == 20), then the
     # area of a cylinder (excluding end caps) is:
@@ -176,38 +229,54 @@ def test_Soma_Cylinders():
 
     # neuromorpho style
     with warnings.catch_warnings(record=True):
-        s = load_morphology(StringIO(u"""
+        s = load_morphology(
+            StringIO(
+                u"""
                 1 1 0   0 0 10 -1
                 2 1 0 -10 0 10  1
-                3 1 0  10 0 10  1"""), reader='swc').soma
+                3 1 0  10 0 10  1"""
+            ),
+            reader='swc',
+        ).soma
 
     assert 'SomaNeuromorphoThreePointCylinders' in str(s)
-    assert list(s.center) == [0., 0., 0.]
+    assert list(s.center) == [0.0, 0.0, 0.0]
     assert_almost_equal(s.area, 1256.6370614)
 
     # some neuromorpho files don't follow the convention
-    #but have (ys + rs) as point 2, and have xs different in each line
+    # but have (ys + rs) as point 2, and have xs different in each line
     # ex: http://neuromorpho.org/dableFiles/brumberg/CNG%20version/april11s1cell-1.CNG.swc
     with warnings.catch_warnings(record=True):
-        s = load_morphology(StringIO(u"""
+        s = load_morphology(
+            StringIO(
+                u"""
                 1 1  0  0 0 10 -1
                 2 1 -2 -6 0 10  1
-                3 1  2  6 0 10  1"""), reader='swc').soma
+                3 1  2  6 0 10  1"""
+            ),
+            reader='swc',
+        ).soma
 
     assert 'SomaNeuromorphoThreePointCylinders' in str(s)
-    assert list(s.center) == [0., 0., 0.]
+    assert list(s.center) == [0.0, 0.0, 0.0]
     assert_almost_equal(s.area, 794.76706126368811, decimal=5)
+    assert_almost_equal(s.volume, 3160.274957542371, decimal=5)
 
-    s = load_morphology(StringIO(u"""
+    s = load_morphology(
+        StringIO(
+            u"""
                 1 1 0  0 0  0 -1
                 2 1 0  2 0  2  1
                 3 1 0  4 0  4  2
                 4 1 0  6 0  6  3
                 5 1 0  8 0  8  4
-                6 1 0 10 0 10  5"""), reader='swc').soma
+                6 1 0 10 0 10  5"""
+        ),
+        reader='swc',
+    ).soma
 
-    assert list(s.center) == [0., 0., 0.]
-    assert_almost_equal(s.area, 444.288293851) # cone area, not including bottom
+    assert list(s.center) == [0.0, 0.0, 0.0]
+    assert_almost_equal(s.area, 444.288293851)  # cone area, not including bottom
 
 
 def test_soma_overlaps():
@@ -223,10 +292,15 @@ def test_soma_overlaps():
     np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [True, False, False])
 
     # Test with cynlindrical soma
-    sm = load_morphology(StringIO(u"""
+    sm = load_morphology(
+        StringIO(
+            u"""
                 1 1 0 0 -10 40 -1
                 2 1 0 0   0 40  1
-                3 1 0 0  10 40  2"""), reader='swc').soma
+                3 1 0 0  10 40  2"""
+        ),
+        reader='swc',
+    ).soma
     assert isinstance(sm, soma.SomaCylinders)
     points = [
         [0, 0, -20],  # on the axis of the cylinder but outside it
@@ -236,13 +310,20 @@ def test_soma_overlaps():
         [100, 0, 0],  # outside all cylinders
     ]
     np.testing.assert_array_equal(sm.overlaps(points), [False, True, True, True, False])
-    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [False, False, True, True, False])
+    np.testing.assert_array_equal(
+        sm.overlaps(points, exclude_boundary=True), [False, False, True, True, False]
+    )
 
     # Test with all points in soma for coverage
-    sm = load_morphology(StringIO(u"""
+    sm = load_morphology(
+        StringIO(
+            u"""
                 1 1 0 0 -10 40 -1
                 2 1 0 0   0 40  1
-                3 1 0 0  10 40  2"""), reader='swc').soma
+                3 1 0 0  10 40  2"""
+        ),
+        reader='swc',
+    ).soma
     assert isinstance(sm, soma.SomaCylinders)
     points = [
         [0, 0, -10],  # on the axis of the cylinder and on it's edge
@@ -253,12 +334,17 @@ def test_soma_overlaps():
     np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [False, True, True])
 
     # Test with contour soma
-    sm = load_morphology(StringIO(u"""
+    sm = load_morphology(
+        StringIO(
+            u"""
                 ((CellBody)
                     (1 0 0 1)
                     (1 1 0 1)
                     (-1 1 0 1)
-                    (-1 0 0 1)) """), reader='asc').soma
+                    (-1 0 0 1)) """
+        ),
+        reader='asc',
+    ).soma
     assert isinstance(sm, soma.SomaSimpleContour)
     points = [
         [0, 0.5, 0],  # on the center of the soma
@@ -269,4 +355,45 @@ def test_soma_overlaps():
         [2, 3, 0],  # outside the soma
     ]
     np.testing.assert_array_equal(sm.overlaps(points), [True, True, True, True, True, False])
-    np.testing.assert_array_equal(sm.overlaps(points, exclude_boundary=True), [True, False, False, True, True, False])
+    np.testing.assert_array_equal(
+        sm.overlaps(points, exclude_boundary=True), [True, False, False, True, True, False]
+    )
+
+
+def test_morphio_soma():
+    sm = load_morphology(
+        StringIO(
+            u"""
+                ((CellBody)
+                    (1 0 0 1)
+                    (1 1 0 1)
+                    (-1 1 0 1)
+                    (-1 0 0 1)) """
+        ),
+        reader='asc',
+    ).soma
+
+    morphio_soma = soma._morphio_soma(sm)
+    assert isinstance(morphio_soma, morphio.Soma)
+
+    morphio_soma = soma._morphio_soma(sm.to_morphio())
+    assert isinstance(morphio_soma, morphio.Soma)
+
+    with pytest.raises(TypeError, match="Unknown soma type"):
+        soma._morphio_soma(10)
+
+
+def test_soma_undefined_area():
+    sm = load_morphology(
+        StringIO(
+            u"""
+                ((CellBody)
+                    (1 0 0 1)
+                    (1 1 0 1)
+                    (-1 1 0 1)
+                    (-1 0 0 1)) """
+        ),
+        reader='asc',
+    ).soma
+    res = soma._soma_undefined_area(sm)
+    assert_almost_equal(res, 15.70796372920407, decimal=5)

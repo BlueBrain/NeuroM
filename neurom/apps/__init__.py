@@ -27,9 +27,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """Helper code for neurom applications."""
-import sys
 import logging
+import sys
 from pathlib import Path
+
 import yaml
 
 from neurom.exceptions import ConfigError

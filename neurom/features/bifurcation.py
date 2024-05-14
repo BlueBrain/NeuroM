@@ -29,18 +29,20 @@
 """Bifurcation point functions."""
 
 import numpy as np
+
+import neurom.features.section
 from neurom import morphmath
-from neurom.exceptions import NeuroMError
 from neurom.core.dataformat import COLS
 from neurom.core.morphology import Section
-from neurom.features.section import section_mean_radius
+from neurom.exceptions import NeuroMError
 
 
 def _raise_if_not_bifurcation(section):
     n_children = len(section.children)
     if n_children != 2:
-        raise NeuroMError('A bifurcation point must have exactly 2 children, found {}'.format(
-            n_children))
+        raise NeuroMError(
+            'A bifurcation point must have exactly 2 children, found {}'.format(n_children)
+        )
 
 
 def local_bifurcation_angle(bif_point):
@@ -51,12 +53,13 @@ def local_bifurcation_angle(bif_point):
     The bifurcation angle is defined as the angle between the first non-zero
     length segments of a bifurcation point.
     """
+
     def skip_0_length(sec):
         """Return the first point with non-zero distance to first point."""
         p0 = sec[0]
         cur = sec[1]
         for i, p in enumerate(sec[1:]):
-            if not np.all(p[:COLS.R] == p0[:COLS.R]):
+            if not np.all(p[: COLS.R] == p0[: COLS.R]):
                 cur = sec[i + 1]
                 break
 
@@ -64,8 +67,10 @@ def local_bifurcation_angle(bif_point):
 
     _raise_if_not_bifurcation(bif_point)
 
-    ch0, ch1 = (skip_0_length(bif_point.children[0].points),
-                skip_0_length(bif_point.children[1].points))
+    ch0, ch1 = (
+        skip_0_length(bif_point.children[0].points),
+        skip_0_length(bif_point.children[1].points),
+    )
 
     return morphmath.angle_3points(bif_point.points[-1], ch0, ch1)
 
@@ -80,9 +85,9 @@ def remote_bifurcation_angle(bif_point):
     """
     _raise_if_not_bifurcation(bif_point)
 
-    return morphmath.angle_3points(bif_point.points[-1],
-                                   bif_point.children[0].points[-1],
-                                   bif_point.children[1].points[-1])
+    return morphmath.angle_3points(
+        bif_point.points[-1], bif_point.children[0].points[-1], bif_point.children[1].points[-1]
+    )
 
 
 def bifurcation_partition(bif_point, iterator_type=Section.ipreorder):
@@ -156,8 +161,8 @@ def sibling_ratio(bif_point, method='first'):
         n = bif_point.children[0].points[1, COLS.R]
         m = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        n = section_mean_radius(bif_point.children[0])
-        m = section_mean_radius(bif_point.children[1])
+        n = neurom.features.section.section_mean_radius(bif_point.children[0])
+        m = neurom.features.section.section_mean_radius(bif_point.children[1])
     return min(n, m) / max(n, m)
 
 
@@ -182,7 +187,35 @@ def diameter_power_relation(bif_point, method='first'):
         d_child1 = bif_point.children[0].points[1, COLS.R]
         d_child2 = bif_point.children[1].points[1, COLS.R]
     if method == 'mean':
-        d_child = section_mean_radius(bif_point)
-        d_child1 = section_mean_radius(bif_point.children[0])
-        d_child2 = section_mean_radius(bif_point.children[1])
-    return (d_child / d_child1)**(1.5) + (d_child / d_child2)**(1.5)
+        d_child = neurom.features.section.section_mean_radius(bif_point)
+        d_child1 = neurom.features.section.section_mean_radius(bif_point.children[0])
+        d_child2 = neurom.features.section.section_mean_radius(bif_point.children[1])
+    return (d_child / d_child1) ** (1.5) + (d_child / d_child2) ** (1.5)
+
+
+def downstream_pathlength_asymmetry(
+    bif_point, normalization_length=1.0, iterator_type=Section.ipreorder
+):
+    """Calculates the downstream pathlength asymmetry at a bifurcation point.
+
+    Args:
+        bif_point: Bifurcation section.
+        normalization_length: Constant to divide the result with.
+        iterator_type: Iterator type that specifies how the two subtrees are traversed.
+
+    Returns:
+        The absolute difference between the downstream path distances of the two children, divided
+        by the normalization length.
+    """
+    _raise_if_not_bifurcation(bif_point)
+    return (
+        abs(
+            neurom.features.section.downstream_pathlength(
+                bif_point.children[0], iterator_type=iterator_type
+            )
+            - neurom.features.section.downstream_pathlength(
+                bif_point.children[1], iterator_type=iterator_type
+            ),
+        )
+        / normalization_length
+    )

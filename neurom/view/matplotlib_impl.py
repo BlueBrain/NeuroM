@@ -29,35 +29,38 @@
 """Morphology draw functions using matplotlib."""
 
 from functools import wraps
+
 import numpy as np
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Polygon, Rectangle
 from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
 from neurom import NeuriteType, geom
+from neurom.core.dataformat import COLS
 from neurom.core.morphology import iter_neurites, iter_sections, iter_segments
 from neurom.core.soma import SomaCylinders
-from neurom.core.dataformat import COLS
 from neurom.core.types import tree_type_checker
 from neurom.morphmath import segment_radius
-from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
-
 from neurom.view import matplotlib_utils
+from neurom.view.dendrogram import Dendrogram, get_size, layout_dendrogram, move_positions
 
 _LINEWIDTH = 1.2
 _ALPHA = 0.8
 _DIAMETER_SCALE = 1.0
-TREE_COLOR = {NeuriteType.basal_dendrite: 'red',
-              NeuriteType.apical_dendrite: 'purple',
-              NeuriteType.axon: 'blue',
-              NeuriteType.soma: 'black',
-              NeuriteType.undefined: 'green',
-              NeuriteType.custom5: 'orange',
-              NeuriteType.custom6: 'orange',
-              NeuriteType.custom7: 'orange',
-              NeuriteType.custom8: 'orange',
-              NeuriteType.custom9: 'orange',
-              NeuriteType.custom10: 'orange'}
+TREE_COLOR = {
+    NeuriteType.basal_dendrite: 'red',
+    NeuriteType.apical_dendrite: 'purple',
+    NeuriteType.axon: 'blue',
+    NeuriteType.soma: 'black',
+    NeuriteType.undefined: 'green',
+    NeuriteType.custom5: 'orange',
+    NeuriteType.custom6: 'orange',
+    NeuriteType.custom7: 'orange',
+    NeuriteType.custom8: 'orange',
+    NeuriteType.custom9: 'orange',
+    NeuriteType.custom10: 'orange',
+}
 
 
 def _implicit_ax(plot_func, params=None):
@@ -86,8 +89,10 @@ def _plane2col(plane):
     """Take a string like 'xy', and return the indices from COLS.*."""
     planes = ('xy', 'yx', 'xz', 'zx', 'yz', 'zy')
     assert plane in planes, 'No such plane found! Please select one of: ' + str(planes)
-    return (getattr(COLS, plane[0].capitalize()),
-            getattr(COLS, plane[1].capitalize()), )
+    return (
+        getattr(COLS, plane[0].capitalize()),
+        getattr(COLS, plane[1].capitalize()),
+    )
 
 
 def _get_linewidth(tree, linewidth, diameter_scale):
@@ -98,8 +103,7 @@ def _get_linewidth(tree, linewidth, diameter_scale):
     If diameter_scale is None, the linewidth is used.
     """
     if diameter_scale is not None and tree:
-        linewidth = [2 * segment_radius(s) * diameter_scale
-                     for s in iter_segments(tree)]
+        linewidth = [2 * segment_radius(s) * diameter_scale for s in iter_segments(tree)]
     return linewidth
 
 
@@ -111,9 +115,16 @@ def _get_color(treecolor, tree_type):
 
 
 @_implicit_ax
-def plot_tree(tree, ax=None, plane='xy',
-              diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA, realistic_diameters=False):
+def plot_tree(
+    tree,
+    ax=None,
+    plane='xy',
+    diameter_scale=_DIAMETER_SCALE,
+    linewidth=_LINEWIDTH,
+    color=None,
+    alpha=_ALPHA,
+    realistic_diameters=False,
+):
     """Plots a 2d figure of the tree's segments.
 
     Args:
@@ -132,33 +143,41 @@ def plot_tree(tree, ax=None, plane='xy',
     """
     plane0, plane1 = _plane2col(plane)
 
-    section_segment_list = [(section, segment)
-                            for section in iter_sections(tree)
-                            for segment in iter_segments(section)]
+    section_segment_list = [
+        (section, segment) for section in iter_sections(tree) for segment in iter_segments(section)
+    ]
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
     if realistic_diameters:
+
         def _get_rectangle(x, y, linewidth):
             """Draw  a rectangle to represent a secgment."""
             x, y = np.array(x), np.array(y)
             diff = y - x
             angle = np.arctan2(diff[1], diff[0]) % (2 * np.pi)
-            return Rectangle(x - linewidth / 2. * np.array([-np.sin(angle), np.cos(angle)]),
-                             np.linalg.norm(diff),
-                             linewidth,
-                             angle=np.rad2deg(angle))
+            return Rectangle(
+                x - linewidth / 2.0 * np.array([-np.sin(angle), np.cos(angle)]),
+                np.linalg.norm(diff),
+                linewidth,
+                angle=np.rad2deg(angle),
+            )
 
-        segs = [_get_rectangle((seg[0][plane0], seg[0][plane1]),
-                               (seg[1][plane0], seg[1][plane1]),
-                               2 * segment_radius(seg) * diameter_scale)
-                for _, seg in section_segment_list]
+        segs = [
+            _get_rectangle(
+                (seg[0][plane0], seg[0][plane1]),
+                (seg[1][plane0], seg[1][plane1]),
+                2 * segment_radius(seg) * diameter_scale,
+            )
+            for _, seg in section_segment_list
+        ]
 
         collection = PatchCollection(segs, alpha=alpha, facecolors=colors)
 
     else:
-        segs = [((seg[0][plane0], seg[0][plane1]),
-                 (seg[1][plane0], seg[1][plane1]))
-                for _, seg in section_segment_list]
+        segs = [
+            ((seg[0][plane0], seg[0][plane1]), (seg[1][plane0], seg[1][plane1]))
+            for _, seg in section_segment_list
+        ]
 
         linewidth = _get_linewidth(
             tree,
@@ -171,10 +190,9 @@ def plot_tree(tree, ax=None, plane='xy',
 
 
 @_implicit_ax
-def plot_soma(soma, ax=None, plane='xy',
-              soma_outline=True,
-              linewidth=_LINEWIDTH,
-              color=None, alpha=_ALPHA):
+def plot_soma(
+    soma, ax=None, plane='xy', soma_outline=True, linewidth=_LINEWIDTH, color=None, alpha=_ALPHA
+):
     """Generates a 2d figure of the soma.
 
     Args:
@@ -192,14 +210,20 @@ def plot_soma(soma, ax=None, plane='xy',
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
             matplotlib_utils.project_cylinder_onto_2d(
-                ax, (plane0, plane1),
-                start=start[COLS.XYZ], end=end[COLS.XYZ],
-                start_radius=start[COLS.R], end_radius=end[COLS.R],
-                color=color, alpha=alpha)
+                ax,
+                (plane0, plane1),
+                start=start[COLS.XYZ],
+                end=end[COLS.XYZ],
+                start_radius=start[COLS.R],
+                end_radius=end[COLS.R],
+                color=color,
+                alpha=alpha,
+            )
     else:
         if soma_outline:
-            ax.add_artist(Circle(soma.center[[plane0, plane1]], soma.radius,
-                                 color=color, alpha=alpha))
+            ax.add_artist(
+                Circle(soma.center[[plane0, plane1]], soma.radius, color=color, alpha=alpha)
+            )
         else:
             points = [[p[plane0], p[plane1]] for p in soma.iter()]
             if points:
@@ -211,19 +235,31 @@ def plot_soma(soma, ax=None, plane='xy',
     ax.set_ylabel(plane[1])
 
     bounding_box = geom.bounding_box(soma)
-    ax.dataLim.update_from_data_xy(np.vstack(([bounding_box[0][plane0], bounding_box[0][plane1]],
-                                              [bounding_box[1][plane0], bounding_box[1][plane1]])),
-                                   ignore=False)
+    ax.dataLim.update_from_data_xy(
+        np.vstack(
+            (
+                [bounding_box[0][plane0], bounding_box[0][plane1]],
+                [bounding_box[1][plane0], bounding_box[1][plane1]],
+            )
+        ),
+        ignore=False,
+    )
 
 
 # pylint: disable=too-many-arguments
 @_implicit_ax
-def plot_morph(morph, ax=None,
-               neurite_type=NeuriteType.all,
-               plane='xy',
-               soma_outline=True,
-               diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-               color=None, alpha=_ALPHA, realistic_diameters=False):
+def plot_morph(
+    morph,
+    ax=None,
+    neurite_type=NeuriteType.all,
+    plane='xy',
+    soma_outline=True,
+    diameter_scale=_DIAMETER_SCALE,
+    linewidth=_LINEWIDTH,
+    color=None,
+    alpha=_ALPHA,
+    realistic_diameters=False,
+):
     """Plots a 2D figure of the morphology, that contains a soma and the neurites.
 
     Args:
@@ -238,13 +274,27 @@ def plot_morph(morph, ax=None,
         alpha(float): Transparency of plotted values
         realistic_diameters(bool): scale linewidths with axis data coordinates
     """
-    plot_soma(morph.soma, ax, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
-              color=color, alpha=alpha)
+    plot_soma(
+        morph.soma,
+        ax,
+        plane=plane,
+        soma_outline=soma_outline,
+        linewidth=linewidth,
+        color=color,
+        alpha=alpha,
+    )
 
     for neurite in iter_neurites(morph, filt=tree_type_checker(neurite_type)):
-        plot_tree(neurite, ax, plane=plane,
-                  diameter_scale=diameter_scale, linewidth=linewidth,
-                  color=color, alpha=alpha, realistic_diameters=realistic_diameters)
+        plot_tree(
+            neurite,
+            ax,
+            plane=plane,
+            diameter_scale=diameter_scale,
+            linewidth=linewidth,
+            color=color,
+            alpha=alpha,
+            realistic_diameters=realistic_diameters,
+        )
 
     ax.set_title(morph.name)
     ax.set_xlabel(plane[0])
@@ -254,19 +304,22 @@ def plot_morph(morph, ax=None,
 def _update_3d_datalim(ax, obj):
     """Unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually."""
     min_bounding_box, max_bounding_box = geom.bounding_box(obj)
-    xy_bounds = np.vstack((min_bounding_box[:COLS.Z],
-                           max_bounding_box[:COLS.Z]))
+    xy_bounds = np.vstack((min_bounding_box[: COLS.Z], max_bounding_box[: COLS.Z]))
     ax.xy_dataLim.update_from_data_xy(xy_bounds, ignore=False)
 
-    z_bounds = np.vstack(((min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
-                          (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z])))
+    z_bounds = np.vstack(
+        (
+            (min_bounding_box[COLS.Z], min_bounding_box[COLS.Z]),
+            (max_bounding_box[COLS.Z], max_bounding_box[COLS.Z]),
+        )
+    )
     ax.zz_dataLim.update_from_data_xy(z_bounds, ignore=False)
 
 
 @_implicit_ax3d
-def plot_tree3d(tree, ax=None,
-                diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                color=None, alpha=_ALPHA):
+def plot_tree3d(
+    tree, ax=None, diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH, color=None, alpha=_ALPHA
+):
     """Generates a figure of the tree in 3d.
 
     If the tree contains one single point the plot will be empty \
@@ -280,9 +333,9 @@ def plot_tree3d(tree, ax=None,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
-    section_segment_list = [(section, segment)
-                            for section in iter_sections(tree)
-                            for segment in iter_segments(section)]
+    section_segment_list = [
+        (section, segment) for section in iter_sections(tree) for segment in iter_segments(section)
+    ]
     segs = [(seg[0][COLS.XYZ], seg[1][COLS.XYZ]) for _, seg in section_segment_list]
     colors = [_get_color(color, section.type) for section, _ in section_segment_list]
 
@@ -308,22 +361,34 @@ def plot_soma3d(soma, ax=None, color=None, alpha=_ALPHA):
 
     if isinstance(soma, SomaCylinders):
         for start, end in zip(soma.points, soma.points[1:]):
-            matplotlib_utils.plot_cylinder(ax,
-                                           start=start[COLS.XYZ], end=end[COLS.XYZ],
-                                           start_radius=start[COLS.R], end_radius=end[COLS.R],
-                                           color=color, alpha=alpha)
+            matplotlib_utils.plot_cylinder(
+                ax,
+                start=start[COLS.XYZ],
+                end=end[COLS.XYZ],
+                start_radius=start[COLS.R],
+                end_radius=end[COLS.R],
+                color=color,
+                alpha=alpha,
+            )
     else:
-        matplotlib_utils.plot_sphere(ax, center=soma.center[COLS.XYZ], radius=soma.radius,
-                                     color=color, alpha=alpha)
+        matplotlib_utils.plot_sphere(
+            ax, center=soma.center[COLS.XYZ], radius=soma.radius, color=color, alpha=alpha
+        )
 
     # unlike w/ 2d Axes, the dataLim isn't set by collections, so it has to be updated manually
     _update_3d_datalim(ax, soma)
 
 
 @_implicit_ax3d
-def plot_morph3d(morph, ax=None, neurite_type=NeuriteType.all,
-                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
-                 color=None, alpha=_ALPHA):
+def plot_morph3d(
+    morph,
+    ax=None,
+    neurite_type=NeuriteType.all,
+    diameter_scale=_DIAMETER_SCALE,
+    linewidth=_LINEWIDTH,
+    color=None,
+    alpha=_ALPHA,
+):
     """Generates a figure of the morphology, that contains a soma and a list of trees.
 
     Args:
@@ -338,9 +403,14 @@ def plot_morph3d(morph, ax=None, neurite_type=NeuriteType.all,
     plot_soma3d(morph.soma, ax, color=color, alpha=alpha)
 
     for neurite in iter_neurites(morph, filt=tree_type_checker(neurite_type)):
-        plot_tree3d(neurite, ax,
-                    diameter_scale=diameter_scale, linewidth=linewidth,
-                    color=color, alpha=alpha)
+        plot_tree3d(
+            neurite,
+            ax,
+            diameter_scale=diameter_scale,
+            linewidth=linewidth,
+            color=color,
+            alpha=alpha,
+        )
 
     ax.set_title(morph.name)
 
@@ -355,12 +425,15 @@ def _get_dendrogram_legend(dendrogram):
     Returns:
         List of legend handles.
     """
+
     def neurite_legend(neurite_type):
         return Line2D([0], [0], color=TREE_COLOR[neurite_type], lw=2, label=neurite_type.name)
 
     if dendrogram.neurite_type == NeuriteType.soma:
-        handles = {d.neurite_type: neurite_legend(d.neurite_type)
-                   for d in [dendrogram] + dendrogram.children}
+        handles = {
+            d.neurite_type: neurite_legend(d.neurite_type)
+            for d in [dendrogram] + dendrogram.children
+        }
         return handles.values()
     return [neurite_legend(dendrogram.neurite_type)]
 
@@ -409,9 +482,9 @@ def plot_dendrogram(obj, ax=None, show_diameters=True):
     dendrogram = Dendrogram(obj)
     positions = layout_dendrogram(dendrogram, np.array([0, 0]))
     w, h = get_size(positions)
-    positions = move_positions(positions, np.array([.5 * w, 0]))
-    ax.set_xlim([-.05 * w, 1.05 * w])
-    ax.set_ylim([-.05 * h, 1.05 * h])
+    positions = move_positions(positions, np.array([0.5 * w, 0]))
+    ax.set_xlim([-0.05 * w, 1.05 * w])
+    ax.set_ylim([-0.05 * h, 1.05 * h])
     ax.set_title('Morphology Dendrogram')
     ax.set_xlabel('micrometers (um)')
     ax.set_ylabel('micrometers (um)')

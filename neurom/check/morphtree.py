@@ -31,8 +31,9 @@
 import numpy as np
 from scipy.spatial import KDTree
 
-from neurom.core.dataformat import COLS
 from neurom import morphmath as mm
+from neurom.core.dataformat import COLS
+from neurom.core.morphology import iter_sections
 from neurom.morphmath import principal_direction_extent
 
 
@@ -48,15 +49,14 @@ def is_monotonic(neurite, tol):
     Returns:
         True if neurite monotonic
     """
-    for node in neurite.iter_sections():
+    for node in iter_sections(neurite):
         # check that points in section satisfy monotonicity
         sec = node.points
         for point_id in range(len(sec) - 1):
             if sec[point_id + 1][COLS.R] > sec[point_id][COLS.R] + tol:
                 return False
         # Check that section boundary points satisfy monotonicity
-        if (node.parent is not None and
-           sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol):
+        if node.parent is not None and sec[0][COLS.R] > node.parent.points[-1][COLS.R] + tol:
             return False
 
     return True
@@ -86,7 +86,7 @@ def is_flat(neurite, tol, method='tolerance'):
     return any(ext < float(tol))
 
 
-def back_tracking_segments(neurite):
+def back_tracking_segments(neurite):  # pylint: disable=too-many-locals
     """Check if a neurite process backtracks to a previous node.
 
     Back-tracking takes place
@@ -101,7 +101,7 @@ def back_tracking_segments(neurite):
         for which a back tracking is detected (so the first point of these segments can be
         retrieved with ``morph.section(section_id).points[segment_id]``.
     """
-    # pylint: disable=too-many-locals
+
     def pair(segs):
         """Pairs the input list into triplets."""
         return zip(segs, segs[1:])
@@ -173,7 +173,7 @@ def back_tracking_segments(neurite):
         return not is_in_the_same_verse(seg1, seg2) and is_seg1_overlapping_with_seg2(seg1, seg2)
 
     # filter out single segment sections
-    section_itr = (sec for sec in neurite.iter_sections() if sec.points.shape[0] > 2)
+    section_itr = (sec for sec in iter_sections(neurite) if sec.points.shape[0] > 2)
     for sec in section_itr:
         # group each section's points intro triplets
         segment_pairs = list(filter(is_not_zero_seg, pair(sec.points)))
@@ -182,7 +182,7 @@ def back_tracking_segments(neurite):
         for i, seg1 in enumerate(segment_pairs[1:]):
             # check if the end point of the segment lies within the previous
             # ones in the current section
-            for j, seg2 in enumerate(segment_pairs[0: i + 1]):
+            for j, seg2 in enumerate(segment_pairs[0 : i + 1]):
                 if is_inside_cylinder(seg1, seg2):
                     yield (sec.id, i, j)
 
@@ -230,7 +230,7 @@ def overlapping_points(neurite, tolerance=None):
                         [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:, :3]],
                         axis=1,
                     )
-                    for sec in neurite.iter_sections()
+                    for sec in iter_sections(neurite)
                 ],
             ),
         ],

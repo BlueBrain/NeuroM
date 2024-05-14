@@ -30,19 +30,18 @@
 
 import numpy as np
 
-
 try:
     import plotly.graph_objs as go
-    from plotly.offline import plot, iplot, init_notebook_mode
+    from plotly.offline import init_notebook_mode, iplot, plot
 except ImportError as e:
     raise ImportError(
         'neurom[plotly] is not installed. Please install it by doing: pip install neurom[plotly]'
     ) from e
 
-from neurom import COLS, iter_segments, iter_neurites
+from neurom import COLS, iter_neurites, iter_segments
 from neurom.core.morphology import Morphology
-from neurom.view.matplotlib_impl import TREE_COLOR
 from neurom.utils import flatten
+from neurom.view.matplotlib_impl import TREE_COLOR
 
 
 def plot_morph(morph, plane='xy', inline=False, **kwargs):
@@ -75,26 +74,19 @@ def _make_trace(morph, plane):
 
         segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in segments]
 
-        coords = {'x': list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
-                  'y': list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
-                  'z': list(flatten((p1[2], p2[2], None) for p1, p2 in segs)),
-                  }
+        coords = {
+            "x": list(flatten((p1[0], p2[0], None) for p1, p2 in segs)),
+            "y": list(flatten((p1[1], p2[1], None) for p1, p2 in segs)),
+            "z": list(flatten((p1[2], p2[2], None) for p1, p2 in segs)),
+        }
 
         color = TREE_COLOR.get(neurite.root_node.type, 'black')
         if plane.lower() == '3d':
             plot_fun = go.Scatter3d
         else:
             plot_fun = go.Scatter
-            coords = {'x': coords[plane[0]],
-                      'y': coords[plane[1]],
-                      }
-        yield plot_fun(
-            line={'color': color,
-                  'width': 2,
-                  },
-            mode='lines',
-            **coords
-        )
+            coords = {"x": coords[plane[0]], "y": coords[plane[1]]}
+        yield plot_fun(line={"color": color, "width": 2}, mode='lines', **coords)
 
 
 def _fill_soma_data(morph, data, plane):
@@ -114,7 +106,6 @@ def _fill_soma_data(morph, data, plane):
                 'y0': morph.soma.center[1] - morph.soma.radius,
                 'x1': morph.soma.center[0] + morph.soma.radius,
                 'y1': morph.soma.center[1] + morph.soma.radius,
-
                 'line': {
                     'color': 'rgba(50, 171, 96, 1)',
                 },
@@ -144,34 +135,33 @@ def get_figure(morph, plane, title):
     """Returns the plotly figure containing the morphology."""
     data = list(_make_trace(morph, plane))
     axis = {
-        'gridcolor': 'rgb(255, 255, 255)',
-        'zerolinecolor': 'rgb(255, 255, 255)',
-        'showbackground': True,
-        'backgroundcolor': 'rgb(230, 230,230)',
+        "gridcolor": "rgb(255, 255, 255)",
+        "zerolinecolor": "rgb(255, 255, 255)",
+        "showbackground": True,
+        "backgroundcolor": "rgb(230, 230,230)",
     }
 
     soma_2d = _fill_soma_data(morph, data, plane)
 
     layout = {
-        'autosize': True,
-        'title': title,
-        'scene': {
-            'xaxis': axis,
-            'yaxis': axis,
-            'zaxis': axis,
-            'camera': {'up': {'x': 0,
-                              'y': 0,
-                              'z': 1,
-                              },
-                       'eye': {'x': -1.7428,
-                               'y': 1.0707,
-                               'z': 0.7100,
-                               },
-                       },
-            'aspectmode': 'data',
+        "autosize": True,
+        "title": title,
+        "scene": {  # This is used for 3D plots
+            "xaxis": axis,
+            "yaxis": axis,
+            "zaxis": axis,
+            "camera": {
+                "up": {"x": 0, "y": 0, "z": 1},
+                "eye": {
+                    "x": -1.7428,
+                    "y": 1.0707,
+                    "z": 0.7100,
+                },
+            },
+            "aspectmode": "data",
         },
-        'yaxis': {'scaleanchor': "x"},  # This is used for 2D plots
-        'shapes': soma_2d,
+        "yaxis": {"scaleanchor": "x"},  # This is used for 2D plots
+        "shapes": soma_2d,
     }
 
     res = {"data": data, "layout": layout}
