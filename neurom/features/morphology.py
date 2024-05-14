@@ -459,7 +459,7 @@ def neurite_volume_density(morph, neurite_type=NeuriteType.all):
 
 @feature(shape=(...,))
 def sholl_crossings(
-    morph, neurite_type=NeuriteType.all, center=None, radii=None, distance_type="euclidean"
+    morph, neurite_type=NeuriteType.all, center=None, radii=None, distance_type="radial"
 ):
     """Calculate crossings of neurites.
 
@@ -469,7 +469,7 @@ def sholl_crossings(
         center(Point): center point, if None then soma center is taken
         radii(iterable of floats): radii for which crossings will be counted,
             if None then soma radius is taken
-        distance_type(str): either `euclidean` or `path` as distance measure to use
+        distance_type(str): either `radial` or `path` as distance measure to use
 
     Returns:
         Array of same length as radii, with a count of the number of crossings
@@ -486,7 +486,7 @@ def sholl_crossings(
         """Used to count_crossings of segments in neurite with radius."""
         count = 0
 
-        if distance_type == 'euclidean':
+        if distance_type == 'radial':
             r2 = radius ** 2
             for start, end in iter_segments(neurite):
                 start_dist2, end_dist2 = (morphmath.point_dist2(center, start),
