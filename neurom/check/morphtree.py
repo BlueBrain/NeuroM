@@ -230,7 +230,7 @@ def overlapping_points(neurite, tolerance=None):
                         [np.ones((len(sec.points) - 1, 1)) * sec.id, sec.points[1:, :3]],
                         axis=1,
                     )
-                    for sec in neurite.iter_sections()
+                    for sec in iter_sections(neurite)
                 ],
             ),
         ],

@@ -377,7 +377,7 @@ def has_no_single_children(morph):
 def has_no_back_tracking(morph):
     """Check if the morphology has sections with back-tracks."""
     bad_ids = [
-        (i, morph.section(i[0]).points[np.newaxis, i[1]])
+        (i, morph.section(i[0]).points[:, COLS.XYZ][np.newaxis, i[1]])
         for neurite in iter_neurites(morph)
         for i in back_tracking_segments(neurite)
     ]
