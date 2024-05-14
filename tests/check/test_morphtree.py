@@ -155,6 +155,30 @@ def test_is_flat():
     assert not mt.is_flat(m.neurites[0], 0.1, method='ratio')
 
 
+def test_back_tracking_segments():
+    # case 1: a back-track falls directly on a previous node
+    t1 = _generate_back_track_tree(1, (0.0, 0.0, 0.0))
+    assert list(mt.back_tracking_segments(t1.neurites[0])) == [(2, 1, 0), (2, 1, 1)]
+
+    # case 2: a zigzag is close to another segment
+    t2 = _generate_back_track_tree(1, (0.1, -0.1, 0.02))
+    assert list(mt.back_tracking_segments(t2.neurites[0])) == [(2, 1, 0), (2, 1, 1)]
+
+    # case 3: a zigzag is close to another segment 2
+    t3 = _generate_back_track_tree(1, (-0.2, 0.04, 0.144))
+    assert list(mt.back_tracking_segments(t3.neurites[0])) == [(2, 1, 0)]
+
+    # case 4: a zigzag far from civilization
+    t4 = _generate_back_track_tree(1, (10.0, -10.0, 10.0))
+    assert list(mt.back_tracking_segments(t4.neurites[0])) == []
+
+    # case 5: a zigzag on another section
+    # currently zigzag is defined on the same section
+    # thus this test should not be true
+    t5 = _generate_back_track_tree(0, (-0.2, 0.04, 0.144))
+    assert list(mt.back_tracking_segments(t5.neurites[0])) == []
+
+
 def test_is_back_tracking():
     # case 1: a back-track falls directly on a previous node
     t = _generate_back_track_tree(1, (0.0, 0.0, 0.0))
@@ -200,3 +224,10 @@ def test_get_nonmonotonic_neurites():
 def test_get_back_tracking_neurites():
     m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
     assert len(mt.get_back_tracking_neurites(m)) == 4
+
+
+def test_get_overlapping_point_neurites():
+    m = load_morphology(Path(SWC_PATH, 'Neuron.swc'))
+    assert len(mt.get_overlapping_point_neurites(m)) == 0
+    assert len(mt.get_overlapping_point_neurites(m, tolerance=0.09)) == 1
+    assert len(mt.get_overlapping_point_neurites(m, tolerance=999)) == 4

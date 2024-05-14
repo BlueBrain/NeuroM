@@ -478,3 +478,69 @@ def test_single_children():
     result = morphology_checks.has_no_single_children(m)
     assert result.status is False
     assert result.info == [0]
+
+
+def test_has_no_back_tracking():
+    m = load_morphology(
+        """
+    ((CellBody) (-1 0 0 2) (1 0 0 2))
+
+    ((Dendrite)
+    (0 0 0 0.4)
+    (0 1 0 0.3)
+    (0 2 0 0.28)
+    (
+      (0 2 0 0.28)
+      (1 3 0 0.3)
+      (2 4 0 0.22)
+      |
+      (0 2 0 0.28)
+      (1 -3 0 0.3)
+      (2 -4 0 0.24)
+      (1 -3 0 0.52)
+      (3 -5 0 0.2)
+      (4 -6 0 0.2)
+    ))
+""",
+        "asc",
+    )
+    result = morphology_checks.has_no_back_tracking(m)
+    assert result.status is False
+    info = result.info
+    assert_array_equal(info[0][0], [2, 1, 0])
+    assert_array_equal(info[0][1], [[1, -3, 0]])
+    assert_array_equal(info[1][0], [2, 1, 1])
+    assert_array_equal(info[1][1], [[1, -3, 0]])
+
+
+def test_has_no_overlapping_point():
+    m = load_morphology(
+        """
+    ((CellBody) (-1 0 0 2) (1 0 0 2))
+
+    ((Dendrite)
+    (0 0 0 0.4)
+    (0 1 0 0.3)
+    (0 2 0 0.28)
+    (
+      (0 2 0 0.28)
+      (1 3 0 0.3)
+      (2 4 0 0.22)
+      |
+      (0 2 0 0.28)
+      (1 -3 0 0.3)
+      (2 -4 0 0.24)
+      (1 -3 0 0.52)
+      (0  1 0 0.2)
+      (4 -6 0 0.2)
+    ))
+""",
+        "asc",
+    )
+    result = morphology_checks.has_no_overlapping_point(m)
+    assert result.status is False
+    info = result.info
+    assert_array_equal(info[0][0], [0, 2])
+    assert_array_equal(info[0][1], [[0, 1, 0]])
+    assert_array_equal(info[1][0], [2, 2])
+    assert_array_equal(info[1][1], [[1, -3, 0]])

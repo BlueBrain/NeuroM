@@ -81,8 +81,8 @@ def plot_density(
     mask = H1 < threshold  # mask = H1==0
     H2 = np.ma.masked_array(H1, mask)
 
-    colormap = mpl.cm.get_cmap(color_map).copy()
-    colormap.set_bad(color="white", alpha=None)
+    colormap = plt.get_cmap(color_map).copy()
+    colormap.set_bad(color='white', alpha=None)
 
     plots = ax.contourf(
         (xedges1[:-1] + xedges1[1:]) / 2,
