@@ -85,13 +85,13 @@ we apply a simple user defined function to the apical dendrites in a population:
 
     stuff = [x for x in nm.iter_neurites(pop, user_func, lambda n : n.type == nm.APICAL_DENDRITE)]
 
-View morphologies with :mod:`neurom.viewer`
+View morphologies with :mod:`neurom.view`
 -------------------------------------------
 
 There are also helper functions to  plot a morphology in 2 and 3 dimensions.
 
-:func:`neurom.viewer.draw` function allows the user to make two and three-dimensional
-plots of neurites, somata and morphologies. It also has a dendrogram morphology plotting mode.
+:func:`neurom.view` function allows the user to make two and three-dimensional plots of neurites, somata and morphologies.
+It also has a dendrogram morphology plotting mode.
 
 
 Extract morphometrics into JSON files

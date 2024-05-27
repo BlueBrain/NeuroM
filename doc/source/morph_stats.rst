@@ -86,8 +86,7 @@ Here, there are two feature categories,
 2. ``neuron``: these are morphometrics that can be applied to a whole morphology, e.g. the soma radius,
    the trunk radii, etc.
 
-Each category sub-item (section_lengths, soma_radius, etc) corresponds to a
-:py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
+Each category sub-item (section_lengths, soma_radius, etc) corresponds to a :py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
 function, e.g.
 
 * ``raw``: array of raw values

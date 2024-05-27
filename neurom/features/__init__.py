@@ -37,7 +37,6 @@ Examples:
     >>> ax_sec_len = features.get('section_lengths', m, neurite_type=neurom.AXON)
 """
 
-import inspect
 import operator
 from enum import Enum
 from functools import partial, reduce, wraps

@@ -120,7 +120,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
 
     Args:
         points: an iterable of indexable objects with indices
-        0, 1, 2 correspoding to 3D cartesian coordinates
+            0, 1, 2 correspoding to 3D cartesian coordinates
         fraction: path length fraction (0.0 <= fraction <= 1.0)
         relative_offset: return absolute or relative segment distance
 
@@ -236,7 +236,7 @@ def angle_3points(p0, p1, p2):
 
     Args:
         p0, p1, p2:  indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+            indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
         Angle in radians between (p1-p0) and (p2-p0).
