@@ -184,7 +184,7 @@ def plot_style(
     """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:
-        fig(matplotlib figure): figure
+        fig: matplotlib figure
         ax(matplotlib axes, belonging to `fig`): axes
 
         pretitle(str): String to include before the general title of the figure
@@ -202,11 +202,11 @@ def plot_style(
         zlabel_arg(dict):  Passsed into matplotlib as zlabel arguments
 
         tick_fontsize (int): Defines the size of the ticks' font
-        xticks([list of ticks]): Defines the values of x ticks in the figure
+        xticks: Defines the values of x ticks in the figure (1D array-like)
         xticks_args(dict):  Passsed into matplotlib as xticks arguments
-        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks: Defines the values of y ticks in the figure( 1D array-like)
         yticks_args(dict):  Passsed into matplotlib as yticks arguments
-        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks: Defines the values of z ticks in the figure (1D array-like)
         zticks_args(dict):  Passsed into matplotlib as zticks arguments
 
         white_space(float): whitespace added to surround the tight limit of the data
@@ -312,11 +312,11 @@ def plot_ticks(
     Args:
         ax: matplotlib axes
         tick_fontsize (int): Defines the size of the ticks' font
-        xticks(1D array-like): Defines the values of x ticks in the figure
+        xticks: Defines the values of x ticks in the figure (1D array-like)
         xticks_args(dict):  Passsed into matplotlib as xticks arguments
-        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks: Defines the values of y ticks in the figure (1D array-like)
         yticks_args(dict):  Passsed into matplotlib as yticks arguments
-        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks: Defines the values of z ticks in the figure (1D array-like)
         zticks_args(dict):  Passsed into matplotlib as zticks arguments
     """
     if xticks is not None:

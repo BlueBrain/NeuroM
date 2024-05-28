@@ -139,9 +139,9 @@ The new format:
 - requires to use ``sum`` instead of ``total`` statistic aggregating function.
 - allows to specify features arguments.
 
-For example, ``partition_asymmetry`` feature has additional arguments like ``method`` and
-``variant`` (see :py:func:`neurom.features.neurite.partition_asymmetries`). Before it wasn't
-possible to set them. Here is how you can set them now:
+For example, ``partition_asymmetry`` feature has additional arguments like ``method`` and ``variant``.
+Before it wasn't possible to set them.
+Here is how you can set them now:
 
 .. code-block:: yaml
 

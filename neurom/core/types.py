@@ -184,8 +184,7 @@ def tree_type_checker(*ref):
     """Tree type checker functor.
 
     Args:
-        *ref(NeuriteType|tuple): Either a single NeuriteType or a variable list of them or a tuple
-        of them.
+        *ref(NeuriteType|tuple): Either a single NeuriteType, list of them or a tuple of them.
 
     Returns:
         Functor that takes a tree, and returns true if that tree matches any of

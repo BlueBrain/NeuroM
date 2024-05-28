@@ -317,8 +317,7 @@ def partition_asymmetry(
 
     Variant: length is a different definition, as the absolute difference in
     downstream path lenghts, relative to the total neurite path length
-    Method: 'petilla' or 'uylings'. The former is default. The latter uses ``-2`` shift. See
-    :func:`neurom.features.bifurcationfunc.partition_asymmetry`
+    Method: 'petilla' or 'uylings'. The former is default. The latter uses ``-2`` shift.
     """
     if variant not in {'branch-order', 'length'}:
         raise ValueError(

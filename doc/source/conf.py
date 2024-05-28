@@ -61,11 +61,14 @@ extensions = [
     'sphinx.ext.doctest',
 ]
 
-napoleon_type_aliases = {
-    "Number": "float|int",
-    #"floats": "",
-}
-
+nitpicky = True
+nitpick_ignore = [
+    ("py:class", "Path"),
+    ("py:class", "morphio.Morphology"),
+    ("py:class", "morphio.mut.Morphology"),
+    ("py:class", "morphio.Section"),
+    ("py:class", "morphio.Soma"),
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
