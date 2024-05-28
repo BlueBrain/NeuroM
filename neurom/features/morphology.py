@@ -595,7 +595,7 @@ def sholl_crossings(morph, neurite_type=NeuriteType.all, center=None, radii=None
         morph(Morphology|list): morphology or a list of neurites
         neurite_type(NeuriteType): Type of neurite to use. By default ``NeuriteType.all`` is used.
         center(Point): center point, if None then soma center is taken
-        radii(iterable of floats): radii for which crossings will be counted,
+        radii: iterable of floats for which crossings will be counted,
             if None then soma radius is taken
 
     Returns:
@@ -658,8 +658,8 @@ def sholl_frequency(morph, neurite_type=NeuriteType.all, step_size=10, bins=None
         morph(Morphology): a morphology
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
-        bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-        intervals of step_size between min and max radii of ``morphologies``.
+        bins: iterable of floats defining custom binning to use for the Sholl radii.
+            If None, it uses intervals of step_size between min and max radii of ``morphologies``.
 
     Note:
         Given a morphology, the soma center is used for the concentric circles,

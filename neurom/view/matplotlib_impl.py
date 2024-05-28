@@ -128,8 +128,8 @@ def plot_tree(
     """Plots a 2d figure of the tree's segments.
 
     Args:
-        tree(neurom.core.Section or neurom.core.Neurite): plotted tree
-        ax(matplotlib axes): on what to plot
+        tree(Section or Neurite): plotted tree
+        ax: on what matplotlib axes to plot
         plane(str): Any pair of 'xyz'
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -196,8 +196,8 @@ def plot_soma(
     """Generates a 2d figure of the soma.
 
     Args:
-        soma(neurom.core.Soma): plotted soma
-        ax(matplotlib axes): on what to plot
+        soma(Soma): plotted soma
+        ax: on what matplotlib axes to plot
         plane(str): Any pair of 'xyz'
         soma_outline(bool): should the soma be drawn as an outline
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -264,7 +264,7 @@ def plot_morph(
 
     Args:
         neurite_type(NeuriteType|tuple): an optional filter on the neurite type
-        ax(matplotlib axes): on what to plot
+        ax: on what matplotlib axes to plot
         morph(Morphology): morphology to be plotted
         soma_outline(bool): should the soma be drawn as an outline
         plane(str): Any pair of 'xyz'
@@ -322,12 +322,12 @@ def plot_tree3d(
 ):
     """Generates a figure of the tree in 3d.
 
-    If the tree contains one single point the plot will be empty \
+    If the tree contains one single point the plot will be empty
     since no segments can be constructed.
 
     Args:
-        tree(neurom.core.Section or neurom.core.Neurite): plotted tree
-        ax(matplotlib axes): on what to plot
+        tree(Section or Neurite): plotted tree
+        ax: on what matplotlib axes to plot
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
         color(str or None): Color of plotted values, None corresponds to default choice
@@ -352,8 +352,8 @@ def plot_soma3d(soma, ax=None, color=None, alpha=_ALPHA):
     """Generates a 3d figure of the soma.
 
     Args:
-        soma(neurom.core.Soma): plotted soma
-        ax(matplotlib axes): on what to plot
+        soma(Soma): plotted soma
+        ax: on what matplotlib axes to plot
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     """
@@ -393,7 +393,7 @@ def plot_morph3d(
 
     Args:
         morph(Morphology): morphology to be plotted
-        ax(matplotlib axes): on what to plot
+        ax: on what matplotlib axes to plot
         neurite_type(NeuriteType): an optional filter on the neurite type
         diameter_scale(float): Scale factor multiplied with segment diameters before plotting
         linewidth(float): all segments are plotted with this width, but only if diameter_scale=None
@@ -475,9 +475,9 @@ def plot_dendrogram(obj, ax=None, show_diameters=True):
     """Plots Dendrogram of `obj`.
 
     Args:
-        obj (neurom.Morphology, neurom.Section): morphology or section
-        ax: matplotlib axes
-        show_diameters (bool): whether to show node diameters or not
+        obj(Morphology, Section): morphology or section
+        ax: on what matplotlib axes to plot
+        show_diameters(bool): whether to show node diameters or not
     """
     dendrogram = Dendrogram(obj)
     positions = layout_dendrogram(dendrogram, np.array([0, 0]))

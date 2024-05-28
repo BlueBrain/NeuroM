@@ -40,8 +40,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
-import os
 import importlib.metadata
 
 VERSION = importlib.metadata.version('neurom')
@@ -62,6 +60,11 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
 ]
+
+napoleon_type_aliases = {
+    "Number": "float|int",
+    #"floats": "",
+}
 
 
 # Add any paths that contain templates here, relative to this directory.

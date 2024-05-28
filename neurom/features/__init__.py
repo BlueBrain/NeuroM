@@ -173,12 +173,12 @@ def get(feature_name, obj, **kwargs):
     For Population features see :mod:`neurom.features.population`.
 
     Arguments:
-        feature_name(string): feature to extract
+        feature_name(str): feature to extract
         obj: a morphology, a morphology population or a neurite tree
         kwargs: parameters to forward to underlying worker functions
 
     Returns:
-        List|Number: feature value as a list or a single number.
+        List|float: feature value as a list or a single number.
     """
     return _get_feature_value_and_func(feature_name, obj, **kwargs)[0]
 
@@ -213,8 +213,8 @@ def feature(shape, namespace: NameSpace, name=None):
 
     Arguments:
         shape(tuple): the expected shape of the feature values
-        namespace(string): a namespace, see :class:`NameSpace`
-        name(string): name of the feature, used to access the feature via `neurom.features.get()`.
+        namespace(str): a namespace, see :class:`NameSpace`
+        name(str): name of the feature, used to access the feature via `neurom.features.get()`.
     """
 
     def inner(func):
