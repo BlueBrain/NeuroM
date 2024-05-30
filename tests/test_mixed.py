@@ -1143,8 +1143,7 @@ def test_sholl_frequency_pop(mixed_morph):
 
 
 def test_axon_fork_as_axon_carrying_dendrite():
-    """Test that a axon subtree starting as a fork is considered an AcD.
-    """
+    """Test that a axon subtree starting as a fork is considered an AcD."""
     m = neurom.load_morphology(
         """
         1  1   0  0  0   0.5 -1

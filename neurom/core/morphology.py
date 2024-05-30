@@ -456,7 +456,7 @@ class Neurite:
         for section in it:
             # A subtree can start from a single branch or as a fork of the same type from a parent
             # with different type.
-            if section.type != section.parent.type and section.type != subtree_types[-1]:
+            if section.type not in {section.parent.type, subtree_types[-1]}:
                 subtree_types.append(section.to_morphio().type)
 
         return subtree_types
