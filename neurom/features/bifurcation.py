@@ -153,16 +153,16 @@ def sibling_ratio(bif_point, method='first'):
     """
     _raise_if_not_bifurcation(bif_point)
 
-    if method not in {'first', 'mean'}:
-        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
-
     if method == 'first':
         # the first point is the same as the parent last point
         n = bif_point.children[0].points[1, COLS.R]
         m = bif_point.children[1].points[1, COLS.R]
-    if method == 'mean':
+    elif method == 'mean':
         n = neurom.features.section.section_mean_radius(bif_point.children[0])
         m = neurom.features.section.section_mean_radius(bif_point.children[1])
+    else:
+        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
+
     return min(n, m) / max(n, m)
 
 
@@ -178,18 +178,18 @@ def diameter_power_relation(bif_point, method='first'):
     """
     _raise_if_not_bifurcation(bif_point)
 
-    if method not in {'first', 'mean'}:
-        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
-
     if method == 'first':
         # the first point is the same as the parent last point
         d_child = bif_point.points[-1, COLS.R]
         d_child1 = bif_point.children[0].points[1, COLS.R]
         d_child2 = bif_point.children[1].points[1, COLS.R]
-    if method == 'mean':
+    elif method == 'mean':
         d_child = neurom.features.section.section_mean_radius(bif_point)
         d_child1 = neurom.features.section.section_mean_radius(bif_point.children[0])
         d_child2 = neurom.features.section.section_mean_radius(bif_point.children[1])
+    else:
+        raise ValueError('Please provide a valid method for sibling ratio, found %s' % method)
+
     return (d_child / d_child1) ** (1.5) + (d_child / d_child2) ** (1.5)
 
 
