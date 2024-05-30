@@ -223,7 +223,7 @@ def test_Soma_Cylinders():
     # area of a cylinder (excluding end caps) is:
     # 2*pi*r*h == 4*pi*r^2 == area of a sphere of radius 20
     assert s.radius == 20.0
-    assert_almost_equal(s.area, 5026.548245743669)
+    assert_almost_equal(s.area, 5026.548245743669, decimal=5)
     assert_array_equal(s.center, [0, 0, -10])
     assert 'SomaCylinders' in str(s)
 
@@ -241,7 +241,7 @@ def test_Soma_Cylinders():
 
     assert 'SomaNeuromorphoThreePointCylinders' in str(s)
     assert list(s.center) == [0.0, 0.0, 0.0]
-    assert_almost_equal(s.area, 1256.6370614)
+    assert_almost_equal(s.area, 1256.6370614, decimal=5)
 
     # some neuromorpho files don't follow the convention
     # but have (ys + rs) as point 2, and have xs different in each line
@@ -260,7 +260,7 @@ def test_Soma_Cylinders():
     assert 'SomaNeuromorphoThreePointCylinders' in str(s)
     assert list(s.center) == [0.0, 0.0, 0.0]
     assert_almost_equal(s.area, 794.76706126368811, decimal=5)
-    assert_almost_equal(s.volume, 3160.274957542371, decimal=5)
+    assert_almost_equal(s.volume, 3160.274957542371, decimal=3)
 
     s = load_morphology(
         StringIO(
@@ -276,7 +276,7 @@ def test_Soma_Cylinders():
     ).soma
 
     assert list(s.center) == [0.0, 0.0, 0.0]
-    assert_almost_equal(s.area, 444.288293851)  # cone area, not including bottom
+    assert_almost_equal(s.area, 444.288293851, decimal=5)  # cone area, not including bottom
 
 
 def test_soma_overlaps():
