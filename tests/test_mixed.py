@@ -1140,3 +1140,26 @@ def test_sholl_frequency_pop(mixed_morph):
         2,
         0,
     ]
+
+
+def test_axon_fork_as_axon_carrying_dendrite():
+    """Test that a axon subtree starting as a fork is considered an AcD."""
+    m = neurom.load_morphology(
+        """
+        1  1   0  0  0   0.5 -1
+        2  3   0  1  0   0.1  1
+        3  3   1  2  0   0.1  2
+        4  2   1  4  0   0.1  3
+        5  2   1  4  1   0.1  4
+        6  2   1  4 -1   0.1  4
+        7  2   2  3  0   0.1  3
+        8  2   2  4  0   0.1  7
+        9  2   3  3  0   0.1  7
+        10 2   3  3  1   0.1  9
+        11 2   3  3 -1   0.1  9
+        """,
+        reader="swc",
+        process_subtrees=True,
+    )
+    neurite = m.neurites[0]
+    assert neurite.type is NeuriteType.axon_carrying_dendrite
