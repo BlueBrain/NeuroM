@@ -184,7 +184,7 @@ def plot_style(
     """Set the basic options of a matplotlib figure, to be used by viewing - plotting functions.
 
     Args:
-        fig(matplotlib figure): figure
+        fig: matplotlib figure
         ax(matplotlib axes, belonging to `fig`): axes
 
         pretitle(str): String to include before the general title of the figure
@@ -202,11 +202,11 @@ def plot_style(
         zlabel_arg(dict):  Passsed into matplotlib as zlabel arguments
 
         tick_fontsize (int): Defines the size of the ticks' font
-        xticks([list of ticks]): Defines the values of x ticks in the figure
+        xticks: Defines the values of x ticks in the figure (1D array-like)
         xticks_args(dict):  Passsed into matplotlib as xticks arguments
-        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks: Defines the values of y ticks in the figure( 1D array-like)
         yticks_args(dict):  Passsed into matplotlib as yticks arguments
-        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks: Defines the values of z ticks in the figure (1D array-like)
         zticks_args(dict):  Passsed into matplotlib as zticks arguments
 
         white_space(float): whitespace added to surround the tight limit of the data
@@ -312,11 +312,11 @@ def plot_ticks(
     Args:
         ax: matplotlib axes
         tick_fontsize (int): Defines the size of the ticks' font
-        xticks([list of ticks]): Defines the values of x ticks in the figure
+        xticks: Defines the values of x ticks in the figure (1D array-like)
         xticks_args(dict):  Passsed into matplotlib as xticks arguments
-        yticks([list of ticks]): Defines the values of y ticks in the figure
+        yticks: Defines the values of y ticks in the figure (1D array-like)
         yticks_args(dict):  Passsed into matplotlib as yticks arguments
-        zticks([list of ticks]): Defines the values of z ticks in the figure
+        zticks: Defines the values of z ticks in the figure (1D array-like)
         zticks_args(dict):  Passsed into matplotlib as zticks arguments
     """
     if xticks is not None:
@@ -421,8 +421,8 @@ def project_cylinder_onto_2d(
     Args:
         ax: matplotlib axes
         plane(tuple of int): where x, y, z = 0, 1, 2, so (0, 1) is the xy axis
-        start(np.array): start coordinates
-        end(np.array): end coordinates
+        start(list of float): start coordinates
+        end(list of float): end coordinates
         start_radius(float): start radius
         end_radius(float): end radius
         color: matplotlib color
@@ -432,6 +432,7 @@ def project_cylinder_onto_2d(
     3d outline is calculated, the non-used plane coordinates are dropped, a
     tight convex hull is found, and that is used for a filled polygon
     """
+    start, end = np.asarray(start), np.asarray(end)
     points = generate_cylindrical_points(start, end, start_radius, end_radius, 10)
     points = np.vstack([points[plane[0]].ravel(), points[plane[1]].ravel()])
     points = points.T

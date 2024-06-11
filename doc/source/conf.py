@@ -40,8 +40,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
-import os
 import importlib.metadata
 
 VERSION = importlib.metadata.version('neurom')
@@ -63,6 +61,14 @@ extensions = [
     'sphinx.ext.doctest',
 ]
 
+nitpicky = True
+nitpick_ignore = [
+    ("py:class", "Path"),
+    ("py:class", "morphio.Morphology"),
+    ("py:class", "morphio.mut.Morphology"),
+    ("py:class", "morphio.Section"),
+    ("py:class", "morphio.Soma"),
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

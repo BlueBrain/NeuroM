@@ -90,7 +90,7 @@ def layout_dendrogram(dendrogram, origin):
 
     Args:
         dendrogram (Dendrogram): dendrogram
-        origin (np.array): xy coordinates of layout origin
+        origin: np.array xy coordinates of layout origin
 
     Returns:
         Dict of positions per each dendrogram node. When placed in those positions, dendrogram nodes
@@ -138,7 +138,7 @@ def get_size(positions):
     """Get the size of bounding rectangle that embodies positions.
 
     Args:
-        positions (dict of Dendrogram: np.array): positions xy coordinates of dendrograms
+        positions: dict of Dendrogram: np.array positions xy coordinates of dendrograms
 
     Returns:
         Tuple of width and height of bounding rectangle.
@@ -154,8 +154,8 @@ def move_positions(positions, to_origin):
     """Move positions to a new origin.
 
     Args:
-        positions (dict of Dendrogram: np.array): positions
-        to_origin (np.array): where to move. np.array of (2,) shape for x,y coordindates.
+        positions: positions (dict of Dendrogram: np.array)
+        to_origin: where to move. np.array of (2,) shape for x,y coordindates.
 
     Returns:
         Moved positions.

@@ -38,6 +38,8 @@ API Documentation
    :nosignatures:
    :toctree: _neurom_build
 
+   neurom
+   neurom.get
    neurom.morphmath
    neurom.features
    neurom.features.population
@@ -53,6 +55,7 @@ API Documentation
    neurom.core.soma
    neurom.core.dataformat
    neurom.io.utils
+   neurom.view
    neurom.view.dendrogram
    neurom.view.matplotlib_utils
    neurom.view.matplotlib_impl

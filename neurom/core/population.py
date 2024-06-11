@@ -64,7 +64,7 @@ class Population:
         """Construct a morphology population.
 
         Arguments:
-            files (collections.abc.Sequence[str|Path|Morphology]): collection of morphology files or
+            files (Sequence[str|Morphology|Path]): collection of morphology files or
                 paths to them or instances of ``Morphology``.
             name (str): Optional name for this Population
             ignored_exceptions (tuple): NeuroM and MorphIO exceptions that you want to ignore when

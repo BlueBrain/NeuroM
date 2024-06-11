@@ -50,8 +50,7 @@ def vector(p1, p2):
     """Compute vector between two 3D points.
 
     Args:
-        p1, p2: indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+        p1, p2: indexable objects with indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
         3-vector from p1 - p2
@@ -120,7 +119,7 @@ def path_fraction_id_offset(points, fraction, relative_offset=False):
 
     Args:
         points: an iterable of indexable objects with indices
-        0, 1, 2 correspoding to 3D cartesian coordinates
+            0, 1, 2 correspoding to 3D cartesian coordinates
         fraction: path length fraction (0.0 <= fraction <= 1.0)
         relative_offset: return absolute or relative segment distance
 
@@ -149,7 +148,7 @@ def path_fraction_point(points, fraction):
 
     Args:
         points: an iterable of indexable objects with indices
-        0, 1, 2 correspoding to 3D cartesian coordinates
+            0, 1, 2 correspoding to 3D cartesian coordinates
         fraction: path length fraction (0 <= fraction <= 1)
 
     Returns:
@@ -163,8 +162,7 @@ def scalar_projection(v1, v2):
     """Compute the scalar projection of v1 upon v2.
 
     Args:
-        v1, v2: iterable
-        indices 0, 1, 2 corresponding to cartesian coordinates
+        v1, v2: iterable indices 0, 1, 2 corresponding to cartesian coordinates
 
     Returns:
         3-vector of the projection of point p onto the direction of v
@@ -176,8 +174,7 @@ def vector_projection(v1, v2):
     """Compute the vector projection of v1 upon v2.
 
     Args:
-        v1, v2: iterable
-        indices 0, 1, 2 corresponding to cartesian coordinates
+        v1, v2: iterable indices 0, 1, 2 corresponding to cartesian coordinates
 
     Returns:
         3-vector of the projection of point p onto the direction of v
@@ -206,8 +203,7 @@ def point_dist2(p1, p2):
     """Compute the square of the euclidian distance between two 3D points.
 
     Args:
-        p1, p2: indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+        p1, p2: indexable objects with indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
         The square of the euclidian distance between the points.
@@ -220,8 +216,7 @@ def point_dist(p1, p2):
     """Compute the euclidian distance between two 3D points.
 
     Args:
-        p1, p2: indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+        p1, p2: indexable objects with indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
         The euclidian distance between the points.
@@ -236,7 +231,7 @@ def angle_3points(p0, p1, p2):
 
     Args:
         p0, p1, p2:  indexable objects with
-        indices 0, 1, 2 corresponding to 3D cartesian coordinates.
+            indices 0, 1, 2 corresponding to 3D cartesian coordinates.
 
     Returns:
         Angle in radians between (p1-p0) and (p2-p0).
@@ -392,9 +387,8 @@ def segment_radial_dist(seg, pos):
 
     Arguments:
         seg: tree segment
-
-        pos: origin to which distances are measured. It must have at lease 3
-        components. The first 3 components are (x, y, z).
+        pos: origin to which distances are measured.
+            It must have at lease 3 components. The first 3 components are (x, y, z).
     """
     return point_dist(pos, np.divide(np.add(seg[0], seg[1]), 2.0))
 
@@ -475,10 +469,10 @@ def principal_direction_extent(points):
     directions of the covariance matrix of the points.
 
     Args:
-        points : a 2D numpy array of points with 2 or 3 columns for (x, y, z)
+        points: a 2D numpy array of points with 2 or 3 columns for (x, y, z)
 
     Returns:
-        extents : the extents for each of the eigenvectors of the cov matrix
+        the extents for each of the eigenvectors of the cov matrix
 
     Note:
         Direction extents are ordered from largest to smallest.

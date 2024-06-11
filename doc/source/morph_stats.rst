@@ -86,8 +86,7 @@ Here, there are two feature categories,
 2. ``neuron``: these are morphometrics that can be applied to a whole morphology, e.g. the soma radius,
    the trunk radii, etc.
 
-Each category sub-item (section_lengths, soma_radius, etc) corresponds to a
-:py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
+Each category sub-item (section_lengths, soma_radius, etc) corresponds to a :py:func:`neurom.get` feature, and each one of its sub-items corresponds to a statistic aggregating
 function, e.g.
 
 * ``raw``: array of raw values
@@ -140,9 +139,9 @@ The new format:
 - requires to use ``sum`` instead of ``total`` statistic aggregating function.
 - allows to specify features arguments.
 
-For example, ``partition_asymmetry`` feature has additional arguments like ``method`` and
-``variant`` (see :py:func:`neurom.features.neurite.partition_asymmetries`). Before it wasn't
-possible to set them. Here is how you can set them now:
+For example, ``partition_asymmetry`` feature has additional arguments like ``method`` and ``variant``.
+Before it wasn't possible to set them.
+Here is how you can set them now:
 
 .. code-block:: yaml
 

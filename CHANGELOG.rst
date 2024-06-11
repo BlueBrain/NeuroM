@@ -145,8 +145,8 @@ Version 2.3.1
 
 Version 2.3.0
 -------------
-- Introduce a new method to calculate partition asymmetry by Uylings. See docstring of
-  :func:`neurom.features.neuritefunc.partition_asymmetries`.
+- Introduce a new method to calculate partition asymmetry by Uylings.
+  See docstring of `neurom.features.neuritefunc.partition_asymmetries`.
 - Follow the same morphology validation rules as in MorphIO. See the :ref:`doc page<validation>`
   about it.
 - Remove the cli command ``neurom features`` that listed all possible features. Instead a proper
@@ -161,8 +161,7 @@ Version 2.2.1
 Version 2.2.0
 -------------
 - Don't force loading of neurons into memory for Population (#922). See new API of
-  :class:`Population<neurom.core.population.Population>` and
-  :func:`load_neurons<neurom.io.utils.load_neurons>`
+  :class:`Population<neurom.core.population.Population>` and `load_neurons<neurom.io.utils.load_neurons>`
 - Move ``total_length`` feature to from ``neuritefunc`` to ``neuronfunc``. Use ``neurite_lengths``
   feature for neurites
 - Include morphology filename extension into Neuron's name

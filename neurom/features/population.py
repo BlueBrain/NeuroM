@@ -63,8 +63,8 @@ def sholl_frequency(morphs, neurite_type=NeuriteType.all, step_size=10, bins=Non
         morphs(list|Population): list of morphologies or morphology population
         neurite_type(NeuriteType): which neurites to operate on
         step_size(float): step size between Sholl radii
-        bins(iterable of floats): custom binning to use for the Sholl radii. If None, it uses
-        intervals of step_size between min and max radii of ``morphs``.
+        bins(Iterable[float]): custom binning to use for the Sholl radii.
+            If None, it uses intervals of step_size between min and max radii of ``morphs``.
         use_subtrees (bool): Enable mixed subtree processing.
 
     Note:

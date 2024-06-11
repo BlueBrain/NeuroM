@@ -98,8 +98,8 @@ def has_no_flat_neurites(morph, tol=0.1, method='ratio'):
     Arguments:
         morph(Morphology): The morphology object to test
         tol(float): tolerance
-        method(string): way of determining flatness, 'tolerance', 'ratio' \
-        as described in :meth:`neurom.check.morphtree.get_flat_neurites`
+        method(str): way of determining flatness, 'tolerance', 'ratio'
+            as described in :meth:`neurom.check.morphtree.get_flat_neurites`
 
     Returns:
         CheckResult with result
@@ -184,8 +184,7 @@ def has_no_jumps(morph, max_distance=30.0, axis='z'):
 
     Arguments:
         morph(Morphology): the morphology to test
-        max_distance(float): value above which consecutive z-values are
-        considered a jump
+        max_distance(float): value above which consecutive z-values are considered a jump
         axis(str): one of x/y/z, which axis to check for jumps
 
     Returns:
@@ -228,11 +227,11 @@ def has_no_fat_ends(morph, multiple_of_mean=2.0, final_point_count=5):
     Arguments:
         morph(Morphology): the morphology to test
         multiple_of_mean(float): how many times larger the final radius
-        has to be compared to the mean of the final points
+            has to be compared to the mean of the final points
         final_point_count(int): how many points to include in the mean
 
     Returns:
-        CheckResult with result list of ids of bad sections
+        CheckResult with a list of all ids of bad sections
 
     Note:
         A fat end is defined as a leaf segment whose last point is larger
@@ -321,14 +320,13 @@ def has_no_narrow_neurite_section(
 
     Arguments:
         morph(Morphology): the morphology to test
-        neurite_filter(callable): filter the neurites by this callable
+        neurite_filter(Callable): filter the neurites by this callable
         radius_threshold(float): radii below this are considered narro
         considered_section_min_length(float): sections with length below
-        this are not taken into account
+            this are not taken into account
 
     Returns:
-        CheckResult with result. `result.info` contains the narrow section ids and their
-        first point
+        CheckResult with result. `result.info` contains the narrow section ids and their first point
     """
     considered_sections = (
         sec

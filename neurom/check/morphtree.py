@@ -68,7 +68,7 @@ def is_flat(neurite, tol, method='tolerance'):
     Args:
         neurite(Neurite): neurite to operate on
         tol(float): tolerance
-        method(string): the method of flatness estimation:
+        method(str): the method of flatness estimation:
             'tolerance' returns true if any extent of the tree is smaller
             than the given tolerance
             'ratio' returns true if the ratio of the smallest directions
@@ -196,7 +196,7 @@ def is_back_tracking(neurite):
         neurite(Neurite): neurite to operate on
 
     Returns:
-        True Under the following scenaria:
+        bool: True when;
             1. A segment endpoint falls back and overlaps with a previous segment's point
             2. The geometry of a segment overlaps with a previous one in the section
     """
@@ -270,7 +270,7 @@ def get_flat_neurites(morph, tol=0.1, method='ratio'):
     Args:
         morph(Morphology): morphology to operate on
         tol(float): the tolerance or the ratio
-        method(string): 'tolerance' or 'ratio' described in :meth:`is_flat`
+        method(str): 'tolerance' or 'ratio' described in :meth:`is_flat`
 
     Returns:
         Bool list corresponding to the flatness check for each neurite
