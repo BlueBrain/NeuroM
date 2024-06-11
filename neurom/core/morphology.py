@@ -454,8 +454,10 @@ class Neurite:
         subtree_types = [next(it).to_morphio().type]
 
         for section in it:
-            if section.type != section.parent.type:
-                subtree_types.append(NeuriteType(section.to_morphio().type))
+            # A subtree can start from a single branch or as a fork of the same type from a parent
+            # with different type.
+            if section.type not in (section.parent.type, subtree_types[-1]):
+                subtree_types.append(section.to_morphio().type)
 
         return subtree_types
 
