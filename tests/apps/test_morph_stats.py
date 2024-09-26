@@ -492,7 +492,7 @@ def test_extract_dataframe_multiproc():
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=os.cpu_count() + 1)
         # drop raw features as they require too much test data to mock
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
-        assert len(w) > 1, "Warning not emitted"
+        assert len(w) >= 1, "Warning not emitted"
 
     assert_frame_equal(actual, expected, check_dtype=False)
 
