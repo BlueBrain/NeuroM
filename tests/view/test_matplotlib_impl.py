@@ -28,8 +28,10 @@
 import warnings
 from io import StringIO
 from pathlib import Path
+from packaging.version import parse
 
 import numpy as np
+import matplotlib
 from neurom import load_morphology
 from neurom.core.types import NeuriteType
 from neurom.view import matplotlib_utils, matplotlib_impl
@@ -112,7 +114,14 @@ def test_tree3d(get_fig_3d):
     xy_bounds = ax.xy_dataLim.bounds
     np.testing.assert_allclose(xy_bounds, (-5.0, 0.0, 11.0, 5.0))
     zz_bounds = ax.zz_dataLim.bounds
-    np.testing.assert_allclose(zz_bounds, (0.0, 0.0, 1.0, 1.0))
+
+    # auto scaling of data limits was fixed for LineCollection3D
+    # in 3.9.1+ fixing the previously wrong bbox limits
+    # See: https://github.com/matplotlib/matplotlib/pull/28403
+    if parse(matplotlib.__version__) < parse("3.9.1"):
+        np.testing.assert_allclose(zz_bounds, (0.0, 0.0, 1.0, 1.0))
+    else:
+        np.testing.assert_allclose(zz_bounds, (0.0, 0.0, 0.0, 1.0))
 
 
 def test_morph3d(get_fig_3d):
