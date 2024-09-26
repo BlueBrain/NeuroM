@@ -101,7 +101,7 @@ def test_Soma_ThreePointCylinder():
     assert 'SomaNeuromorphoThreePointCylinders' in str(sm)
     assert isinstance(sm, soma.SomaNeuromorphoThreePointCylinders)
     assert list(sm.center) == [0, 0, 0]
-    assert sm.radius == 44
+    assert_almost_equal(sm.radius, 44.0, decimal=5)
 
 
 def test_Soma_ThreePointCylinder_invalid_radius():

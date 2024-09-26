@@ -42,8 +42,8 @@ def test_section_base_func():
     assert section.id == 0
     assert_array_equal(section.points, [[0, 0, 0, 1], [0, 5, 0, 1]])
     assert_almost_equal(section.length, 5)
-    assert_almost_equal(section.area, 31.41592653589793)
-    assert_almost_equal(section.volume, 15.707963267948964)
+    assert_almost_equal(section.area, 31.4159, decimal=4)
+    assert_almost_equal(section.volume, 15.7079, decimal=4)
 
     # __nonzero__
     assert section

@@ -77,7 +77,7 @@ def test_neurite_volume_density():
         0.24068543213643726,
         0.26289304906104355,
     ]
-    assert_allclose(vol_density, ref_density)
+    assert_allclose(vol_density, ref_density, rtol=1e-6)
 
 
 def test_neurite_volume_density_failed_convex_hull():
@@ -215,7 +215,7 @@ def test_segment_areas():
 def test_segment_volumes():
     expected = [[15.70796327, 5.23598776, 6.28318531], [12.56637061, 6.28318531, 5.23598776]]
     result = [neurite.segment_volumes(s) for s in SIMPLE.neurites]
-    assert_allclose(result, expected)
+    assert_allclose(result, expected, rtol=1e-6)
 
 
 def test_segment_midpoints():

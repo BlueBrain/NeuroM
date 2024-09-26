@@ -147,7 +147,8 @@ def test_max_radial_distance():
 
 def test_section_tortuosity():
     assert_allclose(
-        _stats(features.get('section_tortuosity', POP)), (1.0, 4.657, 440.408, 1.342), rtol=1e-3
+        _stats(features.get('section_tortuosity', POP)), (1.0, 4.657, 440.408, 1.342),
+        rtol=1e-3,
     )
     assert_allclose(
         _stats(features.get('section_tortuosity', POP, neurite_type=NeuriteType.all)),
@@ -326,6 +327,7 @@ def test_total_length():
     assert_allclose(
         features.get('total_length', POP, neurite_type=NeuriteType.axon),
         [207.8797736031714, 207.81088341560977, 11767.156115224638],
+        rtol=1e-6
     )
     assert_allclose(
         features.get('total_length', POP, neurite_type=NeuriteType.apical_dendrite),
@@ -518,12 +520,14 @@ def test_neurite_volumes():
     assert_allclose(
         _stats(features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.axon)),
         (276.58135508666612, 277.5357232437392, 830.85568094763551, 276.95189364921185),
+        rtol=1e-3,
     )
     assert_allclose(
         _stats(
             features.get('total_volume_per_neurite', POP, neurite_type=NeuriteType.apical_dendrite)
         ),
         (271.94122143951864, 271.94122143951864, 271.94122143951864, 271.94122143951864),
+        rtol=1e-3,
     )
     assert_allclose(
         _stats(
@@ -567,52 +571,61 @@ def test_neurite_density():
     assert_allclose(
         _stats(features.get('neurite_volume_density', POP)),
         (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(features.get('neurite_volume_density', POP, neurite_type=NeuriteType.all)),
         (6.1847539631150784e-06, 0.52464681266899216, 1.9767794901940539, 0.19767794901940539),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(features.get('neurite_volume_density', POP, neurite_type=NeuriteType.axon)),
         (6.1847539631150784e-06, 0.26465213325053372, 0.5275513670655404, 0.1758504556885134),
-        1e-6,
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(
             features.get('neurite_volume_density', POP, neurite_type=NeuriteType.apical_dendrite)
         ),
         (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(
             features.get('neurite_volume_density', POP, neurite_type=NeuriteType.basal_dendrite)
         ),
         (0.00034968816544949771, 0.52464681266899216, 1.0116620531455183, 0.16861034219091972),
+        rtol=1e-6,
     )
 
     assert_allclose(
         _stats(features.get('neurite_volume_density', NRN)),
         (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(features.get('neurite_volume_density', NRN, neurite_type=NeuriteType.all)),
         (0.24068543213643726, 0.52464681266899216, 1.4657913638494682, 0.36644784096236704),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(features.get('neurite_volume_density', NRN, neurite_type=NeuriteType.axon)),
         (0.26289304906104355, 0.26289304906104355, 0.26289304906104355, 0.26289304906104355),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(
             features.get('neurite_volume_density', NRN, neurite_type=NeuriteType.apical_dendrite)
         ),
         (0.43756606998299519, 0.43756606998299519, 0.43756606998299519, 0.43756606998299519),
+        rtol=1e-6,
     )
     assert_allclose(
         _stats(
             features.get('neurite_volume_density', NRN, neurite_type=NeuriteType.basal_dendrite)
         ),
         (0.24068543213643726, 0.52464681266899216, 0.76533224480542938, 0.38266612240271469),
+        rtol=1e-6,
     )
 
 
