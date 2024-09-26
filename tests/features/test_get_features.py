@@ -147,7 +147,8 @@ def test_max_radial_distance():
 
 def test_section_tortuosity():
     assert_allclose(
-        _stats(features.get('section_tortuosity', POP)), (1.0, 4.657, 440.408, 1.342),
+        _stats(features.get('section_tortuosity', POP)),
+        (1.0, 4.657, 440.408, 1.342),
         rtol=1e-3,
     )
     assert_allclose(
@@ -327,7 +328,7 @@ def test_total_length():
     assert_allclose(
         features.get('total_length', POP, neurite_type=NeuriteType.axon),
         [207.8797736031714, 207.81088341560977, 11767.156115224638],
-        rtol=1e-6
+        rtol=1e-6,
     )
     assert_allclose(
         features.get('total_length', POP, neurite_type=NeuriteType.apical_dendrite),
