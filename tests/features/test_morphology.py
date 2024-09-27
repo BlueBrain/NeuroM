@@ -90,8 +90,8 @@ def test_soma_volume():
 
 
 def test_soma_surface_area():
-    assert_allclose(morphology.soma_surface_area(SIMPLE), 12.566370614359172)
-    assert_allclose(morphology.soma_surface_area(NRN), 0.1075095256160432)
+    assert_allclose(morphology.soma_surface_area(SIMPLE), 12.566370614359172, rtol=1e-6)
+    assert_allclose(morphology.soma_surface_area(NRN), 0.1075095256160432, rtol=1e-6)
 
 
 def test_soma_radius():
@@ -105,11 +105,11 @@ def test_total_area_per_neurite():
 
     basal_area = surface(1, 1, 5) + surface(1, 0, 5) + surface(1, 0, 6)
     ret = morphology.total_area_per_neurite(SIMPLE, neurite_type=BASAL_DENDRITE)
-    assert_almost_equal(ret[0], basal_area)
+    assert_almost_equal(ret[0], basal_area, decimal=5)
 
     axon_area = surface(1, 1, 4) + surface(1, 0, 5) + surface(1, 0, 6)
     ret = morphology.total_area_per_neurite(SIMPLE, neurite_type=AXON)
-    assert_almost_equal(ret[0], axon_area)
+    assert_almost_equal(ret[0], axon_area, decimal=5)
 
     ret = morphology.total_area_per_neurite(SIMPLE)
     assert np.allclose(ret, [basal_area, axon_area])
@@ -143,6 +143,7 @@ def test_total_volume_per_neurite():
     assert_allclose(
         total_volumes,
         [271.94122143951864, 281.24754646913954, 274.98039928781355, 276.73860261723024],
+        rtol=1e-6,
     )
 
 

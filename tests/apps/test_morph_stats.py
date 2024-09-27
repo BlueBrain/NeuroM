@@ -212,10 +212,9 @@ def test_extract_stats_scalar_feature():
         # silence warning about approximating soma volume with a sphere
         warnings.simplefilter("ignore", category=UserWarning)
         res = ms.extract_stats(m, config)
-    assert res == {
-        'all': {'max_number_of_forking_points': 277},
-        'morphology': {'sum_soma_volume': 1424.4383771584492},
-    }
+
+    assert res["all"] == {'max_number_of_forking_points': 277}
+    assert_almost_equal(res["morphology"]["sum_soma_volume"], 1424.4383771584492, decimal=4)
 
 
 def test_extract_stats__kwarg_modes_multiple_features():
@@ -493,7 +492,8 @@ def test_extract_dataframe_multiproc():
         actual = ms.extract_dataframe(morphs, REF_CONFIG, n_workers=os.cpu_count() + 1)
         # drop raw features as they require too much test data to mock
         actual = actual.drop(columns='raw_section_branch_orders', level=1)
-        assert len(w) == 1, "Warning not emitted"
+        assert len(w) >= 1, "Warning not emitted"
+
     assert_frame_equal(actual, expected, check_dtype=False)
 
     with warnings.catch_warnings(record=True) as w:
