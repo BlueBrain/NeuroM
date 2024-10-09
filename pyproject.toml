@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "neurom"
 description = "NeuroM: a light-weight neuron morphology analysis package"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { file = "LICENSE.txt" }
 authors = [
     { name = "Blue Brain Project, EPFL" },
@@ -19,7 +19,6 @@ classifiers = [
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -78,10 +77,11 @@ testpaths = [
 [tool.black]
 line-length = 100
 target-version = [
-    'py38',
     'py39',
     'py310',
     'py311',
+    'py312',
+    'py313',
 ]
 skip-string-normalization = true
 include = 'neurom\/.*\.py$|tests\/.*\.py$|doc\/source\/conf\.py$|setup\.py$|examples\/.*\.py$'
