@@ -32,7 +32,7 @@ Examples:
     Load a morphology
 
     >>> import neurom as nm
-    >>> m = nm.load_morphology('some/data/path/morph_file.swc')
+    >>> m = nm.load_morphology('tests/data/swc/Neuron.swc')
 
     Obtain some morphometrics using the get function
 
@@ -43,16 +43,15 @@ Examples:
     files it finds and returns a list of morphologies
 
     >>> import numpy as np  # For mean value calculation
-    >>> pop = nm.load_morphologies('some/data/directory')
-    >>> for m in pop:
-    ...     print 'mean section length', np.mean(nm.get('section_lengths', m))
+    >>> pop = nm.load_morphologies('tests/data/valid_set')
+    >>> mean_section_lengths = [np.mean(nm.get('section_lengths', m)) for m in pop]
 
     Apply a function to a selection of neurites in a morphology or morphology population.
     This example gets the number of points in each axon in a morphology population
 
     >>> import neurom as nm
     >>> filter = lambda n : n.type == nm.AXON
-    >>> mapping = lambda n : len(n.points)
+    >>> mapping = lambda n, section_type : len(n.points)
     >>> n_points = [n for n in nm.iter_neurites(pop, mapping, filter)]
 """
 from importlib.metadata import version
