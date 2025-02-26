@@ -1,3 +1,7 @@
+> [!WARNING]
+> The Blue Brain Project concluded in December 2024, so development has ceased under the BlueBrain GitHub organization.
+> Future development will take place at: https://github.com/openbraininstitute/NeuroM
+
 ![NeuroM Logo](https://raw.githubusercontent.com/BlueBrain/NeuroM/master/doc/source/logo/NeuroM.jpg)
 
 
